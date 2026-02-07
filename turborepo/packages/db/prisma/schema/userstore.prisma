@@ -74,7 +74,7 @@ enum UserStoreSchemaVersion {
 
 model UserStore {
   id                    String @id @default(cuid(2))
-  userId                String @unique
+  userId                String
   storeName             String
   /// voyage-multimodal-3.5 for content containing visual media -- voyage-context-3 otherwise
   defaultEmbeddingModel String @default("voyage-multimodal-3.5")

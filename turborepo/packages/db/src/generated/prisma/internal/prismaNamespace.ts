@@ -409,6 +409,10 @@ export const ModelName = {
   Session: 'Session',
   UserKey: 'UserKey',
   Settings: 'Settings',
+  UserStore: 'UserStore',
+  UserStoreDoc: 'UserStoreDoc',
+  UserStoreDocAnnot: 'UserStoreDocAnnot',
+  UserStoreDocChunk: 'UserStoreDocChunk',
   Verification: 'Verification'
 } as const
 
@@ -425,7 +429,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "localVectorStore" | "localVectorStoreDoc" | "localVectorStoreDocChunk" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "userKey" | "settings" | "verification"
+    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "localVectorStore" | "localVectorStoreDoc" | "localVectorStoreDocChunk" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2263,6 +2267,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    UserStore: {
+      payload: Prisma.$UserStorePayload<ExtArgs>
+      fields: Prisma.UserStoreFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserStoreFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStorePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserStoreFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStorePayload>
+        }
+        findFirst: {
+          args: Prisma.UserStoreFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStorePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserStoreFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStorePayload>
+        }
+        findMany: {
+          args: Prisma.UserStoreFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStorePayload>[]
+        }
+        create: {
+          args: Prisma.UserStoreCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStorePayload>
+        }
+        createMany: {
+          args: Prisma.UserStoreCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserStoreCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStorePayload>[]
+        }
+        delete: {
+          args: Prisma.UserStoreDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStorePayload>
+        }
+        update: {
+          args: Prisma.UserStoreUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStorePayload>
+        }
+        deleteMany: {
+          args: Prisma.UserStoreDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserStoreUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserStoreUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStorePayload>[]
+        }
+        upsert: {
+          args: Prisma.UserStoreUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStorePayload>
+        }
+        aggregate: {
+          args: Prisma.UserStoreAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserStore>
+        }
+        groupBy: {
+          args: Prisma.UserStoreGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserStoreGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserStoreCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserStoreCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserStoreDoc: {
+      payload: Prisma.$UserStoreDocPayload<ExtArgs>
+      fields: Prisma.UserStoreDocFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserStoreDocFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserStoreDocFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocPayload>
+        }
+        findFirst: {
+          args: Prisma.UserStoreDocFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserStoreDocFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocPayload>
+        }
+        findMany: {
+          args: Prisma.UserStoreDocFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocPayload>[]
+        }
+        create: {
+          args: Prisma.UserStoreDocCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocPayload>
+        }
+        createMany: {
+          args: Prisma.UserStoreDocCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserStoreDocCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocPayload>[]
+        }
+        delete: {
+          args: Prisma.UserStoreDocDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocPayload>
+        }
+        update: {
+          args: Prisma.UserStoreDocUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserStoreDocDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserStoreDocUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserStoreDocUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserStoreDocUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocPayload>
+        }
+        aggregate: {
+          args: Prisma.UserStoreDocAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserStoreDoc>
+        }
+        groupBy: {
+          args: Prisma.UserStoreDocGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserStoreDocGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserStoreDocCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserStoreDocCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserStoreDocAnnot: {
+      payload: Prisma.$UserStoreDocAnnotPayload<ExtArgs>
+      fields: Prisma.UserStoreDocAnnotFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserStoreDocAnnotFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocAnnotPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserStoreDocAnnotFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocAnnotPayload>
+        }
+        findFirst: {
+          args: Prisma.UserStoreDocAnnotFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocAnnotPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserStoreDocAnnotFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocAnnotPayload>
+        }
+        findMany: {
+          args: Prisma.UserStoreDocAnnotFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocAnnotPayload>[]
+        }
+        create: {
+          args: Prisma.UserStoreDocAnnotCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocAnnotPayload>
+        }
+        createMany: {
+          args: Prisma.UserStoreDocAnnotCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserStoreDocAnnotCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocAnnotPayload>[]
+        }
+        delete: {
+          args: Prisma.UserStoreDocAnnotDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocAnnotPayload>
+        }
+        update: {
+          args: Prisma.UserStoreDocAnnotUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocAnnotPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserStoreDocAnnotDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserStoreDocAnnotUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserStoreDocAnnotUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocAnnotPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserStoreDocAnnotUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocAnnotPayload>
+        }
+        aggregate: {
+          args: Prisma.UserStoreDocAnnotAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserStoreDocAnnot>
+        }
+        groupBy: {
+          args: Prisma.UserStoreDocAnnotGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserStoreDocAnnotGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserStoreDocAnnotCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserStoreDocAnnotCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserStoreDocChunk: {
+      payload: Prisma.$UserStoreDocChunkPayload<ExtArgs>
+      fields: Prisma.UserStoreDocChunkFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserStoreDocChunkFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocChunkPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserStoreDocChunkFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocChunkPayload>
+        }
+        findFirst: {
+          args: Prisma.UserStoreDocChunkFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocChunkPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserStoreDocChunkFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocChunkPayload>
+        }
+        findMany: {
+          args: Prisma.UserStoreDocChunkFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocChunkPayload>[]
+        }
+        create: {
+          args: Prisma.UserStoreDocChunkCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocChunkPayload>
+        }
+        createMany: {
+          args: Prisma.UserStoreDocChunkCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserStoreDocChunkCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocChunkPayload>[]
+        }
+        delete: {
+          args: Prisma.UserStoreDocChunkDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocChunkPayload>
+        }
+        update: {
+          args: Prisma.UserStoreDocChunkUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocChunkPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserStoreDocChunkDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserStoreDocChunkUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserStoreDocChunkUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocChunkPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserStoreDocChunkUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStoreDocChunkPayload>
+        }
+        aggregate: {
+          args: Prisma.UserStoreDocChunkAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserStoreDocChunk>
+        }
+        groupBy: {
+          args: Prisma.UserStoreDocChunkGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserStoreDocChunkGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserStoreDocChunkCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserStoreDocChunkCountAggregateOutputType> | number
+        }
+      }
+    }
     Verification: {
       payload: Prisma.$VerificationPayload<ExtArgs>
       fields: Prisma.VerificationFieldRefs
@@ -2983,6 +3283,112 @@ export const SettingsScalarFieldEnum = {
 export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
 
 
+export const UserStoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  storeName: 'storeName',
+  defaultEmbeddingModel: 'defaultEmbeddingModel',
+  defaultEmbeddingDim: 'defaultEmbeddingDim',
+  fileCount: 'fileCount',
+  totalBytes: 'totalBytes',
+  totalChunks: 'totalChunks',
+  schemaVersion: 'schemaVersion',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserStoreScalarFieldEnum = (typeof UserStoreScalarFieldEnum)[keyof typeof UserStoreScalarFieldEnum]
+
+
+export const UserStoreDocScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  attachmentId: 'attachmentId',
+  conversationId: 'conversationId',
+  messageId: 'messageId',
+  originatingUrl: 'originatingUrl',
+  originatingModel: 'originatingModel',
+  originatingProvider: 'originatingProvider',
+  provenanceId: 'provenanceId',
+  filename: 'filename',
+  mimeType: 'mimeType',
+  ext: 'ext',
+  size: 'size',
+  schemaVersion: 'schemaVersion',
+  embeddingModel: 'embeddingModel',
+  embeddingDim: 'embeddingDim',
+  hasVisualMedia: 'hasVisualMedia',
+  visualMediaSource: 'visualMediaSource',
+  visualMediaContent: 'visualMediaContent',
+  pageCount: 'pageCount',
+  extractedTextLength: 'extractedTextLength',
+  imageCount: 'imageCount',
+  imagePages: 'imagePages',
+  annotPages: 'annotPages',
+  modelSelectionReason: 'modelSelectionReason',
+  indexedAt: 'indexedAt',
+  errorMessage: 'errorMessage',
+  lastAccessed: 'lastAccessed',
+  state: 'state',
+  chunkCount: 'chunkCount',
+  tokenCount: 'tokenCount',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserStoreDocScalarFieldEnum = (typeof UserStoreDocScalarFieldEnum)[keyof typeof UserStoreDocScalarFieldEnum]
+
+
+export const UserStoreDocAnnotScalarFieldEnum = {
+  id: 'id',
+  docId: 'docId',
+  subtype: 'subtype',
+  uri: 'uri',
+  rect: 'rect',
+  startOffset: 'startOffset',
+  endOffset: 'endOffset',
+  pageNumber: 'pageNumber',
+  isCdnLink: 'isCdnLink',
+  linkedDocId: 'linkedDocId',
+  attachmentId: 'attachmentId',
+  createdAt: 'createdAt'
+} as const
+
+export type UserStoreDocAnnotScalarFieldEnum = (typeof UserStoreDocAnnotScalarFieldEnum)[keyof typeof UserStoreDocAnnotScalarFieldEnum]
+
+
+export const UserStoreDocChunkScalarFieldEnum = {
+  id: 'id',
+  docId: 'docId',
+  storeId: 'storeId',
+  chunkProvenanceId: 'chunkProvenanceId',
+  provenanceId: 'provenanceId',
+  attachmentId: 'attachmentId',
+  conversationId: 'conversationId',
+  messageId: 'messageId',
+  chunkIndex: 'chunkIndex',
+  content: 'content',
+  contentHash: 'contentHash',
+  tokenCount: 'tokenCount',
+  startOffset: 'startOffset',
+  endOffset: 'endOffset',
+  pageStartOffset: 'pageStartOffset',
+  pageEndOffset: 'pageEndOffset',
+  hasVisualContent: 'hasVisualContent',
+  state: 'state',
+  errorMessage: 'errorMessage',
+  retryCount: 'retryCount',
+  schemaVersion: 'schemaVersion',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserStoreDocChunkScalarFieldEnum = (typeof UserStoreDocChunkScalarFieldEnum)[keyof typeof UserStoreDocChunkScalarFieldEnum]
+
+
 export const VerificationScalarFieldEnum = {
   id: 'id',
   identifier: 'identifier',
@@ -3465,6 +3871,90 @@ export type EnumThemePreferenceFieldRefInput<$PrismaModel> = FieldRefInputType<$
 export type ListEnumThemePreferenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ThemePreference[]'>
     
 
+
+/**
+ * Reference to a field of type 'UserStoreSchemaVersion'
+ */
+export type EnumUserStoreSchemaVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserStoreSchemaVersion'>
+    
+
+
+/**
+ * Reference to a field of type 'UserStoreSchemaVersion[]'
+ */
+export type ListEnumUserStoreSchemaVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserStoreSchemaVersion[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VisualMediaSource'
+ */
+export type EnumVisualMediaSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisualMediaSource'>
+    
+
+
+/**
+ * Reference to a field of type 'VisualMediaSource[]'
+ */
+export type ListEnumVisualMediaSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisualMediaSource[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VisualMediaContent'
+ */
+export type EnumVisualMediaContentFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisualMediaContent'>
+    
+
+
+/**
+ * Reference to a field of type 'VisualMediaContent[]'
+ */
+export type ListEnumVisualMediaContentFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisualMediaContent[]'>
+    
+
+
+/**
+ * Reference to a field of type 'UserStoreDocState'
+ */
+export type EnumUserStoreDocStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserStoreDocState'>
+    
+
+
+/**
+ * Reference to a field of type 'UserStoreDocState[]'
+ */
+export type ListEnumUserStoreDocStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserStoreDocState[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AnnotSubtype'
+ */
+export type EnumAnnotSubtypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AnnotSubtype'>
+    
+
+
+/**
+ * Reference to a field of type 'AnnotSubtype[]'
+ */
+export type ListEnumAnnotSubtypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AnnotSubtype[]'>
+    
+
+
+/**
+ * Reference to a field of type 'UserStoreChunkState'
+ */
+export type EnumUserStoreChunkStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserStoreChunkState'>
+    
+
+
+/**
+ * Reference to a field of type 'UserStoreChunkState[]'
+ */
+export type ListEnumUserStoreChunkStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserStoreChunkState[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -3585,6 +4075,10 @@ export type GlobalOmitConfig = {
   session?: Prisma.SessionOmit
   userKey?: Prisma.UserKeyOmit
   settings?: Prisma.SettingsOmit
+  userStore?: Prisma.UserStoreOmit
+  userStoreDoc?: Prisma.UserStoreDocOmit
+  userStoreDocAnnot?: Prisma.UserStoreDocAnnotOmit
+  userStoreDocChunk?: Prisma.UserStoreDocChunkOmit
   verification?: Prisma.VerificationOmit
 }
 

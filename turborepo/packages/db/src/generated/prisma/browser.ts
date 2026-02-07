@@ -143,6 +143,26 @@ export type UserKey = Prisma.UserKeyModel
  */
 export type Settings = Prisma.SettingsModel
 /**
+ * Model UserStore
+ * 
+ */
+export type UserStore = Prisma.UserStoreModel
+/**
+ * Model UserStoreDoc
+ * 
+ */
+export type UserStoreDoc = Prisma.UserStoreDocModel
+/**
+ * Model UserStoreDocAnnot
+ * 
+ */
+export type UserStoreDocAnnot = Prisma.UserStoreDocAnnotModel
+/**
+ * Model UserStoreDocChunk
+ * 
+ */
+export type UserStoreDocChunk = Prisma.UserStoreDocChunkModel
+/**
  * Model Verification
  * 
  */

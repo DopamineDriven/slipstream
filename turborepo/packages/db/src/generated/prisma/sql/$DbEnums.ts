@@ -30,4 +30,10 @@ export interface $DbEnums {
   ProviderDocState: "PENDING" | "PROCESSING" | "ACTIVE" | "FAILED"
   Provider: "OPENAI" | "GROK" | "GEMINI" | "ANTHROPIC" | "META" | "VERCEL"
   ThemePreference: "LIGHT" | "DARK" | "SYSTEM"
+  AnnotSubtype: "LINK" | "TEXT" | "HIGHLIGHT" | "WIDGET" | "MARKUP" | "REFERENCE" | "AUTOLINK"
+  VisualMediaContent: "PHOTOS" | "CHARTS" | "DIAGRAMS" | "SLIDES" | "TABLES" | "VIDEO" | "MIXED" | "AUDIO"
+  VisualMediaSource: "NATIVE" | "SCANNED" | "MIXED"
+  UserStoreDocState: "QUEUED" | "EXTRACTING" | "INDEXING" | "ACTIVE" | "REINDEXING" | "FAILED"
+  UserStoreChunkState: "QUEUED" | "EMBEDDING" | "READY" | "ERROR" | "RETRYING" | "ABANDONED"
+  UserStoreSchemaVersion: "v1_0"
 }

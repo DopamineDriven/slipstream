@@ -24,6 +24,10 @@ import type {
   Settings,
   User,
   UserKey,
+  UserStore,
+  UserStoreDoc,
+  UserStoreDocAnnot,
+  UserStoreDocChunk,
   VideoMetadata
 } from "@slipstream/db/node/generated/client";
 
@@ -38,10 +42,12 @@ export interface UserSingleton<T extends boolean = false> extends User {
   localVectorStores?: LocalVectorStoreSingleton<T>[];
   settings?: SettingsSingleton<T>;
   conversationMemoryStore?: ConversationMemoryStoreSingleton<T>;
+  userStores?: UserStoreSingleton<T>[];
 }
 
 export interface SessionSingleton<T extends boolean = false> extends Session {
   user?: UserSingleton<T>;
+  docs?: UserStoreDoc[];
 }
 
 export interface AccountSingleton<T extends boolean = false> extends Account {
@@ -54,6 +60,37 @@ export interface ProfileSingleton<T extends boolean = false> extends Profile {
 
 export interface SettingsSingleton<T extends boolean = false> extends Settings {
   user?: UserSingleton<T>;
+}
+
+export interface UserStoreSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<UserStore, T> {
+  user?: UserSingleton<T>;
+  docs?: UserStoreDocSingleton<T>[];
+}
+
+export interface UserStoreDocSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<UserStoreDoc, T> {
+  store?: UserStoreSingleton<T>;
+  attachment?: AttachmentSingleton<T>;
+
+  annots?: UserStoreDocAnnotSingleton<T>[];
+  linkedFromAnnots?: UserStoreDocAnnotSingleton<T>[];
+  chunks?: UserStoreDocChunkSingleton<T>[];
+}
+
+export interface UserStoreDocAnnotSingleton<
+  T extends boolean = false
+> extends UserStoreDocAnnot {
+  doc?: UserStoreDocSingleton<T>;
+  linkedDoc?: UserStoreDocSingleton<T>;
+}
+
+export interface UserStoreDocChunkSingleton<
+  T extends boolean = false
+> extends UserStoreDocChunk {
+  doc?: UserStoreDocSingleton<T>;
 }
 
 export interface LocalVectorStoreSingleton<
@@ -151,6 +188,7 @@ export interface AttachmentSingleton<
   image: ImageSingleton | null;
   document: DocumentSingleton | null;
   imageGenOutput: ImageGenOutputSingleton<T> | null;
+  userStoreDoc?: UserStoreDocSingleton<T>;
 }
 
 export interface UserKeySingleton<T extends boolean = false> extends UserKey {

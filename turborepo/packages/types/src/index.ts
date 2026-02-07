@@ -350,6 +350,10 @@ export type {
   SettingsSingleton,
   UserKeySingleton,
   UserSingleton,
+  UserStoreDocAnnotSingleton,
+  UserStoreDocChunkSingleton,
+  UserStoreDocSingleton,
+  UserStoreSingleton,
   VideoSingleton
 } from "@/types.ts";
 

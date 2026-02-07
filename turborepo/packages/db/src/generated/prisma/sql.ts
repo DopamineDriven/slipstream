@@ -11,6 +11,10 @@ export * from "./sql/insertLocalDoc.ts"
 
 export * from "./sql/insertMemoryChunk.ts"
 
+export * from "./sql/insertUserStoreDoc.ts"
+
+export * from "./sql/insertUserStoreDocAnnot.ts"
+
 export * from "./sql/searchConversationMemory.ts"
 
 export * from "./sql/searchLocalDocChunks.ts"
@@ -19,8 +23,16 @@ export * from "./sql/searchLocalDocChunksByStore.ts"
 
 export * from "./sql/searchMemoryByConversation.ts"
 
+export * from "./sql/searchUserStoreChunksByDoc.ts"
+
+export * from "./sql/searchUserStoreChunksByStore.ts"
+
 export * from "./sql/updateLocalDocChunkState.ts"
 
 export * from "./sql/updateLocalDocState.ts"
 
 export * from "./sql/updateMemoryChunkState.ts"
+
+export * from "./sql/updateUserStoreChunkState.ts"
+
+export * from "./sql/updateUserStoreDocState.ts"

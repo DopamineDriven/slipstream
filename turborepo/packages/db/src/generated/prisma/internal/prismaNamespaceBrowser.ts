@@ -76,6 +76,10 @@ export const ModelName = {
   Session: 'Session',
   UserKey: 'UserKey',
   Settings: 'Settings',
+  UserStore: 'UserStore',
+  UserStoreDoc: 'UserStoreDoc',
+  UserStoreDocAnnot: 'UserStoreDocAnnot',
+  UserStoreDocChunk: 'UserStoreDocChunk',
   Verification: 'Verification'
 } as const
 
@@ -696,6 +700,112 @@ export const SettingsScalarFieldEnum = {
 } as const
 
 export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
+
+
+export const UserStoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  storeName: 'storeName',
+  defaultEmbeddingModel: 'defaultEmbeddingModel',
+  defaultEmbeddingDim: 'defaultEmbeddingDim',
+  fileCount: 'fileCount',
+  totalBytes: 'totalBytes',
+  totalChunks: 'totalChunks',
+  schemaVersion: 'schemaVersion',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserStoreScalarFieldEnum = (typeof UserStoreScalarFieldEnum)[keyof typeof UserStoreScalarFieldEnum]
+
+
+export const UserStoreDocScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  attachmentId: 'attachmentId',
+  conversationId: 'conversationId',
+  messageId: 'messageId',
+  originatingUrl: 'originatingUrl',
+  originatingModel: 'originatingModel',
+  originatingProvider: 'originatingProvider',
+  provenanceId: 'provenanceId',
+  filename: 'filename',
+  mimeType: 'mimeType',
+  ext: 'ext',
+  size: 'size',
+  schemaVersion: 'schemaVersion',
+  embeddingModel: 'embeddingModel',
+  embeddingDim: 'embeddingDim',
+  hasVisualMedia: 'hasVisualMedia',
+  visualMediaSource: 'visualMediaSource',
+  visualMediaContent: 'visualMediaContent',
+  pageCount: 'pageCount',
+  extractedTextLength: 'extractedTextLength',
+  imageCount: 'imageCount',
+  imagePages: 'imagePages',
+  annotPages: 'annotPages',
+  modelSelectionReason: 'modelSelectionReason',
+  indexedAt: 'indexedAt',
+  errorMessage: 'errorMessage',
+  lastAccessed: 'lastAccessed',
+  state: 'state',
+  chunkCount: 'chunkCount',
+  tokenCount: 'tokenCount',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserStoreDocScalarFieldEnum = (typeof UserStoreDocScalarFieldEnum)[keyof typeof UserStoreDocScalarFieldEnum]
+
+
+export const UserStoreDocAnnotScalarFieldEnum = {
+  id: 'id',
+  docId: 'docId',
+  subtype: 'subtype',
+  uri: 'uri',
+  rect: 'rect',
+  startOffset: 'startOffset',
+  endOffset: 'endOffset',
+  pageNumber: 'pageNumber',
+  isCdnLink: 'isCdnLink',
+  linkedDocId: 'linkedDocId',
+  attachmentId: 'attachmentId',
+  createdAt: 'createdAt'
+} as const
+
+export type UserStoreDocAnnotScalarFieldEnum = (typeof UserStoreDocAnnotScalarFieldEnum)[keyof typeof UserStoreDocAnnotScalarFieldEnum]
+
+
+export const UserStoreDocChunkScalarFieldEnum = {
+  id: 'id',
+  docId: 'docId',
+  storeId: 'storeId',
+  chunkProvenanceId: 'chunkProvenanceId',
+  provenanceId: 'provenanceId',
+  attachmentId: 'attachmentId',
+  conversationId: 'conversationId',
+  messageId: 'messageId',
+  chunkIndex: 'chunkIndex',
+  content: 'content',
+  contentHash: 'contentHash',
+  tokenCount: 'tokenCount',
+  startOffset: 'startOffset',
+  endOffset: 'endOffset',
+  pageStartOffset: 'pageStartOffset',
+  pageEndOffset: 'pageEndOffset',
+  hasVisualContent: 'hasVisualContent',
+  state: 'state',
+  errorMessage: 'errorMessage',
+  retryCount: 'retryCount',
+  schemaVersion: 'schemaVersion',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserStoreDocChunkScalarFieldEnum = (typeof UserStoreDocChunkScalarFieldEnum)[keyof typeof UserStoreDocChunkScalarFieldEnum]
 
 
 export const VerificationScalarFieldEnum = {

@@ -319,3 +319,70 @@ export const ThemePreference = {
 } as const
 
 export type ThemePreference = (typeof ThemePreference)[keyof typeof ThemePreference]
+
+
+export const AnnotSubtype = {
+  LINK: 'LINK',
+  TEXT: 'TEXT',
+  HIGHLIGHT: 'HIGHLIGHT',
+  WIDGET: 'WIDGET',
+  MARKUP: 'MARKUP',
+  REFERENCE: 'REFERENCE',
+  AUTOLINK: 'AUTOLINK'
+} as const
+
+export type AnnotSubtype = (typeof AnnotSubtype)[keyof typeof AnnotSubtype]
+
+
+export const VisualMediaContent = {
+  PHOTOS: 'PHOTOS',
+  CHARTS: 'CHARTS',
+  DIAGRAMS: 'DIAGRAMS',
+  SLIDES: 'SLIDES',
+  TABLES: 'TABLES',
+  VIDEO: 'VIDEO',
+  MIXED: 'MIXED',
+  AUDIO: 'AUDIO'
+} as const
+
+export type VisualMediaContent = (typeof VisualMediaContent)[keyof typeof VisualMediaContent]
+
+
+export const VisualMediaSource = {
+  NATIVE: 'NATIVE',
+  SCANNED: 'SCANNED',
+  MIXED: 'MIXED'
+} as const
+
+export type VisualMediaSource = (typeof VisualMediaSource)[keyof typeof VisualMediaSource]
+
+
+export const UserStoreDocState = {
+  QUEUED: 'QUEUED',
+  EXTRACTING: 'EXTRACTING',
+  INDEXING: 'INDEXING',
+  ACTIVE: 'ACTIVE',
+  REINDEXING: 'REINDEXING',
+  FAILED: 'FAILED'
+} as const
+
+export type UserStoreDocState = (typeof UserStoreDocState)[keyof typeof UserStoreDocState]
+
+
+export const UserStoreChunkState = {
+  QUEUED: 'QUEUED',
+  EMBEDDING: 'EMBEDDING',
+  READY: 'READY',
+  ERROR: 'ERROR',
+  RETRYING: 'RETRYING',
+  ABANDONED: 'ABANDONED'
+} as const
+
+export type UserStoreChunkState = (typeof UserStoreChunkState)[keyof typeof UserStoreChunkState]
+
+
+export const UserStoreSchemaVersion = {
+  v1_0: 'v1_0'
+} as const
+
+export type UserStoreSchemaVersion = (typeof UserStoreSchemaVersion)[keyof typeof UserStoreSchemaVersion]

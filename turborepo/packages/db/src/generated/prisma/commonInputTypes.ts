@@ -755,6 +755,108 @@ export type EnumThemePreferenceNullableWithAggregatesFilter<$PrismaModel = never
   _max?: Prisma.NestedEnumThemePreferenceNullableFilter<$PrismaModel>
 }
 
+export type EnumUserStoreSchemaVersionFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserStoreSchemaVersion | Prisma.EnumUserStoreSchemaVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.UserStoreSchemaVersion[] | Prisma.ListEnumUserStoreSchemaVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserStoreSchemaVersion[] | Prisma.ListEnumUserStoreSchemaVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserStoreSchemaVersionFilter<$PrismaModel> | $Enums.UserStoreSchemaVersion
+}
+
+export type EnumUserStoreSchemaVersionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserStoreSchemaVersion | Prisma.EnumUserStoreSchemaVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.UserStoreSchemaVersion[] | Prisma.ListEnumUserStoreSchemaVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserStoreSchemaVersion[] | Prisma.ListEnumUserStoreSchemaVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserStoreSchemaVersionWithAggregatesFilter<$PrismaModel> | $Enums.UserStoreSchemaVersion
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumUserStoreSchemaVersionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumUserStoreSchemaVersionFilter<$PrismaModel>
+}
+
+export type EnumVisualMediaSourceNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisualMediaSource | Prisma.EnumVisualMediaSourceFieldRefInput<$PrismaModel> | null
+  in?: $Enums.VisualMediaSource[] | Prisma.ListEnumVisualMediaSourceFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.VisualMediaSource[] | Prisma.ListEnumVisualMediaSourceFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumVisualMediaSourceNullableFilter<$PrismaModel> | $Enums.VisualMediaSource | null
+}
+
+export type EnumVisualMediaContentNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisualMediaContent | Prisma.EnumVisualMediaContentFieldRefInput<$PrismaModel> | null
+  in?: $Enums.VisualMediaContent[] | Prisma.ListEnumVisualMediaContentFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.VisualMediaContent[] | Prisma.ListEnumVisualMediaContentFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumVisualMediaContentNullableFilter<$PrismaModel> | $Enums.VisualMediaContent | null
+}
+
+export type EnumUserStoreDocStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserStoreDocState | Prisma.EnumUserStoreDocStateFieldRefInput<$PrismaModel>
+  in?: $Enums.UserStoreDocState[] | Prisma.ListEnumUserStoreDocStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserStoreDocState[] | Prisma.ListEnumUserStoreDocStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserStoreDocStateFilter<$PrismaModel> | $Enums.UserStoreDocState
+}
+
+export type EnumVisualMediaSourceNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisualMediaSource | Prisma.EnumVisualMediaSourceFieldRefInput<$PrismaModel> | null
+  in?: $Enums.VisualMediaSource[] | Prisma.ListEnumVisualMediaSourceFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.VisualMediaSource[] | Prisma.ListEnumVisualMediaSourceFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumVisualMediaSourceNullableWithAggregatesFilter<$PrismaModel> | $Enums.VisualMediaSource | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisualMediaSourceNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisualMediaSourceNullableFilter<$PrismaModel>
+}
+
+export type EnumVisualMediaContentNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisualMediaContent | Prisma.EnumVisualMediaContentFieldRefInput<$PrismaModel> | null
+  in?: $Enums.VisualMediaContent[] | Prisma.ListEnumVisualMediaContentFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.VisualMediaContent[] | Prisma.ListEnumVisualMediaContentFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumVisualMediaContentNullableWithAggregatesFilter<$PrismaModel> | $Enums.VisualMediaContent | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisualMediaContentNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisualMediaContentNullableFilter<$PrismaModel>
+}
+
+export type EnumUserStoreDocStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserStoreDocState | Prisma.EnumUserStoreDocStateFieldRefInput<$PrismaModel>
+  in?: $Enums.UserStoreDocState[] | Prisma.ListEnumUserStoreDocStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserStoreDocState[] | Prisma.ListEnumUserStoreDocStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserStoreDocStateWithAggregatesFilter<$PrismaModel> | $Enums.UserStoreDocState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumUserStoreDocStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumUserStoreDocStateFilter<$PrismaModel>
+}
+
+export type EnumAnnotSubtypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.AnnotSubtype | Prisma.EnumAnnotSubtypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AnnotSubtype[] | Prisma.ListEnumAnnotSubtypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AnnotSubtype[] | Prisma.ListEnumAnnotSubtypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAnnotSubtypeFilter<$PrismaModel> | $Enums.AnnotSubtype
+}
+
+export type EnumAnnotSubtypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AnnotSubtype | Prisma.EnumAnnotSubtypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AnnotSubtype[] | Prisma.ListEnumAnnotSubtypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AnnotSubtype[] | Prisma.ListEnumAnnotSubtypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAnnotSubtypeWithAggregatesFilter<$PrismaModel> | $Enums.AnnotSubtype
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAnnotSubtypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAnnotSubtypeFilter<$PrismaModel>
+}
+
+export type EnumUserStoreChunkStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserStoreChunkState | Prisma.EnumUserStoreChunkStateFieldRefInput<$PrismaModel>
+  in?: $Enums.UserStoreChunkState[] | Prisma.ListEnumUserStoreChunkStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserStoreChunkState[] | Prisma.ListEnumUserStoreChunkStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserStoreChunkStateFilter<$PrismaModel> | $Enums.UserStoreChunkState
+}
+
+export type EnumUserStoreChunkStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserStoreChunkState | Prisma.EnumUserStoreChunkStateFieldRefInput<$PrismaModel>
+  in?: $Enums.UserStoreChunkState[] | Prisma.ListEnumUserStoreChunkStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserStoreChunkState[] | Prisma.ListEnumUserStoreChunkStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserStoreChunkStateWithAggregatesFilter<$PrismaModel> | $Enums.UserStoreChunkState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumUserStoreChunkStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumUserStoreChunkStateFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -1496,6 +1598,108 @@ export type NestedEnumThemePreferenceNullableWithAggregatesFilter<$PrismaModel =
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumThemePreferenceNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumThemePreferenceNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumUserStoreSchemaVersionFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserStoreSchemaVersion | Prisma.EnumUserStoreSchemaVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.UserStoreSchemaVersion[] | Prisma.ListEnumUserStoreSchemaVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserStoreSchemaVersion[] | Prisma.ListEnumUserStoreSchemaVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserStoreSchemaVersionFilter<$PrismaModel> | $Enums.UserStoreSchemaVersion
+}
+
+export type NestedEnumUserStoreSchemaVersionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserStoreSchemaVersion | Prisma.EnumUserStoreSchemaVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.UserStoreSchemaVersion[] | Prisma.ListEnumUserStoreSchemaVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserStoreSchemaVersion[] | Prisma.ListEnumUserStoreSchemaVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserStoreSchemaVersionWithAggregatesFilter<$PrismaModel> | $Enums.UserStoreSchemaVersion
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumUserStoreSchemaVersionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumUserStoreSchemaVersionFilter<$PrismaModel>
+}
+
+export type NestedEnumVisualMediaSourceNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisualMediaSource | Prisma.EnumVisualMediaSourceFieldRefInput<$PrismaModel> | null
+  in?: $Enums.VisualMediaSource[] | Prisma.ListEnumVisualMediaSourceFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.VisualMediaSource[] | Prisma.ListEnumVisualMediaSourceFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumVisualMediaSourceNullableFilter<$PrismaModel> | $Enums.VisualMediaSource | null
+}
+
+export type NestedEnumVisualMediaContentNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisualMediaContent | Prisma.EnumVisualMediaContentFieldRefInput<$PrismaModel> | null
+  in?: $Enums.VisualMediaContent[] | Prisma.ListEnumVisualMediaContentFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.VisualMediaContent[] | Prisma.ListEnumVisualMediaContentFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumVisualMediaContentNullableFilter<$PrismaModel> | $Enums.VisualMediaContent | null
+}
+
+export type NestedEnumUserStoreDocStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserStoreDocState | Prisma.EnumUserStoreDocStateFieldRefInput<$PrismaModel>
+  in?: $Enums.UserStoreDocState[] | Prisma.ListEnumUserStoreDocStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserStoreDocState[] | Prisma.ListEnumUserStoreDocStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserStoreDocStateFilter<$PrismaModel> | $Enums.UserStoreDocState
+}
+
+export type NestedEnumVisualMediaSourceNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisualMediaSource | Prisma.EnumVisualMediaSourceFieldRefInput<$PrismaModel> | null
+  in?: $Enums.VisualMediaSource[] | Prisma.ListEnumVisualMediaSourceFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.VisualMediaSource[] | Prisma.ListEnumVisualMediaSourceFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumVisualMediaSourceNullableWithAggregatesFilter<$PrismaModel> | $Enums.VisualMediaSource | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisualMediaSourceNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisualMediaSourceNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumVisualMediaContentNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisualMediaContent | Prisma.EnumVisualMediaContentFieldRefInput<$PrismaModel> | null
+  in?: $Enums.VisualMediaContent[] | Prisma.ListEnumVisualMediaContentFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.VisualMediaContent[] | Prisma.ListEnumVisualMediaContentFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumVisualMediaContentNullableWithAggregatesFilter<$PrismaModel> | $Enums.VisualMediaContent | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisualMediaContentNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisualMediaContentNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumUserStoreDocStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserStoreDocState | Prisma.EnumUserStoreDocStateFieldRefInput<$PrismaModel>
+  in?: $Enums.UserStoreDocState[] | Prisma.ListEnumUserStoreDocStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserStoreDocState[] | Prisma.ListEnumUserStoreDocStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserStoreDocStateWithAggregatesFilter<$PrismaModel> | $Enums.UserStoreDocState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumUserStoreDocStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumUserStoreDocStateFilter<$PrismaModel>
+}
+
+export type NestedEnumAnnotSubtypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.AnnotSubtype | Prisma.EnumAnnotSubtypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AnnotSubtype[] | Prisma.ListEnumAnnotSubtypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AnnotSubtype[] | Prisma.ListEnumAnnotSubtypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAnnotSubtypeFilter<$PrismaModel> | $Enums.AnnotSubtype
+}
+
+export type NestedEnumAnnotSubtypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AnnotSubtype | Prisma.EnumAnnotSubtypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AnnotSubtype[] | Prisma.ListEnumAnnotSubtypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AnnotSubtype[] | Prisma.ListEnumAnnotSubtypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAnnotSubtypeWithAggregatesFilter<$PrismaModel> | $Enums.AnnotSubtype
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAnnotSubtypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAnnotSubtypeFilter<$PrismaModel>
+}
+
+export type NestedEnumUserStoreChunkStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserStoreChunkState | Prisma.EnumUserStoreChunkStateFieldRefInput<$PrismaModel>
+  in?: $Enums.UserStoreChunkState[] | Prisma.ListEnumUserStoreChunkStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserStoreChunkState[] | Prisma.ListEnumUserStoreChunkStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserStoreChunkStateFilter<$PrismaModel> | $Enums.UserStoreChunkState
+}
+
+export type NestedEnumUserStoreChunkStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserStoreChunkState | Prisma.EnumUserStoreChunkStateFieldRefInput<$PrismaModel>
+  in?: $Enums.UserStoreChunkState[] | Prisma.ListEnumUserStoreChunkStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserStoreChunkState[] | Prisma.ListEnumUserStoreChunkStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserStoreChunkStateWithAggregatesFilter<$PrismaModel> | $Enums.UserStoreChunkState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumUserStoreChunkStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumUserStoreChunkStateFilter<$PrismaModel>
 }
 
 
