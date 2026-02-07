@@ -33,7 +33,7 @@ export interface $DbEnums {
   AnnotSubtype: "LINK" | "TEXT" | "HIGHLIGHT" | "WIDGET" | "MARKUP" | "REFERENCE" | "AUTOLINK"
   VisualMediaContent: "PHOTOS" | "CHARTS" | "DIAGRAMS" | "SLIDES" | "TABLES" | "VIDEO" | "MIXED" | "AUDIO"
   VisualMediaSource: "NATIVE" | "SCANNED" | "MIXED"
-  UserStoreDocState: "QUEUED" | "EXTRACTING" | "INDEXING" | "ACTIVE" | "REINDEXING" | "FAILED"
+  UserStoreDocState: "QUEUED" | "EXTRACTING" | "INDEXING" | "ACTIVE" | "PARTIAL" | "REINDEXING" | "FAILED"
   UserStoreChunkState: "QUEUED" | "EMBEDDING" | "READY" | "ERROR" | "RETRYING" | "ABANDONED"
   UserStoreSchemaVersion: "v1_0"
 }

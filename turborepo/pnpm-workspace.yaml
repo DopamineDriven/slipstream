@@ -7,11 +7,11 @@ catalogs:
   auth:
     better-auth: ^1.4.18
   aws:
-    "@aws-sdk/client-s3": ^3.984.0
-    "@aws-sdk/client-secrets-manager": ^3.984.0
-    "@aws-sdk/credential-providers": ^3.984.0
-    "@aws-sdk/lib-storage": ^3.984.0
-    "@aws-sdk/s3-request-presigner": ^3.984.0
+    "@aws-sdk/client-s3": ^3.985.0
+    "@aws-sdk/client-secrets-manager": ^3.985.0
+    "@aws-sdk/credential-providers": ^3.985.0
+    "@aws-sdk/lib-storage": ^3.985.0
+    "@aws-sdk/s3-request-presigner": ^3.985.0
     "@aws-sdk/types": ^3.973.1
   babel:
     babel-plugin-react-compiler: ^1.0.0
@@ -33,7 +33,7 @@ catalogs:
   dd:
     "@d0paminedriven/fs": ^11.0.0
     "@d0paminedriven/metadata": ^6.0.1
-    "@d0paminedriven/pdfdown": ^0.9.1
+    "@d0paminedriven/pdfdown": ^0.9.2
   decimal:
     "decimal.js": ^10.6.0
   dotenv:
@@ -123,7 +123,7 @@ catalogs:
   react:
     react: ^19.2.4
     react-dom: ^19.2.4
-    react-resizable-panels: ^4.6.0
+    react-resizable-panels: ^4.6.2
     vaul: ^1.1.2
     "@types/react": ^19.2.13
     "@types/react-dom": ^19.2.3
@@ -162,7 +162,7 @@ catalogs:
   tanstack:
     "@tanstack/react-virtual": ^3.13.18
   test:
-    "@playwright/test": ^1.58.1
+    "@playwright/test": ^1.58.2
   ts:
     typescript: ^5.9.3
   tsdown:
@@ -170,11 +170,11 @@ catalogs:
   tseslint:
     typescript-eslint: ^8.54.0
   tsgo:
-    "@typescript/native-preview": ^7.0.0-dev.20260205.1
+    "@typescript/native-preview": ^7.0.0-dev.20260206.1
   tslib:
     tslib: ^2.8.1
   tsup:
-    "@microsoft/api-extractor": ^7.56.2
+    "@microsoft/api-extractor": ^7.56.3
     terser: ^5.46.0
     tsup: ^8.5.1
   tsx:
@@ -200,9 +200,9 @@ catalogs:
   utils:
     "@changesets/cli": ^2.29.8
     husky: ^9.1.7
-    knip: ^5.83.0
+    knip: ^5.83.1
   vercel:
-    vercel: ^50.12.3
+    vercel: ^50.13.2
     "@vercel/analytics": ^1.6.1
     "@vercel/functions": ^3.4.1
   vfile:

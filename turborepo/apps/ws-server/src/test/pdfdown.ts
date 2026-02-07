@@ -199,7 +199,14 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
   }
   const body = structuredText.map(t => ({ [t.page]: t.body }));
   const toJson = JSON.stringify(
-    { meta, annots, images: imgWithSizeArr, structuredText: body },
+    {
+      meta,
+      imagePages: Array.from(imgPages),
+      annotPages: Array.from(annotPages),
+      annots,
+      images: imgWithSizeArr,
+      structuredText: body
+    },
     null,
     2
   );

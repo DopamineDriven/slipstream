@@ -35,6 +35,11 @@ export class PrismaUtilsService extends ModelService {
     return `${env}-${userId}`;
   }
 
+  public defaultUserStoreName(userId: string) {
+    const env = this.getEnv();
+    return `${env}-${userId}`;
+  }
+
   public localVectorStoreDisplayName(
     userId: string,
     provider: $Enums.Provider
@@ -351,6 +356,22 @@ export class PrismaUtilsService extends ModelService {
     return [name, ext] as const;
   }
 
+  public toUserStoreProvenanceId(att: AttachmentSingleton<true>) {
+    let url: string;
+    if (att.compatStatus === "ACTIVE" && att.compatCdnUrl) {
+      url = att.compatCdnUrl;
+    } else if (att.compatStatus === "ALIASED" && att.cdnUrl) {
+      url = att.cdnUrl;
+    } else {
+      url = "";
+    }
+    const [filename, ext] = this.filenameToHexExtTuple(url, att.compatStatus);
+    if (att.conversationId && att.messageId) {
+      return `${att.conversationId}-${att.messageId}-${att.id}-${filename}.${ext}`;
+    } else {
+      throw new Error(`no conversationId or messageId set for ${att.id}`);
+    }
+  }
   public toVectorStoreFilename(att: AttachmentSingleton<true>) {
     let url: string;
     if (att.compatStatus === "ACTIVE" && att.compatCdnUrl) {

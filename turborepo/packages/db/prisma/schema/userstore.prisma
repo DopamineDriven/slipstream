@@ -45,8 +45,10 @@ enum UserStoreDocState {
   EXTRACTING
   /// chunks partitioned, embeddings being generated
   INDEXING
-  /// fully indexed, searchable
+  /// fully indexed, all chunks searchable
   ACTIVE
+  /// indexed but some chunks ABANDONED — still searchable
+  PARTIAL
   /// re-embedding after a failed attempt
   REINDEXING
   /// terminal failure at any stage

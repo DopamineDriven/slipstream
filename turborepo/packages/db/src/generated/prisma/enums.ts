@@ -362,6 +362,7 @@ export const UserStoreDocState = {
   EXTRACTING: 'EXTRACTING',
   INDEXING: 'INDEXING',
   ACTIVE: 'ACTIVE',
+  PARTIAL: 'PARTIAL',
   REINDEXING: 'REINDEXING',
   FAILED: 'FAILED'
 } as const

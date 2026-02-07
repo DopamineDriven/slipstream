@@ -15,7 +15,28 @@ export interface CreateLocalStoreParams {
   totalChunks?: number;
   totalBytes?: bigint;
 }
+export interface CreateUserStoreParams {
+  userId: string;
+  storeName: string;
+  defaultEmbeddingModel?: Voyage.ModelUnion;
+  defaultEmbeddingDim?: Voyage.EmbeddingDims;
+  schemaVersion?: $Enums.LocalStoreSchemaVersion;
+}
 
+export interface CreateUserStoreRT<T extends boolean = false> {
+    id: string;
+    userId: string;
+    storeName: string;
+    defaultEmbeddingModel: string;
+    defaultEmbeddingDim: number;
+    fileCount: number;
+    totalBytes:  T extends true ? number | null : bigint | null;
+    totalChunks: number;
+    schemaVersion: $Enums.UserStoreSchemaVersion;
+    lastSyncedAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
 export interface CreateLocalStoreRT<T extends boolean = boolean> {
   id: string;
   createdAt: Date;

@@ -5,7 +5,6 @@ import type {
 } from "@/types/index.ts";
 import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import { ExtractService } from "@/extract/index.ts";
-import { PrismaLocalStoreService } from "@/prisma/local-store.ts";
 import type {
   $Enums,
   Attachment,
@@ -16,8 +15,9 @@ import type {
 } from "@slipstream/db/node/generated/client";
 import type { CTR, Rm, RTC, XOR } from "@slipstream/types";
 import { PrismaDbService } from "@slipstream/db/factory";
+import { PrismaUserStoreService } from "@/prisma/user-store.ts";
 
-export class PrismaAttachmentService extends PrismaLocalStoreService {
+export class PrismaAttachmentService extends PrismaUserStoreService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
