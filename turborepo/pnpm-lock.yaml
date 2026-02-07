@@ -71,8 +71,8 @@ catalogs:
       specifier: ^6.0.1
       version: 6.0.1
     '@d0paminedriven/pdfdown':
-      specifier: ^0.9.2
-      version: 0.9.2
+      specifier: ^0.9.3
+      version: 0.9.3
   decimal:
     decimal.js:
       specifier: ^10.6.0
@@ -908,7 +908,7 @@ importers:
         version: 6.0.1
       '@d0paminedriven/pdfdown':
         specifier: catalog:dd
-        version: 0.9.2
+        version: 0.9.3
       '@google/genai':
         specifier: ^1.38.0
         version: 1.38.0(patch_hash=e86aff75c8d40c543d73c37b329a64dc75cc893e479dacdadbfdb34857772aa9)(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))
@@ -2343,95 +2343,95 @@ packages:
   '@d0paminedriven/metadata@6.0.1':
     resolution: {integrity: sha512-BweUGRDb/3vs4vkxQNFox9lnvpOxObdOqhb0/oDFt+K7Zg76VMMM2111TjaiHGBRKmf03ER3m03SS1sypofMrQ==}
 
-  '@d0paminedriven/pdfdown-android-arm-eabi@0.9.2':
-    resolution: {integrity: sha512-wF54Lzpt5hLneGhNpDLQUTQXfRJGgnrmOMGSzG6kGWvVp5IsO/uqLILTWKwKoG/+rJHA71EhBtLMc9yfayWECQ==}
+  '@d0paminedriven/pdfdown-android-arm-eabi@0.9.3':
+    resolution: {integrity: sha512-qyFX5G7tdadiSZVcA0TWL8Ki7mCR6O2jjZF650siA2oaWd9qbLcoyiI/n3U5ttZTdVhUJBXVJM4oTS7H4pUF+Q==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [arm]
     os: [android]
 
-  '@d0paminedriven/pdfdown-android-arm64@0.9.2':
-    resolution: {integrity: sha512-HtTOCB+xZ0qn0QR1kKaZ9FUROqleuvphUWu9q3ufdVk/XS2oeoFPiaD12elH0vR9FKIbCYuAZcfAtUOtzsGZ4g==}
+  '@d0paminedriven/pdfdown-android-arm64@0.9.3':
+    resolution: {integrity: sha512-d1CNmJZZAoINVwOZFrvz48pMR5d7TMjic//sCZB4p1O1wGPX9vM3D3hYD2esWClKhe+eSpKV3TQ7yPK9duCqrw==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [arm64]
     os: [android]
 
-  '@d0paminedriven/pdfdown-darwin-arm64@0.9.2':
-    resolution: {integrity: sha512-mslrba3EYKq1AupSEMCyAYUOZRAve+Oo1OpSGP14+ys0BYQF30ySPPgqfIexOz8JN5TCnD3Y9DIDFhTyCfdGDA==}
+  '@d0paminedriven/pdfdown-darwin-arm64@0.9.3':
+    resolution: {integrity: sha512-4z6Hs/j/7tttX5A0+l1bEmB0NQ6ENm9WCeNIfq2fad7K2sXQm6fNNYj6IfiZzsfgTJzfnpgc983sco9V/VmN3Q==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [arm64]
     os: [darwin]
 
-  '@d0paminedriven/pdfdown-darwin-x64@0.9.2':
-    resolution: {integrity: sha512-B9A7nYQI5APUxW+I0HTfNVNP7zdFkf+oEG5+yffbcWvro228IutLWHy3OdGoTbL0p+mfIJRqXDFPL7nDegTmiA==}
+  '@d0paminedriven/pdfdown-darwin-x64@0.9.3':
+    resolution: {integrity: sha512-CoeZXZm6IM2LA/shSBSVikpSipCJk1B7bkQLzbKO2WTV9QgAcJlDZoG/zyWPIL2/8QajukWU1eNJZCKE1GduDg==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [x64]
     os: [darwin]
 
-  '@d0paminedriven/pdfdown-freebsd-x64@0.9.2':
-    resolution: {integrity: sha512-4uWMwM7SY+Bsvbp1NH/3K3/vh/7u2zrjXiJ+2PhgkfieTJLrZLamwOpNt1hEsleCq8LoOlzsZp2lCS4KKRAUxQ==}
+  '@d0paminedriven/pdfdown-freebsd-x64@0.9.3':
+    resolution: {integrity: sha512-CW3kPophhEVD9oB25fXII1zcUT5B7W69LK8LO7VyKktBnLTNaVGHA1S1/70ysbesl72577q7XvD3ViwshST0Zw==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [x64]
     os: [freebsd]
 
-  '@d0paminedriven/pdfdown-linux-arm-gnueabihf@0.9.2':
-    resolution: {integrity: sha512-Z+uuIooAFbwMUBiRpRT4b89rskrSlS137ZV8YDdH71TuTZWSEwosATRZpzH7785NjpPlWtMRwVOC5PZSHmCtpA==}
+  '@d0paminedriven/pdfdown-linux-arm-gnueabihf@0.9.3':
+    resolution: {integrity: sha512-rFBef9tYXkPBaHVi+pM0fWlS86imds+qnuBHdBMbXUqrYcwb+feaB5b1DJE7GV1eE9XnKvfuGgq5hMkQB4wdMw==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [arm]
     os: [linux]
 
-  '@d0paminedriven/pdfdown-linux-arm64-gnu@0.9.2':
-    resolution: {integrity: sha512-sIdTqZshEsLSNWHw+Rc4PlA3BLHJsMywbz+ASQjcW/YR809xpm5v5AtNn2zI3jmT+LelhtRp/nqW2L0Bb6u2Fg==}
+  '@d0paminedriven/pdfdown-linux-arm64-gnu@0.9.3':
+    resolution: {integrity: sha512-g3rig9Kz+sQGxdb0GeshDHQxJjvmI6QFhsyk7x8tsD7wC13m1Lve5g8TgJeSxaS1ys1z94fU2mUWgO+/n6aCSA==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@d0paminedriven/pdfdown-linux-arm64-musl@0.9.2':
-    resolution: {integrity: sha512-UrPjZPVtvGENxedFFw0+oHahL03Is04t/RSINRRxyLRfVWz0Sml6MNP14YLTkk/hlg0lXtb407LguIVB7jbMKg==}
+  '@d0paminedriven/pdfdown-linux-arm64-musl@0.9.3':
+    resolution: {integrity: sha512-v45TaBgUUbvYrwHIWnyAAKsPeb/dvJ11Mg+30vdW9mRTcsXztWoOXATtuInjxknyZMi8wZvIN115X+j7uLcUYw==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@d0paminedriven/pdfdown-linux-x64-gnu@0.9.2':
-    resolution: {integrity: sha512-L0QvaK+e1YR3w3z+/vSq/VNcVRzsipJHmC3dJERBjV+bcb+WXnMwac+JphTRglVgrqdGrytItKa1Vu+ULKV9kQ==}
+  '@d0paminedriven/pdfdown-linux-x64-gnu@0.9.3':
+    resolution: {integrity: sha512-becRQJ+Ws735WlqvygXkK0vQglhmVZWWPH3qTUEUlhoWsEOdOj2yHcZlWxxW4kqcBa8+7wwXa23j4DhrY7OLWg==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@d0paminedriven/pdfdown-linux-x64-musl@0.9.2':
-    resolution: {integrity: sha512-m72CFx1RgPsJxrTQedRucQsxqAw3dSv2kzlo668c62YtTDGhYPu6sebJF+5S2U6hT1K1Zrb/hCGyN0lfRWx8fQ==}
+  '@d0paminedriven/pdfdown-linux-x64-musl@0.9.3':
+    resolution: {integrity: sha512-rWEUCKTgkySzfq9Ux6XXCCelTeSPORohVDXho51Qlh2xsBFTGB6uKB8v/SdmOZ/ArS0+WbgYpyR3AM6yTDlkBQ==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@d0paminedriven/pdfdown-wasm32-wasi@0.9.2':
-    resolution: {integrity: sha512-p+L0wYVPmlRCTI66PuriHhTh7LMzVYko1jWkptDN3wQdDFvXGzvrDK9BwvADPhh7zioMZXrTVtvKgcKdI9oHog==}
+  '@d0paminedriven/pdfdown-wasm32-wasi@0.9.3':
+    resolution: {integrity: sha512-i04sJi79pRLq04VKxAGTRP6/hTVOb4NojV7ctbm57mPJLJ21WBhq0JycaPz12hPAXd3xLiGjOMQXd9VFxBfFJA==}
     engines: {node: '>=14.0.0'}
     cpu: [wasm32]
 
-  '@d0paminedriven/pdfdown-win32-arm64-msvc@0.9.2':
-    resolution: {integrity: sha512-9l5qTHua9mc1BtJHRd0elgF/tTROq8iqZQe7HwuxMge0S9YY0VY+psPcjo5gsCdF61LD2fUNhEa2Rk++vFuFGQ==}
+  '@d0paminedriven/pdfdown-win32-arm64-msvc@0.9.3':
+    resolution: {integrity: sha512-D0EClcaU+hLXHzKcsNBoGhO9cMwa+PjSztTuSHTzDVy8qZZ02Xicv27Ze3kcvEVH+IpvjLDTFtvIzjWkpnSO1g==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [arm64]
     os: [win32]
 
-  '@d0paminedriven/pdfdown-win32-ia32-msvc@0.9.2':
-    resolution: {integrity: sha512-YJZ/HEwpaB+ERNziW+3zTJi4zDQkP/wBey1v6B0irvw3hmBBwmTUZ0SH6uLvoydyhZmt64aW6fze/t7BObrzbQ==}
+  '@d0paminedriven/pdfdown-win32-ia32-msvc@0.9.3':
+    resolution: {integrity: sha512-3S5aF6Gh+sLb3gqmF4erEhFIa0d6ly9lNv+tnss1c6u4dUtE1riJqjCM13Vd1R93l9LtnYtrecSMjApRKMP3DQ==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [ia32]
     os: [win32]
 
-  '@d0paminedriven/pdfdown-win32-x64-msvc@0.9.2':
-    resolution: {integrity: sha512-/Ot2Lz0nJY03G8txntL534sxw4UbriQYcdXNuI1TXrOeIBrvS3iIS8lBnRQ5KHtpC/4uOc4wJPsJe3nYUQ+Dwg==}
+  '@d0paminedriven/pdfdown-win32-x64-msvc@0.9.3':
+    resolution: {integrity: sha512-gktYUDvqG5gJhwr01ovOr0OcfY4JSug+dkPHdIgEs0CNKh9sZcbgv5snKcS/IW09GUEUIRFKf7j7X5PR6WuxyA==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
     cpu: [x64]
     os: [win32]
 
-  '@d0paminedriven/pdfdown@0.9.2':
-    resolution: {integrity: sha512-EN0XVUNcaM9gvtmgap3dy1Bk9ipB4G8xpc7hLjjRoNZugm63+l5fku1R0Opnz7s/y791Bx1rQ9K3TrBrkZWuqQ==}
+  '@d0paminedriven/pdfdown@0.9.3':
+    resolution: {integrity: sha512-DMPuyz4oJVEc6s3IbjjD0G3HWFN0GdW8BCb0oBjw20MbnSa2BefKayDMk5aMxm15yAEDANUgNUv9yS24RzHmdA==}
     engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
 
   '@edge-runtime/format@2.2.1':
@@ -10798,66 +10798,66 @@ snapshots:
     dependencies:
       fflate: 0.8.2
 
-  '@d0paminedriven/pdfdown-android-arm-eabi@0.9.2':
+  '@d0paminedriven/pdfdown-android-arm-eabi@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown-android-arm64@0.9.2':
+  '@d0paminedriven/pdfdown-android-arm64@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown-darwin-arm64@0.9.2':
+  '@d0paminedriven/pdfdown-darwin-arm64@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown-darwin-x64@0.9.2':
+  '@d0paminedriven/pdfdown-darwin-x64@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown-freebsd-x64@0.9.2':
+  '@d0paminedriven/pdfdown-freebsd-x64@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown-linux-arm-gnueabihf@0.9.2':
+  '@d0paminedriven/pdfdown-linux-arm-gnueabihf@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown-linux-arm64-gnu@0.9.2':
+  '@d0paminedriven/pdfdown-linux-arm64-gnu@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown-linux-arm64-musl@0.9.2':
+  '@d0paminedriven/pdfdown-linux-arm64-musl@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown-linux-x64-gnu@0.9.2':
+  '@d0paminedriven/pdfdown-linux-x64-gnu@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown-linux-x64-musl@0.9.2':
+  '@d0paminedriven/pdfdown-linux-x64-musl@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown-wasm32-wasi@0.9.2':
+  '@d0paminedriven/pdfdown-wasm32-wasi@0.9.3':
     dependencies:
       '@napi-rs/wasm-runtime': 1.1.1
     optional: true
 
-  '@d0paminedriven/pdfdown-win32-arm64-msvc@0.9.2':
+  '@d0paminedriven/pdfdown-win32-arm64-msvc@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown-win32-ia32-msvc@0.9.2':
+  '@d0paminedriven/pdfdown-win32-ia32-msvc@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown-win32-x64-msvc@0.9.2':
+  '@d0paminedriven/pdfdown-win32-x64-msvc@0.9.3':
     optional: true
 
-  '@d0paminedriven/pdfdown@0.9.2':
+  '@d0paminedriven/pdfdown@0.9.3':
     optionalDependencies:
-      '@d0paminedriven/pdfdown-android-arm-eabi': 0.9.2
-      '@d0paminedriven/pdfdown-android-arm64': 0.9.2
-      '@d0paminedriven/pdfdown-darwin-arm64': 0.9.2
-      '@d0paminedriven/pdfdown-darwin-x64': 0.9.2
-      '@d0paminedriven/pdfdown-freebsd-x64': 0.9.2
-      '@d0paminedriven/pdfdown-linux-arm-gnueabihf': 0.9.2
-      '@d0paminedriven/pdfdown-linux-arm64-gnu': 0.9.2
-      '@d0paminedriven/pdfdown-linux-arm64-musl': 0.9.2
-      '@d0paminedriven/pdfdown-linux-x64-gnu': 0.9.2
-      '@d0paminedriven/pdfdown-linux-x64-musl': 0.9.2
-      '@d0paminedriven/pdfdown-wasm32-wasi': 0.9.2
-      '@d0paminedriven/pdfdown-win32-arm64-msvc': 0.9.2
-      '@d0paminedriven/pdfdown-win32-ia32-msvc': 0.9.2
-      '@d0paminedriven/pdfdown-win32-x64-msvc': 0.9.2
+      '@d0paminedriven/pdfdown-android-arm-eabi': 0.9.3
+      '@d0paminedriven/pdfdown-android-arm64': 0.9.3
+      '@d0paminedriven/pdfdown-darwin-arm64': 0.9.3
+      '@d0paminedriven/pdfdown-darwin-x64': 0.9.3
+      '@d0paminedriven/pdfdown-freebsd-x64': 0.9.3
+      '@d0paminedriven/pdfdown-linux-arm-gnueabihf': 0.9.3
+      '@d0paminedriven/pdfdown-linux-arm64-gnu': 0.9.3
+      '@d0paminedriven/pdfdown-linux-arm64-musl': 0.9.3
+      '@d0paminedriven/pdfdown-linux-x64-gnu': 0.9.3
+      '@d0paminedriven/pdfdown-linux-x64-musl': 0.9.3
+      '@d0paminedriven/pdfdown-wasm32-wasi': 0.9.3
+      '@d0paminedriven/pdfdown-win32-arm64-msvc': 0.9.3
+      '@d0paminedriven/pdfdown-win32-ia32-msvc': 0.9.3
+      '@d0paminedriven/pdfdown-win32-x64-msvc': 0.9.3
 
   '@edge-runtime/format@2.2.1': {}
 

@@ -20,7 +20,7 @@ export interface CreateUserStoreParams {
   storeName: string;
   defaultEmbeddingModel?: Voyage.ModelUnion;
   defaultEmbeddingDim?: Voyage.EmbeddingDims;
-  schemaVersion?: $Enums.LocalStoreSchemaVersion;
+  schemaVersion?: $Enums.UserStoreSchemaVersion;
 }
 
 export interface CreateUserStoreRT<T extends boolean = false> {

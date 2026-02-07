@@ -1,18 +1,17 @@
 import type {
   CreateUserStoreParams,
-  CreateUserStoreRT,
-  FindManyLocalStoreDocsShape
+  CreateUserStoreRT
 } from "@/prisma/types.ts";
 import type { Voyage } from "@/voyage/types.ts";
 import { ExtractService } from "@/extract/index.ts";
 import { PrismaLocalStoreService } from "@/prisma/local-store.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { Rm, Unenumerate } from "@slipstream/types";
+import type { UserStoreDocSingleton } from "@slipstream/types";
 import { PrismaDbService } from "@slipstream/db/factory";
 import {
-  searchLocalDocChunksByStore,
-  updateLocalDocChunkState,
-  updateLocalDocState
+  searchUserStoreChunksByStore,
+  updateUserStoreChunkState,
+  updateUserStoreDocState
 } from "@slipstream/db/sql-node";
 
 export class PrismaUserStoreService extends PrismaLocalStoreService {
@@ -33,6 +32,24 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
     isProd: boolean
   ) {
     super(prisma, extractor, isProd);
+  }
+
+  private syncCache(userId: string, data: CreateUserStoreRT<true>) {
+    const nameSet = this.userStoreNamesCache.get(userId);
+    if (nameSet) {
+      nameSet.add(data.storeName);
+    } else {
+      this.userStoreNamesCache.set(userId, new Set([data.storeName]));
+    }
+    const storeMap = this.userIdAndStoreNameCache.get(userId);
+    if (storeMap) {
+      storeMap.set(data.storeName, data);
+    } else {
+      this.userIdAndStoreNameCache.set(
+        userId,
+        new Map([[data.storeName, data]])
+      );
+    }
   }
 
   public async hasUserStoreDocs(userId: string) {
@@ -138,7 +155,11 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
   }: CreateUserStoreParams) {
     const cached = this.userStoreNamesCache.get(userId);
     if (cached?.has(inputName)) {
-      return await this.getUserStoreUnique(userId, inputName);
+      const rich = this.userIdAndStoreNameCache.get(userId)?.get(inputName);
+      if (rich) return rich;
+      const data = await this.getUserStoreUnique(userId, inputName);
+      this.syncCache(userId, data);
+      return data;
     } else {
       const data = await this.createUserStore({
         storeName: inputName,
@@ -147,13 +168,7 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
         defaultEmbeddingModel,
         schemaVersion
       });
-      if (cached) {
-        cached.add(data.storeName);
-      } else {
-        const storeSet = new Set<string>();
-        storeSet.add(data.storeName);
-        this.userStoreNamesCache.set(userId, storeSet);
-      }
+      this.syncCache(userId, data);
       return data;
     }
   }
@@ -168,227 +183,111 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
       .split("::")
       .map(t => (/\d+/.test(t) ? Number.parseInt(t) : t));
   }
-  // public async findManyUserStoreDocs(userId: string, storeName: string) {}
-  public async findManyLocalStoreDocs(
-    provider: $Enums.Provider,
-    userId: string
-  ) {
-    return await this.prismaClient.$transaction(async prisma => {
-      const localstoreDocsFindMany = await prisma.attachment.findMany({
-        where: {
-          AND: [{ localVectorStoreDocs: { some: { provider } }, userId }]
-        },
-        select: {
-          id: true,
-          compatCdnUrl: true,
-          localVectorStoreDocs: {
-            where: { provider },
-            select: {
-              id: true,
-              createdAt: true,
-              lastAccessed: true,
-              provenanceId: true,
-              embeddingDim: true,
-              embeddingModel: true,
-              extractedTextLength: true,
-              hasVisualMedia: true,
-              pageCount: true,
-              annotPages: true,
-              imagePages: true,
-              ext: true,
-              conversationId: true,
-              messageId: true,
-              schemaVersion: true,
-              storeId: true,
-              imageCount: true,
-              visualMediaHint: true,
-              tokenCount: true,
-              modelSelectionReason: true,
-              updatedAt: true,
-              indexedAt: true,
-              provider: true,
-              errorMessage: true,
-              filename: true,
-              mimeType: true,
-              chunkCount: true,
-              state: true,
-              size: true,
-              chunks: {
-                select: {
-                  chunkProvenanceId: true,
-                  chunkIndex: true,
-                  startOffset: true,
-                  errorMessage: true,
-                  content: true,
-                  endOffset: true,
-                  state: true,
-                  contentHash: true,
-                  id: true
-                }
-              }
-            }
-          }
-        }
-      });
 
-      const arr = Array.of<FindManyLocalStoreDocsShape>();
-      for (const attachment of localstoreDocsFindMany) {
-        const attachmentId = attachment.id;
-        if (attachment.localVectorStoreDocs.length > 0) {
-          for (const doc of attachment.localVectorStoreDocs) {
-            const {
-              chunks,
-              chunkCount,
-              annotPages: annotPgs,
-              imagePages: imgPgs,
-              size,
-              provenanceId,
-              ...docRest
-            } = doc;
-
-            const annotPages = this.expandPageRefEnumreable(annotPgs) as
-              | number[]
-              | null;
-
-            const imagePages = this.expandPageRefEnumreable(imgPgs) as
-              | number[]
-              | null;
-
-            const { conversationId, messageId, extension } =
-              this.parseDocname(provenanceId);
-
-            const localStoreName = this.localVectorStoreDisplayName(
-              userId,
-              "ANTHROPIC"
-            );
-            const chunkArr =
-              Array.of<
-                Rm<Unenumerate<typeof chunks>, "content" | "errorMessage">
-              >();
-
-            const chunkErrArr = Array.of<Unenumerate<typeof chunks>>();
-
-            // TODO REPROCESS FAILED CHUNKS IN THE BACKGROUND VIA A VOID CALL BEFORE RETURN
-            for (const t of chunks) {
-              const { errorMessage, content, ...chunkRest } = t;
-              if (t.state === "ERROR") {
-                chunkErrArr.push({
-                  errorMessage,
-                  content,
-                  ...chunkRest
-                });
-              } else {
-                chunkArr.push({
-                  ...chunkRest
-                });
-              }
-            }
-
-            const record = {
-              ...docRest,
-              ext: extension,
-              attachmentId,
-              chunkCount,
-              conversationId,
-              annotPages,
-              imagePages,
-              messageId,
-              chunks,
-              storeName: localStoreName,
-              provenanceId,
-              size: size ? Number(size) : null
-            } satisfies FindManyLocalStoreDocsShape;
-            arr.push(record);
-          }
-        }
-      }
-      return arr;
+  public async findManyUserStoreDocs(userId: string) {
+    const docs = await this.prismaClient.userStoreDoc.findMany({
+      where: { store: { userId } },
+      include: { chunks: true }
     });
+    return docs.map(({ size, ...rest }) => ({
+      ...rest,
+      size: Number(size)
+    })) as UserStoreDocSingleton<true>[];
   }
 
-  // public async findLocalVectorStore(userId: string, provider: $Enums.Provider) {
-  //   const exists = await this.localVectorStoreCheck(provider, userId);
-  //   if (exists) {
-  //     return this.userStoreBigIntToNum(
-  //       await this.prismaClient.localVectorStore.findUniqueOrThrow({
-  //         where: { userId_provider_local: { provider, userId } }
-  //       })
-  //     );
-  //   } else {
-  //     return await this.createUserVectorStore({
-  //       storeName: this.localVectorStoreDisplayName(userId, provider),
-  //       createdAt: new Date(),
-  //       provider,
-  //       userId
-  //     });
-  //   }
-  // }
-
-  public async hasLocalStoreDocument(
-    provider: $Enums.Provider,
-    provenanceId: string,
-    storeId: string
-  ) {
-    const count = await this.prismaClient.localVectorStoreDoc.count({
-      where: {
-        provenanceId,
-        provider,
-        storeId
-      }
+  public async hasUserStoreDoc(attachmentId: string) {
+    const count = await this.prismaClient.userStoreDoc.count({
+      where: { attachmentId }
     });
     return count > 0;
   }
 
-  public async upsertLocalStoreDoc({
+  public async upsertUserStoreDoc({
     storeId,
     attachmentId,
     conversationId,
     messageId,
-    provider,
+    originatingUrl,
+    originatingModel,
+    originatingProvider,
     provenanceId,
     filename,
     mimeType,
     ext,
-    size = null,
+    size,
     embeddingModel = "voyage-multimodal-3.5",
     embeddingDim = 1024,
     hasVisualMedia = false,
-    visualMediaHint = null,
+    visualMediaSource = null,
+    visualMediaContent = null,
     pageCount = null,
+    modelSelectionReason = null,
+    state = "QUEUED",
+    extractedTextLength = null,
+    imageCount = null,
     imagePages = null,
     annotPages = null,
-    modelSelectionReason = null,
-    state = "PENDING"
+    tokenCount = 0,
+    annots = null
   }: {
     storeId: string;
     attachmentId: string;
     conversationId: string;
     messageId: string;
-    provider: $Enums.Provider;
+    originatingUrl: string;
+    originatingModel: string;
+    originatingProvider: $Enums.Provider;
     provenanceId: string;
     filename: string;
     mimeType: string;
     ext: string;
-
-    size?: bigint | null;
+    size: bigint;
     embeddingModel?: Voyage.ModelUnion;
     embeddingDim?: Voyage.EmbeddingDims;
     hasVisualMedia?: boolean;
-    visualMediaHint?: $Enums.VisualMediaHint | null;
+    visualMediaSource?: $Enums.VisualMediaSource | null;
+    visualMediaContent?: $Enums.VisualMediaContent | null;
     pageCount?: number | null;
+    modelSelectionReason?: string | null;
+    state?: $Enums.UserStoreDocState;
+    extractedTextLength?: number | null;
+    imageCount?: number | null;
     imagePages?: string | null;
     annotPages?: string | null;
-    modelSelectionReason?: string | null;
-    state?: $Enums.ProviderDocState;
+    tokenCount?: number;
+    annots?: {
+      subtype: $Enums.AnnotSubtype;
+      uri: string;
+      rect: number[];
+      startOffset: number;
+      endOffset: number;
+      pageNumber?: number | null;
+      isCdnLink?: boolean;
+      linkedDocId?: string | null;
+      attachmentId?: string | null;
+    }[] | null;
   }) {
-    return await this.prismaClient.localVectorStoreDoc.upsert({
-      where: { storeId_provenanceId: { storeId, provenanceId } },
+    const annotsCreate = annots?.map(a => ({
+      subtype: a.subtype,
+      uri: a.uri,
+      rect: a.rect,
+      startOffset: a.startOffset,
+      endOffset: a.endOffset,
+      pageNumber: a.pageNumber ?? null,
+      isCdnLink: a.isCdnLink ?? false,
+      linkedDocId: a.linkedDocId ?? null,
+      attachmentId: a.attachmentId ?? null
+    }));
+    return await this.prismaClient.userStoreDoc.upsert({
+      where: { attachmentId },
       create: {
         storeId,
         attachmentId,
         conversationId,
         messageId,
-        provider,
+        originatingUrl,
+        originatingModel,
+        originatingProvider,
         provenanceId,
         filename,
         mimeType,
@@ -397,23 +296,35 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
         embeddingModel,
         embeddingDim,
         hasVisualMedia,
-        visualMediaHint,
+        visualMediaSource,
+        visualMediaContent,
         pageCount,
+        modelSelectionReason,
+        state,
+        extractedTextLength,
+        imageCount,
         imagePages,
         annotPages,
-        modelSelectionReason,
-        state
+        tokenCount,
+        ...(annotsCreate?.length ? { annots: { create: annotsCreate } } : {})
       },
       update: {
         embeddingModel,
         hasVisualMedia,
-        visualMediaHint,
+        visualMediaSource,
+        visualMediaContent,
         pageCount,
-        imagePages,
-        annotPages,
         modelSelectionReason,
         state,
-        updatedAt: new Date(Date.now())
+        extractedTextLength,
+        imageCount,
+        imagePages,
+        annotPages,
+        tokenCount,
+        updatedAt: new Date(Date.now()),
+        ...(annotsCreate?.length
+          ? { annots: { deleteMany: {}, create: annotsCreate } }
+          : {})
       },
       select: {
         id: true,
@@ -425,16 +336,19 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
     });
   }
 
-  public async createLocalDocChunk(
+  public async createUserStoreChunk(
     provenanceId: string,
     storeId: string,
     docId: string,
     chunkIndex: number,
     content: string,
     contentHash: string,
-    startOffset: number | null = null,
-    endOffset: number | null = null,
-    schemaVersion: $Enums.LocalStoreSchemaVersion = "v1_0"
+    startOffset: number,
+    endOffset: number,
+    hasVisualContent: boolean,
+    pageStartOffset: number | null = null,
+    pageEndOffset: number | null = null,
+    schemaVersion: $Enums.UserStoreSchemaVersion = "v1_0"
   ) {
     const { attachmentId, conversationId, messageId } =
       this.parseDocname(provenanceId);
@@ -442,7 +356,7 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
       provenanceId,
       chunkIndex
     );
-    return await this.prismaClient.localVectorStoreDocChunk.create({
+    return await this.prismaClient.userStoreDocChunk.create({
       data: {
         docId,
         storeId,
@@ -457,44 +371,46 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
         contentHash,
         startOffset,
         endOffset,
-        tokenCount: 0, // placeholder, update this post-chunk completion
+        hasVisualContent,
+        pageStartOffset,
+        pageEndOffset,
+        tokenCount: 0,
         schemaVersion
       }
     });
   }
 
-  public async insertLocalDocChunkTyped(
-    ...args: updateLocalDocChunkState.Parameters
+  public async updateUserStoreChunkTyped(
+    ...args: updateUserStoreChunkState.Parameters
   ) {
     return await this.prismaClient.$queryRawTyped(
-      updateLocalDocChunkState(...args)
+      updateUserStoreChunkState(...args)
     );
   }
 
-  public async searchLocalStoreChunks(
+  public async searchUserStoreChunks(
     storeId: string,
     embedding: string,
     limit: number,
     threshold: number
   ) {
     return await this.prismaClient.$queryRawTyped(
-      searchLocalDocChunksByStore(storeId, embedding, limit, threshold)
+      searchUserStoreChunksByStore(storeId, embedding, limit, threshold)
     );
   }
 
-  public async updateLocalStoreDocState(
-    ...args: updateLocalDocState.Parameters
+  public async updateUserStoreDocStateTyped(
+    ...args: updateUserStoreDocState.Parameters
   ) {
-    return await this.prismaClient.$queryRawTyped(updateLocalDocState(...args));
+    return await this.prismaClient.$queryRawTyped(
+      updateUserStoreDocState(...args)
+    );
   }
 
-  public async localVectorStoreCheck(
-    provider: $Enums.Provider,
-    userId: string
-  ) {
-    const vectorStoreCounts = await this.prismaClient.localVectorStore.count({
-      where: { provider, userId }
+  public async userStoreCheck(userId: string, storeName?: string) {
+    const count = await this.prismaClient.userStore.count({
+      where: storeName ? { userId, storeName } : { userId }
     });
-    return vectorStoreCounts > 0;
+    return count > 0;
   }
 }
