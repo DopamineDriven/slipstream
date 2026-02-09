@@ -40,6 +40,7 @@ export default defineConfig(
         "src/prisma/provider-store.ts",
         "src/prisma/types.ts",
         "src/prisma/user-meta.ts",
+        "src/prisma/user-store.ts",
         "src/prisma/utils.ts",
         "src/providers/index.ts",
         "src/resolver/index.ts",

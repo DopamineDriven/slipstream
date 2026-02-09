@@ -6,7 +6,6 @@ import type { Voyage } from "@/voyage/types.ts";
 import { ExtractService } from "@/extract/index.ts";
 import { PrismaLocalStoreService } from "@/prisma/local-store.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { UserStoreDocSingleton } from "@slipstream/types";
 import { PrismaDbService } from "@slipstream/db/factory";
 import {
   searchUserStoreChunksByStore,
@@ -15,41 +14,12 @@ import {
 } from "@slipstream/db/sql-node";
 
 export class PrismaUserStoreService extends PrismaLocalStoreService {
-  /**
-   * key: userId,
-   */
-  public readonly userStoreNamesCache = new Map<string, Set<string>>();
-  /**
-   * key: [userId, storeName]
-   */
-  public readonly userIdAndStoreNameCache = new Map<
-    string,
-    Map<string, CreateUserStoreRT<true>>
-  >();
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
     isProd: boolean
   ) {
     super(prisma, extractor, isProd);
-  }
-
-  private syncCache(userId: string, data: CreateUserStoreRT<true>) {
-    const nameSet = this.userStoreNamesCache.get(userId);
-    if (nameSet) {
-      nameSet.add(data.storeName);
-    } else {
-      this.userStoreNamesCache.set(userId, new Set([data.storeName]));
-    }
-    const storeMap = this.userIdAndStoreNameCache.get(userId);
-    if (storeMap) {
-      storeMap.set(data.storeName, data);
-    } else {
-      this.userIdAndStoreNameCache.set(
-        userId,
-        new Map([[data.storeName, data]])
-      );
-    }
   }
 
   public async hasUserStoreDocs(userId: string) {
@@ -68,26 +38,6 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
       select: { storeName: true, id: true }
     });
     return allStores;
-  }
-
-  public async populateUserStoreNameCache(userId: string) {
-    const nameSet = new Set<string>();
-    const data = await this.getAllUserStores(userId);
-    if (data.length > 0) {
-      for (const { storeName } of data) {
-        nameSet.add(storeName);
-      }
-    } else {
-      const create = await this.createUserStore({
-        storeName: this.vectorStoreDisplayName(userId),
-        userId,
-        defaultEmbeddingDim: 1024,
-        defaultEmbeddingModel: "voyage-multimodal-3.5",
-        schemaVersion: "v1_0"
-      });
-      nameSet.add(create.storeName);
-    }
-    this.userStoreNamesCache.set(userId, nameSet);
   }
 
   private userStoreBigIntToNum(data: CreateUserStoreRT<false>) {
@@ -115,7 +65,7 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
     } as const;
   }
 
-  private async getUserStoreUnique(userId: string, storeName: string) {
+  public async getUserStoreUnique(userId: string, storeName: string) {
     return this.userStoreBigIntToNum(
       await this.prismaClient.userStore.findUniqueOrThrow({
         where: { userId_storeName: { userId, storeName } },
@@ -124,7 +74,7 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
     ) satisfies CreateUserStoreRT<true>;
   }
 
-  private async createUserStore({
+  public async createUserStore({
     storeName: inputName,
     userId,
     defaultEmbeddingDim = 1024,
@@ -146,33 +96,6 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
     );
   }
 
-  public async createUserVectorStore({
-    storeName: inputName,
-    userId,
-    defaultEmbeddingModel = "voyage-multimodal-3.5",
-    defaultEmbeddingDim = 1024,
-    schemaVersion = "v1_0"
-  }: CreateUserStoreParams) {
-    const cached = this.userStoreNamesCache.get(userId);
-    if (cached?.has(inputName)) {
-      const rich = this.userIdAndStoreNameCache.get(userId)?.get(inputName);
-      if (rich) return rich;
-      const data = await this.getUserStoreUnique(userId, inputName);
-      this.syncCache(userId, data);
-      return data;
-    } else {
-      const data = await this.createUserStore({
-        storeName: inputName,
-        userId,
-        defaultEmbeddingDim,
-        defaultEmbeddingModel,
-        schemaVersion
-      });
-      this.syncCache(userId, data);
-      return data;
-    }
-  }
-
   public collapsePageRefEnumerable(target: (string | number)[]) {
     return target.join("::");
   }
@@ -192,7 +115,7 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
     return docs.map(({ size, ...rest }) => ({
       ...rest,
       size: Number(size)
-    })) as UserStoreDocSingleton<true>[];
+    }));
   }
 
   public async hasUserStoreDoc(attachmentId: string) {
@@ -412,5 +335,43 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
       where: storeName ? { userId, storeName } : { userId }
     });
     return count > 0;
+  }
+
+  public async findAttachmentByCdnUrl(uri: string) {
+    return await this.prismaClient.attachment.findFirst({
+      where: { OR: [{ cdnUrl: uri }, { compatCdnUrl: uri }] },
+      select: {
+        id: true,
+        userStoreDoc: { select: { id: true } }
+      }
+    });
+  }
+
+  public async findUserStoreDocByAttachmentId(attachmentId: string) {
+    return await this.prismaClient.userStoreDoc.findUnique({
+      where: { attachmentId },
+      select: { id: true }
+    });
+  }
+
+  public async findDocumentAttachmentsForCdnCache(userId: string) {
+    return await this.prismaClient.attachment.findMany({
+      where: { userId, assetType: "DOCUMENT" },
+      orderBy: { createdAt: "desc" },
+      take: 1000,
+      select: {
+        id: true,
+        compatCdnUrl: true,
+        compatStatus: true,
+        conversationId: true,
+        messageId: true,
+        filename: true,
+        ext: true,
+        mime: true,
+        compatExt: true,
+        compatMime: true,
+        userStoreDoc: { select: { id: true } }
+      }
+    });
   }
 }

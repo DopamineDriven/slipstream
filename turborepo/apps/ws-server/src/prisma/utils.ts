@@ -130,15 +130,25 @@ export class PrismaUtilsService extends ModelService {
       ? conversationId
       : null;
   }
-  private urlExtWorkup<const T extends $Enums.Provider>(
-    provider: T,
-    attachment: AttachmentSingleton<true>
+
+  private urlLogWorkup(att: AttachmentSingleton<true>, provider?: $Enums.Provider){
+    if (provider) {
+     return `no compat status provided in attachment record ${att.id} for provider ${provider.toLowerCase()} having cdnUrl ${att.cdnUrl}`
+    } else {
+      return `no compat status provided in attachment record ${att.id} for user ${att.userId} having cdnUrl ${att.cdnUrl}`
+    }
+  }
+  private urlExtWorkup(
+    attachment: AttachmentSingleton<true>,
+    provider: $Enums.Provider = "ANTHROPIC",
   ) {
     const urlExtRecord = { url: "", ext: "", mime: "" };
+
+
     try {
       if (!attachment.compatStatus)
         throw new Error(
-          `no compat status provided in attachment record ${attachment.id} for provider ${provider.toLowerCase()}`
+          this.urlLogWorkup(attachment, provider)
         );
       if (
         attachment.compatStatus === "ACTIVE" &&
@@ -167,6 +177,62 @@ export class PrismaUtilsService extends ModelService {
     }
   }
 
+
+  private async userStoreToTmpWorkup(
+    {
+      assetType,
+      compatStatus,
+      conversationId,
+      messageId,
+      id,
+      userId,
+      ...rest
+    }: AttachmentSingleton<true>
+  ) {
+    const displayName = this.toVectorStoreFilename({
+      assetType,
+      compatStatus,
+      conversationId,
+      messageId,
+      id,
+      userId,
+      ...rest
+    });
+    const { ext, mime, url } = this.urlExtWorkup({
+      ...rest,
+      assetType,
+      compatStatus,
+      conversationId,
+      messageId,
+      id,
+      userId
+    });
+    const {timestamp} = this.urlParseNonCompat(url);
+
+    const tmpPrefix = `${timestamp}-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
+    const tmpName = this.extractor.uniqueTmpName(tmpPrefix, ext);
+    const urlObj = new URL(url);
+
+    let usefulName: string;
+    if (conversationId && messageId) {
+      // will always be defined as message and convoId for incoming assets are database derived
+      // and incoming user messages are persisted fully so AI SDKs always receive db-synced data
+      usefulName = displayName;
+    } else {
+      usefulName = urlObj.pathname.replace(/\//gim, "-");
+    }
+    const safeFilename = usefulName;
+    const absTmpPath = resolve(tmpdir(), tmpName);
+    return {
+      tmpFilenamePrefix: tmpPrefix,
+      tmpUniquename: tmpName,
+      absTmpPath,
+      ext,
+      remoteUrl: url,
+      safeFilename,
+      mime
+    };
+  }
   private async filesApiToTmpWorkup<const T extends $Enums.Provider>(
     provider: T,
     {
@@ -188,7 +254,7 @@ export class PrismaUtilsService extends ModelService {
       userId,
       ...rest
     });
-    const { ext, mime, url } = this.urlExtWorkup(provider, {
+    const { ext, mime, url } = this.urlExtWorkup({
       ...rest,
       assetType,
       compatStatus,
@@ -196,7 +262,7 @@ export class PrismaUtilsService extends ModelService {
       messageId,
       id,
       userId
-    });
+    }, provider);
     const tmpPrefix = `${provider.toLowerCase()}-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
     const tmpName = this.extractor.uniqueTmpName(tmpPrefix, ext);
     const urlObj = new URL(url);
@@ -220,6 +286,44 @@ export class PrismaUtilsService extends ModelService {
       safeFilename,
       mime
     };
+  }
+
+  public async userStoreAssetToTmp(
+    att: AttachmentSingleton<true>
+  ) {
+    const workup = await this.userStoreToTmpWorkup(att);
+    if (!workup)
+      throw new Error(
+        `user ${att.userId} workup for ${att.id} not defined`
+      );
+    const {
+      absTmpPath,
+      ext,
+      tmpUniquename,
+      tmpFilenamePrefix,
+      safeFilename,
+      remoteUrl,
+      mime
+    } = workup;
+    await this.extractor.fetchRemoteWriteLocalLargeFiles(
+      remoteUrl,
+      absTmpPath,
+      false
+    );
+    if (this.extractor.existsTmp(tmpUniquename)) {
+      return {
+        tmpUniquename,
+        absTmpPath,
+        ext,
+        tmpFilenamePrefix,
+        safeFilename,
+        mime
+      };
+    } else {
+      throw new Error(
+        `no tmp file exists having filename ${tmpUniquename} at absolute path ${absTmpPath} exist for user ${att.userId}`
+      );
+    }
   }
 
   public async fetchRemoteToTmp<const T extends $Enums.Provider>(
@@ -332,7 +436,7 @@ export class PrismaUtilsService extends ModelService {
    */
   public filenameToHexExtTuple(
     url: string,
-    compatStatus: ("FAILED" | "PENDING" | "ACTIVE" | "ALIASED") | null,
+    compatStatus: $Enums.CompatStatus | null,
     encoded = true
   ) {
     const urlObj = new URL(url);
@@ -356,14 +460,65 @@ export class PrismaUtilsService extends ModelService {
     return [name, ext] as const;
   }
 
+  public urlParseCompat(url: string) {
+    const urlObj = new URL(url);
+    const path = urlObj.pathname;
+    const [toppath, basepaths] = [
+      path.slice(path.lastIndexOf("/") + 1),
+      path.slice(1, path.lastIndexOf("/"))
+    ];
+    const [attachmentId, ext] = [
+      toppath.slice(4, toppath.lastIndexOf(".")),
+      toppath.slice(toppath.lastIndexOf(".") + 1)
+    ];
+    const [origin, converted] = [
+      basepaths.slice(0, basepaths.lastIndexOf("/")).toUpperCase(),
+      basepaths.slice(basepaths.lastIndexOf("/") + 1)
+    ];
+    return {
+      compatStatus: "ACTIVE",
+      attachmentId,
+      ext,
+      // always "converted"
+      converted,
+      origin
+    } as const;
+  }
+  public urlParseNonCompat(url: string) {
+    const urlObj = new URL(url);
+    const path = urlObj.pathname;
+    const [toppath, basepaths] = [
+      path.slice(path.lastIndexOf("/") + 1),
+      path.slice(1, path.lastIndexOf("/"))
+    ];
+    const [origin, userId] = [
+      basepaths
+        .slice(0, basepaths.lastIndexOf("/"))
+        .toUpperCase() as $Enums.AssetOrigin,
+      basepaths.slice(basepaths.lastIndexOf("/") + 1)
+    ];
+    const [timestamp, filename, ext] = [
+      toppath.slice(0, 13),
+      toppath.slice(14, toppath.lastIndexOf(".")),
+      toppath.slice(toppath.lastIndexOf(".") + 1)
+    ];
+    return {
+      compatStatus: "ALIASED",
+      origin,
+      userId,
+      timestamp,
+      filename,
+      ext
+    } as const;
+  }
+
   public toUserStoreProvenanceId(att: AttachmentSingleton<true>) {
+    if (!att.cdnUrl) throw new Error("attachment should not exist if cdnUrl is null.");
     let url: string;
     if (att.compatStatus === "ACTIVE" && att.compatCdnUrl) {
       url = att.compatCdnUrl;
-    } else if (att.compatStatus === "ALIASED" && att.cdnUrl) {
-      url = att.cdnUrl;
     } else {
-      url = "";
+      url = att.cdnUrl;
     }
     const [filename, ext] = this.filenameToHexExtTuple(url, att.compatStatus);
     if (att.conversationId && att.messageId) {
@@ -373,13 +528,12 @@ export class PrismaUtilsService extends ModelService {
     }
   }
   public toVectorStoreFilename(att: AttachmentSingleton<true>) {
+    if (!att.cdnUrl) throw new Error("attachment should not exist if cdnUrl is null.");
     let url: string;
     if (att.compatStatus === "ACTIVE" && att.compatCdnUrl) {
       url = att.compatCdnUrl;
-    } else if (att.compatStatus === "ALIASED" && att.cdnUrl) {
-      url = att.cdnUrl;
     } else {
-      url = "";
+      url = att.cdnUrl;
     }
     const [filename, ext] = this.filenameToHexExtTuple(url, att.compatStatus);
     if (att.conversationId && att.messageId) {

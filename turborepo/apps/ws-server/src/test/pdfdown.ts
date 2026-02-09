@@ -1,9 +1,48 @@
-import type { PageImage } from "@d0paminedriven/pdfdown";
+import type {
+  PageBox,
+  PageImage,
+  PdfMeta,
+  StructuredPageText
+} from "@d0paminedriven/pdfdown";
 import { Fs } from "@d0paminedriven/fs";
 import type { DX, Rm, Unenumerate } from "@slipstream/types";
 
 const fs = new Fs(process.cwd());
 export type PageImageWithSize = DX<Rm<PageImage, "data"> & { size: number }>;
+interface PageOffsetCache {
+  page: number;
+  body: string;
+  offsets: [number, number];
+  hasImages: boolean;
+  hasAnnots: boolean;
+}
+
+// interface AnnotsEnhanced {
+//   page: number;
+//   subtype: string;
+//   rect: [number, number, number, number];
+//   pageBox: PageBoxEnhanced;
+//   uri?: string;
+//   dest?: string;
+//   content?: string;
+// }
+
+interface PageBoxEnhanced extends PageBox {
+  coverage: number;
+}
+
+// interface ImgCache {
+//     height: number;
+//     width: number;
+//     aspectRatio: number;
+//     tmpFileName: string;
+//     absTmpPath: string;
+//     index: number;
+//     page: number;
+//     colorSpace: string;
+//     filter: string;
+//     size: number;
+// }
 
 export const pdfChoiceArr = [
   "Ascension-Through-Fire---A-Sacred-Arrival-Above-Infernal-Gates.pdf",
@@ -46,6 +85,7 @@ export const pdfChoiceArr = [
   "Grokina-Suprema---A-Sardonic-Ode-to-a-Cosmic-Guac-Brandishing-Goddess.pdf",
   "Grokina-Suprema---Cosmic-Guac-Wielder-in-Roman-Veil-and-Sass.pdf",
   "Grokina-Suprema---Irreverent-Riff-of-a-Galactic-Guac-Goddess.pdf",
+  "hello-ocr-ocr.pdf",
   "INFJesus-and-the-Whale-Pt-I.pdf",
   "INFJesus-and-the-Whale-Pt-II.pdf",
   "INFJesus-and-the-Whale-Pt-III.pdf",
@@ -67,6 +107,7 @@ export const pdfChoiceArr = [
   "Lollaclaudplooza-Pt-X.pdf",
   "Lollaclaudplooza-Pt-XI.pdf",
   "Lollaclaudplooza-Pt-XII.pdf",
+  "multipage-ocr-ocr.pdf",
   "O’Geminsea---Unleashing-Fresh-Vector-Store-Deluge-for-Grokina’s-Peak-Indexing.pdf",
   "Parasympathetic-Protocol-Pt-I.pdf",
   "Parasympathetic-Protocol-Pt-II.pdf",
@@ -152,6 +193,101 @@ export const pdfChoiceArr = [
   "summoning-the-muse.pdf"
 ] as const;
 
+function pageBoxHelper(meta: PdfMeta) {
+  // 0 is default page box config key; if size ===1, 0 is the only entry (uniform)
+  const pBoxCache = new Map<number, PageBoxEnhanced>();
+  const { pageBoxes, ...metaRest } = meta;
+  const total = metaRest.pageCount;
+  const anomalySet = new Set<number>();
+  if (pageBoxes.length === 1) {
+    const uniformBox = pageBoxes[0];
+    if (uniformBox) {
+      pBoxCache.set(0, { ...uniformBox, coverage: 1 });
+    }
+  }
+  if (pageBoxes.length > 1) {
+    // intentionally reverse to iterate over the default last
+    // after aggregating the number of pages deviating from the majority page box config
+    for (const p of pageBoxes.reverse()) {
+      if (p.pages?.length) {
+        for (const e of p.pages) {
+          anomalySet.add(e);
+          pBoxCache.set(e, {
+            ...p,
+            coverage: p.pages.length / total
+          });
+        }
+      } else {
+        const coverage = (total - pBoxCache.size) / total;
+        pBoxCache.set(0, { coverage, ...p });
+      }
+    }
+  }
+
+  if (pBoxCache.size > 1) {
+    for (const a of Array.from(pBoxCache.keys())) {
+      if (a !== 0) anomalySet.add(a);
+    }
+  }
+  return { anomalySet, pageBoxCache: pBoxCache, ...metaRest };
+}
+
+// function annotsHandling(meta: PdfMeta, annots: PageAnnotation[]) {
+//   const { pageBoxCache } = pageBoxHelper(meta);
+//   const annotmap = new Map<number, AnnotsEnhanced>();
+//   if (annots.length > 0) {
+//     for (const annot of annots) {
+//       if (pageBoxCache.size > 1) {
+//         if (pageBoxCache.has(annot.page)) {
+//           const pageobj = pageBoxCache.get(annot.page);
+//           if (pageobj) {
+//             const { rect, ...annotRest } = annot;
+//             const rectTyped = rect as [number, number, number, number];
+//             annotmap.set(annot.page, {
+//               ...annotRest,
+//               rect: rectTyped,
+//               pageBox: pageobj
+//             });
+//           }
+//         }
+//       } else {
+//         // 0->default
+//         const pageobj = pageBoxCache.get(0);
+//         if (pageobj) {
+//           const { rect, ...annotRest } = annot;
+//           const rectTyped = rect as [number, number, number, number];
+//           annotmap.set(annot.page, {
+//             ...annotRest,
+//             rect: rectTyped,
+//             pageBox: pageobj
+//           });
+//         }
+//       }
+//     }
+//   }
+//   return
+// }
+
+function annotOffsetsByPage(
+  structuredText: StructuredPageText[],
+  imagePages: Set<number>,
+  annotPages: Set<number>
+) {
+  let offset = 0;
+
+  const mapper = new Map<number, PageOffsetCache>();
+  for (const { body, page } of structuredText) {
+    mapper.set(page, {
+      body,
+      page,
+      offsets: [offset, offset + body.length],
+      hasAnnots: annotPages.has(page),
+      hasImages: imagePages.has(page)
+    });
+    offset += body.length;
+  }
+  return Array.from(mapper.values());
+}
 async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
   const filename = path.slice(0, path.lastIndexOf("."));
   const imgPages = new Set<number>();
@@ -177,8 +313,24 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
       annotPages.add(annot.page);
     }
   }
+
+  const pageBoxMap = new Map<number, PageBox>();
+  for (const [i, x] of meta.pageBoxes.entries()) {
+    if (x?.pages) {
+      pageBoxMap.set(i, x);
+      x.pageCount;
+    }
+  }
+  let offset = 0;
+
+  const mapper = new Map<number, { offsets: [number, number]; body: string }>();
+  for (const { body, page } of structuredText) {
+    mapper.set(page, { body, offsets: [offset, offset + body.length] });
+    offset += body.length;
+  }
+
   console.log(
-    `char length: ${structuredText.map(t => t.body).join(`\n\n`).length}`
+    `char length: ${structuredText.map(t => t.body.trim()).join(``).length}`
   );
   const imgWithSizeArr = Array.of<PageImageWithSize>();
   if (images.length > 0) {
@@ -197,20 +349,25 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
       imgWithSizeArr.push({ ...rest, size: data.byteLength / 1024 / 1024 });
     }
   }
-  const body = structuredText.map(t => ({ [t.page]: t.body }));
+  const myData = annotOffsetsByPage(structuredText, imgPages, annotPages);
+  const pageobjMap = pageBoxHelper(meta);
   const toJson = JSON.stringify(
     {
       meta,
+      annotCount: annots.length,
+      imageCount: images.length,
+      pageBoxHelper: Array.from(pageobjMap.pageBoxCache.values()),
       imagePages: Array.from(imgPages),
       annotPages: Array.from(annotPages),
       annots,
       images: imgWithSizeArr,
-      structuredText: body
+      structuredText: myData
     },
     null,
     2
   );
-  const x = pdfChoiceArr.findIndex(s => s === path);
+
+  const x = pdfChoiceArr.lastIndexOf(path);
   const templatize = `export const pdfIndex${x} = ${toJson};`;
   fs.withWs(`src/test/__out__/pdfdown/${filename}/index.ts`, templatize);
 
@@ -220,11 +377,14 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
     annotPages: Array.from(annotPages),
     annots,
     imgWithSizeArr,
-    body
+    body: myData
   };
 }
 const perf = performance.now();
-readAndExtract("Warlord-of-Whimsy-Pt-I.pdf").then(v => {
+const x = "The-Path-to-Hell-is-Paved-with-Good-Intentions.pdf" as const satisfies Unenumerate<
+  typeof pdfChoiceArr
+>;
+readAndExtract(x).then(v => {
   console.log(`ts script finished in: ${performance.now() - perf} ms`);
   if (v.creationDate && v.creator && v.producer) {
     const imgSizes = v.imgWithSizeArr.map(t => t.size);
@@ -235,9 +395,11 @@ readAndExtract("Warlord-of-Whimsy-Pt-I.pdf").then(v => {
     const {
       creationDate,
       creator,
+      modificationDate,
       pageCount,
       producer,
       version,
+      pageBoxes,
       annotPages,
       imagePages,
       isLinearized
@@ -251,8 +413,10 @@ readAndExtract("Warlord-of-Whimsy-Pt-I.pdf").then(v => {
       version,
       imgSizeMb: i,
       isLinearized,
+      pageBoxes,
       annotPages,
-      imagePages
+      imagePages,
+      modificationDate
     });
   }
 });

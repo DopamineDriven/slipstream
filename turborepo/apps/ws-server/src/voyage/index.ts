@@ -188,16 +188,8 @@ export class VoyageEmbeddingService {
     }
   }
 
-  async countTokensSingle(
-    text: string,
-    model: Voyage.ModelUnion = "voyage-context-3"
-  ) {
-    const result = await this.countTokens([text], model);
-    return result;
-  }
-
   // TODO
-  // ADD VIDEO COVERAGE HERE TOO
+  // ADD VIDEO COVERAGE HERE ONCE USERSTORE IS FULLY UP AND RUNNING FOR IMAGES/PDFS
   /**
    * Exact multimodal token counts via Voyage Python SDK's `count_usage`.
    * Images are passed as file paths — Python reads them via PIL.Image.open(path).

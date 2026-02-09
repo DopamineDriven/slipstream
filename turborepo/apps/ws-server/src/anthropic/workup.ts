@@ -116,7 +116,6 @@ export class AnthropicWorkup extends AnthropicBaseService {
     );
 
     let totalFiles = 0;
-    let totalDocs = 0;
 
     const apiKey = tryApiKey.apiKey ?? this.apiKey;
     // Preserve existing lastAccessedAt data before clearing

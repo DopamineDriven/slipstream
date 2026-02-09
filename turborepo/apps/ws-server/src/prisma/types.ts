@@ -99,6 +99,59 @@ export interface FindManyLocalStoreDocsShape {
   chunks: ChunkArrShape[];
 }
 
+export interface UserStoreChunkArrShape {
+  id: string;
+  errorMessage: string | null;
+  state: $Enums.UserStoreChunkState;
+  chunkProvenanceId: string;
+  chunkIndex: number;
+  content: string;
+  contentHash: string;
+  startOffset: number;
+  endOffset: number;
+  hasVisualContent: boolean;
+  pageStartOffset: number | null;
+  pageEndOffset: number | null;
+  retryCount: number;
+}
+
+export interface FindManyUserStoreDocsShape {
+  id: string;
+  size: number;
+  filename: string;
+  createdAt: Date;
+  updatedAt: Date;
+  attachmentId: string;
+  originatingProvider: $Enums.Provider;
+  originatingModel: string;
+  originatingUrl: string;
+  state: $Enums.UserStoreDocState;
+  schemaVersion: $Enums.UserStoreSchemaVersion;
+  errorMessage: string | null;
+  storeId: string;
+  imageCount: number | null;
+  provenanceId: string;
+  conversationId: string;
+  messageId: string;
+  modelSelectionReason: string | null;
+  indexedAt: Date | null;
+  mimeType: string;
+  ext: string;
+  chunkCount: number;
+  tokenCount: number;
+  lastAccessed: Date | null;
+  embeddingModel: Voyage.ModelUnion;
+  embeddingDim: Voyage.EmbeddingDims;
+  hasVisualMedia: boolean;
+  visualMediaSource: $Enums.VisualMediaSource | null;
+  visualMediaContent: $Enums.VisualMediaContent | null;
+  pageCount: number | null;
+  extractedTextLength: number | null;
+  imagePages: number[] | null;
+  annotPages: number[] | null;
+  chunks: UserStoreChunkArrShape[];
+}
+
 export interface CreateGeminiDocParams {
   userId: string;
   attachmentId: string;

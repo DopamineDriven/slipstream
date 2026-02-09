@@ -19,7 +19,7 @@ import { PrismaDbService } from "@slipstream/db/factory";
  *
  *  ⬆
  *
- * `@/prisma/local-store.ts`
+ * `@/prisma/user-store.ts`
  *
  *  ⬆
  *
@@ -28,7 +28,7 @@ import { PrismaDbService } from "@slipstream/db/factory";
  *  ⬆
  *
  * `@/prisma/attachment-provider.ts`
- * 
+ *
  *  ⬆
  *
  * `@/prisma/user-meta.ts`

@@ -4,6 +4,8 @@ packages:
   - tooling/*
 
 catalogs:
+  anthropic:
+    "@anthropic-ai/sdk": ^0.74.0
   auth:
     better-auth: ^1.4.18
   aws:
@@ -28,6 +30,8 @@ catalogs:
     "@types/js-cookie": ^3.0.6
   csstype:
     csstype: ^3.2.3
+  cuid2:
+    "@paralleldrive/cuid2": ^3.3.0
   cva:
     class-variance-authority: ^0.7.1
   dd:
@@ -51,6 +55,8 @@ catalogs:
     eslint-plugin-react-hooks: ^7.0.1
   fflate:
     fflate: ^0.8.2
+  google:
+    "@google/genai": ^1.38.0
   gtag:
     "@types/gtag.js": ^0.0.20
   jiti:
@@ -58,10 +64,14 @@ catalogs:
   katex:
     katex: ^0.16.28
     "@types/katex": ^0.16.8
+  llama:
+    llama-api-client: ^0.3.0
   lightningcss:
     unplugin-lightningcss: ^0.4.5
   mdast:
     "@types/mdast": ^4.0.4
+  mcp:
+    "@modelcontextprotocol/sdk": ^1.26.0
   motion:
     motion: ^12.33.0
     motion-dom: ^12.33.0
@@ -70,13 +80,21 @@ catalogs:
     motion-utils: ^12.29.2
   nanoid:
     nanoid: ^5.1.6
+  napi:
+    "@napi-rs/canvas": ^0.1.90
   next:
     next: ^16.1.6
     next-themes: ^0.4.6
     eslint-config-next: ^16.1.6
     "@next/eslint-plugin-next": ^16.1.6
   node:
-    "@types/node": ^25.2.1
+    "@types/node": ^25.2.2
+    nodemon: ^3.1.11
+    node-html-parser: ^7.0.2
+  openai:
+    openai: ^6.18.0
+  p-limit:
+    p-limit: ^7.3.0
   pg:
     pg: ^8.18.0
     "@types/pg": ^8.16.0
@@ -96,6 +114,8 @@ catalogs:
     "@prisma/client": ^7.3.0
     "@prisma/client-runtime-utils": ^7.3.0
     "@prisma/extension-accelerate": ^3.0.1
+  py:
+    pythonia: ^1.2.6
   radix:
     "@radix-ui/react-accordion": ^1.2.12
     "@radix-ui/react-alert-dialog": ^1.1.15
@@ -163,6 +183,8 @@ catalogs:
     "@tanstack/react-virtual": ^3.13.18
   test:
     "@playwright/test": ^1.58.2
+  tiktoken:
+    tiktoken: ^1.0.22
   ts:
     typescript: ^5.9.3
   tsdown:
@@ -170,7 +192,7 @@ catalogs:
   tseslint:
     typescript-eslint: ^8.54.0
   tsgo:
-    "@typescript/native-preview": ^7.0.0-dev.20260206.1
+    "@typescript/native-preview": ^7.0.0-dev.20260207.1
   tslib:
     tslib: ^2.8.1
   tsup:
@@ -201,6 +223,7 @@ catalogs:
     "@changesets/cli": ^2.29.8
     husky: ^9.1.7
     knip: ^5.83.1
+    wait-on: ^9.0.3
   vercel:
     vercel: ^50.13.2
     "@vercel/analytics": ^1.6.1
