@@ -20,7 +20,7 @@ export namespace Voyage {
       globals: object
     ) => Promise<V>;
     export type BuiltIns = Promise<{
-      tokenize_result: Promise<Tokenize.Result>;
+      tokenize_result: Promise<Tokenize.PyReturnedJson>;
       raw_usage: Promise<CountUsage.Result>;
       count_usage_result: Promise<string>;
     }>;
@@ -67,6 +67,8 @@ export namespace Voyage {
       total: number;
       model: ModelUnion;
     }
+
+    export type PyReturnedJson = string;
 
     export interface Error {
       error: string;

@@ -1,29 +1,16 @@
+
 import { createReadStream } from "node:fs";
 import type { AnthropicFileRecord } from "@/anthropic/types.ts";
-import type { CreateLocalStoreRT } from "@/prisma/types.ts";
-import type { VoyageEmbeddingService } from "@/voyage/index.ts";
 import { AnthropicBaseService } from "@/anthropic/base.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { Anthropic, toFile } from "@anthropic-ai/sdk";
-import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AnthropicModelIdUnion,
   AttachmentSingleton
 } from "@slipstream/types";
 
 export class AnthropicWorkup extends AnthropicBaseService {
-  /** userId → full store record (parent-level, not large) */
-  protected localStoreCache = new Map<string, CreateLocalStoreRT<true>>();
-  /** attachmentId → { docId, provenanceId, state } */
-  protected docCache = new Map<
-    string,
-    {
-      docId: string;
-      provenanceId: string;
-      state: $Enums.LocalStoreDocState | null;
-    }
-  >();
   protected assetCache = new Map<
     string,
     { fileId: string; dbRecordId: string; lastCheckedAt: Date | null }
@@ -33,11 +20,10 @@ export class AnthropicWorkup extends AnthropicBaseService {
   protected lastRegistrySync: Date | null = null;
   constructor(
     logger: LoggerService,
-    voyage: VoyageEmbeddingService,
     prisma: PrismaService,
     apiKey: string
   ) {
-    super(logger, voyage, prisma, apiKey);
+    super(logger, prisma, apiKey);
   }
   private async *getAllAnthropicFiles(apiKey?: string, limit = 50) {
     let has_more = true;
@@ -67,37 +53,14 @@ export class AnthropicWorkup extends AnthropicBaseService {
     }
   }
 
-  protected async syncLocalStoreDocs(userId: string) {
-    try {
-      const localStoreDocs = await this.prisma.findManyLocalStoreDocs(
-        "ANTHROPIC",
-        userId
-      );
-      if (localStoreDocs.length > 0) {
-        for (const localDoc of localStoreDocs) {
-          this.docCache.set(localDoc.attachmentId, {
-            docId: localDoc.id,
-            provenanceId: localDoc.provenanceId,
-            state: localDoc.state
-          });
-        }
-      }
-    } catch (err) {
-      err;
-    }
-  }
-
   public async syncFileRegistry(userId: string, cleanupStaleFiles = true) {
-    const [hasAnthropicStoredFiles, hasLocalAnthropicStoreDocs] =
-      await Promise.all([
-        this.prisma.hasProviderMessages(userId, "ANTHROPIC"),
-        this.prisma.hasLocalVectorStoreDocs(userId, "ANTHROPIC")
-      ]);
-    if (!hasAnthropicStoredFiles && !hasLocalAnthropicStoreDocs) {
+    const [hasAnthropicStoredFiles] = await Promise.all([
+      this.prisma.hasProviderMessages(userId, "ANTHROPIC")
+    ]);
+    if (!hasAnthropicStoredFiles) {
       return {
         synced: true,
         totalFiles: 0,
-        totalDocs: 0,
         lastSync: new Date()
       };
     }
@@ -105,9 +68,6 @@ export class AnthropicWorkup extends AnthropicBaseService {
     // anthropic provider hosted files from attachments
     this.fileRegistry.clear();
     this.assetCache.clear();
-    // local vector store document store and documents
-    this.docCache.clear();
-    this.localStoreCache.clear();
 
     const tryApiKey = await this.prisma.handleApiKeyLookup("anthropic", userId);
 
@@ -374,7 +334,7 @@ export class AnthropicWorkup extends AnthropicBaseService {
       });
       return await client.beta.files.upload({
         file,
-        betas: this.handleBetaHeaders(model)
+        betas: this.handleBetaHeaders(model, true)
       } satisfies Anthropic.Beta.FileUploadParams);
     } finally {
       this.prisma.cleanupTmpPostupload("ANTHROPIC", absTmpPath, tmpUniquename);

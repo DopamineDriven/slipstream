@@ -13,7 +13,7 @@ import { SharpService } from "@/sharp/index.ts";
 import { UserStoreWorkupService } from "@/store/workup.ts";
 import { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { AttachmentSingleton } from "@slipstream/types";
+import type { AttachmentSingleton, MessageSingleton } from "@slipstream/types";
 
 interface UserStoreChunkDraft {
   page: number;
@@ -572,8 +572,32 @@ export class UserStoreVectorService extends UserStoreWorkupService {
     );
   }
 
-  public async indexAttachment(
+  public async indexMessageAttachments(
+    message: MessageSingleton<true>,
+    storeName?: string
+  ): Promise<UserStoreIndexResult[]> {
+    const docs = message.attachments.filter(
+      (att): att is AttachmentSingleton<true> & { assetType: "DOCUMENT" } =>
+        att.assetType === "DOCUMENT"
+    );
+    if (docs.length === 0) return Array.of<UserStoreIndexResult>();
+    const results = Array.of<UserStoreIndexResult>();
+    for (const att of docs) {
+      const result = await this.indexAttachment(
+        att,
+        message.model,
+        message.provider,
+        storeName
+      );
+      results.push(result);
+    }
+    return results;
+  }
+
+  private async indexAttachment(
     attachment: AttachmentSingleton<true>,
+    originatingModel: string | null,
+    originatingProvider: $Enums.Provider,
     storeName?: string
   ): Promise<UserStoreIndexResult> {
     const preflight = this.postUploadIndexingDecision(attachment);
@@ -652,8 +676,8 @@ export class UserStoreVectorService extends UserStoreWorkupService {
       conversationId: attachment.conversationId,
       messageId: attachment.messageId,
       originatingUrl: url,
-      originatingModel: null,
-      originatingProvider: null,
+      originatingModel,
+      originatingProvider,
       provenanceId,
       filename,
       mimeType: mime || "application/pdf",
@@ -910,9 +934,4 @@ export class UserStoreVectorService extends UserStoreWorkupService {
     };
   }
 
-  public async indexAttachmentById(attachmentId: string, storeName?: string) {
-    const attachment = await this.prisma.getTargetedAtt(attachmentId);
-    const att = attachment satisfies AttachmentSingleton<true>;
-    return await this.indexAttachment(att, storeName);
-  }
 }

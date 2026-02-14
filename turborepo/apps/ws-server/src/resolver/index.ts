@@ -100,37 +100,35 @@ export class Resolver {
       : RedisChannels.conversationStream(conversationId);
   }
 
-  private scheduleUserStoreIndexing(attachmentId: string) {
+  private scheduleUserStoreIndexing(message: MessageSingleton<true>) {
     void this.userVectorStore
-      .indexAttachmentById(attachmentId)
-      .then(result => {
-        if (!result.ok) {
-          this.logger.debug(
-            { attachmentId, reason: result.reason },
-            "skip indexing"
-          );
+      .indexMessageAttachments(message)
+      .then(results => {
+        for (const result of results) {
+          if (!result.ok) {
+            this.logger.debug(
+              { attachmentId: result.attachmentId, reason: result.reason },
+              "skip indexing"
+            );
+          }
         }
       })
       .catch(err => {
         this.logger.warn(
-          { attachmentId, err: this.wsServer.prisma.safeErrMsg(err) },
+          { messageId: message.id, err: this.wsServer.prisma.safeErrMsg(err) },
           "indexing failed"
         );
       });
   }
 
-  private async handleAIChatRequestIndexing(
+  private handleAIChatRequestIndexing(
     msgs: MessageSingleton<true>[],
     requestMessageId: string | undefined
   ) {
     if (!requestMessageId) return;
     const requestMsg = msgs.find(m => m.id === requestMessageId);
-    if (!requestMsg) return;
-    for (const att of requestMsg.attachments) {
-      if (att.assetType === "DOCUMENT") {
-        this.scheduleUserStoreIndexing(att.id);
-      }
-    }
+    if (!requestMsg || requestMsg.attachments.length === 0) return;
+    this.scheduleUserStoreIndexing(requestMsg);
   }
 
   private async titleGenUtil<

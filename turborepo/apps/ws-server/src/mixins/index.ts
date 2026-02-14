@@ -10,7 +10,6 @@ import { xAIService } from "@/xai/index.ts";
 import type { Provider } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
-import { VoyageEmbeddingService } from "@/voyage/index.ts";
 
 export type ProviderNarrowing<P extends Provider> = P extends "openai"
   ? OpenAIService
@@ -70,7 +69,6 @@ export interface ProviderDependencies {
   logger: LoggerService;
   prisma: PrismaService;
   redis: EnhancedRedisPubSub;
-  voyage: VoyageEmbeddingService;
   userStore: UserStoreVectorService;
   isProd: boolean;
   s3: S3Storage;
@@ -158,7 +156,6 @@ export function AnthropicMixin<
             new AnthropicService(
               deps.logger,
               deps.prisma,
-              deps.voyage,
               deps.userStore,
               deps.redis,
               this.claudeApiKey ?? ""

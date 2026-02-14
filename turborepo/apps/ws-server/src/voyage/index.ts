@@ -172,16 +172,16 @@ export class VoyageEmbeddingService {
       await execFunc(script, globalDict);
 
       const result = await globalDict.tokenize_result;
-
-      if (!result) {
+      const parsed = JSON.parse<Voyage.Tokenize.Response>(result);
+      if (!parsed) {
         throw new Error("Voyage tokenize returned null (Python bridge)");
       }
 
-      if (this.isTokenizeError(result)) {
-        throw new Error(`Voyage tokenize error: ${result.error}`);
+      if (this.isTokenizeError(parsed)) {
+        throw new Error(`Voyage tokenize error: ${parsed.error}`);
       }
 
-      return result;
+      return parsed;
     } catch (err) {
       console.error("VoyageTokenizerBridge error:", err);
       throw err;
@@ -311,11 +311,11 @@ count_usage_result = main()
 
     const textsArrayLiteral = `[${escapedTexts.map(t => `"${t}"`).join(", ")}]`;
     // prettier-ignore
-    return `import voyageai
+    return `import voyageai, json
 
 def main():
     try:
-        vo = voyageai.AsyncClient(api_key="${apiKey}")
+        vo = voyageai.Client(api_key="${apiKey}")
 
         texts = ${textsArrayLiteral}
         model = "${model}"
@@ -323,12 +323,12 @@ def main():
         tokenized = vo.tokenize(texts, model=model)
 
         counts=[len(t.tokens) for t in tokenized]
-
-        return {
+        return_dict = {
             "counts": counts,
             "total": sum(counts),
             "model": model
         }
+        return json.dumps(return_dict)
     except Exception as e:
         return {"error": str(e)}
 

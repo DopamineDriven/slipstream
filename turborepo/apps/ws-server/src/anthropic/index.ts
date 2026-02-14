@@ -11,42 +11,8 @@ import { AnthropicVectorStoreWorkup } from "@/anthropic/vector-store.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { UserStoreVectorService } from "@/store/vector-store.ts";
-import { VoyageEmbeddingService } from "@/voyage/index.ts";
-import type {
-  AnthropicModelIdUnion,
-  EventTypeMap,
-  UnionToRecord
-} from "@slipstream/types";
+import type { AnthropicModelIdUnion, EventTypeMap } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
-
-export type BetaRawMessageStreamRecord =
-  UnionToRecord<Anthropic.Beta.Messages.BetaRawMessageStreamEvent>;
-
-/** Record keyed by `type` for BetaContentBlockParam (request/continuation param blocks) */
-export type ContentBlockObj =
-  UnionToRecord<Anthropic.Beta.BetaContentBlockParam>;
-
-export type MapContentBlock<T extends keyof ContentBlockObj> = {
-  [P in T]: ContentBlockObj[P];
-}[T];
-
-/** Record keyed by `type` for content blocks arriving at content_block_start (response blocks) */
-export type ContentBlockStartRecord = UnionToRecord<
-  BetaRawMessageStreamRecord["content_block_start"]["content_block"]
->;
-
-/** Record keyed by `type` for delta payloads arriving at content_block_delta */
-export type ContentBlockDeltaRecord = UnionToRecord<
-  BetaRawMessageStreamRecord["content_block_delta"]["delta"]
->;
-
-/** Record keyed by stop_reason/delta fields from message_delta events */
-export type MessageDeltaRecord =
-  BetaRawMessageStreamRecord["message_delta"];
-
-/** Typed access to the message_start event's message (includes container, usage, etc.) */
-export type MessageStartRecord =
-  BetaRawMessageStreamRecord["message_start"];
 
 export class AnthropicService extends AnthropicVectorStoreWorkup {
   /**
@@ -65,12 +31,11 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
-    voyage: VoyageEmbeddingService,
     userStoreVector: UserStoreVectorService,
     private redis: EnhancedRedisPubSub,
     apiKey: string
   ) {
-    super(logger, voyage, prisma, userStoreVector, apiKey);
+    super(logger, prisma, userStoreVector, apiKey);
   }
 
   /**
@@ -264,6 +229,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       }
       userMsgId;
       let stream: CreateMessageStreamRT;
+      console.log(params);
       try {
         stream = (await anthropic.beta.messages.create(
           params
@@ -541,9 +507,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
                 > | null;
                 const hasStartInput =
                   startInput != null && Object.keys(startInput).length > 0;
-                bb.inputJson = hasStartInput
-                  ? JSON.stringify(startInput)
-                  : "";
+                bb.inputJson = hasStartInput ? JSON.stringify(startInput) : "";
                 bb.input = hasStartInput ? startInput : undefined;
 
                 const caller =
@@ -559,9 +523,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
                 toolAccumulators.set(i, {
                   id: block.id,
                   name: block.name,
-                  inputJson: hasStartInput
-                    ? JSON.stringify(startInput)
-                    : "",
+                  inputJson: hasStartInput ? JSON.stringify(startInput) : "",
                   callerType: "code_execution_20250825",
                   callerToolId:
                     caller?.type === "code_execution_20250825"
@@ -579,10 +541,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
                 if ("signature" in block) bb.signature = block.signature;
               }
 
-              if (
-                block.type === "server_tool_use" &&
-                "id" in block
-              ) {
+              if (block.type === "server_tool_use" && "id" in block) {
                 bb.id = block.id;
                 bb.name = block.name;
                 bb.input = block.input as Record<string, unknown>;

@@ -1,9 +1,8 @@
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
-import type { PageImage } from "@d0paminedriven/pdfdown";
 import Anthropic from "@anthropic-ai/sdk";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import type { searchUserStoreChunksByStore } from "@slipstream/db/sql-node";
-import type { MessageSingleton } from "@slipstream/types";
+import type { MessageSingleton, UnionToRecord } from "@slipstream/types";
 
 export interface AnthropicFileRecord {
   id: string;
@@ -25,18 +24,11 @@ export interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestE
   };
 }
 
-export interface PdfBudgetEntry {
-  attachmentId: string;
-  pageCount: number;
-  filename: string;
-  url: string;
-  turnIndex: number;
-  included: boolean;
-}
+export type RequestOptions<T extends "0" | "1" = "1"> = Exclude<
+  Parameters<InstanceType<typeof Anthropic>["messages"]["create"]>[T],
+  undefined
+>;
 
-export type RequestOptions = Parameters<
-  InstanceType<typeof Anthropic>["messages"]["create"]
->["1"];
 
 export type MessageInputParams = {
   isNewChat: boolean;
@@ -95,6 +87,8 @@ export interface BlockBuilder {
   tool_use_id?: string;
   codeExecutionContent?: Anthropic.Beta.BetaCodeExecutionToolResultBlockParam["content"];
 }
+export type CodeExecutionContentRT = UnionToRecord<Anthropic.Beta.BetaCodeExecutionToolResultBlockParam["content"]>;
+export type ContentBlockParamObj = UnionToRecord<Anthropic.Beta.BetaContentBlockParam>;
 
 export interface RoundRecord {
   round: number;
@@ -103,11 +97,14 @@ export interface RoundRecord {
   assistantBlocks: Anthropic.Beta.BetaContentBlockParam[];
   toolResults: Anthropic.Beta.BetaToolResultBlockParam[];
 }
+export type BetaRawMessageStreamRecord =
+  UnionToRecord<Anthropic.Beta.Messages.BetaRawMessageStreamEvent>;
 
-export interface ChunkDraft {
-  text: string;
-  startOffset: number;
-  endOffset: number;
-  images: PageImage[];
-  tokenCount: number;
-}
+
+/** Record keyed by `type` for BetaContentBlockParam (request/continuation param blocks) */
+export type ContentBlockObj =
+  UnionToRecord<Anthropic.Beta.BetaContentBlockParam>;
+
+export type MapContentBlock<T extends keyof ContentBlockObj> = {
+  [P in T]: ContentBlockObj[P];
+}[T];

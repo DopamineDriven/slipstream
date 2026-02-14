@@ -1,4 +1,3 @@
-import type { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { Logger as PinoLogger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
@@ -10,7 +9,6 @@ export class AnthropicBaseService {
   protected logger: PinoLogger;
   constructor(
     logger: LoggerService,
-    protected voyage: VoyageEmbeddingService,
     protected prisma: PrismaService,
     protected apiKey: string
   ) {
@@ -23,7 +21,23 @@ export class AnthropicBaseService {
     this.defaultClient = new Anthropic({
       apiKey: this.apiKey,
       logLevel: "debug",
-      logger: this.logger
+      logger: this.logger,
+      fetch: async (input, init = {}) => {
+        this.logger.debug(init, "debug")
+        if (
+          typeof init.body === "string" &&
+          init.body.includes("configurations")
+        ) {
+          try {
+            const parsed = JSON.parse<Record<string, unknown>>(init.body);
+            if ("configurations" in parsed) delete parsed.configurations;
+            init = { ...init, body: JSON.stringify(parsed) };
+          } catch {
+            /* fall through */
+          }
+        }
+        return fetch(input, init);
+      }
     });
   }
   protected getClient(overrideKey?: string) {
@@ -44,14 +58,12 @@ export class AnthropicBaseService {
           return [
             "advanced-tool-use-2025-11-20",
             "context-1m-2025-08-07",
-            "compact-2026-01-12",
             "files-api-2025-04-14",
             "extended-cache-ttl-2025-04-11",
             "code-execution-2025-08-25"
           ] satisfies Anthropic.Beta.AnthropicBeta[];
         } else {
           return [
-            "compact-2026-01-12",
             "context-1m-2025-08-07",
             "files-api-2025-04-14",
             "extended-cache-ttl-2025-04-11",

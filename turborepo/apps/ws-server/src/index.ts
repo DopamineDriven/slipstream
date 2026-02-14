@@ -132,8 +132,7 @@ async function exe() {
       cfg.PDF_SERVICES_CLIENT_SECRET,
       cfg.ADOBE_WEBHOOK_SECRET,
       s3,
-      prisma,
-      userStore
+      prisma
     );
 
     const { WSServer } = await import("@/ws-server/index.ts");
@@ -145,7 +144,6 @@ async function exe() {
     const anthropic = new AnthropicService(
       logger,
       prisma,
-      voyage,
       userStore,
       redisInstance,
       cfg.ANTHROPIC_API_KEY
@@ -187,7 +185,6 @@ async function exe() {
       dependencies: {
         logger,
         prisma,
-        voyage,
         userStore,
         redis: redisInstance,
         s3,

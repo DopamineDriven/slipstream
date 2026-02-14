@@ -1,7 +1,6 @@
 import http from "http";
 import { timingSafeEqual } from "node:crypto";
 import { PrismaService } from "@/prisma/index.ts";
-import { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import { S3Storage } from "@slipstream/storage-s3";
 
@@ -24,27 +23,8 @@ export class PdfService {
     private clientSecret: string,
     private webhookSecret: string,
     private s3: S3Storage,
-    private prisma: PrismaService,
-    private userStore: UserStoreVectorService
+    private prisma: PrismaService
   ) {}
-
-  private scheduleUserStoreIndexing(attachmentId: string) {
-    void this.userStore
-      .indexAttachmentById(attachmentId)
-      .then(result => {
-        if (!result.ok) {
-          console.debug(
-            `[user-store] webhook skip indexing ${attachmentId}: ${result.reason}`
-          );
-        }
-      })
-      .catch(err => {
-        console.warn(
-          `[user-store] webhook indexing failed for ${attachmentId}:`,
-          this.prisma.safeErrMsg(err)
-        );
-      });
-  }
 
   private async getAdobeAccessToken() {
     const cached = this.bearerMap.get(this.clientId);
@@ -272,7 +252,5 @@ export class PdfService {
       compatExt: "pdf",
       compatMime: "application/pdf"
     });
-
-    this.scheduleUserStoreIndexing(attachmentId);
   }
 }

@@ -96,3 +96,7 @@ async function countBulkMultimodal() {
 if (process.argv[3] === "multimodal") {
   countBulkMultimodal();
 }
+if (process.argv[3] ==="contextual") {
+  // need to create workup for contextual testing using voyage.countUsage
+  countBulkMultimodal();
+}
