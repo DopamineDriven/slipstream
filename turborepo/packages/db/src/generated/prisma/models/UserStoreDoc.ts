@@ -384,8 +384,8 @@ export type UserStoreDocGroupByOutputType = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel: string | null
+  originatingProvider: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -444,8 +444,8 @@ export type UserStoreDocWhereInput = {
   conversationId?: Prisma.StringFilter<"UserStoreDoc"> | string
   messageId?: Prisma.StringFilter<"UserStoreDoc"> | string
   originatingUrl?: Prisma.StringFilter<"UserStoreDoc"> | string
-  originatingModel?: Prisma.StringFilter<"UserStoreDoc"> | string
-  originatingProvider?: Prisma.EnumProviderFilter<"UserStoreDoc"> | $Enums.Provider
+  originatingModel?: Prisma.StringNullableFilter<"UserStoreDoc"> | string | null
+  originatingProvider?: Prisma.EnumProviderNullableFilter<"UserStoreDoc"> | $Enums.Provider | null
   provenanceId?: Prisma.StringFilter<"UserStoreDoc"> | string
   filename?: Prisma.StringFilter<"UserStoreDoc"> | string
   mimeType?: Prisma.StringFilter<"UserStoreDoc"> | string
@@ -486,8 +486,8 @@ export type UserStoreDocOrderByWithRelationInput = {
   conversationId?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
   originatingUrl?: Prisma.SortOrder
-  originatingModel?: Prisma.SortOrder
-  originatingProvider?: Prisma.SortOrder
+  originatingModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  originatingProvider?: Prisma.SortOrderInput | Prisma.SortOrder
   provenanceId?: Prisma.SortOrder
   filename?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
@@ -531,8 +531,8 @@ export type UserStoreDocWhereUniqueInput = Prisma.AtLeast<{
   conversationId?: Prisma.StringFilter<"UserStoreDoc"> | string
   messageId?: Prisma.StringFilter<"UserStoreDoc"> | string
   originatingUrl?: Prisma.StringFilter<"UserStoreDoc"> | string
-  originatingModel?: Prisma.StringFilter<"UserStoreDoc"> | string
-  originatingProvider?: Prisma.EnumProviderFilter<"UserStoreDoc"> | $Enums.Provider
+  originatingModel?: Prisma.StringNullableFilter<"UserStoreDoc"> | string | null
+  originatingProvider?: Prisma.EnumProviderNullableFilter<"UserStoreDoc"> | $Enums.Provider | null
   provenanceId?: Prisma.StringFilter<"UserStoreDoc"> | string
   filename?: Prisma.StringFilter<"UserStoreDoc"> | string
   mimeType?: Prisma.StringFilter<"UserStoreDoc"> | string
@@ -573,8 +573,8 @@ export type UserStoreDocOrderByWithAggregationInput = {
   conversationId?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
   originatingUrl?: Prisma.SortOrder
-  originatingModel?: Prisma.SortOrder
-  originatingProvider?: Prisma.SortOrder
+  originatingModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  originatingProvider?: Prisma.SortOrderInput | Prisma.SortOrder
   provenanceId?: Prisma.SortOrder
   filename?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
@@ -618,8 +618,8 @@ export type UserStoreDocScalarWhereWithAggregatesInput = {
   conversationId?: Prisma.StringWithAggregatesFilter<"UserStoreDoc"> | string
   messageId?: Prisma.StringWithAggregatesFilter<"UserStoreDoc"> | string
   originatingUrl?: Prisma.StringWithAggregatesFilter<"UserStoreDoc"> | string
-  originatingModel?: Prisma.StringWithAggregatesFilter<"UserStoreDoc"> | string
-  originatingProvider?: Prisma.EnumProviderWithAggregatesFilter<"UserStoreDoc"> | $Enums.Provider
+  originatingModel?: Prisma.StringNullableWithAggregatesFilter<"UserStoreDoc"> | string | null
+  originatingProvider?: Prisma.EnumProviderNullableWithAggregatesFilter<"UserStoreDoc"> | $Enums.Provider | null
   provenanceId?: Prisma.StringWithAggregatesFilter<"UserStoreDoc"> | string
   filename?: Prisma.StringWithAggregatesFilter<"UserStoreDoc"> | string
   mimeType?: Prisma.StringWithAggregatesFilter<"UserStoreDoc"> | string
@@ -653,8 +653,8 @@ export type UserStoreDocCreateInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -695,8 +695,8 @@ export type UserStoreDocUncheckedCreateInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -733,8 +733,8 @@ export type UserStoreDocUpdateInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -775,8 +775,8 @@ export type UserStoreDocUncheckedUpdateInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -815,8 +815,8 @@ export type UserStoreDocCreateManyInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -850,8 +850,8 @@ export type UserStoreDocUpdateManyMutationInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -887,8 +887,8 @@ export type UserStoreDocUncheckedUpdateManyInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1203,8 +1203,8 @@ export type UserStoreDocCreateWithoutAttachmentInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -1243,8 +1243,8 @@ export type UserStoreDocUncheckedCreateWithoutAttachmentInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -1297,8 +1297,8 @@ export type UserStoreDocUpdateWithoutAttachmentInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1337,8 +1337,8 @@ export type UserStoreDocUncheckedUpdateWithoutAttachmentInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1375,8 +1375,8 @@ export type UserStoreDocCreateWithoutStoreInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -1415,8 +1415,8 @@ export type UserStoreDocUncheckedCreateWithoutStoreInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -1484,8 +1484,8 @@ export type UserStoreDocScalarWhereInput = {
   conversationId?: Prisma.StringFilter<"UserStoreDoc"> | string
   messageId?: Prisma.StringFilter<"UserStoreDoc"> | string
   originatingUrl?: Prisma.StringFilter<"UserStoreDoc"> | string
-  originatingModel?: Prisma.StringFilter<"UserStoreDoc"> | string
-  originatingProvider?: Prisma.EnumProviderFilter<"UserStoreDoc"> | $Enums.Provider
+  originatingModel?: Prisma.StringNullableFilter<"UserStoreDoc"> | string | null
+  originatingProvider?: Prisma.EnumProviderNullableFilter<"UserStoreDoc"> | $Enums.Provider | null
   provenanceId?: Prisma.StringFilter<"UserStoreDoc"> | string
   filename?: Prisma.StringFilter<"UserStoreDoc"> | string
   mimeType?: Prisma.StringFilter<"UserStoreDoc"> | string
@@ -1519,8 +1519,8 @@ export type UserStoreDocCreateWithoutAnnotsInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -1560,8 +1560,8 @@ export type UserStoreDocUncheckedCreateWithoutAnnotsInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -1602,8 +1602,8 @@ export type UserStoreDocCreateWithoutLinkedFromAnnotsInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -1643,8 +1643,8 @@ export type UserStoreDocUncheckedCreateWithoutLinkedFromAnnotsInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -1696,8 +1696,8 @@ export type UserStoreDocUpdateWithoutAnnotsInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1737,8 +1737,8 @@ export type UserStoreDocUncheckedUpdateWithoutAnnotsInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1785,8 +1785,8 @@ export type UserStoreDocUpdateWithoutLinkedFromAnnotsInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1826,8 +1826,8 @@ export type UserStoreDocUncheckedUpdateWithoutLinkedFromAnnotsInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1863,8 +1863,8 @@ export type UserStoreDocCreateWithoutChunksInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -1904,8 +1904,8 @@ export type UserStoreDocUncheckedCreateWithoutChunksInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -1957,8 +1957,8 @@ export type UserStoreDocUpdateWithoutChunksInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1998,8 +1998,8 @@ export type UserStoreDocUncheckedUpdateWithoutChunksInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2036,8 +2036,8 @@ export type UserStoreDocCreateManyStoreInput = {
   conversationId: string
   messageId: string
   originatingUrl: string
-  originatingModel: string
-  originatingProvider: $Enums.Provider
+  originatingModel?: string | null
+  originatingProvider?: $Enums.Provider | null
   provenanceId: string
   filename: string
   mimeType: string
@@ -2071,8 +2071,8 @@ export type UserStoreDocUpdateWithoutStoreInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2111,8 +2111,8 @@ export type UserStoreDocUncheckedUpdateWithoutStoreInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2150,8 +2150,8 @@ export type UserStoreDocUncheckedUpdateManyWithoutStoreInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
   originatingUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  originatingProvider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  originatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originatingProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2430,8 +2430,8 @@ export type $UserStoreDocPayload<ExtArgs extends runtime.Types.Extensions.Intern
      * CDN URL (s3->Cloudfront) of source asset
      */
     originatingUrl: string
-    originatingModel: string
-    originatingProvider: $Enums.Provider
+    originatingModel: string | null
+    originatingProvider: $Enums.Provider | null
     /**
      * ${conversationId}-${messageId}-${attachmentId}-${hexFilename}.${ext}
      */

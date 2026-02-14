@@ -118,6 +118,7 @@
     "typecheck": "tsgo --noEmit",
     "start": "node dist/index.js",
     "test": "node --test --import tsx --test-reporter spec",
+    "test:store": "node --test --import tsx --test-reporter spec src/tests/store.tests.ts",
     "test:voyage": "tsx src/test/voyage-tokenize.ts"
   },
   "prettier": "@slipstream/prettier-config",
@@ -131,6 +132,7 @@
     "@d0paminedriven/fs": "catalog:dd",
     "@d0paminedriven/metadata": "catalog:dd",
     "@d0paminedriven/pdfdown": "catalog:dd",
+    "@d0paminedriven/pdfdown-ocr": "catalog:dd-ocr",
     "@google/genai": "catalog:google",
     "@napi-rs/canvas": "catalog:napi",
     "@modelcontextprotocol/sdk": "catalog:mcp",
@@ -175,6 +177,7 @@
     "jiti": "catalog:jiti",
     "nodemon": "catalog:node",
     "prettier": "catalog:prettier",
+    "rolldown": "catalog:rolldown",
     "tsdown": "catalog:tsdown",
     "tsx": "catalog:tsx",
     "typescript-eslint": "catalog:tseslint",

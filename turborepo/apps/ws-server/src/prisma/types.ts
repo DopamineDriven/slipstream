@@ -2,6 +2,21 @@ import type { Voyage } from "@/voyage/types.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { XOR } from "@slipstream/types";
 
+export interface CreateUserStoreChunkParams {
+  provenanceId: string;
+  storeId: string;
+  docId: string;
+  chunkIndex: number;
+  content: string;
+  contentHash: string;
+  startOffset: number;
+  endOffset: number;
+  hasImages: boolean;
+  hasAnnots: boolean;
+  pageStartOffset?: number | null;
+  pageEndOffset?: number | null;
+  schemaVersion?: $Enums.UserStoreSchemaVersion;
+}
 export interface CreateLocalStoreParams {
   provider: $Enums.Provider;
   userId: string;
@@ -24,18 +39,18 @@ export interface CreateUserStoreParams {
 }
 
 export interface CreateUserStoreRT<T extends boolean = false> {
-    id: string;
-    userId: string;
-    storeName: string;
-    defaultEmbeddingModel: string;
-    defaultEmbeddingDim: number;
-    fileCount: number;
-    totalBytes:  T extends true ? number | null : bigint | null;
-    totalChunks: number;
-    schemaVersion: $Enums.UserStoreSchemaVersion;
-    lastSyncedAt: Date | null;
-    createdAt: Date;
-    updatedAt: Date;
+  id: string;
+  userId: string;
+  storeName: string;
+  defaultEmbeddingModel: string;
+  defaultEmbeddingDim: number;
+  fileCount: number;
+  totalBytes: T extends true ? number | null : bigint | null;
+  totalChunks: number;
+  schemaVersion: $Enums.UserStoreSchemaVersion;
+  lastSyncedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 export interface CreateLocalStoreRT<T extends boolean = boolean> {
   id: string;
@@ -109,7 +124,8 @@ export interface UserStoreChunkArrShape {
   contentHash: string;
   startOffset: number;
   endOffset: number;
-  hasVisualContent: boolean;
+  hasImages: boolean;
+  hasAnnots: boolean;
   pageStartOffset: number | null;
   pageEndOffset: number | null;
   retryCount: number;
@@ -122,8 +138,8 @@ export interface FindManyUserStoreDocsShape {
   createdAt: Date;
   updatedAt: Date;
   attachmentId: string;
-  originatingProvider: $Enums.Provider;
-  originatingModel: string;
+  originatingProvider: $Enums.Provider | null;
+  originatingModel: string | null;
   originatingUrl: string;
   state: $Enums.UserStoreDocState;
   schemaVersion: $Enums.UserStoreSchemaVersion;

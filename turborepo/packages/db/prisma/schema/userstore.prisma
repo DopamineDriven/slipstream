@@ -107,8 +107,8 @@ model UserStoreDoc {
   messageId           String
   /// CDN URL (s3->Cloudfront) of source asset
   originatingUrl      String
-  originatingModel    String
-  originatingProvider Provider
+  originatingModel    String?
+  originatingProvider Provider?
   /// ${conversationId}-${messageId}-${attachmentId}-${hexFilename}.${ext}
   provenanceId        String
   filename            String
@@ -225,8 +225,8 @@ model UserStoreDocChunk {
   pageStartOffset Int?
   /// only applicable for pdfs
   pageEndOffset   Int?
-
-  hasVisualContent Boolean
+  hasImages Boolean
+  hasAnnots Boolean
   state            UserStoreChunkState          @default(QUEUED)
   errorMessage     String?
   retryCount       Int                          @default(0)

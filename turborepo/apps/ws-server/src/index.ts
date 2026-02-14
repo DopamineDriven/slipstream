@@ -81,20 +81,6 @@ async function exe() {
 
     const port = cfg.PORT ? Number.parseInt(cfg.PORT) : 4000;
 
-    const { PdfService } = await import("@/pdf/index.ts");
-
-    const pdfService = new PdfService(
-      cfg.PDF_SERVICES_CLIENT_ID,
-      cfg.PDF_SERVICES_CLIENT_SECRET,
-      cfg.ADOBE_WEBHOOK_SECRET,
-      s3,
-      prisma
-    );
-
-    const { WSServer } = await import("@/ws-server/index.ts");
-
-    const wsServer = new WSServer({ port }, redisInstance, prisma, pdfService);
-
     const { Resolver } = await import("@/resolver/index.ts");
 
     const { v0Service } = await import("@/vercel/index.ts");
@@ -120,14 +106,47 @@ async function exe() {
       cfg.X_AI_KEY,
       process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
     );
+
     const { VoyageEmbeddingService } = await import("@/voyage/index.ts");
+
     const voyage = new VoyageEmbeddingService(cfg.VOYAGE_API_KEY);
+
+    const { SharpService } = await import("@/sharp/index.ts");
+
+    const sharp = new SharpService();
+
+    const { UserStoreVectorService } = await import("@/store/vector-store.ts");
+
+    const userStore = new UserStoreVectorService(
+      logger,
+      voyage,
+      prisma,
+      sharp,
+      cfg.VOYAGE_API_KEY
+    );
+
+    const { PdfService } = await import("@/pdf/index.ts");
+
+    const pdfService = new PdfService(
+      cfg.PDF_SERVICES_CLIENT_ID,
+      cfg.PDF_SERVICES_CLIENT_SECRET,
+      cfg.ADOBE_WEBHOOK_SECRET,
+      s3,
+      prisma,
+      userStore
+    );
+
+    const { WSServer } = await import("@/ws-server/index.ts");
+
+    const wsServer = new WSServer({ port }, redisInstance, prisma, pdfService);
+
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
     const anthropic = new AnthropicService(
       logger,
       prisma,
       voyage,
+      userStore,
       redisInstance,
       cfg.ANTHROPIC_API_KEY
     );
@@ -169,6 +188,7 @@ async function exe() {
         logger,
         prisma,
         voyage,
+        userStore,
         redis: redisInstance,
         s3,
         isProd
@@ -191,7 +211,9 @@ async function exe() {
       s3,
       region,
       imgCompatService,
-      process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
+      userStore,
+      process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY,
+      logger
     );
 
     resolver.registerAll();

@@ -11,7 +11,7 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param limit
  * @param threshold
  */
-export const searchUserStoreChunksByStore = $runtime.makeTypedQueryFactory("\nSELECT\nchunk.id,\nchunk.\"docId\",\nchunk.\"chunkProvenanceId\",\nchunk.\"chunkIndex\",\nchunk.content,\nchunk.\"tokenCount\",\nchunk.\"startOffset\",\nchunk.\"endOffset\",\nchunk.\"pageStartOffset\",\nchunk.\"pageEndOffset\",\nchunk.\"hasVisualContent\",\nchunk.\"provenanceId\",\nchunk.\"attachmentId\",\nchunk.\"conversationId\",\nchunk.\"messageId\",\ndoc.filename,\ndoc.\"mimeType\",\ndoc.\"embeddingModel\",\ndoc.\"originatingModel\",\ndoc.\"originatingProvider\"::\"text\" as \"originatingProvider\",\n1 - (chunk.embedding <=> $2::vector) as score\nFROM \"UserStoreDocChunk\" chunk\nINNER JOIN \"UserStoreDoc\" doc ON chunk.\"docId\" = doc.id\nWHERE chunk.\"storeId\" = $1\nAND chunk.\"deletedAt\" IS NULL\nAND doc.\"deletedAt\" IS NULL\nAND doc.state = 'ACTIVE'::\"UserStoreDocState\"\nAND chunk.state = 'READY'::\"UserStoreChunkState\"\nAND chunk.embedding IS NOT NULL\nAND 1 - (chunk.embedding <=> $2::vector) >= $4\nORDER BY chunk.embedding <=> $2::vector\nLIMIT $3;") as (storeId: string, embedding: string, limit: number, threshold: number) => $runtime.TypedSql<searchUserStoreChunksByStore.Parameters, searchUserStoreChunksByStore.Result>
+export const searchUserStoreChunksByStore = $runtime.makeTypedQueryFactory("\nSELECT\nchunk.id,\nchunk.\"docId\",\nchunk.\"chunkProvenanceId\",\nchunk.\"chunkIndex\",\nchunk.content,\nchunk.\"tokenCount\",\nchunk.\"startOffset\",\nchunk.\"endOffset\",\nchunk.\"pageStartOffset\",\nchunk.\"pageEndOffset\",\nchunk.\"hasImages\",\nchunk.\"hasAnnots\",\nchunk.\"provenanceId\",\nchunk.\"attachmentId\",\nchunk.\"conversationId\",\nchunk.\"messageId\",\ndoc.filename,\ndoc.\"mimeType\",\ndoc.\"embeddingModel\",\ndoc.\"originatingModel\",\ndoc.\"originatingProvider\"::\"text\" as \"originatingProvider\",\n1 - (chunk.embedding <=> $2::vector) as score\nFROM \"UserStoreDocChunk\" chunk\nINNER JOIN \"UserStoreDoc\" doc ON chunk.\"docId\" = doc.id\nWHERE chunk.\"storeId\" = $1\nAND chunk.\"deletedAt\" IS NULL\nAND doc.\"deletedAt\" IS NULL\nAND doc.state IN (\n'ACTIVE'::\"UserStoreDocState\",\n'PARTIAL'::\"UserStoreDocState\"\n)\nAND chunk.state = 'READY'::\"UserStoreChunkState\"\nAND chunk.embedding IS NOT NULL\nAND 1 - (chunk.embedding <=> $2::vector) >= $4\nORDER BY chunk.embedding <=> $2::vector\nLIMIT $3;") as (storeId: string, embedding: string, limit: number, threshold: number) => $runtime.TypedSql<searchUserStoreChunksByStore.Parameters, searchUserStoreChunksByStore.Result>
 
 export namespace searchUserStoreChunksByStore {
   export type Parameters = [storeId: string, embedding: string, limit: number, threshold: number]
@@ -26,7 +26,8 @@ export namespace searchUserStoreChunksByStore {
     endOffset: number
     pageStartOffset: number | null
     pageEndOffset: number | null
-    hasVisualContent: boolean
+    hasImages: boolean
+    hasAnnots: boolean
     provenanceId: string
     attachmentId: string
     conversationId: string
@@ -34,7 +35,7 @@ export namespace searchUserStoreChunksByStore {
     filename: string
     mimeType: string
     embeddingModel: string
-    originatingModel: string
+    originatingModel: string | null
     originatingProvider: string | null
     score: number | null
   }

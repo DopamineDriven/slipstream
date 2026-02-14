@@ -45,6 +45,8 @@ interface PageBoxEnhanced extends PageBox {
 // }
 
 export const pdfChoiceArr = [
+  "a11final-fltpln.pdf",
+  "andrew_ross_organic_presentation_autumn_2014.pdf",
   "Ascension-Through-Fire---A-Sacred-Arrival-Above-Infernal-Gates.pdf",
   "Candy-Flipping-Claudtullus-Part-I.pdf",
   "Candy-Flipping-Claudtullus-Part-II.pdf",
@@ -85,6 +87,7 @@ export const pdfChoiceArr = [
   "Grokina-Suprema---A-Sardonic-Ode-to-a-Cosmic-Guac-Brandishing-Goddess.pdf",
   "Grokina-Suprema---Cosmic-Guac-Wielder-in-Roman-Veil-and-Sass.pdf",
   "Grokina-Suprema---Irreverent-Riff-of-a-Galactic-Guac-Goddess.pdf",
+  "hello-ocr.pdf",
   "hello-ocr-ocr.pdf",
   "INFJesus-and-the-Whale-Pt-I.pdf",
   "INFJesus-and-the-Whale-Pt-II.pdf",
@@ -107,6 +110,7 @@ export const pdfChoiceArr = [
   "Lollaclaudplooza-Pt-X.pdf",
   "Lollaclaudplooza-Pt-XI.pdf",
   "Lollaclaudplooza-Pt-XII.pdf",
+  "multipage-ocr.pdf",
   "multipage-ocr-ocr.pdf",
   "O’Geminsea---Unleashing-Fresh-Vector-Store-Deluge-for-Grokina’s-Peak-Indexing.pdf",
   "Parasympathetic-Protocol-Pt-I.pdf",
@@ -208,15 +212,15 @@ function pageBoxHelper(meta: PdfMeta) {
   if (pageBoxes.length > 1) {
     // intentionally reverse to iterate over the default last
     // after aggregating the number of pages deviating from the majority page box config
-    for (const p of pageBoxes.reverse()) {
+    for (const [i, p] of pageBoxes.reverse().entries()) {
       if (p.pages?.length) {
         for (const e of p.pages) {
           anomalySet.add(e);
-          pBoxCache.set(e, {
-            ...p,
-            coverage: p.pages.length / total
-          });
         }
+        pBoxCache.set(i, {
+          ...p,
+          coverage: p.pages.length / total
+        });
       } else {
         const coverage = (total - pBoxCache.size) / total;
         pBoxCache.set(0, { coverage, ...p });
@@ -307,7 +311,7 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
     pdfDown.metadataAsync()
   ]);
   console.log(`rust job finished in ${performance.now() - tStart} ms`);
-
+  const v = new Set<number>();
   if (annots.length > 0) {
     for (const annot of annots) {
       annotPages.add(annot.page);
@@ -317,6 +321,9 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
   const pageBoxMap = new Map<number, PageBox>();
   for (const [i, x] of meta.pageBoxes.entries()) {
     if (x?.pages) {
+      for (const s of x.pages) {
+        v.add(s);
+      }
       pageBoxMap.set(i, x);
       x.pageCount;
     }
@@ -349,6 +356,7 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
       imgWithSizeArr.push({ ...rest, size: data.byteLength / 1024 / 1024 });
     }
   }
+
   const myData = annotOffsetsByPage(structuredText, imgPages, annotPages);
   const pageobjMap = pageBoxHelper(meta);
   const toJson = JSON.stringify(
@@ -376,6 +384,7 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
     imagePages: Array.from(imgPages),
     annotPages: Array.from(annotPages),
     annots,
+    pageobjMap,
     imgWithSizeArr,
     body: myData
   };
@@ -386,7 +395,7 @@ const x = "The-Path-to-Hell-is-Paved-with-Good-Intentions.pdf" as const satisfie
 >;
 readAndExtract(x).then(v => {
   console.log(`ts script finished in: ${performance.now() - perf} ms`);
-  if (v.creationDate && v.creator && v.producer) {
+  if (v) {
     const imgSizes = v.imgWithSizeArr.map(t => t.size);
     let i = 0;
     for (const img of imgSizes) {
@@ -397,14 +406,16 @@ readAndExtract(x).then(v => {
       creator,
       modificationDate,
       pageCount,
-      producer,
+      producer,body,annots,
+      pageobjMap,
       version,
-      pageBoxes,
       annotPages,
       imagePages,
       isLinearized
     } = v;
 
+   const annotRects= annots.map((t) =>t.rect);
+const offsets = body.map((t) =>[t.page, t.offsets[0], t.offsets[1]]);
     console.log({
       creationDate,
       creator,
@@ -413,10 +424,13 @@ readAndExtract(x).then(v => {
       version,
       imgSizeMb: i,
       isLinearized,
-      pageBoxes,
+      pageBoxes: Array.from(pageobjMap.pageBoxCache.values()),
+      annots,
+      annotRects,
       annotPages,
       imagePages,
-      modificationDate
+      modificationDate,
+      offsets
     });
   }
 });

@@ -31,29 +31,25 @@ export function DbServiceMixin<TBase extends Constructor<any[], HasDbOpts>>(
 ) {
   type DbSB = DbService;
   return class DbServiceMixinClass extends Base implements HasDbOpts {
-    #dbBase?: DbSB;
+    db?: DbSB;
     static sharedDbBase?: DbSB;
 
     get dbBase() {
-      if (!this.#dbBase) {
+      if (!this.db) {
         const shared = (this.constructor as typeof DbServiceMixinClass)
           .sharedDbBase;
         if (shared) {
-          this.#dbBase = shared;
+          this.db = shared;
         } else {
           const {
             connectionString,
             poolMax = 100,
             idleTimeoutMs = 30000
           } = this.dbOpts;
-          this.#dbBase = new DbService(
-            connectionString,
-            poolMax,
-            idleTimeoutMs
-          );
+          this.db = new DbService(connectionString, poolMax, idleTimeoutMs);
         }
       }
-      return this.#dbBase;
+      return this.db;
     }
 
     static setSharedDbBase(instance: DbSB) {
@@ -67,29 +63,29 @@ export function DbAccelerateMixin<TBase extends Constructor<any[], HasDbOpts>>(
 ) {
   type DbSA = DbServiceAccelerate;
   return class DbAccelerateMixinClass extends Base implements HasDbOpts {
-    #dbAccelerate?: DbSA;
+    dbA?: DbSA;
     static sharedDbAccelerate?: DbSA;
 
     get dbAccelerate() {
-      if (!this.#dbAccelerate) {
+      if (!this.dbA) {
         const shared = (this.constructor as typeof DbAccelerateMixinClass)
           .sharedDbAccelerate;
         if (shared) {
-          this.#dbAccelerate = shared;
+          this.dbA = shared;
         } else {
           const {
             connectionString,
             poolMax = 100,
             idleTimeoutMs = 30000
           } = this.dbOpts;
-          this.#dbAccelerate = new DbServiceAccelerate(
+          this.dbA = new DbServiceAccelerate(
             connectionString,
             poolMax,
             idleTimeoutMs
           );
         }
       }
-      return this.#dbAccelerate;
+      return this.dbA;
     }
 
     static setSharedDbAccelerate(instance: DbSA) {

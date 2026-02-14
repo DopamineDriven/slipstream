@@ -13,6 +13,7 @@ import type { PageImage, StructuredPageText } from "@d0paminedriven/pdfdown";
 import { AnthropicWorkup } from "@/anthropic/workup.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
+import { UserStoreVectorService } from "@/store/vector-store.ts";
 import { VoyageEmbeddingService } from "@/voyage/index.ts";
 import { Anthropic } from "@anthropic-ai/sdk";
 import type {
@@ -52,6 +53,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     logger: LoggerService,
     voyage: VoyageEmbeddingService,
     prisma: PrismaService,
+    protected userStoreVector: UserStoreVectorService,
     apiKey: string
   ) {
     super(logger, voyage, prisma, apiKey);
@@ -739,80 +741,16 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     limit = 5,
     threshold = 0.3
   ): Promise<LocalSearchResult[]> {
-    const cached = this.localStoreCache.get(userId);
-    const store =
-      cached ?? (await this.prisma.findLocalVectorStore(userId, "ANTHROPIC"));
-    if (!cached) this.localStoreCache.set(userId, store);
-    const storeId = store.id;
-
-    const queryResult = await this.voyage.embedChunksMultimodal("base64", {
-      inputs: [{ content: [{ type: "text", text: query }] }],
-      model: "voyage-multimodal-3.5",
-      input_type: "query"
-    });
-
-    if ("detail" in queryResult) {
-      this.logger.error(
-        `Voyage query embedding error: ${this.prisma.safeErrMsg(queryResult.detail)}`
-      );
-      return [];
-    }
-
-    const queryEmbedding = queryResult.data[0]?.embedding;
-    if (!queryEmbedding) return [];
-
-    const embeddingStr = `[${queryEmbedding.join(",")}]`;
-    return await this.prisma.searchLocalStoreChunks(
-      storeId,
-      embeddingStr,
+    return await this.userStoreVector.searchUserStoreChunks({
+      userId,
+      query,
       limit,
       threshold
-    );
-  }
-
-  // ─── Fire-and-forget orchestrator ────────────────────────────────────
-
-  protected async ensureAssetIndexed(
-    attachment: AttachmentSingleton<true>,
-    userId: string
-  ) {
-    const { storeId } = await this.ensureLocalStore(userId);
-    const { docId, provenanceId, state } = await this.ensureDocRecord(
-      attachment,
-      storeId
-    );
-
-    if (state === "ACTIVE" || state === "PROCESSING") {
-      return { docId, provenanceId };
-    }
-
-    // Fire-and-forget — same pattern as Grok's ensureXaiAssetUploaded
-    void this.chunkAndEmbed(attachment, docId, storeId).catch(err => {
-      console.error({ docId, err: this.prisma.safeErrMsg(err) });
-      console.error("Background chunkAndEmbed failed");
     });
-
-    return { docId, provenanceId };
   }
 
-  // ─── Registry sync ───────────────────────────────────────────────────
-
-  protected async syncLocalStoreRegistry(userId: string) {
-    this.docCache.clear();
-    this.localStoreCache.delete(userId);
-
-    const store = await this.prisma.findLocalVectorStore(userId, "ANTHROPIC");
-    this.localStoreCache.set(userId, store);
-
-    const docs = await this.prisma.findManyLocalStoreDocs("ANTHROPIC", userId);
-    for (const doc of docs) {
-      this.docCache.set(doc.attachmentId, {
-        docId: doc.id,
-        provenanceId: doc.provenanceId,
-        state: doc.state
-      });
-    }
-  }
+  // Legacy local-store indexing methods are intentionally retained in this
+  // class for now, but search is routed through UserStoreVectorService.
 
   // ─── Custom file_search tool definition ──────────────────────────────
 
@@ -987,8 +925,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
                     source: { type: "url", url },
                     citations: { enabled: true }
                   } satisfies Anthropic.Beta.BetaRequestDocumentBlock);
-                } finally {
-                  void this.ensureAssetIndexed(attachment, attachment.userId);
                 }
               } else if (attachment.assetType === "IMAGE") {
                 const sizeInMB = (attachment.size ?? 0) / 1024 / 1024;
@@ -1060,7 +996,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
             } else {
               if (isFreshContext) {
                 textParts.push(`[${filename}][${url}]`);
-                void this.ensureAssetIndexed(attachment, attachment.userId);
               } else {
                 textParts.push(`[seen] [${filename}](${url})`);
               }
@@ -1131,14 +1066,11 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       max_tokens
     );
 
-    const hasLocalStore = await this.prisma.localVectorStoreCheck(
-      "ANTHROPIC",
-      userId
-    );
+    const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
 
-    const tools = this.tooling(model, user_location, hasLocalStore);
+    const tools = this.tooling(model, user_location, hasUserStoreDocs);
 
-    const betas = this.handleBetaHeaders(model, hasLocalStore);
+    const betas = this.handleBetaHeaders(model, hasUserStoreDocs);
     this.logger.info(betas, "beta headers");
     // only opus 4.5 and 4.6 support effort config
     if (model === "claude-opus-4-6" || model === "claude-opus-4-5-20251101") {

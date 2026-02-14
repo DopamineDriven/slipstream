@@ -1,7 +1,10 @@
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
 import type { CreateUserStoreRT } from "@/prisma/types.ts";
 import type {
   AttScopedImg,
   AttScopedImgsCache,
+  AttScopedPageBoxCache,
   CdnCacheEntry,
   OffsetCache,
   PageDimensions,
@@ -12,6 +15,8 @@ import type {
   PageAnnotation,
   PageBox,
   PageImage,
+  PdfDown,
+  PdfMeta,
   StructuredPageText
 } from "@d0paminedriven/pdfdown";
 import type { Logger as PinoLogger } from "pino";
@@ -19,18 +24,19 @@ import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import { AttachmentSingleton } from "@slipstream/types";
+import type { AttachmentSingleton } from "@slipstream/types";
 
-interface AttScopedPageBoxCache extends PageBox {
-  coverage: number;
-}
 export class UserStoreWorkupService {
+  protected pdfdown: Promise<typeof PdfDown>;
   protected logger: PinoLogger;
 
   // ── Caches ───────────────────────────────────────────────────────────
 
-  /** Key: `${userId}::${storeName}` → store record with bigint-to-num conversion */
-  protected storeRegistry = new Map<string, CreateUserStoreRT<true>>();
+  /** Outer key: userId -> inner key: storeName -> store record */
+  public storeRegistry = new Map<
+    string,
+    Map<string, CreateUserStoreRT<true>>
+  >();
 
   /** Key: epoch timestamp (13 chars) → CDN cache entry for non-compat (ALIASED) URLs */
   protected cdnEpochCache = new Map<string, CdnCacheEntry>();
@@ -53,10 +59,7 @@ export class UserStoreWorkupService {
    */
   protected attScopedAnnots = new Map<
     string,
-    Map<
-      number,
-      AttScopedImgsCache
-    >
+    Map<number, AttScopedImgsCache>
   >();
 
   /**
@@ -82,6 +85,7 @@ export class UserStoreWorkupService {
     this.logger = logger
       .getPinoInstance()
       .child({ node_version: process.version }, { msgPrefix: "[store] " });
+    this.pdfdown = import("@d0paminedriven/pdfdown").then(d => d.PdfDown);
   }
 
   // ── CDN Hostname ─────────────────────────────────────────────────────
@@ -91,23 +95,12 @@ export class UserStoreWorkupService {
       ? "assets.aicoalesce.com"
       : "assets-dev.aicoalesce.com";
   }
+  protected async pdfDown(buffer: Buffer) {
+    const PdfD = await this.pdfdown;
+    return new PdfD(buffer);
+  }
 
-  protected async extractPdf(buffer: Buffer){
-      const { PdfDown } = await import("@d0paminedriven/pdfdown");
-
-  const pdfDown = new PdfDown(buffer);
-
-  const [structuredText, images, annots, meta] = await Promise.all([
-    pdfDown.structuredTextAsync(),
-    pdfDown.imagesPerPageAsync(),
-    pdfDown.annotationsPerPageAsync(),
-    pdfDown.metadataAsync()
-  ]);
-
-
-}
-
-  protected annotOffsetsByPage(
+  protected buildAttachmentOffsetCache(
     attachmentId: string,
     structuredText: StructuredPageText[],
     imagePages: Set<number>,
@@ -129,64 +122,344 @@ export class UserStoreWorkupService {
     this.attScopedOffsets.set(attachmentId, mapper);
     return Array.from(mapper.values());
   }
-  // imgMapper(att: AttachmentSingleton<true>, imgs: PageImage[]) {
-  //   const imgByPage = new Map<number, AttScopedImgsCache>();
 
-  //   for (const {
-  //     data,
-  //     width,
-  //     height,
-  //     imageIndex,
-  //     page,
-  //     colorSpace,
-  //     filter
-  //   } of imgs) {
-  //     const size = data.byteLength;
+  protected attachmentImageTmpName(
+    attachmentId: string,
+    page: number,
+    imageIndex: number
+  ) {
+    // Attachment-scoped tmp naming supports proactive post-upload invocation.
+    const tmpFileName = this.prisma.extractor.uniqueTmpName(
+      `${attachmentId}-img-${page}-${imageIndex}`,
+      "png"
+    );
+    const absTmpPath = resolve(tmpdir(), tmpFileName);
+    return { tmpFileName, absTmpPath } as const;
+  }
 
-  //     const _config = {
-  //       height,
-  //       width,
-  //       aspectRatio: width / height,
-  //       index: imageIndex,
-  //       page,
-  //       colorSpace,
-  //       filter,
-  //       // bytes
-  //       size
-  //     };
-  //   }
-  // }
+  protected preflightAttachment(att: AttachmentSingleton<true>) {
+    if (att.assetType !== "DOCUMENT") {
+      return {
+        ok: false,
+        reason: "SKIP_NON_DOCUMENT",
+        assetType: att.assetType
+      } as const;
+    }
+
+    if (!att.compatStatus) {
+      throw new Error(`missing compatStatus for attachment ${att.id}`);
+    }
+
+    if (att.compatStatus === "PENDING") {
+      return {
+        ok: false,
+        reason: "WAIT_COMPAT_ACTIVE",
+        compatStatus: att.compatStatus
+      } as const;
+    }
+
+    if (att.compatStatus === "FAILED") {
+      this.logger.warn(
+        { attachmentId: att.id, compatStatus: att.compatStatus },
+        "Bypassing user store indexing due to FAILED compat status"
+      );
+      return {
+        ok: false,
+        reason: "SKIP_COMPAT_FAILED",
+        compatStatus: att.compatStatus
+      } as const;
+    }
+
+    if (att.compatStatus !== "ACTIVE" && att.compatStatus !== "ALIASED") {
+      throw new Error(`unsupported compatStatus for attachment ${att.id}`);
+    }
+
+    const { ext } = this.prisma.urlExtWorkupEmbeddings(att);
+    if (ext.toLowerCase() !== "pdf") {
+      return {
+        ok: false,
+        reason: "SKIP_NON_PDF",
+        ext
+      } as const;
+    }
+
+    return {
+      ok: true,
+      compatStatus: att.compatStatus,
+      ext: "pdf"
+    } as const;
+  }
+
+  public postUploadIndexingDecision(att: AttachmentSingleton<true>) {
+    return this.preflightAttachment(att);
+  }
+
+  protected imgMapper(att: AttachmentSingleton<true>, imgs: PageImage[]) {
+    const current = this.attScopedImgs.get(att.id);
+    const imgByPage = new Map<number, AttScopedImgsCache>();
+
+    if (current) {
+      for (const [page, pageCache] of current.entries()) {
+        const clonedPageData = new Map(pageCache.data);
+        imgByPage.set(page, {
+          count: clonedPageData.size,
+          page,
+          data: clonedPageData
+        });
+      }
+    }
+
+    for (const { data, width, height, imageIndex, page } of imgs) {
+      const { tmpFileName, absTmpPath } = this.attachmentImageTmpName(
+        att.id,
+        page,
+        imageIndex
+      );
+      this.prisma.extractor.writeTmp(tmpFileName, data);
+
+      const imageRecord = {
+        height,
+        width,
+        aspectRatio: width / height,
+        index: imageIndex,
+        page,
+        tmpFileName,
+        absTmpPath,
+        size: String(data.byteLength)
+      } satisfies AttScopedImg;
+
+      const pageCache = imgByPage.get(page);
+      if (!pageCache) {
+        const pageData = new Map<number, AttScopedImg>([
+          [imageIndex, imageRecord]
+        ]);
+        const next = {
+          count: pageData.size,
+          page,
+          data: pageData
+        } satisfies AttScopedImgsCache;
+        imgByPage.set(page, next);
+        continue;
+      }
+
+      const existingImage = pageCache.data.get(imageIndex);
+      if (
+        existingImage &&
+        existingImage.absTmpPath !== imageRecord.absTmpPath &&
+        this.prisma.extractor.exists(existingImage.absTmpPath)
+      ) {
+        this.prisma.extractor.rmFile(existingImage.absTmpPath);
+      }
+
+      pageCache.data.set(imageIndex, imageRecord);
+      pageCache.count = pageCache.data.size;
+    }
+
+    for (const pageCache of imgByPage.values()) {
+      pageCache.count = pageCache.data.size;
+    }
+
+    this.attScopedImgs.set(att.id, imgByPage);
+    return imgByPage;
+  }
+
+  protected cleanupImgMapper(attId: string) {
+    const mapped = this.attScopedImgs.get(attId);
+    if (!mapped) return;
+
+    const cleanupFailures = Array.of<{
+      page: number;
+      imageIndex: number;
+      tmpFileName: string;
+      absTmpPath: string;
+      reason: string;
+    }>();
+    const remainingByPage = new Map<number, AttScopedImgsCache>();
+
+    for (const [page, pageEntry] of mapped.entries()) {
+      const remainingImgs = new Map<number, AttScopedImg>();
+
+      for (const [imageIndex, imageEntry] of pageEntry.data.entries()) {
+        if (!this.prisma.extractor.exists(imageEntry.absTmpPath)) continue;
+
+        try {
+          this.prisma.extractor.rmFile(imageEntry.absTmpPath);
+        } catch (err) {
+          cleanupFailures.push({
+            page,
+            imageIndex,
+            tmpFileName: imageEntry.tmpFileName,
+            absTmpPath: imageEntry.absTmpPath,
+            reason: this.prisma.safeErrMsg(err)
+          });
+          remainingImgs.set(imageIndex, imageEntry);
+          continue;
+        }
+
+        if (this.prisma.extractor.exists(imageEntry.absTmpPath)) {
+          cleanupFailures.push({
+            page,
+            imageIndex,
+            tmpFileName: imageEntry.tmpFileName,
+            absTmpPath: imageEntry.absTmpPath,
+            reason: "file still exists after rmFile"
+          });
+          remainingImgs.set(imageIndex, imageEntry);
+        }
+      }
+
+      if (remainingImgs.size > 0) {
+        remainingByPage.set(page, {
+          count: remainingImgs.size,
+          page,
+          data: remainingImgs
+        });
+      }
+    }
+
+    if (remainingByPage.size === 0) {
+      this.attScopedImgs.delete(attId);
+    } else {
+      this.attScopedImgs.set(attId, remainingByPage);
+    }
+
+    if (cleanupFailures.length > 0) {
+      this.logger.error(
+        {
+          attachmentId: attId,
+          failedTmpCount: cleanupFailures.length,
+          failures: cleanupFailures
+        },
+        "Failed to cleanup one or more attachment-scoped tmp images"
+      );
+      throw new Error(
+        `tmp image cleanup failed for attachment ${attId} (${cleanupFailures.length} files)`
+      );
+    }
+  }
+
+  public async prepareAttachmentPdfWorkup(att: AttachmentSingleton<true>) {
+    const preflight = this.preflightAttachment(att);
+    if (!preflight.ok) return preflight;
+
+    const tmp = await this.prisma.userStoreAssetToTmp(att);
+    const buffer = this.prisma.extractor.fileToBuffer(tmp.absTmpPath);
+    const pdfDown = await this.pdfDown(buffer);
+
+    const [structuredText, images, annotations, meta] = await Promise.all([
+      pdfDown.structuredTextAsync(),
+      pdfDown.imagesPerPageAsync(),
+      pdfDown.annotationsPerPageAsync(),
+      pdfDown.metadataAsync()
+    ]);
+
+    const imagePages = new Set(images.map(img => img.page));
+    const annotPages = new Set(annotations.map(annot => annot.page));
+
+    const offsets = this.buildAttachmentOffsetCache(
+      att.id,
+      structuredText,
+      imagePages,
+      annotPages
+    );
+    const pageBoxes = this.pageBoxHelper(att.id, meta);
+    const imagesByPage = this.imgMapper(att, images);
+
+    return {
+      ok: true,
+      compatStatus: preflight.compatStatus,
+      tmp,
+      structuredText,
+      images,
+      annotations,
+      meta,
+      offsets,
+      pageBoxes,
+      imagesByPage
+    } as const;
+  }
   // ── Store Registry ───────────────────────────────────────────────────
+  protected pageBoxHelper(attId: string, meta: PdfMeta) {
+    // 0 is default page box config key; if size ===1, 0 is the only entry (uniform)
+    const pBoxCache = new Map<number, AttScopedPageBoxCache>();
+    const { pageBoxes, ...metaRest } = meta;
+    const total = metaRest.pageCount;
+    const anomalySet = new Set<number>();
+    if (pageBoxes.length === 1) {
+      const uniformBox = pageBoxes[0];
+      if (uniformBox) {
+        pBoxCache.set(0, { ...uniformBox, coverage: 1 });
+      }
+    }
+    if (pageBoxes.length > 1) {
+      // intentionally reverse to iterate over the default last
+      // after aggregating the number of pages deviating from the majority page box config
+      for (const [i, p] of pageBoxes.reverse().entries()) {
+        if (p.pages?.length) {
+          for (const e of p.pages) {
+            anomalySet.add(e);
+          }
+          pBoxCache.set(i, {
+            ...p,
+            coverage: p.pages.length / total
+          });
+        } else {
+          const coverage = (total - pBoxCache.size) / total;
+          pBoxCache.set(0, { coverage, ...p });
+        }
+      }
+    }
 
-  protected storeRegistryKey(userId: string, storeName: string) {
-    return `${userId}::${storeName}`;
+    if (pBoxCache.size > 1) {
+      for (const a of Array.from(pBoxCache.keys())) {
+        if (a !== 0) anomalySet.add(a);
+      }
+    }
+    /**
+     * hydrate att scoped page boxes
+     */
+    this.attScopedPageBoxes.set(attId, pBoxCache);
+    return {
+      anomalySet,
+      pageBoxCache: Array.from(pBoxCache.values()),
+      ...metaRest
+    };
+  }
+  protected writeStoreRegistry(
+    userId: string,
+    storeName: string,
+    data: CreateUserStoreRT<true>
+  ) {
+    const byStoreName = this.storeRegistry.get(userId);
+    if (byStoreName) {
+      byStoreName.set(storeName, data);
+    } else {
+      this.storeRegistry.set(userId, new Map([[storeName, data]]));
+    }
   }
 
   public async populateStoreRegistry(userId: string) {
     const stores = await this.prisma.getAllUserStores(userId);
+    const byStoreName = new Map<string, CreateUserStoreRT<true>>();
     for (const store of stores) {
       const data = await this.prisma.getUserStoreUnique(
         userId,
         store.storeName
       );
-      this.storeRegistry.set(
-        this.storeRegistryKey(userId, store.storeName),
-        data
-      );
+      byStoreName.set(store.storeName, data);
     }
+    this.storeRegistry.set(userId, byStoreName);
   }
 
   public async ensureUserStore(userId: string, storeName?: string) {
     const name = storeName ?? this.prisma.defaultUserStoreName(userId);
-    const key = this.storeRegistryKey(userId, name);
-
-    const cached = this.storeRegistry.get(key);
+    const cached = this.storeRegistry.get(userId)?.get(name);
     if (cached) return cached;
 
     const exists = await this.prisma.userStoreCheck(userId, name);
     if (exists) {
       const data = await this.prisma.getUserStoreUnique(userId, name);
-      this.storeRegistry.set(key, data);
+      this.writeStoreRegistry(userId, name, data);
       return data;
     } else {
       const data = await this.prisma.createUserStore({
@@ -196,7 +469,7 @@ export class UserStoreWorkupService {
         defaultEmbeddingModel: "voyage-multimodal-3.5",
         schemaVersion: "v1_0"
       });
-      this.storeRegistry.set(key, data);
+      this.writeStoreRegistry(userId, name, data);
       return data;
     }
   }
@@ -224,16 +497,13 @@ export class UserStoreWorkupService {
     }
   }
 
-  // ── Registry Sync ────────────────────────────────────────────────────
-
   public async syncRegistry(userId: string) {
-    // Clear user-specific entries from both caches
-    for (const key of this.storeRegistry.keys()) {
-      if (key.startsWith(`${userId}::`)) {
-        this.storeRegistry.delete(key);
-      }
+    // Clear user-scoped registry + refresh.
+    this.storeRegistry.delete(userId);
+    for (const [timestamp, entry] of this.cdnEpochCache.entries()) {
+      if (entry.userId !== userId) continue;
+      this.cdnEpochCache.delete(timestamp);
     }
-    this.cdnEpochCache.clear();
 
     await Promise.all([
       this.populateStoreRegistry(userId),
@@ -241,11 +511,37 @@ export class UserStoreWorkupService {
     ]);
   }
 
-  // ── CDN Detection & Resolution ───────────────────────────────────────
-
   protected detectCdnLink(uri: string) {
     if (!URL.canParse(uri)) return false;
     return new URL(uri).hostname === this.cdnHostname;
+  }
+
+  protected detectCdnCompatStatus(url: URL) {
+    const topPath = url.pathname.slice(url.pathname.lastIndexOf("/") + 1);
+    if (topPath.startsWith("att_")) {
+      return {
+        compatStatus: "ACTIVE",
+        topPath,
+        source: "att-prefix"
+      } as const;
+    }
+    if (/^\d{13}-/.test(topPath)) {
+      return {
+        compatStatus: "ALIASED",
+        topPath,
+        source: "epoch-prefix"
+      } as const;
+    }
+
+    const segments = url.pathname
+      .split("/")
+      .filter((segment): segment is string => segment.length > 0);
+    const compatStatus = segments.includes("converted") ? "ACTIVE" : "ALIASED";
+    return {
+      compatStatus,
+      topPath,
+      source: "legacy-path-fallback"
+    } as const;
   }
 
   protected async resolveCdnAnnotation(uri: string) {
@@ -256,18 +552,8 @@ export class UserStoreWorkupService {
       return { linkedDocId: null, attachmentId: null };
     }
 
-    // Determine compat status from URL structure: "converted" in path → ACTIVE
-    const path = url.pathname;
-    const basePath = path.slice(0, path.lastIndexOf("/"));
-    const afterOrigin = basePath.indexOf("/", 1);
-    const secondEnd = basePath.indexOf("/", afterOrigin + 1);
-    const second =
-      secondEnd > 0
-        ? basePath.slice(afterOrigin + 1, secondEnd)
-        : basePath.slice(afterOrigin + 1);
-    const isCompat = second === "converted";
-
-    if (!isCompat) {
+    const parsedCompat = this.detectCdnCompatStatus(url);
+    if (parsedCompat.compatStatus === "ALIASED") {
       // ~98%: epoch-based O(1) cache lookup via urlParseNonCompat
       const parsed = this.prisma.urlParseNonCompat(uri);
       const entry = this.cdnEpochCache.get(parsed.timestamp);
@@ -303,25 +589,26 @@ export class UserStoreWorkupService {
   // These methods are protected — they migrate to store/vector-store.ts later
 
   protected async resolveAnnotationOffsets(
-    structuredText: StructuredPageText[],
+    attachmentId: string,
     annotations: PageAnnotation[],
     pageBoxes: PageBox[]
   ): Promise<ResolvedAnnotation[]> {
+    const offsetCache = this.attScopedOffsets.get(attachmentId);
+    if (!offsetCache) {
+      throw new Error(
+        `offset cache is not hydrated for attachment ${attachmentId}`
+      );
+    }
     const dims = this.buildPageDimensionsMap(pageBoxes);
     const hasOverrides = dims.overrides.size > 0;
-    const { map: offsetMap, sorted: sortedEntries } =
-      this.buildPageOffsetMap(structuredText);
-
-    // Build concatenated text for Levenshtein search
-    const nonEmptyPages = structuredText.filter(p => p.body.trim().length > 0);
-    const concatenated = nonEmptyPages.map(p => p.body).join("\n\n");
+    const sortedEntries = this.offsetEntriesFromCache(offsetCache);
 
     const results = Array.of<ResolvedAnnotation>();
 
     for (const annot of annotations) {
       const pageNumber = annot.page;
 
-      const pageEntry = offsetMap.get(pageNumber);
+      const pageEntry = offsetCache.get(pageNumber);
 
       const { rect: r } = annot;
 
@@ -332,7 +619,12 @@ export class UserStoreWorkupService {
         r2 = r?.[2],
         r3 = r?.[3];
 
-      if (r0 && r1 && r2 && r3) {
+      const hasRect =
+        typeof r0 === "number" &&
+        typeof r1 === "number" &&
+        typeof r2 === "number" &&
+        typeof r3 === "number";
+      if (hasRect) {
         rect = [r0, r1, r2, r3];
       } else {
         rect = [0, 0, 0, 0];
@@ -380,6 +672,8 @@ export class UserStoreWorkupService {
         ? (dims.overrides.get(pageNumber) ?? dims.defaultDims)
         : dims.defaultDims;
       const pageHeight = pageDims.height;
+      const [globalStart, globalEnd] = pageEntry.offsets;
+      const bodyLength = pageEntry.body.length;
 
       // Y interpolation: midpoint of rect, relative to page height (top-down)
       const yMid = (y1 + y2) / 2;
@@ -387,44 +681,17 @@ export class UserStoreWorkupService {
         0,
         Math.min(1, (pageHeight - yMid) / pageHeight)
       );
-      const approxStart =
-        pageEntry.globalStart + Math.round(relativeY * pageEntry.bodyLength);
+      let startOffset = globalStart + Math.round(relativeY * bodyLength);
 
       const uri = annot.uri ?? annot.dest ?? annot.content ?? "";
-      const searchLabel = this.extractSearchLabel(uri);
-
-      let startOffset = approxStart;
-      let endOffset = approxStart;
-
-      if (searchLabel && searchLabel.length >= 3) {
-        const refined = this.refineOffsetWithLevenshtein(
-          concatenated,
-          approxStart,
-          searchLabel
-        );
-        if (refined && refined.confidence > 0.5) {
-          startOffset = refined.start;
-          endOffset = refined.end;
-        } else {
-          endOffset = Math.min(
-            startOffset + searchLabel.length,
-            pageEntry.globalEnd
-          );
-        }
-      } else {
-        // Fallback: X-span heuristic for endOffset
-        const xSpan = Math.abs(x2 - x1);
-        const xFraction = pageDims.width > 0 ? xSpan / pageDims.width : 0;
-        const charEstimate = Math.max(
-          1,
-          Math.round(xFraction * pageEntry.bodyLength)
-        );
-        endOffset = Math.min(startOffset + charEstimate, pageEntry.globalEnd);
-      }
+      const xSpan = Math.abs(x2 - x1);
+      const xFraction = pageDims.width > 0 ? xSpan / pageDims.width : 0;
+      const charEstimate = Math.max(1, Math.round(xFraction * bodyLength));
+      let endOffset = Math.min(startOffset + charEstimate, globalEnd);
 
       // Clamp to page bounds
-      startOffset = Math.max(pageEntry.globalStart, startOffset);
-      endOffset = Math.min(pageEntry.globalEnd, endOffset);
+      startOffset = Math.max(globalStart, startOffset);
+      endOffset = Math.min(globalEnd, endOffset);
       if (endOffset < startOffset) endOffset = startOffset;
 
       const subtype = this.mapAnnotSubtype(annot.subtype);
@@ -457,6 +724,20 @@ export class UserStoreWorkupService {
     return results;
   }
 
+  protected offsetEntriesFromCache(cache: ReadonlyMap<number, OffsetCache>) {
+    const entries = Array.of<PageOffsetEntry>();
+    for (const offset of cache.values()) {
+      const [globalStart, globalEnd] = offset.offsets;
+      entries.push({
+        page: offset.page,
+        globalStart,
+        globalEnd,
+        bodyLength: offset.body.length
+      } satisfies PageOffsetEntry);
+    }
+    return entries.sort((a, b) => a.page - b.page);
+  }
+
   protected buildPageDimensionsMap(pageBoxes: PageBox[]): PageDimensions {
     let defaultDims = { width: 612, height: 1008 }; // US Legal fallback
     const overrides = new Map<number, { width: number; height: number }>();
@@ -476,34 +757,7 @@ export class UserStoreWorkupService {
     return { defaultDims, overrides };
   }
 
-  protected buildPageOffsetMap(structuredText: StructuredPageText[]) {
-    const map = new Map<number, PageOffsetEntry>();
-    const nonEmpty = structuredText.filter(p => p.body.trim().length > 0);
-
-    // Sorted array for boundary lookups on empty-body pages
-    const sorted = Array.of<PageOffsetEntry>();
-
-    let offset = 0;
-    for (const [i, p] of nonEmpty.entries()) {
-      const separator = i > 0 ? 2 : 0; // "\n\n" between pages
-      const globalStart = offset + separator;
-      const bodyLength = p.body.length;
-      const globalEnd = globalStart + bodyLength;
-      const entry = {
-        page: p.page,
-        globalStart,
-        globalEnd,
-        bodyLength
-      } satisfies PageOffsetEntry;
-      map.set(p.page, entry);
-      sorted.push(entry);
-      offset = globalEnd;
-    }
-
-    return { map, sorted } as const;
-  }
-
-  /** For annotations on empty-body pages, find the boundary offset from surrounding pages */
+  /** For annotations on missing pages, find the closest boundary offset from surrounding pages */
   protected findBoundaryOffset(
     pageNumber: number,
     sorted: readonly PageOffsetEntry[]
@@ -535,56 +789,6 @@ export class UserStoreWorkupService {
     return { startOffset: prevEnd, endOffset: nextStart };
   }
 
-  protected extractSearchLabel(uri: string): string | null {
-    if (!uri || !URL.canParse(uri)) return null;
-    const url = new URL(uri);
-    const path = url.pathname;
-    const lastSlash = path.lastIndexOf("/");
-    if (lastSlash === -1 || lastSlash === path.length - 1) return null;
-    const lastSegment = decodeURIComponent(path.slice(lastSlash + 1));
-    const dotIdx = lastSegment.lastIndexOf(".");
-    const stripped = dotIdx > 0 ? lastSegment.slice(0, dotIdx) : lastSegment;
-    return stripped.length >= 3 ? stripped : null;
-  }
-
-  protected refineOffsetWithLevenshtein(
-    concatenatedText: string,
-    approxStart: number,
-    label: string
-  ) {
-    const labelLen = label.length;
-    const windowStart = Math.max(0, approxStart - 200);
-    const windowEnd = Math.min(
-      concatenatedText.length,
-      approxStart + 200 + labelLen
-    );
-    const window = concatenatedText.slice(windowStart, windowEnd);
-
-    if (window.length < labelLen) return null;
-
-    let bestLD = Infinity;
-    let bestPos = 0;
-    const lowerLabel = label.toLowerCase();
-
-    for (let i = 0; i <= window.length - labelLen; i++) {
-      const candidate = window.slice(i, i + labelLen).toLowerCase();
-      const ld = this.prisma.extractor.calculateLD(lowerLabel, candidate);
-      if (ld < bestLD) {
-        bestLD = ld;
-        bestPos = i;
-        if (ld === 0) break; // exact match
-      }
-    }
-
-    const confidence = 1 - bestLD / labelLen;
-    return {
-      start: windowStart + bestPos,
-      end: windowStart + bestPos + labelLen,
-      confidence
-    };
-  }
-
-  protected readonly annotSubtypes = new Set<$Enums.AnnotSubtype>();
   protected isAnnotSubtype(subtype: string) {
     return (
       subtype === "AUTOLINK" ||

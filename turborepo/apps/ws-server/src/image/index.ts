@@ -13,10 +13,13 @@ type PhotoHeuristic = {
 };
 
 export class ImageCompatService {
+  sharp: Promise<typeof sharp>;
   constructor(
     private s3: S3Storage,
     private prisma: PrismaService
-  ) {}
+  ) {
+    this.sharp = import("sharp").then(t => t.default);
+  }
   private async urlToBuff(cdnUrl: string) {
     const response = await fetch(cdnUrl, { method: "GET" });
     if (!response.ok || !response.body) {
@@ -170,6 +173,7 @@ export class ImageCompatService {
   } as const;
 
   private async sharpWorkup(buf: Buffer<ArrayBuffer>, specs: ExpandedImgSpecs) {
+    const sharpInstance = await this.sharp;
     if (
       !(
         specs.format === "png" ||
@@ -178,10 +182,12 @@ export class ImageCompatService {
       )
     ) {
       const target = this.pickCompatExt(specs);
+
       if (specs.width >= 2000 || specs.height >= 2000) {
         const [w, h] = this.calcDims(specs.width, specs.height);
         const isPhotographic = this.isPhotographic(specs);
-        const img = sharp(buf, {
+
+        const img = sharpInstance(buf, {
           limitInputPixels: false,
           sequentialRead: true
         })
@@ -215,7 +221,7 @@ export class ImageCompatService {
         }
       } else {
         const isPhotographic = this.isPhotographic(specs);
-        const img = sharp(buf, {
+        const img = sharpInstance(buf, {
           limitInputPixels: false,
           sequentialRead: true
         })
@@ -245,7 +251,7 @@ export class ImageCompatService {
     } else {
       if (specs.width >= 2000 || specs.height >= 2000) {
         const [w, h] = this.calcDims(specs.width, specs.height);
-        const img = sharp(buf, {
+        const img = sharpInstance(buf, {
           limitInputPixels: false,
           sequentialRead: true
         })
@@ -286,17 +292,21 @@ export class ImageCompatService {
     const transformed = await this.sharpWorkup(buf, specs);
     if (!transformed) return;
 
-    const toS3 = await this.s3.uploadCompatGenerated(transformed, this.prisma.isProd, {
-      attachmentId: id,
-      target,
-      contentType: `image/${target}`,
-      filename,
-      origin,
-      userId,
-      conversationId,
-      messageId: undefined, // this happens before a user hits send on a prompt or parallel to them hittng send on a prompt --- no message id yet
-      size: transformed.byteLength
-    });
+    const toS3 = await this.s3.uploadCompatGenerated(
+      transformed,
+      this.prisma.isProd,
+      {
+        attachmentId: id,
+        target,
+        contentType: `image/${target}`,
+        filename,
+        origin,
+        userId,
+        conversationId,
+        messageId: undefined, // this happens before a user hits send on a prompt or parallel to them hittng send on a prompt --- no message id yet
+        size: transformed.byteLength
+      }
+    );
 
     await this.prisma.updateImgAttachmentCompat({
       attachmentId: id,

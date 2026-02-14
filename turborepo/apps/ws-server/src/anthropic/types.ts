@@ -2,7 +2,7 @@ import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { PageImage } from "@d0paminedriven/pdfdown";
 import Anthropic from "@anthropic-ai/sdk";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
-import type { searchLocalDocChunksByStore } from "@slipstream/db/sql-node";
+import type { searchUserStoreChunksByStore } from "@slipstream/db/sql-node";
 import type { MessageSingleton } from "@slipstream/types";
 
 export interface AnthropicFileRecord {
@@ -67,7 +67,7 @@ export type CreateMessageStreamRT =
   };
 
 /** Direct alias of the typed SQL search result — includes joined doc fields + computed score */
-export type LocalSearchResult = searchLocalDocChunksByStore.Result;
+export type LocalSearchResult = searchUserStoreChunksByStore.Result;
 
 export interface FileSearchToolInput {
   query: string;

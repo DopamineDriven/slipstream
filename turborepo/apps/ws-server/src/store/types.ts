@@ -1,4 +1,5 @@
 import type { PageAnnotation, PageBox } from "@d0paminedriven/pdfdown";
+import type { searchUserStoreChunksByStore } from "@slipstream/db/sql-node";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { Rm } from "@slipstream/types";
 
@@ -90,35 +91,52 @@ export interface AttScopedImg {
   size: string;
 }
 
+export interface UserStoreSearchParams {
+  userId: string;
+  query: string;
+  limit?: number;
+  threshold?: number;
+  storeName?: string;
+}
+
+export type UserStoreSearchResult = searchUserStoreChunksByStore.Result;
+
 /**
  * checking for gtOne (greater than one image in the pages image indexes)
  *
  */
 export type AttScopedImgCache<T extends boolean = boolean> = T extends true
-  ? AttScopedImg[]
-  : readonly [AttScopedImg];
+  ? readonly [AttScopedImg]
+  : AttScopedImg[];
 
 export type AttScopedImages<T extends boolean = boolean> = {
   /**
    * instances of more than one image index being contained within the same page
    */
   exactlyOne: T;
-  count: T extends false ? number : 1;
+  count: T extends true ? 1 : number;
   page: number;
   imageIndexes: T extends true ? readonly [0] : number[];
+  // optionally we could use image index as a third map layer-> Map<number, AttScopedImg>->so the overall view would be
+  // Map<string, Map<number,{page: number; exactlyOne: T; count: T extends true ? 1 : number; imageIndexes: T extends true ? readonly [0] : number[]; img: Map<number, AttScopedImageCache>}>>
   img: AttScopedImgCache<T>;
 };
 
-export type ImageCacheee<T extends boolean = boolean> = Map<
-  number,
-  AttScopedImages<T>
->;
-export type AttScopedImage<
-  Outer extends boolean = boolean,
-  Inner extends boolean = boolean
-> = {
-  hasImages: Outer;
-  pages?: Outer extends true ? number[] : undefined;
-  counts: Outer extends true ? number : 0;
-  images: Outer extends true ? AttScopedImages<Inner> : undefined;
-};
+
+export interface AttScopedPageBoxCache extends PageBox {
+  coverage: number;
+}
+
+// export type ImageCacheee<T extends boolean = boolean> = Map<
+//   number,
+//   AttScopedImages<T>
+// >;
+// export type AttScopedImage<
+//   Outer extends boolean = boolean,
+//   Inner extends boolean = boolean
+// > = {
+//   hasImages: Outer;
+//   pages?: Outer extends true ? number[] : undefined;
+//   counts: Outer extends true ? number : 0;
+//   images: Outer extends true ? AttScopedImages<Inner> : undefined;
+// };

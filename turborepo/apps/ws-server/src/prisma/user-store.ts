@@ -1,4 +1,5 @@
 import type {
+  CreateUserStoreChunkParams,
   CreateUserStoreParams,
   CreateUserStoreRT
 } from "@/prisma/types.ts";
@@ -131,8 +132,8 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
     conversationId,
     messageId,
     originatingUrl,
-    originatingModel,
-    originatingProvider,
+    originatingModel = null,
+    originatingProvider = null,
     provenanceId,
     filename,
     mimeType,
@@ -158,8 +159,8 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
     conversationId: string;
     messageId: string;
     originatingUrl: string;
-    originatingModel: string;
-    originatingProvider: $Enums.Provider;
+    originatingModel?: string | null;
+    originatingProvider?: $Enums.Provider | null;
     provenanceId: string;
     filename: string;
     mimeType: string;
@@ -178,17 +179,19 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
     imagePages?: string | null;
     annotPages?: string | null;
     tokenCount?: number;
-    annots?: {
-      subtype: $Enums.AnnotSubtype;
-      uri: string;
-      rect: number[];
-      startOffset: number;
-      endOffset: number;
-      pageNumber?: number | null;
-      isCdnLink?: boolean;
-      linkedDocId?: string | null;
-      attachmentId?: string | null;
-    }[] | null;
+    annots?:
+      | {
+          subtype: $Enums.AnnotSubtype;
+          uri: string;
+          rect: number[];
+          startOffset: number;
+          endOffset: number;
+          pageNumber?: number | null;
+          isCdnLink?: boolean;
+          linkedDocId?: string | null;
+          attachmentId?: string | null;
+        }[]
+      | null;
   }) {
     const annotsCreate = annots?.map(a => ({
       subtype: a.subtype,
@@ -268,38 +271,90 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
     contentHash: string,
     startOffset: number,
     endOffset: number,
-    hasVisualContent: boolean,
+    hasImages: boolean,
+    hasAnnots: boolean,
     pageStartOffset: number | null = null,
     pageEndOffset: number | null = null,
     schemaVersion: $Enums.UserStoreSchemaVersion = "v1_0"
   ) {
+    return await this.prismaClient.userStoreDocChunk.create({
+      data: this.buildUserStoreChunkCreateData({
+        provenanceId,
+        storeId,
+        docId,
+        chunkIndex,
+        content,
+        contentHash,
+        startOffset,
+        endOffset,
+        hasImages,
+        hasAnnots,
+        pageStartOffset,
+        pageEndOffset,
+        schemaVersion
+      })
+    });
+  }
+
+  private buildUserStoreChunkCreateData({
+    provenanceId,
+    storeId,
+    docId,
+    chunkIndex,
+    content,
+    contentHash,
+    startOffset,
+    endOffset,
+    hasImages,
+    hasAnnots,
+    pageStartOffset = null,
+    pageEndOffset = null,
+    schemaVersion = "v1_0"
+  }: CreateUserStoreChunkParams) {
     const { attachmentId, conversationId, messageId } =
       this.parseDocname(provenanceId);
     const chunkProvenanceId = this.toVectorStoreDocChunkProvenanceId(
       provenanceId,
       chunkIndex
     );
-    return await this.prismaClient.userStoreDocChunk.create({
-      data: {
-        docId,
-        storeId,
-        chunkProvenanceId,
-        chunkIndex,
-        provenanceId,
-        conversationId,
-        messageId,
-        attachmentId,
-        state: "QUEUED",
-        content: content.replace(/\0/g, ""),
-        contentHash,
-        startOffset,
-        endOffset,
-        hasVisualContent,
-        pageStartOffset,
-        pageEndOffset,
-        tokenCount: 0,
-        schemaVersion
-      }
+    return {
+      docId,
+      storeId,
+      chunkProvenanceId,
+      chunkIndex,
+      provenanceId,
+      conversationId,
+      messageId,
+      attachmentId,
+      state: "QUEUED",
+      content: content.replace(/\0/g, ""),
+      contentHash,
+      startOffset,
+      endOffset,
+      hasImages,
+      hasAnnots,
+      pageStartOffset,
+      pageEndOffset,
+      tokenCount: 0,
+      schemaVersion
+    } as const;
+  }
+
+  public async createUserStoreChunkForEmbedding(
+    params: CreateUserStoreChunkParams
+  ) {
+    return await this.prismaClient.$transaction(async tx => {
+      const created = await tx.userStoreDocChunk.create({
+        data: this.buildUserStoreChunkCreateData(params)
+      });
+      return await tx.userStoreDocChunk.update({
+        where: { id: created.id },
+        data: {
+          state: "EMBEDDING",
+          hasImages: params.hasImages,
+          hasAnnots: params.hasAnnots
+        }
+      });
     });
   }
 
@@ -368,6 +423,7 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
         filename: true,
         ext: true,
         mime: true,
+        cdnUrl: true,
         compatExt: true,
         compatMime: true,
         userStoreDoc: { select: { id: true } }

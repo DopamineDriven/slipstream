@@ -10,6 +10,7 @@ import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { Responses } from "openai/resources/index.mjs";
 import { ImageCompatService } from "@/image/index.ts";
 import { ProviderService } from "@/providers/index.ts";
+import { UserStoreVectorService } from "@/store/vector-store.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { WebSocket } from "ws";
 import type {
@@ -26,16 +27,26 @@ import type {
 } from "@slipstream/types";
 import { RedisChannels } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
+import { LoggerService } from "@/logger/index.ts";
+import type { Logger as PinoLogger } from "pino";
 
 export class Resolver {
+
+  private logger: PinoLogger;
   constructor(
     public wsServer: WSServer,
     private providers: ProviderService,
     private s3Service: S3Storage,
     private region: string,
     private imgCompatService: ImageCompatService,
-    private xaiManagementApikey: string
-  ) {}
+    private userVectorStore: UserStoreVectorService,
+    private xaiManagementApikey: string,
+    logger: LoggerService
+  ) {
+    this.logger = logger
+      .getPinoInstance()
+      .child({ node_version: process.version }, { msgPrefix: "[resolver] " });
+  }
 
   // Track high-resolution start times for upload progress per attachment
   private uploadTimers = new Map<string, bigint>();
@@ -88,6 +99,40 @@ export class Resolver {
       ? RedisChannels.user(userId)
       : RedisChannels.conversationStream(conversationId);
   }
+
+  private scheduleUserStoreIndexing(attachmentId: string) {
+    void this.userVectorStore
+      .indexAttachmentById(attachmentId)
+      .then(result => {
+        if (!result.ok) {
+          this.logger.debug(
+            { attachmentId, reason: result.reason },
+            "skip indexing"
+          );
+        }
+      })
+      .catch(err => {
+        this.logger.warn(
+          { attachmentId, err: this.wsServer.prisma.safeErrMsg(err) },
+          "indexing failed"
+        );
+      });
+  }
+
+  private async handleAIChatRequestIndexing(
+    msgs: MessageSingleton<true>[],
+    requestMessageId: string | undefined
+  ) {
+    if (!requestMessageId) return;
+    const requestMsg = msgs.find(m => m.id === requestMessageId);
+    if (!requestMsg) return;
+    for (const att of requestMsg.attachments) {
+      if (att.assetType === "DOCUMENT") {
+        this.scheduleUserStoreIndexing(att.id);
+      }
+    }
+  }
+
   private async titleGenUtil<
     const T extends "ai_chat_request" | "image_gen_request"
   >(
@@ -367,6 +412,8 @@ export class Resolver {
       existingState = await this.wsServer.redis.getStreamState(conversationId),
       createdAt = res.createdAt;
 
+    void this.handleAIChatRequestIndexing(msgs, requestMessageId);
+
     let chunks = Array.of<string>(),
       thinkingChunks = Array.of<string>(),
       resumedFromChunk = 0,
@@ -544,6 +591,7 @@ export class Resolver {
         }
       );
       void this.wsServer.redis.saveStreamState(
+
         conversationId,
         chunks,
         {
@@ -566,6 +614,7 @@ export class Resolver {
     const anthropic = this.providers.getInstance("anthropic");
     const grok = this.providers.getInstance("grok");
     return await Promise.all([
+      this.userVectorStore.syncRegistry(userId),
       anthropic.syncFileRegistry(userId, true),
       gemini.syncFileRegistry(userId, true),
       grok.syncFileRegistry(userId, false, this.xaiManagementApikey)

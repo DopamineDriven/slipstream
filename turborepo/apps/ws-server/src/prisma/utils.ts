@@ -207,9 +207,22 @@ export class PrismaUtilsService extends ModelService {
       id,
       userId
     });
-    const {timestamp} = this.urlParseNonCompat(url);
+    if (!url || !ext) {
+      throw new Error(
+        `unable to create userStore tmp workup for attachment ${id}: missing url/ext`
+      );
+    }
 
-    const tmpPrefix = `${timestamp}-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
+    const tmpBase =
+      compatStatus === "ALIASED"
+        ? this.urlParseNonCompat(url).timestamp
+        : compatStatus === "ACTIVE"
+          ? this.urlParseCompat(url).attachmentId
+          : id;
+
+    // Keep timestamp/attachment-derived prefixing for cache correlation, while
+    // always including attachmentId for deterministic proactive indexing.
+    const tmpPrefix = `${tmpBase}-tmp-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
     const tmpName = this.extractor.uniqueTmpName(tmpPrefix, ext);
     const urlObj = new URL(url);
 
@@ -385,6 +398,8 @@ export class PrismaUtilsService extends ModelService {
       );
     }
   }
+
+  
 
   public urlExtWorkupEmbeddings(attachment: AttachmentSingleton<true>) {
     const urlExtRecord = { url: "", ext: "", mime: "", embeddedFilename: "" };

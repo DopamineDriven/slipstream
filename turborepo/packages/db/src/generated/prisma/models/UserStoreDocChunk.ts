@@ -63,7 +63,8 @@ export type UserStoreDocChunkMinAggregateOutputType = {
   endOffset: number | null
   pageStartOffset: number | null
   pageEndOffset: number | null
-  hasVisualContent: boolean | null
+  hasImages: boolean | null
+  hasAnnots: boolean | null
   state: $Enums.UserStoreChunkState | null
   errorMessage: string | null
   retryCount: number | null
@@ -90,7 +91,8 @@ export type UserStoreDocChunkMaxAggregateOutputType = {
   endOffset: number | null
   pageStartOffset: number | null
   pageEndOffset: number | null
-  hasVisualContent: boolean | null
+  hasImages: boolean | null
+  hasAnnots: boolean | null
   state: $Enums.UserStoreChunkState | null
   errorMessage: string | null
   retryCount: number | null
@@ -117,7 +119,8 @@ export type UserStoreDocChunkCountAggregateOutputType = {
   endOffset: number
   pageStartOffset: number
   pageEndOffset: number
-  hasVisualContent: number
+  hasImages: number
+  hasAnnots: number
   state: number
   errorMessage: number
   retryCount: number
@@ -166,7 +169,8 @@ export type UserStoreDocChunkMinAggregateInputType = {
   endOffset?: true
   pageStartOffset?: true
   pageEndOffset?: true
-  hasVisualContent?: true
+  hasImages?: true
+  hasAnnots?: true
   state?: true
   errorMessage?: true
   retryCount?: true
@@ -193,7 +197,8 @@ export type UserStoreDocChunkMaxAggregateInputType = {
   endOffset?: true
   pageStartOffset?: true
   pageEndOffset?: true
-  hasVisualContent?: true
+  hasImages?: true
+  hasAnnots?: true
   state?: true
   errorMessage?: true
   retryCount?: true
@@ -220,7 +225,8 @@ export type UserStoreDocChunkCountAggregateInputType = {
   endOffset?: true
   pageStartOffset?: true
   pageEndOffset?: true
-  hasVisualContent?: true
+  hasImages?: true
+  hasAnnots?: true
   state?: true
   errorMessage?: true
   retryCount?: true
@@ -334,7 +340,8 @@ export type UserStoreDocChunkGroupByOutputType = {
   endOffset: number
   pageStartOffset: number | null
   pageEndOffset: number | null
-  hasVisualContent: boolean
+  hasImages: boolean
+  hasAnnots: boolean
   state: $Enums.UserStoreChunkState
   errorMessage: string | null
   retryCount: number
@@ -384,7 +391,8 @@ export type UserStoreDocChunkWhereInput = {
   endOffset?: Prisma.IntFilter<"UserStoreDocChunk"> | number
   pageStartOffset?: Prisma.IntNullableFilter<"UserStoreDocChunk"> | number | null
   pageEndOffset?: Prisma.IntNullableFilter<"UserStoreDocChunk"> | number | null
-  hasVisualContent?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
+  hasImages?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
+  hasAnnots?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
   state?: Prisma.EnumUserStoreChunkStateFilter<"UserStoreDocChunk"> | $Enums.UserStoreChunkState
   errorMessage?: Prisma.StringNullableFilter<"UserStoreDocChunk"> | string | null
   retryCount?: Prisma.IntFilter<"UserStoreDocChunk"> | number
@@ -412,7 +420,8 @@ export type UserStoreDocChunkOrderByWithRelationInput = {
   endOffset?: Prisma.SortOrder
   pageStartOffset?: Prisma.SortOrderInput | Prisma.SortOrder
   pageEndOffset?: Prisma.SortOrderInput | Prisma.SortOrder
-  hasVisualContent?: Prisma.SortOrder
+  hasImages?: Prisma.SortOrder
+  hasAnnots?: Prisma.SortOrder
   state?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   retryCount?: Prisma.SortOrder
@@ -444,7 +453,8 @@ export type UserStoreDocChunkWhereUniqueInput = Prisma.AtLeast<{
   endOffset?: Prisma.IntFilter<"UserStoreDocChunk"> | number
   pageStartOffset?: Prisma.IntNullableFilter<"UserStoreDocChunk"> | number | null
   pageEndOffset?: Prisma.IntNullableFilter<"UserStoreDocChunk"> | number | null
-  hasVisualContent?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
+  hasImages?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
+  hasAnnots?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
   state?: Prisma.EnumUserStoreChunkStateFilter<"UserStoreDocChunk"> | $Enums.UserStoreChunkState
   errorMessage?: Prisma.StringNullableFilter<"UserStoreDocChunk"> | string | null
   retryCount?: Prisma.IntFilter<"UserStoreDocChunk"> | number
@@ -472,7 +482,8 @@ export type UserStoreDocChunkOrderByWithAggregationInput = {
   endOffset?: Prisma.SortOrder
   pageStartOffset?: Prisma.SortOrderInput | Prisma.SortOrder
   pageEndOffset?: Prisma.SortOrderInput | Prisma.SortOrder
-  hasVisualContent?: Prisma.SortOrder
+  hasImages?: Prisma.SortOrder
+  hasAnnots?: Prisma.SortOrder
   state?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   retryCount?: Prisma.SortOrder
@@ -507,7 +518,8 @@ export type UserStoreDocChunkScalarWhereWithAggregatesInput = {
   endOffset?: Prisma.IntWithAggregatesFilter<"UserStoreDocChunk"> | number
   pageStartOffset?: Prisma.IntNullableWithAggregatesFilter<"UserStoreDocChunk"> | number | null
   pageEndOffset?: Prisma.IntNullableWithAggregatesFilter<"UserStoreDocChunk"> | number | null
-  hasVisualContent?: Prisma.BoolWithAggregatesFilter<"UserStoreDocChunk"> | boolean
+  hasImages?: Prisma.BoolWithAggregatesFilter<"UserStoreDocChunk"> | boolean
+  hasAnnots?: Prisma.BoolWithAggregatesFilter<"UserStoreDocChunk"> | boolean
   state?: Prisma.EnumUserStoreChunkStateWithAggregatesFilter<"UserStoreDocChunk"> | $Enums.UserStoreChunkState
   errorMessage?: Prisma.StringNullableWithAggregatesFilter<"UserStoreDocChunk"> | string | null
   retryCount?: Prisma.IntWithAggregatesFilter<"UserStoreDocChunk"> | number
@@ -533,7 +545,8 @@ export type UserStoreDocChunkCreateInput = {
   endOffset: number
   pageStartOffset?: number | null
   pageEndOffset?: number | null
-  hasVisualContent: boolean
+  hasImages: boolean
+  hasAnnots: boolean
   state?: $Enums.UserStoreChunkState
   errorMessage?: string | null
   retryCount?: number
@@ -561,7 +574,8 @@ export type UserStoreDocChunkUncheckedCreateInput = {
   endOffset: number
   pageStartOffset?: number | null
   pageEndOffset?: number | null
-  hasVisualContent: boolean
+  hasImages: boolean
+  hasAnnots: boolean
   state?: $Enums.UserStoreChunkState
   errorMessage?: string | null
   retryCount?: number
@@ -587,7 +601,8 @@ export type UserStoreDocChunkUpdateInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hasVisualContent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -615,7 +630,8 @@ export type UserStoreDocChunkUncheckedUpdateInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hasVisualContent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -642,7 +658,8 @@ export type UserStoreDocChunkCreateManyInput = {
   endOffset: number
   pageStartOffset?: number | null
   pageEndOffset?: number | null
-  hasVisualContent: boolean
+  hasImages: boolean
+  hasAnnots: boolean
   state?: $Enums.UserStoreChunkState
   errorMessage?: string | null
   retryCount?: number
@@ -668,7 +685,8 @@ export type UserStoreDocChunkUpdateManyMutationInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hasVisualContent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -695,7 +713,8 @@ export type UserStoreDocChunkUncheckedUpdateManyInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hasVisualContent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -738,7 +757,8 @@ export type UserStoreDocChunkCountOrderByAggregateInput = {
   endOffset?: Prisma.SortOrder
   pageStartOffset?: Prisma.SortOrder
   pageEndOffset?: Prisma.SortOrder
-  hasVisualContent?: Prisma.SortOrder
+  hasImages?: Prisma.SortOrder
+  hasAnnots?: Prisma.SortOrder
   state?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   retryCount?: Prisma.SortOrder
@@ -775,7 +795,8 @@ export type UserStoreDocChunkMaxOrderByAggregateInput = {
   endOffset?: Prisma.SortOrder
   pageStartOffset?: Prisma.SortOrder
   pageEndOffset?: Prisma.SortOrder
-  hasVisualContent?: Prisma.SortOrder
+  hasImages?: Prisma.SortOrder
+  hasAnnots?: Prisma.SortOrder
   state?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   retryCount?: Prisma.SortOrder
@@ -802,7 +823,8 @@ export type UserStoreDocChunkMinOrderByAggregateInput = {
   endOffset?: Prisma.SortOrder
   pageStartOffset?: Prisma.SortOrder
   pageEndOffset?: Prisma.SortOrder
-  hasVisualContent?: Prisma.SortOrder
+  hasImages?: Prisma.SortOrder
+  hasAnnots?: Prisma.SortOrder
   state?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   retryCount?: Prisma.SortOrder
@@ -884,7 +906,8 @@ export type UserStoreDocChunkCreateWithoutDocInput = {
   endOffset: number
   pageStartOffset?: number | null
   pageEndOffset?: number | null
-  hasVisualContent: boolean
+  hasImages: boolean
+  hasAnnots: boolean
   state?: $Enums.UserStoreChunkState
   errorMessage?: string | null
   retryCount?: number
@@ -910,7 +933,8 @@ export type UserStoreDocChunkUncheckedCreateWithoutDocInput = {
   endOffset: number
   pageStartOffset?: number | null
   pageEndOffset?: number | null
-  hasVisualContent: boolean
+  hasImages: boolean
+  hasAnnots: boolean
   state?: $Enums.UserStoreChunkState
   errorMessage?: string | null
   retryCount?: number
@@ -966,7 +990,8 @@ export type UserStoreDocChunkScalarWhereInput = {
   endOffset?: Prisma.IntFilter<"UserStoreDocChunk"> | number
   pageStartOffset?: Prisma.IntNullableFilter<"UserStoreDocChunk"> | number | null
   pageEndOffset?: Prisma.IntNullableFilter<"UserStoreDocChunk"> | number | null
-  hasVisualContent?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
+  hasImages?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
+  hasAnnots?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
   state?: Prisma.EnumUserStoreChunkStateFilter<"UserStoreDocChunk"> | $Enums.UserStoreChunkState
   errorMessage?: Prisma.StringNullableFilter<"UserStoreDocChunk"> | string | null
   retryCount?: Prisma.IntFilter<"UserStoreDocChunk"> | number
@@ -992,7 +1017,8 @@ export type UserStoreDocChunkCreateManyDocInput = {
   endOffset: number
   pageStartOffset?: number | null
   pageEndOffset?: number | null
-  hasVisualContent: boolean
+  hasImages: boolean
+  hasAnnots: boolean
   state?: $Enums.UserStoreChunkState
   errorMessage?: string | null
   retryCount?: number
@@ -1018,7 +1044,8 @@ export type UserStoreDocChunkUpdateWithoutDocInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hasVisualContent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1044,7 +1071,8 @@ export type UserStoreDocChunkUncheckedUpdateWithoutDocInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hasVisualContent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1070,7 +1098,8 @@ export type UserStoreDocChunkUncheckedUpdateManyWithoutDocInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hasVisualContent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   retryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1099,7 +1128,8 @@ export type UserStoreDocChunkSelect<ExtArgs extends runtime.Types.Extensions.Int
   endOffset?: boolean
   pageStartOffset?: boolean
   pageEndOffset?: boolean
-  hasVisualContent?: boolean
+  hasImages?: boolean
+  hasAnnots?: boolean
   state?: boolean
   errorMessage?: boolean
   retryCount?: boolean
@@ -1127,7 +1157,8 @@ export type UserStoreDocChunkSelectCreateManyAndReturn<ExtArgs extends runtime.T
   endOffset?: boolean
   pageStartOffset?: boolean
   pageEndOffset?: boolean
-  hasVisualContent?: boolean
+  hasImages?: boolean
+  hasAnnots?: boolean
   state?: boolean
   errorMessage?: boolean
   retryCount?: boolean
@@ -1155,7 +1186,8 @@ export type UserStoreDocChunkSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   endOffset?: boolean
   pageStartOffset?: boolean
   pageEndOffset?: boolean
-  hasVisualContent?: boolean
+  hasImages?: boolean
+  hasAnnots?: boolean
   state?: boolean
   errorMessage?: boolean
   retryCount?: boolean
@@ -1183,7 +1215,8 @@ export type UserStoreDocChunkSelectScalar = {
   endOffset?: boolean
   pageStartOffset?: boolean
   pageEndOffset?: boolean
-  hasVisualContent?: boolean
+  hasImages?: boolean
+  hasAnnots?: boolean
   state?: boolean
   errorMessage?: boolean
   retryCount?: boolean
@@ -1193,7 +1226,7 @@ export type UserStoreDocChunkSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserStoreDocChunkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "docId" | "storeId" | "chunkProvenanceId" | "provenanceId" | "attachmentId" | "conversationId" | "messageId" | "chunkIndex" | "content" | "contentHash" | "tokenCount" | "startOffset" | "endOffset" | "pageStartOffset" | "pageEndOffset" | "hasVisualContent" | "state" | "errorMessage" | "retryCount" | "schemaVersion" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userStoreDocChunk"]>
+export type UserStoreDocChunkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "docId" | "storeId" | "chunkProvenanceId" | "provenanceId" | "attachmentId" | "conversationId" | "messageId" | "chunkIndex" | "content" | "contentHash" | "tokenCount" | "startOffset" | "endOffset" | "pageStartOffset" | "pageEndOffset" | "hasImages" | "hasAnnots" | "state" | "errorMessage" | "retryCount" | "schemaVersion" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userStoreDocChunk"]>
 export type UserStoreDocChunkInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   doc?: boolean | Prisma.UserStoreDocDefaultArgs<ExtArgs>
 }
@@ -1241,7 +1274,8 @@ export type $UserStoreDocChunkPayload<ExtArgs extends runtime.Types.Extensions.I
      * only applicable for pdfs
      */
     pageEndOffset: number | null
-    hasVisualContent: boolean
+    hasImages: boolean
+    hasAnnots: boolean
     state: $Enums.UserStoreChunkState
     errorMessage: string | null
     retryCount: number
@@ -1689,7 +1723,8 @@ export interface UserStoreDocChunkFieldRefs {
   readonly endOffset: Prisma.FieldRef<"UserStoreDocChunk", 'Int'>
   readonly pageStartOffset: Prisma.FieldRef<"UserStoreDocChunk", 'Int'>
   readonly pageEndOffset: Prisma.FieldRef<"UserStoreDocChunk", 'Int'>
-  readonly hasVisualContent: Prisma.FieldRef<"UserStoreDocChunk", 'Boolean'>
+  readonly hasImages: Prisma.FieldRef<"UserStoreDocChunk", 'Boolean'>
+  readonly hasAnnots: Prisma.FieldRef<"UserStoreDocChunk", 'Boolean'>
   readonly state: Prisma.FieldRef<"UserStoreDocChunk", 'UserStoreChunkState'>
   readonly errorMessage: Prisma.FieldRef<"UserStoreDocChunk", 'String'>
   readonly retryCount: Prisma.FieldRef<"UserStoreDocChunk", 'Int'>

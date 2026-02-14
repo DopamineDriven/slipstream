@@ -225,10 +225,6 @@ export class VoyageEmbeddingService {
       if ("error" in parseIt) {
         throw new Error(`Voyage count_usage error`);
       }
-      console.log("results made it to ts!");
-      console.log(parseIt);
-      // let x;
-      // x = parseIt;
       return parseIt;
     } catch (err) {
       console.error("VoyageCountUsageFromPathsBridge error:", err);

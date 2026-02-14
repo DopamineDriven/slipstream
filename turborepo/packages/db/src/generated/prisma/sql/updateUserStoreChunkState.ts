@@ -13,12 +13,13 @@ import { type $DbEnums } from "./$DbEnums.ts"
  * @param tokenCount
  * @param errorMessage
  * @param retryCount
- * @param hasVisualContent
+ * @param hasImages
+ * @param hasAnnots
  */
-export const updateUserStoreChunkState = $runtime.makeTypedQueryFactory("\nUPDATE \"UserStoreDocChunk\"\nSET\nstate              = $2::\"UserStoreChunkState\",\nembedding          = COALESCE($3::vector, NULL),\n\"tokenCount\"       = COALESCE($4, \"tokenCount\"),\n\"errorMessage\"     = $5,\n\"retryCount\"       = COALESCE($6, \"retryCount\"),\n\"hasVisualContent\" = COALESCE($7, \"hasVisualContent\"),\n\"updatedAt\"        = NOW()\nWHERE id = $1\nRETURNING id, state::\"text\" as state, \"tokenCount\", \"retryCount\";") as (chunkId: string, state: $DbEnums["UserStoreChunkState"], embedding: string | null, tokenCount: number | null, errorMessage: string | null, retryCount: number | null, hasVisualContent: boolean | null) => $runtime.TypedSql<updateUserStoreChunkState.Parameters, updateUserStoreChunkState.Result>
+export const updateUserStoreChunkState = $runtime.makeTypedQueryFactory("\nUPDATE \"UserStoreDocChunk\"\nSET\nstate          = $2::\"UserStoreChunkState\",\nembedding      = COALESCE($3::vector, NULL),\n\"tokenCount\"   = COALESCE($4, \"tokenCount\"),\n\"errorMessage\" = $5,\n\"retryCount\"   = COALESCE($6, \"retryCount\"),\n\"hasImages\"    = COALESCE($7, \"hasImages\"),\n\"hasAnnots\"    = COALESCE($8, \"hasAnnots\"),\n\"updatedAt\"    = NOW()\nWHERE id = $1\nRETURNING id, state::\"text\" as state, \"tokenCount\", \"retryCount\";") as (chunkId: string, state: $DbEnums["UserStoreChunkState"], embedding: string | null, tokenCount: number | null, errorMessage: string | null, retryCount: number | null, hasImages: boolean | null, hasAnnots: boolean | null) => $runtime.TypedSql<updateUserStoreChunkState.Parameters, updateUserStoreChunkState.Result>
 
 export namespace updateUserStoreChunkState {
-  export type Parameters = [chunkId: string, state: $DbEnums["UserStoreChunkState"], embedding: string | null, tokenCount: number | null, errorMessage: string | null, retryCount: number | null, hasVisualContent: boolean | null]
+  export type Parameters = [chunkId: string, state: $DbEnums["UserStoreChunkState"], embedding: string | null, tokenCount: number | null, errorMessage: string | null, retryCount: number | null, hasImages: boolean | null, hasAnnots: boolean | null]
   export type Result = {
     id: string
     state: string | null

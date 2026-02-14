@@ -14,7 +14,8 @@ SELECT
   chunk."endOffset",
   chunk."pageStartOffset",
   chunk."pageEndOffset",
-  chunk."hasVisualContent",
+  chunk."hasImages",
+  chunk."hasAnnots",
   chunk."provenanceId",
   chunk."attachmentId",
   chunk."conversationId",
@@ -30,7 +31,10 @@ INNER JOIN "UserStoreDoc" doc ON chunk."docId" = doc.id
 WHERE chunk."storeId" = $1
   AND chunk."deletedAt" IS NULL
   AND doc."deletedAt" IS NULL
-  AND doc.state = 'ACTIVE'::"UserStoreDocState"
+  AND doc.state IN (
+    'ACTIVE'::"UserStoreDocState",
+    'PARTIAL'::"UserStoreDocState"
+  )
   AND chunk.state = 'READY'::"UserStoreChunkState"
   AND chunk.embedding IS NOT NULL
   AND 1 - (chunk.embedding <=> $2::vector) >= $4

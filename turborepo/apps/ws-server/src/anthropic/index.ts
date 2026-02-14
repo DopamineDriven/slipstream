@@ -10,6 +10,7 @@ import type { Anthropic } from "@anthropic-ai/sdk";
 import { AnthropicVectorStoreWorkup } from "@/anthropic/vector-store.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
+import { UserStoreVectorService } from "@/store/vector-store.ts";
 import { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type {
   AnthropicModelIdUnion,
@@ -65,10 +66,11 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
     logger: LoggerService,
     prisma: PrismaService,
     voyage: VoyageEmbeddingService,
+    userStoreVector: UserStoreVectorService,
     private redis: EnhancedRedisPubSub,
     apiKey: string
   ) {
-    super(logger, voyage, prisma, apiKey);
+    super(logger, voyage, prisma, userStoreVector, apiKey);
   }
 
   /**
@@ -513,6 +515,91 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
             },
             "PTC message_start details"
           );
+
+          const prePopulated = chunk.message.content;
+          if (prePopulated && prePopulated.length > 0) {
+            this.logger.info(
+              {
+                round,
+                prePopulatedCount: prePopulated.length,
+                types: prePopulated.map(b => b.type)
+              },
+              "PTC message_start: pre-populated content blocks detected"
+            );
+
+            for (let i = 0; i < prePopulated.length; i++) {
+              const block = prePopulated[i];
+              if (!block) continue;
+              const bb: BlockBuilder = { type: block.type };
+
+              if (block.type === "tool_use") {
+                bb.id = block.id;
+                bb.name = block.name;
+                const startInput = block.input as Record<
+                  string,
+                  unknown
+                > | null;
+                const hasStartInput =
+                  startInput != null && Object.keys(startInput).length > 0;
+                bb.inputJson = hasStartInput
+                  ? JSON.stringify(startInput)
+                  : "";
+                bb.input = hasStartInput ? startInput : undefined;
+
+                const caller =
+                  "caller" in block
+                    ? (block.caller as
+                        | Anthropic.Beta.BetaServerToolCaller
+                        | undefined)
+                    : undefined;
+                if (caller?.type === "code_execution_20250825") {
+                  bb.caller = caller;
+                }
+
+                toolAccumulators.set(i, {
+                  id: block.id,
+                  name: block.name,
+                  inputJson: hasStartInput
+                    ? JSON.stringify(startInput)
+                    : "",
+                  callerType: "code_execution_20250825",
+                  callerToolId:
+                    caller?.type === "code_execution_20250825"
+                      ? caller.tool_id
+                      : ""
+                });
+              }
+
+              if (block.type === "text" && "text" in block) {
+                bb.text = block.text;
+              }
+
+              if (block.type === "thinking" && "thinking" in block) {
+                bb.thinking = block.thinking;
+                if ("signature" in block) bb.signature = block.signature;
+              }
+
+              if (
+                block.type === "server_tool_use" &&
+                "id" in block
+              ) {
+                bb.id = block.id;
+                bb.name = block.name;
+                bb.input = block.input as Record<string, unknown>;
+              }
+
+              if (block.type === "code_execution_tool_result") {
+                bb.tool_use_id = block.tool_use_id;
+                bb.codeExecutionContent = block.content;
+              }
+
+              blockBuilders.set(i, bb);
+            }
+          }
+
+          if (chunk.message.stop_reason) {
+            done = chunk.message.stop_reason;
+          }
         }
 
         if (chunk.type === "message_delta") {
