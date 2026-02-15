@@ -1,4 +1,4 @@
-import type { PrismaClientWithAccelerate } from "@/lib/prisma";
+import type { PrismaClientBase } from "@/lib/prisma";
 import { PrismaUserKeyService } from "@/orm/user-key-service";
 import { PrismaUserMessageService } from "@/orm/user-message-service";
 
@@ -30,11 +30,9 @@ interface OrmServiceEntity {
     });
   }
  */
-export function ormHandler(
-  prisma: PrismaClientWithAccelerate
-): OrmServiceEntity {
+export function ormHandler(prisma: PrismaClientBase) {
   return {
     prismaApiKeyService: new PrismaUserKeyService(prisma),
     prismaConversationService: new PrismaUserMessageService(prisma)
-  };
+  } satisfies OrmServiceEntity;
 }

@@ -1,15 +1,21 @@
-import type { Rm } from "@/utils.ts";
+import type { SerializeBigInt } from "@/utils.ts";
 import type {
-  $Enums,
   Account,
   Attachment,
   AttachmentProvider,
+  AudioMetadata,
   Conversation,
+  ConversationMemoryChunk,
+  ConversationMemoryContext,
+  ConversationMemoryStore,
   ConversationSettings,
   DocumentMetadata,
   ImageGenJob,
   ImageGenOutput,
   ImageMetadata,
+  LocalVectorStore,
+  LocalVectorStoreDoc,
+  LocalVectorStoreDocChunk,
   Message,
   Profile,
   ProviderStore,
@@ -17,12 +23,13 @@ import type {
   Session,
   Settings,
   User,
-  UserKey
+  UserKey,
+  UserStore,
+  UserStoreDoc,
+  UserStoreDocAnnot,
+  UserStoreDocChunk,
+  VideoMetadata
 } from "@slipstream/db/node/generated/client";
-
-export type BigIntOrNumber<T extends boolean = false> = T extends true
-  ? number
-  : bigint;
 
 export interface UserSingleton<T extends boolean = false> extends User {
   conversations?: ConversationSingleton<T>[];
@@ -32,11 +39,15 @@ export interface UserSingleton<T extends boolean = false> extends User {
   sessions?: SessionSingleton<T>[];
   profile?: ProfileSingleton<T>;
   providerStores?: ProviderStoreSingleton<T>[];
+  localVectorStores?: LocalVectorStoreSingleton<T>[];
   settings?: SettingsSingleton<T>;
+  conversationMemoryStore?: ConversationMemoryStoreSingleton<T>;
+  userStores?: UserStoreSingleton<T>[];
 }
 
 export interface SessionSingleton<T extends boolean = false> extends Session {
   user?: UserSingleton<T>;
+  docs?: UserStoreDoc[];
 }
 
 export interface AccountSingleton<T extends boolean = false> extends Account {
@@ -51,34 +62,102 @@ export interface SettingsSingleton<T extends boolean = false> extends Settings {
   user?: UserSingleton<T>;
 }
 
+export interface UserStoreSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<UserStore, T> {
+  user?: UserSingleton<T>;
+  docs?: UserStoreDocSingleton<T>[];
+}
+
+export interface UserStoreDocSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<UserStoreDoc, T> {
+  store?: UserStoreSingleton<T>;
+  attachment?: AttachmentSingleton<T>;
+
+  annots?: UserStoreDocAnnotSingleton<T>[];
+  linkedFromAnnots?: UserStoreDocAnnotSingleton<T>[];
+  chunks?: UserStoreDocChunkSingleton<T>[];
+}
+
+export interface UserStoreDocAnnotSingleton<
+  T extends boolean = false
+> extends UserStoreDocAnnot {
+  doc?: UserStoreDocSingleton<T>;
+  linkedDoc?: UserStoreDocSingleton<T>;
+}
+
+export interface UserStoreDocChunkSingleton<
+  T extends boolean = false
+> extends UserStoreDocChunk {
+  doc?: UserStoreDocSingleton<T>;
+}
+
+export interface LocalVectorStoreSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<LocalVectorStore, T> {
+  user?: UserSingleton<T>;
+  docs?: LocalVectorStoreDocSingleton<T>[];
+}
+
+export interface LocalVectorStoreDocSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<LocalVectorStoreDoc, T> {
+  store?: LocalVectorStoreSingleton<T>;
+  attachment?: AttachmentSingleton<T>;
+  chunks?: LocalVectorStoreDocChunkSingleton<T>[];
+}
+
+export interface LocalVectorStoreDocChunkSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<LocalVectorStoreDocChunk, T> {
+  doc?: LocalVectorStoreDocSingleton<T>;
+}
+
+export interface ImageSingleton extends ImageMetadata {}
 export interface DocumentSingleton extends DocumentMetadata {}
+export interface VideoSingleton extends VideoMetadata {}
+export interface AudioSingleton extends AudioMetadata {}
 
 export interface AttachmentProviderSingleton<
   T extends boolean = false
-> extends Rm<AttachmentProvider, "size"> {
-  size: BigIntOrNumber<T> | null;
+> extends SerializeBigInt<AttachmentProvider, T> {
   attachment?: AttachmentSingleton<T>;
   userKey?: UserKeySingleton<T>;
 }
 
-export interface ProviderStoreSingleton<T extends boolean = false> extends Rm<
-  ProviderStore,
-  "totalBytes"
-> {
-  totalBytes: BigIntOrNumber<T> | null;
+export interface ProviderStoreSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<ProviderStore, T> {
   docs?: ProviderStoreDocumentSingleton<T>[];
 }
 
 export interface ProviderStoreDocumentSingleton<
   T extends boolean = false
-> extends Rm<ProviderStoreDocument, "size"> {
-  size: BigIntOrNumber<T> | null;
-
+> extends SerializeBigInt<ProviderStoreDocument, T> {
   store?: ProviderStoreSingleton<T>;
   attachment?: AttachmentSingleton<T>;
 }
 
-export interface ImageSingleton extends ImageMetadata {}
+export interface ConversationMemoryStoreSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<ConversationMemoryStore, T> {
+  contexts?: ConversationMemoryContextSingleton<T>[];
+}
+
+export interface ConversationMemoryContextSingleton<
+  T extends boolean = false
+> extends ConversationMemoryContext {
+  memoryStore?: ConversationMemoryStoreSingleton<T>;
+  conversation?: ConversationSingleton<T>;
+  memoryChunks?: ConversationMemoryChunkSingleton<T>[];
+}
+export interface ConversationMemoryChunkSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<ConversationMemoryChunk, T> {
+  context?: ConversationMemoryContextSingleton<T>;
+  messages?: MessageSingleton<T>[];
+}
 
 export interface ConvoSettingsSingleton<
   T extends boolean = false
@@ -87,7 +166,7 @@ export interface ConvoSettingsSingleton<
 }
 
 export interface ImageGenJobSingleton<
-  T extends boolean = false
+  T extends boolean = boolean
 > extends ImageGenJob {
   outputs?: ImageGenOutputSingleton<T>[];
   userKey?: UserKeySingleton<T>;
@@ -100,17 +179,16 @@ export interface ImageGenOutputSingleton<
   job?: ImageGenJobSingleton<T>;
 }
 
-export interface AttachmentSingleton<T extends boolean = false> extends Rm<
-  Attachment,
-  "size"
-> {
-  size: BigIntOrNumber<T> | null;
+export interface AttachmentSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<Attachment, T> {
+  localVectorStoreDocs?: LocalVectorStoreDocSingleton<T>[];
   providerLinks?: AttachmentProviderSingleton<T>[];
-
   providerStoreDocs?: ProviderStoreDocumentSingleton<T>[];
   image: ImageSingleton | null;
   document: DocumentSingleton | null;
   imageGenOutput: ImageGenOutputSingleton<T> | null;
+  userStoreDoc?: UserStoreDocSingleton<T>;
 }
 
 export interface UserKeySingleton<T extends boolean = false> extends UserKey {
@@ -124,6 +202,7 @@ export interface MessageSingleton<T extends boolean = false> extends Message {
   imageGenJob?: ImageGenJobSingleton<T> | null;
   userKey?: UserKeySingleton<T> | null;
   attachments: AttachmentSingleton<T>[];
+  conversationMemoryChunk?: ConversationMemoryChunkSingleton<T>;
 }
 
 export interface ConversationSingleton<
@@ -133,92 +212,10 @@ export interface ConversationSingleton<
   messages: MessageSingleton<T>[];
   attachments?: AttachmentSingleton<T>[];
   user?: UserSingleton<T>;
+  conversationContextState?: ConversationMemoryContextSingleton<T>;
 }
-
 export interface ConversationSingletonOneOff<
   T extends boolean = false
 > extends ConversationSingleton<T> {
   apiKey?: string | null;
 }
-
-export type FlexiProvider = $Enums.Provider | Lowercase<$Enums.Provider>;
-
-export type Signals =
-  | "SIGABRT"
-  | "SIGALRM"
-  | "SIGBREAK"
-  | "SIGBUS"
-  | "SIGCHLD"
-  | "SIGCONT"
-  | "SIGFPE"
-  | "SIGHUP"
-  | "SIGILL"
-  | "SIGINFO"
-  | "SIGINT"
-  | "SIGIO"
-  | "SIGIOT"
-  | "SIGKILL"
-  | "SIGLOST"
-  | "SIGPIPE"
-  | "SIGPOLL"
-  | "SIGPROF"
-  | "SIGPWR"
-  | "SIGQUIT"
-  | "SIGSEGV"
-  | "SIGSTKFLT"
-  | "SIGSTOP"
-  | "SIGSYS"
-  | "SIGTERM"
-  | "SIGTRAP"
-  | "SIGTSTP"
-  | "SIGTTIN"
-  | "SIGTTOU"
-  | "SIGUNUSED"
-  | "SIGURG"
-  | "SIGUSR1"
-  | "SIGUSR2"
-  | "SIGVTALRM"
-  | "SIGWINCH"
-  | "SIGXCPU"
-  | "SIGXFSZ";
-
-export type AssetReadyPayload = {
-  publicUrl: string | null;
-  bucket: string;
-  cacheControl: string | null;
-  contentDisposition: string | null;
-  etag: string | null;
-  s3ObjectId: string | null;
-  key: string;
-  cdnUrl: string | null;
-  versionId: string | null;
-  size: bigint | null;
-  storageClass: string | null;
-  id: string;
-  conversationId: string | null;
-  draftId: string | null;
-  batchId: string | null;
-  userId: string;
-  messageId: string | null;
-  origin: $Enums.AssetOrigin;
-  status: $Enums.AssetStatus;
-  uploadMethod: $Enums.UploadMethod;
-  assetType: $Enums.AssetType;
-  uploadDuration: number | null;
-  sourceUrl: string | null;
-  thumbnailKey: string | null;
-  region: string;
-  contentEncoding: string | null;
-  expiresAt: Date | null;
-  filename: string | null;
-  ext: string | null;
-  mime: string | null;
-  checksumAlgo: $Enums.ChecksumAlgo;
-  checksumSha256: string | null;
-  sseAlgorithm: string | null;
-  sseKmsKeyId: string | null;
-  s3LastModified: Date | null;
-  deletedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-};

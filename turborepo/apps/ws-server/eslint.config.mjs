@@ -10,6 +10,7 @@ export default [
       "@typescript-eslint/require-await": "off",
       "@typescript-eslint/no-misused-promises": "off",
       "prefer-const": "off",
+      "no-loss-of-precision": "off",
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/prefer-regexp-exec": "off",
       "@typescript-eslint/no-empty-object-type": "off",

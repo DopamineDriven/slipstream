@@ -14,6 +14,8 @@ import type {
   S3StorageClass
 } from "@slipstream/types";
 
+export type Include<T, U extends T> =  Exclude<T, Exclude<T, U>>;
+
 export type S3FinalizePayload = {
   bucket: string;
   key: string;
@@ -108,7 +110,7 @@ export type MessageDataWorkupProps = {
     create: {
       userKeyId: string | null;
       userId: string;
-      inputFidelity: "low" | "high" |  (string & {})| undefined;
+      inputFidelity: "low" | "high" | (string & {}) | undefined;
       moderation: (string & {}) | "auto" | "low" | undefined;
       negativePrompt: string | undefined;
       nRequested: number | undefined;
@@ -120,7 +122,12 @@ export type MessageDataWorkupProps = {
       outputSize: string | undefined;
       progress: 0;
       seed: number | undefined;
-      personGeneration:(string & {}) |  "DONT_ALLOW" | "ALLOW_ADULT" | "ALLOW_ALL" | undefined;
+      personGeneration:
+        | (string & {})
+        | "DONT_ALLOW"
+        | "ALLOW_ADULT"
+        | "ALLOW_ALL"
+        | undefined;
       stage: "QUEUED";
       outputQuality: string | undefined;
       topP: number | undefined;

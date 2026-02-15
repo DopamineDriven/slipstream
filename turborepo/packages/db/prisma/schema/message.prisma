@@ -1,0 +1,46 @@
+enum MessageType {
+  AUDIO_GEN
+  COMPUTER_USE
+  IMAGE_GEN
+  DOC_GEN
+  DEEP_RESEARCH
+  TEXT
+  VIDEO_GEN
+}
+
+enum SenderType {
+  USER
+  AI
+  SYSTEM
+}
+
+model Message {
+  id                        String                   @id @default(cuid(2))
+  conversationId            String
+  userId                    String?
+  senderType                SenderType               @default(USER)
+  provider                  Provider
+  model                     String?
+  userKeyId                 String?
+  content                   String
+  conversationMemoryChunkId String?
+  thinkingText              String?
+  thinkingDuration          Int?
+  responseOutput            String? // JSON serialized response output
+  isImageGen                Boolean                  @default(false)
+  messageType               MessageType              @default(TEXT)
+  liked                     Boolean?                 @default(false)
+  disliked                  Boolean?                 @default(false)
+  tryAgain                  Boolean?                 @default(false) // resubmit previous prompt to output a new (branched?) response
+  createdAt                 DateTime                 @default(now())
+  updatedAt                 DateTime                 @updatedAt
+  userKey                   UserKey?                 @relation("MessageToUserKey", fields: [userKeyId], references: [id], onDelete: SetNull)
+  attachments               Attachment[]
+  imageGenJob               ImageGenJob?             @relation("ImageGenJobToMessage")
+  conversation              Conversation             @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationMemoryChunk   ConversationMemoryChunk? @relation(fields: [conversationMemoryChunkId], references: [id], onDelete: SetNull)
+
+  @@index([conversationId, createdAt(sort: Desc)])
+  @@index([conversationId, isImageGen, createdAt(sort: Desc)])
+  @@index([conversationId, messageType, createdAt(sort: Desc)])
+}

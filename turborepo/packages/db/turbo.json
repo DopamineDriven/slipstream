@@ -7,9 +7,12 @@
       "inputs": [
         "$TURBO_DEFAULT$",
         "src/**/*.ts",
-        "edge/**/*.ts",
-        "prisma/schema.prisma",
-        "tsdown.config.ts"
+        "prisma/schema/**/*.prisma",
+        "prisma/sql/**/*.sql",
+        "prisma.config.ts",
+        "tsconfig.json",
+        "package.json",
+        "eslint.config.mjs"
       ]
     }
   }

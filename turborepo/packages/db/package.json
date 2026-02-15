@@ -12,17 +12,10 @@
     "lint": "eslint",
     "format": "prisma format",
     "clean": "git clean -xdf .turbo dist node_modules",
-    "postbuild": "pnpm cp:binaries",
     "prebuild": "rm -rf dist/ && pnpm db:generate",
     "predev": "pnpm db:generate",
-    "predb:generate:node": "tsx src/test/schema-manipulate.ts --target node",
-    "db:generate:node": "prisma generate",
-    "postdb:generate:node": "tsx src/test/schema-manipulate.ts --restore from-node",
-    "predb:generate:edge": "tsx src/test/schema-manipulate.ts --target edge",
-    "db:generate:edge": "prisma generate",
-    "postdb:generate:edge": "tsx src/test/schema-manipulate.ts --restore from-edge",
-    "db:generate": "pnpm db:generate:node && pnpm db:generate:edge",
-    "db:migrate": "prisma migrate dev --skip-generate",
+    "db:generate": "prisma generate --sql",
+    "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio --browser none --port 7777",
     "precp:binaries": "tsx src/test/scan-output.ts --scan output",
@@ -30,15 +23,24 @@
   },
   "files": [
     "dist/**",
-    "edge/**",
     "prisma/**",
     "package.json"
   ],
   "exports": {
+    "./factory": {
+      "types": "./dist/factory.d.ts",
+      "import": "./dist/factory.js",
+      "default": "./dist/factory.js"
+    },
     "./node": {
       "types": "./dist/db.d.ts",
       "import": "./dist/db.js",
       "default": "./dist/db.js"
+    },
+    "./db-accelerate": {
+      "types": "./dist/db-accelerate.d.ts",
+      "import": "./dist/db-accelerate.js",
+      "default": "./dist/db-accelerate.js"
     },
     "./node/generated/client": {
       "types": "./dist/client-node.d.ts",
@@ -50,68 +52,45 @@
       "import": "./dist/models-node.js",
       "default": "./dist/models-node.js"
     },
+    "./sql-node": {
+      "types": "./dist/sql-node.d.ts",
+      "import": "./dist/sql-node.js",
+      "default": "./dist/sql-node.js"
+    },
     "./enums-node": {
       "types": "./dist/enums-node.d.ts",
       "import": "./dist/enums-node.js",
       "default": "./dist/enums-node.js"
-    },
-    "./edge": {
-      "types": "./edge/db-edge.ts",
-      "import": "./edge/db-edge.ts",
-      "default": "./edge/db-edge.ts"
-    },
-    "./wasm": {
-      "types": "./edge/wasm.ts",
-      "import": "./edge/wasm.ts",
-      "default": "./edge/wasm.ts"
-    },
-    "./edge-client-edge": {
-      "types": "./edge/client-edge.ts",
-      "import": "./edge/client-edge.ts",
-      "default": "./edge/client-edge.ts"
-    },
-    "./edge-client": {
-      "types": "./edge/client.ts",
-      "import": "./edge/client.ts",
-      "default": "./edge/client.ts"
-    },
-    "./edge-generated": {
-      "types": "./edge/generated/client/*.d.ts",
-      "import": "./edge/generated/client/*.mjs",
-      "default": "./edge/generated/client/*.js"
-    },
-    "./edge-generated-runtime": {
-      "types": "./edge/generated/client/runtime/*.d.ts",
-      "import": "./edge/generated/client/runtime/*.js",
-      "default": "./edge/generated/client/runtime/*.js"
     }
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^6.19.1",
-    "@prisma/client": "^6.19.1",
-    "@prisma/extension-accelerate": "^2.0.2",
-    "@prisma/extension-optimize": "^2.0.1",
-    "@prisma/instrumentation": "^6.19.1",
-    "jiti": "^2.6.1"
+    "@prisma/adapter-pg": "catalog:prisma",
+    "@prisma/client": "catalog:prisma",
+    "@prisma/client-runtime-utils": "catalog:prisma",
+    "@prisma/extension-accelerate": "catalog:prisma",
+    "dotenv": "catalog:dotenv"
   },
   "devDependencies": {
-    "@d0paminedriven/fs": "^11.0.0",
+    "@d0paminedriven/fs": "catalog:dd",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
-    "@types/node": "catalog:node25",
-    "@typescript/native-preview": "catalog:tsgo7",
-    "dotenv": "^17.2.3",
+    "@types/node": "catalog:node",
+    "@types/pg": "catalog:pg",
+    "@typescript/native-preview": "catalog:tsgo",
+    "dotenv": "catalog:dotenv",
     "eslint": "catalog:eslint",
-    "prettier": "^3.7.4",
-    "prisma": "^6.19.1",
-    "rolldown": "1.0.0-beta.58",
-    "rolldown-plugin-dts": "^0.20.0",
-    "terser": "^5.44.1",
+    "jiti": "catalog:jiti",
+    "pg": "catalog:pg",
+    "prettier": "catalog:prettier",
+    "prisma": "catalog:prisma",
+    "rolldown": "catalog:rolldown",
+    "rolldown-plugin-dts": "catalog:rolldown",
+    "rolldown-plugin-wasm": "catalog:rolldown",
     "tsdown": "catalog:tsdown",
-    "tslib": "^2.8.1",
-    "tsx": "^4.21.0",
-    "typescript": "catalog:ts6",
+    "tslib": "catalog:tslib",
+    "tsx": "catalog:tsx",
+    "typescript": "catalog:ts",
     "typescript-eslint": "catalog:tseslint"
   },
   "prettier": "@slipstream/prettier-config"

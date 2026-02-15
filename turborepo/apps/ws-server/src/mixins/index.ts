@@ -4,6 +4,7 @@ import { LoggerService } from "@/logger/index.ts";
 import { LlamaService } from "@/meta/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
+import { UserStoreVectorService } from "@/store/vector-store.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { xAIService } from "@/xai/index.ts";
 import type { Provider } from "@slipstream/types";
@@ -39,7 +40,7 @@ export type ProviderNarrowed<T extends keyof ProviderMap> = {
 
 export interface ProviderEntry<V extends Provider> {
   provider: V;
-  instance?: Partial<ProviderMap>[V];
+  instance?: ProviderMap[V];
   hasProviderApiKeySet: boolean;
   available: boolean;
   initialized: boolean;
@@ -47,7 +48,7 @@ export interface ProviderEntry<V extends Provider> {
   initTime?: number;
 }
 
-export type ServiceFromProvider<P extends Provider> = Partial<ProviderMap>[P];
+export type ServiceFromProvider<P extends Provider> = ProviderMap[P];
 
 export type Constructor<A extends any[] = any[], I = object> = new (
   ...args: A
@@ -68,6 +69,7 @@ export interface ProviderDependencies {
   logger: LoggerService;
   prisma: PrismaService;
   redis: EnhancedRedisPubSub;
+  userStore: UserStoreVectorService;
   isProd: boolean;
   s3: S3Storage;
 }
@@ -121,8 +123,8 @@ export function AnthropicMixin<
 >(Base: TBase) {
   type S = AnthropicService;
   return class AnthropicServiceMixin extends Base {
-    #anthropic?: S;
-    #anthropicApiKey?: string;
+    claude?: S;
+    claudeApiKey?: string;
     static sharedAnthropic?: S;
     static anthropicFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
@@ -130,16 +132,16 @@ export function AnthropicMixin<
 
       const opts = this.opts;
 
-      if (opts?.anthropic) this.#anthropic = opts.anthropic;
+      if (opts?.anthropic) this.claude = opts.anthropic;
 
-      this.#anthropicApiKey = opts?.apiKeys?.anthropic;
+      this.claudeApiKey = opts?.apiKeys?.anthropic;
     }
     public get anthropic() {
-      if (!this.#anthropic) {
+      if (!this.claude) {
         const shared = (this.constructor as typeof AnthropicServiceMixin)
           .sharedAnthropic;
         if (shared) {
-          this.#anthropic = shared;
+          this.claude = shared;
         } else {
           const deps = this.getDependencies();
           if (!deps) {
@@ -149,17 +151,18 @@ export function AnthropicMixin<
           }
           const factory = (this.constructor as typeof AnthropicServiceMixin)
             .anthropicFactory;
-          this.#anthropic =
-            factory?.(deps, this.#anthropicApiKey) ??
+          this.claude =
+            factory?.(deps, this.claudeApiKey) ??
             new AnthropicService(
               deps.logger,
               deps.prisma,
+              deps.userStore,
               deps.redis,
-              this.#anthropicApiKey ?? ""
+              this.claudeApiKey ?? ""
             );
         }
       }
-      return this.#anthropic;
+      return this.claude;
     }
 
     static setSharedAnthropic(instance: S) {
@@ -172,7 +175,7 @@ export function AnthropicMixin<
 
     public hasAnthropic() {
       return !!(
-        this.#anthropic ??
+        this.claude ??
         (this.constructor as typeof AnthropicServiceMixin)?.sharedAnthropic ??
         this.getDependencies()
       );
@@ -185,8 +188,8 @@ export function GeminiMixin<
 >(Base: TBase) {
   type S = GeminiService;
   return class GeminiServiceMixin extends Base {
-    #gemini?: S;
-    #geminiApiKey?: string;
+    gem?: S;
+    gemApiKey?: string;
     static sharedGemini?: S;
     static geminiFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
@@ -194,16 +197,16 @@ export function GeminiMixin<
 
       const opts = this.opts;
 
-      if (opts?.gemini) this.#gemini = opts.gemini;
+      if (opts?.gemini) this.gem = opts.gemini;
 
-      this.#geminiApiKey = opts?.apiKeys?.gemini;
+      this.gemApiKey = opts?.apiKeys?.gemini;
     }
     public get gemini() {
-      if (!this.#gemini) {
+      if (!this.gem) {
         const shared = (this.constructor as typeof GeminiServiceMixin)
           .sharedGemini;
         if (shared) {
-          this.#gemini = shared;
+          this.gem = shared;
         } else {
           const deps = this.getDependencies();
           if (!deps) {
@@ -215,18 +218,18 @@ export function GeminiMixin<
           const factory = (this.constructor as typeof GeminiServiceMixin)
             .geminiFactory;
 
-          this.#gemini =
-            factory?.(deps, this.#geminiApiKey) ??
+          this.gem =
+            factory?.(deps, this.gemApiKey) ??
             new GeminiService(
               deps.logger,
               deps.prisma,
               deps.redis,
               deps.s3,
-              this.#geminiApiKey ?? ""
+              this.gemApiKey ?? ""
             );
         }
       }
-      return this.#gemini;
+      return this.gem;
     }
 
     static setSharedGemini(instance: S) {
@@ -239,7 +242,7 @@ export function GeminiMixin<
 
     public hasGemini() {
       return !!(
-        this.#gemini ??
+        this.gem ??
         (this.constructor as typeof GeminiServiceMixin)?.sharedGemini ??
         this.getDependencies()
       );
@@ -252,8 +255,8 @@ export function OpenAIMixin<
 >(Base: TBase) {
   type S = OpenAIService;
   return class OpenAIServiceMixin extends Base {
-    #openai?: S;
-    #openaiApiKey?: string;
+    oai?: S;
+    oaiApiKey?: string;
     static sharedOpenai?: S;
     static openaiFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
@@ -261,16 +264,16 @@ export function OpenAIMixin<
 
       const opts = this.opts;
 
-      if (opts?.openai) this.#openai = opts.openai;
+      if (opts?.openai) this.oai = opts.openai;
 
-      this.#openaiApiKey = opts?.apiKeys?.openai;
+      this.oaiApiKey = opts?.apiKeys?.openai;
     }
     public get openai() {
-      if (!this.#openai) {
+      if (!this.oai) {
         const shared = (this.constructor as typeof OpenAIServiceMixin)
           .sharedOpenai;
         if (shared) {
-          this.#openai = shared;
+          this.oai = shared;
         } else {
           const deps = this.getDependencies();
           if (!deps) {
@@ -282,18 +285,18 @@ export function OpenAIMixin<
           const factory = (this.constructor as typeof OpenAIServiceMixin)
             .openaiFactory;
 
-          this.#openai =
-            factory?.(deps, this.#openaiApiKey) ??
+          this.oai =
+            factory?.(deps, this.oaiApiKey) ??
             new OpenAIService(
               deps.logger,
               deps.prisma,
               deps.s3,
               deps.redis,
-              this.#openaiApiKey ?? ""
+              this.oaiApiKey ?? ""
             );
         }
       }
-      return this.#openai;
+      return this.oai;
     }
 
     static setSharedOpenai(instance: S) {
@@ -306,7 +309,7 @@ export function OpenAIMixin<
 
     public hasOpenAI() {
       return !!(
-        this.#openai ??
+        this.oai ??
         (this.constructor as typeof OpenAIServiceMixin)?.sharedOpenai ??
         this.getDependencies()
       );
@@ -319,9 +322,9 @@ export function GrokMixin<
 >(Base: TBase) {
   type S = xAIService;
   return class GrokServiceMixin extends Base {
-    #grok?: S;
-    #grokApiKey?: string;
-    #grokManagementKey?: string;
+    xai?: S;
+    xaiApiKey?: string;
+    xaiManagementKey?: string;
     static sharedGrok?: S;
     static grokFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
@@ -329,16 +332,16 @@ export function GrokMixin<
 
       const opts = this.opts;
 
-      if (opts?.grok) this.#grok = opts.grok;
+      if (opts?.grok) this.xai = opts.grok;
 
-      this.#grokApiKey = opts?.apiKeys?.grok;
-      this.#grokManagementKey = opts?.apiKeys?.grokMgmtKey;
+      this.xaiApiKey = opts?.apiKeys?.grok;
+      this.xaiManagementKey = opts?.apiKeys?.grokMgmtKey;
     }
     public get grok() {
-      if (!this.#grok) {
+      if (!this.xai) {
         const shared = (this.constructor as typeof GrokServiceMixin).sharedGrok;
         if (shared) {
-          this.#grok = shared;
+          this.xai = shared;
         } else {
           const deps = this.getDependencies();
           if (!deps) {
@@ -350,19 +353,19 @@ export function GrokMixin<
           const factory = (this.constructor as typeof GrokServiceMixin)
             .grokFactory;
 
-          this.#grok =
-            factory?.(deps, this.#grokApiKey) ??
+          this.xai =
+            factory?.(deps, this.xaiApiKey) ??
             new xAIService(
               deps.logger,
               deps.prisma,
               deps.redis,
               deps.s3,
-              this.#grokApiKey ?? "",
-              this.#grokManagementKey ?? ""
+              this.xaiApiKey ?? "",
+              this.xaiManagementKey ?? ""
             );
         }
       }
-      return this.#grok;
+      return this.xai;
     }
 
     static setSharedGrok(instance: S) {
@@ -375,7 +378,7 @@ export function GrokMixin<
 
     public hasGrok() {
       return !!(
-        this.#grok ??
+        this.xai ??
         (this.constructor as typeof GrokServiceMixin)?.sharedGrok ??
         this.getDependencies()
       );
@@ -388,8 +391,8 @@ export function VercelMixin<
 >(Base: TBase) {
   type S = v0Service;
   return class VercelServiceMixin extends Base {
-    #vercel?: S;
-    #vercelApiKey?: string;
+    v0?: S;
+    v0ApiKey?: string;
     static sharedVercel?: S;
     static vercelFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
@@ -397,16 +400,16 @@ export function VercelMixin<
 
       const opts = this.opts;
 
-      if (opts?.vercel) this.#vercel = opts.vercel;
+      if (opts?.vercel) this.v0 = opts.vercel;
 
-      this.#vercelApiKey = opts?.apiKeys?.vercel;
+      this.v0ApiKey = opts?.apiKeys?.vercel;
     }
     public get vercel() {
-      if (!this.#vercel) {
+      if (!this.v0) {
         const shared = (this.constructor as typeof VercelServiceMixin)
           .sharedVercel;
         if (shared) {
-          this.#vercel = shared;
+          this.v0 = shared;
         } else {
           const deps = this.getDependencies();
           if (!deps) {
@@ -417,17 +420,17 @@ export function VercelMixin<
           const factory = (this.constructor as typeof VercelServiceMixin)
             .vercelFactory;
 
-          this.#vercel =
-            factory?.(deps, this.#vercelApiKey) ??
+          this.v0 =
+            factory?.(deps, this.v0ApiKey) ??
             new v0Service(
               deps.logger,
               deps.prisma,
               deps.redis,
-              this.#vercelApiKey ?? ""
+              this.v0ApiKey ?? ""
             );
         }
       }
-      return this.#vercel;
+      return this.v0;
     }
 
     static setSharedVercel(instance: S) {
@@ -440,7 +443,7 @@ export function VercelMixin<
 
     public hasVercel() {
       return !!(
-        this.#vercel ??
+        this.v0 ??
         (this.constructor as typeof VercelServiceMixin)?.sharedVercel ??
         this.getDependencies()
       );
@@ -453,8 +456,8 @@ export function MetaMixin<
 >(Base: TBase) {
   type S = LlamaService;
   return class MetaServiceMixin extends Base {
-    #meta?: S;
-    #metaApiKey?: string;
+    llama?: S;
+    llamaApiKey?: string;
     static sharedMeta?: S;
     static metaFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
@@ -462,15 +465,15 @@ export function MetaMixin<
 
       const opts = this.opts;
 
-      if (opts?.meta) this.#meta = opts.meta;
+      if (opts?.meta) this.llama = opts.meta;
 
-      this.#metaApiKey = opts?.apiKeys?.meta;
+      this.llamaApiKey = opts?.apiKeys?.meta;
     }
     public get meta() {
-      if (!this.#meta) {
+      if (!this.llama) {
         const shared = (this.constructor as typeof MetaServiceMixin).sharedMeta;
         if (shared) {
-          this.#meta = shared;
+          this.llama = shared;
         } else {
           const deps = this.getDependencies();
           if (!deps) {
@@ -481,17 +484,17 @@ export function MetaMixin<
           const factory = (this.constructor as typeof MetaServiceMixin)
             .metaFactory;
 
-          this.#meta =
-            factory?.(deps, this.#metaApiKey) ??
+          this.llama =
+            factory?.(deps, this.llamaApiKey) ??
             new LlamaService(
               deps.logger,
               deps.prisma,
               deps.redis,
-              this.#metaApiKey ?? ""
+              this.llamaApiKey ?? ""
             );
         }
       }
-      return this.#meta;
+      return this.llama;
     }
 
     static setSharedMeta(instance: S) {
@@ -504,7 +507,7 @@ export function MetaMixin<
 
     public hasMeta() {
       return !!(
-        this.#meta ??
+        this.llama ??
         (this.constructor as typeof MetaServiceMixin)?.sharedMeta ??
         this.getDependencies()
       );

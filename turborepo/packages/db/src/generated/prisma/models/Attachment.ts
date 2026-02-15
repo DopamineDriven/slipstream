@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model Attachment
@@ -564,10 +564,12 @@ export type AttachmentWhereInput = {
   deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocListRelationFilter
   conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
   message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
   providerLinks?: Prisma.AttachmentProviderListRelationFilter
   providerStoreDocs?: Prisma.ProviderStoreDocumentListRelationFilter
+  userStoreDoc?: Prisma.XOR<Prisma.UserStoreDocNullableScalarRelationFilter, Prisma.UserStoreDocWhereInput> | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   image?: Prisma.XOR<Prisma.ImageMetadataNullableScalarRelationFilter, Prisma.ImageMetadataWhereInput> | null
   video?: Prisma.XOR<Prisma.VideoMetadataNullableScalarRelationFilter, Prisma.VideoMetadataWhereInput> | null
@@ -625,10 +627,12 @@ export type AttachmentOrderByWithRelationInput = {
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocOrderByRelationAggregateInput
   conversation?: Prisma.ConversationOrderByWithRelationInput
   message?: Prisma.MessageOrderByWithRelationInput
   providerLinks?: Prisma.AttachmentProviderOrderByRelationAggregateInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentOrderByRelationAggregateInput
+  userStoreDoc?: Prisma.UserStoreDocOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
   image?: Prisma.ImageMetadataOrderByWithRelationInput
   video?: Prisma.VideoMetadataOrderByWithRelationInput
@@ -689,10 +693,12 @@ export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
   deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocListRelationFilter
   conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
   message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
   providerLinks?: Prisma.AttachmentProviderListRelationFilter
   providerStoreDocs?: Prisma.ProviderStoreDocumentListRelationFilter
+  userStoreDoc?: Prisma.XOR<Prisma.UserStoreDocNullableScalarRelationFilter, Prisma.UserStoreDocWhereInput> | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   image?: Prisma.XOR<Prisma.ImageMetadataNullableScalarRelationFilter, Prisma.ImageMetadataWhereInput> | null
   video?: Prisma.XOR<Prisma.VideoMetadataNullableScalarRelationFilter, Prisma.VideoMetadataWhereInput> | null
@@ -857,10 +863,12 @@ export type AttachmentCreateInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
@@ -918,8 +926,10 @@ export type AttachmentUncheckedCreateInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -973,10 +983,12 @@ export type AttachmentUpdateInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
@@ -1034,8 +1046,10 @@ export type AttachmentUncheckedUpdateInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -1191,21 +1205,6 @@ export type AttachmentUncheckedUpdateManyInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type AttachmentListRelationFilter = {
-  every?: Prisma.AttachmentWhereInput
-  some?: Prisma.AttachmentWhereInput
-  none?: Prisma.AttachmentWhereInput
-}
-
-export type AttachmentOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
-}
-
-export type AttachmentScalarRelationFilter = {
-  is?: Prisma.AttachmentWhereInput
-  isNot?: Prisma.AttachmentWhereInput
 }
 
 export type AttachmentCountOrderByAggregateInput = {
@@ -1371,144 +1370,19 @@ export type AttachmentSumOrderByAggregateInput = {
   size?: Prisma.SortOrder
 }
 
-export type AttachmentCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+export type AttachmentScalarRelationFilter = {
+  is?: Prisma.AttachmentWhereInput
+  isNot?: Prisma.AttachmentWhereInput
 }
 
-export type AttachmentUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+export type AttachmentListRelationFilter = {
+  every?: Prisma.AttachmentWhereInput
+  some?: Prisma.AttachmentWhereInput
+  none?: Prisma.AttachmentWhereInput
 }
 
-export type AttachmentUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
-  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutUserInput | Prisma.AttachmentUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
-}
-
-export type AttachmentUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
-  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutUserInput | Prisma.AttachmentUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
-}
-
-export type AttachmentCreateNestedOneWithoutProviderStoreDocsInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderStoreDocsInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-}
-
-export type AttachmentUpdateOneRequiredWithoutProviderStoreDocsNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderStoreDocsInput
-  upsert?: Prisma.AttachmentUpsertWithoutProviderStoreDocsInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutProviderStoreDocsInput, Prisma.AttachmentUpdateWithoutProviderStoreDocsInput>, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput>
-}
-
-export type AttachmentCreateNestedManyWithoutConversationInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
-  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-}
-
-export type AttachmentUncheckedCreateNestedManyWithoutConversationInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
-  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-}
-
-export type AttachmentUpdateManyWithoutConversationNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
-  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput[]
-  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope
-  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput[]
-  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput | Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput[]
-  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
-}
-
-export type AttachmentUncheckedUpdateManyWithoutConversationNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
-  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput[]
-  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope
-  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput[]
-  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput | Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput[]
-  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
-}
-
-export type AttachmentCreateNestedManyWithoutMessageInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
-  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-}
-
-export type AttachmentUncheckedCreateNestedManyWithoutMessageInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
-  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-}
-
-export type AttachmentUpdateManyWithoutMessageNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
-  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput[]
-  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope
-  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput[]
-  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput | Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput[]
-  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
-}
-
-export type AttachmentUncheckedUpdateManyWithoutMessageNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
-  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput[]
-  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope
-  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput[]
-  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput | Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput[]
-  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+export type AttachmentOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type EnumAssetOriginFieldUpdateOperationsInput = {
@@ -1531,22 +1405,16 @@ export type NullableEnumCompatStatusFieldUpdateOperationsInput = {
   set?: $Enums.CompatStatus | null
 }
 
+export type NullableBigIntFieldUpdateOperationsInput = {
+  set?: bigint | number | null
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
+}
+
 export type EnumChecksumAlgoFieldUpdateOperationsInput = {
   set?: $Enums.ChecksumAlgo
-}
-
-export type AttachmentCreateNestedOneWithoutProviderLinksInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderLinksInput, Prisma.AttachmentUncheckedCreateWithoutProviderLinksInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderLinksInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-}
-
-export type AttachmentUpdateOneRequiredWithoutProviderLinksNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderLinksInput, Prisma.AttachmentUncheckedCreateWithoutProviderLinksInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderLinksInput
-  upsert?: Prisma.AttachmentUpsertWithoutProviderLinksInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutProviderLinksInput, Prisma.AttachmentUpdateWithoutProviderLinksInput>, Prisma.AttachmentUncheckedUpdateWithoutProviderLinksInput>
 }
 
 export type AttachmentCreateNestedOneWithoutImageInput = {
@@ -1605,6 +1473,48 @@ export type AttachmentUpdateOneRequiredWithoutDocumentNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutDocumentInput, Prisma.AttachmentUpdateWithoutDocumentInput>, Prisma.AttachmentUncheckedUpdateWithoutDocumentInput>
 }
 
+export type AttachmentCreateNestedManyWithoutConversationInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
+  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+}
+
+export type AttachmentUncheckedCreateNestedManyWithoutConversationInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
+  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+}
+
+export type AttachmentUpdateManyWithoutConversationNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput[]
+  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput[]
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput | Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput[]
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+}
+
+export type AttachmentUncheckedUpdateManyWithoutConversationNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput[]
+  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput[]
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput | Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput[]
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+}
+
 export type AttachmentCreateNestedOneWithoutImageGenOutputInput = {
   create?: Prisma.XOR<Prisma.AttachmentCreateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutImageGenOutputInput>
   connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutImageGenOutputInput
@@ -1619,7 +1529,147 @@ export type AttachmentUpdateOneRequiredWithoutImageGenOutputNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutImageGenOutputInput, Prisma.AttachmentUpdateWithoutImageGenOutputInput>, Prisma.AttachmentUncheckedUpdateWithoutImageGenOutputInput>
 }
 
-export type AttachmentCreateWithoutUserInput = {
+export type AttachmentCreateNestedOneWithoutLocalVectorStoreDocsInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutLocalVectorStoreDocsInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+}
+
+export type AttachmentUpdateOneRequiredWithoutLocalVectorStoreDocsNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutLocalVectorStoreDocsInput
+  upsert?: Prisma.AttachmentUpsertWithoutLocalVectorStoreDocsInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUpdateWithoutLocalVectorStoreDocsInput>, Prisma.AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput>
+}
+
+export type AttachmentCreateNestedManyWithoutMessageInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
+  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+}
+
+export type AttachmentUncheckedCreateNestedManyWithoutMessageInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
+  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+}
+
+export type AttachmentUpdateManyWithoutMessageNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput[]
+  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput[]
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput | Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput[]
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+}
+
+export type AttachmentUncheckedUpdateManyWithoutMessageNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput[]
+  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput[]
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput | Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput[]
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+}
+
+export type AttachmentCreateNestedOneWithoutProviderLinksInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderLinksInput, Prisma.AttachmentUncheckedCreateWithoutProviderLinksInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderLinksInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+}
+
+export type AttachmentUpdateOneRequiredWithoutProviderLinksNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderLinksInput, Prisma.AttachmentUncheckedCreateWithoutProviderLinksInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderLinksInput
+  upsert?: Prisma.AttachmentUpsertWithoutProviderLinksInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutProviderLinksInput, Prisma.AttachmentUpdateWithoutProviderLinksInput>, Prisma.AttachmentUncheckedUpdateWithoutProviderLinksInput>
+}
+
+export type AttachmentCreateNestedOneWithoutProviderStoreDocsInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderStoreDocsInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+}
+
+export type AttachmentUpdateOneRequiredWithoutProviderStoreDocsNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderStoreDocsInput
+  upsert?: Prisma.AttachmentUpsertWithoutProviderStoreDocsInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutProviderStoreDocsInput, Prisma.AttachmentUpdateWithoutProviderStoreDocsInput>, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput>
+}
+
+export type AttachmentCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+}
+
+export type AttachmentUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+}
+
+export type AttachmentUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutUserInput | Prisma.AttachmentUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+}
+
+export type AttachmentUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutUserInput | Prisma.AttachmentUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+}
+
+export type AttachmentCreateNestedOneWithoutUserStoreDocInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserStoreDocInput, Prisma.AttachmentUncheckedCreateWithoutUserStoreDocInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserStoreDocInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+}
+
+export type AttachmentUpdateOneRequiredWithoutUserStoreDocNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserStoreDocInput, Prisma.AttachmentUncheckedCreateWithoutUserStoreDocInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserStoreDocInput
+  upsert?: Prisma.AttachmentUpsertWithoutUserStoreDocInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutUserStoreDocInput, Prisma.AttachmentUpdateWithoutUserStoreDocInput>, Prisma.AttachmentUncheckedUpdateWithoutUserStoreDocInput>
+}
+
+export type AttachmentCreateWithoutImageInput = {
   id?: string
   draftId?: string | null
   batchId?: string | null
@@ -1665,212 +1715,20 @@ export type AttachmentCreateWithoutUserInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
-}
-
-export type AttachmentUncheckedCreateWithoutUserInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
-  bucket: string
-  key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
-}
-
-export type AttachmentCreateOrConnectWithoutUserInput = {
-  where: Prisma.AttachmentWhereUniqueInput
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput>
-}
-
-export type AttachmentCreateManyUserInputEnvelope = {
-  data: Prisma.AttachmentCreateManyUserInput | Prisma.AttachmentCreateManyUserInput[]
-  skipDuplicates?: boolean
-}
-
-export type AttachmentUpsertWithWhereUniqueWithoutUserInput = {
-  where: Prisma.AttachmentWhereUniqueInput
-  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutUserInput, Prisma.AttachmentUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput>
-}
-
-export type AttachmentUpdateWithWhereUniqueWithoutUserInput = {
-  where: Prisma.AttachmentWhereUniqueInput
-  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutUserInput, Prisma.AttachmentUncheckedUpdateWithoutUserInput>
-}
-
-export type AttachmentUpdateManyWithWhereWithoutUserInput = {
-  where: Prisma.AttachmentScalarWhereInput
-  data: Prisma.XOR<Prisma.AttachmentUpdateManyMutationInput, Prisma.AttachmentUncheckedUpdateManyWithoutUserInput>
-}
-
-export type AttachmentScalarWhereInput = {
-  AND?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
-  OR?: Prisma.AttachmentScalarWhereInput[]
-  NOT?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
-  id?: Prisma.StringFilter<"Attachment"> | string
-  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  batchId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  generationGroupId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  seriesId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  userId?: Prisma.StringFilter<"Attachment"> | string
-  messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  s3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFilter<"Attachment"> | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFilter<"Attachment"> | $Enums.AssetType
-  uploadDuration?: Prisma.IntNullableFilter<"Attachment"> | number | null
-  cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatMime?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatExt?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatVersionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatS3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatStatus?: Prisma.EnumCompatStatusNullableFilter<"Attachment"> | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  compatCdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  bucket?: Prisma.StringFilter<"Attachment"> | string
-  key?: Prisma.StringFilter<"Attachment"> | string
-  versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  region?: Prisma.StringFilter<"Attachment"> | string
-  cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  contentEncoding?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  expiresAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null
-  filename?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  ext?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  mime?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  etag?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFilter<"Attachment"> | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  storageClass?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  sseAlgorithm?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  sseKmsKeyId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  s3LastModified?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
-}
-
-export type AttachmentCreateWithoutProviderStoreDocsInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
-  bucket: string
-  key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
-export type AttachmentUncheckedCreateWithoutProviderStoreDocsInput = {
+export type AttachmentUncheckedCreateWithoutImageInput = {
   id?: string
   conversationId?: string | null
   draftId?: string | null
@@ -1919,31 +1777,33 @@ export type AttachmentUncheckedCreateWithoutProviderStoreDocsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
-export type AttachmentCreateOrConnectWithoutProviderStoreDocsInput = {
+export type AttachmentCreateOrConnectWithoutImageInput = {
   where: Prisma.AttachmentWhereUniqueInput
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput>
 }
 
-export type AttachmentUpsertWithoutProviderStoreDocsInput = {
-  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput>
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
+export type AttachmentUpsertWithoutImageInput = {
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageInput, Prisma.AttachmentUncheckedUpdateWithoutImageInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput>
   where?: Prisma.AttachmentWhereInput
 }
 
-export type AttachmentUpdateToOneWithWhereWithoutProviderStoreDocsInput = {
+export type AttachmentUpdateToOneWithWhereWithoutImageInput = {
   where?: Prisma.AttachmentWhereInput
-  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput>
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageInput, Prisma.AttachmentUncheckedUpdateWithoutImageInput>
 }
 
-export type AttachmentUpdateWithoutProviderStoreDocsInput = {
+export type AttachmentUpdateWithoutImageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1989,18 +1849,20 @@ export type AttachmentUpdateWithoutProviderStoreDocsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
-export type AttachmentUncheckedUpdateWithoutProviderStoreDocsInput = {
+export type AttachmentUncheckedUpdateWithoutImageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2049,10 +1911,768 @@ export type AttachmentUncheckedUpdateWithoutProviderStoreDocsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentCreateWithoutVideoInput = {
+  id?: string
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
+  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentUncheckedCreateWithoutVideoInput = {
+  id?: string
+  conversationId?: string | null
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  userId: string
+  messageId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentCreateOrConnectWithoutVideoInput = {
+  where: Prisma.AttachmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutVideoInput, Prisma.AttachmentUncheckedCreateWithoutVideoInput>
+}
+
+export type AttachmentUpsertWithoutVideoInput = {
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutVideoInput, Prisma.AttachmentUncheckedUpdateWithoutVideoInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutVideoInput, Prisma.AttachmentUncheckedCreateWithoutVideoInput>
+  where?: Prisma.AttachmentWhereInput
+}
+
+export type AttachmentUpdateToOneWithWhereWithoutVideoInput = {
+  where?: Prisma.AttachmentWhereInput
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutVideoInput, Prisma.AttachmentUncheckedUpdateWithoutVideoInput>
+}
+
+export type AttachmentUpdateWithoutVideoInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentUncheckedUpdateWithoutVideoInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentCreateWithoutAudioInput = {
+  id?: string
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
+  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentUncheckedCreateWithoutAudioInput = {
+  id?: string
+  conversationId?: string | null
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  userId: string
+  messageId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentCreateOrConnectWithoutAudioInput = {
+  where: Prisma.AttachmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioInput, Prisma.AttachmentUncheckedCreateWithoutAudioInput>
+}
+
+export type AttachmentUpsertWithoutAudioInput = {
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutAudioInput, Prisma.AttachmentUncheckedUpdateWithoutAudioInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioInput, Prisma.AttachmentUncheckedCreateWithoutAudioInput>
+  where?: Prisma.AttachmentWhereInput
+}
+
+export type AttachmentUpdateToOneWithWhereWithoutAudioInput = {
+  where?: Prisma.AttachmentWhereInput
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutAudioInput, Prisma.AttachmentUncheckedUpdateWithoutAudioInput>
+}
+
+export type AttachmentUpdateWithoutAudioInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentUncheckedUpdateWithoutAudioInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentCreateWithoutDocumentInput = {
+  id?: string
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
+  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentUncheckedCreateWithoutDocumentInput = {
+  id?: string
+  conversationId?: string | null
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  userId: string
+  messageId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentCreateOrConnectWithoutDocumentInput = {
+  where: Prisma.AttachmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutDocumentInput, Prisma.AttachmentUncheckedCreateWithoutDocumentInput>
+}
+
+export type AttachmentUpsertWithoutDocumentInput = {
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutDocumentInput, Prisma.AttachmentUncheckedUpdateWithoutDocumentInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutDocumentInput, Prisma.AttachmentUncheckedCreateWithoutDocumentInput>
+  where?: Prisma.AttachmentWhereInput
+}
+
+export type AttachmentUpdateToOneWithWhereWithoutDocumentInput = {
+  where?: Prisma.AttachmentWhereInput
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutDocumentInput, Prisma.AttachmentUncheckedUpdateWithoutDocumentInput>
+}
+
+export type AttachmentUpdateWithoutDocumentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentUncheckedUpdateWithoutDocumentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
@@ -2103,9 +2723,11 @@ export type AttachmentCreateWithoutConversationInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
@@ -2162,8 +2784,10 @@ export type AttachmentUncheckedCreateWithoutConversationInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -2195,6 +2819,564 @@ export type AttachmentUpdateWithWhereUniqueWithoutConversationInput = {
 export type AttachmentUpdateManyWithWhereWithoutConversationInput = {
   where: Prisma.AttachmentScalarWhereInput
   data: Prisma.XOR<Prisma.AttachmentUpdateManyMutationInput, Prisma.AttachmentUncheckedUpdateManyWithoutConversationInput>
+}
+
+export type AttachmentScalarWhereInput = {
+  AND?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+  OR?: Prisma.AttachmentScalarWhereInput[]
+  NOT?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+  id?: Prisma.StringFilter<"Attachment"> | string
+  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  batchId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  generationGroupId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  seriesId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  userId?: Prisma.StringFilter<"Attachment"> | string
+  messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  s3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFilter<"Attachment"> | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFilter<"Attachment"> | $Enums.AssetType
+  uploadDuration?: Prisma.IntNullableFilter<"Attachment"> | number | null
+  cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatMime?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatExt?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatVersionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatS3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatStatus?: Prisma.EnumCompatStatusNullableFilter<"Attachment"> | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
+  compatCdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  bucket?: Prisma.StringFilter<"Attachment"> | string
+  key?: Prisma.StringFilter<"Attachment"> | string
+  versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  region?: Prisma.StringFilter<"Attachment"> | string
+  cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  contentEncoding?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
+  size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null
+  filename?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  ext?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  mime?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  etag?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFilter<"Attachment"> | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  storageClass?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  sseAlgorithm?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  sseKmsKeyId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  s3LastModified?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
+}
+
+export type AttachmentCreateWithoutImageGenOutputInput = {
+  id?: string
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
+  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentUncheckedCreateWithoutImageGenOutputInput = {
+  id?: string
+  conversationId?: string | null
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  userId: string
+  messageId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentCreateOrConnectWithoutImageGenOutputInput = {
+  where: Prisma.AttachmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutImageGenOutputInput>
+}
+
+export type AttachmentUpsertWithoutImageGenOutputInput = {
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedUpdateWithoutImageGenOutputInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutImageGenOutputInput>
+  where?: Prisma.AttachmentWhereInput
+}
+
+export type AttachmentUpdateToOneWithWhereWithoutImageGenOutputInput = {
+  where?: Prisma.AttachmentWhereInput
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedUpdateWithoutImageGenOutputInput>
+}
+
+export type AttachmentUpdateWithoutImageGenOutputInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentUncheckedUpdateWithoutImageGenOutputInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentCreateWithoutLocalVectorStoreDocsInput = {
+  id?: string
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
+  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput = {
+  id?: string
+  conversationId?: string | null
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  userId: string
+  messageId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentCreateOrConnectWithoutLocalVectorStoreDocsInput = {
+  where: Prisma.AttachmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput>
+}
+
+export type AttachmentUpsertWithoutLocalVectorStoreDocsInput = {
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput>
+  where?: Prisma.AttachmentWhereInput
+}
+
+export type AttachmentUpdateToOneWithWhereWithoutLocalVectorStoreDocsInput = {
+  where?: Prisma.AttachmentWhereInput
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput>
+}
+
+export type AttachmentUpdateWithoutLocalVectorStoreDocsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentCreateWithoutMessageInput = {
@@ -2243,9 +3425,11 @@ export type AttachmentCreateWithoutMessageInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
@@ -2302,8 +3486,10 @@ export type AttachmentUncheckedCreateWithoutMessageInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -2383,9 +3569,11 @@ export type AttachmentCreateWithoutProviderLinksInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
@@ -2443,7 +3631,9 @@ export type AttachmentUncheckedCreateWithoutProviderLinksInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -2513,9 +3703,11 @@ export type AttachmentUpdateWithoutProviderLinksInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
@@ -2573,7 +3765,9 @@ export type AttachmentUncheckedUpdateWithoutProviderLinksInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -2581,7 +3775,7 @@ export type AttachmentUncheckedUpdateWithoutProviderLinksInput = {
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
-export type AttachmentCreateWithoutImageInput = {
+export type AttachmentCreateWithoutProviderStoreDocsInput = {
   id?: string
   draftId?: string | null
   batchId?: string | null
@@ -2627,18 +3821,20 @@ export type AttachmentCreateWithoutImageInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
-export type AttachmentUncheckedCreateWithoutImageInput = {
+export type AttachmentUncheckedCreateWithoutProviderStoreDocsInput = {
   id?: string
   conversationId?: string | null
   draftId?: string | null
@@ -2687,31 +3883,33 @@ export type AttachmentUncheckedCreateWithoutImageInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
-export type AttachmentCreateOrConnectWithoutImageInput = {
+export type AttachmentCreateOrConnectWithoutProviderStoreDocsInput = {
   where: Prisma.AttachmentWhereUniqueInput
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
 }
 
-export type AttachmentUpsertWithoutImageInput = {
-  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageInput, Prisma.AttachmentUncheckedUpdateWithoutImageInput>
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput>
+export type AttachmentUpsertWithoutProviderStoreDocsInput = {
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
   where?: Prisma.AttachmentWhereInput
 }
 
-export type AttachmentUpdateToOneWithWhereWithoutImageInput = {
+export type AttachmentUpdateToOneWithWhereWithoutProviderStoreDocsInput = {
   where?: Prisma.AttachmentWhereInput
-  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageInput, Prisma.AttachmentUncheckedUpdateWithoutImageInput>
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput>
 }
 
-export type AttachmentUpdateWithoutImageInput = {
+export type AttachmentUpdateWithoutProviderStoreDocsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2757,18 +3955,20 @@ export type AttachmentUpdateWithoutImageInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
-export type AttachmentUncheckedUpdateWithoutImageInput = {
+export type AttachmentUncheckedUpdateWithoutProviderStoreDocsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2817,15 +4017,17 @@ export type AttachmentUncheckedUpdateWithoutImageInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
-export type AttachmentCreateWithoutVideoInput = {
+export type AttachmentCreateWithoutUserInput = {
   id?: string
   draftId?: string | null
   batchId?: string | null
@@ -2871,25 +4073,26 @@ export type AttachmentCreateWithoutVideoInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
-  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
-export type AttachmentUncheckedCreateWithoutVideoInput = {
+export type AttachmentUncheckedCreateWithoutUserInput = {
   id?: string
   conversationId?: string | null
   draftId?: string | null
   batchId?: string | null
   generationGroupId?: string | null
   seriesId?: string | null
-  userId: string
   messageId?: string | null
   s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
@@ -2931,633 +4134,44 @@ export type AttachmentUncheckedCreateWithoutVideoInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
-export type AttachmentCreateOrConnectWithoutVideoInput = {
+export type AttachmentCreateOrConnectWithoutUserInput = {
   where: Prisma.AttachmentWhereUniqueInput
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutVideoInput, Prisma.AttachmentUncheckedCreateWithoutVideoInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput>
 }
 
-export type AttachmentUpsertWithoutVideoInput = {
-  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutVideoInput, Prisma.AttachmentUncheckedUpdateWithoutVideoInput>
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutVideoInput, Prisma.AttachmentUncheckedCreateWithoutVideoInput>
-  where?: Prisma.AttachmentWhereInput
+export type AttachmentCreateManyUserInputEnvelope = {
+  data: Prisma.AttachmentCreateManyUserInput | Prisma.AttachmentCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
-export type AttachmentUpdateToOneWithWhereWithoutVideoInput = {
-  where?: Prisma.AttachmentWhereInput
-  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutVideoInput, Prisma.AttachmentUncheckedUpdateWithoutVideoInput>
-}
-
-export type AttachmentUpdateWithoutVideoInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
-}
-
-export type AttachmentUncheckedUpdateWithoutVideoInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
-}
-
-export type AttachmentCreateWithoutAudioInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
-  bucket: string
-  key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
-  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
-}
-
-export type AttachmentUncheckedCreateWithoutAudioInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
-  bucket: string
-  key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
-}
-
-export type AttachmentCreateOrConnectWithoutAudioInput = {
+export type AttachmentUpsertWithWhereUniqueWithoutUserInput = {
   where: Prisma.AttachmentWhereUniqueInput
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioInput, Prisma.AttachmentUncheckedCreateWithoutAudioInput>
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutUserInput, Prisma.AttachmentUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput>
 }
 
-export type AttachmentUpsertWithoutAudioInput = {
-  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutAudioInput, Prisma.AttachmentUncheckedUpdateWithoutAudioInput>
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioInput, Prisma.AttachmentUncheckedCreateWithoutAudioInput>
-  where?: Prisma.AttachmentWhereInput
-}
-
-export type AttachmentUpdateToOneWithWhereWithoutAudioInput = {
-  where?: Prisma.AttachmentWhereInput
-  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutAudioInput, Prisma.AttachmentUncheckedUpdateWithoutAudioInput>
-}
-
-export type AttachmentUpdateWithoutAudioInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
-}
-
-export type AttachmentUncheckedUpdateWithoutAudioInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
-}
-
-export type AttachmentCreateWithoutDocumentInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
-  bucket: string
-  key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
-  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
-}
-
-export type AttachmentUncheckedCreateWithoutDocumentInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
-  bucket: string
-  key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
-}
-
-export type AttachmentCreateOrConnectWithoutDocumentInput = {
+export type AttachmentUpdateWithWhereUniqueWithoutUserInput = {
   where: Prisma.AttachmentWhereUniqueInput
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutDocumentInput, Prisma.AttachmentUncheckedCreateWithoutDocumentInput>
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutUserInput, Prisma.AttachmentUncheckedUpdateWithoutUserInput>
 }
 
-export type AttachmentUpsertWithoutDocumentInput = {
-  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutDocumentInput, Prisma.AttachmentUncheckedUpdateWithoutDocumentInput>
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutDocumentInput, Prisma.AttachmentUncheckedCreateWithoutDocumentInput>
-  where?: Prisma.AttachmentWhereInput
+export type AttachmentUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.AttachmentScalarWhereInput
+  data: Prisma.XOR<Prisma.AttachmentUpdateManyMutationInput, Prisma.AttachmentUncheckedUpdateManyWithoutUserInput>
 }
 
-export type AttachmentUpdateToOneWithWhereWithoutDocumentInput = {
-  where?: Prisma.AttachmentWhereInput
-  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutDocumentInput, Prisma.AttachmentUncheckedUpdateWithoutDocumentInput>
-}
-
-export type AttachmentUpdateWithoutDocumentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
-}
-
-export type AttachmentUncheckedUpdateWithoutDocumentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
-}
-
-export type AttachmentCreateWithoutImageGenOutputInput = {
+export type AttachmentCreateWithoutUserStoreDocInput = {
   id?: string
   draftId?: string | null
   batchId?: string | null
@@ -3603,6 +4217,7 @@ export type AttachmentCreateWithoutImageGenOutputInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
@@ -3612,9 +4227,10 @@ export type AttachmentCreateWithoutImageGenOutputInput = {
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
-export type AttachmentUncheckedCreateWithoutImageGenOutputInput = {
+export type AttachmentUncheckedCreateWithoutUserStoreDocInput = {
   id?: string
   conversationId?: string | null
   draftId?: string | null
@@ -3663,31 +4279,33 @@ export type AttachmentUncheckedCreateWithoutImageGenOutputInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
-export type AttachmentCreateOrConnectWithoutImageGenOutputInput = {
+export type AttachmentCreateOrConnectWithoutUserStoreDocInput = {
   where: Prisma.AttachmentWhereUniqueInput
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutImageGenOutputInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutUserStoreDocInput, Prisma.AttachmentUncheckedCreateWithoutUserStoreDocInput>
 }
 
-export type AttachmentUpsertWithoutImageGenOutputInput = {
-  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedUpdateWithoutImageGenOutputInput>
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutImageGenOutputInput>
+export type AttachmentUpsertWithoutUserStoreDocInput = {
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutUserStoreDocInput, Prisma.AttachmentUncheckedUpdateWithoutUserStoreDocInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutUserStoreDocInput, Prisma.AttachmentUncheckedCreateWithoutUserStoreDocInput>
   where?: Prisma.AttachmentWhereInput
 }
 
-export type AttachmentUpdateToOneWithWhereWithoutImageGenOutputInput = {
+export type AttachmentUpdateToOneWithWhereWithoutUserStoreDocInput = {
   where?: Prisma.AttachmentWhereInput
-  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedUpdateWithoutImageGenOutputInput>
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutUserStoreDocInput, Prisma.AttachmentUncheckedUpdateWithoutUserStoreDocInput>
 }
 
-export type AttachmentUpdateWithoutImageGenOutputInput = {
+export type AttachmentUpdateWithoutUserStoreDocInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3733,6 +4351,7 @@ export type AttachmentUpdateWithoutImageGenOutputInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
@@ -3742,9 +4361,10 @@ export type AttachmentUpdateWithoutImageGenOutputInput = {
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
-export type AttachmentUncheckedUpdateWithoutImageGenOutputInput = {
+export type AttachmentUncheckedUpdateWithoutUserStoreDocInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3793,169 +4413,7 @@ export type AttachmentUncheckedUpdateWithoutImageGenOutputInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-}
-
-export type AttachmentCreateManyUserInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
-  bucket: string
-  key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type AttachmentUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
-}
-
-export type AttachmentUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -3963,56 +4421,6 @@ export type AttachmentUncheckedUpdateWithoutUserInput = {
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
-}
-
-export type AttachmentUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AttachmentCreateManyConversationInput = {
@@ -4111,9 +4519,11 @@ export type AttachmentUpdateWithoutConversationInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
@@ -4170,8 +4580,10 @@ export type AttachmentUncheckedUpdateWithoutConversationInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -4325,9 +4737,11 @@ export type AttachmentUpdateWithoutMessageInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
@@ -4384,8 +4798,10 @@ export type AttachmentUncheckedUpdateWithoutMessageInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -4443,17 +4859,237 @@ export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type AttachmentCreateManyUserInput = {
+  id?: string
+  conversationId?: string | null
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  messageId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AttachmentUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 /**
  * Count Type AttachmentCountOutputType
  */
 
 export type AttachmentCountOutputType = {
+  localVectorStoreDocs: number
   providerLinks: number
   providerStoreDocs: number
 }
 
 export type AttachmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  localVectorStoreDocs?: boolean | AttachmentCountOutputTypeCountLocalVectorStoreDocsArgs
   providerLinks?: boolean | AttachmentCountOutputTypeCountProviderLinksArgs
   providerStoreDocs?: boolean | AttachmentCountOutputTypeCountProviderStoreDocsArgs
 }
@@ -4466,6 +5102,13 @@ export type AttachmentCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.E
    * Select specific fields to fetch from the AttachmentCountOutputType
    */
   select?: Prisma.AttachmentCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * AttachmentCountOutputType without action
+ */
+export type AttachmentCountOutputTypeCountLocalVectorStoreDocsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LocalVectorStoreDocWhereInput
 }
 
 /**
@@ -4532,10 +5175,12 @@ export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  localVectorStoreDocs?: boolean | Prisma.Attachment$localVectorStoreDocsArgs<ExtArgs>
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
   providerLinks?: boolean | Prisma.Attachment$providerLinksArgs<ExtArgs>
   providerStoreDocs?: boolean | Prisma.Attachment$providerStoreDocsArgs<ExtArgs>
+  userStoreDoc?: boolean | Prisma.Attachment$userStoreDocArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   image?: boolean | Prisma.Attachment$imageArgs<ExtArgs>
   video?: boolean | Prisma.Attachment$videoArgs<ExtArgs>
@@ -4706,10 +5351,12 @@ export type AttachmentSelectScalar = {
 
 export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "draftId" | "batchId" | "generationGroupId" | "seriesId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "assetType" | "uploadDuration" | "cdnUrl" | "publicUrl" | "sourceUrl" | "thumbnailKey" | "compatMime" | "compatExt" | "compatVersionId" | "compatKey" | "compatS3ObjectId" | "compatStatus" | "compatReadyAt" | "compatCdnUrl" | "bucket" | "key" | "versionId" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
 export type AttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  localVectorStoreDocs?: boolean | Prisma.Attachment$localVectorStoreDocsArgs<ExtArgs>
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
   providerLinks?: boolean | Prisma.Attachment$providerLinksArgs<ExtArgs>
   providerStoreDocs?: boolean | Prisma.Attachment$providerStoreDocsArgs<ExtArgs>
+  userStoreDoc?: boolean | Prisma.Attachment$userStoreDocArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   image?: boolean | Prisma.Attachment$imageArgs<ExtArgs>
   video?: boolean | Prisma.Attachment$videoArgs<ExtArgs>
@@ -4732,10 +5379,12 @@ export type AttachmentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.E
 export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Attachment"
   objects: {
+    localVectorStoreDocs: Prisma.$LocalVectorStoreDocPayload<ExtArgs>[]
     conversation: Prisma.$ConversationPayload<ExtArgs> | null
     message: Prisma.$MessagePayload<ExtArgs> | null
     providerLinks: Prisma.$AttachmentProviderPayload<ExtArgs>[]
     providerStoreDocs: Prisma.$ProviderStoreDocumentPayload<ExtArgs>[]
+    userStoreDoc: Prisma.$UserStoreDocPayload<ExtArgs> | null
     user: Prisma.$UserPayload<ExtArgs>
     image: Prisma.$ImageMetadataPayload<ExtArgs> | null
     video: Prisma.$VideoMetadataPayload<ExtArgs> | null
@@ -4799,7 +5448,7 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
 export type AttachmentGetPayload<S extends boolean | null | undefined | AttachmentDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AttachmentPayload, S>
 
 export type AttachmentCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AttachmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<AttachmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: AttachmentCountAggregateInputType | true
   }
 
@@ -5186,10 +5835,12 @@ readonly fields: AttachmentFieldRefs;
  */
 export interface Prisma__AttachmentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  localVectorStoreDocs<T extends Prisma.Attachment$localVectorStoreDocsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$localVectorStoreDocsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocalVectorStoreDocPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   conversation<T extends Prisma.Attachment$conversationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$conversationArgs<ExtArgs>>): Prisma.Prisma__ConversationClient<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   message<T extends Prisma.Attachment$messageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$messageArgs<ExtArgs>>): Prisma.Prisma__MessageClient<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   providerLinks<T extends Prisma.Attachment$providerLinksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$providerLinksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentProviderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   providerStoreDocs<T extends Prisma.Attachment$providerStoreDocsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$providerStoreDocsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProviderStoreDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  userStoreDoc<T extends Prisma.Attachment$userStoreDocArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$userStoreDocArgs<ExtArgs>>): Prisma.Prisma__UserStoreDocClient<runtime.Types.Result.GetResult<Prisma.$UserStoreDocPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   image<T extends Prisma.Attachment$imageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$imageArgs<ExtArgs>>): Prisma.Prisma__ImageMetadataClient<runtime.Types.Result.GetResult<Prisma.$ImageMetadataPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   video<T extends Prisma.Attachment$videoArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$videoArgs<ExtArgs>>): Prisma.Prisma__VideoMetadataClient<runtime.Types.Result.GetResult<Prisma.$VideoMetadataPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -5297,6 +5948,7 @@ export type AttachmentFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter, which Attachment to fetch.
    */
   where: Prisma.AttachmentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -5319,6 +5971,7 @@ export type AttachmentFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    * Filter, which Attachment to fetch.
    */
   where: Prisma.AttachmentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -5371,6 +6024,7 @@ export type AttachmentFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter by unique combinations of Attachments.
    */
   distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -5423,6 +6077,7 @@ export type AttachmentFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter by unique combinations of Attachments.
    */
   distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -5470,6 +6125,7 @@ export type AttachmentFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   skip?: number
   distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -5492,6 +6148,7 @@ export type AttachmentCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * The data needed to create a Attachment.
    */
   data: Prisma.XOR<Prisma.AttachmentCreateInput, Prisma.AttachmentUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -5552,6 +6209,7 @@ export type AttachmentUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which Attachment to update.
    */
   where: Prisma.AttachmentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -5630,6 +6288,7 @@ export type AttachmentUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * In case the Attachment was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AttachmentUpdateInput, Prisma.AttachmentUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -5652,6 +6311,7 @@ export type AttachmentDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter which Attachment to delete.
    */
   where: Prisma.AttachmentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -5666,6 +6326,30 @@ export type AttachmentDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Limit how many Attachments to delete.
    */
   limit?: number
+}
+
+/**
+ * Attachment.localVectorStoreDocs
+ */
+export type Attachment$localVectorStoreDocsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LocalVectorStoreDoc
+   */
+  select?: Prisma.LocalVectorStoreDocSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LocalVectorStoreDoc
+   */
+  omit?: Prisma.LocalVectorStoreDocOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LocalVectorStoreDocInclude<ExtArgs> | null
+  where?: Prisma.LocalVectorStoreDocWhereInput
+  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[]
+  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LocalVectorStoreDocScalarFieldEnum | Prisma.LocalVectorStoreDocScalarFieldEnum[]
 }
 
 /**
@@ -5752,6 +6436,25 @@ export type Attachment$providerStoreDocsArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.ProviderStoreDocumentScalarFieldEnum | Prisma.ProviderStoreDocumentScalarFieldEnum[]
+}
+
+/**
+ * Attachment.userStoreDoc
+ */
+export type Attachment$userStoreDocArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserStoreDoc
+   */
+  select?: Prisma.UserStoreDocSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserStoreDoc
+   */
+  omit?: Prisma.UserStoreDocOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserStoreDocInclude<ExtArgs> | null
+  where?: Prisma.UserStoreDocWhereInput
 }
 
 /**

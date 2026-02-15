@@ -67,29 +67,19 @@ async function exe() {
     );
     const connectionString = process.env.DATABASE_URL ?? cfg.DATABASE_URL;
 
-    const { DbService } = await import("@slipstream/db/node");
+    const { PrismaDbService } = await import("@slipstream/db/factory");
 
-    const db = new DbService(connectionString);
+    const db = new PrismaDbService({
+      connectionString,
+      poolMax: 100,
+      idleTimeoutMs: 30000
+    });
 
     const { PrismaService } = await import("@/prisma/index.ts");
 
     const prisma = new PrismaService(db, extract, isProd);
 
     const port = cfg.PORT ? Number.parseInt(cfg.PORT) : 4000;
-
-    const { PdfService } = await import("@/pdf/index.ts");
-
-    const pdfService = new PdfService(
-      cfg.PDF_SERVICES_CLIENT_ID,
-      cfg.PDF_SERVICES_CLIENT_SECRET,
-      cfg.ADOBE_WEBHOOK_SECRET,
-      s3,
-      prisma
-    );
-
-    const { WSServer } = await import("@/ws-server/index.ts");
-
-    const wsServer = new WSServer({ port }, redisInstance, prisma, pdfService);
 
     const { Resolver } = await import("@/resolver/index.ts");
 
@@ -117,11 +107,44 @@ async function exe() {
       process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
     );
 
+    const { VoyageEmbeddingService } = await import("@/voyage/index.ts");
+
+    const voyage = new VoyageEmbeddingService(cfg.VOYAGE_API_KEY);
+
+    const { SharpService } = await import("@/sharp/index.ts");
+
+    const sharp = new SharpService();
+
+    const { UserStoreVectorService } = await import("@/store/vector-store.ts");
+
+    const userStore = new UserStoreVectorService(
+      logger,
+      voyage,
+      prisma,
+      sharp,
+      cfg.VOYAGE_API_KEY
+    );
+
+    const { PdfService } = await import("@/pdf/index.ts");
+
+    const pdfService = new PdfService(
+      cfg.PDF_SERVICES_CLIENT_ID,
+      cfg.PDF_SERVICES_CLIENT_SECRET,
+      cfg.ADOBE_WEBHOOK_SECRET,
+      s3,
+      prisma
+    );
+
+    const { WSServer } = await import("@/ws-server/index.ts");
+
+    const wsServer = new WSServer({ port }, redisInstance, prisma, pdfService);
+
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
     const anthropic = new AnthropicService(
       logger,
       prisma,
+      userStore,
       redisInstance,
       cfg.ANTHROPIC_API_KEY
     );
@@ -162,6 +185,7 @@ async function exe() {
       dependencies: {
         logger,
         prisma,
+        userStore,
         redis: redisInstance,
         s3,
         isProd
@@ -184,7 +208,9 @@ async function exe() {
       s3,
       region,
       imgCompatService,
-      process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
+      userStore,
+      process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY,
+      logger
     );
 
     resolver.registerAll();
@@ -268,6 +294,18 @@ declare global {
   }
   interface Response {
     json<T = unknown>(): Promise<T>;
+  }
+  interface ObjectConstructor {
+    // PropertyKey -> string and number allowed, symbol disallowed (symbol can't be enumerable)
+    keys<T = object>(
+      o: T
+    ): (keyof T extends infer K
+      ? K extends string
+        ? K
+        : K extends number
+          ? `${K}`
+          : never
+      : never)[];
   }
 }
 

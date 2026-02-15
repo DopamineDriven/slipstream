@@ -1,0 +1,257 @@
+enum AnnotSubtype {
+  LINK
+  TEXT
+  HIGHLIGHT
+  WIDGET
+  MARKUP
+  /// markdown [text][ref] style
+  REFERENCE
+  /// bare URLs detected in text
+  AUTOLINK
+}
+
+enum VisualMediaContent {
+  /// photographs, screenshots, renders, generated images
+  PHOTOS
+  /// graphs, plots, data-viz
+  CHARTS
+  /// flowcharts, schematics, architectural drawings
+  DIAGRAMS
+  /// presentation-style layouts
+  SLIDES
+  /// structured tabular content with visual formatting
+  TABLES
+  /// embedded video frames (grok-imagine-video, sora-2-pro, veo-3, etc)
+  VIDEO
+  /// multiple content types present
+  MIXED
+  /// audio files present
+  AUDIO
+}
+
+enum VisualMediaSource {
+  /// vector graphics, embedded image/video objects
+  NATIVE
+  /// rasterized page content, OCR pass required (@d0paminedriven/pdfdown-ocr)
+  SCANNED
+  /// some pages native, some scanned
+  MIXED
+}
+
+enum UserStoreDocState {
+  /// received, awaiting processing
+  QUEUED
+  /// text/media extraction + chunking in progress
+  EXTRACTING
+  /// chunks partitioned, embeddings being generated
+  INDEXING
+  /// fully indexed, all chunks searchable
+  ACTIVE
+  /// indexed but some chunks ABANDONED — still searchable
+  PARTIAL
+  /// re-embedding after a failed attempt
+  REINDEXING
+  /// terminal failure at any stage
+  FAILED
+}
+
+enum UserStoreChunkState {
+  /// created, awaiting embedding
+  QUEUED
+  /// embedding request in-flight
+  EMBEDDING
+  /// successfully embedded, searchable
+  READY
+  /// failed, retry eligible
+  ERROR
+  /// reprocessing attempt in-flight
+  RETRYING
+  /// exceeded max retries, permanent failure
+  ABANDONED
+}
+
+enum UserStoreSchemaVersion {
+  v1_0
+}
+
+model UserStore {
+  id                    String @id @default(cuid(2))
+  userId                String
+  storeName             String
+  /// voyage-multimodal-3.5 for content containing visual media -- voyage-context-3 otherwise
+  defaultEmbeddingModel String @default("voyage-multimodal-3.5")
+  /// default:1024 -> voyage-multimodal-3.5 and voyage-context-3 both support 256 | 512 | 1024 | 2048
+  defaultEmbeddingDim   Int    @default(1024)
+
+  fileCount   Int     @default(0)
+  totalBytes  BigInt?
+  totalChunks Int     @default(0)
+
+  schemaVersion UserStoreSchemaVersion @default(v1_0)
+  lastSyncedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  docs UserStoreDoc[]
+
+  @@unique([userId, storeName])
+  @@index([userId, storeName])
+}
+
+model UserStoreDoc {
+  id                  String    @id @default(cuid(2))
+  storeId             String
+  attachmentId        String    @unique
+  conversationId      String
+  messageId           String
+  /// CDN URL (s3->Cloudfront) of source asset
+  originatingUrl      String
+  originatingModel    String?
+  originatingProvider Provider?
+  /// ${conversationId}-${messageId}-${attachmentId}-${hexFilename}.${ext}
+  provenanceId        String
+  filename            String
+  mimeType            String
+  ext                 String
+  size                BigInt
+
+  schemaVersion  UserStoreSchemaVersion @default(v1_0)
+  /// `voyage-context-3` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
+  embeddingModel String                 @default("voyage-multimodal-3.5")
+  /// 256 | 512 | 1024 | 2048
+  embeddingDim   Int                    @default(1024)
+
+  hasVisualMedia       Boolean             @default(false)
+  /// null when hasVisualMedia=false
+  visualMediaSource    VisualMediaSource?
+  /// null when hasVisualMedia=false
+  visualMediaContent   VisualMediaContent?
+  pageCount            Int?
+  extractedTextLength  Int?
+  imageCount           Int?
+  /// stored in string form with clear separators 1::15::18::21::45... -> parsed to number[]
+  imagePages           String?
+  /// stored in string form with clear separators 1::12::25::165::273... -> parsed to number[]
+  annotPages           String?
+  /// "mime:application/pdf" | "probe:hasVisualMedia" | etc
+  modelSelectionReason String?
+  indexedAt            DateTime?
+  errorMessage         String?
+  lastAccessed         DateTime?
+  state                UserStoreDocState   @default(QUEUED)
+
+  chunkCount Int @default(0)
+  tokenCount Int @default(0)
+
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store            UserStore           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  attachment       Attachment          @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  /// annotations that belong to this doc
+  annots           UserStoreDocAnnot[]
+  /// annotations from other docs that link to this doc
+  linkedFromAnnots UserStoreDocAnnot[] @relation("LinkedAnnots")
+  chunks           UserStoreDocChunk[]
+
+  @@index([originatingModel, originatingProvider])
+  @@index([storeId, state])
+  @@index([storeId, embeddingModel])
+  @@index([provenanceId])
+  @@index([attachmentId])
+  @@index([messageId])
+  @@index([conversationId])
+  @@index([hasVisualMedia])
+  @@index([schemaVersion])
+}
+
+model UserStoreDocAnnot {
+  id    String       @id @default(cuid(2))
+  docId String
+  doc   UserStoreDoc @relation(fields: [docId], references: [id], onDelete: Cascade)
+
+  subtype     AnnotSubtype
+  uri         String
+  /// [x1, y1, x2, y2] from PDF coordinate space
+  rect        Float[]
+  /// character count start offset
+  startOffset Int
+  /// character count end offset
+  endOffset   Int
+
+  /// only applicable for pdfs
+  pageNumber   Int?
+  /// resolved cross-references (populated async after indexing)
+  isCdnLink    Boolean       @default(false) // uri matches assets.aicoalesce.com
+  linkedDocId  String? // resolved UserStoreDoc if CDN link maps to known doc
+  linkedDoc    UserStoreDoc? @relation("LinkedAnnots", fields: [linkedDocId], references: [id])
+  attachmentId String? // extracted from CDN URL path if resolvable
+
+  createdAt DateTime @default(now())
+
+  @@index([docId])
+  @@index([linkedDocId])
+  @@index([isCdnLink])
+}
+
+model UserStoreDocChunk {
+  id      String @id @default(cuid(2))
+  docId   String
+  storeId String // denormalized for direct vector queries
+
+  chunkProvenanceId String // ${provenanceId}#${chunkIndex}
+
+  provenanceId   String // Denormalized for direct lookups
+  attachmentId   String
+  conversationId String
+  messageId      String
+
+  chunkIndex  Int
+  content     String @db.Text
+  /// sha256(content + offsets + schemaVersion)
+  contentHash String
+
+  tokenCount Int
+
+  /// character count start offset
+  startOffset Int
+  /// character count end offset
+  endOffset   Int
+
+  /// only applicable for pdfs
+  pageStartOffset Int?
+  /// only applicable for pdfs
+  pageEndOffset   Int?
+  /// `voyage-context-3` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
+  embeddingModel  String                       @default("voyage-multimodal-3.5")
+
+  hasImages       Boolean
+  hasAnnots       Boolean
+  state           UserStoreChunkState          @default(QUEUED)
+  errorMessage    String?
+  retryCount      Int                          @default(0)
+  embedding       Unsupported("vector(1024)")?
+
+  schemaVersion UserStoreSchemaVersion @default(v1_0)
+  deletedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  doc UserStoreDoc @relation(fields: [docId], references: [id], onDelete: Cascade)
+
+  @@unique([docId, chunkIndex, schemaVersion])
+  @@index([docId])
+  @@index([storeId])
+  @@index([attachmentId])
+  @@index([conversationId, messageId])
+  @@index([contentHash])
+  @@index([state])
+  @@index([docId, state])
+  @@index([embedding], map: "idx_user_store_doc_chunk_embedding_hnsw")
+  @@index([storeId], map: "idx_user_store_doc_chunk_store_active")
+}

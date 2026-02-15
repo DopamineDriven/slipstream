@@ -73,6 +73,7 @@ export interface CredentialEntity {
   X_AI_MANAGEMENT_API_KEY?: string;
   X_AI_TEAM_ID?: string;
   VOYAGE_API_KEY?: string;
+  X_AI_MGMT_KEY?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

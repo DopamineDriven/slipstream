@@ -1,0 +1,144 @@
+enum MemoryChunkingState {
+  QUEUED
+  CHUNKING
+  EMBEDDING
+  INDEXED
+  ERROR
+}
+
+enum MemoryChunkBoundaryReason {
+  TOKEN_LIMIT
+  IDLE_TIME
+  TOPIC_SHIFT // semantic similarity dropped below xyz threshold
+  SESSION_END
+  OTHER
+}
+
+enum MemorySchemaVersion {
+  v1_0
+}
+
+model ConversationMemoryStore {
+  id     String @id @default(cuid(2))
+  userId String @unique
+
+  embeddingModel String @default("voyage-context-3")
+  embeddingDim   Int    @default(1024)
+
+  totalChunks        Int @default(0)
+  totalTokens        BigInt @default(0)
+  totalConversations Int @default(0)
+
+  schemaVersion MemorySchemaVersion @default(v1_0)
+  lastSyncedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contexts ConversationMemoryContext[]
+}
+
+model ConversationMemoryContext {
+  id                String              @id @default(cuid(2))
+  storeId           String
+  conversationId    String              @unique
+  schemaVersion     MemorySchemaVersion @default(v1_0)
+  conversationTitle String?
+
+  // time boundaries for quick range queries
+  firstMessageAt DateTime?
+  lastMessageAt  DateTime?
+
+  rollingSummary          String?   @db.Text
+  rollingSummaryModel     String? // Model that last updated the rolling summary (e.g. "claude-sonnet-4-5")
+  rollingSummaryProvider  Provider? // Provider that last updated the rolling summary (enables model union narrowing)
+  rollingSummaryTokens    Int       @default(0)
+  rollingSummaryUpdatedAt DateTime?
+
+  // Chunking progress
+  lastChunkedMessageId    String?
+  lastChunkedMessageIndex Int?
+  lastChunkedAt           DateTime?
+
+  // Conversation stats (provider-agnostic aggregates)
+  totalTurns   Int @default(0)
+  chunkedTurns Int @default(0)
+  totalTokens  Int @default(0)
+
+  contributingProviderModelsRaw String?  // "ANTHROPIC:claude-opus-4-5-20251101::GROK:grok-4-1-fast-reasoning"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  hasMultipleProviders Boolean @default(false)
+  hasMultipleModels    Boolean @default(false)
+
+  memoryStore  ConversationMemoryStore   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  conversation Conversation              @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  memoryChunks ConversationMemoryChunk[]
+
+  @@index([storeId])
+  @@index([lastChunkedAt])
+}
+
+model ConversationMemoryChunk {
+  id             String @id @default(cuid(2))
+  provenanceId   String @unique // "${conversationId}-${messageIdStart}-${messageIdEnd}-${chunkIndex}"
+  contextId      String
+  storeId        String
+  conversationId String
+
+  chunkIndex            Int
+  messageIdStart        String
+  messageIdEnd          String
+  messageTimestampStart DateTime
+  messageTimestampEnd   DateTime
+  messageIdsRaw         String // "msgIdStart::...::msgIdEnd"
+
+  transcriptMarkdown   String @db.Text
+  contentHash          String
+  chunkedMessagesCount Int    @default(0)
+  tokenCount           Int    @default(0)
+
+  providerModelsRaw String   // "ANTHROPIC:claude-opus-4-5-20251101::GROK:grok-4-1-fast-reasoning"
+
+  hasAttachments          Boolean @default(false)
+  chunkedAttachmentsCount Int?
+
+  attachmentProvenanceIdsRaw String? // "convId-msgId-attId-hexEncodedFilename.ext::convId-msgId-attId-hexEncodedFilename.ext"
+
+  embedding      Unsupported("vector(1024)")
+  embeddingModel String                      @default("voyage-context-3")
+  schemaVersion  MemorySchemaVersion         @default(v1_0)
+  boundaryReason MemoryChunkBoundaryReason?
+
+  chunkingState MemoryChunkingState @default(QUEUED)
+  chunkingError String?
+
+  embeddedAt DateTime?
+
+  // Optional chunk-level summary
+  summary            String?   @db.Text
+  summaryModel       String?
+  summaryProvider    Provider?
+  summaryGeneratedAt DateTime?
+
+  createdAt DateTime                  @default(now())
+  updatedAt DateTime                  @updatedAt
+  messages  Message[]
+  context   ConversationMemoryContext @relation(fields: [contextId], references: [id], onDelete: Cascade)
+
+  @@index([contextId])
+  @@index([storeId])
+  @@index([conversationId])
+  @@index([conversationId, chunkIndex])
+  @@index([messageIdStart, messageIdEnd])
+  @@index([messageTimestampStart, messageTimestampEnd])
+  @@index([chunkingState])
+  @@index([contentHash])
+  @@index([embeddedAt])
+  @@index([embedding], map: "idx_memory_chunk_embedding_hnsw")
+  @@index([storeId], map: "idx_memory_chunk_store_indexed")
+  @@index([contextId], map: "idx_memory_chunk_context_indexed")
+}

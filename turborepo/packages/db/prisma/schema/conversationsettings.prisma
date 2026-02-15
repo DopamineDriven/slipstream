@@ -1,0 +1,33 @@
+enum ReasoningEffort {
+  none
+  minimal
+  low
+  medium
+  high
+  xhigh
+}
+
+enum OutputVerbosity {
+  low
+  medium
+  high
+}
+
+model ConversationSettings {
+  id              String           @id @default(cuid(2))
+  conversationId  String           @unique
+  systemPrompt    String?
+  enableThinking  Boolean?         @default(false)
+  trackUsage      Boolean?         @default(false)
+  enableWebSearch Boolean?         @default(false)
+  enableAssetGen  Boolean?         @default(false)
+  reasoningEffort ReasoningEffort?
+  outputVerbosity OutputVerbosity?
+  maxTokens       Int?
+  usageAlerts     Boolean?         @default(true)
+  temperature     Float?           @default(1.0)
+  topP            Float?           @default(1.0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  conversation    Conversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}

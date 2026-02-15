@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model VideoMetadata
@@ -935,7 +935,7 @@ export type $VideoMetadataPayload<ExtArgs extends runtime.Types.Extensions.Inter
 export type VideoMetadataGetPayload<S extends boolean | null | undefined | VideoMetadataDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$VideoMetadataPayload, S>
 
 export type VideoMetadataCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<VideoMetadataFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<VideoMetadataFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: VideoMetadataCountAggregateInputType | true
   }
 
@@ -1393,6 +1393,7 @@ export type VideoMetadataFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which VideoMetadata to fetch.
    */
   where: Prisma.VideoMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1415,6 +1416,7 @@ export type VideoMetadataFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter, which VideoMetadata to fetch.
    */
   where: Prisma.VideoMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1467,6 +1469,7 @@ export type VideoMetadataFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter by unique combinations of VideoMetadata.
    */
   distinct?: Prisma.VideoMetadataScalarFieldEnum | Prisma.VideoMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1519,6 +1522,7 @@ export type VideoMetadataFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
    * Filter by unique combinations of VideoMetadata.
    */
   distinct?: Prisma.VideoMetadataScalarFieldEnum | Prisma.VideoMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1566,6 +1570,7 @@ export type VideoMetadataFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   skip?: number
   distinct?: Prisma.VideoMetadataScalarFieldEnum | Prisma.VideoMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1588,6 +1593,7 @@ export type VideoMetadataCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * The data needed to create a VideoMetadata.
    */
   data: Prisma.XOR<Prisma.VideoMetadataCreateInput, Prisma.VideoMetadataUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1648,6 +1654,7 @@ export type VideoMetadataUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which VideoMetadata to update.
    */
   where: Prisma.VideoMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1726,6 +1733,7 @@ export type VideoMetadataUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * In case the VideoMetadata was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.VideoMetadataUpdateInput, Prisma.VideoMetadataUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1748,6 +1756,7 @@ export type VideoMetadataDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter which VideoMetadata to delete.
    */
   where: Prisma.VideoMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

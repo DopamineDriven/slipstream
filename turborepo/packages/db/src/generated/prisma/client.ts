@@ -6,7 +6,7 @@
 /*
  * This file should be your main import to use Prisma. Through it you get access to all the models, enums, and input types.
  * If you're looking for something you can import in the client-side of your application, please refer to the `browser.ts` file instead.
- * 
+ *
  * 🟢 You can import this file directly.
  */
 
@@ -15,13 +15,13 @@ import * as path from 'node:path'
 import { fileURLToPath } from 'node:url'
 globalThis['__dirname'] = path.dirname(fileURLToPath(import.meta.url))
 
-import * as runtime from "@prisma/client/runtime/library"
-import * as $Enums from "./enums"
-import * as $Class from "./internal/class"
-import * as Prisma from "./internal/prismaNamespace"
+import * as runtime from "@prisma/client/runtime/client"
+import * as $Enums from "./enums.ts"
+import * as $Class from "./internal/class.ts"
+import * as Prisma from "./internal/prismaNamespace.ts"
 
-export * as $Enums from './enums'
-export * from "./enums"
+export * as $Enums from './enums.ts'
+export * from "./enums.ts"
 /**
  * ## Prisma Client
  * 
@@ -29,86 +29,26 @@ export * from "./enums"
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Users
- * const users = await prisma.user.findMany()
+ * // Fetch zero or more Accounts
+ * const accounts = await prisma.account.findMany()
  * ```
  * 
- * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+ * Read more in our [docs](https://pris.ly/d/client).
  */
-export const PrismaClient = $Class.getPrismaClientClass(__dirname)
+export const PrismaClient = $Class.getPrismaClientClass()
 export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts extends Prisma.PrismaClientOptions["omit"] = Prisma.PrismaClientOptions["omit"], ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = $Class.PrismaClient<LogOpts, OmitOpts, ExtArgs>
 export { Prisma }
 
-
-// file annotations for bundling tools to include these files
-path.join(__dirname, "libquery_engine-debian-openssl-3.0.x.so.node")
-path.join(process.cwd(), "src/generated/prisma/libquery_engine-debian-openssl-3.0.x.so.node")
-
-/**
- * Model User
- * 
- */
-export type User = Prisma.UserModel
-/**
- * Model Profile
- * 
- */
-export type Profile = Prisma.ProfileModel
 /**
  * Model Account
  * 
  */
 export type Account = Prisma.AccountModel
 /**
- * Model Session
- * 
- */
-export type Session = Prisma.SessionModel
-/**
- * Model ProviderStore
- * 
- */
-export type ProviderStore = Prisma.ProviderStoreModel
-/**
- * Model ProviderStoreDocument
- * 
- */
-export type ProviderStoreDocument = Prisma.ProviderStoreDocumentModel
-/**
- * Model UserKey
- * 
- */
-export type UserKey = Prisma.UserKeyModel
-/**
- * Model Settings
- * 
- */
-export type Settings = Prisma.SettingsModel
-/**
- * Model Conversation
- * 
- */
-export type Conversation = Prisma.ConversationModel
-/**
- * Model ConversationSettings
- * 
- */
-export type ConversationSettings = Prisma.ConversationSettingsModel
-/**
- * Model Message
- * 
- */
-export type Message = Prisma.MessageModel
-/**
  * Model Attachment
  * 
  */
 export type Attachment = Prisma.AttachmentModel
-/**
- * Model AttachmentProvider
- * 
- */
-export type AttachmentProvider = Prisma.AttachmentProviderModel
 /**
  * Model ImageMetadata
  * 
@@ -130,6 +70,16 @@ export type AudioMetadata = Prisma.AudioMetadataModel
  */
 export type DocumentMetadata = Prisma.DocumentMetadataModel
 /**
+ * Model Conversation
+ * 
+ */
+export type Conversation = Prisma.ConversationModel
+/**
+ * Model ConversationSettings
+ * 
+ */
+export type ConversationSettings = Prisma.ConversationSettingsModel
+/**
  * Model ImageGenJob
  * 
  */
@@ -139,6 +89,101 @@ export type ImageGenJob = Prisma.ImageGenJobModel
  * 
  */
 export type ImageGenOutput = Prisma.ImageGenOutputModel
+/**
+ * Model LocalVectorStore
+ * 
+ */
+export type LocalVectorStore = Prisma.LocalVectorStoreModel
+/**
+ * Model LocalVectorStoreDoc
+ * 
+ */
+export type LocalVectorStoreDoc = Prisma.LocalVectorStoreDocModel
+/**
+ * Model LocalVectorStoreDocChunk
+ * 
+ */
+export type LocalVectorStoreDocChunk = Prisma.LocalVectorStoreDocChunkModel
+/**
+ * Model ConversationMemoryStore
+ * 
+ */
+export type ConversationMemoryStore = Prisma.ConversationMemoryStoreModel
+/**
+ * Model ConversationMemoryContext
+ * 
+ */
+export type ConversationMemoryContext = Prisma.ConversationMemoryContextModel
+/**
+ * Model ConversationMemoryChunk
+ * 
+ */
+export type ConversationMemoryChunk = Prisma.ConversationMemoryChunkModel
+/**
+ * Model Message
+ * 
+ */
+export type Message = Prisma.MessageModel
+/**
+ * Model Profile
+ * 
+ */
+export type Profile = Prisma.ProfileModel
+/**
+ * Model AttachmentProvider
+ * 
+ */
+export type AttachmentProvider = Prisma.AttachmentProviderModel
+/**
+ * Model ProviderStore
+ * 
+ */
+export type ProviderStore = Prisma.ProviderStoreModel
+/**
+ * Model ProviderStoreDocument
+ * 
+ */
+export type ProviderStoreDocument = Prisma.ProviderStoreDocumentModel
+/**
+ * Model User
+ * 
+ */
+export type User = Prisma.UserModel
+/**
+ * Model Session
+ * 
+ */
+export type Session = Prisma.SessionModel
+/**
+ * Model UserKey
+ * 
+ */
+export type UserKey = Prisma.UserKeyModel
+/**
+ * Model Settings
+ * 
+ */
+export type Settings = Prisma.SettingsModel
+/**
+ * Model UserStore
+ * 
+ */
+export type UserStore = Prisma.UserStoreModel
+/**
+ * Model UserStoreDoc
+ * 
+ */
+export type UserStoreDoc = Prisma.UserStoreDocModel
+/**
+ * Model UserStoreDocAnnot
+ * 
+ */
+export type UserStoreDocAnnot = Prisma.UserStoreDocAnnotModel
+/**
+ * Model UserStoreDocChunk
+ * 
+ */
+export type UserStoreDocChunk = Prisma.UserStoreDocChunkModel
 /**
  * Model Verification
  * 

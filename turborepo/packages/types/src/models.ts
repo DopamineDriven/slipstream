@@ -67,7 +67,11 @@ export const providerModelImageGenFacilitatingApi = {
     "gpt-4o-mini",
     "o3"
   ],
-  gemini: ["gemini-2.5-flash-image", "gemini-3-pro-image-preview", "deep-research-pro-preview-12-2025"]
+  gemini: [
+    "gemini-2.5-flash-image",
+    "gemini-3-pro-image-preview",
+    "deep-research-pro-preview-12-2025"
+  ]
 } as const;
 
 export const imageModelSets = {

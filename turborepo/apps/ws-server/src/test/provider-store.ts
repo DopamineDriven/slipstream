@@ -9,10 +9,10 @@ const data = async (provider: $Enums.Provider, userId: string) => {
   const { Credentials } = await import("@slipstream/credentials");
   const p = new Credentials();
   const datasourceUrl = await p.get("DIRECT_URL");
-  const { PrismaClient } = await import("@slipstream/db/node/generated/client");
-  const prismaClient = new PrismaClient({
-    datasourceUrl: process.env.DIRECT_URL ?? datasourceUrl
-  });
+  const { PrismaDbService } = await import("@slipstream/db/factory");
+  const prismaClient = new PrismaDbService({
+    connectionString: process.env.DIRECT_URL ?? datasourceUrl
+  }).p(false);
   prismaClient.$connect();
   try {
     const data = await prismaClient.providerStore.findUnique({

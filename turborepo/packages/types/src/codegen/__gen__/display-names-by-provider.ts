@@ -72,6 +72,7 @@ export const displayNameModelsByProvider = {
     "Grok 2 Vision"
   ],
   anthropic: [
+    "Claude Opus 4.6",
     "Claude Sonnet 4.5",
     "Claude Opus 4.5",
     "Claude Haiku 4.5",

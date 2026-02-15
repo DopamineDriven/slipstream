@@ -1,6 +1,6 @@
 import { ExtractService } from "@/extract/index.ts";
 import { PrismaChatService } from "@/prisma/chat.ts";
-import { DbService } from "@slipstream/db/node";
+import { PrismaDbService } from "@slipstream/db/factory";
 
 /**
  * **Inheritance chain**
@@ -15,15 +15,23 @@ import { DbService } from "@slipstream/db/node";
  *
  *  ⬆
  *
- * `@/prisma/user-meta.ts`
- *
- *  ⬆
- *
  * `@/prisma/attachment.ts`
  *
  *  ⬆
  *
+ * `@/prisma/user-store.ts`
+ *
+ *  ⬆
+ *
+ * `@/prisma/provider-store.ts`
+ *
+ *  ⬆
+ *
  * `@/prisma/attachment-provider.ts`
+ *
+ *  ⬆
+ *
+ * `@/prisma/user-meta.ts`
  *
  *  ⬆
  *
@@ -34,9 +42,9 @@ import { DbService } from "@slipstream/db/node";
 
 export class PrismaService extends PrismaChatService {
   constructor(
-    prisma: DbService,
+    prisma: PrismaDbService,
     extractor: ExtractService,
-     isProd: boolean
+    isProd: boolean
   ) {
     super(prisma, extractor, isProd);
   }

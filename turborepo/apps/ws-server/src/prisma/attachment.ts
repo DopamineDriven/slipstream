@@ -5,7 +5,6 @@ import type {
 } from "@/types/index.ts";
 import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import { ExtractService } from "@/extract/index.ts";
-import { PrismaAttachmentProviderService } from "@/prisma/attachment-provider.ts";
 import type {
   $Enums,
   Attachment,
@@ -15,10 +14,15 @@ import type {
   VideoMetadata
 } from "@slipstream/db/node/generated/client";
 import type { CTR, Rm, RTC, XOR } from "@slipstream/types";
-import { DbService } from "@slipstream/db/node";
+import { PrismaDbService } from "@slipstream/db/factory";
+import { PrismaUserStoreService } from "@/prisma/user-store.ts";
 
-export class PrismaAttachmentService extends PrismaAttachmentProviderService {
-  constructor(prisma: DbService, extractor: ExtractService, isProd: boolean) {
+export class PrismaAttachmentService extends PrismaUserStoreService {
+  constructor(
+    prisma: PrismaDbService,
+    extractor: ExtractService,
+    isProd: boolean
+  ) {
     super(prisma, extractor, isProd);
   }
 

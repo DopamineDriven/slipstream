@@ -19,3 +19,4 @@ testing.sh
 src/test/anthropic/*
 src/test/xai/**/*
 src/test/google/**/*
+logs/

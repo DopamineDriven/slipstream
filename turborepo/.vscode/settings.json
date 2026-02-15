@@ -29,7 +29,10 @@
   "css.format.newlineBetweenSelectors": true,
   "files.associations": {
     "*.css": "tailwindcss",
-    "*.svg": "svg"
+    "*.svg": "svg",
+    "*.ndjson": "ndjson",
+    "*.jsonl": "jsonl",
+    "*.ps": "postscript"
   },
   "css.hover.documentation": true,
   "css.hover.references": true,
@@ -90,9 +93,22 @@
   "typescript.experimental.useTsgo": false,
   "typescript.tsdk": "node_modules/typescript/lib",
   "yaml.hover": true,
+  "markdown-pdf.margin.top": "0.5in",
+  "markdown-pdf.margin.bottom": "0.5in",
+  "markdown-pdf.highlight": true,
+  "markdown-pdf.margin.left": "0.25in",
+  "markdown-pdf.margin.right": "0.25in",
+  "markdown-pdf.format": "Legal",
+  "markdown-mermaid.darkModeTheme": "dark",
+  "markdown-mermaid.lightModeTheme": "dark",
+  "markdown-pdf.outputDirectoryRelativePathFile": false,
+  "markdown-pdf.footerTemplate": "<div style=\"font-size: 6px; margin: 0 auto;\"> <span class='pageNumber'></span> / <span class='totalPages'></span></div>",
+  "markdown-pdf.displayHeaderFooter": true,
   "markdown-pdf.emoji": true,
-  "markdown-pdf.stylesRelativePathFile": false,
-  "markdown-pdf.styles": ["./misc/markdown-pdf.css"],
+  "markdown-pdf.highlightStyle": "dark.css",
+  "markdown-pdf.styles": [
+    "/home/dopaminedriven/.config/config-fonts/misc/markdown-pdf.css"
+  ],
   "yaml.validate": true,
   "workbench.editor.autoLockGroups": {
     "default": false
@@ -104,8 +120,11 @@
     "scminput": false
   },
   "[prisma]": {
-    "editor.defaultFormatter": "Prisma.prisma"
+    "editor.defaultFormatter": "Prisma.prisma-insider"
   },
   "python.analysis.enableColorPicker": false,
-  "prisma.pinToPrisma6": true
+  "prisma.pinToPrisma6": false,
+  "[sql]": {
+    "editor.defaultFormatter": "ReneSaarsoo.sql-formatter-vsc"
+  }
 }

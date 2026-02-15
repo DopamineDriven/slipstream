@@ -9,8 +9,11 @@ const data = async (provider: $Enums.Provider, userId: string) => {
   const { Credentials } = await import("@slipstream/credentials");
   const p = new Credentials();
   const _datasourceUrl = await p.get("DIRECT_URL");
-  const { PrismaClient } = await import("@slipstream/db/node/generated/client");
-  const prismaClient = new PrismaClient({ datasourceUrl: process.env.DIRECT_URL });
+  const { PrismaDbService: PrismaClient } =
+    await import("@slipstream/db/factory");
+  const prismaClient = new PrismaClient({
+    connectionString: process.env.DIRECT_URL ?? _datasourceUrl
+  }).p(false);
   try {
     prismaClient.$connect();
     return await prismaClient.attachment.findMany({

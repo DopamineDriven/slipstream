@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model UserKey
@@ -400,6 +400,11 @@ export type UserKeyUncheckedUpdateManyInput = {
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
+export type UserKeyNullableScalarRelationFilter = {
+  is?: Prisma.UserKeyWhereInput | null
+  isNot?: Prisma.UserKeyWhereInput | null
+}
+
 export type UserKeyListRelationFilter = {
   every?: Prisma.UserKeyWhereInput
   some?: Prisma.UserKeyWhereInput
@@ -454,9 +459,52 @@ export type UserKeyMinOrderByAggregateInput = {
   isDefault?: Prisma.SortOrder
 }
 
-export type UserKeyNullableScalarRelationFilter = {
-  is?: Prisma.UserKeyWhereInput | null
-  isNot?: Prisma.UserKeyWhereInput | null
+export type UserKeyCreateNestedOneWithoutImageGenJobsInput = {
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutImageGenJobsInput
+  connect?: Prisma.UserKeyWhereUniqueInput
+}
+
+export type UserKeyUpdateOneWithoutImageGenJobsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutImageGenJobsInput
+  upsert?: Prisma.UserKeyUpsertWithoutImageGenJobsInput
+  disconnect?: Prisma.UserKeyWhereInput | boolean
+  delete?: Prisma.UserKeyWhereInput | boolean
+  connect?: Prisma.UserKeyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutImageGenJobsInput, Prisma.UserKeyUpdateWithoutImageGenJobsInput>, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput>
+}
+
+export type UserKeyCreateNestedOneWithoutMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutMessagesInput, Prisma.UserKeyUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutMessagesInput
+  connect?: Prisma.UserKeyWhereUniqueInput
+}
+
+export type UserKeyUpdateOneWithoutMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutMessagesInput, Prisma.UserKeyUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutMessagesInput
+  upsert?: Prisma.UserKeyUpsertWithoutMessagesInput
+  disconnect?: Prisma.UserKeyWhereInput | boolean
+  delete?: Prisma.UserKeyWhereInput | boolean
+  connect?: Prisma.UserKeyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutMessagesInput, Prisma.UserKeyUpdateWithoutMessagesInput>, Prisma.UserKeyUncheckedUpdateWithoutMessagesInput>
+}
+
+export type UserKeyCreateNestedOneWithoutAttachmentProvidersInput = {
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutAttachmentProvidersInput
+  connect?: Prisma.UserKeyWhereUniqueInput
+}
+
+export type UserKeyUpdateOneWithoutAttachmentProvidersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutAttachmentProvidersInput
+  upsert?: Prisma.UserKeyUpsertWithoutAttachmentProvidersInput
+  disconnect?: Prisma.UserKeyWhereInput | boolean
+  delete?: Prisma.UserKeyWhereInput | boolean
+  connect?: Prisma.UserKeyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutAttachmentProvidersInput, Prisma.UserKeyUpdateWithoutAttachmentProvidersInput>, Prisma.UserKeyUncheckedUpdateWithoutAttachmentProvidersInput>
 }
 
 export type UserKeyCreateNestedManyWithoutUserInput = {
@@ -501,59 +549,7 @@ export type UserKeyUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[]
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
-export type UserKeyCreateNestedOneWithoutMessagesInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutMessagesInput, Prisma.UserKeyUncheckedCreateWithoutMessagesInput>
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutMessagesInput
-  connect?: Prisma.UserKeyWhereUniqueInput
-}
-
-export type UserKeyUpdateOneWithoutMessagesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutMessagesInput, Prisma.UserKeyUncheckedCreateWithoutMessagesInput>
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutMessagesInput
-  upsert?: Prisma.UserKeyUpsertWithoutMessagesInput
-  disconnect?: Prisma.UserKeyWhereInput | boolean
-  delete?: Prisma.UserKeyWhereInput | boolean
-  connect?: Prisma.UserKeyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutMessagesInput, Prisma.UserKeyUpdateWithoutMessagesInput>, Prisma.UserKeyUncheckedUpdateWithoutMessagesInput>
-}
-
-export type UserKeyCreateNestedOneWithoutAttachmentProvidersInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput>
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutAttachmentProvidersInput
-  connect?: Prisma.UserKeyWhereUniqueInput
-}
-
-export type UserKeyUpdateOneWithoutAttachmentProvidersNestedInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput>
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutAttachmentProvidersInput
-  upsert?: Prisma.UserKeyUpsertWithoutAttachmentProvidersInput
-  disconnect?: Prisma.UserKeyWhereInput | boolean
-  delete?: Prisma.UserKeyWhereInput | boolean
-  connect?: Prisma.UserKeyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutAttachmentProvidersInput, Prisma.UserKeyUpdateWithoutAttachmentProvidersInput>, Prisma.UserKeyUncheckedUpdateWithoutAttachmentProvidersInput>
-}
-
-export type UserKeyCreateNestedOneWithoutImageGenJobsInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutImageGenJobsInput
-  connect?: Prisma.UserKeyWhereUniqueInput
-}
-
-export type UserKeyUpdateOneWithoutImageGenJobsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutImageGenJobsInput
-  upsert?: Prisma.UserKeyUpsertWithoutImageGenJobsInput
-  disconnect?: Prisma.UserKeyWhereInput | boolean
-  delete?: Prisma.UserKeyWhereInput | boolean
-  connect?: Prisma.UserKeyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutImageGenJobsInput, Prisma.UserKeyUpdateWithoutImageGenJobsInput>, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput>
-}
-
-export type UserKeyCreateWithoutUserInput = {
+export type UserKeyCreateWithoutImageGenJobsInput = {
   id?: string
   provider: $Enums.Provider
   apiKey: string
@@ -563,13 +559,14 @@ export type UserKeyCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isDefault?: boolean
+  user: Prisma.UserCreateNestedOneWithoutKeysInput
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
-  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
-export type UserKeyUncheckedCreateWithoutUserInput = {
+export type UserKeyUncheckedCreateWithoutImageGenJobsInput = {
   id?: string
+  userId: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
@@ -579,50 +576,53 @@ export type UserKeyUncheckedCreateWithoutUserInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
-  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
-export type UserKeyCreateOrConnectWithoutUserInput = {
+export type UserKeyCreateOrConnectWithoutImageGenJobsInput = {
   where: Prisma.UserKeyWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserKeyCreateWithoutUserInput, Prisma.UserKeyUncheckedCreateWithoutUserInput>
+  create: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
 }
 
-export type UserKeyCreateManyUserInputEnvelope = {
-  data: Prisma.UserKeyCreateManyUserInput | Prisma.UserKeyCreateManyUserInput[]
-  skipDuplicates?: boolean
+export type UserKeyUpsertWithoutImageGenJobsInput = {
+  update: Prisma.XOR<Prisma.UserKeyUpdateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput>
+  create: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
+  where?: Prisma.UserKeyWhereInput
 }
 
-export type UserKeyUpsertWithWhereUniqueWithoutUserInput = {
-  where: Prisma.UserKeyWhereUniqueInput
-  update: Prisma.XOR<Prisma.UserKeyUpdateWithoutUserInput, Prisma.UserKeyUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.UserKeyCreateWithoutUserInput, Prisma.UserKeyUncheckedCreateWithoutUserInput>
+export type UserKeyUpdateToOneWithWhereWithoutImageGenJobsInput = {
+  where?: Prisma.UserKeyWhereInput
+  data: Prisma.XOR<Prisma.UserKeyUpdateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput>
 }
 
-export type UserKeyUpdateWithWhereUniqueWithoutUserInput = {
-  where: Prisma.UserKeyWhereUniqueInput
-  data: Prisma.XOR<Prisma.UserKeyUpdateWithoutUserInput, Prisma.UserKeyUncheckedUpdateWithoutUserInput>
+export type UserKeyUpdateWithoutImageGenJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
-export type UserKeyUpdateManyWithWhereWithoutUserInput = {
-  where: Prisma.UserKeyScalarWhereInput
-  data: Prisma.XOR<Prisma.UserKeyUpdateManyMutationInput, Prisma.UserKeyUncheckedUpdateManyWithoutUserInput>
-}
-
-export type UserKeyScalarWhereInput = {
-  AND?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[]
-  OR?: Prisma.UserKeyScalarWhereInput[]
-  NOT?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[]
-  id?: Prisma.StringFilter<"UserKey"> | string
-  userId?: Prisma.StringFilter<"UserKey"> | string
-  provider?: Prisma.EnumProviderFilter<"UserKey"> | $Enums.Provider
-  apiKey?: Prisma.StringFilter<"UserKey"> | string
-  iv?: Prisma.StringFilter<"UserKey"> | string
-  authTag?: Prisma.StringFilter<"UserKey"> | string
-  label?: Prisma.StringNullableFilter<"UserKey"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
-  isDefault?: Prisma.BoolFilter<"UserKey"> | boolean
+export type UserKeyUncheckedUpdateWithoutImageGenJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyCreateWithoutMessagesInput = {
@@ -777,7 +777,7 @@ export type UserKeyUncheckedUpdateWithoutAttachmentProvidersInput = {
   imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
-export type UserKeyCreateWithoutImageGenJobsInput = {
+export type UserKeyCreateWithoutUserInput = {
   id?: string
   provider: $Enums.Provider
   apiKey: string
@@ -787,14 +787,13 @@ export type UserKeyCreateWithoutImageGenJobsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isDefault?: boolean
-  user: Prisma.UserCreateNestedOneWithoutKeysInput
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
-export type UserKeyUncheckedCreateWithoutImageGenJobsInput = {
+export type UserKeyUncheckedCreateWithoutUserInput = {
   id?: string
-  userId: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
@@ -804,53 +803,50 @@ export type UserKeyUncheckedCreateWithoutImageGenJobsInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
-export type UserKeyCreateOrConnectWithoutImageGenJobsInput = {
+export type UserKeyCreateOrConnectWithoutUserInput = {
   where: Prisma.UserKeyWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
+  create: Prisma.XOR<Prisma.UserKeyCreateWithoutUserInput, Prisma.UserKeyUncheckedCreateWithoutUserInput>
 }
 
-export type UserKeyUpsertWithoutImageGenJobsInput = {
-  update: Prisma.XOR<Prisma.UserKeyUpdateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput>
-  create: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
-  where?: Prisma.UserKeyWhereInput
+export type UserKeyCreateManyUserInputEnvelope = {
+  data: Prisma.UserKeyCreateManyUserInput | Prisma.UserKeyCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
-export type UserKeyUpdateToOneWithWhereWithoutImageGenJobsInput = {
-  where?: Prisma.UserKeyWhereInput
-  data: Prisma.XOR<Prisma.UserKeyUpdateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput>
+export type UserKeyUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.UserKeyWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserKeyUpdateWithoutUserInput, Prisma.UserKeyUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.UserKeyCreateWithoutUserInput, Prisma.UserKeyUncheckedCreateWithoutUserInput>
 }
 
-export type UserKeyUpdateWithoutImageGenJobsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
-  iv?: Prisma.StringFieldUpdateOperationsInput | string
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
-  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
+export type UserKeyUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.UserKeyWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserKeyUpdateWithoutUserInput, Prisma.UserKeyUncheckedUpdateWithoutUserInput>
 }
 
-export type UserKeyUncheckedUpdateWithoutImageGenJobsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
-  iv?: Prisma.StringFieldUpdateOperationsInput | string
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
-  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
+export type UserKeyUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.UserKeyScalarWhereInput
+  data: Prisma.XOR<Prisma.UserKeyUpdateManyMutationInput, Prisma.UserKeyUncheckedUpdateManyWithoutUserInput>
+}
+
+export type UserKeyScalarWhereInput = {
+  AND?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[]
+  OR?: Prisma.UserKeyScalarWhereInput[]
+  NOT?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[]
+  id?: Prisma.StringFilter<"UserKey"> | string
+  userId?: Prisma.StringFilter<"UserKey"> | string
+  provider?: Prisma.EnumProviderFilter<"UserKey"> | $Enums.Provider
+  apiKey?: Prisma.StringFilter<"UserKey"> | string
+  iv?: Prisma.StringFilter<"UserKey"> | string
+  authTag?: Prisma.StringFilter<"UserKey"> | string
+  label?: Prisma.StringNullableFilter<"UserKey"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
+  isDefault?: Prisma.BoolFilter<"UserKey"> | boolean
 }
 
 export type UserKeyCreateManyUserInput = {
@@ -1056,7 +1052,7 @@ export type $UserKeyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type UserKeyGetPayload<S extends boolean | null | undefined | UserKeyDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$UserKeyPayload, S>
 
 export type UserKeyCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<UserKeyFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<UserKeyFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: UserKeyCountAggregateInputType | true
   }
 
@@ -1510,6 +1506,7 @@ export type UserKeyFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter, which UserKey to fetch.
    */
   where: Prisma.UserKeyWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1532,6 +1529,7 @@ export type UserKeyFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which UserKey to fetch.
    */
   where: Prisma.UserKeyWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1584,6 +1582,7 @@ export type UserKeyFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter by unique combinations of UserKeys.
    */
   distinct?: Prisma.UserKeyScalarFieldEnum | Prisma.UserKeyScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1636,6 +1635,7 @@ export type UserKeyFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of UserKeys.
    */
   distinct?: Prisma.UserKeyScalarFieldEnum | Prisma.UserKeyScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1683,6 +1683,7 @@ export type UserKeyFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   skip?: number
   distinct?: Prisma.UserKeyScalarFieldEnum | Prisma.UserKeyScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1705,6 +1706,7 @@ export type UserKeyCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * The data needed to create a UserKey.
    */
   data: Prisma.XOR<Prisma.UserKeyCreateInput, Prisma.UserKeyUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1765,6 +1767,7 @@ export type UserKeyUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which UserKey to update.
    */
   where: Prisma.UserKeyWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1843,6 +1846,7 @@ export type UserKeyUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * In case the UserKey was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.UserKeyUpdateInput, Prisma.UserKeyUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1865,6 +1869,7 @@ export type UserKeyDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter which UserKey to delete.
    */
   where: Prisma.UserKeyWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

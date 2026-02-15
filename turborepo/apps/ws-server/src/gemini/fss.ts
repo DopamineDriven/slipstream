@@ -131,7 +131,8 @@ export class FileSearchStoreService {
       let counts = 0;
       if (sizeBytes) totalBytes = BigInt(Number.parseInt(sizeBytes));
       if (activeDocumentsCount) counts = Number.parseInt(activeDocumentsCount);
-      const prismaCreate = await this.prisma.createVectorStoreGemini(
+      const prismaCreate = await this.prisma.createProviderVectorStore(
+        "GEMINI",
         userId,
         name,
         displayName,
@@ -168,7 +169,8 @@ export class FileSearchStoreService {
     const fss = await this.createFssRemote(genai, userId);
     const { name, displayName, createTime, updateTime, ...rest } = fss;
     if (name && displayName && createTime && updateTime) {
-      const prismaCreate = await this.prisma.createVectorStoreGemini(
+      const prismaCreate = await this.prisma.createProviderVectorStore(
+        "GEMINI",
         userId,
         name,
         displayName,
@@ -460,7 +462,7 @@ export class FileSearchStoreService {
     };
     if (t.displayName) {
       const { attachmentId, conversationId, extension, fileName, messageId } =
-        this.prisma.parseFilename(t.displayName);
+        this.prisma.parseDocname(t.displayName);
       const originalFilename = `${fileName}.${extension}`;
       metaObj = {
         attachmentId,
@@ -825,7 +827,7 @@ export class FileSearchStoreService {
     mimeType?: string
   ) {
     const { attachmentId, conversationId, messageId, extension, fileName } =
-      this.prisma.parseFilename(displayName);
+      this.prisma.parseDocname(displayName);
     return {
       file: absPath,
       fileSearchStoreName,

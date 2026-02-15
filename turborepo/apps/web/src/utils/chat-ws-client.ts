@@ -378,7 +378,7 @@ export class ChatWebSocketClient {
   }
 
   public connect() {
-    if (this.socket && this.socket.readyState === WebSocket.OPEN) return;
+    if (this.socket && this.socket?.readyState === WebSocket.OPEN) return;
 
     this.socket = new WebSocket(this.url);
 
@@ -457,7 +457,7 @@ export class ChatWebSocketClient {
 
     // Intentionally suppress verbose ai_chat_request payload logs in production
 
-    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+    if (this.socket && this.socket?.readyState === WebSocket.OPEN) {
       console.log(`[WebSocketClient] Message sent immediately via WebSocket`);
       this.socket.send(msg);
     } else {

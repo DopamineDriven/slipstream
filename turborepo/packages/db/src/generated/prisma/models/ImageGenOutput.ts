@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model ImageGenOutput
@@ -1048,7 +1048,7 @@ export type $ImageGenOutputPayload<ExtArgs extends runtime.Types.Extensions.Inte
 export type ImageGenOutputGetPayload<S extends boolean | null | undefined | ImageGenOutputDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ImageGenOutputPayload, S>
 
 export type ImageGenOutputCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<ImageGenOutputFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<ImageGenOutputFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: ImageGenOutputCountAggregateInputType | true
   }
 
@@ -1505,6 +1505,7 @@ export type ImageGenOutputFindUniqueArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which ImageGenOutput to fetch.
    */
   where: Prisma.ImageGenOutputWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1527,6 +1528,7 @@ export type ImageGenOutputFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter, which ImageGenOutput to fetch.
    */
   where: Prisma.ImageGenOutputWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1579,6 +1581,7 @@ export type ImageGenOutputFindFirstArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of ImageGenOutputs.
    */
   distinct?: Prisma.ImageGenOutputScalarFieldEnum | Prisma.ImageGenOutputScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1631,6 +1634,7 @@ export type ImageGenOutputFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter by unique combinations of ImageGenOutputs.
    */
   distinct?: Prisma.ImageGenOutputScalarFieldEnum | Prisma.ImageGenOutputScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1678,6 +1682,7 @@ export type ImageGenOutputFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    */
   skip?: number
   distinct?: Prisma.ImageGenOutputScalarFieldEnum | Prisma.ImageGenOutputScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1700,6 +1705,7 @@ export type ImageGenOutputCreateArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data needed to create a ImageGenOutput.
    */
   data: Prisma.XOR<Prisma.ImageGenOutputCreateInput, Prisma.ImageGenOutputUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1760,6 +1766,7 @@ export type ImageGenOutputUpdateArgs<ExtArgs extends runtime.Types.Extensions.In
    * Choose, which ImageGenOutput to update.
    */
   where: Prisma.ImageGenOutputWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1838,6 +1845,7 @@ export type ImageGenOutputUpsertArgs<ExtArgs extends runtime.Types.Extensions.In
    * In case the ImageGenOutput was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ImageGenOutputUpdateInput, Prisma.ImageGenOutputUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1860,6 +1868,7 @@ export type ImageGenOutputDeleteArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter which ImageGenOutput to delete.
    */
   where: Prisma.ImageGenOutputWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

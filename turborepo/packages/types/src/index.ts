@@ -74,6 +74,7 @@ export type {
   AIChatEventTypeUnion,
   AssetDraftId,
   AssetOrigin,
+  AssetReadyPayload,
   AssetStatus,
   AssetUploadAbortReason,
   AssetUploadInstructionsMethod,
@@ -282,30 +283,43 @@ export {
  */
 export type {
   ArrFieldReplacer,
+  BigIntKeys,
+  BigIntOrNumber,
+  CommonDiscriminants,
   CTR,
   DeepPartial,
   DeepPartialFields,
   DeepReplace,
+  DiscriminatedUnionToRecord,
   DX,
   Equal,
   Expect,
   Extends,
+  FlexiCase,
+  FlexiProvider,
+  Include,
   InferGSPRT,
   InferGSPRTWorkup,
   IsExact,
   IsOptional,
+  LiteralUnion,
+  NormalizeAndInject,
   OnlyOptional,
   OnlyRequired,
+  PrecisionSerializeBigIntField,
   RTC,
   RequireNested,
   Rm,
+  SerializeBigInt,
+  Signals,
   TCN,
   Unenumerate,
+  UnionToRecord,
   Without,
   XOR
 } from "@/utils.ts";
 
-export { createDraftId, parseDraftId } from "@/utils.ts";
+export { createDraftId, instanceFunc, parseDraftId } from "@/utils.ts";
 
 /**
  * domain level types
@@ -313,26 +327,34 @@ export { createDraftId, parseDraftId } from "@/utils.ts";
 export type {
   AccountSingleton,
   AttachmentProviderSingleton,
-  AssetReadyPayload,
   AttachmentSingleton,
-  BigIntOrNumber,
+  AudioSingleton,
+  ConversationMemoryChunkSingleton,
+  ConversationMemoryContextSingleton,
+  ConversationMemoryStoreSingleton,
   ConversationSingleton,
   ConversationSingletonOneOff,
   ConvoSettingsSingleton,
   DocumentSingleton,
-  FlexiProvider,
   ImageGenJobSingleton,
   ImageGenOutputSingleton,
   ImageSingleton,
+  LocalVectorStoreDocChunkSingleton,
+  LocalVectorStoreDocSingleton,
+  LocalVectorStoreSingleton,
   MessageSingleton,
   ProfileSingleton,
   ProviderStoreDocumentSingleton,
   ProviderStoreSingleton,
   SessionSingleton,
   SettingsSingleton,
-  Signals,
   UserKeySingleton,
-  UserSingleton
+  UserSingleton,
+  UserStoreDocAnnotSingleton,
+  UserStoreDocChunkSingleton,
+  UserStoreDocSingleton,
+  UserStoreSingleton,
+  VideoSingleton
 } from "@/types.ts";
 
 declare global {

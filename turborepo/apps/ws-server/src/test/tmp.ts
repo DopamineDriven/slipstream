@@ -409,10 +409,10 @@ const data = async () => {
   const p = new Credentials();
   const datasourceUrl = await p.get("DIRECT_URL");
   const _datasource = process.env.DIRECT_URL ?? datasourceUrl;
-  const { PrismaClient } = await import("@slipstream/db/node/generated/client");
-  const prismaClient = new PrismaClient({
-    datasourceUrl: datasourceUrl
-  });
+  const { PrismaDbService } = await import("@slipstream/db/factory");
+  const prismaClient = new PrismaDbService({
+    connectionString: datasourceUrl
+  }).p(false);
   prismaClient.$connect();
   try {
     const data = await prismaClient.attachment.findMany({
@@ -462,7 +462,7 @@ const grokFileService = new GrokFileServiceWorkup(
   fs,
   process.env.X_AI_KEY ?? "",
   process.env.X_AI_MANAGEMENT_API_KEY ?? "",
- "collection_b338d912-6f45-4c57-9646-4dfe957974d9"
+  "collection_b338d912-6f45-4c57-9646-4dfe957974d9"
 );
 
 (async () => {

@@ -74,10 +74,10 @@ class Data extends Fs {
     super(process.cwd());
   }
   public data = async (env: string) => {
-    const { PrismaClient } = await import(
-      "@slipstream/db/node/generated/client"
+    const { PrismaDbService } = await import("@slipstream/db/factory");
+    const prismaClient = new PrismaDbService({ connectionString: env }).p(
+      false
     );
-    const prismaClient = new PrismaClient({ datasourceUrl: env });
     try {
       prismaClient.$connect();
       return await prismaClient.attachment.findMany({

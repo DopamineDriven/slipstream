@@ -1,7 +1,36 @@
+import type { $Enums } from "@slipstream/db/node/generated/client";
+
 export type Unenumerate<T> = T extends (infer U)[] | readonly (infer U)[]
   ? U
   : T;
 
+export type BigIntKeys<T> = {
+  [K in keyof T]: T[K] extends bigint ? K : never;
+}[keyof T];
+
+export type SerializeBigInt<T, Serialized extends boolean = boolean> = {
+  [K in keyof T]: T[K] extends bigint | null | undefined
+    ? Serialized extends true
+      ? Exclude<T[K], bigint> | number
+      : T[K]
+    : T[K];
+};
+
+// precision (field-level) targeting
+export type PrecisionSerializeBigIntField<
+  T,
+  Field extends keyof T = BigIntKeys<T>,
+  Serialized extends boolean = false
+> = DX<{
+  [K in keyof T]: K extends Field
+    ? Serialized extends true
+      ? number | null
+      : bigint | null
+    : T[K];
+}>;
+export type NormalizeAndInject<V, Q = object, P extends boolean = boolean> = DX<
+  SerializeBigInt<V, P> & Q
+>;
 export type Rm<T, P extends keyof T = keyof T> = {
   [S in keyof T as Exclude<S, P>]: T[S];
 };
@@ -11,6 +40,8 @@ export type Rm<T, P extends keyof T = keyof T> = {
  * makes properties from U optional and undefined in T, and vice versa
  */
 export type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+
+export type Include<T, U extends T> = Exclude<T, Exclude<T, U>>;
 
 /**
  * enforces mutual exclusivity of T | U
@@ -58,6 +89,25 @@ export type IsExact<T, U> = [T] extends [U]
 export type TCN<T, X extends keyof T = keyof T> = Rm<T, X> & {
   [Q in X]?: XOR<T[Q], never>;
 };
+
+/**
+ * export type ArrFieldReplacer<
+  T extends unknown[] | readonly unknown[],
+  V extends keyof Unenumerate<T>,
+  Q extends boolean = false,
+  P = unknown
+> = T extends (infer U)[] | readonly (infer U)[]
+  ? V extends keyof U
+    ? Q extends true
+      ? P extends Record<infer Z, infer S>
+        ? [...[DX<{ [C in Z]: S } & Rm<U, V>>]][number][]
+        : (Rm<U, V> & P)[]
+      : Q extends false
+        ? Rm<U, V>[]
+        : U
+    : T
+  : T;
+ */
 
 export type ArrFieldReplacer<
   T extends unknown[] | readonly unknown[],
@@ -171,6 +221,8 @@ export type RequireNested<
     ? Rm<T, Path> & Record<Path, Required<T>[Path]>
     : T;
 
+export type FlexiCase<T extends string> = Lowercase<T> | Uppercase<T>;
+
 export function createDraftId(
   userId: string,
   conversationId: string,
@@ -204,6 +256,11 @@ export function parseDraftId(draftId: string) {
     o !== toArr.length - 1 ? v : Number.parseInt(v, 10)
   ) as [string, string, string, number];
 }
+
+export function instanceFunc<const Type>(c: new (...args: Type[]) => Type) {
+  return new c();
+}
+
 // export type IsNever<T> = [T] extends [never] ? true : false;
 
 // /**
@@ -266,26 +323,68 @@ export type CommonDiscriminants =
   | "tag"
   | "_tag"
   | "__typename";
+// type CommonDiscriminantObj<T extends CommonDiscriminants = CommonDiscriminants> = readonly [Include<CommonDiscriminants,T>,string];
 
-export type LiteralUnion<TKnown extends string> = TKnown | (string & {});
+// const O =(props: CommonDiscriminantObj<"type">)=>({[props[0]]: props[1]})
+export type LiteralUnion<TKnown extends string> = TKnown | string;
 
 export type DiscriminatedUnionToRecord<
   TUnion extends Record<TKey, string>,
-  TKey extends LiteralUnion<CommonDiscriminants>
+  TKey extends LiteralUnion<CommonDiscriminants> =
+    LiteralUnion<CommonDiscriminants>
 > = TKey extends keyof TUnion
   ? { [K in TUnion[TKey] & string]: Extract<TUnion, Record<TKey, K>> }
   : never;
 
 export type UnionToRecord<
-  TUnion extends { type: string },
+  TUnion extends Record<"type", string>,
   TDiscriminant extends string = TUnion["type"]
 > = {
   [K in TDiscriminant]: Extract<TUnion, { type: K }>;
 };
+export type Signals =
+  | "SIGABRT"
+  | "SIGALRM"
+  | "SIGBREAK"
+  | "SIGBUS"
+  | "SIGCHLD"
+  | "SIGCONT"
+  | "SIGFPE"
+  | "SIGHUP"
+  | "SIGILL"
+  | "SIGINFO"
+  | "SIGINT"
+  | "SIGIO"
+  | "SIGIOT"
+  | "SIGKILL"
+  | "SIGLOST"
+  | "SIGPIPE"
+  | "SIGPOLL"
+  | "SIGPROF"
+  | "SIGPWR"
+  | "SIGQUIT"
+  | "SIGSEGV"
+  | "SIGSTKFLT"
+  | "SIGSTOP"
+  | "SIGSYS"
+  | "SIGTERM"
+  | "SIGTRAP"
+  | "SIGTSTP"
+  | "SIGTTIN"
+  | "SIGTTOU"
+  | "SIGUNUSED"
+  | "SIGURG"
+  | "SIGUSR1"
+  | "SIGUSR2"
+  | "SIGVTALRM"
+  | "SIGWINCH"
+  | "SIGXCPU"
+  | "SIGXFSZ";
 
-export type SSEEventFromType<TUnion extends { type: string }> = {
-  [K in TUnion["type"]]: {
-    event: K;
-    data: Extract<TUnion, { type: K }>;
-  };
-}[TUnion["type"]];
+export type FlexiProvider = FlexiCase<$Enums.Provider>;
+/**
+ * retained to support repos still using it
+ */
+export type BigIntOrNumber<T extends boolean = false> = T extends true
+  ? number
+  : bigint;

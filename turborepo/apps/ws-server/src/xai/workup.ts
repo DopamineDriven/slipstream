@@ -3,7 +3,7 @@ import type {
   Collection,
   CollectionDocument,
   CreateCollectionRequest,
-  CreateGrokProviderStoreDocParams,
+  CreatManyGrokProviderStoreDocSingleton,
   DeleteXaiFileResponse,
   DocumentStatus,
   FieldDefinition,
@@ -80,7 +80,7 @@ export class GrokWorkupService {
       for (const file of batch.data) {
         if (file.filename && file.id && file.bytes) {
           totalFiles += 1;
-          const { attachmentId } = this.prisma.parseFilename(file.filename);
+          const { attachmentId } = this.prisma.parseDocname(file.filename);
           this.fileCache.set(attachmentId, file);
         }
       }
@@ -147,7 +147,7 @@ export class GrokWorkupService {
         if (s.data.length > 0) {
           for (const doc of s.data) {
             if (doc.file_metadata.file_id && doc.file_metadata.name) {
-              const { attachmentId } = this.prisma.parseFilename(
+              const { attachmentId } = this.prisma.parseDocname(
                 doc.file_metadata.name
               );
               this.docCache.set(attachmentId, doc);
@@ -197,34 +197,37 @@ export class GrokWorkupService {
   ) {
     if (this.storeDbDocRegistry.size !== this.docCache.size) {
       if (this.storeDbDocRegistry.size < this.docCache.size) {
-        const cachedDocsToSync = Array.of<CreateGrokProviderStoreDocParams>();
-        let aggsize = 0n;
+        let totalBytes = 0n;
+        const newDocArr = Array.of<CreatManyGrokProviderStoreDocSingleton>();
         for (const [cacheKey, doc] of Array.from(this.docCache.entries())) {
           if (!this.storeDbDocRegistry.has(cacheKey)) {
+            const indexedAt = doc.last_indexed_at
+              ? new Date(doc.last_indexed_at)
+              : new Date(doc.file_metadata.created_at);
             const size = BigInt(Number.parseInt(doc.file_metadata.size_bytes));
-            aggsize += size;
-            const s = {
+            const docUri = this.xaiURI(storeRef, doc.file_metadata.file_id);
+            const state = this.xaiToDbState[doc.status];
+            totalBytes += size;
+            newDocArr.push({
               attachmentId: doc.fields.attachmentId,
               docRef: doc.file_metadata.file_id,
-              docUri: this.xaiURI(storeRef, doc.file_metadata.file_id),
+              docUri,
               filename: doc.file_metadata.name,
-              last_indexed_at: doc.last_indexed_at
-                ? new Date(doc.last_indexed_at)
-                : new Date(doc.file_metadata.created_at),
+              indexedAt,
+              lastAccessed: indexedAt,
               mimeType: doc.file_metadata.content_type,
-              state: this.xaiToDbState[doc.status],
+              state,
               storeId: storeDbId,
-              storeRef,
-              userId,
+              provider: "GROK",
               size
-            } satisfies CreateGrokProviderStoreDocParams;
-            cachedDocsToSync.push(s);
+            } satisfies CreatManyGrokProviderStoreDocSingleton);
           }
         }
         const res = await this.prisma.createManyGrokProviderDocs({
-          data: cachedDocsToSync,
-          userId,
-          aggsize
+          data: newDocArr,
+          storeRef,
+          totalBytes,
+          userId
         });
         for (const dbDoc of res) {
           this.storeDbDocRegistry.set(dbDoc.attachmentId, dbDoc);
@@ -591,7 +594,8 @@ export class GrokWorkupService {
 
     const data = await res.json<Collection>();
 
-    const prismaCreate = await this.prisma.createGrokVectorStore(
+    const prismaCreate = await this.prisma.createProviderVectorStore(
+      "GROK",
       userId,
       data.collection_id,
       data.collection_name,
@@ -947,11 +951,11 @@ export class GrokWorkupService {
   protected async promoteToCollection(
     documentId: string,
     collectionId: string,
-    xaiFilename: string,
+    provenanceId: string,
     mgmtKey = this.xaiManagementKey
   ) {
     const { attachmentId, conversationId, fileName, extension, messageId } =
-      this.prisma.parseFilename(xaiFilename);
+      this.prisma.parseDocname(provenanceId);
     return await fetch(
       `https://management-api.x.ai/v1/collections/${collectionId}/documents/${documentId}`,
       {
@@ -1089,7 +1093,8 @@ export class GrokWorkupService {
       if (storeInfo.hasStore) {
         storeDbId = storeInfo.dbId;
       } else {
-        const dbStore = await this.prisma.createGrokVectorStore(
+        const dbStore = await this.prisma.createProviderVectorStore(
+          "GROK",
           userId,
           collectionId,
           collection.store.collection_name,
@@ -1243,7 +1248,8 @@ export class GrokWorkupService {
 
     if (!storeDbData?.dbId) {
       if (collectionData.hasStore) {
-        const dbData = await this.prisma.createGrokVectorStore(
+        const dbData = await this.prisma.createProviderVectorStore(
+          "GROK",
           userId,
           collectionData.store.collection_id,
           collectionData.store.collection_name,

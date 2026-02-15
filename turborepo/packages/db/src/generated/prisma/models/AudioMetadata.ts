@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model AudioMetadata
@@ -841,7 +841,7 @@ export type $AudioMetadataPayload<ExtArgs extends runtime.Types.Extensions.Inter
 export type AudioMetadataGetPayload<S extends boolean | null | undefined | AudioMetadataDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AudioMetadataPayload, S>
 
 export type AudioMetadataCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AudioMetadataFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<AudioMetadataFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: AudioMetadataCountAggregateInputType | true
   }
 
@@ -1297,6 +1297,7 @@ export type AudioMetadataFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which AudioMetadata to fetch.
    */
   where: Prisma.AudioMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1319,6 +1320,7 @@ export type AudioMetadataFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter, which AudioMetadata to fetch.
    */
   where: Prisma.AudioMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1371,6 +1373,7 @@ export type AudioMetadataFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter by unique combinations of AudioMetadata.
    */
   distinct?: Prisma.AudioMetadataScalarFieldEnum | Prisma.AudioMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1423,6 +1426,7 @@ export type AudioMetadataFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
    * Filter by unique combinations of AudioMetadata.
    */
   distinct?: Prisma.AudioMetadataScalarFieldEnum | Prisma.AudioMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1470,6 +1474,7 @@ export type AudioMetadataFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   skip?: number
   distinct?: Prisma.AudioMetadataScalarFieldEnum | Prisma.AudioMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1492,6 +1497,7 @@ export type AudioMetadataCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * The data needed to create a AudioMetadata.
    */
   data: Prisma.XOR<Prisma.AudioMetadataCreateInput, Prisma.AudioMetadataUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1552,6 +1558,7 @@ export type AudioMetadataUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which AudioMetadata to update.
    */
   where: Prisma.AudioMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1630,6 +1637,7 @@ export type AudioMetadataUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * In case the AudioMetadata was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AudioMetadataUpdateInput, Prisma.AudioMetadataUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1652,6 +1660,7 @@ export type AudioMetadataDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter which AudioMetadata to delete.
    */
   where: Prisma.AudioMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

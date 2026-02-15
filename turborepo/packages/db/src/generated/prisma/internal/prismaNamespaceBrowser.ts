@@ -17,57 +17,69 @@
 
 import * as runtime from "@prisma/client/runtime/index-browser"
 
-export type * from '../models'
-export type * from './prismaNamespace'
+export type * from '../models.ts'
+export type * from './prismaNamespace.ts'
 
 export const Decimal = runtime.Decimal
 
 
 export const NullTypes = {
-  DbNull: runtime.objectEnumValues.classes.DbNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.DbNull),
-  JsonNull: runtime.objectEnumValues.classes.JsonNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.JsonNull),
-  AnyNull: runtime.objectEnumValues.classes.AnyNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.AnyNull),
+  DbNull: runtime.NullTypes.DbNull as (new (secret: never) => typeof runtime.DbNull),
+  JsonNull: runtime.NullTypes.JsonNull as (new (secret: never) => typeof runtime.JsonNull),
+  AnyNull: runtime.NullTypes.AnyNull as (new (secret: never) => typeof runtime.AnyNull),
 }
 /**
  * Helper for filtering JSON entries that have `null` on the database (empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const DbNull = runtime.objectEnumValues.instances.DbNull
+export const DbNull = runtime.DbNull
+
 /**
  * Helper for filtering JSON entries that have JSON `null` values (not empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const JsonNull = runtime.objectEnumValues.instances.JsonNull
+export const JsonNull = runtime.JsonNull
+
 /**
  * Helper for filtering JSON entries that are `Prisma.DbNull` or `Prisma.JsonNull`
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const AnyNull = runtime.objectEnumValues.instances.AnyNull
+export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  User: 'User',
-  Profile: 'Profile',
   Account: 'Account',
-  Session: 'Session',
-  ProviderStore: 'ProviderStore',
-  ProviderStoreDocument: 'ProviderStoreDocument',
-  UserKey: 'UserKey',
-  Settings: 'Settings',
-  Conversation: 'Conversation',
-  ConversationSettings: 'ConversationSettings',
-  Message: 'Message',
   Attachment: 'Attachment',
-  AttachmentProvider: 'AttachmentProvider',
   ImageMetadata: 'ImageMetadata',
   VideoMetadata: 'VideoMetadata',
   AudioMetadata: 'AudioMetadata',
   DocumentMetadata: 'DocumentMetadata',
+  Conversation: 'Conversation',
+  ConversationSettings: 'ConversationSettings',
   ImageGenJob: 'ImageGenJob',
   ImageGenOutput: 'ImageGenOutput',
+  LocalVectorStore: 'LocalVectorStore',
+  LocalVectorStoreDoc: 'LocalVectorStoreDoc',
+  LocalVectorStoreDocChunk: 'LocalVectorStoreDocChunk',
+  ConversationMemoryStore: 'ConversationMemoryStore',
+  ConversationMemoryContext: 'ConversationMemoryContext',
+  ConversationMemoryChunk: 'ConversationMemoryChunk',
+  Message: 'Message',
+  Profile: 'Profile',
+  AttachmentProvider: 'AttachmentProvider',
+  ProviderStore: 'ProviderStore',
+  ProviderStoreDocument: 'ProviderStoreDocument',
+  User: 'User',
+  Session: 'Session',
+  UserKey: 'UserKey',
+  Settings: 'Settings',
+  UserStore: 'UserStore',
+  UserStoreDoc: 'UserStoreDoc',
+  UserStoreDocAnnot: 'UserStoreDocAnnot',
+  UserStoreDocChunk: 'UserStoreDocChunk',
   Verification: 'Verification'
 } as const
 
@@ -85,38 +97,6 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
-
-
-export const UserScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  email: 'email',
-  emailVerified: 'emailVerified',
-  email_verified: 'email_verified',
-  image: 'image',
-  isAnonymous: 'isAnonymous',
-  lastLoginMethod: 'lastLoginMethod',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
-
-
-export const ProfileScalarFieldEnum = {
-  id: 'id',
-  bio: 'bio',
-  city: 'city',
-  region: 'region',
-  country: 'country',
-  postalCode: 'postalCode',
-  lat: 'lat',
-  lng: 'lng',
-  timezone: 'timezone',
-  userId: 'userId'
-} as const
-
-export type ProfileScalarFieldEnum = (typeof ProfileScalarFieldEnum)[keyof typeof ProfileScalarFieldEnum]
 
 
 export const AccountScalarFieldEnum = {
@@ -143,144 +123,12 @@ export const AccountScalarFieldEnum = {
 export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
 
 
-export const SessionScalarFieldEnum = {
-  id: 'id',
-  sessionToken: 'sessionToken',
-  userId: 'userId',
-  ipAddress: 'ipAddress',
-  userAgent: 'userAgent',
-  expires: 'expires',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+export const RelationLoadStrategy = {
+  query: 'query',
+  join: 'join'
 } as const
 
-export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
-
-
-export const ProviderStoreScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  provider: 'provider',
-  storeRef: 'storeRef',
-  storeName: 'storeName',
-  fileCount: 'fileCount',
-  totalBytes: 'totalBytes',
-  providerStoreCreatedAt: 'providerStoreCreatedAt',
-  lastSyncedAt: 'lastSyncedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type ProviderStoreScalarFieldEnum = (typeof ProviderStoreScalarFieldEnum)[keyof typeof ProviderStoreScalarFieldEnum]
-
-
-export const ProviderStoreDocumentScalarFieldEnum = {
-  id: 'id',
-  storeId: 'storeId',
-  attachmentId: 'attachmentId',
-  provider: 'provider',
-  docRef: 'docRef',
-  docUri: 'docUri',
-  filename: 'filename',
-  state: 'state',
-  indexedAt: 'indexedAt',
-  mimeType: 'mimeType',
-  errorMessage: 'errorMessage',
-  lastAccessed: 'lastAccessed',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  size: 'size'
-} as const
-
-export type ProviderStoreDocumentScalarFieldEnum = (typeof ProviderStoreDocumentScalarFieldEnum)[keyof typeof ProviderStoreDocumentScalarFieldEnum]
-
-
-export const UserKeyScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  provider: 'provider',
-  apiKey: 'apiKey',
-  iv: 'iv',
-  authTag: 'authTag',
-  label: 'label',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  isDefault: 'isDefault'
-} as const
-
-export type UserKeyScalarFieldEnum = (typeof UserKeyScalarFieldEnum)[keyof typeof UserKeyScalarFieldEnum]
-
-
-export const SettingsScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  theme: 'theme',
-  defaultProvider: 'defaultProvider',
-  defaultModel: 'defaultModel'
-} as const
-
-export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
-
-
-export const ConversationScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  userKeyId: 'userKeyId',
-  title: 'title',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  branchId: 'branchId',
-  parentId: 'parentId',
-  isShared: 'isShared',
-  shareToken: 'shareToken'
-} as const
-
-export type ConversationScalarFieldEnum = (typeof ConversationScalarFieldEnum)[keyof typeof ConversationScalarFieldEnum]
-
-
-export const ConversationSettingsScalarFieldEnum = {
-  id: 'id',
-  conversationId: 'conversationId',
-  systemPrompt: 'systemPrompt',
-  enableThinking: 'enableThinking',
-  trackUsage: 'trackUsage',
-  enableWebSearch: 'enableWebSearch',
-  enableAssetGen: 'enableAssetGen',
-  reasoningEffort: 'reasoningEffort',
-  outputVerbosity: 'outputVerbosity',
-  maxTokens: 'maxTokens',
-  usageAlerts: 'usageAlerts',
-  temperature: 'temperature',
-  topP: 'topP',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type ConversationSettingsScalarFieldEnum = (typeof ConversationSettingsScalarFieldEnum)[keyof typeof ConversationSettingsScalarFieldEnum]
-
-
-export const MessageScalarFieldEnum = {
-  id: 'id',
-  conversationId: 'conversationId',
-  userId: 'userId',
-  senderType: 'senderType',
-  provider: 'provider',
-  model: 'model',
-  userKeyId: 'userKeyId',
-  content: 'content',
-  thinkingText: 'thinkingText',
-  thinkingDuration: 'thinkingDuration',
-  responseOutput: 'responseOutput',
-  isImageGen: 'isImageGen',
-  messageType: 'messageType',
-  liked: 'liked',
-  disliked: 'disliked',
-  tryAgain: 'tryAgain',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+export type RelationLoadStrategy = (typeof RelationLoadStrategy)[keyof typeof RelationLoadStrategy]
 
 
 export const AttachmentScalarFieldEnum = {
@@ -335,30 +183,6 @@ export const AttachmentScalarFieldEnum = {
 } as const
 
 export type AttachmentScalarFieldEnum = (typeof AttachmentScalarFieldEnum)[keyof typeof AttachmentScalarFieldEnum]
-
-
-export const AttachmentProviderScalarFieldEnum = {
-  id: 'id',
-  attachmentId: 'attachmentId',
-  provider: 'provider',
-  userKeyId: 'userKeyId',
-  keyFingerprint: 'keyFingerprint',
-  state: 'state',
-  providerUri: 'providerUri',
-  providerRef: 'providerRef',
-  mime: 'mime',
-  size: 'size',
-  readyAt: 'readyAt',
-  expiresAt: 'expiresAt',
-  lastCheckedAt: 'lastCheckedAt',
-  errorCode: 'errorCode',
-  errorMessage: 'errorMessage',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  indexedStoreRefs: 'indexedStoreRefs'
-} as const
-
-export type AttachmentProviderScalarFieldEnum = (typeof AttachmentProviderScalarFieldEnum)[keyof typeof AttachmentProviderScalarFieldEnum]
 
 
 export const ImageMetadataScalarFieldEnum = {
@@ -456,6 +280,43 @@ export const DocumentMetadataScalarFieldEnum = {
 export type DocumentMetadataScalarFieldEnum = (typeof DocumentMetadataScalarFieldEnum)[keyof typeof DocumentMetadataScalarFieldEnum]
 
 
+export const ConversationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  userKeyId: 'userKeyId',
+  title: 'title',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  branchId: 'branchId',
+  parentId: 'parentId',
+  isShared: 'isShared',
+  shareToken: 'shareToken'
+} as const
+
+export type ConversationScalarFieldEnum = (typeof ConversationScalarFieldEnum)[keyof typeof ConversationScalarFieldEnum]
+
+
+export const ConversationSettingsScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  systemPrompt: 'systemPrompt',
+  enableThinking: 'enableThinking',
+  trackUsage: 'trackUsage',
+  enableWebSearch: 'enableWebSearch',
+  enableAssetGen: 'enableAssetGen',
+  reasoningEffort: 'reasoningEffort',
+  outputVerbosity: 'outputVerbosity',
+  maxTokens: 'maxTokens',
+  usageAlerts: 'usageAlerts',
+  temperature: 'temperature',
+  topP: 'topP',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationSettingsScalarFieldEnum = (typeof ConversationSettingsScalarFieldEnum)[keyof typeof ConversationSettingsScalarFieldEnum]
+
+
 export const ImageGenJobScalarFieldEnum = {
   id: 'id',
   requestMessageId: 'requestMessageId',
@@ -514,6 +375,439 @@ export const ImageGenOutputScalarFieldEnum = {
 } as const
 
 export type ImageGenOutputScalarFieldEnum = (typeof ImageGenOutputScalarFieldEnum)[keyof typeof ImageGenOutputScalarFieldEnum]
+
+
+export const LocalVectorStoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  storeName: 'storeName',
+  defaultEmbeddingModel: 'defaultEmbeddingModel',
+  embeddingDim: 'embeddingDim',
+  fileCount: 'fileCount',
+  totalBytes: 'totalBytes',
+  totalChunks: 'totalChunks',
+  schemaVersion: 'schemaVersion',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LocalVectorStoreScalarFieldEnum = (typeof LocalVectorStoreScalarFieldEnum)[keyof typeof LocalVectorStoreScalarFieldEnum]
+
+
+export const LocalVectorStoreDocScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  attachmentId: 'attachmentId',
+  conversationId: 'conversationId',
+  messageId: 'messageId',
+  provider: 'provider',
+  provenanceId: 'provenanceId',
+  filename: 'filename',
+  mimeType: 'mimeType',
+  ext: 'ext',
+  size: 'size',
+  schemaVersion: 'schemaVersion',
+  embeddingModel: 'embeddingModel',
+  embeddingDim: 'embeddingDim',
+  hasVisualMedia: 'hasVisualMedia',
+  visualMediaHint: 'visualMediaHint',
+  pageCount: 'pageCount',
+  extractedTextLength: 'extractedTextLength',
+  imageCount: 'imageCount',
+  imagePages: 'imagePages',
+  annotPages: 'annotPages',
+  modelSelectionReason: 'modelSelectionReason',
+  indexedAt: 'indexedAt',
+  errorMessage: 'errorMessage',
+  lastAccessed: 'lastAccessed',
+  state: 'state',
+  chunkCount: 'chunkCount',
+  tokenCount: 'tokenCount',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LocalVectorStoreDocScalarFieldEnum = (typeof LocalVectorStoreDocScalarFieldEnum)[keyof typeof LocalVectorStoreDocScalarFieldEnum]
+
+
+export const LocalVectorStoreDocChunkScalarFieldEnum = {
+  id: 'id',
+  docId: 'docId',
+  storeId: 'storeId',
+  chunkProvenanceId: 'chunkProvenanceId',
+  provenanceId: 'provenanceId',
+  attachmentId: 'attachmentId',
+  conversationId: 'conversationId',
+  messageId: 'messageId',
+  chunkIndex: 'chunkIndex',
+  content: 'content',
+  contentHash: 'contentHash',
+  tokenCount: 'tokenCount',
+  startOffset: 'startOffset',
+  endOffset: 'endOffset',
+  state: 'state',
+  errorMessage: 'errorMessage',
+  schemaVersion: 'schemaVersion',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LocalVectorStoreDocChunkScalarFieldEnum = (typeof LocalVectorStoreDocChunkScalarFieldEnum)[keyof typeof LocalVectorStoreDocChunkScalarFieldEnum]
+
+
+export const ConversationMemoryStoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  embeddingModel: 'embeddingModel',
+  embeddingDim: 'embeddingDim',
+  totalChunks: 'totalChunks',
+  totalTokens: 'totalTokens',
+  totalConversations: 'totalConversations',
+  schemaVersion: 'schemaVersion',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationMemoryStoreScalarFieldEnum = (typeof ConversationMemoryStoreScalarFieldEnum)[keyof typeof ConversationMemoryStoreScalarFieldEnum]
+
+
+export const ConversationMemoryContextScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  conversationId: 'conversationId',
+  schemaVersion: 'schemaVersion',
+  conversationTitle: 'conversationTitle',
+  firstMessageAt: 'firstMessageAt',
+  lastMessageAt: 'lastMessageAt',
+  rollingSummary: 'rollingSummary',
+  rollingSummaryModel: 'rollingSummaryModel',
+  rollingSummaryProvider: 'rollingSummaryProvider',
+  rollingSummaryTokens: 'rollingSummaryTokens',
+  rollingSummaryUpdatedAt: 'rollingSummaryUpdatedAt',
+  lastChunkedMessageId: 'lastChunkedMessageId',
+  lastChunkedMessageIndex: 'lastChunkedMessageIndex',
+  lastChunkedAt: 'lastChunkedAt',
+  totalTurns: 'totalTurns',
+  chunkedTurns: 'chunkedTurns',
+  totalTokens: 'totalTokens',
+  contributingProviderModelsRaw: 'contributingProviderModelsRaw',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  hasMultipleProviders: 'hasMultipleProviders',
+  hasMultipleModels: 'hasMultipleModels'
+} as const
+
+export type ConversationMemoryContextScalarFieldEnum = (typeof ConversationMemoryContextScalarFieldEnum)[keyof typeof ConversationMemoryContextScalarFieldEnum]
+
+
+export const ConversationMemoryChunkScalarFieldEnum = {
+  id: 'id',
+  provenanceId: 'provenanceId',
+  contextId: 'contextId',
+  storeId: 'storeId',
+  conversationId: 'conversationId',
+  chunkIndex: 'chunkIndex',
+  messageIdStart: 'messageIdStart',
+  messageIdEnd: 'messageIdEnd',
+  messageTimestampStart: 'messageTimestampStart',
+  messageTimestampEnd: 'messageTimestampEnd',
+  messageIdsRaw: 'messageIdsRaw',
+  transcriptMarkdown: 'transcriptMarkdown',
+  contentHash: 'contentHash',
+  chunkedMessagesCount: 'chunkedMessagesCount',
+  tokenCount: 'tokenCount',
+  providerModelsRaw: 'providerModelsRaw',
+  hasAttachments: 'hasAttachments',
+  chunkedAttachmentsCount: 'chunkedAttachmentsCount',
+  attachmentProvenanceIdsRaw: 'attachmentProvenanceIdsRaw',
+  embeddingModel: 'embeddingModel',
+  schemaVersion: 'schemaVersion',
+  boundaryReason: 'boundaryReason',
+  chunkingState: 'chunkingState',
+  chunkingError: 'chunkingError',
+  embeddedAt: 'embeddedAt',
+  summary: 'summary',
+  summaryModel: 'summaryModel',
+  summaryProvider: 'summaryProvider',
+  summaryGeneratedAt: 'summaryGeneratedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationMemoryChunkScalarFieldEnum = (typeof ConversationMemoryChunkScalarFieldEnum)[keyof typeof ConversationMemoryChunkScalarFieldEnum]
+
+
+export const MessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  userId: 'userId',
+  senderType: 'senderType',
+  provider: 'provider',
+  model: 'model',
+  userKeyId: 'userKeyId',
+  content: 'content',
+  conversationMemoryChunkId: 'conversationMemoryChunkId',
+  thinkingText: 'thinkingText',
+  thinkingDuration: 'thinkingDuration',
+  responseOutput: 'responseOutput',
+  isImageGen: 'isImageGen',
+  messageType: 'messageType',
+  liked: 'liked',
+  disliked: 'disliked',
+  tryAgain: 'tryAgain',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+export const ProfileScalarFieldEnum = {
+  id: 'id',
+  bio: 'bio',
+  city: 'city',
+  region: 'region',
+  country: 'country',
+  postalCode: 'postalCode',
+  lat: 'lat',
+  lng: 'lng',
+  timezone: 'timezone',
+  userId: 'userId'
+} as const
+
+export type ProfileScalarFieldEnum = (typeof ProfileScalarFieldEnum)[keyof typeof ProfileScalarFieldEnum]
+
+
+export const AttachmentProviderScalarFieldEnum = {
+  id: 'id',
+  attachmentId: 'attachmentId',
+  provider: 'provider',
+  userKeyId: 'userKeyId',
+  keyFingerprint: 'keyFingerprint',
+  state: 'state',
+  providerUri: 'providerUri',
+  providerRef: 'providerRef',
+  mime: 'mime',
+  size: 'size',
+  readyAt: 'readyAt',
+  expiresAt: 'expiresAt',
+  lastCheckedAt: 'lastCheckedAt',
+  errorCode: 'errorCode',
+  errorMessage: 'errorMessage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  indexedStoreRefs: 'indexedStoreRefs'
+} as const
+
+export type AttachmentProviderScalarFieldEnum = (typeof AttachmentProviderScalarFieldEnum)[keyof typeof AttachmentProviderScalarFieldEnum]
+
+
+export const ProviderStoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  storeRef: 'storeRef',
+  storeName: 'storeName',
+  fileCount: 'fileCount',
+  totalBytes: 'totalBytes',
+  providerStoreCreatedAt: 'providerStoreCreatedAt',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProviderStoreScalarFieldEnum = (typeof ProviderStoreScalarFieldEnum)[keyof typeof ProviderStoreScalarFieldEnum]
+
+
+export const ProviderStoreDocumentScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  attachmentId: 'attachmentId',
+  provider: 'provider',
+  docRef: 'docRef',
+  docUri: 'docUri',
+  filename: 'filename',
+  state: 'state',
+  indexedAt: 'indexedAt',
+  mimeType: 'mimeType',
+  errorMessage: 'errorMessage',
+  lastAccessed: 'lastAccessed',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  size: 'size'
+} as const
+
+export type ProviderStoreDocumentScalarFieldEnum = (typeof ProviderStoreDocumentScalarFieldEnum)[keyof typeof ProviderStoreDocumentScalarFieldEnum]
+
+
+export const UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  emailVerified: 'emailVerified',
+  email_verified: 'email_verified',
+  image: 'image',
+  isAnonymous: 'isAnonymous',
+  lastLoginMethod: 'lastLoginMethod',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const SessionScalarFieldEnum = {
+  id: 'id',
+  sessionToken: 'sessionToken',
+  userId: 'userId',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  expires: 'expires',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const UserKeyScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  apiKey: 'apiKey',
+  iv: 'iv',
+  authTag: 'authTag',
+  label: 'label',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  isDefault: 'isDefault'
+} as const
+
+export type UserKeyScalarFieldEnum = (typeof UserKeyScalarFieldEnum)[keyof typeof UserKeyScalarFieldEnum]
+
+
+export const SettingsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  theme: 'theme',
+  defaultProvider: 'defaultProvider',
+  defaultModel: 'defaultModel'
+} as const
+
+export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
+
+
+export const UserStoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  storeName: 'storeName',
+  defaultEmbeddingModel: 'defaultEmbeddingModel',
+  defaultEmbeddingDim: 'defaultEmbeddingDim',
+  fileCount: 'fileCount',
+  totalBytes: 'totalBytes',
+  totalChunks: 'totalChunks',
+  schemaVersion: 'schemaVersion',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserStoreScalarFieldEnum = (typeof UserStoreScalarFieldEnum)[keyof typeof UserStoreScalarFieldEnum]
+
+
+export const UserStoreDocScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  attachmentId: 'attachmentId',
+  conversationId: 'conversationId',
+  messageId: 'messageId',
+  originatingUrl: 'originatingUrl',
+  originatingModel: 'originatingModel',
+  originatingProvider: 'originatingProvider',
+  provenanceId: 'provenanceId',
+  filename: 'filename',
+  mimeType: 'mimeType',
+  ext: 'ext',
+  size: 'size',
+  schemaVersion: 'schemaVersion',
+  embeddingModel: 'embeddingModel',
+  embeddingDim: 'embeddingDim',
+  hasVisualMedia: 'hasVisualMedia',
+  visualMediaSource: 'visualMediaSource',
+  visualMediaContent: 'visualMediaContent',
+  pageCount: 'pageCount',
+  extractedTextLength: 'extractedTextLength',
+  imageCount: 'imageCount',
+  imagePages: 'imagePages',
+  annotPages: 'annotPages',
+  modelSelectionReason: 'modelSelectionReason',
+  indexedAt: 'indexedAt',
+  errorMessage: 'errorMessage',
+  lastAccessed: 'lastAccessed',
+  state: 'state',
+  chunkCount: 'chunkCount',
+  tokenCount: 'tokenCount',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserStoreDocScalarFieldEnum = (typeof UserStoreDocScalarFieldEnum)[keyof typeof UserStoreDocScalarFieldEnum]
+
+
+export const UserStoreDocAnnotScalarFieldEnum = {
+  id: 'id',
+  docId: 'docId',
+  subtype: 'subtype',
+  uri: 'uri',
+  rect: 'rect',
+  startOffset: 'startOffset',
+  endOffset: 'endOffset',
+  pageNumber: 'pageNumber',
+  isCdnLink: 'isCdnLink',
+  linkedDocId: 'linkedDocId',
+  attachmentId: 'attachmentId',
+  createdAt: 'createdAt'
+} as const
+
+export type UserStoreDocAnnotScalarFieldEnum = (typeof UserStoreDocAnnotScalarFieldEnum)[keyof typeof UserStoreDocAnnotScalarFieldEnum]
+
+
+export const UserStoreDocChunkScalarFieldEnum = {
+  id: 'id',
+  docId: 'docId',
+  storeId: 'storeId',
+  chunkProvenanceId: 'chunkProvenanceId',
+  provenanceId: 'provenanceId',
+  attachmentId: 'attachmentId',
+  conversationId: 'conversationId',
+  messageId: 'messageId',
+  chunkIndex: 'chunkIndex',
+  content: 'content',
+  contentHash: 'contentHash',
+  tokenCount: 'tokenCount',
+  startOffset: 'startOffset',
+  endOffset: 'endOffset',
+  pageStartOffset: 'pageStartOffset',
+  pageEndOffset: 'pageEndOffset',
+  embeddingModel: 'embeddingModel',
+  hasImages: 'hasImages',
+  hasAnnots: 'hasAnnots',
+  state: 'state',
+  errorMessage: 'errorMessage',
+  retryCount: 'retryCount',
+  schemaVersion: 'schemaVersion',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserStoreDocChunkScalarFieldEnum = (typeof UserStoreDocChunkScalarFieldEnum)[keyof typeof UserStoreDocChunkScalarFieldEnum]
 
 
 export const VerificationScalarFieldEnum = {

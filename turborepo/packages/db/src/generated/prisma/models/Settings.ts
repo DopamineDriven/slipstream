@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model Settings
@@ -348,10 +348,6 @@ export type NullableEnumThemePreferenceFieldUpdateOperationsInput = {
   set?: $Enums.ThemePreference | null
 }
 
-export type NullableEnumProviderFieldUpdateOperationsInput = {
-  set?: $Enums.Provider | null
-}
-
 export type SettingsCreateWithoutUserInput = {
   id?: string
   theme?: $Enums.ThemePreference | null
@@ -462,7 +458,7 @@ export type $SettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type SettingsGetPayload<S extends boolean | null | undefined | SettingsDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$SettingsPayload, S>
 
 export type SettingsCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<SettingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<SettingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: SettingsCountAggregateInputType | true
   }
 
@@ -908,6 +904,7 @@ export type SettingsFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter, which Settings to fetch.
    */
   where: Prisma.SettingsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -930,6 +927,7 @@ export type SettingsFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which Settings to fetch.
    */
   where: Prisma.SettingsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -982,6 +980,7 @@ export type SettingsFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter by unique combinations of Settings.
    */
   distinct?: Prisma.SettingsScalarFieldEnum | Prisma.SettingsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1034,6 +1033,7 @@ export type SettingsFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of Settings.
    */
   distinct?: Prisma.SettingsScalarFieldEnum | Prisma.SettingsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1081,6 +1081,7 @@ export type SettingsFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   skip?: number
   distinct?: Prisma.SettingsScalarFieldEnum | Prisma.SettingsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1103,6 +1104,7 @@ export type SettingsCreateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data needed to create a Settings.
    */
   data: Prisma.XOR<Prisma.SettingsCreateInput, Prisma.SettingsUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1163,6 +1165,7 @@ export type SettingsUpdateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Choose, which Settings to update.
    */
   where: Prisma.SettingsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1241,6 +1244,7 @@ export type SettingsUpsertArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * In case the Settings was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.SettingsUpdateInput, Prisma.SettingsUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1263,6 +1267,7 @@ export type SettingsDeleteArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter which Settings to delete.
    */
   where: Prisma.SettingsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

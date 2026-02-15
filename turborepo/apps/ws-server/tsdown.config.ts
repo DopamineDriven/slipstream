@@ -1,29 +1,17 @@
 import { relative } from "node:path";
-import type { UserConfig as Options } from "tsdown";
+import type { UserConfig } from "tsdown";
 import { defineConfig } from "tsdown";
 
 export default defineConfig(
-  (
-    options: Omit<
-      Options,
-      | "entry"
-      | "target"
-      | "dts"
-      | "watch"
-      | "format"
-      | "cwd"
-      | "sourcemap"
-      | "clean"
-      | "outDir"
-      | "tsconfig"
-    >
-  ) =>
+  (options: UserConfig) =>
     ({
       ...options,
       entry: [
         "src/index.ts",
+        "src/anthropic/base.ts",
         "src/anthropic/index.ts",
         "src/anthropic/types.ts",
+        "src/anthropic/vector-store.ts",
         "src/anthropic/workup.ts",
         "src/byte-codec/index.ts",
         "src/extract/index.ts",
@@ -48,10 +36,17 @@ export default defineConfig(
         "src/prisma/attachment.ts",
         "src/prisma/chat.ts",
         "src/prisma/index.ts",
+        "src/prisma/provider-store.ts",
+        "src/prisma/types.ts",
         "src/prisma/user-meta.ts",
+        "src/prisma/user-store.ts",
         "src/prisma/utils.ts",
         "src/providers/index.ts",
         "src/resolver/index.ts",
+        "src/sharp/index.ts",
+        "src/store/types.ts",
+        "src/store/vector-store.ts",
+        "src/store/workup.ts",
         "src/types/index.ts",
         "src/vercel/index.ts",
         "src/vercel/sse.ts",
@@ -69,6 +64,7 @@ export default defineConfig(
         "src/xai/workup.ts",
         "!src/__out__/**/*",
         "!src/test/**/*",
+        "!src/tests/**/*",
         "!public/**/*"
       ],
       cwd: process.cwd(),
@@ -82,5 +78,5 @@ export default defineConfig(
       clean: true,
       outDir: "dist",
       unbundle: true
-    }) satisfies Options
+    }) satisfies UserConfig
 );

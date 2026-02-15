@@ -12,12 +12,10 @@ class MigrateIt extends Fs {
     super((cwd ??= process.cwd()));
   }
   private data = async (env: string) => {
-    const { PrismaClient } = await import(
-      "@slipstream/db/node/generated/client"
-    );
-    const prismaClient = new PrismaClient({
-      datasourceUrl: process.env.DATABASE_URL ?? env
-    });
+    const { PrismaDbService } = await import("@slipstream/db/factory");
+    const prismaClient = new PrismaDbService({
+      connectionString: env
+    }).p(false);
     let toFinally: AccountToUser | null = null;
     try {
       prismaClient.$connect();
@@ -57,17 +55,15 @@ const migrate = new MigrateIt(process.cwd());
     })
   )
   .then(async p => {
-    const { PrismaClient } = await import(
-      "@slipstream/db/node/generated/client"
-    );
-    const prisma = new PrismaClient({
-      datasourceUrl: process.env.DIRECT_URL ?? ""
-    });
+    const { PrismaDbService } = await import("@slipstream/db/factory");
+    const prisma = new PrismaDbService({
+      connectionString: process.env.DATABASE_URL ?? ""
+    }).p(false);
     try {
       prisma.$connect();
       for (const o of p) {
         if (o.user) {
-          const {user, userId: _uid, ...rest} = o;
+          const { user, userId: _uid, ...rest } = o;
 
           return await prisma.user.update({
             include: { accounts: true },
@@ -87,14 +83,14 @@ const migrate = new MigrateIt(process.cwd());
                     create: { ...rest },
                     update: {
                       accessTokenExpiresAt: rest.expires_at
-                        ? new Date(rest.expires_at*1000)
+                        ? new Date(rest.expires_at * 1000)
                         : null
                     }
                   }
                 ]
               }
             },
-            where: {id: user.id }
+            where: { id: user.id }
           });
         } else {
           console.log(o);

@@ -1,0 +1,53 @@
+enum ProviderDocState {
+  PENDING
+  PROCESSING
+  ACTIVE
+  FAILED
+}
+
+model ProviderStore {
+  id         String   @id @default(cuid(2))
+  userId     String
+  provider   Provider
+  storeRef   String // The vector_store_id or collection_id
+  storeName  String
+  fileCount  Int      @default(0)
+  totalBytes BigInt?
+
+  providerStoreCreatedAt DateTime?
+  lastSyncedAt           DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  docs ProviderStoreDocument[]
+
+  @@unique([userId, provider], name: "userId_provider")
+  @@index([storeRef, provider])
+}
+
+model ProviderStoreDocument {
+  id           String           @id @default(cuid(2))
+  storeId      String
+  attachmentId String
+  provider     Provider
+  docRef       String
+  docUri       String?
+  filename     String  // provenance ID--provider agnostic -- conversationId-messageId-attachment-Id-hexEncodedFilename.ext
+  state        ProviderDocState @default(PENDING)
+  indexedAt    DateTime?
+  mimeType     String
+  errorMessage String?
+  lastAccessed DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  size         BigInt?
+
+  store      ProviderStore @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  attachment Attachment    @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, attachmentId])
+  @@index([storeId, state])
+  @@index([attachmentId])
+}

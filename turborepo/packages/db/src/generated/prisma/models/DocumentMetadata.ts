@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model DocumentMetadata
@@ -924,7 +924,7 @@ export type $DocumentMetadataPayload<ExtArgs extends runtime.Types.Extensions.In
 export type DocumentMetadataGetPayload<S extends boolean | null | undefined | DocumentMetadataDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$DocumentMetadataPayload, S>
 
 export type DocumentMetadataCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<DocumentMetadataFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<DocumentMetadataFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: DocumentMetadataCountAggregateInputType | true
   }
 
@@ -1383,6 +1383,7 @@ export type DocumentMetadataFindUniqueArgs<ExtArgs extends runtime.Types.Extensi
    * Filter, which DocumentMetadata to fetch.
    */
   where: Prisma.DocumentMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1405,6 +1406,7 @@ export type DocumentMetadataFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.
    * Filter, which DocumentMetadata to fetch.
    */
   where: Prisma.DocumentMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1457,6 +1459,7 @@ export type DocumentMetadataFindFirstArgs<ExtArgs extends runtime.Types.Extensio
    * Filter by unique combinations of DocumentMetadata.
    */
   distinct?: Prisma.DocumentMetadataScalarFieldEnum | Prisma.DocumentMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1509,6 +1512,7 @@ export type DocumentMetadataFindFirstOrThrowArgs<ExtArgs extends runtime.Types.E
    * Filter by unique combinations of DocumentMetadata.
    */
   distinct?: Prisma.DocumentMetadataScalarFieldEnum | Prisma.DocumentMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1556,6 +1560,7 @@ export type DocumentMetadataFindManyArgs<ExtArgs extends runtime.Types.Extension
    */
   skip?: number
   distinct?: Prisma.DocumentMetadataScalarFieldEnum | Prisma.DocumentMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1578,6 +1583,7 @@ export type DocumentMetadataCreateArgs<ExtArgs extends runtime.Types.Extensions.
    * The data needed to create a DocumentMetadata.
    */
   data: Prisma.XOR<Prisma.DocumentMetadataCreateInput, Prisma.DocumentMetadataUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1638,6 +1644,7 @@ export type DocumentMetadataUpdateArgs<ExtArgs extends runtime.Types.Extensions.
    * Choose, which DocumentMetadata to update.
    */
   where: Prisma.DocumentMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1716,6 +1723,7 @@ export type DocumentMetadataUpsertArgs<ExtArgs extends runtime.Types.Extensions.
    * In case the DocumentMetadata was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.DocumentMetadataUpdateInput, Prisma.DocumentMetadataUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1738,6 +1746,7 @@ export type DocumentMetadataDeleteArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter which DocumentMetadata to delete.
    */
   where: Prisma.DocumentMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

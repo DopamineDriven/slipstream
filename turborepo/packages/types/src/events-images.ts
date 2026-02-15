@@ -30,11 +30,10 @@ export type OpenAIImgNativeGPTImgAR = Record<
   Exclude<OpenAIImgGenModels, "dall-e-2" | "dall-e-3">,
   "1536x1024" | "1024x1536" | "1024x1024" | "auto"
 >;
-export type OpenAINativeImgModelAspectRatioWorkup =
-  OpenAIImgNativeGPTImgAR & {
-    "dall-e-3": "1792x1024" | "1024x1792" | "1024x1024" | "auto";
-    "dall-e-2": "256x256" | "512x512" | "1024x1024" | "auto";
-  };
+export type OpenAINativeImgModelAspectRatioWorkup = OpenAIImgNativeGPTImgAR & {
+  "dall-e-3": "1792x1024" | "1024x1792" | "1024x1024" | "auto";
+  "dall-e-2": "256x256" | "512x512" | "1024x1024" | "auto";
+};
 
 export type OpenAIModelAspectRatio = {
   [P in keyof OpenAIModelAspectRatioWorkup]?: OpenAIModelAspectRatioWorkup[P];
@@ -177,14 +176,13 @@ export type GeminiImageQuality = DX<
     >
 >;
 
-export type OpenAINativeImgModelQualityWorkup =
-  Record<
-    Exclude<OpenAIImgGenModels, "dall-e-2" | "dall-e-3">,
-    "low" | "medium" | "high" | "auto"
-  > & {
-    "dall-e-3": "standard" | "hd" | "auto";
-    "dall-e-2": "standard" | "auto";
-  }
+export type OpenAINativeImgModelQualityWorkup = Record<
+  Exclude<OpenAIImgGenModels, "dall-e-2" | "dall-e-3">,
+  "low" | "medium" | "high" | "auto"
+> & {
+  "dall-e-3": "standard" | "hd" | "auto";
+  "dall-e-2": "standard" | "auto";
+};
 
 /**
  * OpenAI Image Size & Quality Options
@@ -539,7 +537,9 @@ export type OpenAIImageGenOpts = Dalle3Opts | Dalle2Opts | GptImage1Opts;
 export type ImagenOptions = {
   model: Exclude<
     GeminiImgGenModels,
-    "gemini-2.5-flash-image" | "gemini-3-pro-image-preview" | "deep-research-pro-preview-12-2025"
+    | "gemini-2.5-flash-image"
+    | "gemini-3-pro-image-preview"
+    | "deep-research-pro-preview-12-2025"
   >;
   /**
    * The text prompt describing the image.
@@ -571,13 +571,13 @@ export type ImagenOptions = {
    * Supported values:
    * "1:1", "9:16", "16:9", "3:4", "4:3"
    */
-  aspectRatio?: GeminiImageSize['imagen-4.0-generate-001'];
+  aspectRatio?: GeminiImageSize["imagen-4.0-generate-001"];
 
   /**
    * The output resolution. Only available for Imagen 4.
    * Default: "1K"
    */
-  sampleImageSize?:GeminiImageQuality['imagen-4.0-generate-001']
+  sampleImageSize?: GeminiImageQuality["imagen-4.0-generate-001"];
 
   /**
    * A seed value for reproducible results.
@@ -616,11 +616,11 @@ export type NanoBananaImageGenOpts = {
    * The model ID.
    */
   model: Exclude<
-        GeminiImgGenModels,
-        | "imagen-4.0-fast-generate-001"
-        | "imagen-4.0-generate-001"
-        | "imagen-4.0-ultra-generate-001"
-      >
+    GeminiImgGenModels,
+    | "imagen-4.0-fast-generate-001"
+    | "imagen-4.0-generate-001"
+    | "imagen-4.0-ultra-generate-001"
+  >;
 
   /**
    * The prompt, which can be simple text or a mix of
@@ -680,7 +680,7 @@ export type NanoBananaImageGenOpts = {
        *
        * "21:9" (1536x672)
        */
-      aspectRatio?:GeminiImageSize['gemini-3-pro-image-preview']
+      aspectRatio?: GeminiImageSize["gemini-3-pro-image-preview"];
     };
 
     /**
@@ -1150,8 +1150,8 @@ export type Dalle3ImgGenWorkupRT = {
   msgBoundImgAssets: boolean;
   n: number;
   model: "dall-e-3";
-  output_quality: SharedOpenAIImageOpts<"dall-e-3">['quality'];
-  output_size: SharedOpenAIImageOpts<"dall-e-3">['size'];
+  output_quality: SharedOpenAIImageOpts<"dall-e-3">["quality"];
+  output_size: SharedOpenAIImageOpts<"dall-e-3">["size"];
   targetApi: "images";
 };
 
@@ -1161,8 +1161,8 @@ export type Dalle2ImgGenWorkupRT = {
   msgBoundImgAssets: boolean;
   n: number;
   model: "dall-e-2";
-  output_quality:  SharedOpenAIImageOpts<"dall-e-2">['quality'];
-  output_size: SharedOpenAIImageOpts<"dall-e-2">['size'];
+  output_quality: SharedOpenAIImageOpts<"dall-e-2">["quality"];
+  output_size: SharedOpenAIImageOpts<"dall-e-2">["size"];
   targetApi: "images";
 };
 
@@ -1197,8 +1197,12 @@ export type GptImageAndFacilitatorsImgGenWorkupRT = {
     | "o3"
     | "gpt-4o"
     | "gpt-4o-mini";
-  output_quality: SharedOpenAIImageOpts<"gpt-image-1" | "gpt-image-1.5" | "gpt-image-1-mini">['quality'];
-  output_size: SharedOpenAIImageOpts<"gpt-image-1" | "gpt-image-1.5" | "gpt-image-1-mini">['size'];
+  output_quality: SharedOpenAIImageOpts<
+    "gpt-image-1" | "gpt-image-1.5" | "gpt-image-1-mini"
+  >["quality"];
+  output_size: SharedOpenAIImageOpts<
+    "gpt-image-1" | "gpt-image-1.5" | "gpt-image-1-mini"
+  >["size"];
   output_background: "auto" | "transparent" | "opaque" | undefined;
   targetApi: "responses" | "images";
   partialImagesRequested: number | undefined;

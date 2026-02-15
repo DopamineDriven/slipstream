@@ -339,3 +339,24 @@ export type CreateGrokProviderStoreDocParams = {
   state: $Enums.ProviderDocState;
   size?: bigint;
 };
+
+export interface CreatManyGrokProviderStoreDocSingleton {
+  readonly indexedAt: Date;
+  readonly lastAccessed: Date;
+  readonly provider: $Enums.Provider;
+  readonly attachmentId: string;
+  readonly storeId: string;
+  readonly docRef: string;
+  readonly docUri: string;
+  readonly filename: string;
+  readonly mimeType: string;
+  readonly state: $Enums.ProviderDocState;
+  readonly size?: bigint;
+}
+
+export interface CreateManyGrokProviderStoreDocsProps {
+  userId: string;
+  storeRef: string;
+  totalBytes: bigint;
+  data: CreatManyGrokProviderStoreDocSingleton[];
+}

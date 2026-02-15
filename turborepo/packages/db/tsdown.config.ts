@@ -2,27 +2,10 @@ import type { UserConfig as Options } from "tsdown";
 import { defineConfig } from "tsdown";
 
 export default defineConfig(
-  (
-    options: Omit<
-      Options,
-      | "entry"
-      | "target"
-      | "dts"
-      | "format"
-      | "cwd"
-      | "clean"
-      | "outDir"
-      | "tsconfig"
-    >
-  ) =>
+  (options: Options) =>
     ({
       ...options,
-      entry: [
-        "!src/generated/prisma-edge/internal/query_engine_bg.*",
-        "!src/test/**",
-        "!edge/**",
-        "src/**/*.ts"
-      ],
+      entry: ["!prisma/**", "!src/test/**/*.ts", "src/**/*.ts"],
       format: ["esm"],
       clean: true,
       dts: { tsgo: true },

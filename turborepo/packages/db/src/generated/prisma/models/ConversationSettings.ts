@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model ConversationSettings
@@ -828,7 +828,7 @@ export type $ConversationSettingsPayload<ExtArgs extends runtime.Types.Extension
 export type ConversationSettingsGetPayload<S extends boolean | null | undefined | ConversationSettingsDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ConversationSettingsPayload, S>
 
 export type ConversationSettingsCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<ConversationSettingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<ConversationSettingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: ConversationSettingsCountAggregateInputType | true
   }
 
@@ -1284,6 +1284,7 @@ export type ConversationSettingsFindUniqueArgs<ExtArgs extends runtime.Types.Ext
    * Filter, which ConversationSettings to fetch.
    */
   where: Prisma.ConversationSettingsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1306,6 +1307,7 @@ export type ConversationSettingsFindUniqueOrThrowArgs<ExtArgs extends runtime.Ty
    * Filter, which ConversationSettings to fetch.
    */
   where: Prisma.ConversationSettingsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1358,6 +1360,7 @@ export type ConversationSettingsFindFirstArgs<ExtArgs extends runtime.Types.Exte
    * Filter by unique combinations of ConversationSettings.
    */
   distinct?: Prisma.ConversationSettingsScalarFieldEnum | Prisma.ConversationSettingsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1410,6 +1413,7 @@ export type ConversationSettingsFindFirstOrThrowArgs<ExtArgs extends runtime.Typ
    * Filter by unique combinations of ConversationSettings.
    */
   distinct?: Prisma.ConversationSettingsScalarFieldEnum | Prisma.ConversationSettingsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1457,6 +1461,7 @@ export type ConversationSettingsFindManyArgs<ExtArgs extends runtime.Types.Exten
    */
   skip?: number
   distinct?: Prisma.ConversationSettingsScalarFieldEnum | Prisma.ConversationSettingsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1479,6 +1484,7 @@ export type ConversationSettingsCreateArgs<ExtArgs extends runtime.Types.Extensi
    * The data needed to create a ConversationSettings.
    */
   data: Prisma.XOR<Prisma.ConversationSettingsCreateInput, Prisma.ConversationSettingsUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1539,6 +1545,7 @@ export type ConversationSettingsUpdateArgs<ExtArgs extends runtime.Types.Extensi
    * Choose, which ConversationSettings to update.
    */
   where: Prisma.ConversationSettingsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1617,6 +1624,7 @@ export type ConversationSettingsUpsertArgs<ExtArgs extends runtime.Types.Extensi
    * In case the ConversationSettings was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ConversationSettingsUpdateInput, Prisma.ConversationSettingsUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1639,6 +1647,7 @@ export type ConversationSettingsDeleteArgs<ExtArgs extends runtime.Types.Extensi
    * Filter which ConversationSettings to delete.
    */
   where: Prisma.ConversationSettingsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

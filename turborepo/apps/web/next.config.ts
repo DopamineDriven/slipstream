@@ -53,7 +53,7 @@ export default {
         hostname: `chat.aicoalesce.com`,
         protocol: "https"
       },
-      {hostname: "home.nps.gov", protocol: "https"},
+      { hostname: "home.nps.gov", protocol: "https" },
       {
         hostname: `dev.chat.aicoalesce.com`,
         protocol: "https"
@@ -70,11 +70,19 @@ export default {
         hostname: `assets-dev.aicoalesce.com`,
         protocol: "https"
       },
-      {hostname: "raw.githubusercontent.com", protocol: "https"},
+      { hostname: "raw.githubusercontent.com", protocol: "https" },
       { hostname: "imgen.x.ai", protocol: "https" },
       { hostname: "images.unsplash.com", protocol: "https" },
       { hostname: "tailwindcss.com", protocol: "https" }
     ]
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/",
+        destination: "/chat/home"
+      }
+    ];
   },
   productionBrowserSourceMaps: true
 } satisfies NextConfig;

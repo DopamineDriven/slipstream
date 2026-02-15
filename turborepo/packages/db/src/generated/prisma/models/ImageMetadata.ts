@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model ImageMetadata
@@ -780,6 +780,30 @@ export type EnumImageFormatFieldUpdateOperationsInput = {
   set?: $Enums.ImageFormat
 }
 
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type NullableEnumColorSpaceFieldUpdateOperationsInput = {
   set?: $Enums.ColorSpace | null
 }
@@ -1042,7 +1066,7 @@ export type $ImageMetadataPayload<ExtArgs extends runtime.Types.Extensions.Inter
 export type ImageMetadataGetPayload<S extends boolean | null | undefined | ImageMetadataDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ImageMetadataPayload, S>
 
 export type ImageMetadataCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<ImageMetadataFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<ImageMetadataFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: ImageMetadataCountAggregateInputType | true
   }
 
@@ -1504,6 +1528,7 @@ export type ImageMetadataFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which ImageMetadata to fetch.
    */
   where: Prisma.ImageMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1526,6 +1551,7 @@ export type ImageMetadataFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter, which ImageMetadata to fetch.
    */
   where: Prisma.ImageMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1578,6 +1604,7 @@ export type ImageMetadataFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter by unique combinations of ImageMetadata.
    */
   distinct?: Prisma.ImageMetadataScalarFieldEnum | Prisma.ImageMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1630,6 +1657,7 @@ export type ImageMetadataFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
    * Filter by unique combinations of ImageMetadata.
    */
   distinct?: Prisma.ImageMetadataScalarFieldEnum | Prisma.ImageMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1677,6 +1705,7 @@ export type ImageMetadataFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   skip?: number
   distinct?: Prisma.ImageMetadataScalarFieldEnum | Prisma.ImageMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1699,6 +1728,7 @@ export type ImageMetadataCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * The data needed to create a ImageMetadata.
    */
   data: Prisma.XOR<Prisma.ImageMetadataCreateInput, Prisma.ImageMetadataUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1759,6 +1789,7 @@ export type ImageMetadataUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which ImageMetadata to update.
    */
   where: Prisma.ImageMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1837,6 +1868,7 @@ export type ImageMetadataUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * In case the ImageMetadata was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ImageMetadataUpdateInput, Prisma.ImageMetadataUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1859,6 +1891,7 @@ export type ImageMetadataDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter which ImageMetadata to delete.
    */
   where: Prisma.ImageMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

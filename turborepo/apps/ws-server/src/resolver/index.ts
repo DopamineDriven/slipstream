@@ -6,10 +6,11 @@ import type {
   ProviderChatRequestEntity,
   UserData
 } from "@/types/index.ts";
-import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
+import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { Responses } from "openai/resources/index.mjs";
 import { ImageCompatService } from "@/image/index.ts";
 import { ProviderService } from "@/providers/index.ts";
+import { UserStoreVectorService } from "@/store/vector-store.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { WebSocket } from "ws";
 import type {
@@ -26,16 +27,26 @@ import type {
 } from "@slipstream/types";
 import { RedisChannels } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
+import { LoggerService } from "@/logger/index.ts";
+import type { Logger as PinoLogger } from "pino";
 
 export class Resolver {
+
+  private logger: PinoLogger;
   constructor(
     public wsServer: WSServer,
     private providers: ProviderService,
     private s3Service: S3Storage,
     private region: string,
     private imgCompatService: ImageCompatService,
-    private xaiManagementApikey: string
-  ) {}
+    private userVectorStore: UserStoreVectorService,
+    private xaiManagementApikey: string,
+    logger: LoggerService
+  ) {
+    this.logger = logger
+      .getPinoInstance()
+      .child({ node_version: process.version }, { msgPrefix: "[resolver] " });
+  }
 
   // Track high-resolution start times for upload progress per attachment
   private uploadTimers = new Map<string, bigint>();
@@ -88,6 +99,38 @@ export class Resolver {
       ? RedisChannels.user(userId)
       : RedisChannels.conversationStream(conversationId);
   }
+
+  private scheduleUserStoreIndexing(message: MessageSingleton<true>) {
+    void this.userVectorStore
+      .indexMessageAttachments(message)
+      .then(results => {
+        for (const result of results) {
+          if (!result.ok) {
+            this.logger.debug(
+              { attachmentId: result.attachmentId, reason: result.reason },
+              "skip indexing"
+            );
+          }
+        }
+      })
+      .catch(err => {
+        this.logger.warn(
+          { messageId: message.id, err: this.wsServer.prisma.safeErrMsg(err) },
+          "indexing failed"
+        );
+      });
+  }
+
+  private handleAIChatRequestIndexing(
+    msgs: MessageSingleton<true>[],
+    requestMessageId: string | undefined
+  ) {
+    if (!requestMessageId) return;
+    const requestMsg = msgs.find(m => m.id === requestMessageId);
+    if (!requestMsg || requestMsg.attachments.length === 0) return;
+    this.scheduleUserStoreIndexing(requestMsg);
+  }
+
   private async titleGenUtil<
     const T extends "ai_chat_request" | "image_gen_request"
   >(
@@ -367,6 +410,8 @@ export class Resolver {
       existingState = await this.wsServer.redis.getStreamState(conversationId),
       createdAt = res.createdAt;
 
+    void this.handleAIChatRequestIndexing(msgs, requestMessageId);
+
     let chunks = Array.of<string>(),
       thinkingChunks = Array.of<string>(),
       resumedFromChunk = 0,
@@ -544,6 +589,7 @@ export class Resolver {
         }
       );
       void this.wsServer.redis.saveStreamState(
+
         conversationId,
         chunks,
         {
@@ -561,11 +607,12 @@ export class Resolver {
     }
   }
 
-  public async postHandleConnectionEstablishedJob(userId: string) {
+  protected async postHandleConnectionEstablishedJob(userId: string) {
     const gemini = this.providers.getInstance("gemini");
     const anthropic = this.providers.getInstance("anthropic");
     const grok = this.providers.getInstance("grok");
     return await Promise.all([
+      this.userVectorStore.syncRegistry(userId),
       anthropic.syncFileRegistry(userId, true),
       gemini.syncFileRegistry(userId, true),
       grok.syncFileRegistry(userId, false, this.xaiManagementApikey)
@@ -1432,6 +1479,54 @@ export class Resolver {
     }
   }
 
+  private imgExtSupported(s: string | undefined | null) {
+    if (!s)
+      throw new Error(
+        "extension should always be known, it was just promoted to cloudfront..."
+      );
+    return s === "jpg" || s === "png" || s === "jpeg" || s === "webp";
+  }
+  private docExtSupported(s: string | undefined | null) {
+    if (!s)
+      throw new Error(
+        "extension should always be known, it was just promoted to cloudfront..."
+      );
+    return s === "pdf" || s === "txt" || s === "md";
+  }
+
+  private docMimeSupported(mimeType: string | null | undefined) {
+    return (
+      mimeType === "application/pdf" ||
+      // cursed but used by browsers
+      mimeType === "application/text" ||
+      mimeType === "text/markdown" ||
+      mimeType === "text/plain"
+    );
+  }
+
+  private handleCompatStatus(
+    specs: ExpandedDocSpecs | ExpandedImgSpecs,
+    extension: string | undefined
+  ) {
+    if (specs.type === "DOCUMENT") {
+      if (
+        this.docExtSupported(extension) &&
+        this.docExtSupported(specs.format) &&
+        this.docMimeSupported(specs.mimeType)
+      ) {
+        return "ALIASED" as const;
+      } else return "PENDING" as const;
+    } else {
+      if (
+        specs.width < 2000 &&
+        specs.height < 2000 &&
+        this.imgExtSupported(extension)
+      ) {
+        return "ALIASED" as const;
+      } else return "PENDING" as const;
+    }
+  }
+
   public async handleAssetUploadComplete(
     event: EventTypeMap["asset_upload_complete"],
     ws: WebSocket,
@@ -1487,34 +1582,26 @@ export class Resolver {
         cdnUrl,
         64 * 4096
       );
-      const compatStatus =
-        specs.type === "DOCUMENT" &&
-        (extension === "pdf" || extension === "md" || extension === "txt") &&
-        (specs.format === "pdf" ||
-          specs.format === "md" ||
-          specs.format === "txt") &&
-        (specs.mimeType === "application/pdf" ||
-          specs.mimeType === "application/text" ||
-          specs.mimeType === "text/markdown" ||
-          specs.mimeType === "text/plain")
-          ? "ALIASED"
-          : specs.type === "IMAGE" && specs.width < 2000 && specs.height < 2000
-            ? extension === "jpg"
-              ? "ALIASED"
-              : extension === "png"
-                ? "ALIASED"
-                : extension === "webp"
-                  ? "ALIASED"
-                  : "PENDING"
-            : "PENDING";
+      const compatStatus = this.handleCompatStatus(specs, extension);
 
-      const urlObj = new URL(cdnUrl);
+      const {
+        timestamp,
+        ext,
+        origin,
+        filename: fileName
+      } = this.wsServer.prisma.urlParseNonCompat(cdnUrl);
 
-      const path = urlObj.pathname;
+      const filename = `${fileName}.${ext}`;
+      const s3ModDate = new Date(Number.parseInt(lastModified ?? timestamp));
+      const compatCdnUrl = compatStatus === "ALIASED" ? cdnUrl : undefined,
+        compatExt = compatStatus === "ALIASED" ? ext : undefined,
+        compatKey = compatStatus === "ALIASED" ? key : undefined,
+        compatMime = compatStatus === "ALIASED" ? contentType : undefined,
+        compatReadyAt = compatStatus === "ALIASED" ? s3ModDate : undefined,
+        compatS3ObjectId =
+          compatStatus === "ALIASED" ? finalS3ObjectId : undefined,
+        compatVersionId = compatStatus === "ALIASED" ? versionId : undefined;
 
-      const pathname = path.slice(path.lastIndexOf("/") + 1);
-
-      const filename = pathname.slice(14);
       const attachment = await this.wsServer.prisma.updateAttachment({
         data: {
           bucket: finalBucket,
@@ -1526,7 +1613,7 @@ export class Resolver {
           draftId,
           compatStatus,
           expiresAt: expires,
-          s3LastModified: lastModified ? new Date(lastModified) : undefined,
+          s3LastModified: s3ModDate,
           storageClass,
           conversationId,
           id: attachmentId,
@@ -1536,29 +1623,20 @@ export class Resolver {
           uploadDuration: duration,
           userId,
           publicUrl,
-          compatCdnUrl: compatStatus === "ALIASED" ? cdnUrl : undefined,
-          compatExt:
-            compatStatus === "ALIASED"
-              ? (extension ??
-                this.wsServer.prisma.contentTypeToExt(contentType))
-              : undefined,
-          compatKey: compatStatus === "ALIASED" ? key : undefined,
-          compatMime: compatStatus === "ALIASED" ? contentType : undefined,
-          compatReadyAt:
-            compatStatus === "ALIASED"
-              ? lastModified
-                ? new Date(lastModified)
-                : new Date()
-              : undefined,
-          compatS3ObjectId:
-            compatStatus === "ALIASED" ? finalS3ObjectId : undefined,
-          compatVersionId: compatStatus === "ALIASED" ? versionId : undefined,
+          compatCdnUrl,
+          compatExt,
+          compatKey,
+          compatMime,
+          compatReadyAt,
+          compatS3ObjectId,
+          compatVersionId,
           cdnUrl,
           versionId: finalVersion,
           s3ObjectId: finalS3ObjectId,
           etag: finalEtag ?? etag,
           status: "READY",
-          ext: extension ?? this.wsServer.prisma.contentTypeToExt(contentType),
+          ext,
+          origin,
           mime: contentType,
           size: this.wsServer.prisma.toBigInt(size, bytesUploaded)
         },
@@ -1607,7 +1685,7 @@ export class Resolver {
                     ? new Date(specs.modifiedDate)
                     : undefined,
                   encoding: specs.encoding ?? undefined,
-                  format: specs.format ?? "pdf",
+                  format: specs.format ?? ext,
                   isEncrypted: specs.isEncrypted ?? undefined,
                   isLinearized: specs.isLinearized ?? false,
                   language: specs.language ?? undefined,
@@ -1682,7 +1760,6 @@ export class Resolver {
       } satisfies EventTypeMap["asset_ready"];
 
       ws.send(JSON.stringify(assetReady));
-      // TODO implement image conversion pipeline with sharp (for all non-png/jpg/webp images)
       if (
         attachment.compatStatus === "PENDING" &&
         attachment.assetType === "DOCUMENT" &&
