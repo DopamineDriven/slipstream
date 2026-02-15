@@ -14,7 +14,7 @@ export const signinGoogle = async () => {
   });
 };
 
-export const signinAnonymous = async () => {
+// export const signinAnonymous = async () => {
 
-  return await signIn.anonymous();
-};
+//   return await signIn.anonymous();
+// };

@@ -4,7 +4,6 @@ import Image from "next/image";
 import { shimmer } from "@/lib/shimmer";
 import { Logo } from "@/ui/logo";
 import {
-  signinAnonymous,
   signinGithub,
   signinGoogle
 } from "@/utils/auth-sign-in";
@@ -60,7 +59,7 @@ export function AuthUI({
               variant="ghost"
               type="button"
               size="lg"
-              onClick={signinAnonymous}
+              // onClick={signinAnonymous}
               className="dark:bg-background/50 text-foreground transition-color border-foreground/50 relative inline-flex w-full cursor-pointer items-center justify-center gap-3 rounded-md border px-10 py-2 text-sm font-semibold transition-colors duration-150 dark:hover:bg-transparent">
               <AnonymousIcon className="absolute inset-y-auto left-28 my-auto size-12 rounded-full" />
               <span className="absolute inset-y-auto left-36 my-auto">

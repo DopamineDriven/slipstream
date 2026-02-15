@@ -16,7 +16,7 @@ import { MessageActionsDialog } from "@/ui/chat/message-bubble/actions-dialog";
 import { MessageIcons } from "@/ui/chat/message-bubble/message-icons";
 import { ThinkingSection } from "@/ui/chat/thinking";
 import { useTheme } from "next-themes";
-import type { $Enums } from "@slipstream/db/edge-client";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AIChatResponseImgGenFieldsFinal,
   AttachmentSingleton,

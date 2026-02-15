@@ -188,6 +188,7 @@ export function ChatInterface({
         thinkingDuration: null,
         thinkingText: null,
         attachments: optimisticAttachments,
+        conversationMemoryChunkId: null,
         tryAgain: null,
         updatedAt: new Date(),
         userKeyId: null,
@@ -324,6 +325,7 @@ export function ChatInterface({
         conversationId: activeConversationId,
         isImageGen: imgGenEnabled,
         responseOutput: null,
+        conversationMemoryChunkId: null,
         thinkingText: isThinking
           ? thinkingText
           : thinkingDuration
@@ -489,6 +491,7 @@ export function ChatInterface({
         liked: null,
         senderType: "USER",
         thinkingDuration: null,
+        conversationMemoryChunkId: null,
         thinkingText: null,
         tryAgain: null,
         attachments: optimisticAttachments,
