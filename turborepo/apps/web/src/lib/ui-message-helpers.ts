@@ -27,6 +27,7 @@ export function createUserMessage(
         ? params.updatedAt
         : new Date(params.updatedAt),
     userKeyId: params.userKeyId ?? null,
+    conversationMemoryChunkId: null,
     conversationId: params.conversationId,
     model: params.model,
     messageType: params.messageType,
@@ -65,6 +66,7 @@ export function createAIMessage(
     responseOutput: params.responseOutput,
     isImageGen: params.isImageGen,
     model: params.model,
+    conversationMemoryChunkId: null,
     senderType: "AI" as const,
     content: params.content,
     thinkingText: params.thinkingText ?? null,
