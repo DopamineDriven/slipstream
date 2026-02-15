@@ -36,6 +36,12 @@ interface UserStoreChunkReady extends UserStoreChunkDraft {
   budgetAdjustReason: ChunkBudgetAdjustReason | null;
 }
 
+interface ChunkWithRecord {
+  chunk: UserStoreChunkReady;
+  chunkIndex: number;
+  record: { id: string };
+}
+
 type UserStoreIndexSkipReason =
   | "SKIP_NON_DOCUMENT"
   | "WAIT_COMPAT_ACTIVE"
@@ -130,27 +136,49 @@ export class UserStoreVectorService extends UserStoreWorkupService {
           ).sort((a, b) => a.index - b.index)
         : Array.of<AttScopedImg>();
 
-      const hasImages = pageImages.length > 0;
       const hasText = offsetEntry.body.trim().length > 0;
 
-      if (!hasText && !hasImages) continue;
+      if (!hasText && pageImages.length === 0) continue;
 
-      drafts.push({
-        page: offsetEntry.page,
-        text: hasText
-          ? offsetEntry.body
-          : `[Visual content from page ${offsetEntry.page} of ${filename}]`,
-        startOffset,
-        endOffset,
-        hasImages,
-        hasAnnots: offsetEntry.hasAnnots,
-        images: pageImages
-      });
+      // Text chunk: body text only, no images
+      if (hasText) {
+        drafts.push({
+          page: offsetEntry.page,
+          text: offsetEntry.body,
+          startOffset,
+          endOffset,
+          hasImages: false,
+          hasAnnots: offsetEntry.hasAnnots,
+          images: Array.of<AttScopedImg>()
+        });
+      }
+
+      // Image chunks: one per image, with page text as context
+      for (const img of pageImages) {
+        drafts.push({
+          page: offsetEntry.page,
+          text: hasText
+            ? offsetEntry.body
+            : `[Visual content from page ${offsetEntry.page} of ${filename}]`,
+          startOffset,
+          endOffset,
+          hasImages: true,
+          hasAnnots: offsetEntry.hasAnnots,
+          images: [img]
+        });
+      }
     }
     return drafts;
   }
 
   private async tokenUsageForChunk(chunk: UserStoreChunkDraft) {
+    if (!chunk.hasImages) {
+      const result = await this.voyage.countTokens(
+        [chunk.text],
+        "voyage-context-3"
+      );
+      return result.total;
+    }
     const usageInput = Array.of<{ t: string } | { f: string }>();
     usageInput.push({ t: chunk.text });
     for (const image of chunk.images) {
@@ -536,6 +564,34 @@ export class UserStoreVectorService extends UserStoreWorkupService {
     }
   }
 
+  private partitionTextChunkBatches(
+    chunks: readonly ChunkWithRecord[],
+    maxTokensPerBatch: number
+  ) {
+    const batches = Array.of<ChunkWithRecord[]>();
+    let current = Array.of<ChunkWithRecord>();
+    let runningTokens = 0;
+
+    for (const entry of chunks) {
+      if (
+        current.length > 0 &&
+        runningTokens + entry.chunk.tokenCount > maxTokensPerBatch
+      ) {
+        batches.push(current);
+        current = Array.of<ChunkWithRecord>();
+        runningTokens = 0;
+      }
+      current.push(entry);
+      runningTokens += entry.chunk.tokenCount;
+    }
+
+    if (current.length > 0) {
+      batches.push(current);
+    }
+
+    return batches;
+  }
+
   public async searchUserStoreChunks({
     userId,
     query,
@@ -804,12 +860,20 @@ export class UserStoreVectorService extends UserStoreWorkupService {
     let errorCount = 0;
     let totalTokenCount = 0;
 
+    // Phase A: create chunk records, partition by embedding model
+    const textChunks = Array.of<ChunkWithRecord>();
+    const imageChunks = Array.of<ChunkWithRecord>();
+
     for (const [chunkIndex, chunk] of chunkQueue.entries()) {
       const contentHash = createHash("sha256")
         .update(
           `${chunk.page}:${chunk.startOffset}:${chunk.endOffset}:${chunk.text}:${chunk.images.map(image => image.index).join(",")}`
         )
         .digest("hex");
+
+      const embeddingModel = chunk.hasImages
+        ? ("voyage-multimodal-3.5" as const)
+        : ("voyage-context-3" as const);
 
       const chunkRecord = await this.prisma.createUserStoreChunkForEmbedding({
         provenanceId,
@@ -823,9 +887,97 @@ export class UserStoreVectorService extends UserStoreWorkupService {
         hasImages: chunk.hasImages,
         hasAnnots: chunk.hasAnnots,
         pageStartOffset: chunk.startOffset,
-        pageEndOffset: chunk.endOffset
+        pageEndOffset: chunk.endOffset,
+        embeddingModel
       });
 
+      const entry = { chunk, chunkIndex, record: chunkRecord } satisfies ChunkWithRecord;
+      if (chunk.hasImages) {
+        imageChunks.push(entry);
+      } else {
+        textChunks.push(entry);
+      }
+    }
+
+    // Phase B: batch embed text chunks with voyage-context-3
+    if (textChunks.length > 0) {
+      const batches = this.partitionTextChunkBatches(textChunks, 32_000);
+
+      for (const batch of batches) {
+        try {
+          const textBodies = batch.map(({ chunk }) => chunk.text);
+          const contextualResult = await this.voyage.embedChunksContextual({
+            inputs: [textBodies],
+            input_type: "document",
+            model: "voyage-context-3",
+            output_dimension: 1024
+          });
+
+          if ("detail" in contextualResult) {
+            throw new Error(
+              `Voyage contextual embedding error: ${this.prisma.safeErrMsg(contextualResult.detail)}`
+            );
+          }
+
+          const docEmbeddings = contextualResult.data[0];
+          if (!docEmbeddings) {
+            throw new Error(
+              "No document embeddings returned from contextual endpoint"
+            );
+          }
+
+          for (const [i, { chunk, record }] of batch.entries()) {
+            const embedding = docEmbeddings.data[i]?.embedding;
+            if (embedding) {
+              await this.prisma.updateUserStoreChunkTyped(
+                record.id,
+                "READY",
+                `[${embedding.join(",")}]`,
+                chunk.tokenCount,
+                null,
+                null,
+                false,
+                chunk.hasAnnots,
+                "voyage-context-3"
+              );
+              readyCount += 1;
+              totalTokenCount += chunk.tokenCount;
+            } else {
+              errorCount += 1;
+              await this.prisma.updateUserStoreChunkTyped(
+                record.id,
+                "ERROR",
+                null,
+                null,
+                `No embedding returned for text chunk at batch index ${i}`,
+                1,
+                false,
+                chunk.hasAnnots,
+                null
+              );
+            }
+          }
+        } catch (err) {
+          for (const { chunk, record } of batch) {
+            errorCount += 1;
+            await this.prisma.updateUserStoreChunkTyped(
+              record.id,
+              "ERROR",
+              null,
+              null,
+              this.prisma.safeErrMsg(err),
+              1,
+              false,
+              chunk.hasAnnots,
+              null
+            );
+          }
+        }
+      }
+    }
+
+    // Phase C: embed image chunks one-at-a-time with voyage-multimodal-3.5
+    for (const { chunk, chunkIndex, record } of imageChunks) {
       try {
         const embeddingInput = this.buildEmbeddingInput(chunk);
 
@@ -847,33 +999,35 @@ export class UserStoreVectorService extends UserStoreWorkupService {
         const embedding = embeddingResult.data[0]?.embedding;
         if (!embedding) {
           throw new Error(
-            `No embedding returned for chunk index ${chunkIndex}`
+            `No embedding returned for image chunk index ${chunkIndex}`
           );
         }
 
         await this.prisma.updateUserStoreChunkTyped(
-          chunkRecord.id,
+          record.id,
           "READY",
           `[${embedding.join(",")}]`,
           chunk.tokenCount,
           null,
           null,
           chunk.hasImages,
-          chunk.hasAnnots
+          chunk.hasAnnots,
+          "voyage-multimodal-3.5"
         );
         readyCount += 1;
         totalTokenCount += chunk.tokenCount;
       } catch (err) {
         errorCount += 1;
         await this.prisma.updateUserStoreChunkTyped(
-          chunkRecord.id,
+          record.id,
           "ERROR",
           null,
           null,
           this.prisma.safeErrMsg(err),
           1,
           chunk.hasImages,
-          chunk.hasAnnots
+          chunk.hasAnnots,
+          null
         );
       }
     }

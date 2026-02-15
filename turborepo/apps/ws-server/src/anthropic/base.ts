@@ -20,24 +20,7 @@ export class AnthropicBaseService {
       );
     this.defaultClient = new Anthropic({
       apiKey: this.apiKey,
-      logLevel: "debug",
-      logger: this.logger,
-      fetch: async (input, init = {}) => {
-        this.logger.debug(init, "debug")
-        if (
-          typeof init.body === "string" &&
-          init.body.includes("configurations")
-        ) {
-          try {
-            const parsed = JSON.parse<Record<string, unknown>>(init.body);
-            if ("configurations" in parsed) delete parsed.configurations;
-            init = { ...init, body: JSON.stringify(parsed) };
-          } catch {
-            /* fall through */
-          }
-        }
-        return fetch(input, init);
-      }
+      logger: this.logger
     });
   }
   protected getClient(overrideKey?: string) {

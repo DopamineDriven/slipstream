@@ -63,6 +63,7 @@ export type UserStoreDocChunkMinAggregateOutputType = {
   endOffset: number | null
   pageStartOffset: number | null
   pageEndOffset: number | null
+  embeddingModel: string | null
   hasImages: boolean | null
   hasAnnots: boolean | null
   state: $Enums.UserStoreChunkState | null
@@ -91,6 +92,7 @@ export type UserStoreDocChunkMaxAggregateOutputType = {
   endOffset: number | null
   pageStartOffset: number | null
   pageEndOffset: number | null
+  embeddingModel: string | null
   hasImages: boolean | null
   hasAnnots: boolean | null
   state: $Enums.UserStoreChunkState | null
@@ -119,6 +121,7 @@ export type UserStoreDocChunkCountAggregateOutputType = {
   endOffset: number
   pageStartOffset: number
   pageEndOffset: number
+  embeddingModel: number
   hasImages: number
   hasAnnots: number
   state: number
@@ -169,6 +172,7 @@ export type UserStoreDocChunkMinAggregateInputType = {
   endOffset?: true
   pageStartOffset?: true
   pageEndOffset?: true
+  embeddingModel?: true
   hasImages?: true
   hasAnnots?: true
   state?: true
@@ -197,6 +201,7 @@ export type UserStoreDocChunkMaxAggregateInputType = {
   endOffset?: true
   pageStartOffset?: true
   pageEndOffset?: true
+  embeddingModel?: true
   hasImages?: true
   hasAnnots?: true
   state?: true
@@ -225,6 +230,7 @@ export type UserStoreDocChunkCountAggregateInputType = {
   endOffset?: true
   pageStartOffset?: true
   pageEndOffset?: true
+  embeddingModel?: true
   hasImages?: true
   hasAnnots?: true
   state?: true
@@ -340,6 +346,7 @@ export type UserStoreDocChunkGroupByOutputType = {
   endOffset: number
   pageStartOffset: number | null
   pageEndOffset: number | null
+  embeddingModel: string
   hasImages: boolean
   hasAnnots: boolean
   state: $Enums.UserStoreChunkState
@@ -391,6 +398,7 @@ export type UserStoreDocChunkWhereInput = {
   endOffset?: Prisma.IntFilter<"UserStoreDocChunk"> | number
   pageStartOffset?: Prisma.IntNullableFilter<"UserStoreDocChunk"> | number | null
   pageEndOffset?: Prisma.IntNullableFilter<"UserStoreDocChunk"> | number | null
+  embeddingModel?: Prisma.StringFilter<"UserStoreDocChunk"> | string
   hasImages?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
   hasAnnots?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
   state?: Prisma.EnumUserStoreChunkStateFilter<"UserStoreDocChunk"> | $Enums.UserStoreChunkState
@@ -420,6 +428,7 @@ export type UserStoreDocChunkOrderByWithRelationInput = {
   endOffset?: Prisma.SortOrder
   pageStartOffset?: Prisma.SortOrderInput | Prisma.SortOrder
   pageEndOffset?: Prisma.SortOrderInput | Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
   hasImages?: Prisma.SortOrder
   hasAnnots?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -453,6 +462,7 @@ export type UserStoreDocChunkWhereUniqueInput = Prisma.AtLeast<{
   endOffset?: Prisma.IntFilter<"UserStoreDocChunk"> | number
   pageStartOffset?: Prisma.IntNullableFilter<"UserStoreDocChunk"> | number | null
   pageEndOffset?: Prisma.IntNullableFilter<"UserStoreDocChunk"> | number | null
+  embeddingModel?: Prisma.StringFilter<"UserStoreDocChunk"> | string
   hasImages?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
   hasAnnots?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
   state?: Prisma.EnumUserStoreChunkStateFilter<"UserStoreDocChunk"> | $Enums.UserStoreChunkState
@@ -482,6 +492,7 @@ export type UserStoreDocChunkOrderByWithAggregationInput = {
   endOffset?: Prisma.SortOrder
   pageStartOffset?: Prisma.SortOrderInput | Prisma.SortOrder
   pageEndOffset?: Prisma.SortOrderInput | Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
   hasImages?: Prisma.SortOrder
   hasAnnots?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -518,6 +529,7 @@ export type UserStoreDocChunkScalarWhereWithAggregatesInput = {
   endOffset?: Prisma.IntWithAggregatesFilter<"UserStoreDocChunk"> | number
   pageStartOffset?: Prisma.IntNullableWithAggregatesFilter<"UserStoreDocChunk"> | number | null
   pageEndOffset?: Prisma.IntNullableWithAggregatesFilter<"UserStoreDocChunk"> | number | null
+  embeddingModel?: Prisma.StringWithAggregatesFilter<"UserStoreDocChunk"> | string
   hasImages?: Prisma.BoolWithAggregatesFilter<"UserStoreDocChunk"> | boolean
   hasAnnots?: Prisma.BoolWithAggregatesFilter<"UserStoreDocChunk"> | boolean
   state?: Prisma.EnumUserStoreChunkStateWithAggregatesFilter<"UserStoreDocChunk"> | $Enums.UserStoreChunkState
@@ -545,6 +557,7 @@ export type UserStoreDocChunkCreateInput = {
   endOffset: number
   pageStartOffset?: number | null
   pageEndOffset?: number | null
+  embeddingModel?: string
   hasImages: boolean
   hasAnnots: boolean
   state?: $Enums.UserStoreChunkState
@@ -574,6 +587,7 @@ export type UserStoreDocChunkUncheckedCreateInput = {
   endOffset: number
   pageStartOffset?: number | null
   pageEndOffset?: number | null
+  embeddingModel?: string
   hasImages: boolean
   hasAnnots: boolean
   state?: $Enums.UserStoreChunkState
@@ -601,6 +615,7 @@ export type UserStoreDocChunkUpdateInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
   hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
@@ -630,6 +645,7 @@ export type UserStoreDocChunkUncheckedUpdateInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
   hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
@@ -658,6 +674,7 @@ export type UserStoreDocChunkCreateManyInput = {
   endOffset: number
   pageStartOffset?: number | null
   pageEndOffset?: number | null
+  embeddingModel?: string
   hasImages: boolean
   hasAnnots: boolean
   state?: $Enums.UserStoreChunkState
@@ -685,6 +702,7 @@ export type UserStoreDocChunkUpdateManyMutationInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
   hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
@@ -713,6 +731,7 @@ export type UserStoreDocChunkUncheckedUpdateManyInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
   hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
@@ -757,6 +776,7 @@ export type UserStoreDocChunkCountOrderByAggregateInput = {
   endOffset?: Prisma.SortOrder
   pageStartOffset?: Prisma.SortOrder
   pageEndOffset?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
   hasImages?: Prisma.SortOrder
   hasAnnots?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -795,6 +815,7 @@ export type UserStoreDocChunkMaxOrderByAggregateInput = {
   endOffset?: Prisma.SortOrder
   pageStartOffset?: Prisma.SortOrder
   pageEndOffset?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
   hasImages?: Prisma.SortOrder
   hasAnnots?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -823,6 +844,7 @@ export type UserStoreDocChunkMinOrderByAggregateInput = {
   endOffset?: Prisma.SortOrder
   pageStartOffset?: Prisma.SortOrder
   pageEndOffset?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
   hasImages?: Prisma.SortOrder
   hasAnnots?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -906,6 +928,7 @@ export type UserStoreDocChunkCreateWithoutDocInput = {
   endOffset: number
   pageStartOffset?: number | null
   pageEndOffset?: number | null
+  embeddingModel?: string
   hasImages: boolean
   hasAnnots: boolean
   state?: $Enums.UserStoreChunkState
@@ -933,6 +956,7 @@ export type UserStoreDocChunkUncheckedCreateWithoutDocInput = {
   endOffset: number
   pageStartOffset?: number | null
   pageEndOffset?: number | null
+  embeddingModel?: string
   hasImages: boolean
   hasAnnots: boolean
   state?: $Enums.UserStoreChunkState
@@ -990,6 +1014,7 @@ export type UserStoreDocChunkScalarWhereInput = {
   endOffset?: Prisma.IntFilter<"UserStoreDocChunk"> | number
   pageStartOffset?: Prisma.IntNullableFilter<"UserStoreDocChunk"> | number | null
   pageEndOffset?: Prisma.IntNullableFilter<"UserStoreDocChunk"> | number | null
+  embeddingModel?: Prisma.StringFilter<"UserStoreDocChunk"> | string
   hasImages?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
   hasAnnots?: Prisma.BoolFilter<"UserStoreDocChunk"> | boolean
   state?: Prisma.EnumUserStoreChunkStateFilter<"UserStoreDocChunk"> | $Enums.UserStoreChunkState
@@ -1017,6 +1042,7 @@ export type UserStoreDocChunkCreateManyDocInput = {
   endOffset: number
   pageStartOffset?: number | null
   pageEndOffset?: number | null
+  embeddingModel?: string
   hasImages: boolean
   hasAnnots: boolean
   state?: $Enums.UserStoreChunkState
@@ -1044,6 +1070,7 @@ export type UserStoreDocChunkUpdateWithoutDocInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
   hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
@@ -1071,6 +1098,7 @@ export type UserStoreDocChunkUncheckedUpdateWithoutDocInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
   hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
@@ -1098,6 +1126,7 @@ export type UserStoreDocChunkUncheckedUpdateManyWithoutDocInput = {
   endOffset?: Prisma.IntFieldUpdateOperationsInput | number
   pageStartOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   pageEndOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
   hasImages?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hasAnnots?: Prisma.BoolFieldUpdateOperationsInput | boolean
   state?: Prisma.EnumUserStoreChunkStateFieldUpdateOperationsInput | $Enums.UserStoreChunkState
@@ -1128,6 +1157,7 @@ export type UserStoreDocChunkSelect<ExtArgs extends runtime.Types.Extensions.Int
   endOffset?: boolean
   pageStartOffset?: boolean
   pageEndOffset?: boolean
+  embeddingModel?: boolean
   hasImages?: boolean
   hasAnnots?: boolean
   state?: boolean
@@ -1157,6 +1187,7 @@ export type UserStoreDocChunkSelectCreateManyAndReturn<ExtArgs extends runtime.T
   endOffset?: boolean
   pageStartOffset?: boolean
   pageEndOffset?: boolean
+  embeddingModel?: boolean
   hasImages?: boolean
   hasAnnots?: boolean
   state?: boolean
@@ -1186,6 +1217,7 @@ export type UserStoreDocChunkSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   endOffset?: boolean
   pageStartOffset?: boolean
   pageEndOffset?: boolean
+  embeddingModel?: boolean
   hasImages?: boolean
   hasAnnots?: boolean
   state?: boolean
@@ -1215,6 +1247,7 @@ export type UserStoreDocChunkSelectScalar = {
   endOffset?: boolean
   pageStartOffset?: boolean
   pageEndOffset?: boolean
+  embeddingModel?: boolean
   hasImages?: boolean
   hasAnnots?: boolean
   state?: boolean
@@ -1226,7 +1259,7 @@ export type UserStoreDocChunkSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserStoreDocChunkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "docId" | "storeId" | "chunkProvenanceId" | "provenanceId" | "attachmentId" | "conversationId" | "messageId" | "chunkIndex" | "content" | "contentHash" | "tokenCount" | "startOffset" | "endOffset" | "pageStartOffset" | "pageEndOffset" | "hasImages" | "hasAnnots" | "state" | "errorMessage" | "retryCount" | "schemaVersion" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userStoreDocChunk"]>
+export type UserStoreDocChunkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "docId" | "storeId" | "chunkProvenanceId" | "provenanceId" | "attachmentId" | "conversationId" | "messageId" | "chunkIndex" | "content" | "contentHash" | "tokenCount" | "startOffset" | "endOffset" | "pageStartOffset" | "pageEndOffset" | "embeddingModel" | "hasImages" | "hasAnnots" | "state" | "errorMessage" | "retryCount" | "schemaVersion" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userStoreDocChunk"]>
 export type UserStoreDocChunkInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   doc?: boolean | Prisma.UserStoreDocDefaultArgs<ExtArgs>
 }
@@ -1274,6 +1307,10 @@ export type $UserStoreDocChunkPayload<ExtArgs extends runtime.Types.Extensions.I
      * only applicable for pdfs
      */
     pageEndOffset: number | null
+    /**
+     * `voyage-context-3` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
+     */
+    embeddingModel: string
     hasImages: boolean
     hasAnnots: boolean
     state: $Enums.UserStoreChunkState
@@ -1723,6 +1760,7 @@ export interface UserStoreDocChunkFieldRefs {
   readonly endOffset: Prisma.FieldRef<"UserStoreDocChunk", 'Int'>
   readonly pageStartOffset: Prisma.FieldRef<"UserStoreDocChunk", 'Int'>
   readonly pageEndOffset: Prisma.FieldRef<"UserStoreDocChunk", 'Int'>
+  readonly embeddingModel: Prisma.FieldRef<"UserStoreDocChunk", 'String'>
   readonly hasImages: Prisma.FieldRef<"UserStoreDocChunk", 'Boolean'>
   readonly hasAnnots: Prisma.FieldRef<"UserStoreDocChunk", 'Boolean'>
   readonly state: Prisma.FieldRef<"UserStoreDocChunk", 'UserStoreChunkState'>

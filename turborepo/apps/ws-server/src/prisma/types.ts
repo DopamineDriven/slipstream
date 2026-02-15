@@ -15,6 +15,7 @@ export interface CreateUserStoreChunkParams {
   hasAnnots: boolean;
   pageStartOffset?: number | null;
   pageEndOffset?: number | null;
+  embeddingModel?: Voyage.ModelUnion;
   schemaVersion?: $Enums.UserStoreSchemaVersion;
 }
 export interface CreateLocalStoreParams {

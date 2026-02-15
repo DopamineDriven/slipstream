@@ -309,6 +309,7 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
     hasAnnots,
     pageStartOffset = null,
     pageEndOffset = null,
+    embeddingModel = "voyage-multimodal-3.5",
     schemaVersion = "v1_0"
   }: CreateUserStoreChunkParams) {
     const { attachmentId, conversationId, messageId } =
@@ -335,6 +336,7 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
       hasAnnots,
       pageStartOffset,
       pageEndOffset,
+      embeddingModel,
       tokenCount: 0,
       schemaVersion
     } as const;

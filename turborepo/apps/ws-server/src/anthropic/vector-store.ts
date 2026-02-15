@@ -101,7 +101,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     return {
       type: "web_search_20250305",
       name: "web_search",
-      allowed_callers: ["code_execution_20250825", "direct"],
       user_location
     } as const satisfies Anthropic.Beta.BetaWebSearchTool20250305;
   }
@@ -117,8 +116,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   private codeExecutionTool() {
     return {
       type: "code_execution_20250825",
-      name: "code_execution",defer_loading: true,
-      allowed_callers: ["code_execution_20250825", "direct"]
+      name: "code_execution"
     } as const satisfies Anthropic.Beta.BetaToolUnion;
   }
   protected isAdvancedToolCapable(m: AnthropicModelIdUnion) {

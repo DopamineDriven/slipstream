@@ -16,6 +16,7 @@ SELECT
   chunk."pageEndOffset",
   chunk."hasImages",
   chunk."hasAnnots",
+  chunk."embeddingModel",
   chunk."provenanceId",
   chunk."attachmentId",
   1 - (chunk.embedding <=> $2::vector) as score

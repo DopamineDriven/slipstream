@@ -16,6 +16,7 @@ SELECT
   chunk."pageEndOffset",
   chunk."hasImages",
   chunk."hasAnnots",
+  chunk."embeddingModel",
   chunk."provenanceId",
   chunk."attachmentId",
   chunk."conversationId",

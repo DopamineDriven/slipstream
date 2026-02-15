@@ -3376,6 +3376,7 @@ export const UserStoreDocChunkScalarFieldEnum = {
   endOffset: 'endOffset',
   pageStartOffset: 'pageStartOffset',
   pageEndOffset: 'pageEndOffset',
+  embeddingModel: 'embeddingModel',
   hasImages: 'hasImages',
   hasAnnots: 'hasAnnots',
   state: 'state',

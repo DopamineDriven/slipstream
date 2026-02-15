@@ -11,7 +11,7 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param limit
  * @param threshold
  */
-export const searchUserStoreChunksByDoc = $runtime.makeTypedQueryFactory("\nSELECT\nchunk.id,\nchunk.\"chunkProvenanceId\",\nchunk.\"chunkIndex\",\nchunk.content,\nchunk.\"contentHash\",\nchunk.\"tokenCount\",\nchunk.\"startOffset\",\nchunk.\"endOffset\",\nchunk.\"pageStartOffset\",\nchunk.\"pageEndOffset\",\nchunk.\"hasImages\",\nchunk.\"hasAnnots\",\nchunk.\"provenanceId\",\nchunk.\"attachmentId\",\n1 - (chunk.embedding <=> $2::vector) as score\nFROM \"UserStoreDocChunk\" chunk\nWHERE chunk.\"docId\" = $1\nAND chunk.\"deletedAt\" IS NULL\nAND chunk.state = 'READY'::\"UserStoreChunkState\"\nAND chunk.embedding IS NOT NULL\nAND 1 - (chunk.embedding <=> $2::vector) >= $4\nORDER BY chunk.embedding <=> $2::vector\nLIMIT $3;") as (docId: string, embedding: string, limit: number, threshold: number) => $runtime.TypedSql<searchUserStoreChunksByDoc.Parameters, searchUserStoreChunksByDoc.Result>
+export const searchUserStoreChunksByDoc = $runtime.makeTypedQueryFactory("\nSELECT\nchunk.id,\nchunk.\"chunkProvenanceId\",\nchunk.\"chunkIndex\",\nchunk.content,\nchunk.\"contentHash\",\nchunk.\"tokenCount\",\nchunk.\"startOffset\",\nchunk.\"endOffset\",\nchunk.\"pageStartOffset\",\nchunk.\"pageEndOffset\",\nchunk.\"hasImages\",\nchunk.\"hasAnnots\",\nchunk.\"embeddingModel\",\nchunk.\"provenanceId\",\nchunk.\"attachmentId\",\n1 - (chunk.embedding <=> $2::vector) as score\nFROM \"UserStoreDocChunk\" chunk\nWHERE chunk.\"docId\" = $1\nAND chunk.\"deletedAt\" IS NULL\nAND chunk.state = 'READY'::\"UserStoreChunkState\"\nAND chunk.embedding IS NOT NULL\nAND 1 - (chunk.embedding <=> $2::vector) >= $4\nORDER BY chunk.embedding <=> $2::vector\nLIMIT $3;") as (docId: string, embedding: string, limit: number, threshold: number) => $runtime.TypedSql<searchUserStoreChunksByDoc.Parameters, searchUserStoreChunksByDoc.Result>
 
 export namespace searchUserStoreChunksByDoc {
   export type Parameters = [docId: string, embedding: string, limit: number, threshold: number]
@@ -28,6 +28,7 @@ export namespace searchUserStoreChunksByDoc {
     pageEndOffset: number | null
     hasImages: boolean
     hasAnnots: boolean
+    embeddingModel: string
     provenanceId: string
     attachmentId: string
     score: number | null

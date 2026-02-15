@@ -95,14 +95,15 @@ model UserStore {
 
   user User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   docs UserStoreDoc[]
+
   @@unique([userId, storeName])
   @@index([userId, storeName])
 }
 
 model UserStoreDoc {
-  id                  String   @id @default(cuid(2))
+  id                  String    @id @default(cuid(2))
   storeId             String
-  attachmentId        String   @unique
+  attachmentId        String    @unique
   conversationId      String
   messageId           String
   /// CDN URL (s3->Cloudfront) of source asset
@@ -225,12 +226,15 @@ model UserStoreDocChunk {
   pageStartOffset Int?
   /// only applicable for pdfs
   pageEndOffset   Int?
-  hasImages Boolean
-  hasAnnots Boolean
-  state            UserStoreChunkState          @default(QUEUED)
-  errorMessage     String?
-  retryCount       Int                          @default(0)
-  embedding        Unsupported("vector(1024)")?
+  /// `voyage-context-3` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
+  embeddingModel  String                       @default("voyage-multimodal-3.5")
+
+  hasImages       Boolean
+  hasAnnots       Boolean
+  state           UserStoreChunkState          @default(QUEUED)
+  errorMessage    String?
+  retryCount      Int                          @default(0)
+  embedding       Unsupported("vector(1024)")?
 
   schemaVersion UserStoreSchemaVersion @default(v1_0)
   deletedAt     DateTime?

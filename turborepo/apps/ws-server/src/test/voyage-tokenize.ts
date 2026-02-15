@@ -96,7 +96,48 @@ async function countBulkMultimodal() {
 if (process.argv[3] === "multimodal") {
   countBulkMultimodal();
 }
-if (process.argv[3] ==="contextual") {
-  // need to create workup for contextual testing using voyage.countUsage
-  countBulkMultimodal();
+async function countBulkTextTokens() {
+  const voyage = new VoyageEmbeddingService(process.env.VOYAGE_API_KEY ?? "");
+  const fs = new Fs(process.cwd());
+  const { PdfDown } = await import("@d0paminedriven/pdfdown");
+
+  const paths = [
+    "Geminastics-Pt-I",
+    "Geminastics-Pt-II",
+    "Geminastics-Pt-III"
+  ] as const;
+
+  const texts = Array.of<string>();
+
+  for (const p of paths) {
+    const buf = fs.fileToBuffer(`src/test/__out__/condensed/${p}.pdf`);
+    const pdfdown = new PdfDown(buf);
+    const structured = await pdfdown.structuredTextAsync();
+
+    for (const page of structured) {
+      if (page.body && page.body.trim().length > 0) {
+        texts.push(page.body);
+      }
+    }
+  }
+
+  console.log(`Collected ${texts.length} text chunks from ${paths.length} PDFs`);
+
+  try {
+    const result = await voyage.countTokens(texts, "voyage-context-3");
+
+    fs.withWs(
+      "src/test/voyage/__out__/text-tokens.json",
+      JSON.stringify(result, null, 2)
+    );
+    console.log(result);
+    console.log("countTokens result:", JSON.stringify(result, null, 2));
+    return result;
+  } finally {
+    await voyage.exitPython();
+  }
+}
+
+if (process.argv[3] === "contextual") {
+  countBulkTextTokens();
 }

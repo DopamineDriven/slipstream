@@ -81,10 +81,6 @@ catalogs:
     '@d0paminedriven/pdfdown':
       specifier: ^0.9.7
       version: 0.9.7
-  dd-ocr:
-    '@d0paminedriven/pdfdown-ocr':
-      specifier: ^0.9.7
-      version: 0.9.7
   decimal:
     decimal.js:
       specifier: ^10.6.0
@@ -353,8 +349,8 @@ catalogs:
       specifier: ^19.2.4
       version: 19.2.4
     react-resizable-panels:
-      specifier: ^4.6.3
-      version: 4.6.3
+      specifier: ^4.6.4
+      version: 4.6.4
     vaul:
       specifier: ^1.1.2
       version: 1.1.2
@@ -460,8 +456,8 @@ catalogs:
       version: 8.55.0
   tsgo:
     '@typescript/native-preview':
-      specifier: ^7.0.0-dev.20260213.1
-      version: 7.0.0-dev.20260213.1
+      specifier: ^7.0.0-dev.20260214.1
+      version: 7.0.0-dev.20260214.1
   tslib:
     tslib:
       specifier: ^2.8.1
@@ -482,14 +478,14 @@ catalogs:
       version: 4.21.0
   turbo:
     eslint-config-turbo:
-      specifier: ^2.8.8
-      version: 2.8.8
+      specifier: ^2.8.9
+      version: 2.8.9
     eslint-plugin-turbo:
-      specifier: ^2.8.8
-      version: 2.8.8
+      specifier: ^2.8.9
+      version: 2.8.9
     turbo:
-      specifier: ^2.8.8
-      version: 2.8.8
+      specifier: ^2.8.9
+      version: 2.8.9
   tw:
     '@tailwindcss/forms':
       specifier: ^0.5.11
@@ -594,7 +590,7 @@ importers:
         version: 25.2.3
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       dotenv:
         specifier: catalog:dotenv
         version: 17.3.1
@@ -615,7 +611,7 @@ importers:
         version: 4.21.0
       turbo:
         specifier: catalog:turbo
-        version: 2.8.8
+        version: 2.8.9
       typescript:
         specifier: catalog:ts
         version: 5.9.3
@@ -756,7 +752,7 @@ importers:
         version: 19.2.4(react@19.2.4)
       react-resizable-panels:
         specifier: catalog:react
-        version: 4.6.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 4.6.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       rehype-katex:
         specifier: catalog:rehype
         version: 7.0.1
@@ -862,7 +858,7 @@ importers:
         version: 3.0.3
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       '@vercel/functions':
         specifier: catalog:vercel
         version: 3.4.2(@aws-sdk/credential-provider-web-identity@3.972.8)
@@ -962,9 +958,6 @@ importers:
       '@d0paminedriven/pdfdown':
         specifier: catalog:dd
         version: 0.9.7
-      '@d0paminedriven/pdfdown-ocr':
-        specifier: catalog:dd-ocr
-        version: 0.9.7
       '@google/genai':
         specifier: catalog:google
         version: 1.38.0(patch_hash=e86aff75c8d40c543d73c37b329a64dc75cc893e479dacdadbfdb34857772aa9)(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))
@@ -1012,7 +1005,7 @@ importers:
         version: 8.18.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       dotenv:
         specifier: catalog:dotenv
         version: 17.3.1
@@ -1097,7 +1090,7 @@ importers:
         version: 1.0.0-rc.4
       tsdown:
         specifier: catalog:tsdown
-        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260213.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
+        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260214.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
       tsx:
         specifier: catalog:tsx
         version: 4.21.0
@@ -1140,7 +1133,7 @@ importers:
         version: 25.2.3
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       dotenv-cli:
         specifier: catalog:dotenv
         version: 11.0.0
@@ -1155,7 +1148,7 @@ importers:
         version: 3.8.1
       tsdown:
         specifier: catalog:tsdown
-        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260213.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
+        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260214.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1207,7 +1200,7 @@ importers:
         version: 8.16.0
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       eslint:
         specifier: catalog:eslint
         version: 9.39.2(jiti@2.6.1)
@@ -1228,13 +1221,13 @@ importers:
         version: 1.0.0-rc.4
       rolldown-plugin-dts:
         specifier: catalog:rolldown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260213.1)(oxc-resolver@11.15.0)(rolldown@1.0.0-rc.4)(typescript@5.9.3)
+        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260214.1)(oxc-resolver@11.15.0)(rolldown@1.0.0-rc.4)(typescript@5.9.3)
       rolldown-plugin-wasm:
         specifier: catalog:rolldown
         version: 0.2.1(rolldown@1.0.0-rc.4)
       tsdown:
         specifier: catalog:tsdown
-        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260213.1)(oxc-resolver@11.15.0)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
+        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260214.1)(oxc-resolver@11.15.0)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1283,7 +1276,7 @@ importers:
         version: 25.2.3
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       dotenv-cli:
         specifier: catalog:dotenv
         version: 11.0.0
@@ -1298,7 +1291,7 @@ importers:
         version: 3.8.1
       tsdown:
         specifier: catalog:tsdown
-        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260213.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
+        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260214.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1332,7 +1325,7 @@ importers:
         version: 25.2.3
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       dotenv:
         specifier: catalog:dotenv
         version: 17.3.1
@@ -1347,7 +1340,7 @@ importers:
         version: 3.8.1
       tsdown:
         specifier: catalog:tsdown
-        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260213.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
+        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260214.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1380,7 +1373,7 @@ importers:
         version: 25.2.3
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       dotenv:
         specifier: catalog:dotenv
         version: 17.3.1
@@ -1395,7 +1388,7 @@ importers:
         version: 3.8.1
       tsdown:
         specifier: catalog:tsdown
-        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260213.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
+        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260214.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1441,7 +1434,7 @@ importers:
         version: 25.2.3
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       dotenv-cli:
         specifier: catalog:dotenv
         version: 11.0.0
@@ -1456,7 +1449,7 @@ importers:
         version: 3.8.1
       tsdown:
         specifier: catalog:tsdown
-        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260213.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
+        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260214.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1508,7 +1501,7 @@ importers:
         version: 25.2.3
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       dotenv:
         specifier: catalog:dotenv
         version: 17.3.1
@@ -1523,7 +1516,7 @@ importers:
         version: 3.8.1
       tsdown:
         specifier: catalog:tsdown
-        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260213.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
+        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260214.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1566,7 +1559,7 @@ importers:
         version: 25.2.3
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       dotenv-expand:
         specifier: catalog:dotenv
         version: 12.0.3
@@ -1581,7 +1574,7 @@ importers:
         version: 3.8.1
       tsdown:
         specifier: catalog:tsdown
-        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260213.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
+        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260214.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1717,7 +1710,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       autoprefixer:
         specifier: catalog:styles
         version: 10.4.24(postcss@8.5.6)
@@ -1747,7 +1740,7 @@ importers:
         version: 1.0.0-rc.4
       rolldown-plugin-dts:
         specifier: catalog:rolldown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260213.1)(oxc-resolver@11.15.0)(rolldown@1.0.0-rc.4)(typescript@5.9.3)
+        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260214.1)(oxc-resolver@11.15.0)(rolldown@1.0.0-rc.4)(typescript@5.9.3)
       tailwindcss:
         specifier: catalog:tw
         version: 4.1.18
@@ -1756,7 +1749,7 @@ importers:
         version: 5.46.0
       tsdown:
         specifier: catalog:tsdown
-        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260213.1)(oxc-resolver@11.15.0)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
+        version: 0.20.3(@typescript/native-preview@7.0.0-dev.20260214.1)(oxc-resolver@11.15.0)(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1792,7 +1785,7 @@ importers:
         version: 4.2.0(@typescript-eslint/utils@8.55.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(libpg-query@17.7.3)
       eslint-config-turbo:
         specifier: catalog:turbo
-        version: 2.8.8(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.8)
+        version: 2.8.9(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.9)
       eslint-plugin-import:
         specifier: catalog:eslint
         version: 2.32.0(eslint@9.39.2(jiti@2.6.1))
@@ -1810,7 +1803,7 @@ importers:
         version: 7.0.1(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-turbo:
         specifier: catalog:turbo
-        version: 2.8.8(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.8)
+        version: 2.8.9(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.9)
       jiti:
         specifier: catalog:jiti
         version: 2.6.1
@@ -1829,7 +1822,7 @@ importers:
         version: 25.2.3
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       eslint:
         specifier: catalog:eslint
         version: 9.39.2(jiti@2.6.1)
@@ -1857,7 +1850,7 @@ importers:
         version: link:../typescript
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260213.1
+        version: 7.0.0-dev.20260214.1
       typescript:
         specifier: catalog:ts
         version: 5.9.3
@@ -2468,37 +2461,6 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [musl]
-
-  '@d0paminedriven/pdfdown-ocr-darwin-arm64@0.9.7':
-    resolution: {integrity: sha512-Jkv8slqkkYUugd35+mpwI5GTBzOYPZxmhw0C7XnuCcRdVV7O4jz12CUqwBGCgallTusfcKy8x9bU4yBPchUijw==}
-    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@d0paminedriven/pdfdown-ocr-darwin-x64@0.9.7':
-    resolution: {integrity: sha512-9ib0jVghge+DrNjsOtcfaptOP6SvJV1EQW6lZNG++sFtxiITcVxVyLB32rFFpqxZqyKN5wrPSwtwBaqfHBdbaw==}
-    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
-    cpu: [x64]
-    os: [darwin]
-
-  '@d0paminedriven/pdfdown-ocr-linux-arm64-gnu@0.9.7':
-    resolution: {integrity: sha512-H/QW43jlaKV9K1h038EMHikQW+JgAiqaf3N09aqlYnORgbnt+VhLlKhwNwQJmbobdM9Wed8L1HROxgEl/pOLwg==}
-    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@d0paminedriven/pdfdown-ocr-linux-x64-gnu@0.9.7':
-    resolution: {integrity: sha512-EW+A3vYFN7h5pl6D0MO/qippP5iLBPVQmlDRJhlbfuztMa0qPlH21UUlmEER16ekVPnLkxOeS+EiPBw1qO4pRg==}
-    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@d0paminedriven/pdfdown-ocr@0.9.7':
-    resolution: {integrity: sha512-Kxxpgq/rI4E3CwS/iPL+2flQ32d6N8Xsx6jQ/AcqcSYxh5qVA7QNIpZzot2+OS2uZw1BNJreRNUZsJEElL7zVg==}
-    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
-    os: [darwin, linux]
 
   '@d0paminedriven/pdfdown-wasm32-wasi@0.9.7':
     resolution: {integrity: sha512-8aF7UztgN7rmUHj8X6vtqYFzK024cYuMZzsK2p1hPV3bFzvHGZqqEaE+rkO19JW1QxIU6yuO7eBeUr43NwkeiA==}
@@ -5279,43 +5241,43 @@ packages:
     resolution: {integrity: sha512-AxNRwEie8Nn4eFS1FzDMJWIISMGoXMb037sgCBJ3UR6o0fQTzr2tqN9WT+DkWJPhIdQCfV7T6D387566VtnCJA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260213.1':
-    resolution: {integrity: sha512-nqfuHgFZ8MvaHeb1XOkAGIGc6cR91dwQdlHmlbH918n63JguKzkYjzzulpr48IVn1SVewGwjtfs1moCpaDpWcg==}
+  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260214.1':
+    resolution: {integrity: sha512-Jb2WcLGpTOC6x58e8QPYC/14xmDbnbFIuKqUvYoI77hVtojVyxZi8L5Y4CgYqXYx8vRWmIFk35c1OGdtPip6Sg==}
     cpu: [arm64]
     os: [darwin]
 
-  '@typescript/native-preview-darwin-x64@7.0.0-dev.20260213.1':
-    resolution: {integrity: sha512-JDVDVLPIYhYZR12omTKwzKbdw+wnPEtLnkmM+nioqbISlV29fg7IBgFx0/mf1D+Gz1ztUQVHDTqw4GEgOZ9VTg==}
+  '@typescript/native-preview-darwin-x64@7.0.0-dev.20260214.1':
+    resolution: {integrity: sha512-O9l2gVuQFZsb8NIQtu0HN5Tn/Hw2fwylPOPS/0Y4oW+FUMhkqtvetUkb3zZ0qj7capilZ4YnmyGYg3TDqkP4Nw==}
     cpu: [x64]
     os: [darwin]
 
-  '@typescript/native-preview-linux-arm64@7.0.0-dev.20260213.1':
-    resolution: {integrity: sha512-d7Gwl8W4aics0KI4H0zz3TP1ngnP8L5COND0TPBZ7ifWVrxKDNSLhF2V9OuStW43RPfA4Gzik9iIv+l0Lg+eGw==}
+  '@typescript/native-preview-linux-arm64@7.0.0-dev.20260214.1':
+    resolution: {integrity: sha512-Hl4e3yxJqzIGgFI8aH/rLGW+a7kSLHJCpAd5JOLG7hHKnamZF4SjlunnoHLV4IcMri+G6UE3W/84i0QvQP5wLA==}
     cpu: [arm64]
     os: [linux]
 
-  '@typescript/native-preview-linux-arm@7.0.0-dev.20260213.1':
-    resolution: {integrity: sha512-O6iVB8tTnLZJVYrChH6VJuCwqAa2ObWVdMtrKQw5UtmLXBhsOhZ3isttSuGzQrPfTiGN091IdW1KuRi8Ft1lnQ==}
+  '@typescript/native-preview-linux-arm@7.0.0-dev.20260214.1':
+    resolution: {integrity: sha512-TaFrVnx3iXtl/oH1hzwvFyqWj9tzkjW8Ufl2m0Vx2/7GXnzZadm2KA6tFpGbzzWbZJznmXxKHL4O3AZRQYyZqQ==}
     cpu: [arm]
     os: [linux]
 
-  '@typescript/native-preview-linux-x64@7.0.0-dev.20260213.1':
-    resolution: {integrity: sha512-Aq55fID1fE5/8K4XvfVddgw8LKUgY3kp5IOb+QEklfyle4MuAV5gtat3MnEv9XMbiidk8iKVxYrYASlUQEQzDw==}
+  '@typescript/native-preview-linux-x64@7.0.0-dev.20260214.1':
+    resolution: {integrity: sha512-a/JypIXTc/tdodhYdQm24WH6aTfnJJjDbwxce4BS2g6IzYSc2GFcZBvlq1CJYS2FAVLpiSxj0OFAZmgjpCDAKg==}
     cpu: [x64]
     os: [linux]
 
-  '@typescript/native-preview-win32-arm64@7.0.0-dev.20260213.1':
-    resolution: {integrity: sha512-VlyULgXApmGMSqAANjskGx0AcjHchf3I8rhZ47AxF/XKAkZPe/5ewfleJ97iln7dg1UL3lq2cJY2CXxU+JPcFQ==}
+  '@typescript/native-preview-win32-arm64@7.0.0-dev.20260214.1':
+    resolution: {integrity: sha512-MJGPEDvdXj8olcWH0P+cWYcaN4r/0J4aSbcaISlen3MZ/2hrrgNl46PV4eGJKKCDniY2pH2fJzrMyJWZOcdb0w==}
     cpu: [arm64]
     os: [win32]
 
-  '@typescript/native-preview-win32-x64@7.0.0-dev.20260213.1':
-    resolution: {integrity: sha512-lEtWvZDa2oCgqJ2gbP6BRLUeTyHLyrt5BfJmVlvmVSTZzdoBpFROJdp9yprsa2Zry2o5GK8HFAxd3RlvxkOU5Q==}
+  '@typescript/native-preview-win32-x64@7.0.0-dev.20260214.1':
+    resolution: {integrity: sha512-BtF48TRUyiCKznlOcQ7r7EXhonGSanm9X2eu7d8Yq1vaWO5SDgB0e+ISQXSoIfs3a1S3d5S5QV/vTE4+vocPxA==}
     cpu: [x64]
     os: [win32]
 
-  '@typescript/native-preview@7.0.0-dev.20260213.1':
-    resolution: {integrity: sha512-TZ/0Tv954jRpn5IHQJZQF0gaNmw//ZTvkgr3nC2H8u9t4GxUhIk5vfAHVFgdl8JnNGbl7gZks37FVsEwXjdHqg==}
+  '@typescript/native-preview@7.0.0-dev.20260214.1':
+    resolution: {integrity: sha512-BDM0ZLf2v6ilR0tDi8OMEr4X08lFCToPk3/p1SSE4GhagzmlU/5b+9slR0kKtaKMrds01FhvaKx6U9+NmAWgbQ==}
     hasBin: true
 
   '@ungap/structured-clone@1.3.0':
@@ -6506,8 +6468,8 @@ packages:
       typescript:
         optional: true
 
-  eslint-config-turbo@2.8.8:
-    resolution: {integrity: sha512-MucPP2FylZi+aQrtECmXoZqP0FMMu0K+xdix5YwovPX/bGLLkIKdtywW7zQ2ko3kCytapOkEq2qMZUFPjntfJg==}
+  eslint-config-turbo@2.8.9:
+    resolution: {integrity: sha512-U+R5hYzLH5A393R4u6AGMftSLXEs0Gj7ys1ae2ha39YWi+Ei8K2ctOB5y+NQ7TOngvOVIK5uFhxMWQimKAglGw==}
     peerDependencies:
       eslint: '>6.6.0'
       turbo: '>2.0.0'
@@ -6583,8 +6545,8 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9.7
 
-  eslint-plugin-turbo@2.8.8:
-    resolution: {integrity: sha512-6VOzrWbW9SqpItlh8Z+PgWnG1zzG3LEgT2BKC3Jt75uDTobsyc2Smnvo7Im9aV/xgDFWX6UziLzydJOWStjzhQ==}
+  eslint-plugin-turbo@2.8.9:
+    resolution: {integrity: sha512-gmhdR1SNrPxdXu00xxdhnt32SayUBjHbnhw3YpB939D9ZQjsK9Mthw7mPBrafifwb06kx0VqaFzxaP1JLCbh3g==}
     peerDependencies:
       eslint: '>6.6.0'
       turbo: '>2.0.0'
@@ -8741,8 +8703,8 @@ packages:
       '@types/react':
         optional: true
 
-  react-resizable-panels@4.6.3:
-    resolution: {integrity: sha512-nO5ksnCTdnV4YrRNw/OrZrX8ffh0sPA+2uM8kJbF19c8PRNuhH7ojJFE+UisAg2HFQFqIPmmW8bANrJNtIdXeA==}
+  react-resizable-panels@4.6.4:
+    resolution: {integrity: sha512-E7Szs1xyaMZ7xOI2gG4TECNz4r/gmpV1AsXyZRnER6OQnfFf9uclFmrHHZR3h/iF8vQS+nQ1LKyZv9bzwGxPSg==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
@@ -9467,38 +9429,38 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
-  turbo-darwin-64@2.8.8:
-    resolution: {integrity: sha512-7R/XRAleyNB8nIJuenRpS7EnmCM/kYFgcG1rW3F5DF57Nl4WyBO3DzxqwooRheuoXDD1UsJvDse0yRufgxjClA==}
+  turbo-darwin-64@2.8.9:
+    resolution: {integrity: sha512-KnCw1ZI9KTnEAhdI9avZrnZ/z4wsM++flMA1w8s8PKOqi5daGpFV36qoPafg4S8TmYMe52JPWEoFr0L+lQ5JIw==}
     cpu: [x64]
     os: [darwin]
 
-  turbo-darwin-arm64@2.8.8:
-    resolution: {integrity: sha512-whpveO0w/dMcgQ0zFrzqK76mG2W+RBQ/pKIpW+sEvNr+T4UcYd2gZpfV2euehJLvdeFErWgW74dIt/MFfkG1bA==}
+  turbo-darwin-arm64@2.8.9:
+    resolution: {integrity: sha512-CbD5Y2NKJKBXTOZ7z7Cc7vGlFPZkYjApA7ri9lH4iFwKV1X7MoZswh9gyRLetXYWImVX1BqIvP8KftulJg/wIA==}
     cpu: [arm64]
     os: [darwin]
 
-  turbo-linux-64@2.8.8:
-    resolution: {integrity: sha512-BISkcKk+5/Dh11q+YhdQIGONXmdlQ6LY0iQ+GBIK7QOBAJyJFKmKvUeAeMdWGXOa3sImz2oZ6u2StyR+0Y/VVA==}
+  turbo-linux-64@2.8.9:
+    resolution: {integrity: sha512-OXC9HdCtsHvyH+5KUoH8ds+p5WU13vdif0OPbsFzZca4cUXMwKA3HWwUuCgQetk0iAE4cscXpi/t8A263n3VTg==}
     cpu: [x64]
     os: [linux]
 
-  turbo-linux-arm64@2.8.8:
-    resolution: {integrity: sha512-B+DQWWtM3O+AexFF4aYucT0MvvnQOW4n5y9LA5h3Zc3Lpj10yl9K4dEBzJvMVQ2jTkCRNAvA8q9G3EjqmGmGGA==}
+  turbo-linux-arm64@2.8.9:
+    resolution: {integrity: sha512-yI5n8jNXiFA6+CxnXG0gO7h5ZF1+19K8uO3/kXPQmyl37AdiA7ehKJQOvf9OPAnmkGDHcF2HSCPltabERNRmug==}
     cpu: [arm64]
     os: [linux]
 
-  turbo-windows-64@2.8.8:
-    resolution: {integrity: sha512-KP5TRVrmVnrxDyvERvQq7VXu+h5AiEiBwyr90YsRuYy/Z5zLz8hrNZXejTyUR17xmnuI+RbUSxrQlfmPnxiW1A==}
+  turbo-windows-64@2.8.9:
+    resolution: {integrity: sha512-/OztzeGftJAg258M/9vK2ZCkUKUzqrWXJIikiD2pm8TlqHcIYUmepDbyZSDfOiUjMy6NzrLFahpNLnY7b5vNgg==}
     cpu: [x64]
     os: [win32]
 
-  turbo-windows-arm64@2.8.8:
-    resolution: {integrity: sha512-X45sTOksR8iidk+PZUXpNcfEkOhGCTS2p2J8nSUExr1v7u3T4FixwplzliuWmG7QTPGJapAwItzHbi+d/9ckNQ==}
+  turbo-windows-arm64@2.8.9:
+    resolution: {integrity: sha512-xZ2VTwVTjIqpFZKN4UBxDHCPM3oJ2J5cpRzCBSmRpJ/Pn33wpiYjs+9FB2E03svKaD04/lSSLlEUej0UYsugfg==}
     cpu: [arm64]
     os: [win32]
 
-  turbo@2.8.8:
-    resolution: {integrity: sha512-wP+axjWAKzYfZ7bghuggVST9bX4j5cn3NPMU9NPQqtwaUKL9n9JOnWWBIc9gdrEma1aViYR73EoPjDEpVq+liQ==}
+  turbo@2.8.9:
+    resolution: {integrity: sha512-G+Mq8VVQAlpz/0HTsxiNNk/xywaHGl+dk1oiBREgOEVCCDjXInDlONWUn5srRnC9s5tdHTFD1bx1N19eR4hI+g==}
     hasBin: true
 
   tw-animate-css@1.4.0:
@@ -11118,25 +11080,6 @@ snapshots:
 
   '@d0paminedriven/pdfdown-linux-x64-musl@0.9.7':
     optional: true
-
-  '@d0paminedriven/pdfdown-ocr-darwin-arm64@0.9.7':
-    optional: true
-
-  '@d0paminedriven/pdfdown-ocr-darwin-x64@0.9.7':
-    optional: true
-
-  '@d0paminedriven/pdfdown-ocr-linux-arm64-gnu@0.9.7':
-    optional: true
-
-  '@d0paminedriven/pdfdown-ocr-linux-x64-gnu@0.9.7':
-    optional: true
-
-  '@d0paminedriven/pdfdown-ocr@0.9.7':
-    optionalDependencies:
-      '@d0paminedriven/pdfdown-ocr-darwin-arm64': 0.9.7
-      '@d0paminedriven/pdfdown-ocr-darwin-x64': 0.9.7
-      '@d0paminedriven/pdfdown-ocr-linux-arm64-gnu': 0.9.7
-      '@d0paminedriven/pdfdown-ocr-linux-x64-gnu': 0.9.7
 
   '@d0paminedriven/pdfdown-wasm32-wasi@0.9.7':
     dependencies:
@@ -13666,36 +13609,36 @@ snapshots:
       '@typescript-eslint/types': 8.55.0
       eslint-visitor-keys: 4.2.1
 
-  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260213.1':
+  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260214.1':
     optional: true
 
-  '@typescript/native-preview-darwin-x64@7.0.0-dev.20260213.1':
+  '@typescript/native-preview-darwin-x64@7.0.0-dev.20260214.1':
     optional: true
 
-  '@typescript/native-preview-linux-arm64@7.0.0-dev.20260213.1':
+  '@typescript/native-preview-linux-arm64@7.0.0-dev.20260214.1':
     optional: true
 
-  '@typescript/native-preview-linux-arm@7.0.0-dev.20260213.1':
+  '@typescript/native-preview-linux-arm@7.0.0-dev.20260214.1':
     optional: true
 
-  '@typescript/native-preview-linux-x64@7.0.0-dev.20260213.1':
+  '@typescript/native-preview-linux-x64@7.0.0-dev.20260214.1':
     optional: true
 
-  '@typescript/native-preview-win32-arm64@7.0.0-dev.20260213.1':
+  '@typescript/native-preview-win32-arm64@7.0.0-dev.20260214.1':
     optional: true
 
-  '@typescript/native-preview-win32-x64@7.0.0-dev.20260213.1':
+  '@typescript/native-preview-win32-x64@7.0.0-dev.20260214.1':
     optional: true
 
-  '@typescript/native-preview@7.0.0-dev.20260213.1':
+  '@typescript/native-preview@7.0.0-dev.20260214.1':
     optionalDependencies:
-      '@typescript/native-preview-darwin-arm64': 7.0.0-dev.20260213.1
-      '@typescript/native-preview-darwin-x64': 7.0.0-dev.20260213.1
-      '@typescript/native-preview-linux-arm': 7.0.0-dev.20260213.1
-      '@typescript/native-preview-linux-arm64': 7.0.0-dev.20260213.1
-      '@typescript/native-preview-linux-x64': 7.0.0-dev.20260213.1
-      '@typescript/native-preview-win32-arm64': 7.0.0-dev.20260213.1
-      '@typescript/native-preview-win32-x64': 7.0.0-dev.20260213.1
+      '@typescript/native-preview-darwin-arm64': 7.0.0-dev.20260214.1
+      '@typescript/native-preview-darwin-x64': 7.0.0-dev.20260214.1
+      '@typescript/native-preview-linux-arm': 7.0.0-dev.20260214.1
+      '@typescript/native-preview-linux-arm64': 7.0.0-dev.20260214.1
+      '@typescript/native-preview-linux-x64': 7.0.0-dev.20260214.1
+      '@typescript/native-preview-win32-arm64': 7.0.0-dev.20260214.1
+      '@typescript/native-preview-win32-x64': 7.0.0-dev.20260214.1
 
   '@ungap/structured-clone@1.3.0': {}
 
@@ -15100,11 +15043,11 @@ snapshots:
       - eslint-plugin-import-x
       - supports-color
 
-  eslint-config-turbo@2.8.8(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.8):
+  eslint-config-turbo@2.8.9(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.9):
     dependencies:
       eslint: 9.39.2(jiti@2.6.1)
-      eslint-plugin-turbo: 2.8.8(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.8)
-      turbo: 2.8.8
+      eslint-plugin-turbo: 2.8.9(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.9)
+      turbo: 2.8.9
 
   eslint-import-resolver-node@0.3.9:
     dependencies:
@@ -15260,11 +15203,11 @@ snapshots:
       string.prototype.matchall: 4.0.12
       string.prototype.repeat: 1.0.0
 
-  eslint-plugin-turbo@2.8.8(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.8):
+  eslint-plugin-turbo@2.8.9(eslint@9.39.2(jiti@2.6.1))(turbo@2.8.9):
     dependencies:
       dotenv: 16.0.3
       eslint: 9.39.2(jiti@2.6.1)
-      turbo: 2.8.8
+      turbo: 2.8.9
 
   eslint-scope@5.1.1:
     dependencies:
@@ -17748,7 +17691,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
 
-  react-resizable-panels@4.6.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  react-resizable-panels@4.6.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
@@ -17954,7 +17897,7 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rolldown-plugin-dts@0.22.1(@typescript/native-preview@7.0.0-dev.20260213.1)(oxc-resolver@11.15.0)(rolldown@1.0.0-rc.3)(typescript@5.9.3):
+  rolldown-plugin-dts@0.22.1(@typescript/native-preview@7.0.0-dev.20260214.1)(oxc-resolver@11.15.0)(rolldown@1.0.0-rc.3)(typescript@5.9.3):
     dependencies:
       '@babel/generator': 8.0.0-rc.1
       '@babel/helper-validator-identifier': 8.0.0-rc.1
@@ -17967,12 +17910,12 @@ snapshots:
       obug: 2.1.1
       rolldown: 1.0.0-rc.3
     optionalDependencies:
-      '@typescript/native-preview': 7.0.0-dev.20260213.1
+      '@typescript/native-preview': 7.0.0-dev.20260214.1
       typescript: 5.9.3
     transitivePeerDependencies:
       - oxc-resolver
 
-  rolldown-plugin-dts@0.22.1(@typescript/native-preview@7.0.0-dev.20260213.1)(oxc-resolver@11.15.0)(rolldown@1.0.0-rc.4)(typescript@5.9.3):
+  rolldown-plugin-dts@0.22.1(@typescript/native-preview@7.0.0-dev.20260214.1)(oxc-resolver@11.15.0)(rolldown@1.0.0-rc.4)(typescript@5.9.3):
     dependencies:
       '@babel/generator': 8.0.0-rc.1
       '@babel/helper-validator-identifier': 8.0.0-rc.1
@@ -17985,12 +17928,12 @@ snapshots:
       obug: 2.1.1
       rolldown: 1.0.0-rc.4
     optionalDependencies:
-      '@typescript/native-preview': 7.0.0-dev.20260213.1
+      '@typescript/native-preview': 7.0.0-dev.20260214.1
       typescript: 5.9.3
     transitivePeerDependencies:
       - oxc-resolver
 
-  rolldown-plugin-dts@0.22.1(@typescript/native-preview@7.0.0-dev.20260213.1)(rolldown@1.0.0-rc.3)(typescript@5.9.3):
+  rolldown-plugin-dts@0.22.1(@typescript/native-preview@7.0.0-dev.20260214.1)(rolldown@1.0.0-rc.3)(typescript@5.9.3):
     dependencies:
       '@babel/generator': 8.0.0-rc.1
       '@babel/helper-validator-identifier': 8.0.0-rc.1
@@ -18003,7 +17946,7 @@ snapshots:
       obug: 2.1.1
       rolldown: 1.0.0-rc.3
     optionalDependencies:
-      '@typescript/native-preview': 7.0.0-dev.20260213.1
+      '@typescript/native-preview': 7.0.0-dev.20260214.1
       typescript: 5.9.3
     transitivePeerDependencies:
       - oxc-resolver
@@ -18640,7 +18583,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.20.3(@typescript/native-preview@7.0.0-dev.20260213.1)(oxc-resolver@11.15.0)(typescript@5.9.3)(unplugin-lightningcss@0.4.5):
+  tsdown@0.20.3(@typescript/native-preview@7.0.0-dev.20260214.1)(oxc-resolver@11.15.0)(typescript@5.9.3)(unplugin-lightningcss@0.4.5):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14
@@ -18651,7 +18594,7 @@ snapshots:
       obug: 2.1.1
       picomatch: 4.0.3
       rolldown: 1.0.0-rc.3
-      rolldown-plugin-dts: 0.22.1(@typescript/native-preview@7.0.0-dev.20260213.1)(oxc-resolver@11.15.0)(rolldown@1.0.0-rc.3)(typescript@5.9.3)
+      rolldown-plugin-dts: 0.22.1(@typescript/native-preview@7.0.0-dev.20260214.1)(oxc-resolver@11.15.0)(rolldown@1.0.0-rc.3)(typescript@5.9.3)
       semver: 7.7.3
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
@@ -18668,7 +18611,7 @@ snapshots:
       - synckit
       - vue-tsc
 
-  tsdown@0.20.3(@typescript/native-preview@7.0.0-dev.20260213.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5):
+  tsdown@0.20.3(@typescript/native-preview@7.0.0-dev.20260214.1)(typescript@5.9.3)(unplugin-lightningcss@0.4.5):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14
@@ -18679,7 +18622,7 @@ snapshots:
       obug: 2.1.1
       picomatch: 4.0.3
       rolldown: 1.0.0-rc.3
-      rolldown-plugin-dts: 0.22.1(@typescript/native-preview@7.0.0-dev.20260213.1)(rolldown@1.0.0-rc.3)(typescript@5.9.3)
+      rolldown-plugin-dts: 0.22.1(@typescript/native-preview@7.0.0-dev.20260214.1)(rolldown@1.0.0-rc.3)(typescript@5.9.3)
       semver: 7.7.3
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
@@ -18735,32 +18678,32 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  turbo-darwin-64@2.8.8:
+  turbo-darwin-64@2.8.9:
     optional: true
 
-  turbo-darwin-arm64@2.8.8:
+  turbo-darwin-arm64@2.8.9:
     optional: true
 
-  turbo-linux-64@2.8.8:
+  turbo-linux-64@2.8.9:
     optional: true
 
-  turbo-linux-arm64@2.8.8:
+  turbo-linux-arm64@2.8.9:
     optional: true
 
-  turbo-windows-64@2.8.8:
+  turbo-windows-64@2.8.9:
     optional: true
 
-  turbo-windows-arm64@2.8.8:
+  turbo-windows-arm64@2.8.9:
     optional: true
 
-  turbo@2.8.8:
+  turbo@2.8.9:
     optionalDependencies:
-      turbo-darwin-64: 2.8.8
-      turbo-darwin-arm64: 2.8.8
-      turbo-linux-64: 2.8.8
-      turbo-linux-arm64: 2.8.8
-      turbo-windows-64: 2.8.8
-      turbo-windows-arm64: 2.8.8
+      turbo-darwin-64: 2.8.9
+      turbo-darwin-arm64: 2.8.9
+      turbo-linux-64: 2.8.9
+      turbo-linux-arm64: 2.8.9
+      turbo-windows-64: 2.8.9
+      turbo-windows-arm64: 2.8.9
 
   tw-animate-css@1.4.0: {}
 
