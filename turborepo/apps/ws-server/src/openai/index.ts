@@ -1,3 +1,4 @@
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { OpenAIResponsesChatService } from "@/openai/responses-chat.ts";
@@ -10,11 +11,12 @@ export class OpenAIService extends OpenAIResponsesChatService {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
+    userStoreVector: UserStoreVectorService,
     s3: S3Storage,
     redis: EnhancedRedisPubSub,
     apiKey: string
   ) {
-    super(logger, prisma, s3, redis, apiKey);
+    super(logger, prisma, userStoreVector, s3, redis, apiKey);
   }
   public async routeOpenAI({ model, ...rest }: ProviderOpenaiRequestEntity) {
     const m = model as OpenAiModelIdUnion;

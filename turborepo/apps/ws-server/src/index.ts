@@ -154,6 +154,7 @@ async function exe() {
     const openai = new OpenAIService(
       logger,
       prisma,
+      userStore,
       s3,
       redisInstance,
       cfg.OPENAI_API_KEY

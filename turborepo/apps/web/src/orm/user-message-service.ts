@@ -75,7 +75,14 @@ export class PrismaUserMessageService extends ErrorHelperService {
 
   public async getConversationRouteProps(conversationId: string) {
     const session = await getSession();
-    if (!session?.user?.id) redirect("/auth/login");
+    console.log(session?.session);
+    if (!session?.user?.id || !session?.session.expiresAt)
+      redirect("/auth/login");
+
+    const expiryUnixEpoch = new Date(session.session.expiresAt).getTime();
+    if (new Date(Date.now()).getTime() > expiryUnixEpoch)
+      redirect("/auth/login");
+
     if (this.isHomeOrNewChat(conversationId)) {
       return {
         conversationId,

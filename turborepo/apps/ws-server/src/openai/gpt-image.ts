@@ -3,6 +3,7 @@ import type {
   OpenAIImgApiStreamFinal,
   OpenAIImgApiStreamPartial
 } from "@/openai/types.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
   ProviderOpenaiRequestEntity,
   S3FinalizePayload
@@ -27,11 +28,12 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
+    userStoreVector: UserStoreVectorService,
     s3: S3Storage,
     protected redis: EnhancedRedisPubSub,
     apiKey: string
   ) {
-    super(logger, prisma, apiKey, s3);
+    super(logger, prisma, userStoreVector, apiKey, s3);
   }
 
   protected async handleOpenaiNativeImageRequestGptImage1({
@@ -56,7 +58,6 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
     imgGenEnabled,
     imgGenFields
   }: ProviderOpenaiRequestEntity) {
-
     const m = model as OpenAIImgGenModels;
 
     const provider = "openai" as const;
@@ -87,24 +88,24 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
       { onlyMostRecentUser: true }
     );
     const imgOnly = Array.of<{
-    type: "input_image";
-    image_url?: string | undefined;
-    file_id?: string | undefined;
-    detail: "auto" | "low" | "high";
-}>();
+      type: "input_image";
+      image_url?: string | undefined;
+      file_id?: string | undefined;
+      detail: "auto" | "low" | "high";
+    }>();
 
-const promptOnly = {
-  text: ""
-};
+    const promptOnly = {
+      text: ""
+    };
     for (const f of formatted) {
-      if (f.role==="user") {
-        for (const c of f.content){
-          if (typeof c !=="string") {
-            if (c.type==="input_image") {
+      if (f.role === "user") {
+        for (const c of f.content) {
+          if (typeof c !== "string") {
+            if (c.type === "input_image") {
               imgOnly.push(c);
             }
-            if (c.type==="input_text") {
-              promptOnly.text=c.text;
+            if (c.type === "input_text") {
+              promptOnly.text = c.text;
             }
           }
         }
@@ -115,8 +116,6 @@ const promptOnly = {
     const generationGroupId = await this.generateId("generationGroupId");
     const itemId = await this.generateId("itemId");
     const _hasImages = this.hasImages(formatted);
-
-
 
     const _hasFiles = this.hasFiles(formatted);
 
@@ -184,7 +183,7 @@ const promptOnly = {
           done = false,
           rtHelper: S3FinalizePayload | undefined;
 
-          if (started === false) {
+        if (started === false) {
           started = true;
           text = "Image generation in progress...";
         }
