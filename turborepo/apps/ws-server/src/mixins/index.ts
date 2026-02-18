@@ -290,6 +290,7 @@ export function OpenAIMixin<
             new OpenAIService(
               deps.logger,
               deps.prisma,
+              deps.userStore,
               deps.s3,
               deps.redis,
               this.oaiApiKey ?? ""

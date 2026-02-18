@@ -1,4 +1,5 @@
 import type { ImageGenPartialArr, ImgGenResProps } from "@/openai/types.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import { OpenAI } from "openai";
@@ -19,11 +20,12 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
+    userStoreVector: UserStoreVectorService,
     s3: S3Storage,
     redis: EnhancedRedisPubSub,
     apiKey: string
   ) {
-    super(logger, prisma, s3, redis, apiKey);
+    super(logger, prisma, userStoreVector, s3, redis, apiKey);
   }
   protected async handleOpenaiResponsesImgGen({
     chunks,

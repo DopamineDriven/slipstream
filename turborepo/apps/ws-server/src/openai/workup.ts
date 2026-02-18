@@ -1,6 +1,10 @@
 import { createReadStream } from "node:fs";
 import { readFile } from "node:fs/promises";
-import type { ImageGenPartialArr } from "@/openai/types.ts";
+import type {
+  ImageGenPartialArr,
+  OpenAIFileSearchToolInput
+} from "@/openai/types.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
   InferPromiseRT,
   ProviderOpenaiRequestEntity
@@ -37,6 +41,7 @@ export class OpenAIServiceWorkup {
   constructor(
     logger: LoggerService,
     protected prisma: PrismaService,
+    protected userStoreVector: UserStoreVectorService,
     protected apiKey: string,
     protected s3: S3Storage
   ) {
@@ -779,6 +784,212 @@ export class OpenAIServiceWorkup {
         : undefined
     ) satisfies OpenAI.Responses.WebSearchTool.UserLocation | null | undefined;
   }
+
+  protected fileSearchFunctionTool() {
+    return {
+      type: "function",
+      name: "file_search",
+      description:
+        "Search the user's uploaded documents using semantic similarity. " +
+        "Pass one or more queries in a single call. " +
+        "Returns a JSON array of matching chunks with filename, score, content, offsets, and chunk index.",
+      strict: false,
+      parameters: {
+        type: "object",
+        properties: {
+          queries: {
+            type: "array",
+            description:
+              "One or more semantic search queries. Prefer batching related queries in one tool call (max 5).",
+            items: { type: "string" },
+            minItems: 1,
+            maxItems: 5
+          },
+          max_results: {
+            type: "number",
+            description: "Maximum results to return (1-10, default 5)"
+          }
+        },
+        required: ["queries"],
+        additionalProperties: false
+      }
+    } as const satisfies OpenAI.Responses.FunctionTool;
+  }
+
+  private truncateFileSearchContent(content: string, maxChars = 1200) {
+    if (content.length <= maxChars) return content;
+    return content.slice(0, maxChars).concat("...");
+  }
+
+  protected async searchStore(
+    userId: string,
+    query: string,
+    limit = 5,
+    threshold = 0.3
+  ) {
+    return await this.userStoreVector.searchUserStoreChunks({
+      userId,
+      query,
+      limit,
+      threshold
+    });
+  }
+
+  protected parseFileSearchInput(
+    rawArguments: string
+  ): OpenAIFileSearchToolInput {
+    const parsed = JSON.parse<Record<string, unknown>>(rawArguments);
+
+    const queryList = Array.of<string>();
+    if ("queries" in parsed && Array.isArray(parsed.queries)) {
+      for (const q of parsed.queries) {
+        if (typeof q !== "string") continue;
+        const normalized = q.trim();
+        if (normalized.length === 0) continue;
+        queryList.push(normalized);
+      }
+    }
+    // Backward-compatible fallback for single-query invocations.
+    if (
+      queryList.length === 0 &&
+      "query" in parsed &&
+      typeof parsed.query === "string"
+    ) {
+      const normalized = parsed.query.trim();
+      if (normalized.length > 0) {
+        queryList.push(normalized);
+      }
+    }
+    const uniqueQueries = Array.from(new Set(queryList)).slice(0, 5);
+    const firstQuery = uniqueQueries[0];
+    if (!firstQuery) {
+      throw new Error(
+        `file_search input missing required "queries": ${rawArguments}`
+      );
+    }
+    const normalizedQueries = [firstQuery, ...uniqueQueries.slice(1)] as const;
+
+    const maxResults =
+      "max_results" in parsed && typeof parsed.max_results === "number"
+        ? parsed.max_results
+        : undefined;
+
+    return {
+      queries: normalizedQueries,
+      max_results: maxResults
+    } satisfies OpenAIFileSearchToolInput;
+  }
+
+  protected async executeFileSearch(
+    userId: string,
+    input: OpenAIFileSearchToolInput
+  ) {
+    const maxResults = Math.max(1, Math.min(input.max_results ?? 5, 5));
+    const queryResults = await Promise.all(
+      input.queries.map(query => this.searchStore(userId, query, maxResults, 0))
+    );
+    const results = queryResults.flat();
+
+    if (results.length === 0) {
+      return "[]";
+    }
+
+    const unique = new Map<
+      string,
+      {
+        filename: string;
+        score: number;
+        content: string;
+        startOffset: number | null;
+        endOffset: number | null;
+        chunkIndex: number;
+      }
+    >();
+    for (const r of results) {
+      const mapped = {
+        filename: r.filename,
+        score: r.score != null ? Number(r.score.toFixed(4)) : 0,
+        content: this.truncateFileSearchContent(r.content),
+        startOffset: r.startOffset,
+        endOffset: r.endOffset,
+        chunkIndex: r.chunkIndex
+      };
+      const key = `${mapped.filename}::${mapped.chunkIndex}::${mapped.startOffset ?? "null"}::${mapped.endOffset ?? "null"}`;
+      const previous = unique.get(key);
+      if (!previous || mapped.score > previous.score) {
+        unique.set(key, mapped);
+      }
+    }
+    const mapped = Array.from(unique.values())
+      .sort((a, b) => b.score - a.score)
+      .slice(0, Math.min(Math.max(maxResults, 5), 10));
+
+    const maxOutputChars = 48_000;
+    if (JSON.stringify(mapped).length <= maxOutputChars) {
+      return JSON.stringify(mapped);
+    }
+
+    const reduced = [...mapped];
+    while (
+      reduced.length > 1 &&
+      JSON.stringify(reduced).length > maxOutputChars
+    ) {
+      reduced.pop();
+    }
+
+    if (JSON.stringify(reduced).length <= maxOutputChars) {
+      return JSON.stringify(reduced);
+    }
+
+    return JSON.stringify(
+      reduced.map(r => ({
+        filename: r.filename,
+        score: r.score,
+        content: this.truncateFileSearchContent(r.content, 600),
+        startOffset: r.startOffset,
+        endOffset: r.endOffset,
+        chunkIndex: r.chunkIndex
+      }))
+    );
+  }
+
+  protected async executeFunctionToolCall(
+    userId: string,
+    toolCall: OpenAI.Responses.ResponseFunctionToolCall
+  ) {
+    if (toolCall.name !== "file_search") {
+      return {
+        type: "function_call_output",
+        call_id: toolCall.call_id,
+        output: `Unknown tool: ${toolCall.name}`
+      } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
+    }
+
+    try {
+      const input = this.parseFileSearchInput(toolCall.arguments);
+      const output = await this.executeFileSearch(userId, input);
+      return {
+        type: "function_call_output",
+        call_id: toolCall.call_id,
+        output
+      } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
+    } catch (error) {
+      this.logger.error(
+        {
+          toolName: toolCall.name,
+          callId: toolCall.call_id,
+          error: this.prisma.safeErrMsg(error)
+        },
+        "OpenAI function tool execution failed"
+      );
+      return {
+        type: "function_call_output",
+        call_id: toolCall.call_id,
+        output: `file_search error: ${this.prisma.safeErrMsg(error)}`
+      } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
+    }
+  }
+
   // To continue this session, run codex resume 019b2b4a-3e12-7c90-8276-49994f1d3bd2
   protected handleTooling(
     model: OpenAiModelIdUnion,
@@ -786,9 +997,19 @@ export class OpenAIServiceWorkup {
     user_location?: OpenAI.Responses.WebSearchPreviewTool.UserLocation,
     vector_store_ids?: string[],
     imgGenEnabled = false,
-    imgGen?: OpenAI.Responses.Tool.ImageGeneration
+    imgGen?: OpenAI.Responses.Tool.ImageGeneration,
+    localFileSearchEnabled = false
   ) {
     const pureImgModel = this.canCallImageApi(model);
+    if (localFileSearchEnabled) {
+      return [
+        this.fileSearchFunctionTool(),
+        {
+          type: "web_search",
+          user_location
+        }
+      ] satisfies OpenAI.Responses.Tool[];
+    }
     if (fileSearchEnabled && vector_store_ids && vector_store_ids.length >= 1) {
       if (imgGenEnabled === true && imgGen && pureImgModel === false) {
         return [
