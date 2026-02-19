@@ -10,6 +10,7 @@ import type { $Enums } from "@slipstream/db/node/generated/client";
 import { PrismaDbService } from "@slipstream/db/factory";
 import {
   searchUserStoreChunksByStore,
+  searchUserStoreChunksByStoreAndModel,
   updateUserStoreChunkState,
   updateUserStoreDocState
 } from "@slipstream/db/sql-node";
@@ -379,6 +380,26 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
     );
   }
 
+  public async searchUserStoreChunksByModel(
+    storeId: string,
+    embedding: string,
+    limit: number,
+    threshold: number,
+    embeddingModel: string,
+    filename: string | null = null
+  ) {
+    return await this.prismaClient.$queryRawTyped(
+      searchUserStoreChunksByStoreAndModel(
+        storeId,
+        embedding,
+        limit,
+        threshold,
+        embeddingModel,
+        filename
+      )
+    );
+  }
+
   public async updateUserStoreDocStateTyped(
     ...args: updateUserStoreDocState.Parameters
   ) {
@@ -430,6 +451,41 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
         compatMime: true,
         userStoreDoc: { select: { id: true } }
       }
+    });
+  }
+
+  public async syncUserStore(
+    userId: string,
+    storeName = this.defaultUserStoreName(userId)
+  ) {
+    return await this.prismaClient.$transaction(async t => {
+      const getUserStoreDocs = await t.userStore.findUniqueOrThrow({
+        where: { userId_storeName: { storeName, userId } },
+        select: { docs: { select: { size: true, chunkCount: true } } }
+      });
+
+      let totalBytes = 0n;
+      let totalChunks = 0;
+      for (const { size, chunkCount } of getUserStoreDocs.docs) {
+        totalBytes += size;
+        totalChunks += chunkCount;
+      }
+
+      const updateStore = await t.userStore.update({
+        where: { userId_storeName: { storeName, userId } },
+        data: {
+          fileCount: getUserStoreDocs.docs.length,
+          totalBytes,
+          totalChunks,
+          lastSyncedAt: new Date(Date.now())
+        }
+      });
+      return {
+        ...updateStore,
+        totalBytes: updateStore.totalBytes
+          ? Number(updateStore.totalBytes)
+          : null
+      };
     });
   }
 }

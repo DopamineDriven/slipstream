@@ -12,7 +12,9 @@ import { Fs } from "@d0paminedriven/fs";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { ExtractService } from "@/extract/index.ts";
+import { SharpService } from "@/sharp/index.ts";
 import type { OffsetCache, PageOffsetEntry } from "@/store/types.ts";
+import { UserStoreVectorService } from "@/store/vector-store.ts";
 import { UserStoreWorkupService } from "@/store/workup.ts";
 import { VoyageEmbeddingService } from "@/voyage/index.ts";
 import { PrismaDbService } from "@slipstream/db/factory";
@@ -37,6 +39,14 @@ const db = new PrismaDbService({
 
 const prisma = new PrismaService(db, extract, false);
 const voyage = new VoyageEmbeddingService(process.env.VOYAGE_API_KEY ?? "");
+const sharp = new SharpService();
+const vectorStore = new UserStoreVectorService(
+  logger,
+  voyage,
+  prisma,
+  sharp,
+  process.env.VOYAGE_API_KEY ?? ""
+);
 
 // ── Harness — exposes protected methods for testing ─────────────────────────
 
@@ -125,6 +135,57 @@ async function extractPdf(filename: string) {
 }
 
 type ExtractedPdf = Awaited<ReturnType<typeof extractPdf>>;
+type RetrievalProbeStoreCandidate = {
+  storeId: string;
+  userId: string;
+  storeName: string;
+  claudtullusMatches: bigint;
+  geminseaMatches: bigint;
+};
+
+type StoreInventoryRow = {
+  storeId: string;
+  userId: string;
+  storeName: string;
+  totalDocs: bigint;
+  activeDocs: bigint;
+  totalChunks: bigint;
+  readyChunks: bigint;
+  errorChunks: bigint;
+  nullEmbeddingReadyChunks: bigint;
+};
+
+type EmbeddingModelDistRow = {
+  embeddingModel: string;
+  chunkCount: bigint;
+  readyCount: bigint;
+};
+
+type TopChunkRow = {
+  id: string;
+  chunkIndex: number;
+  content: string;
+  embeddingModel: string;
+  score: number;
+};
+
+type AlignmentChunkRow = {
+  id: string;
+  chunkIndex: number;
+  content: string;
+  embeddingModel: string;
+  state: string;
+  hasEmbedding: boolean;
+  multimodalScore: number | null;
+  contextScore: number | null;
+};
+
+type IntegrityRow = {
+  id: string;
+  storeId: string;
+  chunkIndex: number;
+  embeddingModel: string;
+};
 
 // Track tmp files for Voyage cleanup
 const tmpFilesToClean = Array.of<string>();
@@ -689,5 +750,581 @@ describe("store workup offset cache (synthetic)", () => {
         [3, 5, 5]
       ]
     );
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Suite 9: vector retrieval probe (real DB + Voyage)
+// ══════════════════════════════════════════════════════════════════════════════
+
+describe("vector retrieval probe (real DB + Voyage)", () => {
+  it("retrieves Claudtullus and Geminsea chunks from a default user store", async t => {
+    const candidateRows = await db.p(false).$queryRaw<
+      RetrievalProbeStoreCandidate[]
+    >`
+      SELECT
+        chunk."storeId" AS "storeId",
+        store."userId" AS "userId",
+        store."storeName" AS "storeName",
+        COUNT(*) FILTER (
+          WHERE chunk.content ILIKE '%Claudtullus%'
+        ) AS "claudtullusMatches",
+        COUNT(*) FILTER (
+          WHERE chunk.content ILIKE '%Geminsea%'
+        ) AS "geminseaMatches"
+      FROM "UserStoreDocChunk" chunk
+      INNER JOIN "UserStoreDoc" doc ON doc.id = chunk."docId"
+      INNER JOIN "UserStore" store ON store.id = chunk."storeId"
+      WHERE chunk."deletedAt" IS NULL
+      AND doc."deletedAt" IS NULL
+      AND chunk.state = 'READY'::"UserStoreChunkState"
+      AND doc.state IN ('ACTIVE'::"UserStoreDocState", 'PARTIAL'::"UserStoreDocState")
+      AND (
+        chunk.content ILIKE '%Claudtullus%'
+        OR chunk.content ILIKE '%Geminsea%'
+      )
+      GROUP BY chunk."storeId", store."userId", store."storeName"
+      HAVING
+        COUNT(*) FILTER (WHERE chunk.content ILIKE '%Claudtullus%') > 0
+        AND COUNT(*) FILTER (WHERE chunk.content ILIKE '%Geminsea%') > 0
+      ORDER BY
+        (
+          COUNT(*) FILTER (WHERE chunk.content ILIKE '%Claudtullus%')
+          + COUNT(*) FILTER (WHERE chunk.content ILIKE '%Geminsea%')
+        ) DESC
+      LIMIT 20;
+    `;
+
+    const defaultStoreCandidate = candidateRows.find(row => {
+      return row.storeName === prisma.defaultUserStoreName(row.userId);
+    });
+
+    if (!defaultStoreCandidate) {
+      t.skip(
+        "No default user store contains both Claudtullus and Geminsea chunks"
+      );
+      return;
+    }
+
+    const probeTerms = ["Claudtullus", "Geminsea"] as const;
+
+    for (const term of probeTerms) {
+      const hits = await vectorStore.searchUserStoreChunks({
+        userId: defaultStoreCandidate.userId,
+        query: term,
+        limit: 10,
+        threshold: 0
+      });
+
+      assert.ok(
+        hits.length > 0,
+        `expected at least one vector hit for "${term}" in default store ${defaultStoreCandidate.storeId}`
+      );
+
+      const containsTerm = hits.some(hit => {
+        const needle = term.toLowerCase();
+        return (
+          hit.content.toLowerCase().includes(needle) ||
+          hit.filename.toLowerCase().includes(needle)
+        );
+      });
+      assert.equal(
+        containsTerm,
+        true,
+        `expected at least one hit containing "${term}" for user ${defaultStoreCandidate.userId}`
+      );
+
+      for (let i = 1; i < hits.length; i++) {
+        const prev = hits[i - 1]?.score ?? Number.NEGATIVE_INFINITY;
+        const next = hits[i]?.score ?? Number.NEGATIVE_INFINITY;
+        assert.ok(
+          prev >= next,
+          `scores should be non-increasing for "${term}" at index ${i}`
+        );
+      }
+    }
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Suite 10: semantic search diagnostics (real DB + Voyage)
+// ══════════════════════════════════════════════════════════════════════════════
+
+describe("semantic search diagnostics (real DB + Voyage)", () => {
+  const probeTerms = (
+    process.env.PROBE_TERMS ?? "Claudtullus,Geminastics,neo-dinosaur hellscape"
+  )
+    .split(",")
+    .map(t => t.trim())
+    .filter((t): t is string => t.length > 0);
+
+  let storeInventory = Array.of<StoreInventoryRow>();
+  let candidateStore: StoreInventoryRow | null = null;
+  const multimodalEmbeddings = new Map<string, number[]>();
+  const contextEmbeddings = new Map<string, number[]>();
+
+  before(async () => {
+    // 1. Store inventory
+    storeInventory = await db.p(false).$queryRaw<StoreInventoryRow[]>`
+      SELECT
+        store.id AS "storeId",
+        store."userId",
+        store."storeName",
+        COUNT(DISTINCT doc.id) AS "totalDocs",
+        COUNT(DISTINCT doc.id) FILTER (
+          WHERE doc.state = 'ACTIVE'::"UserStoreDocState"
+        ) AS "activeDocs",
+        COUNT(chunk.id) AS "totalChunks",
+        COUNT(chunk.id) FILTER (
+          WHERE chunk.state = 'READY'::"UserStoreChunkState"
+        ) AS "readyChunks",
+        COUNT(chunk.id) FILTER (
+          WHERE chunk.state = 'ERROR'::"UserStoreChunkState"
+        ) AS "errorChunks",
+        COUNT(chunk.id) FILTER (
+          WHERE chunk.state = 'READY'::"UserStoreChunkState"
+            AND chunk.embedding IS NULL
+        ) AS "nullEmbeddingReadyChunks"
+      FROM "UserStore" store
+      LEFT JOIN "UserStoreDoc" doc
+        ON doc."storeId" = store.id AND doc."deletedAt" IS NULL
+      LEFT JOIN "UserStoreDocChunk" chunk
+        ON chunk."storeId" = store.id AND chunk."deletedAt" IS NULL
+      GROUP BY store.id, store."userId", store."storeName"
+      ORDER BY COUNT(chunk.id) FILTER (
+        WHERE chunk.state = 'READY'::"UserStoreChunkState"
+      ) DESC
+      LIMIT 50;
+    `;
+
+    // 2. Find candidate store
+    candidateStore =
+      storeInventory.find(
+        row =>
+          row.storeName === prisma.defaultUserStoreName(row.userId) &&
+          Number(row.readyChunks) > 0
+      ) ?? null;
+
+    // 3. Pre-compute query embeddings for all probe terms with both models
+    if (candidateStore && probeTerms.length > 0) {
+      for (const term of probeTerms) {
+        // multimodal-3.5
+        try {
+          const mmResult = await voyage.embedChunksMultimodal("base64", {
+            inputs: [{ content: [{ type: "text", text: term }] }],
+            model: "voyage-multimodal-3.5",
+            input_type: "query"
+          });
+          if (!("detail" in mmResult) && mmResult.data[0]?.embedding) {
+            multimodalEmbeddings.set(term, mmResult.data[0].embedding);
+          }
+        } catch {
+          // best-effort — test will report missing embedding
+        }
+
+        // context-3
+        try {
+          const ctxResult = await voyage.embedChunksContextual({
+            inputs: [[term]],
+            input_type: "query",
+            model: "voyage-context-3",
+            output_dimension: 1024
+          });
+          if (
+            !("detail" in ctxResult) &&
+            ctxResult.data[0]?.data[0]?.embedding
+          ) {
+            contextEmbeddings.set(term, ctxResult.data[0].data[0].embedding);
+          }
+        } catch {
+          // best-effort
+        }
+      }
+    }
+  });
+
+  it("10a: store inventory", async t => {
+    if (storeInventory.length === 0) {
+      t.skip("No user stores found in database");
+      return;
+    }
+
+    for (const row of storeInventory) {
+      t.diagnostic(
+        `Store: ${row.storeName} (id: ${row.storeId})\n` +
+          `  Docs: ${Number(row.totalDocs)} total | ${Number(row.activeDocs)} ACTIVE\n` +
+          `  Chunks: ${Number(row.totalChunks)} total | ` +
+          `${Number(row.readyChunks)} READY | ` +
+          `${Number(row.errorChunks)} ERROR | ` +
+          `${Number(row.nullEmbeddingReadyChunks)} READY-but-NULL-embedding`
+      );
+    }
+
+    if (candidateStore) {
+      t.diagnostic(
+        `\nCandidate store for probe: ${candidateStore.storeName} ` +
+          `(user: ${candidateStore.userId})`
+      );
+    } else {
+      t.diagnostic("\nNo candidate default store found with READY chunks");
+    }
+  });
+
+  it("10b: embedding integrity audit", async t => {
+    const broken = await db.p(false).$queryRaw<IntegrityRow[]>`
+      SELECT
+        chunk.id,
+        chunk."storeId",
+        chunk."chunkIndex",
+        chunk."embeddingModel"
+      FROM "UserStoreDocChunk" chunk
+      WHERE chunk."deletedAt" IS NULL
+        AND chunk.state = 'READY'::"UserStoreChunkState"
+        AND chunk.embedding IS NULL
+      ORDER BY chunk."storeId", chunk."chunkIndex"
+      LIMIT 100;
+    `;
+
+    if (broken.length === 0) {
+      t.diagnostic("Embedding integrity: PASS — no READY chunks with NULL embeddings");
+    } else {
+      t.diagnostic(
+        `Embedding integrity: FAIL — ${broken.length} READY chunks with NULL embedding:`
+      );
+      for (const row of broken) {
+        t.diagnostic(
+          `  chunk ${row.id} (store: ${row.storeId}, idx: ${row.chunkIndex}, model: ${row.embeddingModel})`
+        );
+      }
+    }
+  });
+
+  it("10c: model distribution", async t => {
+    if (!candidateStore) {
+      t.skip("No candidate store");
+      return;
+    }
+
+    const dist = await db.p(false).$queryRaw<EmbeddingModelDistRow[]>`
+      SELECT
+        chunk."embeddingModel",
+        COUNT(*) AS "chunkCount",
+        COUNT(*) FILTER (
+          WHERE chunk.state = 'READY'::"UserStoreChunkState"
+        ) AS "readyCount"
+      FROM "UserStoreDocChunk" chunk
+      WHERE chunk."deletedAt" IS NULL
+        AND chunk."storeId" = ${candidateStore.storeId}
+      GROUP BY chunk."embeddingModel"
+      ORDER BY "readyCount" DESC;
+    `;
+
+    t.diagnostic(`Model distribution for store ${candidateStore.storeName}:`);
+    const models = Array.of<string>();
+    for (const row of dist) {
+      t.diagnostic(
+        `  ${row.embeddingModel}: ${Number(row.chunkCount)} total | ${Number(row.readyCount)} READY`
+      );
+      models.push(row.embeddingModel);
+    }
+
+    if (models.includes("voyage-context-3") && models.includes("voyage-multimodal-3.5")) {
+      t.diagnostic(
+        "\n  WARNING: Store has chunks from BOTH embedding models. " +
+          "Queries must use the correct model per chunk for reliable cosine similarity."
+      );
+    }
+  });
+
+  it("10d: multimodal-3.5 query search (current behavior)", async t => {
+    if (!candidateStore) {
+      t.skip("No candidate store");
+      return;
+    }
+
+    for (const term of probeTerms) {
+      t.diagnostic(`\n=== "${term}" (voyage-multimodal-3.5 query) ===`);
+
+      const hits = await vectorStore.searchUserStoreChunks({
+        userId: candidateStore.userId,
+        query: term,
+        limit: 10,
+        threshold: 0
+      });
+
+      t.diagnostic(`  Hits: ${hits.length}`);
+      for (const hit of hits) {
+        const snippet = hit.content.slice(0, 120).replace(/\n/g, " ");
+        t.diagnostic(
+          `  [${(hit.score ?? 0).toFixed(4)}] chunk#${hit.chunkIndex} (${hit.embeddingModel}) "${snippet}..."`
+        );
+      }
+
+      // Raw top-5 closest with multimodal embedding regardless of threshold
+      const mmEmb = multimodalEmbeddings.get(term);
+      if (mmEmb) {
+        const embStr = `[${mmEmb.join(",")}]`;
+        const top5 = await db.p(false).$queryRaw<TopChunkRow[]>`
+          SELECT
+            chunk.id,
+            chunk."chunkIndex",
+            LEFT(chunk.content, 150) AS content,
+            chunk."embeddingModel",
+            1 - (chunk.embedding <=> ${embStr}::vector) AS score
+          FROM "UserStoreDocChunk" chunk
+          INNER JOIN "UserStoreDoc" doc ON doc.id = chunk."docId"
+          WHERE chunk."storeId" = ${candidateStore.storeId}
+            AND chunk."deletedAt" IS NULL
+            AND doc."deletedAt" IS NULL
+            AND doc.state IN ('ACTIVE'::"UserStoreDocState", 'PARTIAL'::"UserStoreDocState")
+            AND chunk.state = 'READY'::"UserStoreChunkState"
+            AND chunk.embedding IS NOT NULL
+          ORDER BY chunk.embedding <=> ${embStr}::vector
+          LIMIT 5;
+        `;
+
+        t.diagnostic(`  Raw top-5 closest (multimodal-3.5 query, no threshold):`);
+        for (const row of top5) {
+          const snippet = row.content.replace(/\n/g, " ");
+          t.diagnostic(
+            `    [${row.score.toFixed(4)}] chunk#${row.chunkIndex} (${row.embeddingModel}) "${snippet}..."`
+          );
+        }
+      } else {
+        t.diagnostic("  (multimodal embedding unavailable for raw search)");
+      }
+    }
+  });
+
+  it("10e: context-3 query search (model-matched)", async t => {
+    if (!candidateStore) {
+      t.skip("No candidate store");
+      return;
+    }
+
+    for (const term of probeTerms) {
+      t.diagnostic(`\n=== "${term}" (voyage-context-3 query) ===`);
+
+      const ctxEmb = contextEmbeddings.get(term);
+      if (!ctxEmb) {
+        t.diagnostic("  (context-3 embedding unavailable — skipping)");
+        continue;
+      }
+
+      const embStr = `[${ctxEmb.join(",")}]`;
+
+      // Search via prisma typed query
+      const ctxHits = await prisma.searchUserStoreChunks(
+        candidateStore.storeId,
+        embStr,
+        10,
+        0
+      );
+
+      t.diagnostic(`  Hits: ${ctxHits.length}`);
+      for (const hit of ctxHits) {
+        const snippet = hit.content.slice(0, 120).replace(/\n/g, " ");
+        t.diagnostic(
+          `  [${(hit.score ?? 0).toFixed(4)}] chunk#${hit.chunkIndex} (${hit.embeddingModel}) "${snippet}..."`
+        );
+      }
+
+      // Raw top-5 closest with context-3 embedding
+      const top5 = await db.p(false).$queryRaw<TopChunkRow[]>`
+        SELECT
+          chunk.id,
+          chunk."chunkIndex",
+          LEFT(chunk.content, 150) AS content,
+          chunk."embeddingModel",
+          1 - (chunk.embedding <=> ${embStr}::vector) AS score
+        FROM "UserStoreDocChunk" chunk
+        INNER JOIN "UserStoreDoc" doc ON doc.id = chunk."docId"
+        WHERE chunk."storeId" = ${candidateStore.storeId}
+          AND chunk."deletedAt" IS NULL
+          AND doc."deletedAt" IS NULL
+          AND doc.state IN ('ACTIVE'::"UserStoreDocState", 'PARTIAL'::"UserStoreDocState")
+          AND chunk.state = 'READY'::"UserStoreChunkState"
+          AND chunk.embedding IS NOT NULL
+        ORDER BY chunk.embedding <=> ${embStr}::vector
+        LIMIT 5;
+      `;
+
+      t.diagnostic(`  Raw top-5 closest (context-3 query, no threshold):`);
+      for (const row of top5) {
+        const snippet = row.content.replace(/\n/g, " ");
+        t.diagnostic(
+          `    [${row.score.toFixed(4)}] chunk#${row.chunkIndex} (${row.embeddingModel}) "${snippet}..."`
+        );
+      }
+
+      // Side-by-side comparison
+      const mmEmb = multimodalEmbeddings.get(term);
+      if (mmEmb) {
+        const mmTop = await db.p(false).$queryRaw<TopChunkRow[]>`
+          SELECT
+            chunk.id,
+            chunk."chunkIndex",
+            LEFT(chunk.content, 60) AS content,
+            chunk."embeddingModel",
+            1 - (chunk.embedding <=> ${`[${mmEmb.join(",")}]`}::vector) AS score
+          FROM "UserStoreDocChunk" chunk
+          INNER JOIN "UserStoreDoc" doc ON doc.id = chunk."docId"
+          WHERE chunk."storeId" = ${candidateStore.storeId}
+            AND chunk."deletedAt" IS NULL
+            AND doc."deletedAt" IS NULL
+            AND doc.state IN ('ACTIVE'::"UserStoreDocState", 'PARTIAL'::"UserStoreDocState")
+            AND chunk.state = 'READY'::"UserStoreChunkState"
+            AND chunk.embedding IS NOT NULL
+          ORDER BY chunk.embedding <=> ${`[${mmEmb.join(",")}]`}::vector
+          LIMIT 1;
+        `;
+
+        const mmBest = mmTop[0];
+        const ctxBest = top5[0];
+        t.diagnostic(`\n  Side-by-side for "${term}":`);
+        t.diagnostic(
+          `    [multimodal-3.5 query] top score: ${mmBest ? mmBest.score.toFixed(4) : "N/A"}  model: ${mmBest?.embeddingModel ?? "N/A"}`
+        );
+        t.diagnostic(
+          `    [context-3 query]      top score: ${ctxBest ? ctxBest.score.toFixed(4) : "N/A"}  model: ${ctxBest?.embeddingModel ?? "N/A"}`
+        );
+      }
+    }
+  });
+
+  it("10f: content-to-embedding alignment", async t => {
+    if (!candidateStore) {
+      t.skip("No candidate store");
+      return;
+    }
+
+    for (const term of probeTerms) {
+      t.diagnostic(`\n=== Alignment check: "${term}" ===`);
+
+      const mmEmb = multimodalEmbeddings.get(term);
+      const ctxEmb = contextEmbeddings.get(term);
+
+      if (!mmEmb && !ctxEmb) {
+        t.diagnostic("  (no embeddings available — skipping)");
+        continue;
+      }
+
+      const mmEmbStr = mmEmb ? `[${mmEmb.join(",")}]` : null;
+      const ctxEmbStr = ctxEmb ? `[${ctxEmb.join(",")}]` : null;
+
+      // Find chunks containing the term via ILIKE
+      const ilikePattern = `%${term}%`;
+      const matched = await db.p(false).$queryRaw<AlignmentChunkRow[]>`
+        SELECT
+          chunk.id,
+          chunk."chunkIndex",
+          LEFT(chunk.content, 200) AS content,
+          chunk."embeddingModel",
+          chunk.state::text AS state,
+          (chunk.embedding IS NOT NULL) AS "hasEmbedding",
+          CASE WHEN chunk.embedding IS NOT NULL AND ${mmEmbStr}::vector IS NOT NULL
+            THEN 1 - (chunk.embedding <=> ${mmEmbStr ?? ""}::vector)
+            ELSE NULL
+          END AS "multimodalScore",
+          CASE WHEN chunk.embedding IS NOT NULL AND ${ctxEmbStr}::vector IS NOT NULL
+            THEN 1 - (chunk.embedding <=> ${ctxEmbStr ?? ""}::vector)
+            ELSE NULL
+          END AS "contextScore"
+        FROM "UserStoreDocChunk" chunk
+        INNER JOIN "UserStoreDoc" doc ON doc.id = chunk."docId"
+        WHERE chunk."storeId" = ${candidateStore.storeId}
+          AND chunk.content ILIKE ${ilikePattern}
+          AND chunk."deletedAt" IS NULL
+          AND doc."deletedAt" IS NULL
+        ORDER BY chunk."chunkIndex"
+        LIMIT 20;
+      `;
+
+      if (matched.length === 0) {
+        t.diagnostic(`  No chunks contain "${term}" (ILIKE search)`);
+        continue;
+      }
+
+      t.diagnostic(`  ${matched.length} chunks contain "${term}":`);
+      for (const row of matched) {
+        const snippet = row.content.slice(0, 100).replace(/\n/g, " ");
+        const mmScore =
+          row.multimodalScore != null ? row.multimodalScore.toFixed(4) : "N/A";
+        const ctxScore =
+          row.contextScore != null ? row.contextScore.toFixed(4) : "N/A";
+        const delta =
+          row.multimodalScore != null && row.contextScore != null
+            ? (row.contextScore - row.multimodalScore).toFixed(4)
+            : "N/A";
+
+        t.diagnostic(
+          `  chunk#${row.chunkIndex} (${row.embeddingModel}, ${row.state}, embed: ${row.hasEmbedding})\n` +
+            `    "${snippet}..."\n` +
+            `    multimodal-3.5 query: ${mmScore} | context-3 query: ${ctxScore} | delta: ${delta}`
+        );
+      }
+    }
+  });
+
+  it("10g: query embedding sanity", async t => {
+    const firstTerm = probeTerms[0];
+    if (!firstTerm) {
+      t.skip("No probe terms configured");
+      return;
+    }
+
+    const mmEmb = multimodalEmbeddings.get(firstTerm);
+    const ctxEmb = contextEmbeddings.get(firstTerm);
+
+    const l2Norm = (v: number[]) =>
+      Math.sqrt(v.reduce((s, x) => s + x * x, 0));
+
+    t.diagnostic(`Query embedding sanity for "${firstTerm}":\n`);
+
+    if (mmEmb) {
+      t.diagnostic(`  voyage-multimodal-3.5:`);
+      t.diagnostic(`    dimension: ${mmEmb.length}`);
+      t.diagnostic(`    L2 norm:   ${l2Norm(mmEmb).toFixed(6)}`);
+      t.diagnostic(`    first 5:   [${mmEmb.slice(0, 5).map(v => v.toFixed(6)).join(", ")}]`);
+    } else {
+      t.diagnostic("  voyage-multimodal-3.5: UNAVAILABLE");
+    }
+
+    if (ctxEmb) {
+      t.diagnostic(`  voyage-context-3:`);
+      t.diagnostic(`    dimension: ${ctxEmb.length}`);
+      t.diagnostic(`    L2 norm:   ${l2Norm(ctxEmb).toFixed(6)}`);
+      t.diagnostic(`    first 5:   [${ctxEmb.slice(0, 5).map(v => v.toFixed(6)).join(", ")}]`);
+    } else {
+      t.diagnostic("  voyage-context-3: UNAVAILABLE");
+    }
+
+    // Cross-model similarity
+    // eslint-disable-next-line
+    if (mmEmb && ctxEmb && mmEmb.length === ctxEmb.length) {
+      let dotProduct = 0;
+      for (let i = 0; i < mmEmb.length; i++) {
+        dotProduct += (mmEmb[i] ?? 0) * (ctxEmb[i] ?? 0);
+      }
+      const normA = l2Norm(mmEmb);
+      const normB = l2Norm(ctxEmb);
+      const crossSim = normA > 0 && normB > 0 ? dotProduct / (normA * normB) : 0;
+
+      t.diagnostic(`\n  Cross-model cosine similarity (same query, different models): ${crossSim.toFixed(6)}`);
+
+      if (crossSim < 0.5) {
+        t.diagnostic(
+          "  CONFIRMED: Embedding spaces are NOT aligned (similarity < 0.5). " +
+            "Same-model querying is required for reliable search."
+        );
+      } else if (crossSim < 0.8) {
+        t.diagnostic(
+          "  WARNING: Moderate cross-model alignment. Some queries may work " +
+            "cross-model but unusual phrases will likely fail."
+        );
+      } else {
+        t.diagnostic("  Cross-model alignment appears reasonable (>= 0.8).");
+      }
+    }
   });
 });

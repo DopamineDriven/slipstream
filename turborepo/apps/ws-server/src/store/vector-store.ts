@@ -3,6 +3,11 @@ import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import type {
   AttScopedImg,
+  ChunkBudgetAdjustReason,
+  ChunkWithRecord,
+  UserStoreChunkDraft,
+  UserStoreChunkReady,
+  UserStoreIndexResult,
   UserStoreSearchParams,
   UserStoreSearchResult
 } from "@/store/types.ts";
@@ -14,63 +19,6 @@ import { UserStoreWorkupService } from "@/store/workup.ts";
 import { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { AttachmentSingleton, MessageSingleton } from "@slipstream/types";
-
-interface UserStoreChunkDraft {
-  page: number;
-  text: string;
-  startOffset: number;
-  endOffset: number;
-  hasImages: boolean;
-  hasAnnots: boolean;
-  images: AttScopedImg[];
-}
-
-type ChunkBudgetAdjustReason =
-  | "RESIZED"
-  | "TEXT_ONLY_FALLBACK"
-  | "TEXT_RECHUNK"
-  | "IMAGE_RECHUNK";
-
-interface UserStoreChunkReady extends UserStoreChunkDraft {
-  tokenCount: number;
-  budgetAdjustReason: ChunkBudgetAdjustReason | null;
-}
-
-interface ChunkWithRecord {
-  chunk: UserStoreChunkReady;
-  chunkIndex: number;
-  record: { id: string };
-}
-
-type UserStoreIndexSkipReason =
-  | "SKIP_NON_DOCUMENT"
-  | "WAIT_COMPAT_ACTIVE"
-  | "SKIP_COMPAT_FAILED"
-  | "SKIP_NON_PDF"
-  | "SKIP_MISSING_CONTEXT"
-  | "SKIP_MISSING_SOURCE_URL";
-
-type UserStoreIndexSkip = {
-  readonly ok: false;
-  readonly reason: UserStoreIndexSkipReason;
-  readonly attachmentId: string;
-  readonly compatStatus?: $Enums.CompatStatus;
-  readonly ext?: string;
-};
-
-type UserStoreIndexSuccess = {
-  readonly ok: true;
-  readonly attachmentId: string;
-  readonly storeId: string;
-  readonly docId: string;
-  readonly state: $Enums.UserStoreDocState;
-  readonly chunkCount: number;
-  readonly readyCount: number;
-  readonly errorCount: number;
-  readonly tokenCount: number;
-};
-
-export type UserStoreIndexResult = UserStoreIndexSuccess | UserStoreIndexSkip;
 
 export class UserStoreVectorService extends UserStoreWorkupService {
   constructor(
@@ -596,45 +544,111 @@ export class UserStoreVectorService extends UserStoreWorkupService {
     userId,
     query,
     limit = 5,
-    threshold = 0
+    threshold = 0,
+    filename
   }: UserStoreSearchParams): Promise<UserStoreSearchResult[]> {
     if (query.trim().length === 0) return Array.of<UserStoreSearchResult>();
 
     const store = await this.ensureUserStore(userId);
+    const clampedLimit = Math.max(1, Math.min(limit, 25));
+    const filenameFilter = filename?.trim() ?? null;
 
-    const queryResult = await this.voyage.embedChunksMultimodal("base64", {
-      inputs: [{ content: [{ type: "text", text: query }] }],
-      model: "voyage-multimodal-3.5",
-      input_type: "query"
-    });
+    // Embed query with both models in parallel — allSettled so one failure
+    // doesn't block the other
+    const [multimodalSettled, contextualSettled] = await Promise.allSettled([
+      this.voyage.embedChunksMultimodal("base64", {
+        inputs: [{ content: [{ type: "text", text: query }] }],
+        model: "voyage-multimodal-3.5",
+        input_type: "query"
+      }),
+      this.voyage.embedChunksContextual({
+        inputs: [[query]],
+        input_type: "query",
+        model: "voyage-context-3",
+        output_dimension: 1024
+      })
+    ]);
 
-    if ("detail" in queryResult) {
-      this.logger.error(
-        { userId, detail: this.prisma.safeErrMsg(queryResult.detail) },
-        "UserStore query embedding failed"
+    const results = Array.of<UserStoreSearchResult>();
+
+    // Search multimodal-3.5 chunks
+    if (multimodalSettled.status === "fulfilled") {
+      const mmResult = multimodalSettled.value;
+      if (!("detail" in mmResult)) {
+        const mmEmb = mmResult.data[0]?.embedding;
+        if (mmEmb) {
+          const mmHits = await this.prisma.searchUserStoreChunksByModel(
+            store.id,
+            `[${mmEmb.join(",")}]`,
+            clampedLimit,
+            threshold,
+            "voyage-multimodal-3.5",
+            filenameFilter
+          );
+          results.push(...mmHits);
+        }
+      } else {
+        this.logger.warn(
+          { userId, detail: this.prisma.safeErrMsg(mmResult.detail) },
+          "UserStore multimodal query embedding failed"
+        );
+      }
+    } else {
+      this.logger.warn(
+        { userId, error: multimodalSettled.reason },
+        "UserStore multimodal query embedding threw"
       );
-      return Array.of<UserStoreSearchResult>();
     }
 
-    const queryEmbedding = queryResult.data[0]?.embedding;
-    if (!queryEmbedding) return Array.of<UserStoreSearchResult>();
+    // Search context-3 chunks
+    if (contextualSettled.status === "fulfilled") {
+      const ctxResult = contextualSettled.value;
+      if (!("detail" in ctxResult)) {
+        const ctxEmb = ctxResult.data[0]?.data[0]?.embedding;
+        if (ctxEmb) {
+          const ctxHits = await this.prisma.searchUserStoreChunksByModel(
+            store.id,
+            `[${ctxEmb.join(",")}]`,
+            clampedLimit,
+            threshold,
+            "voyage-context-3",
+            filenameFilter
+          );
+          results.push(...ctxHits);
+        }
+      } else {
+        this.logger.warn(
+          { userId, detail: this.prisma.safeErrMsg(ctxResult.detail) },
+          "UserStore contextual query embedding failed"
+        );
+      }
+    } else {
+      this.logger.warn(
+        { userId, error: contextualSettled.reason },
+        "UserStore contextual query embedding threw"
+      );
+    }
 
-    const embedding = `[${queryEmbedding.join(",")}]`;
-    return await this.prisma.searchUserStoreChunks(
-      store.id,
-      embedding,
-      Math.max(1, Math.min(limit, 25)),
-      threshold
-    );
+    if (results.length === 0) return results;
+
+    // Deduplicate by chunk id, sort by score descending, take limit
+    const seen = new Set<string>();
+    return results
+      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+      .filter(hit => {
+        if (seen.has(hit.id)) return false;
+        seen.add(hit.id);
+        return true;
+      })
+      .slice(0, clampedLimit);
   }
 
   public async indexMessageAttachments(
     message: MessageSingleton<true>,
     storeName?: string
-  ): Promise<UserStoreIndexResult[]> {
+  ) {
     const docs = message.attachments.filter(
-      (att): att is AttachmentSingleton<true> & { assetType: "DOCUMENT" } =>
-        att.assetType === "DOCUMENT"
+      att => att.assetType === "DOCUMENT"
     );
     if (docs.length === 0) return Array.of<UserStoreIndexResult>();
     const results = Array.of<UserStoreIndexResult>();
@@ -871,9 +885,11 @@ export class UserStoreVectorService extends UserStoreWorkupService {
         )
         .digest("hex");
 
-      const embeddingModel = chunk.hasImages
-        ? ("voyage-multimodal-3.5" as const)
-        : ("voyage-context-3" as const);
+      const embeddingModel = (
+        chunk.hasImages
+          ? ("voyage-multimodal-3.5" as const)
+          : ("voyage-context-3" as const)
+      ) satisfies Voyage.ModelUnion;
 
       const chunkRecord = await this.prisma.createUserStoreChunkForEmbedding({
         provenanceId,
@@ -891,7 +907,11 @@ export class UserStoreVectorService extends UserStoreWorkupService {
         embeddingModel
       });
 
-      const entry = { chunk, chunkIndex, record: chunkRecord } satisfies ChunkWithRecord;
+      const entry = {
+        chunk,
+        chunkIndex,
+        record: chunkRecord
+      } satisfies ChunkWithRecord;
       if (chunk.hasImages) {
         imageChunks.push(entry);
       } else {
@@ -1088,4 +1108,20 @@ export class UserStoreVectorService extends UserStoreWorkupService {
     };
   }
 
+  public async syncUserStoreByName(userId: string) {
+    await this.syncRegistry(userId);
+    const storeNames = this.storeRegistry.get(userId);
+    let storeNameArr = Array.of<string>();
+    if (storeNames) {
+      const storeKeys = Array.from(storeNames.keys());
+      if (storeKeys.length > 1) {
+        storeNameArr = storeKeys;
+      } else {
+        storeNameArr = [this.prisma.defaultUserStoreName(userId)];
+      }
+    }
+    for (const storeName of storeNameArr) {
+      await this.prisma.syncUserStore(userId, storeName);
+    }
+  }
 }

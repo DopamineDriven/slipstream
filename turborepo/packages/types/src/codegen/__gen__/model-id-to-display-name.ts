@@ -24,7 +24,7 @@ export const modelIdToDisplayName = {
     "gpt-image-1-mini": "GPT Image 1 mini",
     "dall-e-3": "DALL·E 3",
     "dall-e-2": "DALL·E 2",
-    "chatgpt-4o-latest": "ChatGPT-4o",
+    "chatgpt-4o-latest": "chatgpt-4o-latest",
     "o4-mini": "o4-mini",
     "o4-mini-deep-research": "o4-mini-deep-research",
     "o3-deep-research": "o3-deep-research",
@@ -73,6 +73,7 @@ export const modelIdToDisplayName = {
     "grok-2-vision-1212": "Grok 2 Vision"
   },
   anthropic: {
+    "claude-sonnet-4-6": "Claude Sonnet 4.6",
     "claude-opus-4-6": "Claude Opus 4.6",
     "claude-sonnet-4-5-20250929": "Claude Sonnet 4.5",
     "claude-opus-4-5-20251101": "Claude Opus 4.5",

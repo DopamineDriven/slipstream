@@ -27,6 +27,8 @@ export * from "./sql/searchUserStoreChunksByDoc.ts"
 
 export * from "./sql/searchUserStoreChunksByStore.ts"
 
+export * from "./sql/searchUserStoreChunksByStoreAndModel.ts"
+
 export * from "./sql/updateLocalDocChunkState.ts"
 
 export * from "./sql/updateLocalDocState.ts"

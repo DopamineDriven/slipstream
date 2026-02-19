@@ -8,7 +8,9 @@ import type {
 } from "@/types/index.ts";
 import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { Responses } from "openai/resources/index.mjs";
+import type { Logger as PinoLogger } from "pino";
 import { ImageCompatService } from "@/image/index.ts";
+import { LoggerService } from "@/logger/index.ts";
 import { ProviderService } from "@/providers/index.ts";
 import { UserStoreVectorService } from "@/store/vector-store.ts";
 import { WSServer } from "@/ws-server/index.ts";
@@ -27,11 +29,8 @@ import type {
 } from "@slipstream/types";
 import { RedisChannels } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
-import { LoggerService } from "@/logger/index.ts";
-import type { Logger as PinoLogger } from "pino";
 
 export class Resolver {
-
   private logger: PinoLogger;
   constructor(
     public wsServer: WSServer,
@@ -589,7 +588,6 @@ export class Resolver {
         }
       );
       void this.wsServer.redis.saveStreamState(
-
         conversationId,
         chunks,
         {
@@ -612,7 +610,7 @@ export class Resolver {
     const anthropic = this.providers.getInstance("anthropic");
     const grok = this.providers.getInstance("grok");
     return await Promise.all([
-      this.userVectorStore.syncRegistry(userId),
+      this.userVectorStore.syncUserStoreByName(userId),
       anthropic.syncFileRegistry(userId, true),
       gemini.syncFileRegistry(userId, true),
       grok.syncFileRegistry(userId, false, this.xaiManagementApikey)
