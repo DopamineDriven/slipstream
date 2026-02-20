@@ -24,7 +24,7 @@ export const displayNameModelsByProvider = {
     "GPT Image 1 mini",
     "DALL·E 3",
     "DALL·E 2",
-    "ChatGPT-4o",
+    "chatgpt-4o-latest",
     "o4-mini",
     "o4-mini-deep-research",
     "o3-deep-research",
@@ -72,6 +72,7 @@ export const displayNameModelsByProvider = {
     "Grok 2 Vision"
   ],
   anthropic: [
+    "Claude Sonnet 4.6",
     "Claude Opus 4.6",
     "Claude Sonnet 4.5",
     "Claude Opus 4.5",

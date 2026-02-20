@@ -96,4 +96,5 @@ export type ImgGenResProps = {
 export interface OpenAIFileSearchToolInput {
   queries: readonly [string, ...string[]];
   max_results?: number;
+  filename?: string;
 }

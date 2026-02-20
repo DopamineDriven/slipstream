@@ -97,6 +97,7 @@ export interface UserStoreSearchParams {
   limit?: number;
   threshold?: number;
   storeName?: string;
+  filename?: string;
 }
 
 export type UserStoreSearchResult = searchUserStoreChunksByStore.Result;
@@ -126,6 +127,63 @@ export type AttScopedImages<T extends boolean = boolean> = {
 export interface AttScopedPageBoxCache extends PageBox {
   coverage: number;
 }
+
+export interface UserStoreChunkDraft {
+  page: number;
+  text: string;
+  startOffset: number;
+  endOffset: number;
+  hasImages: boolean;
+  hasAnnots: boolean;
+  images: AttScopedImg[];
+}
+
+export type ChunkBudgetAdjustReason =
+  | "RESIZED"
+  | "TEXT_ONLY_FALLBACK"
+  | "TEXT_RECHUNK"
+  | "IMAGE_RECHUNK";
+
+export interface UserStoreChunkReady extends UserStoreChunkDraft {
+  tokenCount: number;
+  budgetAdjustReason: ChunkBudgetAdjustReason | null;
+}
+
+export interface ChunkWithRecord {
+  chunk: UserStoreChunkReady;
+  chunkIndex: number;
+  record: { id: string };
+}
+
+export type UserStoreIndexSkipReason =
+  | "SKIP_NON_DOCUMENT"
+  | "WAIT_COMPAT_ACTIVE"
+  | "SKIP_COMPAT_FAILED"
+  | "SKIP_NON_PDF"
+  | "SKIP_MISSING_CONTEXT"
+  | "SKIP_MISSING_SOURCE_URL";
+
+export type UserStoreIndexSkip = {
+  readonly ok: false;
+  readonly reason: UserStoreIndexSkipReason;
+  readonly attachmentId: string;
+  readonly compatStatus?: $Enums.CompatStatus;
+  readonly ext?: string;
+};
+
+export type UserStoreIndexSuccess = {
+  readonly ok: true;
+  readonly attachmentId: string;
+  readonly storeId: string;
+  readonly docId: string;
+  readonly state: $Enums.UserStoreDocState;
+  readonly chunkCount: number;
+  readonly readyCount: number;
+  readonly errorCount: number;
+  readonly tokenCount: number;
+};
+
+export type UserStoreIndexResult = UserStoreIndexSuccess | UserStoreIndexSkip;
 
 // export type ImageCacheee<T extends boolean = boolean> = Map<
 //   number,

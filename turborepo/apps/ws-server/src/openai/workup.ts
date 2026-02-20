@@ -808,6 +808,13 @@ export class OpenAIServiceWorkup {
           max_results: {
             type: "number",
             description: "Maximum results to return (1-10, default 5)"
+          },
+          filename: {
+            type: "string",
+            description:
+              "Optional filename filter (fuzzy, case-insensitive). " +
+              "Only chunks from documents whose filename closely matches this string are returned. " +
+              "Example: 'Path to Hell Pt VIII' matches 'The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VIII.pdf'."
           }
         },
         required: ["queries"],
@@ -825,13 +832,15 @@ export class OpenAIServiceWorkup {
     userId: string,
     query: string,
     limit = 5,
-    threshold = 0.3
+    threshold = 0.3,
+    filename?: string
   ) {
     return await this.userStoreVector.searchUserStoreChunks({
       userId,
       query,
       limit,
-      threshold
+      threshold,
+      filename
     });
   }
 
@@ -874,9 +883,15 @@ export class OpenAIServiceWorkup {
         ? parsed.max_results
         : undefined;
 
+    const filenameInput =
+      "filename" in parsed && typeof parsed.filename === "string"
+        ? parsed.filename.trim() || undefined
+        : undefined;
+
     return {
       queries: normalizedQueries,
-      max_results: maxResults
+      max_results: maxResults,
+      filename: filenameInput
     } satisfies OpenAIFileSearchToolInput;
   }
 
@@ -886,7 +901,9 @@ export class OpenAIServiceWorkup {
   ) {
     const maxResults = Math.max(1, Math.min(input.max_results ?? 5, 5));
     const queryResults = await Promise.all(
-      input.queries.map(query => this.searchStore(userId, query, maxResults, 0))
+      input.queries.map(query =>
+        this.searchStore(userId, query, maxResults, 0, input.filename)
+      )
     );
     const results = queryResults.flat();
 

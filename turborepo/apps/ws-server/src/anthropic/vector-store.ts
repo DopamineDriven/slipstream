@@ -28,26 +28,28 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     userId: string,
     query: string,
     limit = 5,
-    threshold = 0.3
+    threshold = 0.3,
+    filename?: string
   ): Promise<LocalSearchResult[]> {
     return await this.userStoreVector.searchUserStoreChunks({
       userId,
       query,
       limit,
-      threshold
+      threshold,
+      filename
     });
   }
 
   protected fileSearchTool(): Anthropic.Beta.BetaToolUnion {
     return {
       name: "file_search",
-      allowed_callers: ["code_execution_20250825"],
+      allowed_callers: ["direct", "code_execution_20250825"],
       description:
         "Search the user's uploaded documents using semantic similarity. " +
         "Returns a JSON array of matching chunks. Each element has: " +
         '{ "filename": string, "score": number (0-1), "content": string, ' +
         '"startOffset": number | null, "endOffset": number | null, "chunkIndex": number }. ' +
-        "Use code_execution to call this tool and process results programmatically.",
+        "Call directly for single retrieval tasks, or from code_execution for multi-step programmatic workflows.",
       input_schema: {
         type: "object" as const,
         properties: {
@@ -58,6 +60,13 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
           max_results: {
             type: "number",
             description: "Maximum results to return (1-10, default 5)"
+          },
+          filename: {
+            type: "string",
+            description:
+              "Optional filename filter (fuzzy, case-insensitive). " +
+              "Only chunks from documents whose filename closely matches this string are returned. " +
+              "Example: 'Path to Hell Pt VIII' matches 'The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VIII.pdf'."
           }
         },
         required: ["query"]
@@ -73,7 +82,8 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       userId,
       input.query,
       Math.min(input.max_results ?? 5, 10),
-      0
+      0,
+      input.filename
     );
 
     if (results.length === 0) {
@@ -94,7 +104,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
   private webSearchTool(
     user_location:
-      | Anthropic.Beta.Messages.BetaWebSearchTool20250305.UserLocation
+      | Anthropic.WebSearchTool20250305["user_location"]
       | null
       | undefined
   ) {
@@ -119,17 +129,28 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       name: "code_execution"
     } as const satisfies Anthropic.Beta.BetaToolUnion;
   }
+
   protected isAdvancedToolCapable(m: AnthropicModelIdUnion) {
     return (
+      m === "claude-sonnet-4-6" ||
       m === "claude-opus-4-6" ||
       m === "claude-opus-4-5-20251101" ||
       m === "claude-sonnet-4-5-20250929"
     );
   }
+
+  protected isEffortCapable(model: AnthropicModelIdUnion) {
+    return (
+      model === "claude-opus-4-6" ||
+      model === "claude-opus-4-5-20251101" ||
+      model === "claude-sonnet-4-6"
+    );
+  }
+
   protected tooling(
     m: AnthropicModelIdUnion,
     user_location:
-      | Anthropic.Beta.Messages.BetaWebSearchTool20250305.UserLocation
+      | Anthropic.WebSearchTool20250305["user_location"]
       | null
       | undefined,
     hasLocalStore = false
@@ -144,7 +165,9 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       if (hasLocalStore && this.isAdvancedToolCapable(m)) {
         return [
           this.codeExecutionTool(),
-          this.fileSearchTool()
+          this.fileSearchTool(),
+          this.webSearchTool(user_location),
+          this.webFetchTool()
         ] satisfies Anthropic.Beta.BetaToolUnion[];
       }
       return [
@@ -325,7 +348,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     messages: msgs,
     userId,
     apiKey,
-    container,
+    container=undefined,
     keyId,
     max_tokens,
     model: m,
@@ -356,14 +379,13 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       max_tokens
     );
 
-    const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
+    const tools = this.tooling(model, user_location, true);
 
-    const tools = this.tooling(model, user_location, hasUserStoreDocs);
-
-    const betas = this.handleBetaHeaders(model, hasUserStoreDocs);
+    const betas = this.handleBetaHeaders(model, true);
     this.logger.info(betas, "beta headers");
-    // only opus 4.5 (with effort beta header set) and 4.6 (natively) support effort config
-    if (model === "claude-opus-4-6" || model === "claude-opus-4-5-20251101") {
+    this.logger.info(tools, "tools returned");
+    // only opus 4.5 (with effort beta header set), opus 4.6 & sonnet 4.6 (natively) support effort config
+    if (this.isEffortCapable(model)) {
       return {
         params: {
           max_tokens: maxTokens,
@@ -377,7 +399,12 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
           tools,
           // only 4.6 supports max effort
           output_config: {
-            effort: model === "claude-opus-4-6" ? "max" : "high"
+            effort:
+              model === "claude-opus-4-6"
+                ? "max"
+                : model === "claude-sonnet-4-6"
+                  ? "high"
+                  : "high"
           },
           tool_choice: { type: "auto" },
           metadata: { user_id: userId },

@@ -64,6 +64,7 @@ export type LocalSearchResult = searchUserStoreChunksByStore.Result;
 export interface FileSearchToolInput {
   query: string;
   max_results?: number;
+  filename?: string;
 }
 
 export interface ToolUseAccumulator {
