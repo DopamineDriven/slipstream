@@ -3,7 +3,7 @@ import type {
   PageImage,
   PdfMeta,
   StructuredPageText
-} from "@d0paminedriven/pdfdown-ocr";
+} from "@d0paminedriven/pdfdown";
 import { Fs } from "@d0paminedriven/fs";
 import type { DX, Rm, Unenumerate } from "@slipstream/types";
 
@@ -300,26 +300,26 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
   const readIt = fs.fileToBuffer(`src/test/__out__/condensed/${path}`);
   const size = readIt.byteLength / 1024 / 1024;
   console.log(`filesize: ${size} MB`);
-  const { PdfDown } = await import("@d0paminedriven/pdfdown-ocr");
+  const { PdfDown } = await import("@d0paminedriven/pdfdown");
 
   const pdfDown = new PdfDown(readIt);
   const tStart = performance.now();
-  const [structuredText, images, annots, meta, rendered] = await Promise.all([
+  const [structuredText, images, annots, meta] = await Promise.all([
     pdfDown.structuredTextAsync(),
     pdfDown.imagesPerPageAsync(),
     pdfDown.annotationsPerPageAsync(),
-    pdfDown.metadataAsync(),
-    pdfDown.renderPagesAsync({
-      mode: "Always"
-    })
+    pdfDown.metadataAsync()
+    // pdfDown.renderPagesAsync({
+    //   mode: "Always"
+    // })
   ]);
 
-  for (const r of rendered) {
-    fs.withWs(
-      `src/test/__out__/pdfdown/${filename}/rendered/${r.page}.png`,
-      r.data
-    );
-  }
+  // for (const r of rendered) {
+  //   fs.withWs(
+  //     `src/test/__out__/pdfdown/${filename}/rendered/${r.page}.png`,
+  //     r.data
+  //   );
+  // }
   console.log(`rust job finished in ${performance.now() - tStart} ms`);
   const v = new Set<number>();
   if (annots.length > 0) {

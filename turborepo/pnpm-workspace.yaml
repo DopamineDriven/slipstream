@@ -38,8 +38,6 @@ catalogs:
     "@d0paminedriven/fs": ^11.0.0
     "@d0paminedriven/metadata": ^6.0.1
     "@d0paminedriven/pdfdown": ^0.9.9
-  dd-ocr:
-    "@d0paminedriven/pdfdown-ocr": ^0.9.9
   decimal:
     "decimal.js": ^10.6.0
   dotenv:
