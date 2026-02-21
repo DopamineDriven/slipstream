@@ -716,7 +716,6 @@ export class GeminiWorkupService extends FileSearchStoreService {
         const fssRef = this.fssRegistry.get(userId);
         if (fssRef) {
           return [
-            { urlContext: {} },
             { fileSearch: { fileSearchStoreNames: [fssRef] } }
           ] satisfies GenerateContentConfig["tools"];
         } else

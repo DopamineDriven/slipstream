@@ -3,12 +3,12 @@ import type {
   PageImage,
   PdfMeta,
   StructuredPageText
-} from "@d0paminedriven/pdfdown";
+} from "@d0paminedriven/pdfdown-ocr";
 import { Fs } from "@d0paminedriven/fs";
 import type { DX, Rm, Unenumerate } from "@slipstream/types";
 
 const fs = new Fs(process.cwd());
-export type PageImageWithSize = DX<Rm<PageImage, "data"> & { size: number }>;
+type PageImageWithSize = DX<Rm<PageImage, "data"> & { size: number }>;
 interface PageOffsetCache {
   page: number;
   body: string;
@@ -44,7 +44,7 @@ interface PageBoxEnhanced extends PageBox {
 //     size: number;
 // }
 
-export const pdfChoiceArr = [
+const pdfChoiceArr = [
   "a11final-fltpln.pdf",
   "andrew_ross_organic_presentation_autumn_2014.pdf",
   "Ascension-Through-Fire---A-Sacred-Arrival-Above-Infernal-Gates.pdf",
@@ -300,16 +300,26 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
   const readIt = fs.fileToBuffer(`src/test/__out__/condensed/${path}`);
   const size = readIt.byteLength / 1024 / 1024;
   console.log(`filesize: ${size} MB`);
-  const { PdfDown } = await import("@d0paminedriven/pdfdown");
+  const { PdfDown } = await import("@d0paminedriven/pdfdown-ocr");
 
   const pdfDown = new PdfDown(readIt);
   const tStart = performance.now();
-  const [structuredText, images, annots, meta] = await Promise.all([
+  const [structuredText, images, annots, meta, rendered] = await Promise.all([
     pdfDown.structuredTextAsync(),
     pdfDown.imagesPerPageAsync(),
     pdfDown.annotationsPerPageAsync(),
-    pdfDown.metadataAsync()
+    pdfDown.metadataAsync(),
+    pdfDown.renderPagesAsync({
+      mode: "Always"
+    })
   ]);
+
+  for (const r of rendered) {
+    fs.withWs(
+      `src/test/__out__/pdfdown/${filename}/rendered/${r.page}.png`,
+      r.data
+    );
+  }
   console.log(`rust job finished in ${performance.now() - tStart} ms`);
   const v = new Set<number>();
   if (annots.length > 0) {
@@ -390,9 +400,10 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
   };
 }
 const perf = performance.now();
-const x = "The-Path-to-Hell-is-Paved-with-Good-Intentions.pdf" as const satisfies Unenumerate<
-  typeof pdfChoiceArr
->;
+const x =
+  "The-Path-to-Hell-is-Paved-with-Good-Intentions.pdf" as const satisfies Unenumerate<
+    typeof pdfChoiceArr
+  >;
 readAndExtract(x).then(v => {
   console.log(`ts script finished in: ${performance.now() - perf} ms`);
   if (v) {
@@ -406,7 +417,9 @@ readAndExtract(x).then(v => {
       creator,
       modificationDate,
       pageCount,
-      producer,body,annots,
+      producer,
+      body,
+      annots,
       pageobjMap,
       version,
       annotPages,
@@ -414,8 +427,8 @@ readAndExtract(x).then(v => {
       isLinearized
     } = v;
 
-   const annotRects= annots.map((t) =>t.rect);
-const offsets = body.map((t) =>[t.page, t.offsets[0], t.offsets[1]]);
+    const annotRects = annots.map(t => t.rect);
+    const offsets = body.map(t => [t.page, t.offsets[0], t.offsets[1]]);
     console.log({
       creationDate,
       creator,

@@ -132,6 +132,7 @@
     "@d0paminedriven/fs": "catalog:dd",
     "@d0paminedriven/metadata": "catalog:dd",
     "@d0paminedriven/pdfdown": "catalog:dd",
+    "@d0paminedriven/pdfdown-ocr": "catalog:dd-ocr",
     "@google/genai": "catalog:google",
     "@napi-rs/canvas": "catalog:napi",
     "@modelcontextprotocol/sdk": "catalog:mcp",

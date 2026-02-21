@@ -5,20 +5,20 @@ packages:
 
 catalogs:
   anthropic:
-    "@anthropic-ai/sdk": ^0.77.0
+    "@anthropic-ai/sdk": ^0.78.0
   auth:
     better-auth: ^1.4.18
   aws:
-    "@aws-sdk/client-s3": ^3.993.0
-    "@aws-sdk/client-secrets-manager": ^3.993.0
-    "@aws-sdk/credential-providers": ^3.993.0
-    "@aws-sdk/lib-storage": ^3.993.0
-    "@aws-sdk/s3-request-presigner": ^3.993.0
+    "@aws-sdk/client-s3": ^3.995.0
+    "@aws-sdk/client-secrets-manager": ^3.995.0
+    "@aws-sdk/credential-providers": ^3.995.0
+    "@aws-sdk/lib-storage": ^3.995.0
+    "@aws-sdk/s3-request-presigner": ^3.995.0
     "@aws-sdk/types": ^3.973.1
   babel:
     babel-plugin-react-compiler: ^1.0.0
   biome:
-    "@biomejs/biome": ^2.4.2
+    "@biomejs/biome": ^2.4.4
   bui:
     "@base-ui-components/react": ^1.0.0-rc.0
   clsx:
@@ -37,7 +37,9 @@ catalogs:
   dd:
     "@d0paminedriven/fs": ^11.0.0
     "@d0paminedriven/metadata": ^6.0.1
-    "@d0paminedriven/pdfdown": ^0.9.8
+    "@d0paminedriven/pdfdown": ^0.9.9
+  dd-ocr:
+    "@d0paminedriven/pdfdown-ocr": ^0.9.9
   decimal:
     "decimal.js": ^10.6.0
   dotenv:
@@ -46,8 +48,8 @@ catalogs:
     dotenv-expand: ^12.0.3
   eslint:
     "@eslint/compat": ^2.0.2
-    "@eslint/js": ^9.39.2
-    eslint: ^9.39.2
+    "@eslint/js": ^9.39.3
+    eslint: ^9.39.3
     eslint-plugin-import: ^2.32.0
     eslint-plugin-jsx-a11y: ^6.10.2
     eslint-plugin-react: ^7.37.5
@@ -73,15 +75,15 @@ catalogs:
   mcp:
     "@modelcontextprotocol/sdk": ^1.27.0
   motion:
-    motion: ^12.34.2
-    motion-dom: ^12.34.2
+    motion: ^12.34.3
+    motion-dom: ^12.34.3
     motion-plus: ^1.5.1
     motion-plus-dom: ^2.11.2
     motion-utils: ^12.29.2
   nanoid:
     nanoid: ^5.1.6
   napi:
-    "@napi-rs/canvas": ^0.1.93
+    "@napi-rs/canvas": ^0.1.94
   next:
     next: ^16.1.6
     next-themes: ^0.4.6
@@ -89,7 +91,7 @@ catalogs:
     "@next/eslint-plugin-next": ^16.1.6
   node:
     "@types/node": ^25.3.0
-    nodemon: ^3.1.11
+    nodemon: ^3.1.14
     node-html-parser: ^7.0.2
   openai:
     openai: ^6.22.0
@@ -109,10 +111,10 @@ catalogs:
     prettier-plugin-tailwindcss: ^0.7.2
     "@ianvs/prettier-plugin-sort-imports": ^4.7.1
   prisma:
-    prisma: ^7.4.0
-    "@prisma/adapter-pg": ^7.4.0
-    "@prisma/client": ^7.4.0
-    "@prisma/client-runtime-utils": ^7.4.0
+    prisma: ^7.4.1
+    "@prisma/adapter-pg": ^7.4.1
+    "@prisma/client": ^7.4.1
+    "@prisma/client-runtime-utils": ^7.4.1
     "@prisma/extension-accelerate": ^3.0.1
   py:
     pythonia: ^1.2.6
@@ -192,11 +194,11 @@ catalogs:
   tseslint:
     typescript-eslint: ^8.56.0
   tsgo:
-    "@typescript/native-preview": ^7.0.0-dev.20260219.1
+    "@typescript/native-preview": ^7.0.0-dev.20260220.1
   tslib:
     tslib: ^2.8.1
   tsup:
-    "@microsoft/api-extractor": ^7.57.0
+    "@microsoft/api-extractor": ^7.57.2
     terser: ^5.46.0
     tsup: ^8.5.1
   tsx:
@@ -225,7 +227,7 @@ catalogs:
     knip: ^5.84.1
     wait-on: ^9.0.4
   vercel:
-    vercel: ^50.20.0
+    vercel: ^50.22.1
     "@vercel/analytics": ^1.6.1
     "@vercel/functions": ^3.4.2
   vfile:
