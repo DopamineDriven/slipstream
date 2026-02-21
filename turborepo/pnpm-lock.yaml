@@ -81,10 +81,6 @@ catalogs:
     '@d0paminedriven/pdfdown':
       specifier: ^0.9.9
       version: 0.9.9
-  dd-ocr:
-    '@d0paminedriven/pdfdown-ocr':
-      specifier: ^0.9.9
-      version: 0.9.9
   decimal:
     decimal.js:
       specifier: ^10.6.0
@@ -961,9 +957,6 @@ importers:
         version: 6.0.1
       '@d0paminedriven/pdfdown':
         specifier: catalog:dd
-        version: 0.9.9
-      '@d0paminedriven/pdfdown-ocr':
-        specifier: catalog:dd-ocr
         version: 0.9.9
       '@google/genai':
         specifier: catalog:google
@@ -2468,37 +2461,6 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [musl]
-
-  '@d0paminedriven/pdfdown-ocr-darwin-arm64@0.9.9':
-    resolution: {integrity: sha512-Pa/WpFNw2xqvC+i3z/7zq/UKIF3/jnlltXr/9Gzfw/tfAju/tsntiyBoTCQWjPGMyNec+5kcOqukDCqVat++cQ==}
-    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@d0paminedriven/pdfdown-ocr-darwin-x64@0.9.9':
-    resolution: {integrity: sha512-+iGT9kbcooHHEmj8fgm3ouUE50U/har7tVfeKoT5BTsujICa8LB1IOj6+yw3VevKeuoAcLcq0N0x8BRot4f2Tw==}
-    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
-    cpu: [x64]
-    os: [darwin]
-
-  '@d0paminedriven/pdfdown-ocr-linux-arm64-gnu@0.9.9':
-    resolution: {integrity: sha512-vlPxS4sbm9xE7IjKNV+zMIuXrjzwxIV4jgtXoMKff0+HDj4/oqoSJk132d1cl1qbI+8ea1feAKaqG85j0n5wdQ==}
-    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@d0paminedriven/pdfdown-ocr-linux-x64-gnu@0.9.9':
-    resolution: {integrity: sha512-cTGLGFVNnpV92JdFD2Al+k1S9GAG9VpdJ5JF52KDbnnSVaj/A7MpxR4mJP085R3YJ0TTnNpdWai5DgcKrjPL9w==}
-    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@d0paminedriven/pdfdown-ocr@0.9.9':
-    resolution: {integrity: sha512-x87A2jh4NzOipqKJ0V2HF1kByRmtu2+bwEdA8T2UeGTQIwEFnoXNkaRxCptZxcMYsZB719CJA/hR3UShGHo+MQ==}
-    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
-    os: [darwin, linux]
 
   '@d0paminedriven/pdfdown-wasm32-wasi@0.9.9':
     resolution: {integrity: sha512-Ix+x2m9se4jS/zjTl+eeooTgNjypPNm+4kpzYA2R5KAq6fDr9EDkbQ8FPZCu00AF+F4yat8uo8duLEcEuu1iZw==}
@@ -11047,25 +11009,6 @@ snapshots:
 
   '@d0paminedriven/pdfdown-linux-x64-musl@0.9.9':
     optional: true
-
-  '@d0paminedriven/pdfdown-ocr-darwin-arm64@0.9.9':
-    optional: true
-
-  '@d0paminedriven/pdfdown-ocr-darwin-x64@0.9.9':
-    optional: true
-
-  '@d0paminedriven/pdfdown-ocr-linux-arm64-gnu@0.9.9':
-    optional: true
-
-  '@d0paminedriven/pdfdown-ocr-linux-x64-gnu@0.9.9':
-    optional: true
-
-  '@d0paminedriven/pdfdown-ocr@0.9.9':
-    optionalDependencies:
-      '@d0paminedriven/pdfdown-ocr-darwin-arm64': 0.9.9
-      '@d0paminedriven/pdfdown-ocr-darwin-x64': 0.9.9
-      '@d0paminedriven/pdfdown-ocr-linux-arm64-gnu': 0.9.9
-      '@d0paminedriven/pdfdown-ocr-linux-x64-gnu': 0.9.9
 
   '@d0paminedriven/pdfdown-wasm32-wasi@0.9.9':
     dependencies:
