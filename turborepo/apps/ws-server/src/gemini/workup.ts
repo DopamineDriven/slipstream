@@ -29,10 +29,10 @@ import type {
 } from "@slipstream/types";
 
 export class GeminiWorkupService extends FileSearchStoreService {
-  protected nanoid: Promise<typeof import("nanoid")>;
+  protected nanoid: Promise<(typeof import("nanoid"))["nanoid"]>;
   constructor(logger: LoggerService, prisma: PrismaService, apiKey: string) {
     super(logger, prisma, apiKey);
-    this.nanoid = import("nanoid").then(d => d);
+    this.nanoid = import("nanoid").then(d => d.nanoid);
   }
   /**
    * gemini-3-* only
@@ -823,7 +823,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
     }
   }
   protected async generateId(target: "seriesId" | "generationGroupId") {
-    const { nanoid } = await this.nanoid;
+    const nanoid = await this.nanoid;
     if (target === "generationGroupId") {
       const generationGroupId = "resp_" + nanoid();
       return generationGroupId;

@@ -781,7 +781,7 @@ export type GrokImagineImageGenOpts = {
   aspect_ratio?: GrokImagineARUnion | null;
 
   /**
-   * Resolution of the generated image. Defaults to 1k. Only supported by grok-imagine models.
+   * Resolution of the generated image. Defaults to 2k. Only supported by grok-imagine models.
    */
   resolution?: "1k" | "2k" | null;
   /**
