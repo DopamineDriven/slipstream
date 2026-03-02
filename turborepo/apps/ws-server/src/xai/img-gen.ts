@@ -9,15 +9,23 @@ import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { GrokCollectionsService } from "@/xai/collections.ts";
 import type {
+  AIChatRequestImgGenFields,
   AIChatResponseImgGenSubFields,
   EventTypeMap,
+  GrokImagineARUnion,
   GrokImgGenModels,
   MessageSingleton
 } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
 
+type xAIImageEditsInput = {
+  readonly url: string;
+  readonly type: "image_url";
+};
+
 export class GrokImgGenService extends GrokCollectionsService {
+  protected nanoid: Promise<(typeof import("nanoid"))["nanoid"]>;
   constructor(
     protected redis: EnhancedRedisPubSub,
     protected s3: S3Storage,
@@ -27,6 +35,7 @@ export class GrokImgGenService extends GrokCollectionsService {
     managementKey: string
   ) {
     super(logger, prisma, apiKey, managementKey);
+    this.nanoid = import("nanoid").then(d => d.nanoid);
   }
 
   private handleMostRecentMsgsForImg(msgs: MessageSingleton<true>[]) {
@@ -52,36 +61,157 @@ export class GrokImgGenService extends GrokCollectionsService {
           .join("\n") ?? "");
   }
 
+  private isGrokImagineAspectRatio(value: string): value is GrokImagineARUnion {
+    return /^(1:1|2:3|3:2|3:4|4:3|16:9|9:16|19\.5:9|9:19\.5|9:20|20:9|1:2|2:1|auto)$/.test(
+      value
+    );
+  }
+
+  private isValidImgRes(res: string) {
+    return res === "1k" || res === "2k";
+  }
+
+  private handleMostRecentImagineMsg(msgs: MessageSingleton<true>[]) {
+    const mostRecentMsg = msgs.slice(-1)?.[0];
+    if (!mostRecentMsg) throw new Error("no message found for grok image gen");
+
+    const images = Array.of<xAIImageEditsInput>();
+    for (const att of mostRecentMsg.attachments) {
+      const url = att.compatStatus === "ACTIVE" ? att.compatCdnUrl : att.cdnUrl;
+      const mime = att.compatStatus === "ACTIVE" ? att.compatMime : att.mime;
+
+      if (
+        att.assetType === "IMAGE" &&
+        typeof url === "string" &&
+        typeof mime === "string" &&
+        mime.startsWith("image/")
+      ) {
+        images.push({ url, type: "image_url" });
+      }
+    }
+
+    if (images.length > 3) {
+      throw new Error(
+        "xAI image edits supports a maximum of 3 input images per request."
+      );
+    }
+
+    return {
+      prompt: mostRecentMsg.content,
+      images
+    } as const;
+  }
+
+  private resolveGrokImagineImgOpts(
+    model: "grok-imagine-image" | "grok-imagine-image-pro",
+    imgGenFields?: AIChatRequestImgGenFields
+  ) {
+    const rawAspectRatio = imgGenFields?.output_size;
+    const rawResolution = imgGenFields?.output_quality;
+    const normalizedResolution =
+      typeof rawResolution === "string" ? rawResolution.toLowerCase() : undefined;
+
+    const aspect_ratio = this.prisma.handleOutputSize(
+      "grok",
+      model,
+      typeof rawAspectRatio === "string" &&
+        this.isGrokImagineAspectRatio(rawAspectRatio)
+        ? { output_size: rawAspectRatio }
+        : undefined
+    );
+    const resolution = this.prisma.handleImgGenOutputQuality(
+      "grok",
+      model,
+      typeof normalizedResolution === "string" &&
+        this.isValidImgRes(normalizedResolution)
+        ? { output_quality: normalizedResolution }
+        : undefined
+    );
+
+    return {
+      aspect_ratio: aspect_ratio ?? "auto",
+      resolution: resolution ?? "2k"
+    } as const satisfies {
+      aspect_ratio: GrokImagineARUnion;
+      resolution: "1k" | "2k";
+    };
+  }
+
+  private async handleImgGenReq(
+    key: string,
+    url: typeof this.baseImgGenUrl | typeof this.baseImgEditsUrl,
+    body: Record<string, unknown>
+  ) {
+    const imgResponse = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+    if (!imgResponse.ok) {
+      const errorText = await imgResponse.text();
+      throw new Error(
+        `xAI API error (${imgResponse.status}, ${imgResponse.statusText}) at ${url}: ${errorText}`
+      );
+    }
+    return await imgResponse.json<xAIImgGenResponse>();
+  }
+
   private async handleImgGen(
     model = "grok-2-image-1212" satisfies GrokImgGenModels,
     n = 1,
     messages: MessageSingleton<true>[],
     userId: string,
+    imgGenFields?: AIChatRequestImgGenFields,
     apiKey?: string
   ) {
     const key = apiKey ?? this.xaiKey;
     if (model === ("grok-2-image-1212" satisfies GrokImgGenModels)) {
-      const imgResponse = await fetch(this.baseImgGenUrl, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${key}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "grok-2-image-1212" satisfies GrokImgGenModels,
-          prompt: this.handleMostRecentMsgsForImg(messages),
-          n,
-          response_format: "b64_json",
-          user: userId
-        })
+      return await this.handleImgGenReq(key, this.baseImgGenUrl, {
+        model: "grok-2-image-1212" satisfies GrokImgGenModels,
+        prompt: this.handleMostRecentMsgsForImg(messages),
+        n,
+        response_format: "b64_json",
+        user: userId
       });
-      if (!imgResponse.ok) {
-        const errorText = await imgResponse.text();
-        throw new Error(
-          `xAI API error (${imgResponse.status}, ${imgResponse.statusText}): ${errorText}`
-        );
+    }
+    if (
+      model === ("grok-imagine-image" satisfies GrokImgGenModels) ||
+      model === ("grok-imagine-image-pro" satisfies GrokImgGenModels)
+    ) {
+      const { prompt, images } = this.handleMostRecentImagineMsg(messages);
+      const { aspect_ratio, resolution } = this.resolveGrokImagineImgOpts(
+        model,
+        imgGenFields
+      );
+      const baseBody = {
+        model,
+        prompt,
+        n,
+        aspect_ratio,
+        resolution,
+        response_format: "b64_json",
+        user: userId
+      } as const satisfies {
+        model: "grok-imagine-image" | "grok-imagine-image-pro";
+        prompt: string;
+        n: number;
+        aspect_ratio: GrokImagineARUnion;
+        resolution: "1k" | "2k";
+        response_format: "b64_json";
+        user: string;
+      };
+
+      if (images.length > 0) {
+        return await this.handleImgGenReq(key, this.baseImgEditsUrl, {
+          ...baseBody,
+          images
+        } satisfies typeof baseBody & { images: xAIImageEditsInput[] });
       }
-      return await imgResponse.json<xAIImgGenResponse>();
+
+      return await this.handleImgGenReq(key, this.baseImgGenUrl, baseBody);
     }
   }
 
@@ -123,7 +253,7 @@ export class GrokImgGenService extends GrokCollectionsService {
   }
 
   private async generateId(target: "seriesId" | "generationGroupId") {
-    const { nanoid } = await import("nanoid");
+    const nanoid = await this.nanoid;
     if (target === "generationGroupId") {
       const generationGroupId = "resp_" + nanoid();
       return generationGroupId;
@@ -322,6 +452,7 @@ export class GrokImgGenService extends GrokCollectionsService {
         n,
         msgs,
         userId,
+        imgGenFields,
         apiKey ?? undefined
       );
 

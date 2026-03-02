@@ -3,6 +3,7 @@ import type {
   AllModelsUnion,
   GetModelUtilRT,
   GoogleSafetyFilterLevel,
+  GrokModelAspectRatio,
   OpenAIModelAspectRatio,
   OutputSizeProps,
   Provider,
@@ -11,7 +12,19 @@ import type {
 
 export class ProviderValidation {
   public grokImgGenCapable(m: AllModelsUnion) {
+    return this.grokNativeImageGenModel(m);
+  }
+
+  public grokImageLegacyModel(m: AllModelsUnion) {
     return m === "grok-2-image-1212";
+  }
+
+  public grokImagineImgGenModel(m: AllModelsUnion) {
+    return m === "grok-imagine-image" || m === "grok-imagine-image-pro";
+  }
+
+  public grokNativeImageGenModel(m: AllModelsUnion) {
+    return this.grokImageLegacyModel(m) || this.grokImagineImgGenModel(m);
   }
 
   public openAIDalle2(m: AllModelsUnion) {
@@ -60,6 +73,7 @@ export class ProviderValidation {
   public geminiNanoBananasModel(m: AllModelsUnion) {
     return (
       m === "deep-research-pro-preview-12-2025" ||
+      m === "gemini-3.1-flash-image-preview" ||
       m === "gemini-2.5-flash-image" ||
       m === "gemini-3-pro-image-preview"
     );
@@ -220,6 +234,9 @@ export class ProviderValidation {
           }
           case "deep-research-pro-preview-12-2025":
           case "gemini-3-flash-preview":
+          case "gemini-3.1-flash-image-preview":
+          case "gemini-3.1-pro-preview":
+          case "gemini-3.1-pro-preview-customtools":
           case "gemini-3-pro-image-preview":
           case "gemini-2.0-flash":
           case "gemini-2.0-flash-lite":
@@ -227,7 +244,6 @@ export class ProviderValidation {
           case "gemini-2.5-flash-image":
           case "gemini-2.5-flash-lite":
           case "gemini-2.5-pro":
-          case "gemini-3-pro-preview":
           case "veo-2.0-generate-001":
           case "veo-3.0-fast-generate-001":
           case "veo-3.0-generate-001":
@@ -463,7 +479,7 @@ export class ProviderValidation {
           | "standard"
           | "hd"
           | undefined;
-        grok?: undefined;
+        grok?: "1k" | "2k" | undefined;
         meta?: undefined;
         vercel?: undefined;
         anthropic?: undefined;
@@ -472,7 +488,7 @@ export class ProviderValidation {
   ): {
     gemini?: "1K" | "2K" | "4K" | undefined;
     openai?: "high" | "medium" | "low" | "auto" | "standard" | "hd" | undefined;
-    grok?: undefined;
+    grok?: "1k" | "2k" | undefined;
     meta?: undefined;
     vercel?: undefined;
     anthropic?: undefined;
@@ -481,6 +497,7 @@ export class ProviderValidation {
       case "gemini": {
         const m = model as GetModelUtilRT<"gemini">;
         switch (m) {
+          case "gemini-3.1-flash-image-preview":
           case "deep-research-pro-preview-12-2025":
           case "gemini-3-pro-image-preview":
           case "gemini-2.5-flash-image": {
@@ -498,7 +515,7 @@ export class ProviderValidation {
                   | "standard"
                   | "hd"
                   | undefined;
-                grok?: undefined;
+                grok?: "1k" | "2k" | undefined;
                 meta?: undefined;
                 vercel?: undefined;
                 anthropic?: undefined;
@@ -514,7 +531,7 @@ export class ProviderValidation {
                   | "standard"
                   | "hd"
                   | undefined;
-                grok?: undefined;
+                grok?: "1k" | "2k" | undefined;
                 meta?: undefined;
                 vercel?: undefined;
                 anthropic?: undefined;
@@ -537,7 +554,7 @@ export class ProviderValidation {
                   | "standard"
                   | "hd"
                   | undefined;
-                grok?: undefined;
+                grok?: "1k" | "2k" | undefined;
                 meta?: undefined;
                 vercel?: undefined;
                 anthropic?: undefined;
@@ -553,14 +570,15 @@ export class ProviderValidation {
                   | "standard"
                   | "hd"
                   | undefined;
-                grok?: undefined;
+                grok?: "1k" | "2k" | undefined;
                 meta?: undefined;
                 vercel?: undefined;
                 anthropic?: undefined;
               }[T];
           }
+          case "gemini-3.1-pro-preview":
+          case "gemini-3.1-pro-preview-customtools":
           case "gemini-3-flash-preview":
-          case "gemini-3-pro-preview":
           case "gemini-2.0-flash":
           case "gemini-2.0-flash-lite":
           case "gemini-2.5-flash":
@@ -572,7 +590,93 @@ export class ProviderValidation {
           case "veo-3.1-fast-generate-preview":
           case "veo-3.1-generate-preview":
           default: {
-            return undefined;
+            return undefined as {
+              gemini?: "1K" | "2K" | "4K" | undefined;
+              openai?:
+                | "high"
+                | "medium"
+                | "low"
+                | "auto"
+                | "standard"
+                | "hd"
+                | undefined;
+              grok?: "1k" | "2k" | undefined;
+              meta?: undefined;
+              vercel?: undefined;
+              anthropic?: undefined;
+            }[T];
+          }
+        }
+      }
+      case "grok": {
+        if (!model) return undefined;
+        const m = model as GetModelUtilRT<"grok">;
+        switch (m) {
+          case "grok-imagine-image":
+          case "grok-imagine-image-pro": {
+            if (
+              data?.output_quality &&
+              /^(1|2)k$/gm.test(data.output_quality)
+            ) {
+              return data.output_quality as "1k" | "2k" as {
+                gemini?: "1K" | "2K" | "4K" | undefined;
+                openai?:
+                  | "high"
+                  | "medium"
+                  | "low"
+                  | "auto"
+                  | "standard"
+                  | "hd"
+                  | undefined;
+                grok?: "1k" | "2k" | undefined;
+                meta?: undefined;
+                vercel?: undefined;
+                anthropic?: undefined;
+              }[T];
+            } else
+              return "2k" as {
+                gemini?: "1K" | "2K" | "4K" | undefined;
+                openai?:
+                  | "high"
+                  | "medium"
+                  | "low"
+                  | "auto"
+                  | "standard"
+                  | "hd"
+                  | undefined;
+                grok?: "1k" | "2k" | undefined;
+                meta?: undefined;
+                vercel?: undefined;
+                anthropic?: undefined;
+              }[T];
+          }
+          case "grok-2-image-1212":
+          case "grok-2-vision-1212":
+          case "grok-3":
+          case "grok-3-mini":
+          case "grok-4-0709":
+          case "grok-4-1-fast-non-reasoning":
+          case "grok-4-1-fast-reasoning":
+          case "grok-4-fast-non-reasoning":
+          case "grok-4-fast-reasoning":
+          case "grok-code-fast-1":
+          case "grok-imagine-video":
+          default: {
+            return undefined as {
+              gemini?: "1K" | "2K" | "4K" | undefined;
+              openai?:
+                | "high"
+                | "medium"
+                | "low"
+                | "auto"
+                | "standard"
+                | "hd"
+                | undefined;
+              grok?: "1k" | "2k" | undefined;
+              meta?: undefined;
+              vercel?: undefined;
+              anthropic?: undefined;
+            }[T];
           }
         }
       }
@@ -595,7 +699,7 @@ export class ProviderValidation {
                   | "standard"
                   | "hd"
                   | undefined;
-                grok?: undefined;
+                grok?: "1k" | "2k" | undefined;
                 meta?: undefined;
                 vercel?: undefined;
                 anthropic?: undefined;
@@ -611,7 +715,7 @@ export class ProviderValidation {
                   | "standard"
                   | "hd"
                   | undefined;
-                grok?: undefined;
+                grok?: "1k" | "2k" | undefined;
                 meta?: undefined;
                 vercel?: undefined;
                 anthropic?: undefined;
@@ -632,7 +736,7 @@ export class ProviderValidation {
                   | "standard"
                   | "hd"
                   | undefined;
-                grok?: undefined;
+                grok?: "1k" | "2k" | undefined;
                 meta?: undefined;
                 vercel?: undefined;
                 anthropic?: undefined;
@@ -648,7 +752,7 @@ export class ProviderValidation {
                   | "standard"
                   | "hd"
                   | undefined;
-                grok?: undefined;
+                grok?: "1k" | "2k" | undefined;
                 meta?: undefined;
                 vercel?: undefined;
                 anthropic?: undefined;
@@ -689,7 +793,7 @@ export class ProviderValidation {
                   | "standard"
                   | "hd"
                   | undefined;
-                grok?: undefined;
+                grok?: "1k" | "2k" | undefined;
                 meta?: undefined;
                 vercel?: undefined;
                 anthropic?: undefined;
@@ -705,7 +809,7 @@ export class ProviderValidation {
                   | "standard"
                   | "hd"
                   | undefined;
-                grok?: undefined;
+                grok?: "1k" | "2k" | undefined;
                 meta?: undefined;
                 vercel?: undefined;
                 anthropic?: undefined;
@@ -730,7 +834,21 @@ export class ProviderValidation {
           case "o3-mini":
           case "o3-pro":
           case "o4-mini": {
-            return undefined;
+            return undefined as {
+              gemini?: "1K" | "2K" | "4K" | undefined;
+              openai?:
+                | "high"
+                | "medium"
+                | "low"
+                | "auto"
+                | "standard"
+                | "hd"
+                | undefined;
+              grok?: "1k" | "2k" | undefined;
+              meta?: undefined;
+              vercel?: undefined;
+              anthropic?: undefined;
+            }[T];
           }
           default: {
             return "auto" as {
@@ -743,7 +861,7 @@ export class ProviderValidation {
                 | "standard"
                 | "hd"
                 | undefined;
-              grok?: undefined;
+              grok?: "1k" | "2k" | undefined;
               meta?: undefined;
               vercel?: undefined;
               anthropic?: undefined;
@@ -754,7 +872,6 @@ export class ProviderValidation {
       case "anthropic":
       case "meta":
       case "vercel":
-      case "grok":
       default: {
         return undefined as {
           gemini?: "1K" | "2K" | "4K" | undefined;
@@ -766,7 +883,7 @@ export class ProviderValidation {
             | "standard"
             | "hd"
             | undefined;
-          grok?: undefined;
+          grok?: "1k" | "2k" | undefined;
           meta?: undefined;
           vercel?: undefined;
           anthropic?: undefined;
@@ -778,10 +895,10 @@ export class ProviderValidation {
   public fallbackImgGenModelByProvider(provider: Provider) {
     switch (provider) {
       case "gemini": {
-        return "gemini-3-pro-image-preview" satisfies AllModelsUnion;
+        return "gemini-3.1-flash-image-preview" satisfies AllModelsUnion;
       }
       case "grok": {
-        return "grok-2-image-1212" satisfies AllModelsUnion;
+        return "grok-imagine-image" satisfies AllModelsUnion;
       }
       case "openai": {
         return "gpt-5.2" satisfies AllModelsUnion;
@@ -878,14 +995,14 @@ export class ProviderValidation {
     switch (provider) {
       case "anthropic":
       case "meta":
-      case "vercel":
-      case "grok": {
+      case "vercel": {
         return undefined;
       }
       case "gemini": {
         const m = model as GetModelUtilRT<"gemini"> | undefined;
         switch (m) {
           case "deep-research-pro-preview-12-2025":
+          case "gemini-3.1-flash-image-preview":
           case "gemini-3-pro-image-preview":
           case "gemini-2.5-flash-image": {
             if (
@@ -907,8 +1024,9 @@ export class ProviderValidation {
               return data.output_size as OutputSizeProps<typeof provider>;
             } else return "1:1" as OutputSizeProps<typeof provider>;
           }
+          case "gemini-3.1-pro-preview":
+          case "gemini-3.1-pro-preview-customtools":
           case "gemini-3-flash-preview":
-          case "gemini-3-pro-preview":
           case "gemini-2.0-flash":
           case "gemini-2.0-flash-lite":
           case "gemini-2.5-flash":
@@ -924,6 +1042,24 @@ export class ProviderValidation {
           case undefined:
           default: {
             return "1:1" as OutputSizeProps<typeof provider>;
+          }
+        }
+      }
+      case "grok": {
+        const m = model as GetModelUtilRT<"grok"> | undefined;
+        if (!m || !this.grokImagineImgGenModel(m)) return undefined;
+        else {
+          if (
+            data?.output_size &&
+            /^(1:1|2:3|3:2|3:4|4:3|16:9|9:16|19\.5:9|9:19\.5|9:20|20:9|1:2|2:1|auto)$/gm.test(
+              data?.output_size
+            )
+          ) {
+            return data.output_size as GrokModelAspectRatio[GetModelUtilRT<"grok">] as OutputSizeProps<
+              typeof provider
+            >;
+          } else {
+            return "auto" as OutputSizeProps<typeof provider>;
           }
         }
       }

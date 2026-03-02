@@ -588,7 +588,7 @@ export function ChatInput({
                     placeholder={effectivePlaceholder}
                     disabled={isDisabled}
                     className={cn(
-                      "min-h-[60px] w-full resize-none border-none bg-transparent p-0 text-base leading-6 focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none",
+                      "min-h-15 w-full resize-none border-none bg-transparent p-0 text-base leading-6 focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none",
                       isDisabled ? "cursor-not-allowed" : ""
                     )}
                     rows={3}

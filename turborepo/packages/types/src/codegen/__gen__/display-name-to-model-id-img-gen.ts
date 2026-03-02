@@ -23,6 +23,7 @@ export const displayNameToModelIdImgGen = {
   gemini: {
     "Deep Research Pro Preview (Dec-12-2025)":
       "deep-research-pro-preview-12-2025",
+    "Nano Banana 2": "gemini-3.1-flash-image-preview",
     "Nano Banana Pro": "gemini-3-pro-image-preview",
     "Nano Banana": "gemini-2.5-flash-image",
     "Imagen 4": "imagen-4.0-generate-001",
@@ -30,6 +31,8 @@ export const displayNameToModelIdImgGen = {
     "Imagen 4 Ultra": "imagen-4.0-ultra-generate-001"
   },
   grok: {
-    "Grok 2 Image": "grok-2-image-1212"
+    "Grok 2 Image": "grok-2-image-1212",
+    "Grok Imagine Image": "grok-imagine-image",
+    "Grok Imagine Image Pro": "grok-imagine-image-pro"
   }
 } as const;

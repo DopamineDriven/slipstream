@@ -11,6 +11,7 @@ import type {
   PartMediaResolution,
   ToolConfig
 } from "@google/genai";
+import { FileSearchStoreService } from "@/gemini/fss.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import {
@@ -26,13 +27,12 @@ import type {
   GeminiModelIdUnion,
   MessageSingleton
 } from "@slipstream/types";
-import { FileSearchStoreService } from "./fss.ts";
-
-
 
 export class GeminiWorkupService extends FileSearchStoreService {
+  protected nanoid: Promise<(typeof import("nanoid"))["nanoid"]>;
   constructor(logger: LoggerService, prisma: PrismaService, apiKey: string) {
     super(logger, prisma, apiKey);
+    this.nanoid = import("nanoid").then(d => d.nanoid);
   }
   /**
    * gemini-3-* only
@@ -175,7 +175,12 @@ export class GeminiWorkupService extends FileSearchStoreService {
                   contentItems.push({
                     type: "image",
                     uri: fileUri,
-                    mime_type: mimeType
+                    mime_type: mimeType as
+                      | "image/png"
+                      | "image/jpeg"
+                      | "image/webp"
+                      | "image/heic"
+                      | "image/heif"
                   });
                   break;
 
@@ -183,7 +188,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
                   contentItems.push({
                     type: "document",
                     uri: fileUri,
-                    mime_type: mimeType
+                    mime_type: mimeType as "application/pdf"
                   });
                   break;
 
@@ -193,7 +198,16 @@ export class GeminiWorkupService extends FileSearchStoreService {
                   contentItems.push({
                     type: "video",
                     uri: fileUri,
-                    mime_type: mimeType
+                    mime_type: mimeType as
+                      | "video/mp4"
+                      | "video/mpeg"
+                      | "video/mpg"
+                      | "video/mov"
+                      | "video/avi"
+                      | "video/x-flv"
+                      | "video/webm"
+                      | "video/wmv"
+                      | "video/3gpp"
                   });
                   break;
 
@@ -311,10 +325,11 @@ export class GeminiWorkupService extends FileSearchStoreService {
               if (typeof item === "string") {
                 console.log(item);
               } else {
-                if (item.data) {
+                if (item.type === "image") {
+                  item.data;
                   // handle base64 string upload to s3
-                }
-                if (item.uri) {
+                } else {
+                  console.log(item.text);
                   // handle fetch then base64 upload to s3
                 }
                 //it's an image
@@ -346,10 +361,9 @@ export class GeminiWorkupService extends FileSearchStoreService {
     keyFingerprint: string,
     keyId?: string,
     apiKey?: string,
-    model?: GeminiModelIdUnion
+    m: GeminiModelIdUnion = "gemini-3.1-pro-preview"
   ) {
     const formatted = Array.of<Content>();
-    const m = model ?? "gemini-2.5-pro";
     for (const msg of msgs) {
       if (msg.senderType === "USER") {
         const partArr = Array.of<Part>();
@@ -363,7 +377,10 @@ export class GeminiWorkupService extends FileSearchStoreService {
                 attachment?.compatMime &&
                 attachment?.compatStatus
               ) {
-                if (m === "gemini-3-pro-preview") {
+                if (
+                  m === "gemini-3.1-pro-preview" ||
+                  m === "gemini-3.1-pro-preview-customtools"
+                ) {
                   const { fileUri, mimeType } = await this.ensureAssetUploaded(
                     attachment,
                     keyFingerprint,
@@ -665,6 +682,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
   private mediaModalities(model: GeminiModelIdUnion) {
     if (
       !(
+        model === "gemini-3.1-flash-image-preview" ||
         model === "gemini-2.5-flash-image" ||
         model === "gemini-3-pro-image-preview"
       )
@@ -676,6 +694,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
   private candidateCount(model: GeminiModelIdUnion, n = 1) {
     if (
       !(
+        model === "gemini-3.1-flash-image-preview" ||
         model === "gemini-2.5-flash-image" ||
         model === "gemini-3-pro-image-preview"
       )
@@ -691,25 +710,28 @@ export class GeminiWorkupService extends FileSearchStoreService {
       retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
     } satisfies ToolConfig;
   }
-/**
+  /**
  The following models support File Search Tooling:
  ```json
 [
   "deep-research-pro-preview-12-2025",
   "gemini-3-flash-preview",
-  "gemini-3-pro-preview",
+  "gemini-3.1-pro-preview",
+  "gemini-3.1-pro-preview-customtools"
   "gemini-2.5-pro",
   "gemini-2.5-flash",
   "gemini-2.5-flash-lite"
 ]
 ```
  */
-  private getTools(userId: string, model?: GeminiModelIdUnion) {
-    const m = model ?? "gemini-2.5-pro";
-
+  private getTools(
+    userId: string,
+    m: GeminiModelIdUnion = "gemini-3.1-pro-preview"
+  ) {
     switch (m) {
       case "gemini-2.5-pro":
-      case "gemini-3-pro-preview":
+      case "gemini-3.1-pro-preview":
+      case "gemini-3.1-pro-preview-customtools":
       case "gemini-3-flash-preview":
       case "deep-research-pro-preview-12-2025":
       case "gemini-2.5-flash": {
@@ -724,6 +746,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
             { urlContext: {} }
           ] satisfies GenerateContentConfig["tools"];
       }
+      case "gemini-3.1-flash-image-preview":
       case "gemini-3-pro-image-preview": {
         return [{ googleSearch: {} }] satisfies GenerateContentConfig["tools"];
       }
@@ -754,20 +777,21 @@ export class GeminiWorkupService extends FileSearchStoreService {
     }
   }
 
-  private getThinkingConfig(model?: GeminiModelIdUnion) {
-    const m = model ?? "gemini-2.5-pro";
+  private getThinkingConfig(m: GeminiModelIdUnion = "gemini-3.1-pro-preview") {
     switch (m) {
       /**
-       * gemini-3-* only
+       * gemini-3* only
        */
       case "deep-research-pro-preview-12-2025":
       case "gemini-3-flash-preview":
-      case "gemini-3-pro-preview": {
+      case "gemini-3.1-pro-preview":
+      case "gemini-3.1-pro-preview-customtools": {
         return {
           includeThoughts: true,
           thinkingLevel: ThinkingLevel.HIGH
         } satisfies GenerateContentConfig["thinkingConfig"];
       }
+      case "gemini-3.1-flash-image-preview":
       case "gemini-3-pro-image-preview":
       case "gemini-2.5-flash":
       case "gemini-2.5-flash-lite":
@@ -799,7 +823,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
     }
   }
   protected async generateId(target: "seriesId" | "generationGroupId") {
-    const { nanoid } = await import("nanoid");
+    const nanoid = await this.nanoid;
     if (target === "generationGroupId") {
       const generationGroupId = "resp_" + nanoid();
       return generationGroupId;
@@ -899,6 +923,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
       | "21:9"
       | undefined satisfies
       | GeminiModelAspectRatioWorkup[
+          | "gemini-3.1-flash-image-preview"
           | "gemini-3-pro-image-preview"
           | "gemini-2.5-flash-image"]
       | undefined;
@@ -940,7 +965,9 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }: GenerateContentResponseProps) {
     const m = model as GeminiModelIdUnion;
     if (
-      (m === "gemini-2.5-flash-image" || m === "gemini-3-pro-image-preview") &&
+      (m === "gemini-2.5-flash-image" ||
+        m === "gemini-3-pro-image-preview" ||
+        m === "gemini-3.1-flash-image-preview") &&
       typeof imgGenFields !== "undefined"
     ) {
       return this.contentGenNanoBananas({

@@ -39,7 +39,7 @@ export class GeminiChatService extends GeminiWorkupService {
     keyId,
     apiKey,
     max_tokens,
-    model: m = "gemini-2.5-pro" satisfies GeminiModelIdUnion,
+    model: m = "gemini-3.1-pro-preview" satisfies GeminiModelIdUnion,
     systemPrompt,
     temperature,
     title,

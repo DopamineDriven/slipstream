@@ -9,5 +9,8 @@ export const modelIdToDisplayNameVideoGen = {
     "veo-3.0-generate-001": "Veo 3",
     "veo-3.0-fast-generate-001": "Veo 3 fast",
     "veo-2.0-generate-001": "Veo 2"
+  },
+  grok: {
+    "grok-imagine-video": "Grok Imagine Video"
   }
 } as const;

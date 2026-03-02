@@ -22,11 +22,12 @@ export const modelIdsByProviderImgGen = {
   ],
   gemini: [
     "deep-research-pro-preview-12-2025",
+    "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
     "imagen-4.0-generate-001",
     "imagen-4.0-fast-generate-001",
     "imagen-4.0-ultra-generate-001"
   ],
-  grok: ["grok-2-image-1212"]
+  grok: ["grok-2-image-1212", "grok-imagine-image", "grok-imagine-image-pro"]
 } as const;

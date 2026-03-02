@@ -40,10 +40,12 @@ export const modelIdToDisplayName = {
     "sora-2-pro": "Sora 2 Pro"
   },
   gemini: {
-    "gemini-3-pro-preview": "Gemini 3 Pro Preview",
+    "gemini-3.1-pro-preview": "Gemini 3.1 Pro Preview",
+    "gemini-3.1-pro-preview-customtools": "Gemini 3.1 Pro Preview Custom Tools",
     "gemini-3-flash-preview": "Gemini 3 Flash Preview",
     "gemini-2.5-pro": "Gemini 2.5 Pro",
     "gemini-3-pro-image-preview": "Nano Banana Pro",
+    "gemini-3.1-flash-image-preview": "Nano Banana 2",
     "gemini-2.5-flash-image": "Nano Banana",
     "gemini-2.5-flash": "Gemini 2.5 Flash",
     "gemini-2.5-flash-lite": "Gemini 2.5 Flash-Lite",
@@ -67,10 +69,13 @@ export const modelIdToDisplayName = {
     "grok-code-fast-1": "Grok Code Fast 1",
     "grok-4-fast-reasoning": "Grok 4 Fast Reasoning",
     "grok-4-fast-non-reasoning": "Grok 4 Fast Non-Reasoning",
+    "grok-imagine-image": "Grok Imagine Image",
+    "grok-imagine-image-pro": "Grok Imagine Image Pro",
     "grok-2-image-1212": "Grok 2 Image",
     "grok-3": "Grok 3",
     "grok-3-mini": "Grok 3 Mini",
-    "grok-2-vision-1212": "Grok 2 Vision"
+    "grok-2-vision-1212": "Grok 2 Vision",
+    "grok-imagine-video": "Grok Imagine Video"
   },
   anthropic: {
     "claude-sonnet-4-6": "Claude Sonnet 4.6",
@@ -81,8 +86,6 @@ export const modelIdToDisplayName = {
     "claude-opus-4-1-20250805": "Claude Opus 4.1",
     "claude-sonnet-4-20250514": "Claude Sonnet 4",
     "claude-opus-4-20250514": "Claude Opus 4",
-    "claude-3-7-sonnet-20250219": "Claude Sonnet 3.7",
-    "claude-3-5-haiku-20241022": "Claude Haiku 3.5",
     "claude-3-haiku-20240307": "Claude Haiku 3"
   },
   meta: {

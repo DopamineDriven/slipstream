@@ -40,10 +40,12 @@ export const displayNameModelsByProvider = {
     "Sora 2 Pro"
   ],
   gemini: [
-    "Gemini 3 Pro Preview",
+    "Gemini 3.1 Pro Preview",
+    "Gemini 3.1 Pro Preview Custom Tools",
     "Gemini 3 Flash Preview",
     "Gemini 2.5 Pro",
     "Nano Banana Pro",
+    "Nano Banana 2",
     "Nano Banana",
     "Gemini 2.5 Flash",
     "Gemini 2.5 Flash-Lite",
@@ -66,10 +68,13 @@ export const displayNameModelsByProvider = {
     "Grok Code Fast 1",
     "Grok 4 Fast Reasoning",
     "Grok 4 Fast Non-Reasoning",
+    "Grok Imagine Image",
+    "Grok Imagine Image Pro",
     "Grok 2 Image",
     "Grok 3",
     "Grok 3 Mini",
-    "Grok 2 Vision"
+    "Grok 2 Vision",
+    "Grok Imagine Video"
   ],
   anthropic: [
     "Claude Sonnet 4.6",
@@ -80,8 +85,6 @@ export const displayNameModelsByProvider = {
     "Claude Opus 4.1",
     "Claude Sonnet 4",
     "Claude Opus 4",
-    "Claude Sonnet 3.7",
-    "Claude Haiku 3.5",
     "Claude Haiku 3"
   ],
   meta: [

@@ -40,10 +40,12 @@ export const modelIdsByProvider = {
     "sora-2-pro"
   ],
   gemini: [
-    "gemini-3-pro-preview",
+    "gemini-3.1-pro-preview",
+    "gemini-3.1-pro-preview-customtools",
     "gemini-3-flash-preview",
     "gemini-2.5-pro",
     "gemini-3-pro-image-preview",
+    "gemini-3.1-flash-image-preview",
     "gemini-2.5-flash-image",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
@@ -66,10 +68,13 @@ export const modelIdsByProvider = {
     "grok-code-fast-1",
     "grok-4-fast-reasoning",
     "grok-4-fast-non-reasoning",
+    "grok-imagine-image",
+    "grok-imagine-image-pro",
     "grok-2-image-1212",
     "grok-3",
     "grok-3-mini",
-    "grok-2-vision-1212"
+    "grok-2-vision-1212",
+    "grok-imagine-video"
   ],
   anthropic: [
     "claude-sonnet-4-6",
@@ -80,8 +85,6 @@ export const modelIdsByProvider = {
     "claude-opus-4-1-20250805",
     "claude-sonnet-4-20250514",
     "claude-opus-4-20250514",
-    "claude-3-7-sonnet-20250219",
-    "claude-3-5-haiku-20241022",
     "claude-3-haiku-20240307"
   ],
   meta: [
