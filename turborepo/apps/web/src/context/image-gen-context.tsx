@@ -43,9 +43,12 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
     case "grok": {
       const m = model as GetModelUtilRT<typeof p>;
       switch (m) {
+        case "grok-imagine-image":
+        case "grok-imagine-image-pro":
         case "grok-2-image-1212": {
           return true;
         }
+        case "grok-imagine-video":
         case "grok-2-vision-1212":
         case "grok-3":
         case "grok-4-0709":
@@ -66,12 +69,14 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
         case "deep-research-pro-preview-12-2025":
         case "gemini-3-pro-image-preview":
         case "gemini-2.5-flash-image":
+        case "gemini-3.1-flash-image-preview":
         case "imagen-4.0-fast-generate-001":
         case "imagen-4.0-generate-001":
         case "imagen-4.0-ultra-generate-001": {
           return true;
         }
-        case "gemini-3-pro-preview":
+        case "gemini-3.1-pro-preview":
+        case "gemini-3.1-pro-preview-customtools":
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":
@@ -157,9 +162,12 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
     case "grok": {
       const m = model as GetModelUtilRT<typeof p>;
       switch (m) {
+        case "grok-imagine-image":
+          case "grok-imagine-image-pro":
         case "grok-2-image-1212": {
           return true;
         }
+        case "grok-imagine-video":
         case "grok-2-vision-1212":
         case "grok-3":
         case "grok-3-mini":
@@ -177,6 +185,7 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
     case "gemini": {
       const m = model as GetModelUtilRT<typeof p>;
       switch (m) {
+        case "gemini-3.1-flash-image-preview":
         case "gemini-3-pro-image-preview":
         case "gemini-2.5-flash-image":
         case "imagen-4.0-fast-generate-001":
@@ -185,7 +194,8 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
           return true;
         }
         case "gemini-3-flash-preview":
-        case "gemini-3-pro-preview":
+        case "gemini-3.1-pro-preview":
+        case "gemini-3.1-pro-preview-customtools":
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
         case "deep-research-pro-preview-12-2025":
@@ -264,13 +274,30 @@ function handleOutputSize(
   switch (provider) {
     case "anthropic":
     case "meta":
-    case "vercel":
-    case "grok": {
+    case "vercel": {
       return undefined;
+    }
+    case "grok": {
+      const m = model as GetModelUtilRT<"grok"> | undefined;
+      if (!(m === "grok-imagine-image" || m === "grok-imagine-image-pro"))
+        return undefined;
+      else {
+        if (
+          data?.output_size &&
+          /^(1:1|2:3|3:2|3:4|4:3|16:9|9:16|19\.5:9|9:19\.5|9:20|20:9|1:2|2:1|auto)$/gm.test(
+            data?.output_size
+          )
+        ) {
+          return data.output_size;
+        } else {
+          return "auto";
+        }
+      }
     }
     case "gemini": {
       switch (model) {
         case "deep-research-pro-preview-12-2025":
+        case "gemini-3.1-flash-image-preview":
         case "gemini-3-pro-image-preview":
         case "gemini-2.5-flash-image": {
           if (
@@ -292,7 +319,8 @@ function handleOutputSize(
             return data.output_size;
           } else return "1:1";
         }
-        case "gemini-3-pro-preview":
+        case "gemini-3.1-pro-preview":
+        case "gemini-3.1-pro-preview-customtools":
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":
@@ -467,9 +495,18 @@ function handleImgGenOutputQuality(
   switch (provider) {
     case "anthropic":
     case "meta":
-    case "vercel":
-    case "grok": {
+    case "vercel": {
       return undefined;
+    }
+    case "grok": {
+      if (
+        model === "grok-imagine-image" ||
+        model === "grok-imagine-image-pro"
+      ) {
+        if (data?.output_quality && /^(1|2)k$/gm.test(data.output_quality)) {
+          return data.output_quality;
+        } else return "2k";
+      } else return;
     }
     case "gemini": {
       const m = model as GetModelUtilRT<typeof provider>;
@@ -483,6 +520,7 @@ function handleImgGenOutputQuality(
         }
         case "deep-research-pro-preview-12-2025":
         case "gemini-2.5-flash-image":
+        case "gemini-3.1-flash-image-preview":
         case "gemini-3-pro-image-preview": {
           if (
             data?.output_quality &&
@@ -491,7 +529,8 @@ function handleImgGenOutputQuality(
             return data.output_quality as "1K" | "2K" | "4K";
           } else return "1K";
         }
-        case "gemini-3-pro-preview":
+        case "gemini-3.1-pro-preview":
+        case "gemini-3.1-pro-preview-customtools":
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":

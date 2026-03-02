@@ -895,7 +895,7 @@ export class ProviderValidation {
   public fallbackImgGenModelByProvider(provider: Provider) {
     switch (provider) {
       case "gemini": {
-        return "gemini-3-pro-image-preview" satisfies AllModelsUnion;
+        return "gemini-3.1-flash-image-preview" satisfies AllModelsUnion;
       }
       case "grok": {
         return "grok-imagine-image" satisfies AllModelsUnion;
@@ -1002,6 +1002,7 @@ export class ProviderValidation {
         const m = model as GetModelUtilRT<"gemini"> | undefined;
         switch (m) {
           case "deep-research-pro-preview-12-2025":
+          case "gemini-3.1-flash-image-preview":
           case "gemini-3-pro-image-preview":
           case "gemini-2.5-flash-image": {
             if (
@@ -1023,6 +1024,8 @@ export class ProviderValidation {
               return data.output_size as OutputSizeProps<typeof provider>;
             } else return "1:1" as OutputSizeProps<typeof provider>;
           }
+          case "gemini-3.1-pro-preview":
+          case "gemini-3.1-pro-preview-customtools":
           case "gemini-3-flash-preview":
           case "gemini-2.0-flash":
           case "gemini-2.0-flash-lite":
@@ -1046,8 +1049,15 @@ export class ProviderValidation {
         const m = model as GetModelUtilRT<"grok"> | undefined;
         if (!m || !this.grokImagineImgGenModel(m)) return undefined;
         else {
-          if (data?.output_size && /^(1:1|2:3|3:2|3:4|4:3|16:9|9:16|19\.5:9|9:19\.5|9:20|20:9|1:2|2:1|auto)$/gm.test(data?.output_size)) {
-            return data.output_size as GrokModelAspectRatio[GetModelUtilRT<"grok">] as OutputSizeProps<typeof provider>
+          if (
+            data?.output_size &&
+            /^(1:1|2:3|3:2|3:4|4:3|16:9|9:16|19\.5:9|9:19\.5|9:20|20:9|1:2|2:1|auto)$/gm.test(
+              data?.output_size
+            )
+          ) {
+            return data.output_size as GrokModelAspectRatio[GetModelUtilRT<"grok">] as OutputSizeProps<
+              typeof provider
+            >;
           } else {
             return "auto" as OutputSizeProps<typeof provider>;
           }
