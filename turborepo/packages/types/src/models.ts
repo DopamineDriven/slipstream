@@ -18,12 +18,15 @@ export type ImageGenModels =
   | "gpt-image-1-mini"
   | "dall-e-2"
   | "dall-e-3"
+  | "grok-imagine-image"
+  | "grok-imagine-image-pro"
   | "grok-2-image-1212"
   | "imagen-4.0-fast-generate-001"
   | "imagen-4.0-ultra-generate-001"
   | "imagen-4.0-generate-001"
   | "gemini-2.5-flash-image"
-  | "gemini-3-pro-image-preview";
+  | "gemini-3-pro-image-preview"
+  | "gemini-3.1-flash-image-preview";
 
 export const providerModelImageGenApi = {
   openai: [
@@ -34,6 +37,7 @@ export const providerModelImageGenApi = {
     "dall-e-3"
   ],
   gemini: [
+    "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
     "deep-research-pro-preview-12-2025",
@@ -41,7 +45,7 @@ export const providerModelImageGenApi = {
     "imagen-4.0-generate-001",
     "imagen-4.0-ultra-generate-001"
   ],
-  grok: ["grok-2-image-1212"]
+  grok: ["grok-imagine-image-pro", "grok-imagine-image", "grok-2-image-1212"]
 } as const;
 
 export const allImgSupportingProviderModels = {
@@ -68,6 +72,7 @@ export const providerModelImageGenFacilitatingApi = {
     "o3"
   ],
   gemini: [
+    "gemini-3.1-flash-image-preview",
     "gemini-2.5-flash-image",
     "gemini-3-pro-image-preview",
     "deep-research-pro-preview-12-2025"
@@ -173,13 +178,17 @@ export type OpenAIVideoGenModels = VideoGenModelMap["openai"];
 
 export type GeminiVideoGenModels = VideoGenModelMap["gemini"];
 
+export type GrokVideoGenModels = VideoGenModelMap["grok"];
+
 export type AllVideoGenModels = VideoGenModelMap[VideoGenProviders];
 
 export type GetVideoModelUtilRT<T = VideoGenProviders> = T extends "openai"
   ? OpenAIVideoGenModels
   : T extends "gemini"
     ? GeminiVideoGenModels
-    : never;
+    : T extends "grok"
+      ? GrokVideoGenModels
+      : never;
 
 export const providerModelChatApi = modelIdsByProvider;
 
@@ -370,19 +379,19 @@ export const getDisplayNameByModelId = <
 export const defaultModelDisplayNameByProvider = {
   openai: "GPT-5 nano" satisfies OpenAiDisplayNameUnion,
   gemini: "Gemini 2.5 Flash" satisfies GeminiDisplayNameUnion,
-  grok: "Grok 4 Fast Reasoning" satisfies GrokDisplayNameUnion,
-  anthropic: "Claude Sonnet 4.5" satisfies AnthropicDisplayNameUnion,
+  grok: "Grok 4.1 Fast Reasoning" satisfies GrokDisplayNameUnion,
+  anthropic: "Claude Sonnet 4.6" satisfies AnthropicDisplayNameUnion,
   meta: "Llama 3.3 (70B, Instruct)" satisfies MetaDisplayNameUnion,
-  vercel: "v0 medium (legacy)" satisfies VercelDisplayNameUnion
+  vercel: "v0 medium" satisfies VercelDisplayNameUnion
 } as const;
 
 export const defaultModelIdByProvider = {
   openai: "gpt-5-nano" satisfies OpenAiModelIdUnion,
   gemini: "gemini-2.5-flash" satisfies GeminiModelIdUnion,
-  grok: "grok-4-fast-reasoning" satisfies GrokModelIdUnion,
-  anthropic: "claude-sonnet-4-5-20250929" satisfies AnthropicModelIdUnion,
+  grok: "grok-4-1-fast-reasoning" satisfies GrokModelIdUnion,
+  anthropic: "claude-sonnet-4-6" satisfies AnthropicModelIdUnion,
   meta: "Llama-3.3-70B-Instruct" satisfies MetaModelIdUnion,
-  vercel: "v0-1.0-md" satisfies VercelModelIdUnion
+  vercel: "v0-1.5-md" satisfies VercelModelIdUnion
 } as const;
 
 export type ModelDisplayNameToModelId<T extends Provider> =
@@ -414,6 +423,13 @@ export type OpenAiDisplayNameUnionVideoGen =
  */
 export type GeminiDisplayNameUnionVideoGen =
   ModelDisplayNameToModelIdVideoGen<"gemini">;
+
+/**
+ * valid video gen capable grok model display names
+ */
+export type GrokDisplayNameUnionVideoGen =
+  ModelDisplayNameToModelIdVideoGen<"grok">;
+
 /**
  * valid image gen capable openai model display names
  */
@@ -480,6 +496,11 @@ export type OpenAiModelIdUnionVideoGen =
 export type GeminiModelIdUnionVideoGen =
   ModelIdToModelDisplayNameVideoGen<"gemini">;
 /**
+ * valid grok video models to call
+ */
+export type GrokModelIdUnionVideoGen =
+  ModelIdToModelDisplayNameVideoGen<"grok">;
+/**
  * valid grok models to call
  */
 export type GrokModelIdUnion = ModelIdToModelDisplayName<"grok">;
@@ -539,7 +560,7 @@ export type GetModelsForProviderRTVideoGen<T extends Provider> =
   T extends "gemini"
     ? GeminiModelIdUnionVideoGen
     : T extends "grok"
-      ? undefined
+      ? GrokModelIdUnionVideoGen
       : T extends "openai"
         ? OpenAiModelIdUnionVideoGen
         : T extends "anthropic"
@@ -583,7 +604,7 @@ export type GetDisplayNamesForProviderRTVideoGen<T extends Provider> =
   T extends "gemini"
     ? GeminiDisplayNameUnionVideoGen
     : T extends "grok"
-      ? undefined
+      ? GrokDisplayNameUnionVideoGen
       : T extends "openai"
         ? OpenAiDisplayNameUnionVideoGen
         : T extends "anthropic"
@@ -622,7 +643,7 @@ export function getModelsForProviderImgGen<const T extends Provider>(
 ) {
   if (!(provider === "gemini" || provider === "openai" || provider === "grok"))
     return undefined;
-  const p = provider as ImageGenProviders;
+  const p = provider satisfies ImageGenProviders;
   return Object.entries(displayNameToModelIdImgGen[p])
     .map(([t, v]) => {
       return [t as T, v as GetModelsForProviderRTImgGen<T>] as const;
@@ -633,8 +654,9 @@ export function getModelsForProviderImgGen<const T extends Provider>(
 export function getModelsForProviderVideoGen<const T extends Provider>(
   provider: T
 ) {
-  if (!(provider === "gemini" || provider === "openai")) return undefined;
-  const p = provider as VideoGenProviders;
+  if (!(provider === "gemini" || provider === "openai" || provider === "grok"))
+    return undefined;
+  const p = provider satisfies VideoGenProviders;
   return Object.entries(displayNameToModelIdVideoGen[p])
     .map(([t, v]) => {
       return [t as T, v as GetModelsForProviderRTVideoGen<T>] as const;
@@ -668,7 +690,8 @@ export function getDisplayNamesForProviderImgGen<
 export function getDisplayNamesForProviderVideoGen<
   const V extends Provider = Provider
 >(provider: V) {
-  if (!(provider === "gemini" || provider === "openai")) return undefined;
+  if (!(provider === "gemini" || provider === "openai" || provider === "grok"))
+    return undefined;
   const p = provider as VideoGenProviders;
   return Object.entries(modelIdToDisplayNameVideoGen[p])
     .map(([k, v]) => {
@@ -685,7 +708,7 @@ export function allImgGenProviders() {
 }
 
 export function allVideoGenProviders() {
-  return ["gemini", "openai"] as const;
+  return ["gemini", "grok", "openai"] as const;
 }
 export function getAllProviders() {
   return allProviders();

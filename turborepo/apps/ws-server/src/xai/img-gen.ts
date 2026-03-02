@@ -18,6 +18,7 @@ import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
 
 export class GrokImgGenService extends GrokCollectionsService {
+  protected nanoid: Promise<(typeof import("nanoid"))["nanoid"]>;
   constructor(
     protected redis: EnhancedRedisPubSub,
     protected s3: S3Storage,
@@ -27,6 +28,7 @@ export class GrokImgGenService extends GrokCollectionsService {
     managementKey: string
   ) {
     super(logger, prisma, apiKey, managementKey);
+    this.nanoid = import("nanoid").then(d => d.nanoid);
   }
 
   private handleMostRecentMsgsForImg(msgs: MessageSingleton<true>[]) {
@@ -123,7 +125,7 @@ export class GrokImgGenService extends GrokCollectionsService {
   }
 
   private async generateId(target: "seriesId" | "generationGroupId") {
-    const { nanoid } = await import("nanoid");
+    const nanoid = await this.nanoid;
     if (target === "generationGroupId") {
       const generationGroupId = "resp_" + nanoid();
       return generationGroupId;

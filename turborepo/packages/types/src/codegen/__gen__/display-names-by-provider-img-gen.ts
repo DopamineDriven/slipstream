@@ -22,11 +22,12 @@ export const displayNameModelsByProviderImgGen = {
   ],
   gemini: [
     "Deep Research Pro Preview (Dec-12-2025)",
+    "Nano Banana 2",
     "Nano Banana Pro",
     "Nano Banana",
     "Imagen 4",
     "Imagen 4 Fast",
     "Imagen 4 Ultra"
   ],
-  grok: ["Grok 2 Image"]
+  grok: ["Grok 2 Image", "Grok Imagine Image", "Grok Imagine Image Pro"]
 } as const;

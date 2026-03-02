@@ -3,6 +3,7 @@ import type {
   GeminiModelIdUnion,
   GetModelUtilRT,
   GrokImgGenModels,
+  GrokModelIdUnion,
   OpenAIImgGenFacilitatingModels,
   OpenAIImgGenModels,
   OpenAiModelIdUnion,
@@ -52,15 +53,46 @@ export type GeminiModelAspectRatioWorkup = DX<
     Record<
       Exclude<
         GeminiImgGenModels,
-        "gemini-3-pro-image-preview" | "gemini-2.5-flash-image"
+        | "gemini-3-pro-image-preview"
+        | "gemini-2.5-flash-image"
+        | "gemini-3.1-flash-image-preview"
       >,
       "1:1" | "3:4" | "4:3" | "9:16" | "16:9"
     > &
     Record<Exclude<GeminiModelIdUnion, GeminiImgGenModels>, undefined>
 >;
 
+export type GrokImagineARUnion =
+  | "1:1"
+  | "16:9"
+  | "9:16"
+  | "4:3"
+  | "3:4"
+  | "3:2"
+  | "2:3"
+  | "2:1"
+  | "1:2"
+  | "19.5:9"
+  | "9:19.5"
+  | "20:9"
+  | "9:20"
+  | "auto";
+
+export type GrokImagineImgModelUnion =
+  | "grok-imagine-image"
+  | "grok-imagine-image-pro";
+
+export type GrokModelAspectRatioWorkup = DX<
+  Record<Exclude<GrokImgGenModels, "grok-2-image-1212">, GrokImagineARUnion> &
+    Record<Exclude<GrokModelIdUnion, GrokImagineImgModelUnion>, undefined>
+>;
+
 export type GeminiModelAspectRatio = {
   [P in keyof GeminiModelAspectRatioWorkup]?: GeminiModelAspectRatioWorkup[P];
+};
+
+export type GrokModelAspectRatio = {
+  [P in keyof GrokModelAspectRatioWorkup]?: GrokModelAspectRatioWorkup[P];
 };
 
 export type OutputSizeProps<P extends Provider = Provider> = {
@@ -68,9 +100,7 @@ export type OutputSizeProps<P extends Provider = Provider> = {
   anthropic?: {
     [M in GetModelUtilRT<"anthropic">]: undefined;
   }[GetModelUtilRT<"anthropic">];
-  grok?: {
-    [S in GetModelUtilRT<"grok">]?: undefined;
-  }[GetModelUtilRT<"grok">];
+  grok?: GrokModelAspectRatio[GetModelUtilRT<"grok">];
   meta?: {
     [P in GetModelUtilRT<"meta">]?: undefined;
   }[GetModelUtilRT<"meta">];
@@ -537,6 +567,7 @@ export type OpenAIImageGenOpts = Dalle3Opts | Dalle2Opts | GptImage1Opts;
 export type ImagenOptions = {
   model: Exclude<
     GeminiImgGenModels,
+    | "gemini-3.1-flash-image-preview"
     | "gemini-2.5-flash-image"
     | "gemini-3-pro-image-preview"
     | "deep-research-pro-preview-12-2025"
@@ -704,7 +735,7 @@ export type NanoBananaImageGenOpts = {
 export type GoogleGenAIImageGenOpts = NanoBananaImageGenOpts | ImagenOptions;
 
 export type GrokImageGenOpts = {
-  model: GrokImgGenModels;
+  model: Exclude<GrokImgGenModels, GrokImagineImgModelUnion>;
   /**
    *
    * Number of images to be generated
@@ -731,10 +762,51 @@ export type GrokImageGenOpts = {
   user?: string | null;
 };
 
+export type GrokImagineImageGenOpts = {
+  model: GrokImagineImgModelUnion;
+  /**
+   *
+   * Number of images to be generated
+   *
+   *  default: 1,
+   *  max: 10
+   */
+  n?: number;
+
+  prompt: string;
+
+  /**
+   * Aspect ratio of the generated image. Can be 1:1, 3:4, 4:3, 9:16, 16:9, 2:3, 3:2, 9:19.5, 19.5:9, 9:20, 20:9, 1:2, 2:1, or auto. Defaults to auto for automatically selecting the best ratio for the prompt. Only supported by grok-imagine models.
+   */
+  aspect_ratio?: GrokImagineARUnion | null;
+
+  /**
+   * Resolution of the generated image. Defaults to 1k. Only supported by grok-imagine models.
+   */
+  resolution?: "1k" | "2k" | null;
+  /**
+   * default: `"url"`
+   *
+   * Response format to return the image in. Can be `"url" | "b64_json"`.
+   *
+   * If `"b64_json"` is specified, the image will be returned as a base64-encoded string instead of a url to the generated image file
+   */
+  response_format?: string | null;
+
+  /**
+   * A unique identifier representing the end-user, which can help xAI to monitor and detect abuse.
+   */
+  user?: string | null;
+
+  respect_moderation?: string;
+};
+
+export type GrokImgGenUnionOpts = GrokImageGenOpts | GrokImagineImageGenOpts;
+
 export type ImageGenOptsByProvider = {
   openai: OpenAIImageGenOpts;
   gemini: GoogleGenAIImageGenOpts;
-  grok: GrokImageGenOpts;
+  grok: GrokImgGenUnionOpts;
 };
 
 export type AIChatRequestImgGenFields = {

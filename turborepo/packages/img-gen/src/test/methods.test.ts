@@ -11,6 +11,25 @@ describe("handleOutputSize", () => {
     assert.equal(p.handleOutputSize("gemini"), "1:1");
   });
   it(
+    "should return auto for grok provider, model grok-imagine-image, with no output size set",
+    {},
+    () => {
+      assert.equal(p.handleOutputSize("grok", "grok-imagine-image"), "auto");
+    }
+  );
+  it(
+    "should return 19.5:9 for grok provider, model grok-imagine-image, with 19.5:9 size set",
+    {},
+    () => {
+      assert.equal(
+        p.handleOutputSize("grok", "grok-imagine-image", {
+          output_size: "19.5:9"
+        }),
+        "19.5:9"
+      );
+    }
+  );
+  it(
     "should return 21:9 for gemini provdier, model gemini-2.5-flash-image, output size set to 21:9",
     {},
     () => {
@@ -40,9 +59,13 @@ describe("handleOutputSize", () => {
 });
 
 describe("handleImgGenOutputQuality", () => {
-  it("should return undefined for openai provdier with no model set", {}, () => {
-    assert.equal(p.handleImgGenOutputQuality("openai"), undefined);
-  });
+  it(
+    "should return undefined for openai provdier with no model set",
+    {},
+    () => {
+      assert.equal(p.handleImgGenOutputQuality("openai"), undefined);
+    }
+  );
   it(
     "should return undefined for gemini provdier with no model set",
     {},
@@ -74,6 +97,9 @@ describe("handleImgGenOutputQuality", () => {
   );
   it("should return undefined for grok provdier with no model set", {}, () => {
     assert.equal(p.handleImgGenOutputQuality("grok"), undefined);
+  });
+    it("should return 2k for grok provider with model set to grok-imagine-image", {}, () => {
+    assert.equal(p.handleImgGenOutputQuality("grok", "grok-imagine-image"), "2k");
   });
 });
 

@@ -64,7 +64,7 @@ export class AnthropicBaseService {
             "advanced-tool-use-2025-11-20",
             "effort-2025-11-24",
             "files-api-2025-04-14",
-                        "web-fetch-2025-09-10",
+            "web-fetch-2025-09-10",
             "extended-cache-ttl-2025-04-11",
             "code-execution-2025-08-25"
           ] satisfies Anthropic.Beta.AnthropicBeta[];
@@ -87,7 +87,7 @@ export class AnthropicBaseService {
             "advanced-tool-use-2025-11-20",
             "files-api-2025-04-14",
             "extended-cache-ttl-2025-04-11",
-                        "web-fetch-2025-09-10",
+            "web-fetch-2025-09-10",
             "context-1m-2025-08-07",
             "code-execution-2025-08-25"
           ] satisfies Anthropic.Beta.AnthropicBeta[];
@@ -101,17 +101,6 @@ export class AnthropicBaseService {
           ] satisfies Anthropic.Beta.AnthropicBeta[];
         }
       }
-      // output context window expansion 64k->128k is only supported by claude-sonnet-3.7
-      case "claude-3-7-sonnet-20250219": {
-        return [
-          "files-api-2025-04-14",
-          "extended-cache-ttl-2025-04-11",
-          "output-128k-2025-02-19",
-          "web-fetch-2025-09-10",
-          "code-execution-2025-08-25"
-        ] satisfies Anthropic.Beta.AnthropicBeta[];
-      }
-      case "claude-3-5-haiku-20241022":
       case "claude-opus-4-20250514":
       case "claude-opus-4-1-20250805":
       case "claude-haiku-4-5-20251001": {
@@ -136,28 +125,24 @@ export class AnthropicBaseService {
     "claude-sonnet-4-6": 64000,
     "claude-opus-4-6": 128000,
     "claude-3-haiku-20240307": 4096,
-    "claude-3-5-haiku-20241022": 8192,
     "claude-opus-4-20250514": 32000,
     "claude-opus-4-1-20250805": 32000,
     "claude-opus-4-5-20251101": 64000,
     "claude-haiku-4-5-20251001": 64000,
     "claude-sonnet-4-20250514": 64000,
-    "claude-sonnet-4-5-20250929": 64000,
-    "claude-3-7-sonnet-20250219": 128000
+    "claude-sonnet-4-5-20250929": 64000
   } as const;
 
   protected inputTokenCeilingByModel = {
     "claude-sonnet-4-6": 1000000,
     "claude-opus-4-6": 1000000,
     "claude-3-haiku-20240307": 200000,
-    "claude-3-5-haiku-20241022": 200000,
     "claude-opus-4-20250514": 200000,
     "claude-opus-4-1-20250805": 200000,
     "claude-opus-4-5-20251101": 200000,
     "claude-haiku-4-5-20251001": 200000,
     "claude-sonnet-4-20250514": 1000000,
-    "claude-sonnet-4-5-20250929": 1000000,
-    "claude-3-7-sonnet-20250219": 200000
+    "claude-sonnet-4-5-20250929": 1000000
   } as const;
 
   protected getMaxTokens = <const T extends AnthropicModelIdUnion>(
@@ -179,7 +164,6 @@ export class AnthropicBaseService {
     switch (mod) {
       case "claude-sonnet-4-6":
       case "claude-opus-4-6":
-      case "claude-3-7-sonnet-20250219":
       case "claude-opus-4-1-20250805":
       case "claude-opus-4-20250514":
       case "claude-sonnet-4-20250514":
@@ -207,7 +191,6 @@ export class AnthropicBaseService {
           } as const satisfies Anthropic.Beta.BetaThinkingConfigDisabled;
         }
       }
-      case "claude-3-5-haiku-20241022":
       case "claude-3-haiku-20240307":
       default: {
         return {

@@ -35,13 +35,14 @@ const providerModelImagesApi = {
   ],
   gemini: [
     "deep-research-pro-preview-12-2025",
+    "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
     "imagen-4.0-generate-001",
     "imagen-4.0-fast-generate-001",
     "imagen-4.0-ultra-generate-001"
   ],
-  grok: ["grok-2-image-1212"]
+  grok: ["grok-2-image-1212", "grok-imagine-image", "grok-imagine-image-pro"]
 } as const;
 
 const providerModelVideosApi = {
@@ -52,7 +53,8 @@ const providerModelVideosApi = {
     "veo-3.0-generate-001",
     "veo-3.0-fast-generate-001",
     "veo-2.0-generate-001"
-  ]
+  ],
+  grok: ["grok-imagine-video"]
 } as const;
 
 const providerModelChatApi = {
@@ -97,10 +99,12 @@ const providerModelChatApi = {
     "sora-2-pro"
   ],
   gemini: [
-    "gemini-3-pro-preview",
+    "gemini-3.1-pro-preview",
+    "gemini-3.1-pro-preview-customtools",
     "gemini-3-flash-preview",
     "gemini-2.5-pro",
     "gemini-3-pro-image-preview",
+    "gemini-3.1-flash-image-preview",
     "gemini-2.5-flash-image",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
@@ -123,13 +127,13 @@ const providerModelChatApi = {
     "grok-code-fast-1",
     "grok-4-fast-reasoning",
     "grok-4-fast-non-reasoning",
+    "grok-imagine-image",
+    "grok-imagine-image-pro",
     "grok-2-image-1212",
     "grok-3",
     "grok-3-mini",
-    "grok-2-vision-1212"
-    // TODO ADD THESE ONCE LOCAL VECTOR STORE FINISHED
-    // "grok-imagine-image",
-    // "grok-imagine-video"
+    "grok-2-vision-1212",
+    "grok-imagine-video"
   ],
   /**
    * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-names
@@ -144,8 +148,6 @@ const providerModelChatApi = {
     "claude-opus-4-1-20250805",
     "claude-sonnet-4-20250514",
     "claude-opus-4-20250514",
-    "claude-3-7-sonnet-20250219",
-    "claude-3-5-haiku-20241022",
     "claude-3-haiku-20240307"
   ],
   meta: [
@@ -214,7 +216,10 @@ async function geminiFetcher() {
 const GROK_NAME_OVERRIDES = {
   "grok-4-fast-non-reasoning": "Grok 4 Fast Non-Reasoning",
   "grok-4-1-fast-non-reasoning": "Grok 4.1 Fast Non-Reasoning",
-  "grok-4-1-fast-reasoning": "Grok 4.1 Fast Reasoning"
+  "grok-4-1-fast-reasoning": "Grok 4.1 Fast Reasoning",
+  "grok-imagine-image": "Grok Imagine Image",
+  "grok-imagine-image-pro": "Grok Imagine Image Pro",
+  "grok-imagine-video": "Grok Imagine Video"
 } satisfies Record<string, string>;
 
 function grokDisplayName(id: string) {
@@ -232,7 +237,13 @@ function grokDisplayName(id: string) {
       ? GROK_NAME_OVERRIDES[id]
       : id === "grok-4-1-fast-reasoning"
         ? GROK_NAME_OVERRIDES[id]
-        : s;
+        : id === "grok-imagine-image"
+          ? GROK_NAME_OVERRIDES[id]
+          : id === "grok-imagine-image-pro"
+            ? GROK_NAME_OVERRIDES[id]
+            : id === "grok-imagine-video"
+              ? GROK_NAME_OVERRIDES[id]
+              : s;
 }
 
 function displayNameV0(id: string) {
@@ -601,6 +612,16 @@ const videoModelMapper = async (modelKeys = true) => {
     ([provider, models]) => {
       const p = provider as keyof typeof providerModelVideosApi;
       switch (p) {
+        case "grok": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            const name = grokDisplayName(model);
+            modelKeys === true
+              ? helper.push([model, name])
+              : helper.push([name, model]);
+          });
+          return helper;
+        }
         case "gemini": {
           let helper = Array.of<[string, string]>();
           models.forEach(function (model) {
@@ -771,8 +792,8 @@ async function displayNameModelIdGenVideos<
   );
   const openai = mapper[0];
   const gemini = mapper[1];
-
-  if (!openai || !gemini)
+  const grok = mapper[2];
+  if (!openai || !gemini || !grok)
     throw new Error("empty data in displayNameModelIdGen");
 
   if (typeof arrayOnly !== "undefined") {
@@ -780,31 +801,36 @@ async function displayNameModelIdGenVideos<
       if (target === "keys=display-name") {
         return {
           openai: openai.map(([keys, _v]) => keys),
-          gemini: gemini.map(([keys, _v]) => keys)
+          gemini: gemini.map(([keys, _v]) => keys),
+          grok: grok.map(([keys, _v]) => keys)
         };
       } else {
         return {
           openai: openai.map(([_, vals]) => vals),
-          gemini: gemini.map(([_, vals]) => vals)
+          gemini: gemini.map(([_, vals]) => vals),
+          grok: grok.map(([_, vals]) => vals)
         };
       }
     } else {
       if (target === "keys=display-name") {
         return {
           openai: openai.map(([_, vals]) => vals),
-          gemini: gemini.map(([_, vals]) => vals)
+          gemini: gemini.map(([_, vals]) => vals),
+          grok: grok.map(([_, vals]) => vals)
         };
       } else {
         return {
           openai: openai.map(([keys, _v]) => keys),
-          gemini: gemini.map(([keys, _v]) => keys)
+          gemini: gemini.map(([keys, _v]) => keys),
+          grok: grok.map(([keys, _v]) => keys)
         };
       }
     }
   }
   return {
     openai: Object.fromEntries(openai),
-    gemini: Object.fromEntries(gemini)
+    gemini: Object.fromEntries(gemini),
+    grok: Object.fromEntries(grok)
   };
 }
 async function Multimodal<

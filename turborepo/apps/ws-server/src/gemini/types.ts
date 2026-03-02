@@ -26,7 +26,7 @@ export type UnionToRecord<
 
 export type InteractionDeltas = CTR<
   Interactions.ContentDelta,
-  "delta"
+  "event_id"
 >["delta"];
 
 export type GeminiEventMap = UnionToRecord<InteractionDeltas>;
@@ -165,7 +165,7 @@ export type SurfaceMeta<T extends boolean = true> = T extends false
   ? FssDoc
   : FssDocSurfacedMeta;
 
-export type EqCheck = Equal<FssDoc[], SurfaceMeta<false>[]>
+export type EqCheck = Equal<FssDoc[], SurfaceMeta<false>[]>;
 
 export type OOO = SurfaceMeta<true>;
 

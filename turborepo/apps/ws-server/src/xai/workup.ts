@@ -25,6 +25,10 @@ export class GrokWorkupService {
   protected logger: Logger;
   protected readonly baseUrl = "https://api.x.ai/v1/responses";
   protected readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
+  /**
+   * use if image attachments detected -- for grok-imagine-image and grok-imagine-image-pro only
+   */
+  protected readonly baseImgEditsUrl = "https://api.x.ai/v1/images/edits";
   protected storeDbDocRegistry = new Map<string, xAIDocDbRegistryProps>();
   protected fileDbRegistry = new Map<string, FilesDbRegistryProps>();
   protected fileCache = new Map<string, UploadFileRT>();
@@ -55,8 +59,12 @@ export class GrokWorkupService {
     DOCUMENT_STATUS_PROCESSING: "PROCESSING",
     DOCUMENT_STATUS_UNKNOWN: "PENDING"
   } as const satisfies Record<DocumentStatus, ProviderDocState>;
+
   protected canViewImgs(model: GrokModelIdUnion) {
     return (
+      model === "grok-imagine-image" ||
+      model === "grok-imagine-image-pro" ||
+      model === "grok-imagine-video" ||
       model === "grok-2-vision-1212" ||
       model === "grok-4-0709" ||
       model === "grok-4-1-fast-non-reasoning" ||
@@ -71,7 +79,11 @@ export class GrokWorkupService {
   }
 
   protected isImgGenModel(model: GrokModelIdUnion) {
-    return model === "grok-2-image-1212";
+    return (
+      model === "grok-2-image-1212" ||
+      model === "grok-imagine-image" ||
+      model === "grok-imagine-image-pro"
+    );
   }
 
   protected async syncFilesRegistry(apiKey = this.xaiKey) {
