@@ -284,9 +284,7 @@ export class GeminiChatService extends GeminiWorkupService {
           );
         }
       }
-      let iData = 0;
       if (dataPart) {
-        iData++;
         geminiDataArr.push(dataPart);
         geminiDataPart = dataPart;
         const _dataUrl =
@@ -314,7 +312,6 @@ export class GeminiChatService extends GeminiWorkupService {
         const finalImg = geminiDataArr.at(-1);
         if (
           imgGenEnabled &&
-          iData > 0 &&
           geminiDataArr.length > 0 &&
           finalImg?.data &&
           finalImg?.mimeType
