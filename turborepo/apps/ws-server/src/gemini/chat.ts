@@ -99,6 +99,7 @@ export class GeminiChatService extends GeminiWorkupService {
       }
       if (chunk.responseId && typeof resId === "undefined") {
         resId = chunk.responseId;
+        console.log(resId)
       }
       if (chunk.candidates) {
         for (const candidate of chunk.candidates) {
