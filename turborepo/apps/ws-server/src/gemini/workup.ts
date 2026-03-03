@@ -784,6 +784,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
        */
       case "deep-research-pro-preview-12-2025":
       case "gemini-3-flash-preview":
+      case "gemini-3.1-flash-image-preview":
       case "gemini-3.1-pro-preview":
       case "gemini-3.1-pro-preview-customtools": {
         return {
@@ -791,7 +792,6 @@ export class GeminiWorkupService extends FileSearchStoreService {
           thinkingLevel: ThinkingLevel.HIGH
         } satisfies GenerateContentConfig["thinkingConfig"];
       }
-      case "gemini-3.1-flash-image-preview":
       case "gemini-3-pro-image-preview":
       case "gemini-2.5-flash":
       case "gemini-2.5-flash-lite":

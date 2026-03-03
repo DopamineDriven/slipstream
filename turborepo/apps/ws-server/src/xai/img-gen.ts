@@ -21,7 +21,6 @@ import { S3Storage } from "@slipstream/storage-s3";
 
 type xAIImageEditsInput = {
   readonly url: string;
-  readonly type: "image_url";
 };
 
 export class GrokImgGenService extends GrokCollectionsService {
@@ -61,9 +60,22 @@ export class GrokImgGenService extends GrokCollectionsService {
           .join("\n") ?? "");
   }
 
-  private isGrokImagineAspectRatio(value: string): value is GrokImagineARUnion {
-    return /^(1:1|2:3|3:2|3:4|4:3|16:9|9:16|19\.5:9|9:19\.5|9:20|20:9|1:2|2:1|auto)$/.test(
-      value
+  private isValidAr(r: string) {
+    return (
+      r === "1:1" ||
+      r === "2:3" ||
+      r === "3:2" ||
+      r === "3:4" ||
+      r === "4:3" ||
+      r === "16:9" ||
+      r === "9:16" ||
+      r === "19.5:9" ||
+      r === "9:19.5" ||
+      r === "9:20" ||
+      r === "20:9" ||
+      r === "2:1" ||
+      r === "1:2" ||
+      r === "auto"
     );
   }
 
@@ -80,13 +92,8 @@ export class GrokImgGenService extends GrokCollectionsService {
       const url = att.compatStatus === "ACTIVE" ? att.compatCdnUrl : att.cdnUrl;
       const mime = att.compatStatus === "ACTIVE" ? att.compatMime : att.mime;
 
-      if (
-        att.assetType === "IMAGE" &&
-        typeof url === "string" &&
-        typeof mime === "string" &&
-        mime.startsWith("image/")
-      ) {
-        images.push({ url, type: "image_url" });
+      if (att.assetType === "IMAGE" && url && mime) {
+        images.push({ url });
       }
     }
 
@@ -108,29 +115,25 @@ export class GrokImgGenService extends GrokCollectionsService {
   ) {
     const rawAspectRatio = imgGenFields?.output_size;
     const rawResolution = imgGenFields?.output_quality;
-    const normalizedResolution =
-      typeof rawResolution === "string" ? rawResolution.toLowerCase() : undefined;
 
-    const aspect_ratio = this.prisma.handleOutputSize(
-      "grok",
-      model,
-      typeof rawAspectRatio === "string" &&
-        this.isGrokImagineAspectRatio(rawAspectRatio)
-        ? { output_size: rawAspectRatio }
-        : undefined
-    );
-    const resolution = this.prisma.handleImgGenOutputQuality(
-      "grok",
-      model,
-      typeof normalizedResolution === "string" &&
-        this.isValidImgRes(normalizedResolution)
-        ? { output_quality: normalizedResolution }
-        : undefined
-    );
+    let ar: GrokImagineARUnion;
+    let r: "1k" | "2k";
+
+    if (rawAspectRatio && this.isValidAr(rawAspectRatio)) {
+      ar = rawAspectRatio;
+    } else {
+      ar = "auto" as const;
+    }
+
+    if (rawResolution && this.isValidImgRes(rawResolution)) {
+      r = rawResolution;
+    } else {
+      r = "2k";
+    }
 
     return {
-      aspect_ratio: aspect_ratio ?? "auto",
-      resolution: resolution ?? "2k"
+      aspect_ratio: ar,
+      resolution: r
     } as const satisfies {
       aspect_ratio: GrokImagineARUnion;
       resolution: "1k" | "2k";
