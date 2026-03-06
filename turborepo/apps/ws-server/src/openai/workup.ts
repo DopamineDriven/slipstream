@@ -107,6 +107,7 @@ export class OpenAIServiceWorkup {
     return (
       m === "gpt-5-pro" ||
       m === "gpt-5.2-pro" ||
+      m === "gpt-5.4-pro" ||
       m === "o1-pro" ||
       m === "o3-pro" ||
       m === "o3-deep-research" ||
@@ -127,6 +128,8 @@ export class OpenAIServiceWorkup {
       m === "gpt-5.1" ||
       m === "gpt-5.2" ||
       m === "gpt-5.2-pro" ||
+      m === "gpt-5.4" ||
+      m === "gpt-5.4-pro" ||
       m === "o3" ||
       m === "gpt-4o" ||
       m === "gpt-4o-mini"
@@ -1119,6 +1122,8 @@ export class OpenAIServiceWorkup {
           }
         }
       }
+      case "gpt-5.2-codex":
+      case "gpt-5.3-codex":
       case "gpt-5.1-codex-max": {
         if (
           effort === "high" ||
@@ -1131,7 +1136,8 @@ export class OpenAIServiceWorkup {
           return { effort: "xhigh", summary } as const satisfies Reasoning;
         }
       }
-      case "gpt-5.2": {
+      case "gpt-5.2":
+      case "gpt-5.4": {
         if (imgGenEnabled === true) {
           return { effort: "low", summary } as const satisfies Reasoning;
         } else {
@@ -1144,10 +1150,11 @@ export class OpenAIServiceWorkup {
           ) {
             return { effort, summary } as const satisfies Reasoning;
           } else {
-            return { effort: "high", summary } as const satisfies Reasoning;
+            return { effort: "xhigh", summary } as const satisfies Reasoning;
           }
         }
       }
+      case "gpt-5.4-pro":
       case "gpt-5.2-pro": {
         if (effort === "xhigh") {
           return { effort, summary } as const satisfies Reasoning;
@@ -1176,6 +1183,10 @@ export class OpenAIServiceWorkup {
 
   protected isReasoningModel(m: OpenAiModelIdUnion) {
     return (
+      m === "gpt-5.4" ||
+      m === "gpt-5.2-codex" ||
+      m === "gpt-5.3-codex" ||
+      m === "gpt-5.4-pro" ||
       m === "gpt-5" ||
       m === "gpt-5-chat-latest" ||
       m === "gpt-5-codex" ||
@@ -1216,6 +1227,10 @@ export class OpenAIServiceWorkup {
     imgGenEnabled = false
   ) {
     switch (model) {
+      case "gpt-5.2-codex":
+      case "gpt-5.3-codex":
+      case "gpt-5.4":
+      case "gpt-5.4-pro":
       case "gpt-5.1-codex-max":
       case "gpt-5.2":
       case "gpt-5.1":

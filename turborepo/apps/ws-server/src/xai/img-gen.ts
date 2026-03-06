@@ -1,9 +1,5 @@
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
-import type {
-  ImageGenPartialArr,
-  ImgGenMessageParts,
-  xAIImgGenResponse
-} from "@/xai/types.ts";
+import type { ImageGenPartialArr, xAIImgGenResponse } from "@/xai/types.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
@@ -14,6 +10,7 @@ import type {
   EventTypeMap,
   GrokImagineARUnion,
   GrokImgGenModels,
+  GrokModelIdUnion,
   MessageSingleton
 } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
@@ -35,29 +32,6 @@ export class GrokImgGenService extends GrokCollectionsService {
   ) {
     super(logger, prisma, apiKey, managementKey);
     this.nanoid = import("nanoid").then(d => d.nanoid);
-  }
-
-  private handleMostRecentMsgsForImg(msgs: MessageSingleton<true>[]) {
-    const mostRecentMsg = msgs.slice(-1)?.[0];
-    if (!mostRecentMsg) throw new Error("no message found for grok image gen");
-    const parts = this.buildContent(
-      mostRecentMsg,
-      "grok-2-image-1212",
-      false,
-      "high"
-    );
-    const userMsg =
-      parts.length === 1 && parts[0]?.type === "text"
-        ? { role: "user" as const, content: parts[0].text }
-        : { role: "user" as const, content: parts };
-
-    return typeof userMsg.content === "string"
-      ? userMsg.content
-      : (userMsg?.content
-          ?.map((t, o) =>
-            t.type === "text" ? t.text : `![img ${o++}](${t.image_url.url})`
-          )
-          .join("\n") ?? "");
   }
 
   private isValidAr(r: string) {
@@ -163,7 +137,7 @@ export class GrokImgGenService extends GrokCollectionsService {
   }
 
   private async handleImgGen(
-    model = "grok-2-image-1212" satisfies GrokImgGenModels,
+    model = "grok-imagine-image" satisfies GrokImgGenModels,
     n = 1,
     messages: MessageSingleton<true>[],
     userId: string,
@@ -171,15 +145,6 @@ export class GrokImgGenService extends GrokCollectionsService {
     apiKey?: string
   ) {
     const key = apiKey ?? this.xaiKey;
-    if (model === ("grok-2-image-1212" satisfies GrokImgGenModels)) {
-      return await this.handleImgGenReq(key, this.baseImgGenUrl, {
-        model: "grok-2-image-1212" satisfies GrokImgGenModels,
-        prompt: this.handleMostRecentMsgsForImg(messages),
-        n,
-        response_format: "b64_json",
-        user: userId
-      });
-    }
     if (
       model === ("grok-imagine-image" satisfies GrokImgGenModels) ||
       model === ("grok-imagine-image-pro" satisfies GrokImgGenModels)
@@ -216,43 +181,6 @@ export class GrokImgGenService extends GrokCollectionsService {
 
       return await this.handleImgGenReq(key, this.baseImgGenUrl, baseBody);
     }
-  }
-
-  private buildContent(
-    m: MessageSingleton<true>,
-    model: GrokImgGenModels,
-    includeProviderTag = false,
-    detail: "low" | "medium" | "high" = "medium"
-  ) {
-    const parts = Array.of<ImgGenMessageParts>();
-    if (
-      model === "grok-2-image-1212" &&
-      m.attachments &&
-      m.attachments.length > 0
-    ) {
-      for (const att of m.attachments) {
-        // Properly check compat status to determine which URLs/MIME to use
-        const url =
-          att.compatStatus === "ACTIVE" ? att.compatCdnUrl : att.cdnUrl;
-        const mime = att.compatStatus === "ACTIVE" ? att.compatMime : att.mime;
-
-        if (url && mime?.startsWith("image/")) {
-          parts.push({ type: "image_url", image_url: { url, detail } });
-        }
-      }
-    }
-
-    // Add text content with optional provider tag
-    let textContent = m.content;
-    if (includeProviderTag && m.senderType === "AI") {
-      const provider = m.provider.toLowerCase();
-      const modelName = m.model ?? "";
-      const modelIdentifier = `[${provider}/${modelName}]`;
-      textContent = `${modelIdentifier}\n${m.content}`;
-    }
-
-    parts.push({ type: "text", text: textContent });
-    return parts;
   }
 
   private async generateId(target: "seriesId" | "generationGroupId") {
@@ -415,7 +343,7 @@ export class GrokImgGenService extends GrokCollectionsService {
     apiKey,
     ws,
     userId,
-    model = "grok-2-image-1212" as GrokImgGenModels,
+    model = "grok-imagine-image",
     systemPrompt,
     temperature,
     imgGenEnabled,
@@ -426,7 +354,8 @@ export class GrokImgGenService extends GrokCollectionsService {
     title,
     topP
   }: ProviderChatRequestEntity) {
-    if (!imgGenFields || !imgGenEnabled) return;
+    const m = model as GrokModelIdUnion;
+    if (!imgGenFields || !imgGenEnabled || !this.isNativeImgModel(m)) return;
 
     let partialImgArr = Array.of<ImageGenPartialArr>(),
       tInitial = 0,
@@ -436,8 +365,6 @@ export class GrokImgGenService extends GrokCollectionsService {
       grokChunks = Array.of<string>();
 
     const provider = "grok" as const;
-
-    const m = model as GrokImgGenModels;
 
     try {
       let text: string | undefined = undefined;

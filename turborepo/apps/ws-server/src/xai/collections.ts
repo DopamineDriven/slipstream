@@ -474,11 +474,7 @@ export class GrokCollectionsService extends GrokWorkupService {
         const content = Array.of<ContentBlockUnion>();
         const textParts = Array.of<string>();
         try {
-          if (
-            msg.attachments &&
-            msg.attachments.length > 0 &&
-            (this.canViewDocs(model) || this.canViewImgs(model))
-          ) {
+          if (msg.attachments && msg.attachments.length > 0) {
             let currentUserFileCount = 0;
 
             for (const attachment of msg.attachments) {
@@ -502,8 +498,7 @@ export class GrokCollectionsService extends GrokWorkupService {
                 const name = `${filename}.${ext}`;
 
                 if (
-                  attachment.assetType === "DOCUMENT" &&
-                  this.canViewDocs(model)
+                  attachment.assetType === "DOCUMENT"
                 ) {
                   try {
                     const { fileId, docUri } =
@@ -519,7 +514,7 @@ export class GrokCollectionsService extends GrokWorkupService {
                         if (!isCurrentUserMsg) {
                           textParts.push(`[${name}](${docUri})`);
                         } else {
-                          if (currentUserFileCount === 0) {
+                          if (currentUserFileCount === 0 && this.canViewDocs(model)) {
                             const docBlock = {
                               type: "input_file",
                               file_id: fileId
@@ -543,10 +538,9 @@ export class GrokCollectionsService extends GrokWorkupService {
                     );
                   }
                 } else if (
-                  attachment.assetType === "IMAGE" &&
-                  this.canViewImgs(model)
+                  attachment.assetType === "IMAGE"
                 ) {
-                  if (isFreshContext && isCurrentUserMsg) {
+                  if (isFreshContext && isCurrentUserMsg && this.canViewImgs(model)) {
                     const imgBlock = {
                       type: "input_image",
                       image_url: url,
@@ -600,7 +594,7 @@ export class GrokCollectionsService extends GrokWorkupService {
 
                 const name = `${filename}.${ext}`;
 
-                if (assetType === "DOCUMENT" && this.canViewDocs(model)) {
+                if (assetType === "DOCUMENT") {
                   try {
                     const { docUri } = await this.ensureXaiAssetUploaded(
                       att,
@@ -617,7 +611,7 @@ export class GrokCollectionsService extends GrokWorkupService {
                     );
                   }
                   // can have image attachments from image gen models in multi-provider/multi-model convos
-                } else if (assetType === "IMAGE" && this.canViewImgs(model)) {
+                } else if (assetType === "IMAGE") {
                   textParts.push(`${modelIdentifier}\n![${name}](${url})`);
                 }
               }
@@ -759,18 +753,12 @@ export class GrokCollectionsService extends GrokWorkupService {
   }
 
   protected canUseServerTools(m: GrokModelIdUnion) {
-    return (
-      m === "grok-4-0709" ||
-      m === "grok-4-1-fast-non-reasoning" ||
-      m === "grok-4-1-fast-reasoning" ||
-      m === "grok-4-fast-reasoning" ||
-      m === "grok-4-fast-non-reasoning"
-    );
+    return this.is420BetaModel(m) || this.isGrok4Model(m);
   }
 
   /**
    * Model Compatibility
-   * Supported Models: grok-4-0709, grok-4-fast-reasoning, grok-4-fast-non-reasoning, grok-4-1-fast-reasoning, grok-4-1-fast-non-reasoning
+   * Supported Models: grok-4-0709, grok-4-fast-reasoning, grok-4-fast-non-reasoning, grok-4-1-fast-reasoning, grok-4-1-fast-non-reasoning, grok-4.20-experimental-beta-0304-non-reasoning, grok-4.20-experimental-beta-0304-reasoning, grok-4.20-multi-agent-experimental-beta-0304
    */
   protected handleTooling({
     model,

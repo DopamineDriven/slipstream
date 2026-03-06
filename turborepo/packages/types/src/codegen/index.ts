@@ -13,6 +13,8 @@ dotenv.config({ quiet: true });
 
 const providerModelImagesApi = {
   openai: [
+    "gpt-5.4",
+    "gpt-5.4-pro",
     "gpt-5.2",
     "gpt-5.2-pro",
     "gpt-5.1",
@@ -42,7 +44,7 @@ const providerModelImagesApi = {
     "imagen-4.0-fast-generate-001",
     "imagen-4.0-ultra-generate-001"
   ],
-  grok: ["grok-2-image-1212", "grok-imagine-image", "grok-imagine-image-pro"]
+  grok: ["grok-imagine-image", "grok-imagine-image-pro"]
 } as const;
 
 const providerModelVideosApi = {
@@ -59,6 +61,7 @@ const providerModelVideosApi = {
 
 const providerModelChatApi = {
   openai: [
+    "gpt-5.4",
     "gpt-5.2",
     "gpt-5.2-chat-latest",
     "gpt-5.1",
@@ -66,10 +69,13 @@ const providerModelChatApi = {
     "gpt-5-mini",
     "gpt-5-nano",
     "gpt-5.1-chat-latest",
+    "gpt-5.3-codex",
+    "gpt-5.2-codex",
     "gpt-5.1-codex-max",
     "gpt-5.1-codex",
     "gpt-5.1-codex-mini",
     "gpt-5-codex",
+    "gpt-5.4-pro",
     "gpt-5.2-pro",
     "gpt-5-pro",
     "gpt-5-chat-latest",
@@ -101,6 +107,7 @@ const providerModelChatApi = {
   gemini: [
     "gemini-3.1-pro-preview",
     "gemini-3.1-pro-preview-customtools",
+    "gemini-3.1-flash-lite-preview",
     "gemini-3-flash-preview",
     "gemini-2.5-pro",
     "gemini-3-pro-image-preview",
@@ -121,18 +128,19 @@ const providerModelChatApi = {
     "veo-2.0-generate-001"
   ],
   grok: [
+    "grok-4.20-multi-agent-experimental-beta-0304",
+    "grok-4.20-experimental-beta-0304-reasoning",
+    "grok-4.20-experimental-beta-0304-non-reasoning",
     "grok-4-1-fast-reasoning",
     "grok-4-1-fast-non-reasoning",
-    "grok-4-0709",
-    "grok-code-fast-1",
     "grok-4-fast-reasoning",
     "grok-4-fast-non-reasoning",
+    "grok-4-0709",
     "grok-imagine-image",
     "grok-imagine-image-pro",
-    "grok-2-image-1212",
+    "grok-code-fast-1",
     "grok-3",
     "grok-3-mini",
-    "grok-2-vision-1212",
     "grok-imagine-video"
   ],
   /**
@@ -219,7 +227,11 @@ const GROK_NAME_OVERRIDES = {
   "grok-4-1-fast-reasoning": "Grok 4.1 Fast Reasoning",
   "grok-imagine-image": "Grok Imagine Image",
   "grok-imagine-image-pro": "Grok Imagine Image Pro",
-  "grok-imagine-video": "Grok Imagine Video"
+  "grok-imagine-video": "Grok Imagine Video",
+  "grok-4.20-multi-agent-experimental-beta-0304": "Grok 4.20 Multi-Agent Beta",
+  "grok-4.20-experimental-beta-0304-non-reasoning":
+    "Grok 4.20 Non-Reasoning Beta",
+  "grok-4.20-experimental-beta-0304-reasoning": "Grok 4.20 Reasoning Beta"
 } satisfies Record<string, string>;
 
 function grokDisplayName(id: string) {
@@ -243,7 +255,13 @@ function grokDisplayName(id: string) {
             ? GROK_NAME_OVERRIDES[id]
             : id === "grok-imagine-video"
               ? GROK_NAME_OVERRIDES[id]
-              : s;
+              : id === "grok-4.20-multi-agent-experimental-beta-0304"
+                ? GROK_NAME_OVERRIDES[id]
+                : id === "grok-4.20-experimental-beta-0304-reasoning"
+                  ? GROK_NAME_OVERRIDES[id]
+                  : id === "grok-4.20-experimental-beta-0304-non-reasoning"
+                    ? GROK_NAME_OVERRIDES[id]
+                    : s;
 }
 
 function displayNameV0(id: string) {

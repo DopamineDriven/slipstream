@@ -732,6 +732,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
       case "gemini-2.5-pro":
       case "gemini-3.1-pro-preview":
       case "gemini-3.1-pro-preview-customtools":
+      case "gemini-3.1-flash-lite-preview":
       case "gemini-3-flash-preview":
       case "deep-research-pro-preview-12-2025":
       case "gemini-2.5-flash": {
@@ -785,6 +786,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
       case "deep-research-pro-preview-12-2025":
       case "gemini-3-flash-preview":
       case "gemini-3.1-flash-image-preview":
+      case "gemini-3.1-flash-lite-preview":
       case "gemini-3.1-pro-preview":
       case "gemini-3.1-pro-preview-customtools": {
         return {

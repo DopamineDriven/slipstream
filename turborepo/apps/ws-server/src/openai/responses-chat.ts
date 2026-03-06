@@ -76,12 +76,10 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       undefined,
       hasUserStoreDocs
     );
-    const instructions = this
-      .buildInstructions(systemPrompt)
-      .concat(
-        "\n\nTool policy: use file_search sparingly. Do not repeat the same query. " +
-          "If results are empty or not improving, stop using tools and provide the best available answer, plus what is missing."
-      );
+    const instructions = this.buildInstructions(systemPrompt).concat(
+      "\n\nTool policy: use file_search sparingly. Do not repeat the same query. " +
+        "If results are empty or not improving, stop using tools and provide the best available answer, plus what is missing."
+    );
     const nearBudgetInstruction =
       "\n\nSYSTEM: You are near your tool budget. Synthesize findings now and respond directly. " +
       "Only call file_search again if it is strictly necessary.";
@@ -131,17 +129,25 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
               m,
               m === "gpt-5.2"
                 ? "xhigh"
-                : m === "gpt-5-pro"
-                  ? "high"
-                  : m === "gpt-5.2-pro"
+                : m === "gpt-5.4"
+                  ? "xhigh"
+                  : m === "gpt-5.2-codex"
                     ? "xhigh"
-                    : m === "gpt-5.1"
-                      ? "high"
-                      : m === "gpt-5"
-                        ? "high"
-                        : m === "gpt-5.1-codex-max"
-                          ? "xhigh"
-                          : "medium",
+                    : m === "gpt-5.3-codex"
+                      ? "xhigh"
+                      : m === "gpt-5.4-pro"
+                        ? "xhigh"
+                        : m === "gpt-5-pro"
+                          ? "high"
+                          : m === "gpt-5.2-pro"
+                            ? "xhigh"
+                            : m === "gpt-5.1"
+                              ? "high"
+                              : m === "gpt-5"
+                                ? "high"
+                                : m === "gpt-5.1-codex-max"
+                                  ? "xhigh"
+                                  : "medium",
               "auto",
               false
             ),

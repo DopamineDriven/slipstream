@@ -1,5 +1,7 @@
 export const displayNameModelsByProviderImgGen = {
   openai: [
+    "GPT-5.4",
+    "GPT-5.4 pro",
     "GPT-5.2",
     "GPT-5.2 pro",
     "GPT-5.1",
@@ -29,5 +31,5 @@ export const displayNameModelsByProviderImgGen = {
     "Imagen 4 Fast",
     "Imagen 4 Ultra"
   ],
-  grok: ["Grok 2 Image", "Grok Imagine Image", "Grok Imagine Image Pro"]
+  grok: ["Grok Imagine Image", "Grok Imagine Image Pro"]
 } as const;

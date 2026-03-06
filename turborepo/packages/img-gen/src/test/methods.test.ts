@@ -98,15 +98,22 @@ describe("handleImgGenOutputQuality", () => {
   it("should return undefined for grok provdier with no model set", {}, () => {
     assert.equal(p.handleImgGenOutputQuality("grok"), undefined);
   });
-    it("should return 2k for grok provider with model set to grok-imagine-image", {}, () => {
-    assert.equal(p.handleImgGenOutputQuality("grok", "grok-imagine-image"), "2k");
-  });
+  it(
+    "should return 2k for grok provider with model set to grok-imagine-image",
+    {},
+    () => {
+      assert.equal(
+        p.handleImgGenOutputQuality("grok", "grok-imagine-image"),
+        "2k"
+      );
+    }
+  );
 });
 
 describe("handleImgGenOutputFormat", () => {
   it("should return undefined for grok", {}, () => {
     assert.equal(
-      p.handleImgGenOutputFormat("grok", "grok-2-image-1212", {
+      p.handleImgGenOutputFormat("grok", "grok-imagine-image", {
         format: undefined
       }),
       undefined
@@ -290,21 +297,21 @@ describe("handleImgGenCount", () => {
     }
   );
   it(
-    "should return 1 for grok-2-image-1212 model with n=-11 set as input",
+    "should return 1 for grok-imagine-image model with n=-11 set as input",
     {},
     () => {
       assert.equal(
-        p.handleImgGenCount("grok", "grok-2-image-1212", { n: -11 }),
+        p.handleImgGenCount("grok", "grok-imagine-image", { n: -11 }),
         1
       );
     }
   );
   it(
-    "should return 10 for grok-2-image-1212 model with n=11 set as input",
+    "should return 10 for grok-imagine-image model with n=11 set as input",
     {},
     () => {
       assert.equal(
-        p.handleImgGenCount("grok", "grok-2-image-1212", { n: 11 }),
+        p.handleImgGenCount("grok", "grok-imagine-image", { n: 11 }),
         10
       );
     }
@@ -349,10 +356,10 @@ describe("isImgGenCapableModel", () => {
     assert.equal(p.isImgGenCapableModel("grok", "grok-4-0709"), false);
   });
   it(
-    "should return true for provider=grok, model=grok-2-image-1212",
+    "should return true for provider=grok, model=grok-imagine-image",
     {},
     () => {
-      assert.equal(p.isImgGenCapableModel("grok", "grok-2-image-1212"), true);
+      assert.equal(p.isImgGenCapableModel("grok", "grok-imagine-image"), true);
     }
   );
   it("should return true for provider=openai, model=gpt-5", {}, () => {
@@ -414,10 +421,10 @@ describe("isPureImgGenModel", () => {
     assert.equal(p.isPureImgGenModel("grok", "grok-4-0709"), false);
   });
   it(
-    "should return true for provider=grok, model=grok-2-image-1212",
+    "should return true for provider=grok, model=grok-imagine-image",
     {},
     () => {
-      assert.equal(p.isPureImgGenModel("grok", "grok-2-image-1212"), true);
+      assert.equal(p.isPureImgGenModel("grok", "grok-imagine-image"), true);
     }
   );
   it("should return false for provider=openai, model=gpt-5", {}, () => {

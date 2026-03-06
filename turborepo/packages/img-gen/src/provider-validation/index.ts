@@ -15,16 +15,12 @@ export class ProviderValidation {
     return this.grokNativeImageGenModel(m);
   }
 
-  public grokImageLegacyModel(m: AllModelsUnion) {
-    return m === "grok-2-image-1212";
-  }
-
   public grokImagineImgGenModel(m: AllModelsUnion) {
     return m === "grok-imagine-image" || m === "grok-imagine-image-pro";
   }
 
   public grokNativeImageGenModel(m: AllModelsUnion) {
-    return this.grokImageLegacyModel(m) || this.grokImagineImgGenModel(m);
+    return this.grokImagineImgGenModel(m);
   }
 
   public openAIDalle2(m: AllModelsUnion) {
@@ -48,6 +44,8 @@ export class ProviderValidation {
   }
   public openAIFacilitatingImgGenModel(model: AllModelsUnion) {
     return (
+      model === "gpt-5.4" ||
+      model === "gpt-5.4-pro" ||
       model === "gpt-4.1" ||
       model === "gpt-4.1-mini" ||
       model === "gpt-4.1-nano" ||
@@ -232,6 +230,7 @@ export class ProviderValidation {
               }[T];
             else return;
           }
+          case "gemini-3.1-flash-lite-preview":
           case "deep-research-pro-preview-12-2025":
           case "gemini-3-flash-preview":
           case "gemini-3.1-flash-image-preview":
@@ -259,6 +258,8 @@ export class ProviderValidation {
         switch (m) {
           case "gpt-image-1":
           case "gpt-image-1-mini":
+          case "gpt-5.4":
+          case "gpt-5.4-pro":
           case "gpt-4.1":
           case "gpt-4.1-mini":
           case "gpt-4.1-nano":
@@ -297,6 +298,8 @@ export class ProviderValidation {
           case "gpt-3.5-turbo":
           case "gpt-4":
           case "chatgpt-4o-latest":
+          case "gpt-5.2-codex":
+          case "gpt-5.3-codex":
           case "gpt-5.1-chat-latest":
           case "gpt-5.1-codex-max":
           case "gpt-5.2-chat-latest":
@@ -576,6 +579,7 @@ export class ProviderValidation {
                 anthropic?: undefined;
               }[T];
           }
+          case "gemini-3.1-flash-lite-preview":
           case "gemini-3.1-pro-preview":
           case "gemini-3.1-pro-preview-customtools":
           case "gemini-3-flash-preview":
@@ -650,8 +654,9 @@ export class ProviderValidation {
                 anthropic?: undefined;
               }[T];
           }
-          case "grok-2-image-1212":
-          case "grok-2-vision-1212":
+          case "grok-4.20-experimental-beta-0304-non-reasoning":
+          case "grok-4.20-experimental-beta-0304-reasoning":
+          case "grok-4.20-multi-agent-experimental-beta-0304":
           case "grok-3":
           case "grok-3-mini":
           case "grok-4-0709":
@@ -764,6 +769,8 @@ export class ProviderValidation {
           case "gpt-4o":
           case "gpt-4o-mini":
           case "gpt-5.1":
+          case "gpt-5.4":
+          case "gpt-5.4-pro":
           case "gpt-5":
           case "gpt-5.2":
           case "gpt-5.2-pro":
@@ -815,6 +822,8 @@ export class ProviderValidation {
                 anthropic?: undefined;
               }[T];
           }
+          case "gpt-5.2-codex":
+          case "gpt-5.3-codex":
           case "gpt-5.1-chat-latest":
           case "gpt-5.1-codex":
           case "gpt-5.1-codex-mini":
@@ -942,9 +951,13 @@ export class ProviderValidation {
             case "gpt-5.1-chat-latest":
             case "gpt-5.1-codex":
             case "gpt-5.1-codex-mini":
+            case "gpt-5.2-codex":
+              case "gpt-5.3-codex":
             case "o1": {
               return undefined;
             }
+            case "gpt-5.4":
+            case "gpt-5.4-pro":
             case "gpt-5.2":
             case "gpt-5.2-pro":
             case "gpt-image-1.5":
@@ -1024,6 +1037,7 @@ export class ProviderValidation {
               return data.output_size as OutputSizeProps<typeof provider>;
             } else return "1:1" as OutputSizeProps<typeof provider>;
           }
+          case "gemini-3.1-flash-lite-preview":
           case "gemini-3.1-pro-preview":
           case "gemini-3.1-pro-preview-customtools":
           case "gemini-3-flash-preview":
@@ -1092,6 +1106,8 @@ export class ProviderValidation {
           case "gpt-4o":
           case "gpt-4o-mini":
           case "gpt-5":
+          case "gpt-5.4":
+          case "gpt-5.4-pro":
           case "gpt-5.2":
           case "gpt-image-1.5":
           case "gpt-5.2-pro":
@@ -1112,6 +1128,8 @@ export class ProviderValidation {
               >;
             } else return "auto" as OutputSizeProps<typeof provider>;
           }
+          case "gpt-5.2-codex":
+          case "gpt-5.3-codex":
           case "gpt-5.1-codex-max":
           case "gpt-5.2-chat-latest":
           case "gpt-3.5-turbo":

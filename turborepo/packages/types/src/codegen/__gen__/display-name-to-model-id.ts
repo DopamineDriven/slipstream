@@ -1,5 +1,6 @@
 export const displayNameToModelId = {
   openai: {
+    "GPT-5.4": "gpt-5.4",
     "GPT-5.2": "gpt-5.2",
     "GPT-5.2 Chat": "gpt-5.2-chat-latest",
     "GPT-5.1": "gpt-5.1",
@@ -7,10 +8,13 @@ export const displayNameToModelId = {
     "GPT-5 mini": "gpt-5-mini",
     "GPT-5 nano": "gpt-5-nano",
     "GPT-5.1 Chat": "gpt-5.1-chat-latest",
+    "GPT-5.3 codex": "gpt-5.3-codex",
+    "GPT-5.2 codex": "gpt-5.2-codex",
     "GPT-5.1-Codex-Max": "gpt-5.1-codex-max",
     "GPT-5.1 Codex": "gpt-5.1-codex",
     "GPT-5.1 Codex mini": "gpt-5.1-codex-mini",
     "GPT-5-Codex": "gpt-5-codex",
+    "GPT-5.4 pro": "gpt-5.4-pro",
     "GPT-5.2 pro": "gpt-5.2-pro",
     "GPT-5 pro": "gpt-5-pro",
     "GPT-5 Chat": "gpt-5-chat-latest",
@@ -42,6 +46,7 @@ export const displayNameToModelId = {
   gemini: {
     "Gemini 3.1 Pro Preview": "gemini-3.1-pro-preview",
     "Gemini 3.1 Pro Preview Custom Tools": "gemini-3.1-pro-preview-customtools",
+    "Gemini 3.1 Flash Lite Preview": "gemini-3.1-flash-lite-preview",
     "Gemini 3 Flash Preview": "gemini-3-flash-preview",
     "Gemini 2.5 Pro": "gemini-2.5-pro",
     "Nano Banana Pro": "gemini-3-pro-image-preview",
@@ -63,18 +68,21 @@ export const displayNameToModelId = {
     "Veo 2": "veo-2.0-generate-001"
   },
   grok: {
+    "Grok 4.20 Multi-Agent Beta":
+      "grok-4.20-multi-agent-experimental-beta-0304",
+    "Grok 4.20 Reasoning Beta": "grok-4.20-experimental-beta-0304-reasoning",
+    "Grok 4.20 Non-Reasoning Beta":
+      "grok-4.20-experimental-beta-0304-non-reasoning",
     "Grok 4.1 Fast Reasoning": "grok-4-1-fast-reasoning",
     "Grok 4.1 Fast Non-Reasoning": "grok-4-1-fast-non-reasoning",
-    "Grok 4": "grok-4-0709",
-    "Grok Code Fast 1": "grok-code-fast-1",
     "Grok 4 Fast Reasoning": "grok-4-fast-reasoning",
     "Grok 4 Fast Non-Reasoning": "grok-4-fast-non-reasoning",
+    "Grok 4": "grok-4-0709",
     "Grok Imagine Image": "grok-imagine-image",
     "Grok Imagine Image Pro": "grok-imagine-image-pro",
-    "Grok 2 Image": "grok-2-image-1212",
+    "Grok Code Fast 1": "grok-code-fast-1",
     "Grok 3": "grok-3",
     "Grok 3 Mini": "grok-3-mini",
-    "Grok 2 Vision": "grok-2-vision-1212",
     "Grok Imagine Video": "grok-imagine-video"
   },
   anthropic: {

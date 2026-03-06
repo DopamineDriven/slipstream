@@ -44,12 +44,13 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
       const m = model as GetModelUtilRT<typeof p>;
       switch (m) {
         case "grok-imagine-image":
-        case "grok-imagine-image-pro":
-        case "grok-2-image-1212": {
+        case "grok-imagine-image-pro": {
           return true;
         }
         case "grok-imagine-video":
-        case "grok-2-vision-1212":
+        case "grok-4.20-experimental-beta-0304-non-reasoning":
+        case "grok-4.20-experimental-beta-0304-reasoning":
+        case "grok-4.20-multi-agent-experimental-beta-0304":
         case "grok-3":
         case "grok-4-0709":
         case "grok-4-1-fast-non-reasoning":
@@ -75,6 +76,7 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
         case "imagen-4.0-ultra-generate-001": {
           return true;
         }
+        case "gemini-3.1-flash-lite-preview":
         case "gemini-3.1-pro-preview":
         case "gemini-3.1-pro-preview-customtools":
         case "gemini-2.0-flash":
@@ -96,6 +98,8 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
     case "openai": {
       const m = model as GetModelUtilRT<typeof p>;
       switch (m) {
+        case "gpt-5.4":
+        case "gpt-5.4-pro":
         case "gpt-image-1.5":
         case "dall-e-2":
         case "dall-e-3":
@@ -117,6 +121,8 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
         case "gpt-5": {
           return true;
         }
+        case "gpt-5.2-codex":
+        case "gpt-5.3-codex":
         case "gpt-5.1-codex-max":
         case "gpt-5.2-chat-latest":
         case "gpt-5.1-chat-latest":
@@ -163,12 +169,13 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
       const m = model as GetModelUtilRT<typeof p>;
       switch (m) {
         case "grok-imagine-image":
-          case "grok-imagine-image-pro":
-        case "grok-2-image-1212": {
+        case "grok-imagine-image-pro": {
           return true;
         }
         case "grok-imagine-video":
-        case "grok-2-vision-1212":
+        case "grok-4.20-experimental-beta-0304-non-reasoning":
+        case "grok-4.20-experimental-beta-0304-reasoning":
+        case "grok-4.20-multi-agent-experimental-beta-0304":
         case "grok-3":
         case "grok-3-mini":
         case "grok-4-0709":
@@ -193,6 +200,7 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
         case "imagen-4.0-ultra-generate-001": {
           return true;
         }
+        case "gemini-3.1-flash-lite-preview":
         case "gemini-3-flash-preview":
         case "gemini-3.1-pro-preview":
         case "gemini-3.1-pro-preview-customtools":
@@ -222,6 +230,10 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
         case "gpt-image-1-mini": {
           return true;
         }
+        case "gpt-5.2-codex":
+        case "gpt-5.3-codex":
+        case "gpt-5.4":
+        case "gpt-5.4-pro":
         case "gpt-5.1-codex-max":
         case "gpt-5.2":
         case "gpt-5.2-chat-latest":
@@ -319,6 +331,7 @@ function handleOutputSize(
             return data.output_size;
           } else return "1:1";
         }
+        case "gemini-3.1-flash-lite-preview":
         case "gemini-3.1-pro-preview":
         case "gemini-3.1-pro-preview-customtools":
         case "gemini-2.0-flash":
@@ -358,6 +371,8 @@ function handleOutputSize(
           } else return "auto";
         }
         case "gpt-image-1.5":
+        case "gpt-5.4":
+        case "gpt-5.4-pro":
         case "gpt-5.2":
         case "gpt-5.2-pro":
         case "gpt-5-chat-latest":
@@ -380,6 +395,8 @@ function handleOutputSize(
             return data.output_size;
           } else return "auto";
         }
+        case "gpt-5.3-codex":
+        case "gpt-5.2-codex":
         case "gpt-5.1-codex-max":
         case "gpt-5.2-chat-latest":
         case "sora-2":
@@ -427,6 +444,8 @@ function _handlePartialImgGen(
           case "o3-mini":
           case "o3-pro":
           case "o4-mini":
+          case "gpt-5.2-codex":
+          case "gpt-5.3-codex":
           case "chatgpt-4o-latest":
           case "gpt-5.1-chat-latest":
           case "gpt-5.1-codex":
@@ -445,6 +464,8 @@ function _handlePartialImgGen(
           case "gpt-5-codex": {
             return undefined;
           }
+          case "gpt-5.4":
+          case "gpt-5.4-pro":
           case "gpt-image-1.5":
           case "gpt-5.2":
           case "gpt-5.2-pro":
@@ -529,6 +550,7 @@ function handleImgGenOutputQuality(
             return data.output_quality as "1K" | "2K" | "4K";
           } else return "1K";
         }
+        case "gemini-3.1-flash-lite-preview":
         case "gemini-3.1-pro-preview":
         case "gemini-3.1-pro-preview-customtools":
         case "gemini-2.0-flash":
@@ -568,6 +590,8 @@ function handleImgGenOutputQuality(
           } else return "auto";
         }
         case "gpt-image-1.5":
+        case "gpt-5.4":
+        case "gpt-5.4-pro":
         case "gpt-5.1":
         case "gpt-4.1":
         case "gpt-4.1-mini":
@@ -591,6 +615,8 @@ function handleImgGenOutputQuality(
             return data.output_quality as "high" | "medium" | "low" | "auto";
           } else return "auto";
         }
+        case "gpt-5.2-codex":
+        case "gpt-5.3-codex":
         case "gpt-5.1-codex-max":
         case "gpt-5.2-chat-latest":
         case "gpt-5.1-chat-latest":

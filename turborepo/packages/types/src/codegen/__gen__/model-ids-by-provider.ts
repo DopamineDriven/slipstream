@@ -1,5 +1,6 @@
 export const modelIdsByProvider = {
   openai: [
+    "gpt-5.4",
     "gpt-5.2",
     "gpt-5.2-chat-latest",
     "gpt-5.1",
@@ -7,10 +8,13 @@ export const modelIdsByProvider = {
     "gpt-5-mini",
     "gpt-5-nano",
     "gpt-5.1-chat-latest",
+    "gpt-5.3-codex",
+    "gpt-5.2-codex",
     "gpt-5.1-codex-max",
     "gpt-5.1-codex",
     "gpt-5.1-codex-mini",
     "gpt-5-codex",
+    "gpt-5.4-pro",
     "gpt-5.2-pro",
     "gpt-5-pro",
     "gpt-5-chat-latest",
@@ -42,6 +46,7 @@ export const modelIdsByProvider = {
   gemini: [
     "gemini-3.1-pro-preview",
     "gemini-3.1-pro-preview-customtools",
+    "gemini-3.1-flash-lite-preview",
     "gemini-3-flash-preview",
     "gemini-2.5-pro",
     "gemini-3-pro-image-preview",
@@ -62,18 +67,19 @@ export const modelIdsByProvider = {
     "veo-2.0-generate-001"
   ],
   grok: [
+    "grok-4.20-multi-agent-experimental-beta-0304",
+    "grok-4.20-experimental-beta-0304-reasoning",
+    "grok-4.20-experimental-beta-0304-non-reasoning",
     "grok-4-1-fast-reasoning",
     "grok-4-1-fast-non-reasoning",
-    "grok-4-0709",
-    "grok-code-fast-1",
     "grok-4-fast-reasoning",
     "grok-4-fast-non-reasoning",
+    "grok-4-0709",
     "grok-imagine-image",
     "grok-imagine-image-pro",
-    "grok-2-image-1212",
+    "grok-code-fast-1",
     "grok-3",
     "grok-3-mini",
-    "grok-2-vision-1212",
     "grok-imagine-video"
   ],
   anthropic: [

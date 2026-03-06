@@ -9,7 +9,7 @@ import type {
   S3FinalizePayload
 } from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
-import { OpenAI } from "openai";
+import type { OpenAI } from "openai";
 import { Stream } from "openai/core/streaming.mjs";
 import { LoggerService } from "@/logger/index.ts";
 import { OpenAIServiceWorkup } from "@/openai/workup.ts";

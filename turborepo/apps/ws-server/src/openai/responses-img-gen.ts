@@ -2,7 +2,7 @@ import type { ImageGenPartialArr, ImgGenResProps } from "@/openai/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
-import { OpenAI } from "openai";
+import type { OpenAI } from "openai";
 import { LoggerService } from "@/logger/index.ts";
 import { OpenAIGPTImageService } from "@/openai/gpt-image.ts";
 import { PrismaService } from "@/prisma/index.ts";
@@ -41,7 +41,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     max_tokens,
     jobId,
     requestMessageId,
-    model = "gpt-image-1.5" satisfies OpenAiModelIdUnion,
+    model = "gpt-5.4" satisfies OpenAiModelIdUnion,
     systemPrompt,
     temperature,
     title,
@@ -51,11 +51,9 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     imgGenFields,
     user_location
   }: ProviderOpenaiRequestEntity) {
-    // use most recent message id for image gen requests to update Im
-
     const m = this.prisma.openAIImgGenCapable(model as OpenAiModelIdUnion)
       ? (model as OpenAIImgCapableModels)
-      : "gpt-5.2";
+      : "gpt-5.4";
 
     const provider = "openai" as const;
 
@@ -127,6 +125,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       vectorStoreId ? [vectorStoreId] : undefined,
       true,
       {
+        action: "auto",
         type: "image_generation",
         background: r.output_background,
         input_fidelity: hasImages ? "high" : r.input_fidelity,
