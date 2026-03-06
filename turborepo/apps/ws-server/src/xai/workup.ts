@@ -60,30 +60,46 @@ export class GrokWorkupService {
     DOCUMENT_STATUS_UNKNOWN: "PENDING"
   } as const satisfies Record<DocumentStatus, ProviderDocState>;
 
+  protected is420BetaModel(m: GrokModelIdUnion) {
+    return (
+      m === "grok-4.20-experimental-beta-0304-non-reasoning" ||
+      m === "grok-4.20-experimental-beta-0304-reasoning" ||
+      m === "grok-4.20-multi-agent-experimental-beta-0304"
+    );
+  }
+
+  protected isGrok4Model(m: GrokModelIdUnion) {
+    return (
+      m === "grok-4-0709" ||
+      m === "grok-4-1-fast-non-reasoning" ||
+      m === "grok-4-1-fast-reasoning" ||
+      m === "grok-4-fast-reasoning" ||
+      m === "grok-4-fast-non-reasoning"
+    );
+  }
+
+  protected isNativeImgModel(m: GrokModelIdUnion) {
+    return m === "grok-imagine-image" || m === "grok-imagine-image-pro";
+  }
+
+  protected isNativeVideoModel(m: GrokModelIdUnion) {
+    return m === "grok-imagine-video";
+  }
+
   protected canViewImgs(model: GrokModelIdUnion) {
     return (
-      model === "grok-imagine-image" ||
-      model === "grok-imagine-image-pro" ||
-      model === "grok-imagine-video" ||
-      model === "grok-2-vision-1212" ||
-      model === "grok-4-0709" ||
-      model === "grok-4-1-fast-non-reasoning" ||
-      model === "grok-4-fast-reasoning" ||
-      model === "grok-4-fast-non-reasoning" ||
-      model === "grok-4-1-fast-reasoning"
+      this.isNativeImgModel(model) ||
+      this.isNativeVideoModel(model) ||
+      this.isGrok4Model(model)
     );
   }
 
   protected canViewDocs(model: GrokModelIdUnion) {
-    return this.canViewImgs(model);
+    return this.isGrok4Model(model) || this.is420BetaModel(model);
   }
 
   protected isImgGenModel(model: GrokModelIdUnion) {
-    return (
-      model === "grok-2-image-1212" ||
-      model === "grok-imagine-image" ||
-      model === "grok-imagine-image-pro"
-    );
+    return model === "grok-imagine-image" || model === "grok-imagine-image-pro";
   }
 
   protected async syncFilesRegistry(apiKey = this.xaiKey) {

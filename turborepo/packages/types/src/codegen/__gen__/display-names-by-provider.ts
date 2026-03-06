@@ -1,5 +1,6 @@
 export const displayNameModelsByProvider = {
   openai: [
+    "GPT-5.4",
     "GPT-5.2",
     "GPT-5.2 Chat",
     "GPT-5.1",
@@ -7,10 +8,13 @@ export const displayNameModelsByProvider = {
     "GPT-5 mini",
     "GPT-5 nano",
     "GPT-5.1 Chat",
+    "GPT-5.3 codex",
+    "GPT-5.2 codex",
     "GPT-5.1-Codex-Max",
     "GPT-5.1 Codex",
     "GPT-5.1 Codex mini",
     "GPT-5-Codex",
+    "GPT-5.4 pro",
     "GPT-5.2 pro",
     "GPT-5 pro",
     "GPT-5 Chat",
@@ -42,6 +46,7 @@ export const displayNameModelsByProvider = {
   gemini: [
     "Gemini 3.1 Pro Preview",
     "Gemini 3.1 Pro Preview Custom Tools",
+    "Gemini 3.1 Flash Lite Preview",
     "Gemini 3 Flash Preview",
     "Gemini 2.5 Pro",
     "Nano Banana Pro",
@@ -62,18 +67,19 @@ export const displayNameModelsByProvider = {
     "Veo 2"
   ],
   grok: [
+    "Grok 4.20 Multi-Agent Beta",
+    "Grok 4.20 Reasoning Beta",
+    "Grok 4.20 Non-Reasoning Beta",
     "Grok 4.1 Fast Reasoning",
     "Grok 4.1 Fast Non-Reasoning",
-    "Grok 4",
-    "Grok Code Fast 1",
     "Grok 4 Fast Reasoning",
     "Grok 4 Fast Non-Reasoning",
+    "Grok 4",
     "Grok Imagine Image",
     "Grok Imagine Image Pro",
-    "Grok 2 Image",
+    "Grok Code Fast 1",
     "Grok 3",
     "Grok 3 Mini",
-    "Grok 2 Vision",
     "Grok Imagine Video"
   ],
   anthropic: [

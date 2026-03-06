@@ -84,7 +84,7 @@ export class ProviderService extends VercelMixin(
   MetaMixin(
     OpenAIMixin(
       GeminiMixin(
-        AnthropicMixin(GrokMixin(ProviderBaseMixin(ProviderServiceBase)))
+        GrokMixin(AnthropicMixin(ProviderBaseMixin(ProviderServiceBase)))
       )
     )
   )

@@ -78,13 +78,11 @@ export type GrokImagineARUnion =
   | "9:20"
   | "auto";
 
-export type GrokImagineImgModelUnion =
-  | "grok-imagine-image"
-  | "grok-imagine-image-pro";
+export type GrokImagineImgModelUnion = GrokImgGenModels;
 
 export type GrokModelAspectRatioWorkup = DX<
-  Record<Exclude<GrokImgGenModels, "grok-2-image-1212">, GrokImagineARUnion> &
-    Record<Exclude<GrokModelIdUnion, GrokImagineImgModelUnion>, undefined>
+  Record<GrokImgGenModels, GrokImagineARUnion> &
+    Record<Exclude<GrokModelIdUnion, GrokImgGenModels>, undefined>
 >;
 
 export type GeminiModelAspectRatio = {
@@ -734,34 +732,6 @@ export type NanoBananaImageGenOpts = {
 
 export type GoogleGenAIImageGenOpts = NanoBananaImageGenOpts | ImagenOptions;
 
-export type GrokImageGenOpts = {
-  model: Exclude<GrokImgGenModels, GrokImagineImgModelUnion>;
-  /**
-   *
-   * Number of images to be generated
-   *
-   *  default: 1,
-   *  max: 10
-   */
-  n?: number;
-
-  prompt: string;
-
-  /**
-   * default: `"url"`
-   *
-   * Response format to return the image in. Can be `"url"` or `"b64_json"`.
-   *
-   * If `"b64_json"` is specified, the image will be returned as a base64-encoded string instead of a url to the generated image file
-   */
-  response_format?: string | null;
-
-  /**
-   * A unique identifier representing the end-user, which can help xAI to monitor and detect abuse.
-   */
-  user?: string | null;
-};
-
 export type GrokImagineImageGenOpts = {
   model: GrokImagineImgModelUnion;
   /**
@@ -801,7 +771,7 @@ export type GrokImagineImageGenOpts = {
   respect_moderation?: string;
 };
 
-export type GrokImgGenUnionOpts = GrokImageGenOpts | GrokImagineImageGenOpts;
+export type GrokImgGenUnionOpts = GrokImagineImageGenOpts;
 
 export type ImageGenOptsByProvider = {
   openai: OpenAIImageGenOpts;
@@ -906,6 +876,12 @@ export type AIChatRequestImgGenFields = {
    * imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
    * "1K" (default); "1K" | "2K"
+   *
+   *
+   * grok-imagine-image and grok-imagine-image-pro
+   *
+   * "1k" | "2k" | null
+   *
    */
   output_quality?: string;
   /**
@@ -928,6 +904,10 @@ export type AIChatRequestImgGenFields = {
    * gemini-2.5-flash-image:
    *
    * "1:1"="1024x1024" (default) | "2:3"="832x1248" | "3:2"="1248x832" | "3:4"="864x1184" | "4:3"="1184x864" | "4:5"="896x1152" | "5:4"="1152x896" | "9:16"="768x1344" | "16:9"="1344x768" | "21:9"="1536x672"
+   *
+   * grok-imagine-image, grok-imagine-image-pro:
+   *
+   * 1:1 | "3:4" | "4:3" | "9:16" | "16:9" | "2:3" | "3:2" | "9:19.5" | "19.5:9" | "9:20" | "20:9" | "1:2" | "2:1" | "auto"
    *
    */
   output_size?: string;
@@ -1252,6 +1232,7 @@ export type GptImageAndFacilitatorsImgGenWorkupRT = {
   output_format: "jpeg" | "webp" | "png";
   output_compression: number | undefined;
   model:
+    | "gpt-5.4"
     | "gpt-5.2"
     | "gpt-5.1"
     | "gpt-image-1.5"
@@ -1263,6 +1244,7 @@ export type GptImageAndFacilitatorsImgGenWorkupRT = {
     | "gpt-4.1"
     | "gpt-5-pro"
     | "gpt-5.2-pro"
+    | "gpt-5.4-pro"
     | "gpt-5-chat-latest"
     | "gpt-4.1-mini"
     | "gpt-4.1-nano"
@@ -1293,6 +1275,8 @@ export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> = T extends "dall-e-3"
           | "gpt-5-chat-latest"
           | "gpt-5-pro"
           | "gpt-5-mini"
+          | "gpt-5.4"
+          | "gpt-5.4-pro"
           | "gpt-5.2"
           | "gpt-5.2-pro"
           | "gpt-5.1"
@@ -1345,6 +1329,11 @@ export type ImgGenWorkupRTObj = {
   "gpt-5.2": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.2-pro": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.1": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5.4": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5.4-pro": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5.3-codex": undefined;
+  "gpt-5.2-codex": undefined;
+  "gpt-5.1-codex-mini": undefined;
   o1: undefined;
   "o1-pro": undefined;
   "gpt-5.2-chat-latest": undefined;

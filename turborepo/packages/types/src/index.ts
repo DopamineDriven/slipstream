@@ -50,7 +50,6 @@ export type {
   GrokImgGenUnionOpts,
   GrokModelAspectRatio,
   GrokModelAspectRatioWorkup,
-  GrokImageGenOpts,
   ImageGenOptsByProvider,
   ImageGenPartialArr,
   ImagenOptions,

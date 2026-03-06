@@ -1,5 +1,7 @@
 export const modelIdsByProviderImgGen = {
   openai: [
+    "gpt-5.4",
+    "gpt-5.4-pro",
     "gpt-5.2",
     "gpt-5.2-pro",
     "gpt-5.1",
@@ -29,5 +31,5 @@ export const modelIdsByProviderImgGen = {
     "imagen-4.0-fast-generate-001",
     "imagen-4.0-ultra-generate-001"
   ],
-  grok: ["grok-2-image-1212", "grok-imagine-image", "grok-imagine-image-pro"]
+  grok: ["grok-imagine-image", "grok-imagine-image-pro"]
 } as const;

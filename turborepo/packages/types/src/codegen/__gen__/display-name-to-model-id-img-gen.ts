@@ -1,5 +1,7 @@
 export const displayNameToModelIdImgGen = {
   openai: {
+    "GPT-5.4": "gpt-5.4",
+    "GPT-5.4 pro": "gpt-5.4-pro",
     "GPT-5.2": "gpt-5.2",
     "GPT-5.2 pro": "gpt-5.2-pro",
     "GPT-5.1": "gpt-5.1",
@@ -31,7 +33,6 @@ export const displayNameToModelIdImgGen = {
     "Imagen 4 Ultra": "imagen-4.0-ultra-generate-001"
   },
   grok: {
-    "Grok 2 Image": "grok-2-image-1212",
     "Grok Imagine Image": "grok-imagine-image",
     "Grok Imagine Image Pro": "grok-imagine-image-pro"
   }
