@@ -31,6 +31,7 @@ import { S3Storage } from "@slipstream/storage-s3";
 export class OpenAIServiceWorkup {
   protected readonly vsCache = new Map<string, string>();
   protected readonly inflightVS = new Map<string, Promise<string>>();
+  protected nanoId: Promise<(typeof import("nanoid"))["nanoid"]>;
   private assetCache = new Map<
     string,
     { fileId: string; dbRecordId: string; lastCheckedAt: Date | null }
@@ -56,6 +57,7 @@ export class OpenAIServiceWorkup {
       apiKey: this.apiKey,
       logger: this.logger
     });
+    this.nanoId = import("nanoid").then(t => t.nanoid);
   }
   public getClient(overrideKey?: string) {
     const client = this.defaultClient;
@@ -391,7 +393,7 @@ export class OpenAIServiceWorkup {
             : "application/octet-stream";
   }
   protected async generateId(target: "itemId" | "generationGroupId") {
-    const { nanoid } = await import("nanoid");
+    const nanoid = await this.nanoId;
     if (target === "generationGroupId") {
       const generationGroupId = "resp_" + nanoid();
       return generationGroupId;
