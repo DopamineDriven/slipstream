@@ -1,820 +1,1056 @@
-# Programmatic tool calling
+# Please Read the discovery conversation between me and GPT-5.4 (CRITICAL CONTEXT)
+
+Andrew: should I try testing via a simple get weather for x location tool that a lot of provider docs (openai, anthropic) use as a simple example? eg, a tool where one round is all that's needed to test via curl?
+
+GPT: Yes — that is exactly what I’d do.
+
+A simple weather tool is a good **probe**, with one caveat:
+
+**one round is enough only to test whether v0 emits a tool call**
+**two rounds are needed to test the full continuation path**
+
+So I’d break it into phases instead of trying to prove everything at once.
+
+## Best test order
+
+### 1) First: test tool-call emission only
+
+Goal: answer these questions:
+
+* does v0 actually honor `tools`?
+* what does the returned `tool_calls` shape look like?
+* does it work in non-streaming?
+* does it work in streaming?
+
+For that, a weather tool is perfect.
+
+But I would make it **fake and deterministic**, not “real weather.”
+You don’t need an external dependency yet. You just need the model to call a function.
+
+Something like:
+
+```json
+{
+  "type": "function",
+  "function": {
+    "name": "get_weather",
+    "description": "Get the current weather for a location.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "location": { "type": "string" }
+      },
+      "required": ["location"],
+      "additionalProperties": false
+    }
+  }
+}
+```
+
+And prompt it with something brutally obvious like:
+
+> What is the weather in Chicago right now? Use the provided tool.
+
+That isolates tool calling from your memory-store work.
+
+## 2) Use non-streaming before streaming
+
+Because their docs are flimsy and vibes-based, I’d test non-streaming first.
+
+Why:
+
+* easier to inspect exact JSON
+* easier to confirm `tool_calls`
+* easier to confirm assistant message shape
+
+Then do the same with `stream: true` and inspect SSE chunk anatomy.
+
+That way if streaming is weird, you already know whether the base tool behavior works at all.
+
+## 3) Force the tool if possible
+
+Since the docs say `tool_choice` can be string or object but don’t show examples, I’d try the most explicit version first.
+
+Try one of these:
+
+```json
+"tool_choice": "required"
+```
+
+If that works, great.
+
+Then try the more specific object form if supported, like OpenAI-style:
+
+```json
+"tool_choice": {
+  "type": "function",
+  "function": { "name": "get_weather" }
+}
+```
+
+Because the docs are vague, I would not assume both work. Test both.
+
+## 4) Separate the two goals clearly
+
+### Goal A: “Does v0 call tools?”
+
+One request is enough.
+
+You only need to see whether the response includes a tool call.
+
+### Goal B: “Can I implement the full loop?”
+
+That requires:
+
+1. request with tool definition
+2. model returns tool call
+3. you send assistant tool-call message + tool result message
+4. model continues and answers
+
+That is the real integration test.
+
+So yes, weather is a great first test — just don’t mistake “it emitted a tool call once” for “tooling is fully wired.”
+
+## What I’d avoid
+
+I would not start with your actual `file_search` tool first.
+
+That mixes together:
+
+* provider tool support
+* your parser
+* your continuation logic
+* your vector search execution
+* result truncation/dedupe
+* prompt policy
+
+Too many moving pieces. If it fails, you learn nothing except that entropy remains undefeated.
+
+Weather is good because it’s dumb and clean.
+
+## My recommended test ladder
+
+Start here:
+
+1. **non-streaming + fake weather tool + required tool choice**
+2. **streaming + fake weather tool**
+3. inspect whether tool deltas appear in chunks
+4. test a second request with a fake tool result
+5. only then swap in `file_search`
+
+## Tiny extra improvement
+
+I’d actually make the first tool even dumber than weather.
+
+Something like:
+
+* `echo_location`
+* input: `{ "location": "Chicago" }`
+* description: “Echo the provided location.”
+
+Why? Because weather is such a familiar doc example that some providers weirdly optimize around it or answer from priors instead of cleanly calling the tool unless forced. An absurdly mechanical tool makes the test cleaner.
+
+So my actual preference is:
+
+* **first probe:** `echo_location`
+* **second probe:** `get_weather`
+* **third probe:** `file_search`
+
+That gives you a clean gradient from “can it call any tool at all?” to “can it do realistic tool use?”
+
+So yes — do it. That’s the right move. Just remember: one round proves tool-call emission; two rounds prove the real loop.
+
+
+Andrew: 
+
+based on this curl 
+
+```bash
+curl https://api.v0.dev/v1/chat/completions \
+  -H "Authorization: Bearer $V0_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "v0-1.5-md",
+    "stream": true,
+    "max_completion_tokens": 32000,
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": "https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1766680330907-slipstream-simplified-overview-big-picture-scaled.jpg",
+              "detail": "auto"
+            }
+          },
+          {
+            "type": "text",
+            "text": "Based on the attached archtiectural diagram, how hard do you think configuring parallelized prompting (targeting two or more provider/models with the same user prompt simultaneously) would be?"
+          }
+        ]
+      }
+    ]
+  }' \
+  --no-buffer \
+  >v0-1-5-md-01.txt
+```
+
+which works well, how can I modify for the tool test?
+
+
+GPT:
+
+Yes — start from your working curl, but for the **first tool probe** I’d actually remove the image and keep it brutally simple.
+
+You’re trying to answer one question first:
+
+**Will v0 emit a tool call at all?**
+
+So I’d begin with a forced weather tool in **non-streaming** mode.
+
+### 1) First probe: non-streaming, forced tool call
+
+```bash
+curl https://api.v0.dev/v1/chat/completions \
+  -H "Authorization: Bearer $V0_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "v0-1.5-md",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the current weather in Chicago, IL? Use the provided tool."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_weather",
+          "description": "Get the current weather for a location.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "City and state, e.g. Chicago, IL"
+              }
+            },
+            "required": ["location"],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "tool_choice": "required",
+    "max_completion_tokens": 4000
+  }'
+```
+
+What you want back is some form of assistant message containing `tool_calls`.
+
+If v0 ignores `"required"`, then try the more explicit object form:
+
+```bash
+curl https://api.v0.dev/v1/chat/completions \
+  -H "Authorization: Bearer $V0_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "v0-1.5-md",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the current weather in Chicago, IL? Use the provided tool."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_weather",
+          "description": "Get the current weather for a location.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string"
+              }
+            },
+            "required": ["location"],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "tool_choice": {
+      "type": "function",
+      "function": {
+        "name": "get_weather"
+      }
+    },
+    "max_completion_tokens": 4000
+  }'
+```
+
+### 2) Then probe streaming tool deltas
+
+Once non-streaming shows a tool call, switch to `stream: true` and inspect the SSE output:
+
+```bash
+curl https://api.v0.dev/v1/chat/completions \
+  -H "Authorization: Bearer $V0_API_KEY" \
+  -H "Content-Type: application/json" \
+  --no-buffer \
+  -d '{
+    "model": "v0-1.5-md",
+    "stream": true,
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the current weather in Chicago, IL? Use the provided tool."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_weather",
+          "description": "Get the current weather for a location.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string"
+              }
+            },
+            "required": ["location"],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "tool_choice": "required",
+    "max_completion_tokens": 4000
+  }' \
+  > v0-tool-stream.txt
+```
+
+Now grep for `tool_calls`:
+
+```bash
+grep -n "tool_calls" v0-tool-stream.txt
+```
+
+That tells you whether the stream emits tool-call deltas at all.
+
+### 3) Then test the continuation round
+
+This is the real test: can you send the tool result back and get a final answer?
+
+Assuming the first response returned something like:
+
+* tool call id: `call_abc123`
+* function name: `get_weather`
+* arguments: `{"location":"Chicago, IL"}`
+
+then the second request should look like this:
+
+```bash
+curl https://api.v0.dev/v1/chat/completions \
+  -H "Authorization: Bearer $V0_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "v0-1.5-md",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the current weather in Chicago, IL? Use the provided tool."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_abc123",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": "{\"location\":\"Chicago, IL\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_abc123",
+        "content": "{\"location\":\"Chicago, IL\",\"temperature_f\":72,\"condition\":\"Sunny\"}"
+      }
+    ],
+    "max_completion_tokens": 4000
+  }'
+```
+
+If that works, then you’ve proven:
+
+* tool definitions are accepted
+* tool calls are emitted
+* continuation format is accepted
+* tool results are consumed correctly
+
+Which is the whole game.
+
+### 4) One tweak I’d make for a cleaner first probe
+
+A weather tool is fine, but models sometimes answer weather-ish questions from priors unless you bully them a bit. So I’d tighten the user prompt to:
+
+```text
+Answer only after calling the provided get_weather tool.
+```
+
+Like this:
+
+```json
+"content": "What is the current weather in Chicago, IL? Answer only after calling the provided get_weather tool."
+```
+
+That reduces freelancing.
+
+### 5) If you want the dumbest possible test
+
+This is even cleaner than weather:
+
+```json
+{
+  "name": "echo_location",
+  "description": "Echo the exact provided location string.",
+  ...
+}
+```
+
+Because then there’s zero temptation for the model to improvise.
+
+But weather is a perfectly good first probe if you force tool usage.
+
+My recommendation: run the non-streaming version first. The first thing you need from v0 is not wisdom — it’s a confession.
+
+
+Andrew:
+
+okay so this curl request:
+
+```bash
+
+curl https://api.v0.dev/v1/chat/completions \
+  -H "Authorization: Bearer $V0_API_KEY" \
+  -H "Content-Type: application/json" \
+  --no-buffer \
+  -d '{
+    "model": "v0-1.5-md",
+    "stream": true,
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the current weather in Chicago, IL? Use the provided tool."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_weather",
+          "description": "Get the current weather for a location.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string"
+              }
+            },
+            "required": ["location"],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "tool_choice": "required",
+    "max_completion_tokens": 4000
+  }' \
+  > v0-tool-stream.txt
+```
+
+returned this output:
+
+
+```txt
+data: {"id":"v0-TuLFRKlIJHMnNRo39P2BrlsQMdws1nRU","object":"chat.completion.chunk","created":1772952749613,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-m0pAOSTvvxTCF8SeDW4rz6Qq5kAIbVP7","choices":[{"index":0,"delta":{"role":"assistant","content":null,"tool_calls":[{"index":0,"id":"toolu_01BAdjJCZR8DCcaXeqPRvZup","type":"function","function":{"name":"get_weather","arguments":""}}],"refusal":null},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-TuLFRKlIJHMnNRo39P2BrlsQMdws1nRU","object":"chat.completion.chunk","created":1772952749614,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-m0pAOSTvvxTCF8SeDW4rz6Qq5kAIbVP7","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":""}}]},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-TuLFRKlIJHMnNRo39P2BrlsQMdws1nRU","object":"chat.completion.chunk","created":1772952749903,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-m0pAOSTvvxTCF8SeDW4rz6Qq5kAIbVP7","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"{\"lo"}}]},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-TuLFRKlIJHMnNRo39P2BrlsQMdws1nRU","object":"chat.completion.chunk","created":1772952749906,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-m0pAOSTvvxTCF8SeDW4rz6Qq5kAIbVP7","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"ca"}}]},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-TuLFRKlIJHMnNRo39P2BrlsQMdws1nRU","object":"chat.completion.chunk","created":1772952749907,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-m0pAOSTvvxTCF8SeDW4rz6Qq5kAIbVP7","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"tion\": "}}]},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-TuLFRKlIJHMnNRo39P2BrlsQMdws1nRU","object":"chat.completion.chunk","created":1772952749908,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-m0pAOSTvvxTCF8SeDW4rz6Qq5kAIbVP7","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"\"Chicago, I"}}]},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-TuLFRKlIJHMnNRo39P2BrlsQMdws1nRU","object":"chat.completion.chunk","created":1772952749910,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-m0pAOSTvvxTCF8SeDW4rz6Qq5kAIbVP7","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"L\"}"}}]},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-TuLFRKlIJHMnNRo39P2BrlsQMdws1nRU","object":"chat.completion.chunk","created":1772952749933,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-m0pAOSTvvxTCF8SeDW4rz6Qq5kAIbVP7","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"tool_calls"}],"usage":{"prompt_tokens":2792,"completion_tokens":56,"total_tokens":2848}}
+```
+
+GPT:
+
+Beautiful. This is the smoking gun.
+
+You’ve now proven that v0’s tool calling is real, and the stream shape is much clearer than the docs deserve.
+
+## What this proves
+
+### 1) v0 does support streamed function calling
+
+It emits `delta.tool_calls` incrementally, exactly the thing you needed to verify.
+
+### 2) Tool arguments are streamed in fragments
+
+The arguments came through in pieces:
+
+```txt
+{"lo
+ca
+tion":
+"Chicago, I
+L"}
+```
+
+So your accumulator absolutely needs to concatenate `function.arguments` across chunks by `tool_calls[index]`.
+
+### 3) `finish_reason` is useless for normal text, but **not** useless for tool calls
+
+This is the big update.
+
+For plain text completions, you observed `finish_reason` staying `null` until the terminal usage chunk.
+
+But here, the final chunk is:
+
+```json id="xtm14g"
+{
+  "choices": [
+    {
+      "index": 0,
+      "delta": {},
+      "logprobs": null,
+      "finish_reason": "tool_calls"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 2792,
+    "completion_tokens": 56,
+    "total_tokens": 2848
+  }
+}
+```
+
+So the real rule is:
+
+* **normal text completion:** rely on terminal usage chunk
+* **tool call completion:** `finish_reason: "tool_calls"` may actually appear
+
+So your runtime should treat `finish_reason` as **conditionally meaningful**, not universally meaningless.
+
+### 4) The first delta includes extra fields your current types don’t model
+
+This first chunk includes:
+
+* `role: "assistant"`
+* `content: null`
+* `tool_calls`
+* `refusal: null`
+
+So your current v0 delta type is definitely too narrow.
+
+## What your parser/types should allow now
+
+At minimum, your `delta` type should tolerate this shape:
+
+```ts id="mhs6yn"
+type V0ToolCallDelta = {
+  index: number;
+  id?: string;
+  type?: "function";
+  function?: {
+    name?: string;
+    arguments?: string;
+  };
+};
+
+type V0Delta = Partial<{
+  role: "assistant";
+  content: string | null;
+  reasoning_content: string;
+  refusal: string | null;
+  tool_calls: V0ToolCallDelta[];
+}>;
+```
+
+And finish reason should be widened:
+
+```ts id="v5xzep"
+type V0FinishReason = "stop" | "length" | "tool_calls" | "content_filter" | null;
+```
+
+That’s much closer to reality now.
+
+## The accumulator logic you need
+
+This is basically the core of the streamed tool-call path:
+
+```ts id="sekegv"
+for (const choice of chunk.choices ?? []) {
+  const delta = choice.delta;
+
+  if (Array.isArray(delta.tool_calls)) {
+    for (const tc of delta.tool_calls) {
+      const acc = toolCalls.get(tc.index) ?? {
+        id: "",
+        name: "",
+        arguments: ""
+      };
+
+      if (tc.id) acc.id = tc.id;
+      if (tc.function?.name) acc.name = tc.function.name;
+      if (tc.function?.arguments) acc.arguments += tc.function.arguments;
+
+      toolCalls.set(tc.index, acc);
+    }
+  }
+
+  if (choice.finish_reason === "tool_calls") {
+    sawToolCallFinish = true;
+  }
+}
+```
+
+That output you captured is exactly why this has to exist.
+
+## Weird but useful detail
+
+The tool call id is:
+
+```txt id="rl3iqc"
+toolu_01BAdjJCZR8DCcaXeqPRvZup
+```
+
+That’s interesting because it looks more Anthropic-ish than OpenAI-ish, but the surrounding payload is still OpenAI-style chat completions.
+
+So the safest rule is:
+**don’t assume ID format means anything**
+just pass it through exactly.
+
+## You now have enough to test the second round
+
+This is the next real test: continuation after tool execution.
+
+Based on your observed stream, the second request should look like this:
+
+```bash
+curl https://api.v0.dev/v1/chat/completions \
+  -H "Authorization: Bearer $V0_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "v0-1.5-md",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the current weather in Chicago, IL? Use the provided tool."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01BAdjJCZR8DCcaXeqPRvZup",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": "{\"location\":\"Chicago, IL\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "toolu_01BAdjJCZR8DCcaXeqPRvZup",
+        "content": "{\"location\":\"Chicago, IL\",\"temperature_f\":72,\"condition\":\"Sunny\"}"
+      }
+    ],
+    "max_completion_tokens": 4000
+  }'
+```
+
+That request will tell you whether v0 accepts the standard assistant-tool_call + tool-result continuation format.
+
+If it does, you’re basically done proving the integration model.
+
+## Net result
+
+This test answered a lot:
+
+* yes, tools work
+* yes, streamed tool-call deltas work
+* yes, arguments are chunked
+* yes, `finish_reason: "tool_calls"` can appear
+* yes, your current v0 types are too skinny
+
+So the architecture is no longer hypothetical. It’s real enough to wire.
+
+The next boss fight is just:
+**does round-two continuation work cleanly?**
+
+That’s the test I’d run next.
+
+
+Andrew:
+
+yes this works!
+
+
+```bash
+  curl https://api.v0.dev/v1/chat/completions \
+  -H "Authorization: Bearer $V0_API_KEY" \
+  -H "Content-Type: application/json" \
+  --no-buffer \
+  -d '{
+    "model": "v0-1.5-md",
+    "stream": true,
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the current weather in Chicago, IL? Use the provided tool."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01BAdjJCZR8DCcaXeqPRvZup",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": "{\"location\":\"Chicago, IL\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "toolu_01BAdjJCZR8DCcaXeqPRvZup",
+        "content": "{\"location\":\"Chicago, IL\",\"temperature_f\":37,\"condition\":\"Cloudy\"}"
+      }
+    ],
+    "max_completion_tokens": 4000
+  }' \
+  >v0-tool-stream-2.txt
+
+```
+
+
+(I updated it to 37F and Cloudy, the current weather in Chicago)
+
+```txt
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953122275,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":"Here"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953122690,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" is"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953122705,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" the current weather for"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953122709,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" **"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953122712,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":"Chicago, IL**:\n\n-"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953122716,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" "},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953122717,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":"🌡"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953122720,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":"️ **Temperature:** 37°"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953122720,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":"F\n- 🌥"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123177,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":"️ **Condition:** Clou"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123209,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":"dy"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123221,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":"\n\nIt"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123226,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":"'s"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123229,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" a"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123230,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" cold"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123231,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" and"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123231,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" cloudy day in Chicago!"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123433,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" Make"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123438,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" sure to bundle"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123438,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" up if"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123439,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" you're heading"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123440,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":" outside"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123445,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[{"index":0,"delta":{"content":"."},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"v0-xsu98v1iLKGQ6DlR3m1sMPzTM4IYyTBH","object":"chat.completion.chunk","created":1772953123458,"model":"v0-1.5-md","service_tier":"default","system_fingerprint":"fp-YDuQoeS0zwFxb3uI1YeIamUb7JbdtlW3","choices":[],"usage":{"prompt_tokens":2320,"completion_tokens":68,"total_tokens":2388}}
+```
+
+GPT:
+
+Hell yes. That’s the proof you needed.
+
+You’ve now established the **full v0 tool loop contract** well enough to wire it with confidence.
+
+## What you’ve proven
+
+### Round 1: tool invocation
+
+v0 accepts:
+
+* `tools`
+* `tool_choice`
+* streamed tool-call deltas
+* fragmented `function.arguments`
+* terminal `finish_reason: "tool_calls"`
+
+### Round 2: tool continuation
+
+v0 also accepts the standard continuation shape:
+
+* prior `user` message
+* `assistant` message containing `tool_calls`
+* `tool` message containing `tool_call_id` + `content`
+
+and then streams a normal assistant response back.
+
+That is the whole mechanism. No longer hypothetical, no longer “docs imply.” It works.
+
+## The actual observed contract
+
+At this point I’d treat v0’s streaming behavior as:
+
+### Normal text completion
+
+* content streams via `choices[0].delta.content`
+* `finish_reason` stays `null`
+* terminal frame is:
+
+  * `choices: []`
+  * `usage: {...}`
+
+### Tool call completion
+
+* tool calls stream via `choices[0].delta.tool_calls`
+* `function.arguments` arrive in chunks and must be concatenated
+* terminal tool frame is:
+
+  * `finish_reason: "tool_calls"`
+  * plus `usage`
+
+### Continuation after tool result
+
+* accepted with standard OpenAI-style chat-completions message history
+
+That’s enough to build against.
+
+## What I would change in your code now
+
+### 1) Widen the v0 delta model
+
+Your current v0 SSE types are too skinny.
+
+You now know `delta` can include:
+
+```ts
+type V0ToolCallDelta = {
+  index: number;
+  id?: string;
+  type?: "function";
+  function?: {
+    name?: string;
+    arguments?: string;
+  };
+};
+
+type V0Delta = Partial<{
+  role: "assistant";
+  content: string | null;
+  reasoning_content: string;
+  refusal: string | null;
+  tool_calls: V0ToolCallDelta[];
+}>;
+```
+
+And finish reason should no longer be typed as only `null`:
+
+```ts
+type V0FinishReason = "stop" | "length" | "tool_calls" | "content_filter" | null;
+```
+
+### 2) Stop treating `finish_reason` as always worthless
+
+The refined rule is:
+
+* for **normal text**, don’t rely on it
+* for **tool calls**, do pay attention to `"tool_calls"`
+
+So your runtime should be something like:
+
+```ts
+const isTerminalUsageChunk =
+  Array.isArray(chunk.choices) &&
+  chunk.choices.length === 0 &&
+  chunk.usage !== undefined;
+```
+
+plus:
+
+```ts
+const sawToolCallFinish = chunk.choices?.some(
+  c => c.finish_reason === "tool_calls"
+) ?? false;
+```
+
+### 3) Add a tool-call accumulator
+
+You now know for sure you need to accumulate by `index`, merging:
+
+* `id`
+* `function.name`
+* `function.arguments += ...`
+
+That’s mandatory, not optional.
+
+### 4) Keep the continuation format exactly as proven
+
+Do not get clever here. Use the exact accepted shape:
+
+```ts
+{
+  role: "assistant",
+  content: "",
+  tool_calls: [
+    {
+      id,
+      type: "function",
+      function: {
+        name,
+        arguments
+      }
+    }
+  ]
+},
+{
+  role: "tool",
+  tool_call_id: id,
+  content: toolResultJson
+}
+```
+
+v0 has now signed that contract in blood.
+
+### 5) Replace the “no tools” prompt with the narrower version
+
+Given the old phantom-internal-tool behavior, I’d keep the warning but tighten it to:
+
+* only use explicitly provided tools
+* never use internal/undeclared Vercel tools
+* use `file_search` sparingly
+
+That keeps the guardrail without blocking your local retrieval.
+
+## What this means for `file_search`
+
+At this point, wiring `file_search` is basically just a substitution exercise:
+
+* `get_weather` becomes `file_search`
+* parsed input becomes your batched search input
+* tool result becomes JSON search results from `UserStoreVectorService`
+
+So the path is now:
+
+1. inject `userStore` into `v0Service`
+2. widen `src/vercel/sse.ts`
+3. preserve tool deltas in `src/vercel/index.ts`
+4. add tool-call accumulator
+5. add continuation loop
+6. swap weather tool for local `file_search`
+
+## One subtle implementation note
+
+For round completion, I’d use a decision tree like this:
+
+```ts
+if (sawToolCalls && sawToolCallFinish) {
+  // execute tool(s), continue
+} else if (isTerminalUsageChunk && !sawToolCalls) {
+  // normal final response
+}
+```
+
+And I would not require `finish_reason === "tool_calls"` in every possible future case if you already accumulated tool calls and the stream reached a terminal state. Providers get weird. Defensive coding beats pious optimism.
+
+## Net result
+
+This is the milestone.
+
+You’ve proven:
+
+* multimodal works
+* tool calling works
+* streamed tool deltas work
+* continuation works
+
+So now you can stop reverse-engineering whether v0 is capable and start implementing the real adapter.
+
+The weather probe did its job. Time to replace the toy screwdriver with the actual `file_search` wrench.
 
 ---
 
-Programmatic tool calling allows Claude to write code that calls your tools programmatically within a [code execution](/docs/en/agents-and-tools/tool-use/code-execution-tool) container, rather than requiring round trips through the model for each tool invocation. This reduces latency for multi-tool workflows and decreases token consumption by allowing Claude to filter or process data before it reaches the model's context window.
+ADDITIONAL ASIDE:
 
-<Note>
-This feature requires the code execution tool to be enabled.
-</Note>
+```bash
+v0 also accepts images via the following format:
 
-<Note>
-This feature is **not** covered by [Zero Data Retention (ZDR)](/docs/en/build-with-claude/zero-data-retention) arrangements. Data is retained according to the feature's standard retention policy.
-</Note>
-
-## Model compatibility
-
-Programmatic tool calling is available on the following models:
-
-| Model | Tool Version |
-|-------|--------------|
-| Claude Opus 4.6 (`claude-opus-4-6`) | `code_execution_20250825` |
-| Claude Sonnet 4.6 (`claude-sonnet-4-6`) | `code_execution_20250825` |
-| Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`) | `code_execution_20250825` |
-| Claude Opus 4.5 (`claude-opus-4-5-20251101`) | `code_execution_20250825` |
-
-<Warning>
-Programmatic tool calling is available via the Claude API and Microsoft Foundry.
-</Warning>
-
-## Quick start
-
-Here's a simple example where Claude programmatically queries a database multiple times and aggregates results:
-
-<CodeGroup>
-```bash Shell
-curl https://api.anthropic.com/v1/messages \
-    --header "x-api-key: $ANTHROPIC_API_KEY" \
-    --header "anthropic-version: 2023-06-01" \
-    --header "content-type: application/json" \
-    --data '{
-        "model": "claude-opus-4-6",
-        "max_tokens": 4096,
-        "messages": [
-            {
-                "role": "user",
-                "content": "Query sales data for the West, East, and Central regions, then tell me which region had the highest revenue"
-            }
-        ],
-        "tools": [
-            {
-                "type": "code_execution_20250825",
-                "name": "code_execution"
-            },
-            {
-                "name": "query_database",
-                "description": "Execute a SQL query against the sales database. Returns a list of rows as JSON objects.",
-                "input_schema": {
-                    "type": "object",
-                    "properties": {
-                        "sql": {
-                            "type": "string",
-                            "description": "SQL query to execute"
-                        }
-                    },
-                    "required": ["sql"]
-                },
-                "allowed_callers": ["code_execution_20250825"]
-            }
-        ]
-    }'
-```
-
-```python Python
-import anthropic
-
-client = anthropic.Anthropic()
-
-response = client.messages.create(
-    model="claude-opus-4-6",
-    max_tokens=4096,
-    messages=[
-        {
-            "role": "user",
-            "content": "Query sales data for the West, East, and Central regions, then tell me which region had the highest revenue",
-        }
-    ],
-    tools=[
-        {"type": "code_execution_20250825", "name": "code_execution"},
-        {
-            "name": "query_database",
-            "description": "Execute a SQL query against the sales database. Returns a list of rows as JSON objects.",
-            "input_schema": {
-                "type": "object",
-                "properties": {
-                    "sql": {"type": "string", "description": "SQL query to execute"}
-                },
-                "required": ["sql"],
-            },
-            "allowed_callers": ["code_execution_20250825"],
-        },
-    ],
-)
-
-print(response)
-```
-
-```typescript TypeScript
-import { Anthropic } from "@anthropic-ai/sdk";
-
-const anthropic = new Anthropic();
-
-async function main() {
-  const response = await anthropic.messages.create({
-    model: "claude-opus-4-6",
-    max_tokens: 4096,
-    messages: [
+curl https://api.v0.dev/v1/chat/completions \
+  -H "Authorization: Bearer $V0_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "v0-1.5-md",
+    "stream": true,
+    "max_completion_tokens": 32000,
+    "messages": [
       {
-        role: "user",
-        content: "Query sales data for the West, East, and Central regions, then tell me which region had the highest revenue"
-      }
-    ],
-    tools: [
-      {
-        type: "code_execution_20250825",
-        name: "code_execution"
-      },
-      {
-        name: "query_database",
-        description: "Execute a SQL query against the sales database. Returns a list of rows as JSON objects.",
-        input_schema: {
-          type: "object",
-          properties: {
-            sql: {
-              type: "string",
-              description: "SQL query to execute"
+        "role": "user",
+        "content": [
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": "https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1766680330907-slipstream-simplified-overview-big-picture-scaled.jpg",
+              "detail": "auto"
             }
           },
-          required: ["sql"]
-        },
-        allowed_callers: ["code_execution_20250825"]
+          {
+            "type": "text",
+            "text": "Based on the attached archtiectural diagram, how hard do you think configuring parallelized prompting (targeting two or more provider/models with the same user prompt simultaneously) would be?"
+          }
+        ]
       }
     ]
-  });
-
-  console.log(response);
-}
-
-main().catch(console.error);
-```
-</CodeGroup>
-
-## How programmatic tool calling works
-
-When you configure a tool to be callable from code execution and Claude decides to use that tool:
-
-1. Claude writes Python code that invokes the tool as a function, potentially including multiple tool calls and pre/post-processing logic
-2. Claude runs this code in a sandboxed container via code execution
-3. When a tool function is called, code execution pauses and the API returns a `tool_use` block
-4. You provide the tool result, and code execution continues (intermediate results are not loaded into Claude's context window)
-5. Once all code execution completes, Claude receives the final output and continues working on the task
-
-This approach is particularly useful for:
-- **Large data processing**: Filter or aggregate tool results before they reach Claude's context
-- **Multi-step workflows**: Save tokens and latency by calling tools serially or in a loop without sampling Claude in-between tool calls
-- **Conditional logic**: Make decisions based on intermediate tool results
-
-<Note>
-Custom tools are converted to async Python functions to support parallel tool calling. When Claude writes code that calls your tools, it uses `await` (e.g., `result = await query_database("<sql>")`) and automatically includes the appropriate async wrapper function.
-
-The async wrapper is omitted from code examples in this documentation for clarity.
-</Note>
-
-## Core concepts
-
-### The `allowed_callers` field
-
-The `allowed_callers` field specifies which contexts can invoke a tool:
-
-```json
-{
-  "name": "query_database",
-  "description": "Execute a SQL query against the database",
-  "input_schema": {...},
-  "allowed_callers": ["code_execution_20250825"]
-}
-```
-
-**Possible values:**
-- `["direct"]` - Only Claude can call this tool directly (default if omitted)
-- `["code_execution_20250825"]` - Only callable from within code execution
-- `["direct", "code_execution_20250825"]` - Callable both directly and from code execution
-
-<Tip>
-Choose either `["direct"]` or `["code_execution_20250825"]` for each tool rather than enabling both, as this provides clearer guidance to Claude for how best to use the tool.
-</Tip>
-
-### The `caller` field in responses
-
-Every tool use block includes a `caller` field indicating how it was invoked:
-
-**Direct invocation (traditional tool use):**
-```json
-{
-  "type": "tool_use",
-  "id": "toolu_abc123",
-  "name": "query_database",
-  "input": {"sql": "<sql>"},
-  "caller": {"type": "direct"}
-}
-```
-
-**Programmatic invocation:**
-```json
-{
-  "type": "tool_use",
-  "id": "toolu_xyz789",
-  "name": "query_database",
-  "input": {"sql": "<sql>"},
-  "caller": {
-    "type": "code_execution_20250825",
-    "tool_id": "srvtoolu_abc123"
-  }
-}
-```
-
-The `tool_id` references the code execution tool that made the programmatic call.
-
-### Container lifecycle
-
-Programmatic tool calling uses the same containers as code execution:
-
-- **Container creation**: A new container is created for each session unless you reuse an existing one
-- **Expiration**: Containers expire after approximately 4.5 minutes of inactivity (subject to change)
-- **Container ID**: Returned in responses via the `container` field
-- **Reuse**: Pass the container ID to maintain state across requests
-
-<Warning>
-When a tool is called programmatically and the container is waiting for your tool result, you must respond before the container expires. Monitor the `expires_at` field. If the container expires, Claude may treat the tool call as timed out and retry it.
-</Warning>
-
-## Example workflow
-
-Here's how a complete programmatic tool calling flow works:
-
-### Step 1: Initial request
-
-Send a request with code execution and a tool that allows programmatic calling. To enable programmatic calling, add the `allowed_callers` field to your tool definition.
-
-<Note>
-Provide detailed descriptions of your tool's output format in the tool description. If you specify that the tool returns JSON, Claude will attempt to deserialize and process the result in code. The more detail you provide about the output schema, the better Claude can handle the response programmatically.
-</Note>
-
-<CodeGroup>
-```python Python
-response = client.messages.create(
-    model="claude-opus-4-6",
-    max_tokens=4096,
-    messages=[
-        {
-            "role": "user",
-            "content": "Query customer purchase history from the last quarter and identify our top 5 customers by revenue",
-        }
-    ],
-    tools=[
-        {"type": "code_execution_20250825", "name": "code_execution"},
-        {
-            "name": "query_database",
-            "description": "Execute a SQL query against the sales database. Returns a list of rows as JSON objects.",
-            "input_schema": {...},
-            "allowed_callers": ["code_execution_20250825"],
-        },
-    ],
-)
-```
-
-```typescript TypeScript
-const response = await anthropic.messages.create({
-  model: "claude-opus-4-6",
-  max_tokens: 4096,
-  messages: [{
-    role: "user",
-    content: "Query customer purchase history from the last quarter and identify our top 5 customers by revenue"
-  }],
-  tools: [
-    {
-      type: "code_execution_20250825",
-      name: "code_execution"
-    },
-    {
-      name: "query_database",
-      description: "Execute a SQL query against the sales database. Returns a list of rows as JSON objects.",
-      input_schema: { /* ... */ },
-      allowed_callers: ["code_execution_20250825"]
-    }
-  ]
-});
-```
-</CodeGroup>
-
-### Step 2: API response with tool call
-
-Claude writes code that calls your tool. The API pauses and returns:
-
-```json
-{
-  "role": "assistant",
-  "content": [
-    {
-      "type": "text",
-      "text": "I'll query the purchase history and analyze the results."
-    },
-    {
-      "type": "server_tool_use",
-      "id": "srvtoolu_abc123",
-      "name": "code_execution",
-      "input": {
-        "code": "results = await query_database('<sql>')\ntop_customers = sorted(results, key=lambda x: x['revenue'], reverse=True)[:5]\nprint(f'Top 5 customers: {top_customers}')"
-      }
-    },
-    {
-      "type": "tool_use",
-      "id": "toolu_def456",
-      "name": "query_database",
-      "input": {"sql": "<sql>"},
-      "caller": {
-        "type": "code_execution_20250825",
-        "tool_id": "srvtoolu_abc123"
-      }
-    }
-  ],
-  "container": {
-    "id": "container_xyz789",
-    "expires_at": "2025-01-15T14:30:00Z"
-  },
-  "stop_reason": "tool_use"
-}
-```
-
-### Step 3: Provide tool result
-
-Include the full conversation history plus your tool result:
-
-<CodeGroup>
-```python Python
-response = client.messages.create(
-    model="claude-opus-4-6",
-    max_tokens=4096,
-    container="container_xyz789",  # Reuse the container
-    messages=[
-        {
-            "role": "user",
-            "content": "Query customer purchase history from the last quarter and identify our top 5 customers by revenue",
-        },
-        {
-            "role": "assistant",
-            "content": [
-                {
-                    "type": "text",
-                    "text": "I'll query the purchase history and analyze the results.",
-                },
-                {
-                    "type": "server_tool_use",
-                    "id": "srvtoolu_abc123",
-                    "name": "code_execution",
-                    "input": {"code": "..."},
-                },
-                {
-                    "type": "tool_use",
-                    "id": "toolu_def456",
-                    "name": "query_database",
-                    "input": {"sql": "<sql>"},
-                    "caller": {
-                        "type": "code_execution_20250825",
-                        "tool_id": "srvtoolu_abc123",
-                    },
-                },
-            ],
-        },
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "tool_result",
-                    "tool_use_id": "toolu_def456",
-                    "content": '[{"customer_id": "C1", "revenue": 45000}, {"customer_id": "C2", "revenue": 38000}, ...]',
-                }
-            ],
-        },
-    ],
-    tools=[...],
-)
-```
-
-```typescript TypeScript
-const response = await anthropic.messages.create({
-  model: "claude-opus-4-6",
-  max_tokens: 4096,
-  container: "container_xyz789", // Reuse the container
-  messages: [
-    { role: "user", content: "Query customer purchase history from the last quarter and identify our top 5 customers by revenue" },
-    {
-      role: "assistant",
-      content: [
-        { type: "text", text: "I'll query the purchase history and analyze the results." },
-        {
-          type: "server_tool_use",
-          id: "srvtoolu_abc123",
-          name: "code_execution",
-          input: { code: "..." }
-        },
-        {
-          type: "tool_use",
-          id: "toolu_def456",
-          name: "query_database",
-          input: { sql: "<sql>" },
-          caller: {
-            type: "code_execution_20250825",
-            tool_id: "srvtoolu_abc123"
-          }
-        }
-      ]
-    },
-    {
-      role: "user",
-      content: [
-        {
-          type: "tool_result",
-          tool_use_id: "toolu_def456",
-          content: "[{\"customer_id\": \"C1\", \"revenue\": 45000}, {\"customer_id\": \"C2\", \"revenue\": 38000}, ...]"
-        }
-      ]
-    }
-  ],
-  tools: [/* ... */]
-});
-```
-</CodeGroup>
-
-### Step 4: Next tool call or completion
-
-The code execution continues and processes the results. If additional tool calls are needed, repeat Step 3 until all tool calls are satisfied.
-
-### Step 5: Final response
-
-Once the code execution completes, Claude provides the final response:
-
-```json
-{
-  "content": [
-    {
-      "type": "code_execution_tool_result",
-      "tool_use_id": "srvtoolu_abc123",
-      "content": {
-        "type": "code_execution_result",
-        "stdout": "Top 5 customers by revenue:\n1. Customer C1: $45,000\n2. Customer C2: $38,000\n3. Customer C5: $32,000\n4. Customer C8: $28,500\n5. Customer C3: $24,000",
-        "stderr": "",
-        "return_code": 0,
-        "content": []
-      }
-    },
-    {
-      "type": "text",
-      "text": "I've analyzed the purchase history from last quarter. Your top 5 customers generated $167,500 in total revenue, with Customer C1 leading at $45,000."
-    }
-  ],
-  "stop_reason": "end_turn"
-}
-```
-
-## Advanced patterns
-
-### Batch processing with loops
-
-Claude can write code that processes multiple items efficiently:
-
-```python
-# async wrapper omitted for clarity
-regions = ["West", "East", "Central", "North", "South"]
-results = {}
-for region in regions:
-    data = await query_database(f"<sql for {region}>")
-    results[region] = sum(row["revenue"] for row in data)
-
-# Process results programmatically
-top_region = max(results.items(), key=lambda x: x[1])
-print(f"Top region: {top_region[0]} with ${top_region[1]:,} in revenue")
-```
-
-This pattern:
-- Reduces model round-trips from N (one per region) to 1
-- Processes large result sets programmatically before returning to Claude
-- Saves tokens by only returning aggregated conclusions instead of raw data
-
-### Early termination
-
-Claude can stop processing as soon as success criteria are met:
-
-```python
-# async wrapper omitted for clarity
-endpoints = ["us-east", "eu-west", "apac"]
-for endpoint in endpoints:
-    status = await check_health(endpoint)
-    if status == "healthy":
-        print(f"Found healthy endpoint: {endpoint}")
-        break  # Stop early, don't check remaining
-```
-
-### Conditional tool selection
-
-```python
-# async wrapper omitted for clarity
-file_info = await get_file_info(path)
-if file_info["size"] < 10000:
-    content = await read_full_file(path)
-else:
-    content = await read_file_summary(path)
-print(content)
-```
-
-### Data filtering
-
-```python
-# async wrapper omitted for clarity
-logs = await fetch_logs(server_id)
-errors = [log for log in logs if "ERROR" in log]
-print(f"Found {len(errors)} errors")
-for error in errors[-10:]:  # Only return last 10 errors
-    print(error)
-```
-
-## Response format
-
-### Programmatic tool call
-
-When code execution calls a tool:
-
-```json
-{
-  "type": "tool_use",
-  "id": "toolu_abc123",
-  "name": "query_database",
-  "input": {"sql": "<sql>"},
-  "caller": {
-    "type": "code_execution_20250825",
-    "tool_id": "srvtoolu_xyz789"
-  }
-}
-```
-
-### Tool result handling
-
-Your tool result is passed back to the running code:
-
-```json
-{
-  "role": "user",
-  "content": [
-    {
-      "type": "tool_result",
-      "tool_use_id": "toolu_abc123",
-      "content": "[{\"customer_id\": \"C1\", \"revenue\": 45000, \"orders\": 23}, {\"customer_id\": \"C2\", \"revenue\": 38000, \"orders\": 18}, ...]"
-    }
-  ]
-}
-```
-
-### Code execution completion
-
-When all tool calls are satisfied and code completes:
-
-```json
-{
-  "type": "code_execution_tool_result",
-  "tool_use_id": "srvtoolu_xyz789",
-  "content": {
-    "type": "code_execution_result",
-    "stdout": "Analysis complete. Top 5 customers identified from 847 total records.",
-    "stderr": "",
-    "return_code": 0,
-    "content": []
-  }
-}
-```
-
-## Error handling
-
-### Common errors
-
-| Error | Description | Solution |
-|-------|-------------|----------|
-| `invalid_tool_input` | Tool input doesn't match schema | Validate your tool's input_schema |
-| `tool_not_allowed` | Tool doesn't allow the requested caller type | Check `allowed_callers` includes the right contexts |
-| `missing_beta_header` | Required beta header not provided | Add the required beta headers to your request |
-
-### Container expiration during tool call
-
-If your tool takes too long to respond, the code execution will receive a `TimeoutError`. Claude sees this in stderr and will typically retry:
-
-```json
-{
-  "type": "code_execution_tool_result",
-  "tool_use_id": "srvtoolu_abc123",
-  "content": {
-    "type": "code_execution_result",
-    "stdout": "",
-    "stderr": "TimeoutError: Calling tool ['query_database'] timed out.",
-    "return_code": 0,
-    "content": []
-  }
-}
-```
-
-To prevent timeouts:
-- Monitor the `expires_at` field in responses
-- Implement timeouts for your tool execution
-- Consider breaking long operations into smaller chunks
-
-### Tool execution errors
-
-If your tool returns an error:
-
-```python
-# Provide error information in the tool result
-{
-    "type": "tool_result",
-    "tool_use_id": "toolu_abc123",
-    "content": "Error: Query timeout - table lock exceeded 30 seconds",
-}
-```
-
-Claude's code will receive this error and can handle it appropriately.
-
-## Constraints and limitations
-
-### Feature incompatibilities
-
-- **Structured outputs**: Tools with `strict: true` are not supported with programmatic calling
-- **Tool choice**: You cannot force programmatic calling of a specific tool via `tool_choice`
-- **Parallel tool use**: `disable_parallel_tool_use: true` is not supported with programmatic calling
-
-### Tool restrictions
-
-The following tools cannot currently be called programmatically, but support may be added in future releases:
-
-- Web search
-- Web fetch
-- Tools provided by an [MCP connector](/docs/en/agents-and-tools/mcp-connector)
-
-### Message formatting restrictions
-
-When responding to programmatic tool calls, there are strict formatting requirements:
-
-**Tool result only responses**: If there are pending programmatic tool calls waiting for results, your response message must contain **only** `tool_result` blocks. You cannot include any text content, even after the tool results.
-
-```json
-// ❌ INVALID - Cannot include text when responding to programmatic tool calls
-{
-  "role": "user",
-  "content": [
-    {"type": "tool_result", "tool_use_id": "toolu_01", "content": "[{\"customer_id\": \"C1\", \"revenue\": 45000}]"},
-    {"type": "text", "text": "What should I do next?"}  // This will cause an error
-  ]
-}
-
-// ✅ VALID - Only tool results when responding to programmatic tool calls
-{
-  "role": "user",
-  "content": [
-    {"type": "tool_result", "tool_use_id": "toolu_01", "content": "[{\"customer_id\": \"C1\", \"revenue\": 45000}]"}
-  ]
-}
-```
-
-This restriction only applies when responding to programmatic (code execution) tool calls. For regular client-side tool calls, you can include text content after tool results.
-
-### Rate limits
-
-Programmatic tool calls are subject to the same rate limits as regular tool calls. Each tool call from code execution counts as a separate invocation.
-
-### Validate tool results before use
-
-When implementing custom tools that will be called programmatically:
-
-- **Tool results are returned as strings**: They can contain any content, including code snippets or executable commands that may be processed by the execution environment.
-- **Validate external tool results**: If your tool returns data from external sources or accepts user input, be aware of code injection risks if the output will be interpreted or executed as code.
-
-## Token efficiency
-
-Programmatic tool calling can significantly reduce token consumption:
-
-- **Tool results from programmatic calls are not added to Claude's context** - only the final code output is
-- **Intermediate processing happens in code** - filtering, aggregation, etc. don't consume model tokens
-- **Multiple tool calls in one code execution** - reduces overhead compared to separate model turns
-
-For example, calling 10 tools directly uses ~10x the tokens of calling them programmatically and returning a summary.
-
-## Usage and pricing
-
-Programmatic tool calling uses the same pricing as code execution. See the [code execution pricing](/docs/en/agents-and-tools/tool-use/code-execution-tool#usage-and-pricing) for details.
-
-<Note>
-Token counting for programmatic tool calls: Tool results from programmatic invocations do not count toward your input/output token usage. Only the final code execution result and Claude's response count.
-</Note>
-
-## Best practices
-
-### Tool design
-
-- **Provide detailed output descriptions**: Since Claude deserializes tool results in code, clearly document the format (JSON structure, field types, etc.)
-- **Return structured data**: JSON or other easily parseable formats work best for programmatic processing
-- **Keep responses concise**: Return only necessary data to minimize processing overhead
-
-### When to use programmatic calling
-
-**Good use cases:**
-- Processing large datasets where you only need aggregates or summaries
-- Multi-step workflows with 3+ dependent tool calls
-- Operations requiring filtering, sorting, or transformation of tool results
-- Tasks where intermediate data shouldn't influence Claude's reasoning
-- Parallel operations across many items (e.g., checking 50 endpoints)
-
-**Less ideal use cases:**
-- Single tool calls with simple responses
-- Tools that need immediate user feedback
-- Very fast operations where code execution overhead would outweigh the benefit
-
-### Performance optimization
-
-- **Reuse containers** when making multiple related requests to maintain state
-- **Batch similar operations** in a single code execution when possible
-
-## Troubleshooting
-
-### Common issues
-
-**"Tool not allowed" error**
-- Verify your tool definition includes `"allowed_callers": ["code_execution_20250825"]`
-
-**Container expiration**
-- Ensure you respond to tool calls within the container's lifetime (~4.5 minutes)
-- Monitor the `expires_at` field in responses
-- Consider implementing faster tool execution
-
-**Tool result not parsed correctly**
-- Ensure your tool returns string data that Claude can deserialize
-- Provide clear output format documentation in your tool description
-
-### Debugging tips
-
-1. **Log all tool calls and results** to track the flow
-2. **Check the `caller` field** to confirm programmatic invocation
-3. **Monitor container IDs** to ensure proper reuse
-4. **Test tools independently** before enabling programmatic calling
-
-## Why programmatic tool calling works
-
-Claude's training includes extensive exposure to code, making it effective at reasoning through and chaining function calls. When tools are presented as callable functions within a code execution environment, Claude can leverage this strength to:
-
-- **Reason naturally about tool composition**: Chain operations and handle dependencies as naturally as writing any Python code
-- **Process large results efficiently**: Filter down large tool outputs, extract only relevant data, or write intermediate results to files before returning summaries to the context window
-- **Reduce latency significantly**: Eliminate the overhead of re-sampling Claude between each tool call in multi-step workflows
-
-This approach enables workflows that would be impractical with traditional tool use (such as processing files over 1M tokens) by allowing Claude to work with data programmatically rather than loading everything into the conversation context.
-
-## Alternative implementations
-
-Programmatic tool calling is a generalizable pattern that can be implemented outside of Anthropic's managed code execution. Here's an overview of the approaches:
-
-### Client-side direct execution
-
-Provide Claude with a code execution tool and describe what functions are available in that environment. When Claude invokes the tool with code, your application executes it locally where those functions are defined.
-
-**Advantages:**
-- Simple to implement with minimal re-architecting
-- Full control over the environment and instructions
-
-**Disadvantages:**
-- Executes untrusted code outside of a sandbox
-- Tool invocations can be vectors for code injection
-
-**Use when:** Your application can safely execute arbitrary code, you want a simple solution, and Anthropic's managed offering doesn't fit your needs.
-
-### Self-managed sandboxed execution
-
-Same approach from Claude's perspective, but code runs in a sandboxed container with security restrictions (e.g., no network egress). If your tools require external resources, you'll need a protocol for executing tool calls outside the sandbox.
-
-**Advantages:**
-- Safe programmatic tool calling on your own infrastructure
-- Full control over the execution environment
-
-**Disadvantages:**
-- Complex to build and maintain
-- Requires managing both infrastructure and inter-process communication
-
-**Use when:** Security is critical and Anthropic's managed solution doesn't fit your requirements.
-
-### Anthropic-managed execution
-
-Anthropic's programmatic tool calling is a managed version of sandboxed execution with an opinionated Python environment tuned for Claude. Anthropic handles container management, code execution, and secure tool invocation communication.
-
-**Advantages:**
-- Safe and secure by default
-- Easy to enable with minimal configuration
-- Environment and instructions optimized for Claude
-
-Consider using Anthropic's managed solution if you're using the Claude API.
-
-## Related features
-
-<CardGroup cols={2}>
-  <Card title="Code Execution Tool" icon="code" href="/docs/en/agents-and-tools/tool-use/code-execution-tool">
-    Learn about the underlying code execution capability that powers programmatic tool calling.
-  </Card>
-  <Card title="Tool Use Overview" icon="wrench" href="/docs/en/agents-and-tools/tool-use/overview">
-    Understand the fundamentals of tool use with Claude.
-  </Card>
-  <Card title="Implement Tool Use" icon="hammer" href="/docs/en/agents-and-tools/tool-use/implement-tool-use">
-    Step-by-step guide for implementing tools.
-  </Card>
-</CardGroup>
+  }' \
+  --no-buffer \
+  >v0-1-5-md-01.txt
+  ```

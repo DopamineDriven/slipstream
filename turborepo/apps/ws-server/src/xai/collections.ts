@@ -378,6 +378,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     const {
       input,
       instructions,
+      reasoning,
       max_output_tokens,
       model,
       parallel_tool_calls = parallel_tool_calling,
@@ -412,22 +413,40 @@ export class GrokCollectionsService extends GrokWorkupService {
       include: ["reasoning.encrypted_content"]
     });
 
-    const requestBody = {
-      model,
-      input,
-      store,
-      stream: streaming,
-      instructions,
-      temperature,
-      user,
-      top_p,
-      logprobs,
-      max_output_tokens,
-      tools,
-      include: ["reasoning.encrypted_content"] as const,
-      tool_choice,
-      parallel_tool_calls
-    } satisfies ResponsesContentWorkup;
+    const requestBody = this.isMultiAgent(model)
+      ? {
+          reasoning: reasoning ?? { effort: "high" },
+          model,
+          input,
+          store,
+          stream: streaming,
+          instructions,
+          temperature,
+          user,
+          top_p,
+          logprobs,
+          max_output_tokens,
+          tools,
+          include: ["reasoning.encrypted_content"] as const,
+          tool_choice,
+          parallel_tool_calls
+        }
+      : ({
+          model,
+          input,
+          store,
+          stream: streaming,
+          instructions,
+          temperature,
+          user,
+          top_p,
+          logprobs,
+          max_output_tokens,
+          tools,
+          include: ["reasoning.encrypted_content"] as const,
+          tool_choice,
+          parallel_tool_calls
+        } satisfies ResponsesContentWorkup);
 
     const response = await fetch(this.baseUrl, {
       method: "POST",
@@ -497,9 +516,7 @@ export class GrokCollectionsService extends GrokWorkupService {
 
                 const name = `${filename}.${ext}`;
 
-                if (
-                  attachment.assetType === "DOCUMENT"
-                ) {
+                if (attachment.assetType === "DOCUMENT") {
                   try {
                     const { fileId, docUri } =
                       await this.ensureXaiAssetUploaded(
@@ -514,7 +531,10 @@ export class GrokCollectionsService extends GrokWorkupService {
                         if (!isCurrentUserMsg) {
                           textParts.push(`[${name}](${docUri})`);
                         } else {
-                          if (currentUserFileCount === 0 && this.canViewDocs(model)) {
+                          if (
+                            currentUserFileCount === 0 &&
+                            this.canViewDocs(model)
+                          ) {
                             const docBlock = {
                               type: "input_file",
                               file_id: fileId
@@ -537,10 +557,12 @@ export class GrokCollectionsService extends GrokWorkupService {
                       `Failed to upload PDF to Collections/Files API of collectionId ${collectionId}.`
                     );
                   }
-                } else if (
-                  attachment.assetType === "IMAGE"
-                ) {
-                  if (isFreshContext && isCurrentUserMsg && this.canViewImgs(model)) {
+                } else if (attachment.assetType === "IMAGE") {
+                  if (
+                    isFreshContext &&
+                    isCurrentUserMsg &&
+                    this.canViewImgs(model)
+                  ) {
                     const imgBlock = {
                       type: "input_image",
                       image_url: url,
@@ -789,7 +811,7 @@ export class GrokCollectionsService extends GrokWorkupService {
 
   private async getResponsesApiInputWorkup({
     isNewChat,
-    model = "grok-4-1-fast-reasoning",
+    model = "grok-4.20-multi-agent-experimental-beta-0304",
     userId,
     msgs,
     keyFingerprint = "server",
@@ -807,6 +829,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     enableWebSearch = true,
     enableXSearch = true,
     web_enable_image_understanding = true,
+    reasoning,
     x_enable_image_understanding = true,
     x_enable_video_understanding = true,
     parallel_tool_calls = true,
@@ -841,19 +864,35 @@ export class GrokCollectionsService extends GrokWorkupService {
     );
 
     this.logger.info(history);
-
-    return {
-      input: history,
-      model,
-      instructions: systemInstruction,
-      tools: tooling,
-      tool_choice: tool_choice ?? "auto",
-      store: false,
-      include,
-      stream: true,
-      parallel_tool_calls,
-      max_output_tokens,
-      user: userId
-    } as const;
+    if (this.isMultiAgent(model)) {
+      return {
+        input: history,
+        model,
+        reasoning: reasoning ?? { effort: "high" },
+        instructions: systemInstruction,
+        tools: tooling,
+        tool_choice: tool_choice ?? "auto",
+        store: false,
+        include,
+        stream: true,
+        parallel_tool_calls,
+        max_output_tokens,
+        user: userId
+      } as const;
+    } else {
+      return {
+        input: history,
+        model,
+        instructions: systemInstruction,
+        tools: tooling,
+        tool_choice: tool_choice ?? "auto",
+        store: false,
+        include,
+        stream: true,
+        parallel_tool_calls,
+        max_output_tokens,
+        user: userId
+      } as const;
+    }
   }
 }

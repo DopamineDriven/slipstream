@@ -1,8 +1,20 @@
 import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
 import { xAIResponses } from "@/xai/event-types.ts";
-import type { GrokModelIdUnion, MessageSingleton, XOR } from "@slipstream/types";
+import type {
+  GrokModelIdUnion,
+  MessageSingleton,
+  XOR
+} from "@slipstream/types";
 
 export type ResponsesRole = "user" | "assistant" | "developer" | "system";
+/**
+ * Supported by multi-agent only
+ *
+ * "low" | "medium" - recruits 4 agents
+ * "high" | "xhigh" - recruits 16 agents
+ *
+ */
+export type ReasoningEffort = "low" | "medium" | "high" | "xhigh";
 
 /**
  * `from_date` and `to_date` *must* be in ISO8601 format, e.g., "YYYY-MM-DD" if included
@@ -318,13 +330,17 @@ export interface HandleToolUsageParams extends ResponsesToolsParams {
   model: GrokModelIdUnion;
 }
 
+export interface MultiAgentReasoningEffort {
+  effort: ReasoningEffort;
+}
+
 export interface ResponsesApiInputWorkupParams {
   isNewChat: boolean;
   model: GrokModelIdUnion;
   userId: string;
   msgs: MessageSingleton<true>[];
   keyFingerprint: string;
-  include?: readonly ["reasoning.encrypted_content"]
+  include?: readonly ["reasoning.encrypted_content"];
   systemPrompt?: string;
   max_output_tokens?: number;
   tool_choice?: ToolChoiceUnion;
@@ -342,4 +358,5 @@ export interface ResponsesApiInputWorkupParams {
   x_enable_image_understanding?: boolean;
   x_enable_video_understanding?: boolean;
   parallel_tool_calls?: boolean;
+  reasoning?: MultiAgentReasoningEffort;
 }

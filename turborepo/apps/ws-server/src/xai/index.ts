@@ -19,7 +19,7 @@ export class xAIService extends GrokResponsesApiService {
   }
   public async routeXai({ model: m, ...rest }: ProviderChatRequestEntity) {
     const model = (m ?? "grok-4-1-fast-reasoning") as GrokModelIdUnion;
-    if (this.isImgGenModel(model)) {
+    if (this.isNativeImgModel(model)) {
       return this.handleXAIAiImageGenRequest({ model, ...rest });
     } else {
       return this.handleXAIAiResponsesApiRequest({

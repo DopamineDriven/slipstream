@@ -1,17 +1,38 @@
-import type { XOR } from "@slipstream/types";
-
 export interface SSEEvent<T = unknown> {
   event?: string;
   data: T;
 }
 
-export type v0Delta = XOR<{ reasoning_content: string }, { content: string }>;
+export type v0ToolCallDelta = {
+  index: number;
+  id?: string;
+  type?: "function";
+  function?: {
+    name?: string;
+    arguments?: string;
+  };
+};
+
+export type v0Delta = Partial<{
+  role: "assistant";
+  content: string | null;
+  reasoning_content: string;
+  refusal: string | null;
+  tool_calls: v0ToolCallDelta[];
+}>;
+
+export type v0FinishReason =
+  | "stop"
+  | "length"
+  | "tool_calls"
+  | "content_filter"
+  | null;
 
 export type v0Choice = {
   index: number;
   delta: v0Delta;
   logprobs: null;
-  finish_reason: null;
+  finish_reason: v0FinishReason;
 };
 
 export type v0Usage = {
@@ -160,13 +181,15 @@ export function isReasoningDelta(
 }
 
 export function isContentDelta(delta: v0Delta): delta is { content: string } {
-  return "content" in delta && typeof delta.content !== "undefined";
+  return typeof delta.content === "string";
 }
 
-export function isFinished(chunk: v0ChatCompletionsRes) {
-  if ("usage" in chunk && typeof chunk.usage !== "undefined") {
-    return true;
-  } else {
-    return false;
-  }
+export function hasToolCallDelta(
+  delta: v0Delta
+): delta is { tool_calls: v0ToolCallDelta[] } {
+  return Array.isArray(delta.tool_calls);
+}
+
+export function isTerminalTextChunk(chunk: v0ChatCompletionsRes) {
+  return Array.isArray(chunk.choices) && chunk.choices.length === 0 && !!chunk.usage;
 }

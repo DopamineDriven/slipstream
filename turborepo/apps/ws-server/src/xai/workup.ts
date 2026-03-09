@@ -60,11 +60,15 @@ export class GrokWorkupService {
     DOCUMENT_STATUS_UNKNOWN: "PENDING"
   } as const satisfies Record<DocumentStatus, ProviderDocState>;
 
+  protected isMultiAgent(m: GrokModelIdUnion) {
+    return m === "grok-4.20-multi-agent-experimental-beta-0304";
+  }
+
   protected is420BetaModel(m: GrokModelIdUnion) {
     return (
       m === "grok-4.20-experimental-beta-0304-non-reasoning" ||
       m === "grok-4.20-experimental-beta-0304-reasoning" ||
-      m === "grok-4.20-multi-agent-experimental-beta-0304"
+      this.isMultiAgent(m)
     );
   }
 
@@ -90,16 +94,13 @@ export class GrokWorkupService {
     return (
       this.isNativeImgModel(model) ||
       this.isNativeVideoModel(model) ||
-      this.isGrok4Model(model)
+      this.isGrok4Model(model) ||
+      this.is420BetaModel(model)
     );
   }
 
   protected canViewDocs(model: GrokModelIdUnion) {
     return this.isGrok4Model(model) || this.is420BetaModel(model);
-  }
-
-  protected isImgGenModel(model: GrokModelIdUnion) {
-    return model === "grok-imagine-image" || model === "grok-imagine-image-pro";
   }
 
   protected async syncFilesRegistry(apiKey = this.xaiKey) {
