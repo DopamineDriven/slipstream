@@ -427,6 +427,7 @@ export function VercelMixin<
               deps.logger,
               deps.prisma,
               deps.redis,
+              deps.userStore,
               this.v0ApiKey ?? ""
             );
         }

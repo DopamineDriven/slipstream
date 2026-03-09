@@ -83,10 +83,6 @@ async function exe() {
 
     const { Resolver } = await import("@/resolver/index.ts");
 
-    const { v0Service } = await import("@/vercel/index.ts");
-
-    const v0 = new v0Service(logger, prisma, redisInstance, cfg.V0_API_KEY);
-
     const { LlamaService } = await import("@/meta/index.ts");
 
     const meta = new LlamaService(
@@ -123,6 +119,16 @@ async function exe() {
       prisma,
       sharp,
       cfg.VOYAGE_API_KEY
+    );
+
+    const { v0Service } = await import("@/vercel/index.ts");
+
+    const v0 = new v0Service(
+      logger,
+      prisma,
+      redisInstance,
+      userStore,
+      cfg.V0_API_KEY
     );
 
     const { PdfService } = await import("@/pdf/index.ts");
