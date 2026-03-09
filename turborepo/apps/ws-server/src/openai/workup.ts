@@ -837,7 +837,7 @@ export class OpenAIServiceWorkup {
     userId: string,
     query: string,
     limit = 5,
-    threshold = 0.3,
+    threshold = 0,
     filename?: string
   ) {
     return await this.userStoreVector.searchUserStoreChunks({
