@@ -492,6 +492,7 @@ export function MetaMixin<
               deps.logger,
               deps.prisma,
               deps.redis,
+              deps.userStore,
               this.llamaApiKey ?? ""
             );
         }
