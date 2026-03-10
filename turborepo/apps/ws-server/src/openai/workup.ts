@@ -796,19 +796,15 @@ export class OpenAIServiceWorkup {
       name: "file_search",
       description:
         "Search the user's uploaded documents using semantic similarity. " +
-        "Pass one or more queries in a single call. " +
-        "Returns a JSON array of matching chunks with filename, score, content, offsets, and chunk index.",
+        "Returns a JSON array of matching chunks with filename, score, content, offsets, and chunk index. " +
+        "Issue one query per call; use multiple calls for multiple terms.",
       strict: false,
       parameters: {
         type: "object",
         properties: {
-          queries: {
-            type: "array",
-            description:
-              "One or more semantic search queries. Prefer batching related queries in one tool call (max 5).",
-            items: { type: "string" },
-            minItems: 1,
-            maxItems: 5
+          query: {
+            type: "string",
+            description: "The semantic search query."
           },
           max_results: {
             type: "number",
@@ -822,15 +818,10 @@ export class OpenAIServiceWorkup {
               "Example: 'Path to Hell Pt VIII' matches 'The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VIII.pdf'."
           }
         },
-        required: ["queries"],
+        required: ["query"],
         additionalProperties: false
       }
     } as const satisfies OpenAI.Responses.FunctionTool;
-  }
-
-  private truncateFileSearchContent(content: string, maxChars = 1200) {
-    if (content.length <= maxChars) return content;
-    return content.slice(0, maxChars).concat("...");
   }
 
   protected async searchStore(
@@ -852,7 +843,30 @@ export class OpenAIServiceWorkup {
   protected parseFileSearchInput(
     rawArguments: string
   ): OpenAIFileSearchToolInput {
-    const parsed = JSON.parse<Record<string, unknown>>(rawArguments);
+    const parsed = rawArguments.trim().length
+      ? JSON.parse<Record<string, unknown>>(rawArguments)
+      : {};
+
+    if ("query" in parsed && typeof parsed.query === "string") {
+      const normalized = parsed.query.trim();
+      if (normalized.length > 0) {
+        const maxResults =
+          "max_results" in parsed && typeof parsed.max_results === "number"
+            ? parsed.max_results
+            : undefined;
+
+        const filenameInput =
+          "filename" in parsed && typeof parsed.filename === "string"
+            ? parsed.filename.trim() || undefined
+            : undefined;
+
+        return {
+          query: normalized,
+          max_results: maxResults,
+          filename: filenameInput
+        } satisfies OpenAIFileSearchToolInput;
+      }
+    }
 
     const queryList = Array.of<string>();
     if ("queries" in parsed && Array.isArray(parsed.queries)) {
@@ -863,25 +877,13 @@ export class OpenAIServiceWorkup {
         queryList.push(normalized);
       }
     }
-    // Backward-compatible fallback for single-query invocations.
-    if (
-      queryList.length === 0 &&
-      "query" in parsed &&
-      typeof parsed.query === "string"
-    ) {
-      const normalized = parsed.query.trim();
-      if (normalized.length > 0) {
-        queryList.push(normalized);
-      }
-    }
     const uniqueQueries = Array.from(new Set(queryList)).slice(0, 5);
     const firstQuery = uniqueQueries[0];
     if (!firstQuery) {
       throw new Error(
-        `file_search input missing required "queries": ${rawArguments}`
+        `file_search input missing required "query": ${rawArguments}`
       );
     }
-    const normalizedQueries = [firstQuery, ...uniqueQueries.slice(1)] as const;
 
     const maxResults =
       "max_results" in parsed && typeof parsed.max_results === "number"
@@ -894,7 +896,7 @@ export class OpenAIServiceWorkup {
         : undefined;
 
     return {
-      queries: normalizedQueries,
+      queries: [firstQuery, ...uniqueQueries.slice(1)] as const,
       max_results: maxResults,
       filename: filenameInput
     } satisfies OpenAIFileSearchToolInput;
@@ -904,70 +906,27 @@ export class OpenAIServiceWorkup {
     userId: string,
     input: OpenAIFileSearchToolInput
   ) {
-    const maxResults = Math.max(1, Math.min(input.max_results ?? 5, 5));
-    const queryResults = await Promise.all(
-      input.queries.map(query =>
-        this.searchStore(userId, query, maxResults, 0, input.filename)
-      )
-    );
-    const results = queryResults.flat();
+    const maxResults = Math.max(1, Math.min(input.max_results ?? 5, 10));
+    const results =
+      "query" in input
+        ? await this.searchStore(userId, input.query, maxResults, 0, input.filename)
+        : (
+            await Promise.all(
+              input.queries.map(query =>
+                this.searchStore(userId, query, maxResults, 0, input.filename)
+              )
+            )
+          ).flat();
 
     if (results.length === 0) {
       return "[]";
     }
 
-    const unique = new Map<
-      string,
-      {
-        filename: string;
-        score: number;
-        content: string;
-        startOffset: number | null;
-        endOffset: number | null;
-        chunkIndex: number;
-      }
-    >();
-    for (const r of results) {
-      const mapped = {
+    return JSON.stringify(
+      results.map(r => ({
         filename: r.filename,
         score: r.score != null ? Number(r.score.toFixed(4)) : 0,
-        content: this.truncateFileSearchContent(r.content),
-        startOffset: r.startOffset,
-        endOffset: r.endOffset,
-        chunkIndex: r.chunkIndex
-      };
-      const key = `${mapped.filename}::${mapped.chunkIndex}::${mapped.startOffset ?? "null"}::${mapped.endOffset ?? "null"}`;
-      const previous = unique.get(key);
-      if (!previous || mapped.score > previous.score) {
-        unique.set(key, mapped);
-      }
-    }
-    const mapped = Array.from(unique.values())
-      .sort((a, b) => b.score - a.score)
-      .slice(0, Math.min(Math.max(maxResults, 5), 10));
-
-    const maxOutputChars = 48_000;
-    if (JSON.stringify(mapped).length <= maxOutputChars) {
-      return JSON.stringify(mapped);
-    }
-
-    const reduced = [...mapped];
-    while (
-      reduced.length > 1 &&
-      JSON.stringify(reduced).length > maxOutputChars
-    ) {
-      reduced.pop();
-    }
-
-    if (JSON.stringify(reduced).length <= maxOutputChars) {
-      return JSON.stringify(reduced);
-    }
-
-    return JSON.stringify(
-      reduced.map(r => ({
-        filename: r.filename,
-        score: r.score,
-        content: this.truncateFileSearchContent(r.content, 600),
+        content: r.content,
         startOffset: r.startOffset,
         endOffset: r.endOffset,
         chunkIndex: r.chunkIndex

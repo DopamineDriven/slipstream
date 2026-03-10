@@ -76,15 +76,9 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       undefined,
       hasUserStoreDocs
     );
-    const instructions = this.buildInstructions(systemPrompt).concat(
-      "\n\nTool policy: use file_search sparingly. Do not repeat the same query. " +
-        "If results are empty or not improving, stop using tools and provide the best available answer, plus what is missing."
-    );
-    const nearBudgetInstruction =
-      "\n\nSYSTEM: You are near your tool budget. Synthesize findings now and respond directly. " +
-      "Only call file_search again if it is strictly necessary.";
-    const maxFileSearchCalls = 4;
-    const MAX_TOOL_ROUNDS = 8;
+    const instructions = this.buildInstructions(systemPrompt);
+    const maxFileSearchCalls = 10;
+    const MAX_TOOL_ROUNDS = 10;
     let roundInput = Array.of<OpenAI.Responses.ResponseInputItem>(...formatted);
     const toolCallSignatureRegistry = new Map<string, number>();
     let fileSearchCallsTotal = 0;
@@ -97,16 +91,11 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
       let streamRes: AsyncIterable<OpenAI.Responses.ResponseStreamEvent>;
       try {
-        const nearToolBudget =
-          round >= MAX_TOOL_ROUNDS - 2 ||
-          fileSearchCallsTotal >= maxFileSearchCalls - 1;
         streamRes = await client.responses.create(
           {
             stream: true,
             input: roundInput,
-            instructions: nearToolBudget
-              ? instructions.concat(nearBudgetInstruction)
-              : instructions,
+            instructions,
             store: false,
             model: m,
             text: this.openAiVerbosity(

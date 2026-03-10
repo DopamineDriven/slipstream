@@ -258,12 +258,16 @@ export class LlamaService {
     input: OpenAIFileSearchToolInput
   ) {
     const maxResults = Math.max(1, Math.min(input.max_results ?? 5, 5));
-    const queryResults = await Promise.all(
-      input.queries.map(query =>
-        this.searchStore(userId, query, maxResults, 0, input.filename)
-      )
-    );
-    const results = queryResults.flat();
+    const results =
+      "query" in input
+        ? await this.searchStore(userId, input.query, maxResults, 0, input.filename)
+        : (
+            await Promise.all(
+              input.queries.map(query =>
+                this.searchStore(userId, query, maxResults, 0, input.filename)
+              )
+            )
+          ).flat();
 
     if (results.length === 0) {
       return "[]";
