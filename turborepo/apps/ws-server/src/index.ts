@@ -83,15 +83,6 @@ async function exe() {
 
     const { Resolver } = await import("@/resolver/index.ts");
 
-    const { LlamaService } = await import("@/meta/index.ts");
-
-    const meta = new LlamaService(
-      logger,
-      prisma,
-      redisInstance,
-      cfg.LLAMA_API_KEY
-    );
-
     const { xAIService } = await import("@/xai/index.ts");
 
     const xai = new xAIService(
@@ -119,6 +110,16 @@ async function exe() {
       prisma,
       sharp,
       cfg.VOYAGE_API_KEY
+    );
+
+    const { LlamaService } = await import("@/meta/index.ts");
+
+    const meta = new LlamaService(
+      logger,
+      prisma,
+      redisInstance,
+      userStore,
+      cfg.LLAMA_API_KEY
     );
 
     const { v0Service } = await import("@/vercel/index.ts");

@@ -174,7 +174,7 @@ const components = {
   h6: createHeading(6),
   img: CustomImage,
   p: ({ className, children, ...props }: ComponentPropsWithRef<"p">) => (
-    <p className={cn("mb-1.5 leading-7", className)} {...props}>
+    <p className={cn("mb-1.5 leading-7 wrap-anywhere", className)} {...props}>
       {children}
     </p>
   ),
@@ -253,7 +253,7 @@ const components = {
     </caption>
   ),
   em: ({ className, children, ...props }: ComponentPropsWithRef<"em">) => (
-    <em className={cn(className)} {...props}>
+    <em className={cn("wrap-anywhere", className)} {...props}>
       {children}
     </em>
   ),
@@ -262,12 +262,12 @@ const components = {
     children,
     ...props
   }: ComponentPropsWithRef<"strong">) => (
-    <strong className={cn("font-bold", className)} {...props}>
+    <strong className={cn("font-bold wrap-anywhere", className)} {...props}>
       {children}
     </strong>
   ),
   b: ({ className, children, ...props }: ComponentPropsWithRef<"b">) => (
-    <b className={cn("font-bold", className)} {...props}>
+    <b className={cn("font-bold wrap-anywhere", className)} {...props}>
       {children}
     </b>
   ),

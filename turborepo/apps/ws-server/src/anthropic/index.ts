@@ -910,8 +910,8 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       for (const acc of toolAccumulators.values()) {
         if (acc.name === "file_search") {
           try {
-            const parsed: Record<string, any> = acc.inputJson
-              ? JSON.parse<Record<string, any>>(acc.inputJson)
+            const parsed = acc.inputJson
+              ? JSON.parse<Record<string, unknown>>(acc.inputJson)
               : {};
 
             if (!("query" in parsed) || typeof parsed.query !== "string") {
@@ -925,11 +925,19 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               max_results:
                 typeof parsed.max_results === "number"
                   ? parsed.max_results
+                  : undefined,
+              filename:
+                typeof parsed.filename === "string"
+                  ? parsed.filename.trim() || undefined
                   : undefined
             };
 
             this.logger.info(
-              { query: input.query, max_results: input.max_results },
+              {
+                query: input.query,
+                max_results: input.max_results,
+                filename: input.filename
+              },
               "PTC file_search query"
             );
             const json = await this.executeFileSearch(userId, input);
