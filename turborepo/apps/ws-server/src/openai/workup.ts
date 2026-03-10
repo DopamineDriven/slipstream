@@ -843,9 +843,7 @@ export class OpenAIServiceWorkup {
   protected parseFileSearchInput(
     rawArguments: string
   ): OpenAIFileSearchToolInput {
-    const parsed = rawArguments.trim().length
-      ? JSON.parse<Record<string, unknown>>(rawArguments)
-      : {};
+    const parsed = this.parseFileSearchArguments(rawArguments);
 
     if ("query" in parsed && typeof parsed.query === "string") {
       const normalized = parsed.query.trim();
@@ -900,6 +898,79 @@ export class OpenAIServiceWorkup {
       max_results: maxResults,
       filename: filenameInput
     } satisfies OpenAIFileSearchToolInput;
+  }
+
+  protected parseFileSearchArguments(rawArguments: string) {
+    const trimmed = rawArguments.trim();
+    if (trimmed.length === 0) {
+      return {} satisfies Record<string, unknown>;
+    }
+
+    try {
+      return JSON.parse<Record<string, unknown>>(trimmed);
+    } catch (error) {
+      const recovered = this.extractFirstJsonObject(trimmed);
+      if (!recovered) {
+        throw error;
+      }
+
+      this.logger.warn(
+        {
+          rawArgumentsPreview: trimmed.slice(0, 300),
+          recoveredPreview: recovered.slice(0, 300),
+          error: this.prisma.safeErrMsg(error)
+        },
+        "Recovered malformed OpenAI file_search arguments"
+      );
+      return JSON.parse<Record<string, unknown>>(recovered);
+    }
+  }
+
+  protected extractFirstJsonObject(raw: string) {
+    let start = -1;
+    let depth = 0;
+    let inString = false;
+    let isEscaped = false;
+
+    for (const [index, char] of Array.from(raw).entries()) {
+      if (start === -1) {
+        if (char === "{") {
+          start = index;
+          depth = 1;
+        }
+        continue;
+      }
+
+      if (inString) {
+        if (isEscaped) {
+          isEscaped = false;
+        } else if (char === "\\") {
+          isEscaped = true;
+        } else if (char === '"') {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (char === '"') {
+        inString = true;
+        continue;
+      }
+
+      if (char === "{") {
+        depth += 1;
+        continue;
+      }
+
+      if (char === "}") {
+        depth -= 1;
+        if (depth === 0) {
+          return raw.slice(start, index + 1);
+        }
+      }
+    }
+
+    return undefined;
   }
 
   protected async executeFileSearch(

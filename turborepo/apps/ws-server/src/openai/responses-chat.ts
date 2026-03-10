@@ -77,16 +77,9 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       hasUserStoreDocs
     );
     const instructions = this.buildInstructions(systemPrompt);
-    const maxFileSearchCalls = 10;
     const MAX_TOOL_ROUNDS = 10;
     let roundInput = Array.of<OpenAI.Responses.ResponseInputItem>(...formatted);
-    const toolCallSignatureRegistry = new Map<string, number>();
-    let fileSearchCallsTotal = 0;
-    let forcedLoopStopReason:
-      | "MAX_ROUNDS"
-      | "MAX_FILE_SEARCH_CALLS"
-      | "REPEATED_TOOL_CALLS"
-      | null = null;
+    let forcedLoopStopReason: "MAX_ROUNDS" | null = null;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
       let streamRes: AsyncIterable<OpenAI.Responses.ResponseStreamEvent>;
@@ -326,47 +319,6 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       }
 
       if (functionCalls.length === 0) {
-        break;
-      }
-
-      let repeatedSignatures = 0;
-      for (const call of functionCalls) {
-        if (call.name === "file_search") {
-          fileSearchCallsTotal += 1;
-        }
-        const signature = `${call.name}:${call.arguments.trim()}`;
-        const seenCount = toolCallSignatureRegistry.get(signature) ?? 0;
-        if (seenCount > 0) {
-          repeatedSignatures += 1;
-        }
-        toolCallSignatureRegistry.set(signature, seenCount + 1);
-      }
-
-      if (fileSearchCallsTotal > maxFileSearchCalls) {
-        forcedLoopStopReason = "MAX_FILE_SEARCH_CALLS";
-        this.logger.warn(
-          {
-            round,
-            responseId: openaiResId,
-            fileSearchCallsTotal,
-            maxFileSearchCalls
-          },
-          "OpenAI tool loop stopped after file_search call cap"
-        );
-        break;
-      }
-
-      if (repeatedSignatures === functionCalls.length) {
-        forcedLoopStopReason = "REPEATED_TOOL_CALLS";
-        this.logger.warn(
-          {
-            round,
-            responseId: openaiResId,
-            repeatedSignatures,
-            functionCallCount: functionCalls.length
-          },
-          "OpenAI tool loop stopped due to repeated tool calls"
-        );
         break;
       }
 

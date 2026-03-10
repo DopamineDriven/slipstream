@@ -80,8 +80,6 @@ type V0AccumulatedToolCall = {
 
 type V0ForcedLoopStopReason =
   | "MAX_ROUNDS"
-  | "MAX_FILE_SEARCH_CALLS"
-  | "REPEATED_TOOL_CALLS"
   | null;
 
 export class v0Service {
@@ -281,9 +279,7 @@ export class v0Service {
   private parseFileSearchInput(
     rawArguments: string
   ): OpenAIFileSearchToolInput {
-    const parsed = rawArguments.trim().length
-      ? JSON.parse<Record<string, unknown>>(rawArguments)
-      : {};
+    const parsed = this.parseFileSearchArguments(rawArguments);
 
     if ("query" in parsed && typeof parsed.query === "string") {
       const normalized = parsed.query.trim();
@@ -339,6 +335,79 @@ export class v0Service {
       max_results: maxResults,
       filename: filenameInput
     } satisfies OpenAIFileSearchToolInput;
+  }
+
+  private parseFileSearchArguments(rawArguments: string) {
+    const trimmed = rawArguments.trim();
+    if (trimmed.length === 0) {
+      return {} satisfies Record<string, unknown>;
+    }
+
+    try {
+      return JSON.parse<Record<string, unknown>>(trimmed);
+    } catch (error) {
+      const recovered = this.extractFirstJsonObject(trimmed);
+      if (!recovered) {
+        throw error;
+      }
+
+      this.logger.warn(
+        {
+          rawArgumentsPreview: trimmed.slice(0, 300),
+          recoveredPreview: recovered.slice(0, 300),
+          error: this.prisma.safeErrMsg(error)
+        },
+        "Recovered malformed streamed v0 file_search arguments"
+      );
+      return JSON.parse<Record<string, unknown>>(recovered);
+    }
+  }
+
+  private extractFirstJsonObject(raw: string) {
+    let start = -1;
+    let depth = 0;
+    let inString = false;
+    let isEscaped = false;
+
+    for (const [index, char] of Array.from(raw).entries()) {
+      if (start === -1) {
+        if (char === "{") {
+          start = index;
+          depth = 1;
+        }
+        continue;
+      }
+
+      if (inString) {
+        if (isEscaped) {
+          isEscaped = false;
+        } else if (char === "\\") {
+          isEscaped = true;
+        } else if (char === '"') {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (char === '"') {
+        inString = true;
+        continue;
+      }
+
+      if (char === "{") {
+        depth += 1;
+        continue;
+      }
+
+      if (char === "}") {
+        depth -= 1;
+        if (depth === 0) {
+          return raw.slice(start, index + 1);
+        }
+      }
+    }
+
+    return undefined;
   }
 
   private async executeFileSearch(
@@ -501,9 +570,6 @@ export class v0Service {
     );
 
     const MAX_TOOL_ROUNDS = 10;
-    const maxFileSearchCalls = 10;
-    const toolCallSignatureRegistry = new Map<string, number>();
-    let fileSearchCallsTotal = 0;
     let forcedLoopStopReason: V0ForcedLoopStopReason = null;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
@@ -720,45 +786,6 @@ export class v0Service {
         materializedToolCalls.length > 0 && (sawToolCallFinish || !!roundUsage);
 
       if (!hasActionableToolCalls) {
-        break;
-      }
-
-      let repeatedSignatures = 0;
-      for (const toolCall of materializedToolCalls) {
-        if (toolCall.function.name === "file_search") {
-          fileSearchCallsTotal += 1;
-        }
-        const signature = `${toolCall.function.name}:${toolCall.function.arguments.trim()}`;
-        const seenCount = toolCallSignatureRegistry.get(signature) ?? 0;
-        if (seenCount > 0) {
-          repeatedSignatures += 1;
-        }
-        toolCallSignatureRegistry.set(signature, seenCount + 1);
-      }
-
-      if (fileSearchCallsTotal > maxFileSearchCalls) {
-        forcedLoopStopReason = "MAX_FILE_SEARCH_CALLS";
-        this.logger.warn(
-          {
-            round,
-            fileSearchCallsTotal,
-            maxFileSearchCalls
-          },
-          "v0 tool loop stopped after file_search call cap"
-        );
-        break;
-      }
-
-      if (repeatedSignatures === materializedToolCalls.length) {
-        forcedLoopStopReason = "REPEATED_TOOL_CALLS";
-        this.logger.warn(
-          {
-            round,
-            repeatedSignatures,
-            toolCallCount: materializedToolCalls.length
-          },
-          "v0 tool loop stopped due to repeated tool calls"
-        );
         break;
       }
 
