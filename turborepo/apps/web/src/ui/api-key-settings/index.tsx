@@ -463,12 +463,7 @@ export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
   const getDisplayValue = useCallback(
     (keyData: ApiKeyData) => {
       if (editingKey === keyData.provider) {
-        const tempValue = tempValuesRef.current.get(keyData.provider) ?? "";
-        if (visibleKeys.has(keyData.provider)) {
-          return tempValue;
-        } else {
-          return tempValue ? getPlaceholder(keyData.provider) : "";
-        }
+        return tempValuesRef.current.get(keyData.provider) ?? "";
       }
 
       if (!keyData.isSet || !keyData.value) {
@@ -703,7 +698,7 @@ export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
                                       e.target.value
                                     )
                                   }
-                                  disabled={!visibleKeys.has(keyData.provider)}
+                                  disabled={false}
                                   className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text pr-12"
                                   required
                                 />
