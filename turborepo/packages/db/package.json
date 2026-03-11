@@ -72,6 +72,7 @@
   },
   "devDependencies": {
     "@d0paminedriven/fs": "catalog:dd",
+    "@slipstream/credentials": "workspace:*",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",

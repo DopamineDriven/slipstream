@@ -227,14 +227,15 @@ model UserStoreDocChunk {
   /// only applicable for pdfs
   pageEndOffset   Int?
   /// `voyage-context-3` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
-  embeddingModel  String                       @default("voyage-multimodal-3.5")
+  embeddingModel  String @default("voyage-multimodal-3.5")
 
-  hasImages       Boolean
-  hasAnnots       Boolean
-  state           UserStoreChunkState          @default(QUEUED)
-  errorMessage    String?
-  retryCount      Int                          @default(0)
-  embedding       Unsupported("vector(1024)")?
+  hasImages    Boolean
+  hasAnnots    Boolean
+  state        UserStoreChunkState          @default(QUEUED)
+  errorMessage String?
+  retryCount   Int                          @default(0)
+  embedding    Unsupported("vector(1024)")?
+  contentTsv   Unsupported("tsvector")?
 
   schemaVersion UserStoreSchemaVersion @default(v1_0)
   deletedAt     DateTime?
@@ -254,4 +255,5 @@ model UserStoreDocChunk {
   @@index([docId, state])
   @@index([embedding], map: "idx_user_store_doc_chunk_embedding_hnsw")
   @@index([storeId], map: "idx_user_store_doc_chunk_store_active")
+  @@index([contentTsv], map: "idx_user_store_doc_chunk_content_tsv", type: Gin)
 }

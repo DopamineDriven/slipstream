@@ -795,9 +795,11 @@ export class OpenAIServiceWorkup {
       type: "function",
       name: "file_search",
       description:
-        "Search the user's uploaded documents using semantic similarity. " +
-        "Returns a JSON array of matching chunks with filename, score, content, offsets, and chunk index. " +
-        "Issue one query per call; use multiple calls for multiple terms.",
+        "Search the user's uploaded documents. Uses semantic similarity by default. " +
+        "When search_terms is provided, also performs fulltext keyword search and returns " +
+        "both result sets separately (semantic + fulltext) so you can reason about which signal is most relevant. " +
+        "Without search_terms: returns a flat JSON array. " +
+        "With search_terms: returns { semantic, fulltext, overlap, meta }.",
       strict: false,
       parameters: {
         type: "object",
@@ -816,6 +818,13 @@ export class OpenAIServiceWorkup {
               "Optional filename filter (fuzzy, case-insensitive). " +
               "Only chunks from documents whose filename closely matches this string are returned. " +
               "Example: 'Path to Hell Pt VIII' matches 'The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VIII.pdf'."
+          },
+          search_terms: {
+            type: "string",
+            description:
+              "Optional exact-match search terms for fulltext search. " +
+              "Supports quoted phrases and negation (-deprecated). " +
+              "When provided, returns partitioned semantic + fulltext results instead of a flat array."
           }
         },
         required: ["query"],
@@ -840,6 +849,24 @@ export class OpenAIServiceWorkup {
     });
   }
 
+  protected async searchStoreHybrid(
+    userId: string,
+    query: string,
+    searchTerms: string,
+    limit = 10,
+    threshold = 0,
+    filename?: string
+  ) {
+    return await this.userStoreVector.searchUserStoreChunksHybrid({
+      userId,
+      query,
+      searchTerms,
+      limit,
+      threshold,
+      filename
+    });
+  }
+
   protected parseFileSearchInput(
     rawArguments: string
   ): OpenAIFileSearchToolInput {
@@ -858,10 +885,16 @@ export class OpenAIServiceWorkup {
             ? parsed.filename.trim() || undefined
             : undefined;
 
+        const searchTermsInput =
+          "search_terms" in parsed && typeof parsed.search_terms === "string"
+            ? parsed.search_terms.trim() || undefined
+            : undefined;
+
         return {
           query: normalized,
           max_results: maxResults,
-          filename: filenameInput
+          filename: filenameInput,
+          search_terms: searchTermsInput
         } satisfies OpenAIFileSearchToolInput;
       }
     }
@@ -893,10 +926,16 @@ export class OpenAIServiceWorkup {
         ? parsed.filename.trim() || undefined
         : undefined;
 
+    const searchTermsInput =
+      "search_terms" in parsed && typeof parsed.search_terms === "string"
+        ? parsed.search_terms.trim() || undefined
+        : undefined;
+
     return {
       queries: [firstQuery, ...uniqueQueries.slice(1)] as const,
       max_results: maxResults,
-      filename: filenameInput
+      filename: filenameInput,
+      search_terms: searchTermsInput
     } satisfies OpenAIFileSearchToolInput;
   }
 
@@ -978,6 +1017,20 @@ export class OpenAIServiceWorkup {
     input: OpenAIFileSearchToolInput
   ) {
     const maxResults = Math.max(1, Math.min(input.max_results ?? 5, 10));
+
+    if (input.search_terms) {
+      const query = "query" in input ? input.query : input.queries[0];
+      const partitioned = await this.searchStoreHybrid(
+        userId,
+        query,
+        input.search_terms,
+        maxResults,
+        0,
+        input.filename
+      );
+      return this.userStoreVector.formatPartitionedResults(partitioned, query);
+    }
+
     const results =
       "query" in input
         ? await this.searchStore(userId, input.query, maxResults, 0, input.filename)
