@@ -11,6 +11,7 @@ import { PrismaDbService } from "@slipstream/db/factory";
 import {
   searchUserStoreChunksByStore,
   searchUserStoreChunksByStoreAndModel,
+  searchUserStoreChunksHybrid,
   updateUserStoreChunkState,
   updateUserStoreDocState
 } from "@slipstream/db/sql-node";
@@ -394,6 +395,30 @@ export class PrismaUserStoreService extends PrismaLocalStoreService {
         embedding,
         limit,
         threshold,
+        embeddingModel,
+        filename
+      )
+    );
+  }
+
+  public async searchUserStoreChunksHybrid(
+    storeId: string,
+    embedding: string,
+    semanticLimit: number,
+    threshold: number,
+    searchTerms: string | null,
+    fulltextLimit: number,
+    embeddingModel: string,
+    filename: string | null = null
+  ) {
+    return await this.prismaClient.$queryRawTyped(
+      searchUserStoreChunksHybrid(
+        storeId,
+        embedding,
+        semanticLimit,
+        threshold,
+        searchTerms,
+        fulltextLimit,
         embeddingModel,
         filename
       )

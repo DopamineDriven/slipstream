@@ -1,5 +1,8 @@
 import type { PageAnnotation, PageBox } from "@d0paminedriven/pdfdown";
-import type { searchUserStoreChunksByStore } from "@slipstream/db/sql-node";
+import type {
+  searchUserStoreChunksByStore,
+  searchUserStoreChunksHybrid
+} from "@slipstream/db/sql-node";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { Rm } from "@slipstream/types";
 
@@ -101,6 +104,33 @@ export interface UserStoreSearchParams {
 }
 
 export type UserStoreSearchResult = searchUserStoreChunksByStore.Result;
+
+/** Raw row from the hybrid SQL query — includes signal, rank, and overlap flag */
+export type HybridChunkHit = searchUserStoreChunksHybrid.Result;
+
+/** Discriminant for partitioned search results */
+export type HybridSearchSignal = "semantic" | "fulltext";
+
+/** Input params for hybrid search — extends base with optional searchTerms */
+export interface UserStoreHybridSearchParams extends UserStoreSearchParams {
+  searchTerms?: string;
+}
+
+/** Partitioned result returned to providers when search_terms is provided */
+export interface PartitionedSearchResult {
+  readonly semantic: readonly HybridChunkHit[];
+  readonly fulltext: readonly HybridChunkHit[];
+  readonly overlap: {
+    readonly chunkIds: readonly string[];
+    readonly jaccardSimilarity: number;
+  };
+  readonly meta: {
+    readonly searchTerms: string | null;
+    readonly semanticThreshold: number;
+    readonly semanticCount: number;
+    readonly fulltextCount: number;
+  };
+}
 
 /**
  * checking for gtOne (greater than one image in the pages image indexes)

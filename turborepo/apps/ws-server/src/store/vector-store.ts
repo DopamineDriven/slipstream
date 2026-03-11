@@ -5,8 +5,11 @@ import type {
   AttScopedImg,
   ChunkBudgetAdjustReason,
   ChunkWithRecord,
+  HybridChunkHit,
+  PartitionedSearchResult,
   UserStoreChunkDraft,
   UserStoreChunkReady,
+  UserStoreHybridSearchParams,
   UserStoreIndexResult,
   UserStoreSearchParams,
   UserStoreSearchResult
@@ -641,6 +644,312 @@ export class UserStoreVectorService extends UserStoreWorkupService {
         return true;
       })
       .slice(0, clampedLimit);
+  }
+
+  public async searchUserStoreChunksHybrid({
+    userId,
+    query,
+    searchTerms,
+    limit = 10,
+    threshold = 0,
+    filename
+  }: UserStoreHybridSearchParams): Promise<PartitionedSearchResult> {
+    if (query.trim().length === 0) {
+      return this.emptyPartitionedResult(searchTerms ?? null, threshold);
+    }
+
+    const store = await this.ensureUserStore(userId);
+    const semanticLimit = Math.max(1, Math.min(limit, 25));
+    const fulltextLimit = Math.max(1, Math.min(limit, 25));
+    const filenameFilter = filename?.trim() ?? null;
+    const terms = searchTerms?.trim().slice(0, 500) ?? null;
+
+    const [multimodalSettled, contextualSettled] = await Promise.allSettled([
+      this.voyage.embedChunksMultimodal("base64", {
+        inputs: [{ content: [{ type: "text", text: query }] }],
+        model: "voyage-multimodal-3.5",
+        input_type: "query"
+      }),
+      this.voyage.embedChunksContextual({
+        inputs: [[query]],
+        input_type: "query",
+        model: "voyage-context-3",
+        output_dimension: 1024
+      })
+    ]);
+
+    const allRows = Array.of<HybridChunkHit>();
+
+    if (multimodalSettled.status === "fulfilled") {
+      const mmResult = multimodalSettled.value;
+      if (!("detail" in mmResult)) {
+        const mmEmb = mmResult.data[0]?.embedding;
+        if (mmEmb) {
+          const rows = await this.prisma.searchUserStoreChunksHybrid(
+            store.id,
+            `[${mmEmb.join(",")}]`,
+            semanticLimit,
+            threshold,
+            terms,
+            fulltextLimit,
+            "voyage-multimodal-3.5",
+            filenameFilter
+          );
+          allRows.push(...rows);
+        }
+      } else {
+        this.logger.warn(
+          { userId, detail: this.prisma.safeErrMsg(mmResult.detail) },
+          "Hybrid search multimodal query embedding failed"
+        );
+      }
+    } else {
+      this.logger.warn(
+        { userId, error: multimodalSettled.reason },
+        "Hybrid search multimodal query embedding threw"
+      );
+    }
+
+    if (contextualSettled.status === "fulfilled") {
+      const ctxResult = contextualSettled.value;
+      if (!("detail" in ctxResult)) {
+        const ctxEmb = ctxResult.data[0]?.data[0]?.embedding;
+        if (ctxEmb) {
+          const rows = await this.prisma.searchUserStoreChunksHybrid(
+            store.id,
+            `[${ctxEmb.join(",")}]`,
+            semanticLimit,
+            threshold,
+            terms,
+            fulltextLimit,
+            "voyage-context-3",
+            filenameFilter
+          );
+          allRows.push(...rows);
+        }
+      } else {
+        this.logger.warn(
+          { userId, detail: this.prisma.safeErrMsg(ctxResult.detail) },
+          "Hybrid search contextual query embedding failed"
+        );
+      }
+    } else {
+      this.logger.warn(
+        { userId, error: contextualSettled.reason },
+        "Hybrid search contextual query embedding threw"
+      );
+    }
+
+    return this.partitionHybridRows(allRows, terms, threshold);
+  }
+
+  private partitionHybridRows(
+    rows: HybridChunkHit[],
+    searchTerms: string | null,
+    threshold: number
+  ): PartitionedSearchResult {
+    const semanticSeen = new Set<string>();
+    const fulltextSeen = new Set<string>();
+    const semantic = Array.of<HybridChunkHit>();
+    const fulltext = Array.of<HybridChunkHit>();
+
+    // Filter rows with null id (can't happen at runtime — Prisma CTE nullability artifact)
+    const valid = rows.filter((r): r is HybridChunkHit & { id: string } =>
+      r.id != null
+    );
+
+    // Sort by score descending within each signal so dedup keeps highest score
+    valid.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+
+    for (const row of valid) {
+      if (row.signal === "semantic") {
+        if (!semanticSeen.has(row.id)) {
+          semanticSeen.add(row.id);
+          semantic.push(row);
+        }
+      } else if (row.signal === "fulltext") {
+        if (!fulltextSeen.has(row.id)) {
+          fulltextSeen.add(row.id);
+          fulltext.push(row);
+        }
+      }
+    }
+
+    // Re-sort by rank ascending (positional order from the query)
+    semantic.sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0));
+    fulltext.sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0));
+
+    const overlapIds = [...semanticSeen].filter(id => fulltextSeen.has(id));
+    const unionSize = new Set([...semanticSeen, ...fulltextSeen]).size;
+
+    return {
+      semantic,
+      fulltext,
+      overlap: {
+        chunkIds: overlapIds,
+        jaccardSimilarity: unionSize > 0 ? overlapIds.length / unionSize : 0
+      },
+      meta: {
+        searchTerms,
+        semanticThreshold: threshold,
+        semanticCount: semantic.length,
+        fulltextCount: fulltext.length
+      }
+    } satisfies PartitionedSearchResult;
+  }
+
+  private emptyPartitionedResult(
+    searchTerms: string | null,
+    threshold: number
+  ): PartitionedSearchResult {
+    return {
+      semantic: [],
+      fulltext: [],
+      overlap: { chunkIds: [], jaccardSimilarity: 0 },
+      meta: {
+        searchTerms,
+        semanticThreshold: threshold,
+        semanticCount: 0,
+        fulltextCount: 0
+      }
+    } satisfies PartitionedSearchResult;
+  }
+
+  public formatPartitionedResults(result: PartitionedSearchResult, query: string) {
+    const searchTerms = result.meta.searchTerms;
+    const parsedTerms = searchTerms
+      ? this.parseSearchTerms(searchTerms)
+      : Array.of<string>();
+
+    const toScore = (raw: number | null) =>
+      raw != null ? Number(Number(raw).toFixed(4)) : 0;
+
+    const semanticResults = result.semantic.map(r => ({
+      filename: r.filename,
+      score: toScore(r.score),
+      content: r.content,
+      startOffset: r.startOffset,
+      endOffset: r.endOffset,
+      chunkIndex: r.chunkIndex,
+      rank: r.rank,
+      match_type: r.appearsInBothSignals === true ? "both" : "semantic"
+    }));
+
+    const fulltextResults = result.fulltext.map(r => {
+      const { matchedTerms, spans } =
+        r.content && parsedTerms.length > 0
+          ? this.extractMatchedSpans(r.content, parsedTerms)
+          : { matchedTerms: Array.of<string>(), spans: Array.of<[number, number]>() };
+
+      return {
+        filename: r.filename,
+        score: toScore(r.score),
+        content: r.content,
+        startOffset: r.startOffset,
+        endOffset: r.endOffset,
+        chunkIndex: r.chunkIndex,
+        rank: r.rank,
+        match_type: r.appearsInBothSignals === true ? "both" : "fulltext",
+        matched_terms: matchedTerms,
+        matched_spans: spans
+      };
+    });
+
+    const overlapResults = result.overlap.chunkIds
+      .map(chunkId => {
+        const semHit = result.semantic.find(r => r.id === chunkId);
+        const ftHit = result.fulltext.find(r => r.id === chunkId);
+        const hit = semHit ?? ftHit;
+        if (!hit) return null;
+
+        const { matchedTerms, spans } =
+          hit.content && parsedTerms.length > 0
+            ? this.extractMatchedSpans(hit.content, parsedTerms)
+            : { matchedTerms: Array.of<string>(), spans: Array.of<[number, number]>() };
+
+        return {
+          filename: hit.filename,
+          semantic_score: semHit ? toScore(semHit.score) : null,
+          fulltext_score: ftHit ? toScore(ftHit.score) : null,
+          content: hit.content,
+          startOffset: hit.startOffset,
+          endOffset: hit.endOffset,
+          chunkIndex: hit.chunkIndex,
+          match_type: "both",
+          matched_terms: matchedTerms,
+          matched_spans: spans
+        };
+      })
+      .filter((r): r is NonNullable<typeof r> => r != null);
+
+    return JSON.stringify({
+      query,
+      search_terms: searchTerms,
+      semantic_results: semanticResults,
+      fulltext_results: fulltextResults,
+      overlap_results: overlapResults,
+      metadata: {
+        semantic_count: result.meta.semanticCount,
+        fulltext_count: result.meta.fulltextCount,
+        overlap_count: result.overlap.chunkIds.length,
+        jaccard_similarity: Number(
+          result.overlap.jaccardSimilarity.toFixed(4)
+        ),
+        semantic_threshold: result.meta.semanticThreshold
+      }
+    });
+  }
+
+  private parseSearchTerms(searchTerms: string) {
+    const terms = Array.of<string>();
+    let remaining = searchTerms;
+
+    // Extract quoted phrases first
+    const quoteRegex = /"([^"]+)"/g;
+    let match: RegExpExecArray | null;
+    while ((match = quoteRegex.exec(searchTerms)) !== null) {
+      const phrase = match[1];
+      if (phrase) terms.push(phrase);
+      remaining = remaining.replace(match[0], " ");
+    }
+
+    // Split remaining on whitespace, skip negated terms and boolean operators
+    for (const word of remaining.split(/\s+/)) {
+      const trimmed = word.trim();
+      if (trimmed.length === 0 || trimmed.startsWith("-")) continue;
+      if (trimmed === "OR" || trimmed === "AND") continue;
+      terms.push(trimmed);
+    }
+
+    return terms;
+  }
+
+  private extractMatchedSpans(
+    content: string,
+    terms: readonly string[]
+  ) {
+    const matchedTerms = Array.of<string>();
+    const spans = Array.of<[number, number]>();
+    const lowerContent = content.toLowerCase();
+
+    for (const term of terms) {
+      const lowerTerm = term.toLowerCase();
+      let pos = 0;
+      let found = false;
+
+      while (pos < lowerContent.length) {
+        const idx = lowerContent.indexOf(lowerTerm, pos);
+        if (idx === -1) break;
+        spans.push([idx, idx + term.length]);
+        pos = idx + term.length;
+        found = true;
+      }
+
+      if (found) matchedTerms.push(term);
+    }
+
+    spans.sort((a, b) => a[0] - b[0]);
+    return { matchedTerms, spans };
   }
 
   public async indexMessageAttachments(

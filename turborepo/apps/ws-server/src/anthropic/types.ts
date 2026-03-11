@@ -65,6 +65,7 @@ export interface FileSearchToolInput {
   query: string;
   max_results?: number;
   filename?: string;
+  search_terms?: string;
 }
 
 export interface ToolUseAccumulator {

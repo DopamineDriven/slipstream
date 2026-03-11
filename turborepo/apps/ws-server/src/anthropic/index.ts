@@ -929,6 +929,10 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               filename:
                 typeof parsed.filename === "string"
                   ? parsed.filename.trim() || undefined
+                  : undefined,
+              search_terms:
+                typeof parsed.search_terms === "string"
+                  ? parsed.search_terms.trim() || undefined
                   : undefined
             };
 

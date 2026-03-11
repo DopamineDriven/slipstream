@@ -40,15 +40,35 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     });
   }
 
+  protected async searchStoreHybrid(
+    userId: string,
+    query: string,
+    searchTerms: string,
+    limit = 10,
+    threshold = 0,
+    filename?: string
+  ) {
+    return await this.userStoreVector.searchUserStoreChunksHybrid({
+      userId,
+      query,
+      searchTerms,
+      limit,
+      threshold,
+      filename
+    });
+  }
+
   protected fileSearchTool(): Anthropic.Beta.BetaToolUnion {
     return {
       name: "file_search",
       allowed_callers: ["direct", "code_execution_20250825"],
       description:
-        "Search the user's uploaded documents using semantic similarity. " +
-        "Returns a JSON array of matching chunks. Each element has: " +
-        '{ "filename": string, "score": number (0-1), "content": string, ' +
-        '"startOffset": number | null, "endOffset": number | null, "chunkIndex": number }. ' +
+        "Search the user's uploaded documents. Uses semantic similarity by default. " +
+        "When search_terms is provided, also performs fulltext keyword search and returns " +
+        "both result sets separately (semantic + fulltext) so you can reason about which signal " +
+        "is most relevant to the user's intent. " +
+        "Without search_terms: returns a flat JSON array of chunks. " +
+        "With search_terms: returns { semantic: [...], fulltext: [...], overlap: { chunkIds, jaccardSimilarity }, meta }. " +
         "Call directly for single retrieval tasks, or from code_execution for multi-step programmatic workflows.",
       input_schema: {
         type: "object" as const,
@@ -67,6 +87,13 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
               "Optional filename filter (fuzzy, case-insensitive). " +
               "Only chunks from documents whose filename closely matches this string are returned. " +
               "Example: 'Path to Hell Pt VIII' matches 'The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VIII.pdf'."
+          },
+          search_terms: {
+            type: "string",
+            description:
+              "Optional exact-match search terms for fulltext search. " +
+              "Supports quoted phrases and negation (-deprecated). " +
+              "When provided, returns partitioned semantic + fulltext results instead of a flat array."
           }
         },
         required: ["query"]
@@ -78,10 +105,27 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     userId: string,
     input: FileSearchToolInput
   ) {
+    const limit = Math.min(input.max_results ?? 5, 10);
+
+    if (input.search_terms) {
+      const partitioned = await this.searchStoreHybrid(
+        userId,
+        input.query,
+        input.search_terms,
+        limit,
+        0,
+        input.filename
+      );
+      return this.userStoreVector.formatPartitionedResults(
+        partitioned,
+        input.query
+      );
+    }
+
     const results = await this.searchStore(
       userId,
       input.query,
-      Math.min(input.max_results ?? 5, 10),
+      limit,
       0,
       input.filename
     );

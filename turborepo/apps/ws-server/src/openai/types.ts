@@ -98,9 +98,11 @@ export type OpenAIFileSearchToolInput =
       query: string;
       max_results?: number;
       filename?: string;
+      search_terms?: string;
     }
   | {
       queries: readonly [string, ...string[]];
       max_results?: number;
       filename?: string;
+      search_terms?: string;
     };
