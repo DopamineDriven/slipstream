@@ -1,6 +1,6 @@
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import type { Logger as PinoLogger } from "pino";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
 import { Anthropic } from "@anthropic-ai/sdk";
 import type { AnthropicModelIdUnion } from "@slipstream/types";
 

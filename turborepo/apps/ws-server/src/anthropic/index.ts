@@ -6,13 +6,13 @@ import type {
   RoundRecord,
   ToolUseAccumulator
 } from "@/anthropic/types.ts";
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { AnthropicVectorStoreWorkup } from "@/anthropic/vector-store.ts";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
-import { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { AnthropicModelIdUnion, EventTypeMap } from "@slipstream/types";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class AnthropicService extends AnthropicVectorStoreWorkup {
   /**
@@ -229,7 +229,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       }
       userMsgId;
       let stream: CreateMessageStreamRT;
-      console.log(params);
+
       try {
         stream = (await anthropic.beta.messages.create(
           params
@@ -270,11 +270,6 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       let usage: number | undefined = undefined;
 
       for await (const chunk of stream) {
-        // — Diagnostic: log every chunk received to diagnose Round 1 hang
-        this.logger.debug(
-          { round, chunkType: chunk.type },
-          "PTC chunk received"
-        );
 
         console.info(
           {

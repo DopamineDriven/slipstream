@@ -2,9 +2,12 @@ import type {
   GeminiEventMap,
   GenerateContentResponseProps
 } from "@/gemini/types.ts";
+import type { FileSearchToolInput } from "@/store/types.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
   Content,
   ContentUnion,
+  FunctionDeclaration,
   GenerateContentConfig,
   GenerateContentParameters,
   Part,
@@ -18,7 +21,8 @@ import {
   GoogleGenAI,
   Interactions,
   PartMediaResolutionLevel,
-  ThinkingLevel
+  ThinkingLevel,
+  Type
 } from "@google/genai";
 import type {
   AttachmentSingleton,
@@ -30,7 +34,12 @@ import type {
 
 export class GeminiWorkupService extends FileSearchStoreService {
   protected nanoid: Promise<(typeof import("nanoid"))["nanoid"]>;
-  constructor(logger: LoggerService, prisma: PrismaService, apiKey: string) {
+  constructor(
+    logger: LoggerService,
+    prisma: PrismaService,
+    protected store: UserStoreVectorService,
+    apiKey: string
+  ) {
     super(logger, prisma, apiKey);
     this.nanoid = import("nanoid").then(d => d.nanoid);
   }
@@ -703,6 +712,48 @@ export class GeminiWorkupService extends FileSearchStoreService {
     } else return this.prisma.handleImgGenCount("gemini", model, { n });
   }
 
+  protected userStoreSearchTool() {
+    return {
+      name: "user_store_search",
+      description:
+        "Search the user's uploaded documents. Uses semantic similarity by default. " +
+        "When search_terms is provided, also performs fulltext keyword search and returns " +
+        "both result sets separately (semantic + fulltext) so you can reason about which signal " +
+        "is most relevant to the user's intent. " +
+        "Without search_terms: returns a flat JSON array of chunks. " +
+        "With search_terms: returns { semantic: [...], fulltext: [...], overlap: { chunkIds, jaccardSimilarity }, meta }. " +
+        "Call directly for single retrieval tasks, or from code_execution for multi-step programmatic workflows.",
+      parameters: {
+        type: Type.OBJECT,
+        properties: {
+          query: {
+            type: Type.STRING,
+            description: "The semantic search query"
+          },
+          max_results: {
+            type: Type.NUMBER,
+            description: "Maximum results to return (1-10, default 5)"
+          },
+          filename: {
+            type: Type.STRING,
+            description:
+              "Optional filename filter (fuzzy, case-insensitive). " +
+              "Only chunks from documents whose filename closely matches this string are returned. " +
+              "Example: 'Path to Hell Pt VIII' matches 'The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VIII.pdf'."
+          },
+          search_terms: {
+            type: Type.STRING,
+            description:
+              "Optional exact-match search terms for fulltext search. " +
+              "Supports quoted phrases and negation (-deprecated). " +
+              "When provided, returns partitioned semantic + fulltext results instead of a flat array."
+          }
+        },
+        required: ["query"]
+      }
+    } satisfies FunctionDeclaration;
+  }
+
   private getToolConfig(latlng?: string) {
     const [lat, lng] = this.prisma.handleLatLng(latlng);
 
@@ -735,17 +786,13 @@ export class GeminiWorkupService extends FileSearchStoreService {
       case "gemini-3.1-flash-lite-preview":
       case "gemini-3-flash-preview":
       case "deep-research-pro-preview-12-2025":
-      case "gemini-2.5-flash": {
-        const fssRef = this.fssRegistry.get(userId);
-        if (fssRef) {
-          return [
-            { fileSearch: { fileSearchStoreNames: [fssRef] } }
-          ] satisfies GenerateContentConfig["tools"];
-        } else
-          return [
-            { googleSearch: {} },
-            { urlContext: {} }
-          ] satisfies GenerateContentConfig["tools"];
+      case "gemini-2.5-flash":
+      case "gemini-2.5-flash-lite": {
+        return [
+          {
+            functionDeclarations: [this.userStoreSearchTool()]
+          }
+        ] satisfies GenerateContentConfig["tools"];
       }
       case "gemini-3.1-flash-image-preview":
       case "gemini-3-pro-image-preview": {
@@ -754,16 +801,20 @@ export class GeminiWorkupService extends FileSearchStoreService {
       case "gemini-2.5-flash-image": {
         return [] satisfies GenerateContentConfig["tools"];
       }
-      case "gemini-2.5-flash-lite": {
+      case "gemini-2.0-flash": {
         return [
-          { googleSearch: {} },
-          { urlContext: {} }
+          {
+            functionDeclarations: [this.userStoreSearchTool()]
+          }
         ] satisfies GenerateContentConfig["tools"];
       }
-      case "gemini-2.0-flash": {
-        return [{ googleSearch: {} }] satisfies GenerateContentConfig["tools"];
+      case "gemini-2.0-flash-lite": {
+        return [
+          {
+            functionDeclarations: [this.userStoreSearchTool()]
+          }
+        ] satisfies GenerateContentConfig["tools"];
       }
-      case "gemini-2.0-flash-lite":
       case "imagen-4.0-fast-generate-001":
       case "imagen-4.0-generate-001":
       case "imagen-4.0-ultra-generate-001":
@@ -832,6 +883,82 @@ export class GeminiWorkupService extends FileSearchStoreService {
     } else return nanoid();
   }
 
+  protected async searchUserStore(
+    userId: string,
+    query: string,
+    limit = 5,
+    threshold = 0,
+    filename?: string
+  ) {
+    return await this.store.searchUserStoreChunks({
+      userId,
+      query,
+      limit,
+      threshold,
+      filename
+    });
+  }
+
+  protected async searchUserStoreHybrid(
+    userId: string,
+    query: string,
+    searchTerms: string,
+    limit = 10,
+    threshold = 0,
+    filename?: string
+  ) {
+    return await this.store.searchUserStoreChunksHybrid({
+      userId,
+      query,
+      searchTerms,
+      limit,
+      threshold,
+      filename
+    });
+  }
+
+  protected async executeUserStoreSearch(
+    userId: string,
+    input: FileSearchToolInput
+  ) {
+    const limit = Math.max(1, Math.min(input.max_results ?? 5, 10));
+
+    if (input.search_terms) {
+      const partitioned = await this.searchUserStoreHybrid(
+        userId,
+        input.query,
+        input.search_terms,
+        limit,
+        0,
+        input.filename
+      );
+      return this.store.formatPartitionedResults(partitioned, input.query);
+    }
+
+    const results = await this.searchUserStore(
+      userId,
+      input.query,
+      limit,
+      0,
+      input.filename
+    );
+
+    if (results.length === 0) {
+      return "[]";
+    }
+
+    return JSON.stringify(
+      results.map(r => ({
+        filename: r.filename,
+        score: r.score != null ? Number(r.score.toFixed(4)) : 0,
+        content: r.content,
+        startOffset: r.startOffset,
+        endOffset: r.endOffset,
+        chunkIndex: r.chunkIndex
+      }))
+    );
+  }
+
   private async contentGenChat({
     userId,
     isNewChat,
@@ -870,7 +997,8 @@ export class GeminiWorkupService extends FileSearchStoreService {
       config: {
         maxOutputTokens,
         toolConfig,
-        automaticFunctionCalling: { disable: false },
+        // Custom Gemini tool rounds are handled explicitly in chat.ts.
+        automaticFunctionCalling: { disable: true },
         responseModalities,
         tools,
         topP,
