@@ -13,3 +13,4 @@ dist-arn-*
 dist-domain-*
 bucket-policy-*
 dist-config-prod*.json
+claude-notes.md

@@ -791,10 +791,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
         return [
           {
             functionDeclarations: [this.userStoreSearchTool()]
-          },
-          { codeExecution: {} },
-          { googleSearch: {} },
-          { urlContext: {} }
+          }
         ] satisfies GenerateContentConfig["tools"];
       }
       case "gemini-3.1-flash-image-preview":
@@ -808,9 +805,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
         return [
           {
             functionDeclarations: [this.userStoreSearchTool()]
-          },
-          { codeExecution: {} },
-          { googleSearch: {} }
+          }
         ] satisfies GenerateContentConfig["tools"];
       }
       case "gemini-2.0-flash-lite": {
@@ -926,7 +921,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
     userId: string,
     input: FileSearchToolInput
   ) {
-    const limit = Math.min(input.max_results ?? 5, 10);
+    const limit = Math.max(1, Math.min(input.max_results ?? 5, 10));
 
     if (input.search_terms) {
       const partitioned = await this.searchUserStoreHybrid(
@@ -1002,7 +997,8 @@ export class GeminiWorkupService extends FileSearchStoreService {
       config: {
         maxOutputTokens,
         toolConfig,
-        automaticFunctionCalling: { disable: false },
+        // Custom Gemini tool rounds are handled explicitly in chat.ts.
+        automaticFunctionCalling: { disable: true },
         responseModalities,
         tools,
         topP,

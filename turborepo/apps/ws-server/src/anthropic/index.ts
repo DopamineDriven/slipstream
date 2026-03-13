@@ -229,7 +229,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       }
       userMsgId;
       let stream: CreateMessageStreamRT;
-      console.log(params);
+
       try {
         stream = (await anthropic.beta.messages.create(
           params
@@ -270,11 +270,6 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       let usage: number | undefined = undefined;
 
       for await (const chunk of stream) {
-        // — Diagnostic: log every chunk received to diagnose Round 1 hang
-        this.logger.debug(
-          { round, chunkType: chunk.type },
-          "PTC chunk received"
-        );
 
         console.info(
           {
