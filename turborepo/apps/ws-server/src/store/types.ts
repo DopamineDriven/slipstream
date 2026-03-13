@@ -215,16 +215,9 @@ export type UserStoreIndexSuccess = {
 
 export type UserStoreIndexResult = UserStoreIndexSuccess | UserStoreIndexSkip;
 
-// export type ImageCacheee<T extends boolean = boolean> = Map<
-//   number,
-//   AttScopedImages<T>
-// >;
-// export type AttScopedImage<
-//   Outer extends boolean = boolean,
-//   Inner extends boolean = boolean
-// > = {
-//   hasImages: Outer;
-//   pages?: Outer extends true ? number[] : undefined;
-//   counts: Outer extends true ? number : 0;
-//   images: Outer extends true ? AttScopedImages<Inner> : undefined;
-// };
+export interface FileSearchToolInput {
+  query: string;
+  max_results?: number;
+  filename?: string;
+  search_terms?: string;
+}

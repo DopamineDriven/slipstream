@@ -1,13 +1,10 @@
-import type {
-  FileSearchToolInput,
-  LocalSearchResult,
-  MessageInputParams
-} from "@/anthropic/types.ts";
+import type { MessageInputParams } from "@/anthropic/types.ts";
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
+import type { FileSearchToolInput } from "@/store/types.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { Anthropic } from "@anthropic-ai/sdk";
 import { AnthropicWorkup } from "@/anthropic/workup.ts";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
-import { UserStoreVectorService } from "@/store/vector-store.ts";
-import { Anthropic } from "@anthropic-ai/sdk";
 import type {
   AnthropicModelIdUnion,
   MessageSingleton
@@ -28,9 +25,9 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     userId: string,
     query: string,
     limit = 5,
-    threshold = 0.3,
+    threshold = 0,
     filename?: string
-  ): Promise<LocalSearchResult[]> {
+  ) {
     return await this.userStoreVector.searchUserStoreChunks({
       userId,
       query,
@@ -392,7 +389,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     messages: msgs,
     userId,
     apiKey,
-    container=undefined,
+    container = undefined,
     keyId,
     max_tokens,
     model: m,

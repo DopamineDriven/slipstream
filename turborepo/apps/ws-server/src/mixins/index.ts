@@ -223,6 +223,7 @@ export function GeminiMixin<
             new GeminiService(
               deps.logger,
               deps.prisma,
+              deps.userStore,
               deps.redis,
               deps.s3,
               this.gemApiKey ?? ""

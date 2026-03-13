@@ -1,309 +1,341 @@
-# Hybrid Retrieval: Partitioned Foraging for Enhanced AX
+Compositional or sequential function calling allows Gemini to chain multiple function calls together to fulfill a complex request. For example, to answer "Get the temperature in my current location", the Gemini API might first invoke a get_current_location() function followed by a get_weather() function that takes the location as a parameter.
 
-## Context
+```ts
+import { GoogleGenAI, Type } from "@google/genai";
 
-The user store has thousands of existing chunks with vector embeddings (pgvector) but no fulltext search capability. Currently, all file search goes through pure semantic similarity — the agent embeds the query with Voyage, does cosine distance search, and gets ranked results. This works well for conceptual queries but fails when users search for exact terms (error codes, specific identifiers, quoted phrases).
+// Configure the client
+const ai = new GoogleGenAI({});
 
-The design decision (from the claude-read.md conversation) is to **not** fuse the two signals with RRF, but instead return both result sets separately so the agent can reason about which to prioritize based on context. This is the "partitioned foraging" approach — the agent is the intelligence layer that decides weighting, not a fixed heuristic.
-
-### Key Design Decisions
-
-- **Output format**: Structured JSON (`{ semantic, fulltext, overlap, meta }`) — models handle JSON well, and `code_execution`-capable models can parse it programmatically
-- **Activation**: Opt-in only — the partitioned format is returned **only** when the agent explicitly provides `search_terms`. When absent, the existing flat JSON array is returned unchanged (zero regressions)
-
----
-
-## Files to Modify/Create
-
-| File | Action |
-|------|--------|
-| `packages/db/prisma/migrations/20260311035622_tsvector_incorporation/migration.sql` | **Edit** — fill the empty migration |
-| `packages/db/prisma/schema/userstore.prisma` | **Edit** — add `contentTsv` column + GIN index |
-| `packages/db/prisma/sql/searchUserStoreChunksHybrid.sql` | **Create** — partitioned hybrid query |
-| `apps/ws-server/src/store/types.ts` | **Edit** — add hybrid result types |
-| `apps/ws-server/src/prisma/user-store.ts` | **Edit** — add hybrid query method |
-| `apps/ws-server/src/store/vector-store.ts` | **Edit** — add `searchUserStoreChunksHybrid()` |
-| `apps/ws-server/src/anthropic/types.ts` | **Edit** — add `search_terms` to `FileSearchToolInput` |
-| `apps/ws-server/src/anthropic/vector-store.ts` | **Edit** — update tool definition + `executeFileSearch()` |
-| `apps/ws-server/src/openai/workup.ts` | **Edit** — same pattern as Anthropic |
-| `apps/ws-server/src/meta/index.ts` | **Edit** — same pattern as Anthropic |
-
-Grok/xAI is **excluded** — it uses native xAI collection-based search, not `UserStoreVectorService`.
-
----
-
-## Step 1: Migration SQL
-
-**File**: `packages/db/prisma/migrations/20260311035622_tsvector_incorporation/migration.sql`
-
-Fill the existing empty "create only" migration with four operations:
-
-```sql
--- 1. Add nullable tsvector column (same pattern as embedding Unsupported)
-ALTER TABLE "UserStoreDocChunk"
-  ADD COLUMN "contentTsv" tsvector;
-
--- 2. Backfill existing rows (thousands of chunks)
-UPDATE "UserStoreDocChunk"
-SET "contentTsv" = to_tsvector('english', COALESCE(REPLACE(content, E'\u0000', ''), ''))
-WHERE "contentTsv" IS NULL AND content IS NOT NULL;
-
--- 3. GIN index (plain CREATE INDEX, not CONCURRENTLY — safe inside migration transaction)
-CREATE INDEX idx_user_store_doc_chunk_content_tsv
-  ON "UserStoreDocChunk" USING GIN ("contentTsv");
-
--- 4. Trigger to auto-maintain on INSERT or content UPDATE
-CREATE OR REPLACE FUNCTION user_store_chunk_tsv_trigger() RETURNS trigger AS $$
-BEGIN
-  NEW."contentTsv" := to_tsvector('english', COALESCE(NEW.content, ''));
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_user_store_chunk_tsv
-  BEFORE INSERT OR UPDATE OF content ON "UserStoreDocChunk"
-  FOR EACH ROW
-  EXECUTE FUNCTION user_store_chunk_tsv_trigger();
-```
-
-**Key**: The `BEFORE INSERT OR UPDATE OF content` clause means `updateUserStoreChunkState.sql` (which updates state/embedding/tokenCount but never content) will NOT fire the trigger. Zero overhead on the embedding hot path.
-
----
-
-## Step 2: Prisma Schema
-
-**File**: `packages/db/prisma/schema/userstore.prisma`
-
-Add to `UserStoreDocChunk` model after the `embedding` field (line ~237):
-
-```prisma
-contentTsv  Unsupported("tsvector")?
-```
-
-Add to the `@@index` block (after line ~255):
-
-```prisma
-@@index([contentTsv], map: "idx_user_store_doc_chunk_content_tsv", type: Gin)
-```
-
----
-
-## Step 3: Hybrid SQL Query
-
-**File**: `packages/db/prisma/sql/searchUserStoreChunksHybrid.sql` (new)
-
-Parameters follow existing `@param` JSDoc convention:
-
-```
-$1:storeId, $2:embedding, $3:semanticLimit, $4:threshold,
-$5:searchTerms?, $6:fulltextLimit, $7:embeddingModel, $8:filename?
-```
-
-Structure — two CTEs + UNION ALL:
-
-- **`semantic_ranked` CTE**: Replicates existing `searchUserStoreChunksByStoreAndModel` logic — filters by storeId, embeddingModel, active doc/chunk states, cosine threshold, optional filename fuzzy match via `similarity()`. Adds `ROW_NUMBER()` for rank. Limited to `$3`.
-
-- **`fulltext_ranked` CTE**: Guarded by `$5 IS NOT NULL AND $5 <> ''` (no-op when search terms absent). Matches via `chunk."contentTsv" @@ websearch_to_tsquery('english', $5)`. Scores with `ts_rank_cd()`. Same state/filename filters. Limited to `$6`.
-
-- **Final SELECT**: `UNION ALL` with `'semantic'` / `'fulltext'` as `signal` discriminant. Each row includes all chunk fields + doc metadata + `score`, `rank`, `signal`, `"appearsInBothSignals"` (cross-CTE existence check). Ordered by `signal, rank`.
-
-The `$5 IS NOT NULL` guard means the planner completely eliminates the fulltext CTE when no search terms are provided — zero cost for semantic-only calls.
-
----
-
-## Step 4: Type Definitions
-
-**File**: `apps/ws-server/src/store/types.ts`
-
-New types (after existing `UserStoreSearchResult` at line 103):
-
-```typescript
-import type { searchUserStoreChunksHybrid } from "@slipstream/db/sql-node";
-
-/** Raw row from the hybrid SQL query */
-export type HybridChunkHit = searchUserStoreChunksHybrid.Result;
-
-/** 'semantic' | 'fulltext' */
-export type HybridSearchSignal = "semantic" | "fulltext";
-
-/** Input params for hybrid search */
-export interface UserStoreHybridSearchParams extends UserStoreSearchParams {
-  searchTerms?: string;
+// Example Functions
+function get_weather_forecast({ location }) {
+  console.log(`Tool Call: get_weather_forecast(location=${location})`);
+  // TODO: Make API call
+  console.log("Tool Response: {'temperature': 25, 'unit': 'celsius'}");
+  return { temperature: 25, unit: "celsius" };
 }
 
-/** Partitioned result returned to providers */
-export interface PartitionedSearchResult {
-  readonly semantic: ReadonlyArray<HybridChunkHit>;
-  readonly fulltext: ReadonlyArray<HybridChunkHit>;
-  readonly overlap: {
-    readonly chunkIds: ReadonlyArray<string>;
-    readonly jaccardSimilarity: number;
-  };
-  readonly meta: {
-    readonly searchTerms: string | null;
-    readonly semanticThreshold: number;
-    readonly semanticCount: number;
-    readonly fulltextCount: number;
-  };
-}
-```
-
-**File**: `apps/ws-server/src/anthropic/types.ts` — add `search_terms?: string` to `FileSearchToolInput` (line 64-68).
-
-Same change in OpenAI and Meta tool input types.
-
----
-
-## Step 5: Prisma Service Layer
-
-**File**: `apps/ws-server/src/prisma/user-store.ts`
-
-Add new method (follows pattern of existing `searchUserStoreChunksByModel` at line 383):
-
-```typescript
-public async searchUserStoreChunksHybrid(
-  storeId: string,
-  embedding: string,
-  semanticLimit: number,
-  threshold: number,
-  searchTerms: string | null,
-  fulltextLimit: number,
-  embeddingModel: string,
-  filename: string | null = null
-) {
-  return await this.prismaClient.$queryRawTyped(
-    searchUserStoreChunksHybrid(
-      storeId, embedding, semanticLimit, threshold,
-      searchTerms, fulltextLimit, embeddingModel, filename
-    )
+function set_thermostat_temperature({ temperature }) {
+  console.log(
+    `Tool Call: set_thermostat_temperature(temperature=${temperature})`,
   );
+  // TODO: Make API call
+  console.log("Tool Response: {'status': 'success'}");
+  return { status: "success" };
 }
-```
 
-Import `searchUserStoreChunksHybrid` from `@slipstream/db/sql-node` at the top (alongside existing SQL imports at line 12-16).
+const toolFunctions = {
+  get_weather_forecast,
+  set_thermostat_temperature,
+};
 
----
+const tools = [
+  {
+    functionDeclarations: [
+      {
+        name: "get_weather_forecast",
+        description:
+          "Gets the current weather temperature for a given location.",
+        parameters: {
+          type: Type.OBJECT,
+          properties: {
+            location: {
+              type: Type.STRING,
+            },
+          },
+          required: ["location"],
+        },
+      },
+      {
+        name: "set_thermostat_temperature",
+        description: "Sets the thermostat to a desired temperature.",
+        parameters: {
+          type: Type.OBJECT,
+          properties: {
+            temperature: {
+              type: Type.NUMBER,
+            },
+          },
+          required: ["temperature"],
+        },
+      },
+    ],
+  },
+];
 
-## Step 6: Vector Service — Hybrid Search Method
+// Prompt for the model
+let contents = [
+  {
+    role: "user",
+    parts: [
+      {
+        text: "If it's warmer than 20°C in London, set the thermostat to 20°C, otherwise set it to 18°C.",
+      },
+    ],
+  },
+];
 
-**File**: `apps/ws-server/src/store/vector-store.ts`
-
-Add `searchUserStoreChunksHybrid()` as a new public method (alongside existing `searchUserStoreChunks` at line 543). Does NOT replace the existing method.
-
-Logic:
-1. Validate query, clamp limits, truncate `searchTerms` to 500 chars
-2. `ensureUserStore(userId)` to get store ID
-3. Embed query with both Voyage models in parallel (`Promise.allSettled`, same pattern as lines 558-570)
-4. For each successful embedding, call `this.prisma.searchUserStoreChunksHybrid()` passing `searchTerms`
-5. Collect all raw rows from both model calls
-6. Partition into `semantic` and `fulltext` arrays by checking the `signal` column
-7. Deduplicate within each signal by chunk ID (keep highest score)
-8. Compute Jaccard overlap: `intersection.size / union.size`
-9. Return `PartitionedSearchResult`
-
-Also add a `formatPartitionedResults()` method that serializes the result to agent-friendly JSON:
-
-```json
-{
-  "semantic": [{ "filename", "score", "content", "startOffset", "endOffset", "chunkIndex", "rank", "appearsInBothSignals" }],
-  "fulltext": [{ ... same shape ... }],
-  "overlap": { "chunkIds": [...], "jaccardSimilarity": 0.18 },
-  "meta": { "searchTerms": "ECONNREFUSED", "semanticCount": 8, "fulltextCount": 5 }
-}
-```
-
-When `searchTerms` is null → `fulltext` is empty, which degrades gracefully to the existing behavior.
-
----
-
-## Step 7: Provider Layer Updates
-
-Three providers need parallel changes. Anthropic is the pattern file; OpenAI and Meta follow.
-
-### 7a. Tool Definition — Add `search_terms` to schema
-
-Each provider's `fileSearchTool()` gets a new optional property in `input_schema.properties`:
-
-```
-search_terms: {
-  type: "string",
-  description: "Optional exact-match search terms for fulltext search. Supports quoted phrases (\"AES-256-GCM\") and negation (-deprecated). When provided, returns both semantic and fulltext result sets separately."
-}
-```
-
-Update tool description to mention dual-signal capability.
-
-Files:
-- `apps/ws-server/src/anthropic/vector-store.ts` — `fileSearchTool()` (line 43)
-- `apps/ws-server/src/openai/workup.ts` — `fileSearchFunctionTool()`
-- `apps/ws-server/src/meta/index.ts` — `fileSearchFunctionTool()`
-
-### 7b. Input Parsing — Extract `search_terms`
-
-Each provider's tool input parsing adds `search_terms` extraction alongside `query`, `max_results`, `filename`. Backward compatible — absent means `null`.
-
-Files:
-- `apps/ws-server/src/anthropic/index.ts` (lines 913-933)
-- `apps/ws-server/src/openai/workup.ts` (`parseFileSearchInput()`)
-- `apps/ws-server/src/meta/index.ts` (`parseFileSearchInput()`)
-
-### 7c. `executeFileSearch()` — Conditional Hybrid Path
-
-When `input.search_terms` is present and non-empty:
-- Call `searchUserStoreChunksHybrid()` instead of `searchStore()`
-- Format with `formatPartitionedResults()`
-- Return structured JSON
-
-When `input.search_terms` is absent:
-- Fall back to existing `searchStore()` behavior
-- Return existing flat JSON array
-
-This ensures zero regressions for models that don't use `search_terms`.
-
-Files:
-- `apps/ws-server/src/anthropic/vector-store.ts` — `executeFileSearch()` (line 77)
-- `apps/ws-server/src/openai/workup.ts` — `executeFileSearch()`
-- `apps/ws-server/src/meta/index.ts` — `executeFileSearch()`
-
-### 7d. `searchStoreHybrid()` — New Protected Method
-
-Each provider gets a `searchStoreHybrid()` that wraps `userStoreVector.searchUserStoreChunksHybrid()`:
-
-```typescript
-protected async searchStoreHybrid(
-  userId: string,
-  query: string,
-  searchTerms: string,
-  limit?: number,
-  threshold?: number,
-  filename?: string
-): Promise<PartitionedSearchResult> {
-  return await this.userStoreVector.searchUserStoreChunksHybrid({
-    userId, query, searchTerms, limit, threshold, filename
+// Loop until the model has no more function calls to make
+while (true) {
+  const result = await ai.models.generateContent({
+    model: "gemini-3-flash-preview",
+    contents,
+    config: { tools },
   });
+
+  if (result.functionCalls && result.functionCalls.length > 0) {
+    const functionCall = result.functionCalls[0];
+
+    const { name, args } = functionCall;
+
+    if (!toolFunctions[name]) {
+      throw new Error(`Unknown function call: ${name}`);
+    }
+
+    // Call the function and get the response.
+    const toolResponse = toolFunctions[name](args);
+
+    const functionResponsePart = {
+      name: functionCall.name,
+      response: {
+        result: toolResponse,
+      },
+    };
+
+    // Send the function response back to the model.
+    contents.push({
+      role: "model",
+      parts: [
+        {
+          functionCall: functionCall,
+        },
+      ],
+    });
+    contents.push({
+      role: "user",
+      parts: [
+        {
+          functionResponse: functionResponsePart,
+        },
+      ],
+    });
+  } else {
+    // No more function calls, break the loop.
+    console.log(result.text);
+    break;
+  }
 }
+```
+
+Function calling modes
+
+The Gemini API lets you control how the model uses the provided tools (function declarations). Specifically, you can set the mode within the.function_calling_config.
+
+    AUTO (Default): The model decides whether to generate a natural language response or suggest a function call based on the prompt and context. This is the most flexible mode and recommended for most scenarios.
+    ANY: The model is constrained to always predict a function call and guarantees function schema adherence. If allowed_function_names is not specified, the model can choose from any of the provided function declarations. If allowed_function_names is provided as a list, the model can only choose from the functions in that list. Use this mode when you require a function call response to every prompt (if applicable).
+    NONE: The model is prohibited from making function calls. This is equivalent to sending a request without any function declarations. Use this to temporarily disable function calling without removing your tool definitions.
+
+    VALIDATED (Preview): The model is constrained to predict either function calls or natural language, and ensures function schema adherence. If allowed_function_names is not provided, the model picks from all of the available function declarations. If allowed_function_names is provided, the model picks from the set of allowed functions
+
+
+---
+
+Schedule Meeting example:
+
+```ts
+import { GoogleGenAI, Type } from '@google/genai';
+
+// Configure the client
+const ai = new GoogleGenAI({});
+
+// Define the function declaration for the model
+const scheduleMeetingFunctionDeclaration = {
+  name: 'schedule_meeting',
+  description: 'Schedules a meeting with specified attendees at a given time and date.',
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      attendees: {
+        type: Type.ARRAY,
+        items: { type: Type.STRING },
+        description: 'List of people attending the meeting.',
+      },
+      date: {
+        type: Type.STRING,
+        description: 'Date of the meeting (e.g., "2024-07-29")',
+      },
+      time: {
+        type: Type.STRING,
+        description: 'Time of the meeting (e.g., "15:00")',
+      },
+      topic: {
+        type: Type.STRING,
+        description: 'The subject or topic of the meeting.',
+      },
+    },
+    required: ['attendees', 'date', 'time', 'topic'],
+  },
+};
+
+// Send request with function declarations
+const response = await ai.models.generateContent({
+  model: 'gemini-3-flash-preview',
+  contents: 'Schedule a meeting with Bob and Alice for 03/27/2025 at 10:00 AM about the Q3 planning.',
+  config: {
+    tools: [{
+      functionDeclarations: [scheduleMeetingFunctionDeclaration]
+    }],
+  },
+});
+
+// Check for function calls in the response
+if (response.functionCalls && response.functionCalls.length > 0) {
+  const functionCall = response.functionCalls[0]; // Assuming one function call
+  console.log(`Function to call: ${functionCall.name}`);
+  console.log(`Arguments: ${JSON.stringify(functionCall.args)}`);
+  // In a real app, you would call your actual function here:
+  // const result = await scheduleMeeting(functionCall.args);
+} else {
+  console.log("No function call found in the response.");
+  console.log(response.text);
+}
+```
+
+Create Chart Example
+
+```ts
+import { GoogleGenAI, Type } from '@google/genai';
+
+// Configure the client
+const ai = new GoogleGenAI({});
+
+// Define the function declaration for the model
+const createChartFunctionDeclaration = {
+  name: 'create_bar_chart',
+  description: 'Creates a bar chart given a title, labels, and corresponding values.',
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      title: {
+        type: Type.STRING,
+        description: 'The title for the chart.',
+      },
+      labels: {
+        type: Type.ARRAY,
+        items: { type: Type.STRING },
+        description: 'List of labels for the data points (e.g., ["Q1", "Q2", "Q3"]).',
+      },
+      values: {
+        type: Type.ARRAY,
+        items: { type: Type.NUMBER },
+        description: 'List of numerical values corresponding to the labels (e.g., [50000, 75000, 60000]).',
+      },
+    },
+    required: ['title', 'labels', 'values'],
+  },
+};
+
+// Send request with function declarations
+const response = await ai.models.generateContent({
+  model: 'gemini-3-flash-preview',
+  contents: "Create a bar chart titled 'Quarterly Sales' with data: Q1: 50000, Q2: 75000, Q3: 60000.",
+  config: {
+    tools: [{
+      functionDeclarations: [createChartFunctionDeclaration]
+    }],
+  },
+});
+
+// Check for function calls in the response
+if (response.functionCalls && response.functionCalls.length > 0) {
+  const functionCall = response.functionCalls[0]; // Assuming one function call
+  console.log(`Function to call: ${functionCall.name}`);
+  console.log(`Arguments: ${JSON.stringify(functionCall.args)}`);
+  // In a real app, you would call your actual function here:
+  // const result = await createBarChart(functionCall.args);
+} else {
+  console.log("No function call found in the response.");
+  console.log(response.text);
+}
+
 ```
 
 ---
 
-## Step 8: Regenerate & Verify
+- Notes from before compaction:
 
-1. `cd packages/db && pnpm db:generate` — regenerates TypedSQL wrappers including `searchUserStoreChunksHybrid`
-2. `cd packages/db && pnpm build` — compile new exports
-3. Verify `@slipstream/db/sql-node` exports `searchUserStoreChunksHybrid`
-4. `cd apps/ws-server && pnpm build` — type-check all service/provider changes
-5. Apply migration to dev DB: `cd packages/db && pnpm db:deploy`
-6. Verify backfill: `SELECT COUNT(*) FROM "UserStoreDocChunk" WHERE "contentTsv" IS NOT NULL` should match total chunk count
-7. Test hybrid search end-to-end: send a message with a file_search tool call that includes `search_terms`
 
----
+● Write(~/.claude/projects/-home-dopaminedriven-cloneathon-t3-chat-clone-turborepo/memory/project_gemini_file_search.md)
+  ⎿  Wrote 91 lines to ../../../.claude/projects/-home-dopaminedriven-cloneathon-t3-chat-clone-turborepo/memory/project_gemini_file_search.md
+       1 ---
+       2 name: Gemini File Search Implementation
+       3 description: In-progress implementation of custom file_search function calling for Gemini models, threading UserStoreVectorService through the class hierarchy
+       4 type: project
+       5 ---
+       6
+       7 ## Status: IN PROGRESS — workup.ts imports added, constructor + methods + chat.ts tool loop still pending
+       8
+       9 ## What's Done (Partitioned Foraging / Hybrid Search)
+      10 All completed for Anthropic, OpenAI, Meta, v0 providers:
+     … +81 lines (ctrl+o to expand)
 
-## Verification Plan
+● Read 1 file (ctrl+o to expand)
 
-1. **Migration**: Run against dev DB, verify column exists, GIN index present, trigger fires on INSERT
-2. **Backfill**: Confirm all existing chunks have populated `contentTsv`
-3. **Pure semantic (regression)**: Existing `searchUserStoreChunks()` unchanged, verify existing file_search calls work identically
-4. **Hybrid with terms**: Call file_search with `{ "query": "authentication flow", "search_terms": "ECONNREFUSED" }` — should return separate semantic + fulltext arrays
-5. **Hybrid without terms**: Call file_search with `{ "query": "authentication flow" }` — fulltext array should be empty, semantic array populated (backward compat)
-6. **Overlap detection**: Use a query where both signals overlap — verify `appearsInBothSignals` and Jaccard are computed correctly
-7. **Agent reasoning**: Verify the agent can see both result sets and reason about which to prioritize in its response
+● Write(~/.claude/projects/-home-dopaminedriven-cloneathon-t3-chat-clone-turborepo/memory/MEMORY.md)
+  ⎿  Wrote 11 lines to ../../../.claude/projects/-home-dopaminedriven-cloneathon-t3-chat-clone-turborepo/memory/MEMORY.md
+       1 # Memory Index
+       2
+       3 ## Project
+       4 - [Gemini File Search Implementation](project_gemini_file_search.md) — In-progress: adding custom file_search function calling to Gemini models via UserStoreVectorService, threading through class hierarchy. Partitioned foraging (hybrid search) already comple
+         te for Anthropic, OpenAI, Meta, v0.
+       5
+       6 ## User
+       7 - [User Profile](user_profile.md) — Solo developer, preferences for script patterns, ESLint conventions
+       8
+       9 ## Feedback
+      10 - [ESLint Array Syntax](feedback_eslint_array.md) — Use `readonly T[]` not `ReadonlyArray<T>`; use `T[]` not `Array<T>`
+     … +1 line (ctrl+o to expand)
+
+● Write(~/.claude/projects/-home-dopaminedriven-cloneathon-t3-chat-clone-turborepo/memory/user_profile.md)
+  ⎿  Wrote 13 lines to ../../../.claude/projects/-home-dopaminedriven-cloneathon-t3-chat-clone-turborepo/memory/user_profile.md
+       1 ---                                                                                                       
+       2 name: User Profile
+       3 description: Solo developer on t3-chat-clone, experienced TypeScript dev with strong opinions on type safety and code quality
+       4 type: user
+       5 ---                                                                                                                                                                                                                                                                      
+       6                                                                                  
+       7 - Solo developer — only person touching this repo
+       8 - Deep TypeScript expertise, strong opinions on type safety (see CLAUDE.md hard rules)                                                                                                                                                                                   
+       9 - Appreciates well-crafted scripts ("quality scripts are my shit")
+      10 - Prefers concise, direct communication                                                                                                                                                                                                                                  
+     … +3 lines (ctrl+o to expand)                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                
+● Write(~/.claude/projects/-home-dopaminedriven-cloneathon-t3-chat-clone-turborepo/memory/feedback_eslint_array.md)                                                                                                                                                               
+  ⎿  Wrote 11 lines to ../../../.claude/projects/-home-dopaminedriven-cloneathon-t3-chat-clone-turborepo/memory/feedback_eslint_array.md                                                                                                                                          
+       1 ---                                                                                                                                                                                                                                                                      
+       2 name: ESLint Array Syntax                                                                                                                                                                                                                                                
+       3 description: Use readonly T[] not ReadonlyArray<T>, and T[] not Array<T> per ESLint config                                                                                                                                                                               
+       4 type: feedback                                                                   
+       5 ---
+       6                                                                                                                                                                                                                                                                          
+       7 Use `readonly T[]` instead of `ReadonlyArray<T>`.
+       8 Use `T[]` instead of `Array<T>` for type annotations.                                                                                                                                                                                                                    
+       9                                                                                                                                                                                                                                                                        
+      10 **Why:** ESLint is configured to enforce this syntax style.                                                                                                                                                                                                            
+     … +1 line (ctrl+o to expand)                                                                                                                                                                                                                                                 
+                                                                                                                                                                                                                                                                                  
+● Write(~/.claude/projects/-home-dopaminedriven-cloneathon-t3-chat-clone-turborepo/memory/feedback_script_args.md)                                                                                                                                                                
+  ⎿  Wrote 16 lines to ../../../.claude/projects/-home-dopaminedriven-cloneathon-t3-chat-clone-turborepo/memory/feedback_script_args.md                                                                                                                                           
+       1 ---                                                                                                                                                                                                                                                                      
+       2 name: Script Argument Pattern                                                    
+       3 description: Use positional argv flags with gated execution at bottom of file, not parseArgs() functions
+       4 type: feedback                                                                                                                                                                                                                                                           
+       5 ---
+       6                                                                                                                                                                                                                                                                          
+       7 For standalone scripts (test/backfill scripts), use explicit positional `process.argv` flags:                                                                                                                                                                          
+       8 - `argv[3]` = first flag value (e.g., `--env dev`)                                                                                                                                                                                                                     
+       9 - `argv[5]` = second flag value (e.g., `--size 200`)                                                                                                                                                                                                                     
+      10 - `argv[7]` = third flag value (e.g., `--dry true`)                                                                                                                                                                                                                      
+     … +6 lines (ctrl+o to expand)                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                  
+✢ Compacting conversation… (1m 19s · ↑ 2.2k tokens)
+  ⎿  Tip: Use /btw to ask a quick side question without interrupting Claude's current work

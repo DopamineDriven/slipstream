@@ -172,6 +172,7 @@ async function exe() {
     const gemini = new GeminiService(
       logger,
       prisma,
+      userStore,
       redisInstance,
       s3,
       cfg.GOOGLE_API_KEY

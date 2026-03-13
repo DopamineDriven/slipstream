@@ -1,4 +1,7 @@
 import type { ProviderGeminiChatRequestEntity } from "@/gemini/types.ts";
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type {
   Blob,
@@ -6,25 +9,24 @@ import type {
   GenerateContentResponse
 } from "@google/genai";
 import { GeminiWorkupService } from "@/gemini/workup.ts";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
+import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AIChatResponseImgGenSubFields,
   EventTypeMap,
   GeminiModelIdUnion
 } from "@slipstream/types";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import { S3Storage } from "@slipstream/storage-s3";
 
 export class GeminiChatService extends GeminiWorkupService {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
+    store: UserStoreVectorService,
     protected redis: EnhancedRedisPubSub,
     protected s3: S3Storage,
     apiKey: string
   ) {
-    super(logger, prisma, apiKey);
+    super(logger, prisma, store, apiKey);
   }
   protected async handleGeminiAiChatRequest({
     chunks,
@@ -67,6 +69,8 @@ export class GeminiChatService extends GeminiWorkupService {
       topP
     });
 
+    const MAX_ROUNDS = 10;
+
     let geminiThinkingStartTime: number | null = null,
       geminiThinkingDuration = 0,
       geminiIsCurrentlyThinking = false,
@@ -77,13 +81,12 @@ export class GeminiChatService extends GeminiWorkupService {
       tInitial = 0,
       uploadtDelta = 0,
       geminiAgg = "",
-      geminiDataPart: Blob | undefined = undefined;
+      geminiDataPart: Blob | undefined = undefined,
+      currentRound = 0;
 
     const geminiDataArr = Array.of<Blob>();
 
     const gemini = this.getClient(apiKey);
-
-    // const imagen = await gemini.models.generateImages({model: "imagen-4.0-generate-001" satisfies GeminiModelIdUnion,prompt: "",config: {includeRaiReason: true,}})
 
     const stream = (await gemini.models.generateContentStream(
       params
@@ -99,7 +102,7 @@ export class GeminiChatService extends GeminiWorkupService {
       }
       if (chunk.responseId && typeof resId === "undefined") {
         resId = chunk.responseId;
-        console.log(resId)
+        console.log(resId);
       }
       if (chunk.candidates) {
         for (const candidate of chunk.candidates) {

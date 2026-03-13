@@ -1,9 +1,8 @@
-
 import { createReadStream } from "node:fs";
 import type { AnthropicFileRecord } from "@/anthropic/types.ts";
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import { AnthropicBaseService } from "@/anthropic/base.ts";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
 import { Anthropic, toFile } from "@anthropic-ai/sdk";
 import type {
   AnthropicModelIdUnion,
@@ -18,11 +17,7 @@ export class AnthropicWorkup extends AnthropicBaseService {
   // Registry of all Anthropic files with access tracking
   protected fileRegistry = new Map<string, AnthropicFileRecord>();
   protected lastRegistrySync: Date | null = null;
-  constructor(
-    logger: LoggerService,
-    prisma: PrismaService,
-    apiKey: string
-  ) {
+  constructor(logger: LoggerService, prisma: PrismaService, apiKey: string) {
     super(logger, prisma, apiKey);
   }
   private async *getAllAnthropicFiles(apiKey?: string, limit = 50) {
