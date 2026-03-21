@@ -83,7 +83,7 @@ type V0ForcedLoopStopReason =
   | null;
 
 export class v0Service {
-  private readonly baseUrl = "https://api.v0.dev/v1/chat/completions";
+  private readonly baseUrl = "https://ai-gateway.vercel.sh/v1/chat/completions";
   private logger: PinoLogger;
 
   constructor(
@@ -121,7 +121,7 @@ export class v0Service {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model,
+        model: `vercel/${model}`,
         messages,
         stream: true,
         ...(typeof options?.temperature === "number"
@@ -153,18 +153,18 @@ export class v0Service {
 
   private buildSystemPrompt(
     systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
-    fileSearchEnabled = false
+    _fileSearchEnabled = false
   ) {
-    const basePrompt = fileSearchEnabled
-      ? "You are a knowledgeable full-stack expert. If document lookup would help, use the provided file_search tool."
-      : "You are a knowledgeable full-stack expert; without using any tools provide assistance by outputting formatted code blocks into chat. Tools such as QuickEdit are not to be used and are unnecessary for this.";
+    // const basePrompt = fileSearchEnabled
+    //   ? "You are a knowledgeable full-stack expert. If document lookup would help, use the provided file_search tool."
+    //   : "You are a knowledgeable full-stack expert; without using any tools provide assistance by outputting formatted code blocks into chat. Tools such as QuickEdit are not to be used and are unnecessary for this.";
 
     const historyNote =
       "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
 
     return systemPrompt
-      ? `${systemPrompt}\n\n${basePrompt}\n\n${historyNote}`
-      : `${basePrompt}\n\n${historyNote}`;
+      ? `${systemPrompt}\n\n${historyNote}`
+      : `${historyNote}`;
   }
 
   private prependProviderModelTag(

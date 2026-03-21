@@ -1569,6 +1569,11 @@ export type VideoMetadataFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Skip the first `n` VideoMetadata.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of VideoMetadata.
+   */
   distinct?: Prisma.VideoMetadataScalarFieldEnum | Prisma.VideoMetadataScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

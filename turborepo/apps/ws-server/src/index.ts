@@ -129,7 +129,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
-      cfg.V0_API_KEY
+      process.env.AI_GATEWAY_API_KEY ?? cfg.AI_GATEWAY_API_KEY
     );
 
     const { PdfService } = await import("@/pdf/index.ts");
@@ -187,7 +187,7 @@ async function exe() {
         grok: cfg.X_AI_KEY,
         meta: cfg.LLAMA_API_KEY,
         openai: cfg.OPENAI_API_KEY,
-        vercel: cfg.V0_API_KEY,
+        vercel: process.env.AI_GATEWAY_API_KEY ?? cfg.AI_GATEWAY_API_KEY,
         grokMgmtKey:
           process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
       },

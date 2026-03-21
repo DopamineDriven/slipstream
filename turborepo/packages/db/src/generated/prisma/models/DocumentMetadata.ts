@@ -1559,6 +1559,11 @@ export type DocumentMetadataFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Skip the first `n` DocumentMetadata.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of DocumentMetadata.
+   */
   distinct?: Prisma.DocumentMetadataScalarFieldEnum | Prisma.DocumentMetadataScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

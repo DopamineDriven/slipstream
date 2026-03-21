@@ -2174,6 +2174,11 @@ export type ConversationMemoryContextFindManyArgs<ExtArgs extends runtime.Types.
    * Skip the first `n` ConversationMemoryContexts.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ConversationMemoryContexts.
+   */
   distinct?: Prisma.ConversationMemoryContextScalarFieldEnum | Prisma.ConversationMemoryContextScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

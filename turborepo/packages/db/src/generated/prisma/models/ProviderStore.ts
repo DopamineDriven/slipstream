@@ -1529,6 +1529,11 @@ export type ProviderStoreFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Skip the first `n` ProviderStores.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ProviderStores.
+   */
   distinct?: Prisma.ProviderStoreScalarFieldEnum | Prisma.ProviderStoreScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

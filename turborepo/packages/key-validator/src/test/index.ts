@@ -30,9 +30,9 @@ async function llamaFetcher() {
   return res;
 }
 async function v0Fetcher() {
-  return await fetch("https://api.v0.dev/v1/models", {
+  return await fetch("https://ai-gateway.vercel.sh/v1/models", {
     headers: {
-      Authorization: `Bearer ` + (process.env.V0_API_KEY ?? "")
+      Authorization: `Bearer ` + (process.env.AI_GATEWAY_API_KEY ?? "")
     }
   });
 }

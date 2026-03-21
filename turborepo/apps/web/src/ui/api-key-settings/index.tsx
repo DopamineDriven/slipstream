@@ -491,7 +491,7 @@ export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
       case "meta":
         return "LLM|******************|*******************";
       case "vercel":
-        return "v0:team_******************:**************";
+        return "vck_********************************";
       case "gemini":
         return "AIza********************";
       case "openai":

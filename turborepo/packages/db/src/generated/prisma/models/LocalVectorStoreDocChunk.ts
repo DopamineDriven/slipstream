@@ -1724,6 +1724,11 @@ export type LocalVectorStoreDocChunkFindManyArgs<ExtArgs extends runtime.Types.E
    * Skip the first `n` LocalVectorStoreDocChunks.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of LocalVectorStoreDocChunks.
+   */
   distinct?: Prisma.LocalVectorStoreDocChunkScalarFieldEnum | Prisma.LocalVectorStoreDocChunkScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
