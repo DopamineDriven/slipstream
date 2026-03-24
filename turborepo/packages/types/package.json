@@ -97,7 +97,8 @@
     "gen:media": "pnpm tsx src/codegen/index.ts --target img",
     "pregen": "pnpm gen:media",
     "gen": "pnpm tsx src/codegen/index.ts --target default",
-    "postgen": "pnpm format"
+    "postgen": "pnpm format",
+    "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
     "@d0paminedriven/fs": "catalog:dd",

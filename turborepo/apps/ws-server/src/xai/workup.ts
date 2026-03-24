@@ -61,20 +61,19 @@ export class GrokWorkupService {
   } as const satisfies Record<DocumentStatus, ProviderDocState>;
 
   protected isMultiAgent(m: GrokModelIdUnion) {
-    return m === "grok-4.20-multi-agent-experimental-beta-0304";
+    return m === "grok-4.20-multi-agent-0309";
   }
 
   protected is420BetaModel(m: GrokModelIdUnion) {
     return (
-      m === "grok-4.20-experimental-beta-0304-non-reasoning" ||
-      m === "grok-4.20-experimental-beta-0304-reasoning" ||
+      m === "grok-4.20-0309-reasoning" ||
+      m === "grok-4.20-0309-non-reasoning" ||
       this.isMultiAgent(m)
     );
   }
 
   protected isGrok4Model(m: GrokModelIdUnion) {
     return (
-      m === "grok-4-0709" ||
       m === "grok-4-1-fast-non-reasoning" ||
       m === "grok-4-1-fast-reasoning" ||
       m === "grok-4-fast-reasoning" ||

@@ -87,7 +87,6 @@
   "js/ts.implementationsCodeLens.enabled": true,
   "js/ts.implementationsCodeLens.showOnInterfaceMethods": true,
   "js/ts.locale": "en",
-  "js/ts.referencesCodeLens.enabled": true,
   "js/ts.referencesCodeLens.showOnAllFunctions": true,
   "js/ts.experimental.useTsgo": false,
   "js/ts.tsdk.path": "node_modules/typescript/lib",
@@ -118,8 +117,9 @@
     "markdown": false,
     "scminput": false
   },
+  "prisma.trace.server": "messages",
   "[prisma]": {
-    "editor.defaultFormatter": "Prisma.prisma-insider"
+    "editor.defaultFormatter": "Prisma.prisma"
   },
   "python.analysis.enableColorPicker": false,
   "prisma.pinToPrisma6": false,

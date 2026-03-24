@@ -91,6 +91,34 @@ export namespace xAIResponses {
       }
     }
   }
+  export namespace FunctionCallArguments {
+    export interface Delta {
+      sequence_number: number;
+      type: "response.function_call_arguments.delta";
+      /**
+       * contains stringified JSON for parsing
+       */
+      delta: string;
+      /**
+       * item_id starts with `fc_`
+       */
+      item_id: string;
+      output_index: number;
+    }
+    export interface Done {
+      sequence_number: number;
+      type: "response.function_call_arguments.done";
+      /**
+       * contains stringified JSON for parsing
+       */
+      arguments: string;
+      /**
+       * item_id starts with `fc_`
+       */
+      item_id: string;
+      output_index: number;
+    }
+  }
   export namespace FileSearchCall {
     export interface Searching {
       sequence_number: number;
@@ -133,6 +161,21 @@ export namespace xAIResponses {
   }
   export namespace OutputItem {
     export namespace Added {
+      export interface FunctionCall {
+        /**
+         * alway an empty `""` -- populated in a `"response.function_call_arguments.delta"` event
+         * immediately after this event
+         */
+        arguments: string;
+        call_id: string;
+        name: "slather_user_store" | (string & {});
+        type: "function_call";
+        /**
+         * id starts with `fc_`
+         */
+        id: string;
+        status: "in_progress";
+      }
       export interface Reasoning {
         /**
          * id starts with `rs_`
@@ -218,10 +261,25 @@ export namespace xAIResponses {
         | Added.Message
         | Added.FileSearchCall
         | Added.WebSearchCall
-        | Added.CustomToolCall;
+        | Added.CustomToolCall
+        | Added.FunctionCall;
       output_index: number;
     }
     export namespace Done {
+      export interface FunctionCall {
+        /**
+         * contains stringified JSON for parsing
+         */
+        arguments: string;
+        call_id: string;
+        name: "slather_user_store" | (string & {});
+        type: "function_call";
+        /**
+         * id starts with `fc_`
+         */
+        id: string;
+        status: "completed";
+      }
       export namespace Reasoning {
         export interface SummaryText {
           text: string;
@@ -322,7 +380,8 @@ export namespace xAIResponses {
         | Done.Message
         | Done.FileSearchCall
         | Done.WebSearchCall
-        | Done.CustomToolCall;
+        | Done.CustomToolCall
+        | Done.FunctionCall;
       output_index: number;
     }
   }

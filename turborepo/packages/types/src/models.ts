@@ -16,8 +16,6 @@ export type ImageGenModels =
   | "gpt-image-1"
   | "gpt-image-1.5"
   | "gpt-image-1-mini"
-  | "dall-e-2"
-  | "dall-e-3"
   | "grok-imagine-image"
   | "grok-imagine-image-pro"
   | "imagen-4.0-fast-generate-001"
@@ -28,13 +26,7 @@ export type ImageGenModels =
   | "gemini-3.1-flash-image-preview";
 
 export const providerModelImageGenApi = {
-  openai: [
-    "gpt-image-1",
-    "gpt-image-1.5",
-    "gpt-image-1-mini",
-    "dall-e-2",
-    "dall-e-3"
-  ],
+  openai: ["gpt-image-1", "gpt-image-1.5", "gpt-image-1-mini"],
   gemini: [
     "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
@@ -56,6 +48,8 @@ export const allImgSupportingProviderModels = {
 export const providerModelImageGenFacilitatingApi = {
   openai: [
     "gpt-5.4",
+    "gpt-5.4-mini",
+    "gpt-5.4-nano",
     "gpt-5.2",
     "gpt-5.1",
     "gpt-5",

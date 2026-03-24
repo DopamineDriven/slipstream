@@ -1,3 +1,6 @@
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { xAIResponses } from "@/xai/event-types.ts";
 import type {
   CodeInterpreterTool,
@@ -21,8 +24,6 @@ import type {
   FilesDbRegistryProps,
   xAIDocDbRegistryProps
 } from "@/xai/types.ts";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
 import { ResponsesStreamParser } from "@/xai/response-sse.ts";
 import { GrokWorkupService } from "@/xai/workup.ts";
 import type {
@@ -33,13 +34,17 @@ import type {
 } from "@slipstream/types";
 
 export class GrokCollectionsService extends GrokWorkupService {
+  protected userStore: UserStoreVectorService;
+
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
+    userStore: UserStoreVectorService,
     xaiKey: string,
     xaiManagementKey: string
   ) {
     super(logger, prisma, xaiKey, xaiManagementKey);
+    this.userStore = userStore;
   }
 
   protected async ensureXaiFile(
@@ -389,7 +394,7 @@ export class GrokCollectionsService extends GrokWorkupService {
       user
     } = await this.getResponsesApiInputWorkup({
       isNewChat,
-      model: (m ?? "grok-4-1-fast-reasoning") as GrokModelIdUnion,
+      model: (m ?? "grok-4.20-0309-reasoning") as GrokModelIdUnion,
       userId,
       msgs,
       keyFingerprint: keyId ?? "server",
@@ -415,7 +420,7 @@ export class GrokCollectionsService extends GrokWorkupService {
 
     const requestBody = this.isMultiAgent(model)
       ? {
-          reasoning: reasoning ?? { effort: "high" },
+          reasoning: reasoning ?? { effort: "low" },
           model,
           input,
           store,
@@ -465,6 +470,85 @@ export class GrokCollectionsService extends GrokWorkupService {
     }
 
     return ResponsesStreamParser.createXAIResponsesParser(response);
+  }
+
+  protected slatherUserStore() {
+    return {
+      name: "slather_user_store",
+      description:
+        "This tool utilizes a 'Partitioned Foraging' approach which recognizes that for the 200,000+ years that humans have existed " +
+        "we have been foragers for most of it (>=95%). Agents are trained exclusively on data aggregated/curated by humans; " +
+        "think of it as agentic foraging complete with Jaccard similarity scores for cross-analyzing your bounties. " +
+        "Slather (search) the user's uploaded documents. Uses semantic similarity by default. " +
+        "When search_terms is provided, execjtes fulltext keyword search and returns " +
+        "both result sets separately (semantic + fulltext) so you can reason about which signal " +
+        "is most relevant to the user's intent. " +
+        "Without search_terms: returns a flat JSON array of chunks. " +
+        "With search_terms: returns { semantic: [...], fulltext: [...], overlap: { chunkIds, jaccardSimilarity }, meta }. " +
+        "Call directly for single retrieval tasks, or from code_execution for multi-step programmatic workflows.",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The semantic search query"
+          },
+          max_results: {
+            type: "number",
+            description: "Maximum results to return (1-10, default 5)"
+          },
+          filename: {
+            type: "string",
+            description:
+              "Optional filename filter (fuzzy, case-insensitive). " +
+              "Only chunks from documents whose filename closely matches this string are returned. " +
+              "Example: 'Path to Hell Pt VIII' matches 'The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VIII.pdf'."
+          },
+          search_terms: {
+            type: "string",
+            description:
+              "Optional exact-match search terms for fulltext search. " +
+              "Supports quoted phrases and negation (-deprecated). " +
+              "When provided, returns partitioned semantic + fulltext results instead of a flat array."
+          }
+        },
+        required: ["query"]
+      }
+    } as const;
+  }
+
+    protected async searchStore(
+    userId: string,
+    query: string,
+    limit = 5,
+    threshold = 0,
+    filename?: string
+  ) {
+    return await this.userStore.searchUserStoreChunks({
+      userId,
+      query,
+      limit,
+      threshold,
+      filename
+    });
+  }
+
+  protected async searchStoreHybrid(
+    userId: string,
+    query: string,
+    searchTerms: string,
+    limit = 10,
+    threshold = 0,
+    filename?: string
+  ) {
+    return await this.userStore.searchUserStoreChunksHybrid({
+      userId,
+      query,
+      searchTerms,
+      limit,
+      threshold,
+      filename
+    });
   }
 
   protected async formatxAIMsgHistory(
@@ -811,7 +895,7 @@ export class GrokCollectionsService extends GrokWorkupService {
 
   private async getResponsesApiInputWorkup({
     isNewChat,
-    model = "grok-4.20-multi-agent-experimental-beta-0304",
+    model = "grok-4.20-0309-reasoning",
     userId,
     msgs,
     keyFingerprint = "server",
@@ -868,7 +952,7 @@ export class GrokCollectionsService extends GrokWorkupService {
       return {
         input: history,
         model,
-        reasoning: reasoning ?? { effort: "high" },
+        reasoning: reasoning ?? { effort: "low" },
         instructions: systemInstruction,
         tools: tooling,
         tool_choice: tool_choice ?? "auto",

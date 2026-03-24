@@ -116,4 +116,5 @@ export class PrismaDbService extends DbAccelerateMixin(
 export type Constructor<A extends unknown[] = any[], I = object> = new (
   ...args: A
 ) => I;
+
 export type { PrismaClient } from "./generated/prisma/client.ts";

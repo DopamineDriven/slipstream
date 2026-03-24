@@ -7,8 +7,8 @@
     "**/*.wasm"
   ],
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown",
+    "build": "tsup",
+    "dev": "tsup",
     "lint": "eslint",
     "format": "prisma format",
     "clean": "git clean -xdf .turbo dist node_modules",
@@ -85,11 +85,8 @@
     "pg": "catalog:pg",
     "prettier": "catalog:prettier",
     "prisma": "catalog:prisma",
-    "rolldown": "catalog:rolldown",
-    "rolldown-plugin-dts": "catalog:rolldown",
-    "rolldown-plugin-wasm": "catalog:rolldown",
-    "tsdown": "catalog:tsdown",
     "tslib": "catalog:tslib",
+    "tsup": "catalog:tsup",
     "tsx": "catalog:tsx",
     "typescript": "catalog:ts",
     "typescript-eslint": "catalog:tseslint"

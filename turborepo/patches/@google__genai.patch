@@ -1,44 +1,35 @@
 diff --git a/dist/node/node.d.ts b/dist/node/node.d.ts
-index 8698dcdb593e46682afdcb708c04ee14fc7115f3..1e86e29596da3d7bc143c0f8b460ee1bab36f3ba 100644
+index caf239065965ca7aa97a136d00a3f0da18e3e97b..2e85314c6892c343ed5fe214eff57593d624a0f0 100644
 --- a/dist/node/node.d.ts
 +++ b/dist/node/node.d.ts
-@@ -1810,7 +1810,7 @@ declare namespace ContentDelta {
+@@ -1900,7 +1900,7 @@ declare namespace ContentDelta {
          /**
           * Tool call result delta.
           */
--        result: FunctionResultDelta.Items | unknown | string;
-+        result: FunctionResultDelta.Items | string;
+-        result: FunctionResult.Items | unknown | string;
++        result: FunctionResult.Items | string;
          type: 'function_result';
          is_error?: boolean;
          name?: string;
-@@ -1903,7 +1903,7 @@ declare namespace ContentDelta {
-         /**
-          * Tool call result delta.
-          */
--        result: MCPServerToolResultDelta.Items | unknown | string;
-+        result: MCPServerToolResultDelta.Items | string;
-         type: 'mcp_server_tool_result';
-         name?: string;
-         server_name?: string;
-@@ -3966,7 +3966,7 @@ declare interface FunctionResultContent {
+@@ -4199,7 +4199,7 @@ declare interface FunctionResultContent {
      /**
       * The result of the tool call.
       */
--    result: FunctionResultContent.Items | unknown | string;
-+    result: FunctionResultContent.Items | string;
+-    result: unknown | Array<TextContent | ImageContent> | string;
++    result: Array<TextContent | ImageContent> | string;
      type: 'function_result';
      /**
       * Whether the tool call resulted in an error.
-@@ -7233,7 +7233,7 @@ declare interface MCPServerToolResultContent {
+@@ -7615,7 +7615,7 @@ declare interface MCPServerToolResultContent {
      /**
-      * The result of the tool call.
+      * The output from the MCP server call. Can be simple text or rich content.
       */
--    result: MCPServerToolResultContent.Items | unknown | string;
-+    result: MCPServerToolResultContent.Items | string;
+-    result: unknown | Array<TextContent | ImageContent> | string;
++    result: Array<TextContent | ImageContent> | string;
      type: 'mcp_server_tool_result';
      /**
       * Name of the tool which is called for this specific tool call.
-@@ -7315,7 +7315,7 @@ export declare enum MediaResolution {
+@@ -7695,7 +7695,7 @@ export declare enum MediaResolution {
   * This type contains `RequestInit` options that may be available on the current runtime,
   * including per-platform extensions like `dispatcher`, `agent`, `client`, etc.
   */
@@ -47,7 +38,7 @@ index 8698dcdb593e46682afdcb708c04ee14fc7115f3..1e86e29596da3d7bc143c0f8b460ee1b
  /** We don't include these in the types as they'll be overridden for every request. */
  Partial<Record<'body' | 'headers' | 'method' | 'signal', never>>;
  
-@@ -8877,7 +8877,7 @@ export declare interface Schema {
+@@ -9381,7 +9381,7 @@ export declare interface Schema {
      type?: Type;
  }
  

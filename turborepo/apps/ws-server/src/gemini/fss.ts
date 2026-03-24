@@ -17,7 +17,7 @@ import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { GoogleGenAI } from "@google/genai";
-import type { $Enums } from "@slipstream/db/node/generated/client";
+import * as $Enums from "@slipstream/db/node/generated/client";
 import type { AttachmentSingleton } from "@slipstream/types";
 
 export class FileSearchStoreService {

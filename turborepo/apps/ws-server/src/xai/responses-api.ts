@@ -1,10 +1,11 @@
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
 import { GrokImgGenService } from "@/xai/img-gen.ts";
+import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap, GrokModelIdUnion } from "@slipstream/types";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import { S3Storage } from "@slipstream/storage-s3";
 
 export class GrokResponsesApiService extends GrokImgGenService {
   constructor(
@@ -12,10 +13,11 @@ export class GrokResponsesApiService extends GrokImgGenService {
     s3: S3Storage,
     logger: LoggerService,
     prisma: PrismaService,
+    userStore: UserStoreVectorService,
     apiKey: string,
     managementKey: string
   ) {
-    super(redis, s3, logger, prisma, apiKey, managementKey);
+    super(redis, s3, logger, prisma, userStore, apiKey, managementKey);
   }
   protected async handleXAIAiResponsesApiRequest({
     chunks,
@@ -28,7 +30,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
     userId,
     isNewChat,
     max_tokens,
-    model = "grok-4-0709" as GrokModelIdUnion,
+    model = "grok-4.20-0309-reasoning" as GrokModelIdUnion,
     systemPrompt,
     temperature,
     keyId,

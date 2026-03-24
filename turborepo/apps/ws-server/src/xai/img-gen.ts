@@ -15,7 +15,7 @@ import type {
 } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
-
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 type xAIImageEditsInput = {
   readonly url: string;
 };
@@ -27,10 +27,11 @@ export class GrokImgGenService extends GrokCollectionsService {
     protected s3: S3Storage,
     logger: LoggerService,
     prisma: PrismaService,
+    userStore: UserStoreVectorService,
     apiKey: string,
     managementKey: string
   ) {
-    super(logger, prisma, apiKey, managementKey);
+    super(logger, prisma, userStore, apiKey, managementKey);
     this.nanoid = import("nanoid").then(d => d.nanoid);
   }
 
@@ -371,7 +372,7 @@ export class GrokImgGenService extends GrokCollectionsService {
 
       const generationGroupId = await this.generateId("generationGroupId");
 
-      const n = this.prisma.handleImgGenCount(provider, m, {
+      const n = this.prisma.handleImgGenCount(m, {
         n: imgGenFields?.n
       });
 

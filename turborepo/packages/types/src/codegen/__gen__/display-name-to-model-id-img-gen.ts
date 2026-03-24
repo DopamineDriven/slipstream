@@ -1,6 +1,8 @@
 export const displayNameToModelIdImgGen = {
   openai: {
     "GPT-5.4": "gpt-5.4",
+    "GPT-5.4 mini": "gpt-5.4-mini",
+    "GPT-5.4 nano": "gpt-5.4-nano",
     "GPT-5.4 pro": "gpt-5.4-pro",
     "GPT-5.2": "gpt-5.2",
     "GPT-5.2 pro": "gpt-5.2-pro",
@@ -18,9 +20,7 @@ export const displayNameToModelIdImgGen = {
     o3: "o3",
     "GPT Image 1.5": "gpt-image-1.5",
     "GPT Image 1": "gpt-image-1",
-    "GPT Image 1 mini": "gpt-image-1-mini",
-    "DALL·E 3": "dall-e-3",
-    "DALL·E 2": "dall-e-2"
+    "GPT Image 1 mini": "gpt-image-1-mini"
   },
   gemini: {
     "Deep Research Pro Preview (Dec-12-2025)":

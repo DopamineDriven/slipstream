@@ -129,3 +129,7 @@ function _prettyModelName(id: string): string {
     })
     .join(" ");
 }
+
+import * as DATA from "./__out__/v0-results.json" with {type: "json"};
+
+console.log(DATA.default.data.length)

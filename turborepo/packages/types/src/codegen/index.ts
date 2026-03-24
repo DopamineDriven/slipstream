@@ -11,9 +11,15 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ quiet: true });
 
+/**
+ * facilitate image-gen by recruting an image gen model via tooling for the task
+ */
+
 const providerModelImagesApi = {
   openai: [
     "gpt-5.4",
+    "gpt-5.4-mini",
+    "gpt-5.4-nano",
     "gpt-5.4-pro",
     "gpt-5.2",
     "gpt-5.2-pro",
@@ -31,9 +37,7 @@ const providerModelImagesApi = {
     "o3",
     "gpt-image-1.5",
     "gpt-image-1",
-    "gpt-image-1-mini",
-    "dall-e-3",
-    "dall-e-2"
+    "gpt-image-1-mini"
   ],
   gemini: [
     "deep-research-pro-preview-12-2025",
@@ -62,6 +66,8 @@ const providerModelVideosApi = {
 const providerModelChatApi = {
   openai: [
     "gpt-5.4",
+    "gpt-5.4-mini",
+    "gpt-5.4-nano",
     "gpt-5.2",
     "gpt-5.2-chat-latest",
     "gpt-5.1",
@@ -87,8 +93,6 @@ const providerModelChatApi = {
     "gpt-image-1.5",
     "gpt-image-1",
     "gpt-image-1-mini",
-    "dall-e-3",
-    "dall-e-2",
     "chatgpt-4o-latest",
     "o4-mini",
     "o4-mini-deep-research",
@@ -128,19 +132,15 @@ const providerModelChatApi = {
     "veo-2.0-generate-001"
   ],
   grok: [
-    "grok-4.20-multi-agent-experimental-beta-0304",
-    "grok-4.20-experimental-beta-0304-reasoning",
-    "grok-4.20-experimental-beta-0304-non-reasoning",
+    "grok-4.20-multi-agent-0309",
+    "grok-4.20-0309-reasoning",
+    "grok-4.20-0309-non-reasoning",
     "grok-4-1-fast-reasoning",
     "grok-4-1-fast-non-reasoning",
     "grok-4-fast-reasoning",
     "grok-4-fast-non-reasoning",
-    "grok-4-0709",
     "grok-imagine-image",
     "grok-imagine-image-pro",
-    "grok-code-fast-1",
-    "grok-3",
-    "grok-3-mini",
     "grok-imagine-video"
   ],
   /**
@@ -167,7 +167,7 @@ const providerModelChatApi = {
     "Cerebras-Llama-4-Scout-17B-16E-Instruct",
     "Groq-Llama-4-Maverick-17B-128E-Instruct"
   ],
-  vercel: ["v0-1.5-md", "v0-1.5-lg", "v0-1.0-md"]
+  vercel: ["v0-1.5-md", "v0-1.0-md"]
 } as const;
 
 async function anthropicFetcher() {
@@ -222,16 +222,16 @@ async function geminiFetcher() {
  * one-offs here for when xAI ships odd labels
  */
 const GROK_NAME_OVERRIDES = {
+  "grok-4-fast-reasoning": "Grok 4 Fast Reasoning",
   "grok-4-fast-non-reasoning": "Grok 4 Fast Non-Reasoning",
   "grok-4-1-fast-non-reasoning": "Grok 4.1 Fast Non-Reasoning",
   "grok-4-1-fast-reasoning": "Grok 4.1 Fast Reasoning",
   "grok-imagine-image": "Grok Imagine Image",
   "grok-imagine-image-pro": "Grok Imagine Image Pro",
   "grok-imagine-video": "Grok Imagine Video",
-  "grok-4.20-multi-agent-experimental-beta-0304": "Grok 4.20 Multi-Agent Beta",
-  "grok-4.20-experimental-beta-0304-non-reasoning":
-    "Grok 4.20 Non-Reasoning Beta",
-  "grok-4.20-experimental-beta-0304-reasoning": "Grok 4.20 Reasoning Beta"
+  "grok-4.20-multi-agent-0309": "Grok 4.20 Multi-Agent",
+  "grok-4.20-0309-reasoning": "Grok 4.20 Reasoning",
+  "grok-4.20-0309-non-reasoning": "Grok 4.20 Non-Reasoning"
 } satisfies Record<string, string>;
 
 function grokDisplayName(id: string) {
@@ -243,25 +243,27 @@ function grokDisplayName(id: string) {
 
   // Explicit model-specific overrides take ultimate precedence
 
-  return id === "grok-4-fast-non-reasoning"
+  return id === "grok-4-fast-reasoning"
     ? GROK_NAME_OVERRIDES[id]
-    : id === "grok-4-1-fast-non-reasoning"
+    : id === "grok-4-fast-non-reasoning"
       ? GROK_NAME_OVERRIDES[id]
-      : id === "grok-4-1-fast-reasoning"
+      : id === "grok-4-1-fast-non-reasoning"
         ? GROK_NAME_OVERRIDES[id]
-        : id === "grok-imagine-image"
+        : id === "grok-4-1-fast-reasoning"
           ? GROK_NAME_OVERRIDES[id]
-          : id === "grok-imagine-image-pro"
+          : id === "grok-imagine-image"
             ? GROK_NAME_OVERRIDES[id]
-            : id === "grok-imagine-video"
+            : id === "grok-imagine-image-pro"
               ? GROK_NAME_OVERRIDES[id]
-              : id === "grok-4.20-multi-agent-experimental-beta-0304"
+              : id === "grok-imagine-video"
                 ? GROK_NAME_OVERRIDES[id]
-                : id === "grok-4.20-experimental-beta-0304-reasoning"
+                : id === "grok-4.20-multi-agent-0309"
                   ? GROK_NAME_OVERRIDES[id]
-                  : id === "grok-4.20-experimental-beta-0304-non-reasoning"
+                  : id === "grok-4.20-0309-reasoning"
                     ? GROK_NAME_OVERRIDES[id]
-                    : s;
+                    : id === "grok-4.20-0309-non-reasoning"
+                      ? GROK_NAME_OVERRIDES[id]
+                      : s;
 }
 
 function displayNameV0(id: string) {

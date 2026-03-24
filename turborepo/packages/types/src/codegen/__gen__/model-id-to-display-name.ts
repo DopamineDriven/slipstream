@@ -1,6 +1,8 @@
 export const modelIdToDisplayName = {
   openai: {
     "gpt-5.4": "GPT-5.4",
+    "gpt-5.4-mini": "GPT-5.4 mini",
+    "gpt-5.4-nano": "GPT-5.4 nano",
     "gpt-5.2": "GPT-5.2",
     "gpt-5.2-chat-latest": "GPT-5.2 Chat",
     "gpt-5.1": "GPT-5.1",
@@ -26,8 +28,6 @@ export const modelIdToDisplayName = {
     "gpt-image-1.5": "GPT Image 1.5",
     "gpt-image-1": "GPT Image 1",
     "gpt-image-1-mini": "GPT Image 1 mini",
-    "dall-e-3": "DALL·E 3",
-    "dall-e-2": "DALL·E 2",
     "chatgpt-4o-latest": "chatgpt-4o-latest",
     "o4-mini": "o4-mini",
     "o4-mini-deep-research": "o4-mini-deep-research",
@@ -68,21 +68,15 @@ export const modelIdToDisplayName = {
     "veo-2.0-generate-001": "Veo 2"
   },
   grok: {
-    "grok-4.20-multi-agent-experimental-beta-0304":
-      "Grok 4.20 Multi-Agent Beta",
-    "grok-4.20-experimental-beta-0304-reasoning": "Grok 4.20 Reasoning Beta",
-    "grok-4.20-experimental-beta-0304-non-reasoning":
-      "Grok 4.20 Non-Reasoning Beta",
+    "grok-4.20-multi-agent-0309": "Grok 4.20 Multi-Agent",
+    "grok-4.20-0309-reasoning": "Grok 4.20 Reasoning",
+    "grok-4.20-0309-non-reasoning": "Grok 4.20 Non-Reasoning",
     "grok-4-1-fast-reasoning": "Grok 4.1 Fast Reasoning",
     "grok-4-1-fast-non-reasoning": "Grok 4.1 Fast Non-Reasoning",
     "grok-4-fast-reasoning": "Grok 4 Fast Reasoning",
     "grok-4-fast-non-reasoning": "Grok 4 Fast Non-Reasoning",
-    "grok-4-0709": "Grok 4",
     "grok-imagine-image": "Grok Imagine Image",
     "grok-imagine-image-pro": "Grok Imagine Image Pro",
-    "grok-code-fast-1": "Grok Code Fast 1",
-    "grok-3": "Grok 3",
-    "grok-3-mini": "Grok 3 Mini",
     "grok-imagine-video": "Grok Imagine Video"
   },
   anthropic: {
@@ -112,7 +106,6 @@ export const modelIdToDisplayName = {
   },
   vercel: {
     "v0-1.5-md": "v0 medium",
-    "v0-1.5-lg": "v0 large",
     "v0-1.0-md": "v0 medium (legacy)"
   }
 } as const;

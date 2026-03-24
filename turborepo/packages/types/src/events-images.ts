@@ -14,52 +14,35 @@ import type {
   ImageGenOutputSingleton,
   ImageSingleton
 } from "@/types.ts";
-import type { DX, Rm } from "@/utils.ts";
+import type { DX, Include, Rm } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 
 export type OpenAIModelAspectRatioWorkup = DX<
   Record<
-    Exclude<OpenAIImgCapableModels, "dall-e-2" | "dall-e-3">,
+    OpenAIImgCapableModels,
     "1536x1024" | "1024x1536" | "1024x1024" | "auto"
-  > &
-    Record<Exclude<OpenAiModelIdUnion, OpenAIImgCapableModels>, undefined> & {
-      "dall-e-3": "1792x1024" | "1024x1792" | "1024x1024" | "auto";
-      "dall-e-2": "256x256" | "512x512" | "1024x1024" | "auto";
-    }
+  >
 >;
-export type OpenAIImgNativeGPTImgAR = Record<
-  Exclude<OpenAIImgGenModels, "dall-e-2" | "dall-e-3">,
-  "1536x1024" | "1024x1536" | "1024x1024" | "auto"
->;
-export type OpenAINativeImgModelAspectRatioWorkup = OpenAIImgNativeGPTImgAR & {
-  "dall-e-3": "1792x1024" | "1024x1792" | "1024x1024" | "auto";
-  "dall-e-2": "256x256" | "512x512" | "1024x1024" | "auto";
+export type OpenAIImgNativeGPTImgAR = {
+  "gpt-image-1.5": "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-image-1": "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-image-1-mini": "1536x1024" | "1024x1536" | "1024x1024" | "auto";
 };
-
+export type OpenAINativeImgModelAspectRatioWorkup = OpenAIImgNativeGPTImgAR;
 export type OpenAIModelAspectRatio = {
   [P in keyof OpenAIModelAspectRatioWorkup]?: OpenAIModelAspectRatioWorkup[P];
 };
 
 export type GeminiModelAspectRatioWorkup = DX<
-  Record<
-    Exclude<
-      GeminiImgGenModels,
-      | "imagen-4.0-ultra-generate-001"
-      | "imagen-4.0-generate-001"
-      | "imagen-4.0-fast-generate-001"
-    >,
-    "1:1" | "2:3" | "3:2" | "3:4" | "4:3" | "9:16" | "16:9" | "21:9"
-  > &
-    Record<
-      Exclude<
-        GeminiImgGenModels,
-        | "gemini-3-pro-image-preview"
-        | "gemini-2.5-flash-image"
-        | "gemini-3.1-flash-image-preview"
-      >,
-      "1:1" | "3:4" | "4:3" | "9:16" | "16:9"
-    > &
-    Record<Exclude<GeminiModelIdUnion, GeminiImgGenModels>, undefined>
+  {
+    "imagen-4.0-fast-generate-001": BaseImagenOutpiutAR;
+    "imagen-4.0-generate-001": BaseImagenOutpiutAR;
+    "imagen-4.0-ultra-generate-001": BaseImagenOutpiutAR;
+    "gemini-3-pro-image-preview": BaseNanoBananaOutputAR;
+    "gemini-2.5-flash-image": BaseNanoBananaOutputAR;
+    "deep-research-pro-preview-12-2025": BaseNanoBananaOutputAR;
+    "gemini-3.1-flash-image-preview": NanoBanana2OutputAR;
+  } & Record<Exclude<GeminiModelIdUnion, GeminiImgGenModels>, undefined>
 >;
 
 export type GrokImagineARUnion =
@@ -94,7 +77,10 @@ export type GrokModelAspectRatio = {
 };
 
 export type OutputSizeProps<P extends Provider = Provider> = {
-  openai?: OpenAIModelAspectRatio[GetModelUtilRT<"openai">];
+  openai?: OpenAIModelAspectRatio[Include<
+    OpenAiModelIdUnion,
+    OpenAIImgCapableModels
+  >];
   anthropic?: {
     [M in GetModelUtilRT<"anthropic">]: undefined;
   }[GetModelUtilRT<"anthropic">];
@@ -108,7 +94,23 @@ export type OutputSizeProps<P extends Provider = Provider> = {
   }[GetModelUtilRT<"vercel">];
 }[P];
 
-export type NanoBananaOutputSize =
+export type BaseImagenOutpiutAR = "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
+
+export type BaseNanoBananaOutputAR =
+  | "1:1"
+  | "2:3"
+  | "3:2"
+  | "3:4"
+  | "4:3"
+  | "4:5"
+  | "5:4"
+  | "9:16"
+  | "16:9"
+  | "21:9";
+
+export type NanoBananaOutputSize = BaseNanoBananaOutputAR | undefined;
+
+export type NanoBanana2OutputAR =
   | "1:1"
   | "2:3"
   | "3:2"
@@ -119,7 +121,10 @@ export type NanoBananaOutputSize =
   | "9:16"
   | "16:9"
   | "21:9"
-  | undefined;
+  | "1:4"
+  | "4:1"
+  | "1:8"
+  | "8:1";
 
 export type GptImageOutputSize =
   | "1024x1024"
@@ -128,19 +133,6 @@ export type GptImageOutputSize =
   | "auto"
   | undefined;
 
-export type Dalle3OutputSize =
-  | "1024x1024"
-  | "1792x1024"
-  | "1024x1792"
-  | "auto"
-  | undefined;
-
-export type Dalle2OutputSize =
-  | "256x256"
-  | "512x512"
-  | "1024x1024"
-  | "auto"
-  | undefined;
 export type ImagenOutputSize =
   | "1:1"
   | "9:16"
@@ -153,64 +145,30 @@ export type OpenAIImgCapableModels =
   | OpenAIImgGenFacilitatingModels
   | OpenAIImgGenModels;
 
-export type GeminiImageSize = DX<
-  Record<
-    Exclude<
-      GeminiImgGenModels,
-      | "gemini-2.5-flash-image"
-      | "gemini-3-pro-image-preview"
-      | "deep-research-pro-preview-12-2025"
-    >,
-    "1:1" | "3:4" | "4:3" | "9:16" | "16:9"
-  > &
-    Record<
-      Exclude<
-        GeminiImgGenModels,
-        | "imagen-4.0-fast-generate-001"
-        | "imagen-4.0-generate-001"
-        | "imagen-4.0-ultra-generate-001"
-      >,
-      | "1:1"
-      | "2:3"
-      | "3:2"
-      | "3:4"
-      | "4:3"
-      | "4:5"
-      | "5:4"
-      | "9:16"
-      | "16:9"
-      | "21:9"
-    >
->;
+export type GeminiImageSize = {
+  "imagen-4.0-fast-generate-001": BaseImagenOutpiutAR;
+  "imagen-4.0-generate-001": BaseImagenOutpiutAR;
+  "imagen-4.0-ultra-generate-001": BaseImagenOutpiutAR;
+  "gemini-3-pro-image-preview": BaseNanoBananaOutputAR;
+  "gemini-2.5-flash-image": BaseNanoBananaOutputAR;
+  "deep-research-pro-preview-12-2025": BaseNanoBananaOutputAR;
+  "gemini-3.1-flash-image-preview": NanoBanana2OutputAR;
+};
 
-export type GeminiImageQuality = DX<
-  Record<
-    Exclude<
-      GeminiImgGenModels,
-      | "gemini-2.5-flash-image"
-      | "gemini-3-pro-image-preview"
-      | "deep-research-pro-preview-12-2025"
-    >,
-    "1K" | "2K"
-  > &
-    Record<
-      Exclude<
-        GeminiImgGenModels,
-        | "imagen-4.0-fast-generate-001"
-        | "imagen-4.0-generate-001"
-        | "imagen-4.0-ultra-generate-001"
-      >,
-      "1K" | "2K" | "4K"
-    >
->;
+export type GeminiImageQuality = {
+  "gemini-3.1-flash-image-preview": "0.5K" | "1K" | "2K" | "4K";
+  "imagen-4.0-fast-generate-001": "1K" | "2K";
+  "imagen-4.0-generate-001": "1K" | "2K";
+  "imagen-4.0-ultra-generate-001": "1K" | "2K";
+  "gemini-3-pro-image-preview": "1K" | "2K" | "4K";
+  "gemini-2.5-flash-image": "1K";
+  "deep-research-pro-preview-12-2025": "1K" | "2K" | "4K";
+};
 
 export type OpenAINativeImgModelQualityWorkup = Record<
-  Exclude<OpenAIImgGenModels, "dall-e-2" | "dall-e-3">,
+  OpenAIImgGenModels,
   "low" | "medium" | "high" | "auto"
-> & {
-  "dall-e-3": "standard" | "hd" | "auto";
-  "dall-e-2": "standard" | "auto";
-};
+>;
 
 /**
  * OpenAI Image Size & Quality Options
@@ -426,14 +384,6 @@ export interface GoogleImagenGenerateImagesConfig {
 export interface SharedOpenAIImageOpts<T extends OpenAIImgGenModels> {
   model: T;
   /**
-   * **dall-e-2**
-   *
-   * max: 1000 chars
-   *
-   * **dall-e-3**
-   *
-   * max: 4000 chars
-   *
    * **gpt-image-1**
    *
    * max: 32000 chars
@@ -441,15 +391,10 @@ export interface SharedOpenAIImageOpts<T extends OpenAIImgGenModels> {
   text: string;
   /**
    *
-   * **dall-e-2 gpt-image-1 & gpt-image-1-mini**
+   * **gpt-image-1.5, gpt-image-1 & gpt-image-1-mini**
    *
    *  default: 1,
    *  max: 10
-   *
-   * **dall-e-3**
-   *
-   * default: 1,
-   *  max: 1
    */
   n?: number;
   /**
@@ -464,30 +409,6 @@ export interface SharedOpenAIImageOpts<T extends OpenAIImgGenModels> {
    * A unique identifier representing the end-user; can help OpenAI to monitor and detect abuse
    */
   user?: string;
-}
-
-export interface Dalle2Opts extends SharedOpenAIImageOpts<"dall-e-2"> {
-  /**
-   * default: "url"
-   */
-  response_format?: "url" | "b64_json";
-}
-
-export interface Dalle3Opts extends SharedOpenAIImageOpts<"dall-e-3"> {
-  /**
-   * default: "url"
-   */
-  response_format?: "url" | "b64_json";
-  /**
-   * For `dall-e-3` only, the revised prompt that was used to generate the image.
-   */
-  revised_prompt?: string;
-  /**
-   * **dall-e-3 only**
-   *
-   * default: "vivid"
-   */
-  style?: "natural" | "vivid";
 }
 
 export interface GptImage1Opts extends SharedOpenAIImageOpts<
@@ -555,7 +476,7 @@ export interface GptImage1Opts extends SharedOpenAIImageOpts<
   partial_images?: number;
 }
 
-export type OpenAIImageGenOpts = Dalle3Opts | Dalle2Opts | GptImage1Opts;
+export type OpenAIImageGenOpts = GptImage1Opts;
 
 /**
  * Parameters for Google's Imagen 3 & 4 models
@@ -640,97 +561,81 @@ export type ImagenOptions = {
  * Parameters for Google's native image-generating model
  * (gemini-2.5-flash-image)
  */
-export type NanoBananaImageGenOpts = {
-  /**
-   * The model ID.
-   */
-  model: Exclude<
-    GeminiImgGenModels,
-    | "imagen-4.0-fast-generate-001"
-    | "imagen-4.0-generate-001"
-    | "imagen-4.0-ultra-generate-001"
-  >;
-
-  /**
-   * The prompt, which can be simple text or a mix of
-   * text and image parts (for image-to-image tasks).
-   * Can contain up to 3 image attachments.
-   * * e.g., ["A cat wearing a wizard hat"]
-   * or [ {text: "Make this dog a cyborg"}, {inlineData: ...} ]
-   */
-  contents: (
-    | string
-    | { text: string }
-    | { inlineData: { mimeType: string; data: string } }
-    | { fileData: { fileUri: string; mimeType: string } }
-  )[];
-
-  /**
-   * Configuration for the generation process.
-   */
-  generationConfig?: {
-    /**
-     * Number of response candidates to generate.
-     * Note: This is for the *whole response*.
-     * You can request *more images* using the imageConfig.
-     * * Default: 1, Max: 8
-     */
-    candidateCount?: number;
-
-    responseModalities: ["TEXT", "IMAGE"];
-    /**
-     * Specific controls for the image generation part.
-     */
-    imageConfig?: {
+export type NanoBananaImageGenOpts<
+  T extends GeminiModelIdUnion = GeminiModelIdUnion
+> = T extends
+  | "gemini-3-pro-image-preview"
+  | "gemini-2.5-flash-image"
+  | "gemini-3.1-flash-image-preview"
+  | "deep-research-pro-preview-12-2025"
+  ? {
       /**
-       * Number of images to generate for this request.
-       * Max: 10
+       * The model ID.
        */
-      sampleCount?: number;
+      model: T;
+
       /**
-       * Aspect ratio for the *output* images.
-       * Default: "1:1" (1024x1024)
-       *
-       * "2:3" (832x1248)
-       *
-       * "3:2" (1248x832)
-       *
-       * "3:4" (864x1184)
-       *
-       * "4:3" (1184x864)
-       *
-       * "4:5" (896x1152)
-       *
-       * "5:4" (1152x896)
-       *
-       * "9:16" (768x1344)
-       *
-       * "16:9" (1344x768)
-       *
-       * "21:9" (1536x672)
+       * The prompt, which can be simple text or a mix of
+       * text and image parts (for image-to-image tasks).
+       * Can contain up to 3 image attachments.
+       * * e.g., ["A cat wearing a wizard hat"]
+       * or [ {text: "Make this dog a cyborg"}, {inlineData: ...} ]
        */
-      aspectRatio?: GeminiImageSize["gemini-3-pro-image-preview"];
-    };
+      contents: (
+        | string
+        | { text: string }
+        | { inlineData: { mimeType: string; data: string } }
+        | { fileData: { fileUri: string; mimeType: string } }
+      )[];
 
-    /**
-     * Controls randomness. Lower is more deterministic.
-     * Default: 1.0, Range: 0.0 - 2.0
-     */
-    temperature?: number;
-    /**
-     * Nucleus sampling.
-     * Default: 0.95, Range: 0.0 - 1.0
-     */
-    topP?: number;
-    /**
-     * Top-k sampling.
-     * Default: 64 (fixed)
-     */
-    topK?: number;
-  };
-};
+      /**
+       * Configuration for the generation process.
+       */
+      generationConfig?: {
+        /**
+         * Number of response candidates to generate.
+         * Note: This is for the *whole response*.
+         * You can request *more images* using the imageConfig.
+         * * Default: 1, Max: 8 -- max 14 for nano banana 2
+         */
+        candidateCount?: number;
 
-export type GoogleGenAIImageGenOpts = NanoBananaImageGenOpts | ImagenOptions;
+        responseModalities: ["TEXT", "IMAGE"];
+        /**
+         * Specific controls for the image generation part.
+         */
+        imageConfig?: {
+          /**
+           * Number of images to generate for this request.
+           * Max: 10
+           */
+          sampleCount?: number;
+          aspectRatio?: GeminiImageSize[T];
+          imageSize?: GeminiImageQuality[T];
+        };
+
+        /**
+         * Controls randomness. Lower is more deterministic.
+         * Default: 1.0, Range: 0.0 - 2.0
+         */
+        temperature?: number;
+        /**
+         * Nucleus sampling.
+         * Default: 0.95, Range: 0.0 - 1.0
+         */
+        topP?: number;
+        /**
+         * Top-k sampling.
+         * Default: 64 (fixed)
+         */
+        topK?: number;
+      };
+    }
+  : never;
+
+export type GoogleGenAIImageGenOpts<
+  T extends GeminiModelIdUnion = GeminiModelIdUnion
+> = NanoBananaImageGenOpts<T> | ImagenOptions;
 
 export type GrokImagineImageGenOpts = {
   model: GrokImagineImgModelUnion;
@@ -782,27 +687,22 @@ export type ImageGenOptsByProvider = {
 export type AIChatRequestImgGenFields = {
   pureImgGenModel?: boolean;
   /**
-   * gpt-image-1 only
+   * gpt-image-1 and gpt-image-1.5 only
    *
    * values include "high" | "low" | null
    */
   input_fidelity?: "high" | "low" | null | (string & {});
   /**
-   * gpt-image-1 & gpt-image-1-mini only
+   * gpt-image-1.5, gpt-image-1, gpt-image-1-mini only
    *
    * values include "low" | "auto"
    */
   moderation?: "low" | "auto" | (string & {});
   /**
-   * gpt-image-1, gpt-image-1-mini, gemini-2.5-flash-image, dall-e-2, grok-2-image-1212:
+   * gpt-image-1.5, gpt-image-1, gpt-image-1-mini, gemini-2.5-flash-image, grok-imagine-image:
    *
    * n=1 (default),
    * n=10 (max)
-   *
-   * dall-e-3:
-   *
-   * n=1 (default),
-   * n=1 (max)
    *
    *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
@@ -820,7 +720,7 @@ export type AIChatRequestImgGenFields = {
    */
   negativePrompt?: string;
   /**
-   * gpt-image-1 & gpt-image-1-mini only:
+   *  gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * n=0 (default),
    * n=3 (max)
@@ -840,7 +740,7 @@ export type AIChatRequestImgGenFields = {
   output_format?: string;
   /**
    *
-   * gpt-image-1, gpt-image-1-mini:
+   *  gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * output must be of type jpeg or webp
    *
@@ -853,7 +753,7 @@ export type AIChatRequestImgGenFields = {
    */
   output_compression?: number;
   /**
-   * gpt-image-1, gpt-image-1-mini:
+   *  gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * "auto" (default); "transparent" | "opaque" | "auto"
    *
@@ -861,17 +761,10 @@ export type AIChatRequestImgGenFields = {
    */
   output_background?: "transparent" | "opaque" | "auto";
   /**
-   *  gpt-image-1, gpt-image-1-mini:
+   *  gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * "auto" (default); "low" | "medium" | "high" | "auto"
    *
-   * dall-e-3:
-   *
-   * "auto" (default); "standard" | "hd" | "auto"
-   *
-   * dall-e-2:
-   *
-   * "auto" (default); "standard" | "auto"
    *
    * imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
@@ -885,17 +778,9 @@ export type AIChatRequestImgGenFields = {
    */
   output_quality?: string;
   /**
-   *  gpt-image-1, gpt-image-1-mini:
+   *  gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * "auto" (default); "1024x1024" | "1536x1024" | "1024x1536" | "auto"
-   *
-   * dall-e-3:
-   *
-   * "auto" (default); "1024x1024" | "1792x1024" | "1024x1792" | "auto"
-   *
-   * dall-e-2:
-   *
-   * "auto" (default); "1024x1024" | "256x256" | "512x512" | "auto"
    *
    *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
@@ -918,20 +803,20 @@ export type AIChatRequestImgGenFields = {
    */
   personGeneration?: string;
   /**
-   * **dall-e-3 only**
+   * **former dall-e-3 only field**
    *
    * "vivid" (default) | "natural"
    */
   style?: string;
   /**
-   * **dall-e-2, dall-e-3, and grok-2-image-1212 only**
+   * **grok-imagine-image and grok-imagine-image-pro only**
    *
    * "url" (default) | "b64_json"
    */
   response_format?: "url" | "b64_json";
 
   /**
-   * **gpt-image-1 and gpt-image-1-mini only**
+   * **gpt-image-1.5, gpt-image-1, and gpt-image-1-mini only**
    *
    * Optional mask for inpainting. Contains `image_url` (string, optional) and
    * `file_id` (string, optional).
@@ -1195,29 +1080,6 @@ export type ImgGenStage =
   | "refusal"
   | "aborted";
 
-export type Dalle3ImgGenWorkupRT = {
-  response_format: "url" | "b64_json";
-  isPureImgGenModel: true;
-  style: "vivid" | "natural";
-  msgBoundImgAssets: boolean;
-  n: number;
-  model: "dall-e-3";
-  output_quality: SharedOpenAIImageOpts<"dall-e-3">["quality"];
-  output_size: SharedOpenAIImageOpts<"dall-e-3">["size"];
-  targetApi: "images";
-};
-
-export type Dalle2ImgGenWorkupRT = {
-  response_format: "url" | "b64_json";
-  isPureImgGenModel: true;
-  msgBoundImgAssets: boolean;
-  n: number;
-  model: "dall-e-2";
-  output_quality: SharedOpenAIImageOpts<"dall-e-2">["quality"];
-  output_size: SharedOpenAIImageOpts<"dall-e-2">["size"];
-  targetApi: "images";
-};
-
 export type GptImageAndFacilitatorsImgGenWorkupRT = {
   input_image_mask:
     | {
@@ -1231,26 +1093,7 @@ export type GptImageAndFacilitatorsImgGenWorkupRT = {
   moderation: "low" | "auto";
   output_format: "jpeg" | "webp" | "png";
   output_compression: number | undefined;
-  model:
-    | "gpt-5.4"
-    | "gpt-5.2"
-    | "gpt-5.1"
-    | "gpt-image-1.5"
-    | "gpt-image-1"
-    | "gpt-image-1-mini"
-    | "gpt-5"
-    | "gpt-5-mini"
-    | "gpt-5-nano"
-    | "gpt-4.1"
-    | "gpt-5-pro"
-    | "gpt-5.2-pro"
-    | "gpt-5.4-pro"
-    | "gpt-5-chat-latest"
-    | "gpt-4.1-mini"
-    | "gpt-4.1-nano"
-    | "o3"
-    | "gpt-4o"
-    | "gpt-4o-mini";
+  model: OpenAIImgCapableModels;
   output_quality: SharedOpenAIImageOpts<
     "gpt-image-1" | "gpt-image-1.5" | "gpt-image-1-mini"
   >["quality"];
@@ -1263,55 +1106,12 @@ export type GptImageAndFacilitatorsImgGenWorkupRT = {
   input_fidelity: "low" | "high" | undefined;
 };
 
-export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> = T extends "dall-e-3"
-  ? Dalle3ImgGenWorkupRT
-  : T extends "dall-e-2"
-    ? Dalle2ImgGenWorkupRT
-    : T extends
-          | "gpt-image-1.5"
-          | "gpt-image-1"
-          | "gpt-image-1-mini"
-          | "gpt-5"
-          | "gpt-5-chat-latest"
-          | "gpt-5-pro"
-          | "gpt-5-mini"
-          | "gpt-5.4"
-          | "gpt-5.4-pro"
-          | "gpt-5.2"
-          | "gpt-5.2-pro"
-          | "gpt-5.1"
-          | "gpt-5-nano"
-          | "gpt-4.1"
-          | "gpt-4.1-mini"
-          | "gpt-4.1-nano"
-          | "o3"
-          | "gpt-4o"
-          | "gpt-4o-mini"
-      ? GptImageAndFacilitatorsImgGenWorkupRT
-      : T extends
-            | "gpt-5.2-chat-latest"
-            | "gpt-5-codex"
-            | "gpt-3.5-turbo"
-            | "gpt-4-turbo"
-            | "gpt-5.1-chat-latest"
-            | "gpt-5.1-codex"
-            | "gpt-5.1-codex-mini"
-            | "gpt-5.1-codex-max"
-            | "chatgpt-4o-latest"
-            | "o1-pro"
-            | "o1"
-            | "sora-2"
-            | "sora-2-pro"
-            | "o3-deep-research"
-            | "o4-mini-deep-research"
-            | "o3-pro"
-            | "o4-mini"
-        ? undefined
-        : undefined;
+export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> =
+  T extends OpenAIImgCapableModels
+    ? GptImageAndFacilitatorsImgGenWorkupRT
+    : undefined;
 
 export type ImgGenWorkupRTObj = {
-  "dall-e-2": Dalle2ImgGenWorkupRT;
-  "dall-e-3": Dalle3ImgGenWorkupRT;
   "gpt-image-1.5": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-image-1": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-image-1-mini": GptImageAndFacilitatorsImgGenWorkupRT;
@@ -1331,6 +1131,8 @@ export type ImgGenWorkupRTObj = {
   "gpt-5.1": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.4": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.4-pro": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5.4-mini": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5.4-nano": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.3-codex": undefined;
   "gpt-5.2-codex": undefined;
   "gpt-5.1-codex-mini": undefined;

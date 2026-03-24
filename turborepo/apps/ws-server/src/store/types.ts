@@ -215,8 +215,8 @@ export type UserStoreIndexSuccess = {
 
 export type UserStoreIndexResult = UserStoreIndexSuccess | UserStoreIndexSkip;
 
-export interface FileSearchToolInput {
-  query: string;
+export interface FileSearchToolInput<T extends string | readonly [string, ...string[]] = string> {
+  query: T;
   max_results?: number;
   filename?: string;
   search_terms?: string;
