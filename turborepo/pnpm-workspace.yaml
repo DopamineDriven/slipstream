@@ -3,7 +3,6 @@ packages:
   - packages/*
   - tooling/*
 
-enablePrePostScripts: true
 
 catalogs:
   anthropic:

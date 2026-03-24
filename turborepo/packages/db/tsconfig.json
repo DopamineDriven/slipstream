@@ -6,6 +6,7 @@
       "@/*": ["./src/*"]
     },
     "exactOptionalPropertyTypes": true,
+    "declarationMap": true,
     "outDir": "dist"
   },
   "exclude": ["dist"],
