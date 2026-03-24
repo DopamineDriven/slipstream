@@ -19,7 +19,7 @@ Monorepo for a multi‑provider AI chat application with streaming over WebSocke
   - `packages/encryption`: AES‑256‑GCM encryption/decryption of user API keys using `ENCRYPTION_KEY`.
   - `packages/key-validator`: Provider API key verification (OpenAI, Anthropic, Gemini, xAI/Grok, Meta workaround, Vercel v0).
   - `packages/ui`: Shared UI components and icons.
-
+ 
 ## Architecture
 
 ```
