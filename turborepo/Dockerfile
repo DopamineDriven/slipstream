@@ -55,6 +55,9 @@ RUN turbo prune --scope=@slipstream/ws-server --docker
 # --- Installer ---
 FROM builder AS installer
 
+ARG MOTION_PLUS_TOKEN
+ENV MOTION_PLUS_TOKEN=$MOTION_PLUS_TOKEN
+
 # cp pruned pnpm files and sources
 COPY --from=builder /app/out/json/ ./
 
