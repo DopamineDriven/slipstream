@@ -1479,6 +1479,11 @@ export type ConversationMemoryStoreFindManyArgs<ExtArgs extends runtime.Types.Ex
    * Skip the first `n` ConversationMemoryStores.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ConversationMemoryStores.
+   */
   distinct?: Prisma.ConversationMemoryStoreScalarFieldEnum | Prisma.ConversationMemoryStoreScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

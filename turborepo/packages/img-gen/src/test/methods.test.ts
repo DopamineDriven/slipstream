@@ -4,25 +4,29 @@ import { ProviderValidation } from "@/provider-validation/index.ts";
 
 const p = new ProviderValidation();
 describe("handleOutputSize", () => {
-  it("should return auto for openai provdier with no model set", {}, () => {
-    assert.equal(p.handleOutputSize("openai"), "auto");
-  });
-  it("should return 1:1 for gemini provdier with no model set", {}, () => {
-    assert.equal(p.handleOutputSize("gemini"), "1:1");
+  it("should return auto for gpt-5.4 with no args set", {}, () => {
+    assert.equal(p.handleOutputSize("gpt-5.4"), "auto");
   });
   it(
-    "should return auto for grok provider, model grok-imagine-image, with no output size set",
+    "should return 1:1 with model set to 🍌 gemini-3.1-flash-image-preview 🍌 (Nano Banana 2) and no args",
     {},
     () => {
-      assert.equal(p.handleOutputSize("grok", "grok-imagine-image"), "auto");
+      assert.equal(p.handleOutputSize("gemini-3.1-flash-image-preview"), "1:1");
     }
   );
   it(
-    "should return 19.5:9 for grok provider, model grok-imagine-image, with 19.5:9 size set",
+    "should return auto for model grok-imagine-image with no output size set",
+    {},
+    () => {
+      assert.equal(p.handleOutputSize("grok-imagine-image"), "auto");
+    }
+  );
+  it(
+    "should return 19.5:9 for model grok-imagine-image, with 19.5:9 size set",
     {},
     () => {
       assert.equal(
-        p.handleOutputSize("grok", "grok-imagine-image", {
+        p.handleOutputSize("grok-imagine-image", {
           output_size: "19.5:9"
         }),
         "19.5:9"
@@ -30,47 +34,55 @@ describe("handleOutputSize", () => {
     }
   );
   it(
-    "should return 21:9 for gemini provdier, model gemini-2.5-flash-image, output size set to 21:9",
+    "should return 21:9 for model gemini-3-pro-image, output size set to 21:9",
     {},
     () => {
       assert.equal(
-        p.handleOutputSize("gemini", "gemini-2.5-flash-image", {
+        p.handleOutputSize("gemini-3-pro-image-preview", {
           output_size: "21:9"
         }),
         "21:9"
       );
     }
   );
-  it("should return undefined for grok provdier with no model set", {}, () => {
-    assert.equal(p.handleOutputSize("grok"), undefined);
-  });
   it(
-    "should return 1024x1024 for openai with gpt-image-1 selected and output_size set to 1024x1536",
+    "should return 1:8 for Nano Bananas 2 🍌 -- (1:8, 8:1, 1:4, and 4:1 are unique to 🍌 numero dos)",
     {},
     () => {
       assert.equal(
-        p.handleOutputSize("openai", "gpt-image-1", {
-          output_size: "1536x1024"
+        p.handleOutputSize("gemini-3.1-flash-image-preview", {
+          output_size: "1:8"
         }),
-        "1536x1024"
+        "1:8"
+      );
+    }
+  );
+  it(
+    "should return 1024x1536 for openai with gpt-image-1.5 selected and output_size set to 1024x1536",
+    {},
+    () => {
+      assert.equal(
+        p.handleOutputSize("gpt-image-1.5", {
+          output_size: "1024x1536"
+        }),
+        "1024x1536"
       );
     }
   );
 });
 
 describe("handleImgGenOutputQuality", () => {
+  it("should return 'auto' for gpt-5.4 provdier with no model set", {}, () => {
+    assert.equal(p.handleImgGenOutputQuality("gpt-5.4"), "auto");
+  });
   it(
-    "should return undefined for openai provdier with no model set",
+    "should return 2K for gemini-3.1-flash-image-preview when no arg passed in",
     {},
     () => {
-      assert.equal(p.handleImgGenOutputQuality("openai"), undefined);
-    }
-  );
-  it(
-    "should return undefined for gemini provdier with no model set",
-    {},
-    () => {
-      assert.equal(p.handleImgGenOutputQuality("gemini"), undefined);
+      assert.equal(
+        p.handleImgGenOutputQuality("gemini-3.1-flash-image-preview"),
+        "2K"
+      );
     }
   );
   it(
@@ -78,34 +90,31 @@ describe("handleImgGenOutputQuality", () => {
     {},
     () => {
       assert.equal(
-        p.handleImgGenOutputQuality("gemini", "imagen-4.0-ultra-generate-001"),
+        p.handleImgGenOutputQuality("imagen-4.0-ultra-generate-001"),
         "1K"
       );
     }
   );
   it(
-    "should return 4K for gemini provdier with model set to gemini-2.5-flash-image",
+    "should return 4K for gemini provdier with model set to gemini-3.1-flash-image-preview",
     {},
     () => {
       assert.equal(
-        p.handleImgGenOutputQuality("gemini", "gemini-2.5-flash-image", {
+        p.handleImgGenOutputQuality("gemini-3.1-flash-image-preview", {
           output_quality: "4K"
         }),
         "4K"
       );
     }
   );
-  it("should return undefined for grok provdier with no model set", {}, () => {
-    assert.equal(p.handleImgGenOutputQuality("grok"), undefined);
+  it("should return 1k for grok-imagine-image with no arg set", {}, () => {
+    assert.equal(p.handleImgGenOutputQuality("grok-imagine-image"), "1k");
   });
   it(
-    "should return 2k for grok provider with model set to grok-imagine-image",
+    "should return 2k for grok-imagine-image-pro and no args passed in",
     {},
     () => {
-      assert.equal(
-        p.handleImgGenOutputQuality("grok", "grok-imagine-image"),
-        "2k"
-      );
+      assert.equal(p.handleImgGenOutputQuality("grok-imagine-image-pro"), "2k");
     }
   );
 });
@@ -113,7 +122,7 @@ describe("handleImgGenOutputQuality", () => {
 describe("handleImgGenOutputFormat", () => {
   it("should return undefined for grok", {}, () => {
     assert.equal(
-      p.handleImgGenOutputFormat("grok", "grok-imagine-image", {
+      p.handleImgGenOutputFormat("grok-imagine-image", {
         format: undefined
       }),
       undefined
@@ -124,7 +133,7 @@ describe("handleImgGenOutputFormat", () => {
     {},
     () => {
       assert.equal(
-        p.handleImgGenOutputFormat("gemini", "imagen-4.0-fast-generate-001", {
+        p.handleImgGenOutputFormat("imagen-4.0-fast-generate-001", {
           format: "image/png"
         }),
         "image/png"
@@ -136,7 +145,7 @@ describe("handleImgGenOutputFormat", () => {
     {},
     () => {
       assert.equal(
-        p.handleImgGenOutputFormat("openai", "gpt-5.1", {
+        p.handleImgGenOutputFormat("gpt-5.1", {
           format: "webp"
         }),
         "webp"
@@ -151,7 +160,7 @@ describe("handleImgGenCompression", () => {
     {},
     () => {
       assert.equal(
-        p.handleImgGenCompression("openai", "gpt-image-1", {
+        p.handleImgGenCompression("gpt-image-1", {
           output_compression: 90,
           output_format: "png"
         }),
@@ -164,7 +173,7 @@ describe("handleImgGenCompression", () => {
     {},
     () => {
       assert.equal(
-        p.handleImgGenCompression("openai", "gpt-image-1", {
+        p.handleImgGenCompression("gpt-image-1", {
           output_compression: 90,
           output_format: "webp"
         }),
@@ -173,11 +182,11 @@ describe("handleImgGenCompression", () => {
     }
   );
   it(
-    "should return 100 for openai provider with model set to gpt-image-1, output_format set to jpeg, and output_compression set to 110",
+    "should return 100 for openai provider with model set to gpt-image-1.5, output_format set to jpeg, and output_compression set to 110",
     {},
     () => {
       assert.equal(
-        p.handleImgGenCompression("openai", "gpt-image-1", {
+        p.handleImgGenCompression("gpt-image-1.5", {
           output_compression: 110,
           output_format: "jpeg"
         }),
@@ -186,11 +195,11 @@ describe("handleImgGenCompression", () => {
     }
   );
   it(
-    "should return 100 for openai provider with model set to gpt-image-1, output_format set to jpeg, and output_compression set to undefined",
+    "should return 100 for openai provider with model set to gpt-image-1.5, output_format set to jpeg, and output_compression set to undefined",
     {},
     () => {
       assert.equal(
-        p.handleImgGenCompression("openai", "gpt-image-1", {
+        p.handleImgGenCompression("gpt-image-1.5", {
           output_compression: undefined,
           output_format: "jpeg"
         }),
@@ -203,7 +212,7 @@ describe("handleImgGenCompression", () => {
     {},
     () => {
       assert.equal(
-        p.handleImgGenCompression("gemini", "imagen-4.0-ultra-generate-001", {
+        p.handleImgGenCompression("imagen-4.0-ultra-generate-001", {
           output_compression: undefined,
           output_format: "jpeg"
         }),
@@ -216,7 +225,7 @@ describe("handleImgGenCompression", () => {
     {},
     () => {
       assert.equal(
-        p.handleImgGenCompression("gemini", "gemini-2.5-flash-image", {
+        p.handleImgGenCompression("gemini-2.5-flash-image", {
           output_compression: 100,
           output_format: "jpeg"
         }),
@@ -225,11 +234,11 @@ describe("handleImgGenCompression", () => {
     }
   );
   it(
-    "should return undefined for anthropic provider with model set to undefined, output_format set to jpeg, and output_compression set to 100",
+    "should return undefined for claude-opus-4-6, output_format set to jpeg, and output_compression set to 100",
     {},
     () => {
       assert.equal(
-        p.handleImgGenCompression("anthropic", undefined, {
+        p.handleImgGenCompression("claude-opus-4-6", {
           output_compression: 100,
           output_format: "jpeg"
         }),
@@ -241,39 +250,69 @@ describe("handleImgGenCompression", () => {
 
 describe("handlePartialImgGen", () => {
   it("should return undefined for grok provider", {}, () => {
-    assert.equal(p.handlePartialImgGen("grok"), undefined);
+    assert.equal(
+      p.handlePartialImgGen("grok-imagine-image-pro", {
+        partialImagesRequested: 2
+      }),
+      undefined
+    );
   });
-  it("should return undefined for gemini provider", {}, () => {
-    assert.equal(p.handlePartialImgGen("gemini"), undefined);
-  });
+  it(
+    "should return undefined for 🍌 Nano Bananas Two 🍌 without an arg",
+    {},
+    () => {
+      assert.equal(
+        p.handlePartialImgGen("gemini-3.1-flash-image-preview"),
+        undefined
+      );
+    }
+  );
+  it(
+    "should return undefined for 🍌 Nano Bananas Two 🍌 with an arg",
+    {},
+    () => {
+      assert.equal(
+        p.handlePartialImgGen("gemini-3.1-flash-image-preview", {
+          partialImagesRequested: 3
+        }),
+        undefined
+      );
+    }
+  );
   it(
     "should return 0 for openai provider with gpt-image-1 or gpt-image-1-mini set",
     {},
     () => {
-      assert.equal(p.handlePartialImgGen("openai", "gpt-image-1"), 0);
+      assert.equal(p.handlePartialImgGen("gpt-image-1"), 0);
     }
   );
-  it("should return 0 for openai provider with gpt-5 set", {}, () => {
-    assert.equal(p.handlePartialImgGen("openai", "gpt-5"), 0);
-  });
   it(
-    "should return undefined for openai provider with dall-e-3 set",
+    "should return 0 for openai provider with gpt-5 set and no args",
     {},
     () => {
-      assert.equal(p.handlePartialImgGen("openai", "dall-e-3"), undefined);
+      assert.equal(p.handlePartialImgGen("gpt-5.4"), 0);
+    }
+  );
+  it(
+    "should return 3 for 100 partial images requested (gpt-image-1.5)",
+    {},
+    () => {
+      assert.equal(
+        p.handlePartialImgGen("gpt-image-1.5", {
+          partialImagesRequested: 100
+        }),
+        3
+      );
     }
   );
 });
 
 describe("handleImgGenCount", () => {
   it(
-    "should return 4 for imagen-4.0-ultra-generate-001 model with n=undefined",
+    "should return 1 for imagen-4.0-ultra-generate-001 model with n=undefined",
     {},
     () => {
-      assert.equal(
-        p.handleImgGenCount("gemini", "imagen-4.0-ultra-generate-001"),
-        4
-      );
+      assert.equal(p.handleImgGenCount("imagen-4.0-ultra-generate-001"), 1);
     }
   );
   it(
@@ -281,7 +320,7 @@ describe("handleImgGenCount", () => {
     {},
     () => {
       assert.equal(
-        p.handleImgGenCount("gemini", "gemini-2.5-flash-image", { n: -11 }),
+        p.handleImgGenCount("gemini-3.1-flash-image-preview", { n: -11 }),
         1
       );
     }
@@ -291,7 +330,7 @@ describe("handleImgGenCount", () => {
     {},
     () => {
       assert.equal(
-        p.handleImgGenCount("gemini", "gemini-2.5-flash-image", { n: 11 }),
+        p.handleImgGenCount("gemini-2.5-flash-image", { n: 11 }),
         10
       );
     }
@@ -300,99 +339,80 @@ describe("handleImgGenCount", () => {
     "should return 1 for grok-imagine-image model with n=-11 set as input",
     {},
     () => {
-      assert.equal(
-        p.handleImgGenCount("grok", "grok-imagine-image", { n: -11 }),
-        1
-      );
+      assert.equal(p.handleImgGenCount("grok-imagine-image", { n: -11 }), 1);
     }
   );
   it(
     "should return 10 for grok-imagine-image model with n=11 set as input",
     {},
     () => {
-      assert.equal(
-        p.handleImgGenCount("grok", "grok-imagine-image", { n: 11 }),
-        10
-      );
+      assert.equal(p.handleImgGenCount("grok-imagine-image", { n: 11 }), 10);
     }
   );
   it(
-    "should return 7 for gpt-image-1 or gpt-image-1-mini with n=7 set as input",
+    "should return 7 for gpt-image-1.5, gpt-image-1, or gpt-image-1-mini with n=7 set as input",
     {},
     () => {
-      assert.equal(p.handleImgGenCount("openai", "gpt-image-1", { n: 7 }), 7);
+      assert.equal(p.handleImgGenCount("gpt-image-1.5", { n: 7 }), 7);
     }
   );
-  it("should return 1 for gpt-5 with n=7 set as input", {}, () => {
-    assert.equal(p.handleImgGenCount("openai", "gpt-5", { n: 7 }), 1);
+  it("should return 1 for gpt-5.4 with n=-7 set as input", {}, () => {
+    assert.equal(p.handleImgGenCount("gpt-5.4", { n: -7 }), 1);
   });
-  it("should return 1 for dall-e-3 model with n=2 as input", {}, () => {
-    assert.equal(p.handleImgGenCount("openai", "dall-e-3", { n: 2 }), 1);
-  });
-  it("should return 10 for dall-e-2 with n=2000 set", {}, () => {
-    assert.equal(p.handleImgGenCount("openai", "dall-e-2", { n: 2000 }), 10);
+  it(
+    "should return 4 for imagen-4.0-ultra-generate-001 model with n=4000",
+    {},
+    () => {
+      assert.equal(
+        p.handleImgGenCount("imagen-4.0-ultra-generate-001", {
+          n: 4000
+        }),
+        4
+      );
+    }
+  );
+  it("should return 10 for gpt-5.4 with n=2000 set", {}, () => {
+    assert.equal(p.handleImgGenCount("gpt-5.4", { n: 2000 }), 10);
   });
 });
 
 describe("isImgGenCapableModel", () => {
+  it("should return true for imagen-4.0-ultra-generate-001", {}, () => {
+    assert.equal(p.isImgGenCapableModel("imagen-4.0-ultra-generate-001"), true);
+  });
+  it("should return true for gemini-3.1-flash-image-preview", {}, () => {
+    assert.equal(
+      p.isImgGenCapableModel("gemini-3.1-flash-image-preview"),
+      true
+    );
+  });
+  it("should return false for grok-4.20-multi-agent-0309", {}, () => {
+    assert.equal(p.isImgGenCapableModel("grok-4.20-multi-agent-0309"), false);
+  });
+  it("should return true for grok-imagine-image", {}, () => {
+    assert.equal(p.isImgGenCapableModel("grok-imagine-image"), true);
+  });
+  it("should return true for gpt-5.4", {}, () => {
+    assert.equal(p.isImgGenCapableModel("gpt-5.4"), true);
+  });
+  it("should return true for gpt-image-1.5", {}, () => {
+    assert.equal(p.isImgGenCapableModel("gpt-image-1.5"), true);
+  });
+  it("should return false for sora-2-pro", {}, () => {
+    assert.equal(p.isImgGenCapableModel("sora-2-pro"), false);
+  });
+  it("should return false for claude-opus-4-6", {}, () => {
+    assert.equal(p.isImgGenCapableModel("claude-opus-4-6"), false);
+  });
+  it("should return false for v0-1.5-md", {}, () => {
+    assert.equal(p.isImgGenCapableModel("v0-1.5-md"), false);
+  });
   it(
-    "should return true for provider=gemini, model=imagen-4.0-ultra-generate-001",
+    "should return false for Llama-4-Maverick-17B-128E-Instruct-FP8",
     {},
     () => {
       assert.equal(
-        p.isImgGenCapableModel("gemini", "imagen-4.0-ultra-generate-001"),
-        true
-      );
-    }
-  );
-  it(
-    "should return false for provider=gemini, model=gemini-2.5-pro",
-    {},
-    () => {
-      assert.equal(p.isImgGenCapableModel("gemini", "gemini-2.5-pro"), false);
-    }
-  );
-  it("should return false for provider=grok, model=grok-4-0709", {}, () => {
-    assert.equal(p.isImgGenCapableModel("grok", "grok-4-0709"), false);
-  });
-  it(
-    "should return true for provider=grok, model=grok-imagine-image",
-    {},
-    () => {
-      assert.equal(p.isImgGenCapableModel("grok", "grok-imagine-image"), true);
-    }
-  );
-  it("should return true for provider=openai, model=gpt-5", {}, () => {
-    assert.equal(p.isImgGenCapableModel("openai", "gpt-5"), true);
-  });
-  it("should return true for provider=openai, model=gpt-image-1", {}, () => {
-    assert.equal(p.isImgGenCapableModel("openai", "gpt-image-1"), true);
-  });
-  it("should return false for provider=openai, model=gpt-3.5-turbo", {}, () => {
-    assert.equal(p.isImgGenCapableModel("openai", "gpt-3.5-turbo"), false);
-  });
-  it(
-    "should return false for provider=anthropic, model=claude-sonnet-4-5-20250929",
-    {},
-    () => {
-      assert.equal(
-        p.isImgGenCapableModel("anthropic", "claude-sonnet-4-5-20250929"),
-        false
-      );
-    }
-  );
-  it("should return false for provider=vercel, model=v0-1.5-md", {}, () => {
-    assert.equal(p.isImgGenCapableModel("vercel", "v0-1.5-md"), false);
-  });
-  it(
-    "should return false for provider=meta, model=Llama-4-Maverick-17B-128E-Instruct-FP8",
-    {},
-    () => {
-      assert.equal(
-        p.isImgGenCapableModel(
-          "meta",
-          "Llama-4-Maverick-17B-128E-Instruct-FP8"
-        ),
+        p.isImgGenCapableModel("Llama-4-Maverick-17B-128E-Instruct-FP8"),
         false
       );
     }
@@ -400,61 +420,49 @@ describe("isImgGenCapableModel", () => {
 });
 
 describe("isPureImgGenModel", () => {
+  it("should return true for  imagen-4.0-ultra-generate-001", {}, () => {
+    assert.equal(p.isPureImgGenModel("imagen-4.0-ultra-generate-001"), true);
+  });
   it(
-    "should return true for provider=gemini, model=imagen-4.0-ultra-generate-001",
+    "should return true for gemini-3.1-flash-image-preview (🍌 nano banana 2 🍌)",
+    {},
+    () => {
+      assert.equal(p.isPureImgGenModel("gemini-3.1-flash-image-preview"), true);
+    }
+  );
+  it("should return false for gemini-3.1-pro-preview", {}, () => {
+    assert.equal(p.isPureImgGenModel("gemini-3.1-pro-preview"), false);
+  });
+  it("should return false for grok-4.20-multi-agent-0309", {}, () => {
+    assert.equal(p.isPureImgGenModel("grok-4.20-multi-agent-0309"), false);
+  });
+  it("should return true for grok-imagine-image", {}, () => {
+    assert.equal(p.isPureImgGenModel("grok-imagine-image"), true);
+  });
+  it("should return false for deep-research-pro-preview-12-2025", {}, () => {
+    assert.equal(
+      p.isPureImgGenModel("deep-research-pro-preview-12-2025"),
+      false
+    );
+  });
+  it("should return true for gpt-image-1.5", {}, () => {
+    assert.equal(p.isPureImgGenModel("gpt-image-1.5"), true);
+  });
+  it("should return false for gpt-5.3-codex", {}, () => {
+    assert.equal(p.isPureImgGenModel("gpt-5.3-codex"), false);
+  });
+  it("should return false for claude-opus-4-6", {}, () => {
+    assert.equal(p.isPureImgGenModel("claude-opus-4-6"), false);
+  });
+  it("should return false for v0-1.5-md", {}, () => {
+    assert.equal(p.isPureImgGenModel("v0-1.5-md"), false);
+  });
+  it(
+    "should return false for Llama-4-Maverick-17B-128E-Instruct-FP8",
     {},
     () => {
       assert.equal(
-        p.isPureImgGenModel("gemini", "imagen-4.0-ultra-generate-001"),
-        true
-      );
-    }
-  );
-  it(
-    "should return false for provider=gemini, model=gemini-2.5-pro",
-    {},
-    () => {
-      assert.equal(p.isPureImgGenModel("gemini", "gemini-2.5-pro"), false);
-    }
-  );
-  it("should return false for provider=grok, model=grok-4-0709", {}, () => {
-    assert.equal(p.isPureImgGenModel("grok", "grok-4-0709"), false);
-  });
-  it(
-    "should return true for provider=grok, model=grok-imagine-image",
-    {},
-    () => {
-      assert.equal(p.isPureImgGenModel("grok", "grok-imagine-image"), true);
-    }
-  );
-  it("should return false for provider=openai, model=gpt-5", {}, () => {
-    assert.equal(p.isPureImgGenModel("openai", "gpt-5"), false);
-  });
-  it("should return true for provider=openai, model=gpt-image-1", {}, () => {
-    assert.equal(p.isPureImgGenModel("openai", "gpt-image-1"), true);
-  });
-  it("should return false for provider=openai, model=gpt-3.5-turbo", {}, () => {
-    assert.equal(p.isPureImgGenModel("openai", "gpt-3.5-turbo"), false);
-  });
-  it(
-    "should return false for provider=anthropic, model=claude-sonnet-4-5-20250929",
-    {},
-    () => {
-      assert.equal(
-        p.isPureImgGenModel("anthropic", "claude-sonnet-4-5-20250929"),
-        false
-      );
-    }
-  );
-  it("should return false for provider=vercel, model=v0-1.5-md", {}, () => {
-    assert.equal(p.isPureImgGenModel("vercel", "v0-1.5-md"), false);
-  });
-  it(
-    "should return false for provider=meta, model=Llama-4-Maverick-17B-128E-Instruct-FP8",
-    {},
-    () => {
-      assert.equal(
-        p.isPureImgGenModel("meta", "Llama-4-Maverick-17B-128E-Instruct-FP8"),
+        p.isPureImgGenModel("Llama-4-Maverick-17B-128E-Instruct-FP8"),
         false
       );
     }
@@ -462,22 +470,15 @@ describe("isPureImgGenModel", () => {
 });
 
 describe("handleImgGenBg", () => {
+  it("should return undefined for imagen-4.0-ultra-generate-001", {}, () => {
+    assert.equal(p.handleImgGenBg("imagen-4.0-ultra-generate-001"), undefined);
+  });
   it(
-    "should return undefined for provider=gemini, model=imagen-4.0-ultra-generate-001",
+    "should return undefined for gemini-3.1-flash-image-preview with background=auto and format=webp",
     {},
     () => {
-      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
-        p.handleImgGenBg("gemini", "imagen-4.0-ultra-generate-001"),
-        undefined
-      );
-    }
-  );
-  it(
-    "should return undefined for provider=gemini, model=gemini-2.5-flash-image,background=auto, format=webp",
-    {},
-    () => {
-      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
-        p.handleImgGenBg("gemini", "gemini-2.5-flash-image", {
+      assert.equal(
+        p.handleImgGenBg("gemini-3.1-flash-image-preview", {
           background: "auto",
           format: "webp"
         }),
@@ -486,11 +487,11 @@ describe("handleImgGenBg", () => {
     }
   );
   it(
-    "should return undefined for provider=grok, model=grok-4-0709,  background=auto, format=webp",
+    "should return undefined for grok-4.20-multi-agent-0309 with background=auto and format=webp",
     {},
     () => {
-      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
-        p.handleImgGenBg("grok", "grok-4-0709", {
+      assert.equal(
+        p.handleImgGenBg("grok-4.20-multi-agent-0309", {
           background: "auto",
           format: "webp"
         }),
@@ -499,11 +500,11 @@ describe("handleImgGenBg", () => {
     }
   );
   it(
-    "should return undefined for provider=openai, model=dall-e-3, background=auto, format=webp",
+    "should return undefined for gpt-5.3-codex with background=auto and format=webp",
     {},
     () => {
-      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
-        p.handleImgGenBg("openai", "dall-e-3", {
+      assert.equal(
+        p.handleImgGenBg("gpt-5.3-codex", {
           background: "auto",
           format: "webp"
         }),
@@ -512,11 +513,11 @@ describe("handleImgGenBg", () => {
     }
   );
   it(
-    "should return opaque for provider=openai, model=gpt-5, background=opaque, format=webp",
+    "should return opaque for gpt-5.4 with background=opaque and format=webp",
     {},
     () => {
-      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
-        p.handleImgGenBg("openai", "gpt-5", {
+      assert.equal(
+        p.handleImgGenBg("gpt-5.4", {
           background: "opaque",
           format: "webp"
         }),
@@ -525,11 +526,11 @@ describe("handleImgGenBg", () => {
     }
   );
   it(
-    "should return transparent for provider=openai, model=gpt-5, background=transparent, format=png",
+    "should return transparent for gpt-5.4 with background=transparent and format=png",
     {},
     () => {
-      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
-        p.handleImgGenBg("openai", "gpt-5", {
+      assert.equal(
+        p.handleImgGenBg("gpt-5.4", {
           background: "transparent",
           format: "png"
         }),
@@ -538,11 +539,11 @@ describe("handleImgGenBg", () => {
     }
   );
   it(
-    "should return undefined for provider=openai, model=gpt-5, format=jpeg, background=transparent",
+    "should return undefined for gpt-5.4 with format=jpeg and background=transparent",
     {},
     () => {
-      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
-        p.handleImgGenBg("openai", "gpt-5", {
+      assert.equal(
+        p.handleImgGenBg("gpt-5.4", {
           background: "transparent",
           format: "jpeg"
         }),
@@ -551,11 +552,11 @@ describe("handleImgGenBg", () => {
     }
   );
   it(
-    "should return auto for provider=openai, model=gpt-image-1, background=auto, format=webp",
+    "should return auto for gpt-image-1.5 with background=auto and format=webp",
     {},
     () => {
-      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
-        p.handleImgGenBg("openai", "gpt-image-1", {
+      assert.equal(
+        p.handleImgGenBg("gpt-image-1.5", {
           background: "auto",
           format: "webp"
         }),
@@ -564,11 +565,11 @@ describe("handleImgGenBg", () => {
     }
   );
   it(
-    "should return auto for provider=openai, model=gpt-image-1, background=undefined, format=webp",
+    "should return auto for gpt-image-1.5 with background=undefined and format=webp",
     {},
     () => {
-      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
-        p.handleImgGenBg("openai", "gpt-image-1", {
+      assert.equal(
+        p.handleImgGenBg("gpt-image-1.5", {
           background: undefined,
           format: "webp"
         }),
@@ -577,11 +578,11 @@ describe("handleImgGenBg", () => {
     }
   );
   it(
-    "should return auto for provider=openai, model=gpt-image-1, background=undefined, format=png",
+    "should return auto for gpt-image-1.5 with background=undefined and format=png",
     {},
     () => {
-      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
-        p.handleImgGenBg("openai", "gpt-image-1", {
+      assert.equal(
+        p.handleImgGenBg("gpt-image-1.5", {
           background: undefined,
           format: "png"
         }),
@@ -590,11 +591,11 @@ describe("handleImgGenBg", () => {
     }
   );
   it(
-    "should return undefined for provider=openai, model=gpt-image-1, background=undefined, format=jpeg",
+    "should return undefined for gpt-image-1.5 with background=undefined and format=jpeg",
     {},
     () => {
-      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
-        p.handleImgGenBg("openai", "gpt-image-1", {
+      assert.equal(
+        p.handleImgGenBg("gpt-image-1.5", {
           background: undefined,
           format: "jpeg"
         }),
@@ -603,11 +604,14 @@ describe("handleImgGenBg", () => {
     }
   );
   it(
-    "should return undefined for provider=anthropic, model=claude-sonnet-4-5-20250929",
+    "should return undefined for claude-sonnet-4-5-20250929 with background=auto and format=webp",
     {},
     () => {
-      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
-        p.handleImgGenBg("anthropic", "claude-sonnet-4-5-20250929"),
+      assert.equal(
+        p.handleImgGenBg("claude-sonnet-4-5-20250929", {
+          background: "auto",
+          format: "webp"
+        }),
         undefined
       );
     }

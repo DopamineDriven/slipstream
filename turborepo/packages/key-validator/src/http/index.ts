@@ -14,7 +14,7 @@ export class KeyValidator {
   private gemini_url =
     "https://generativelanguage.googleapis.com/v1beta/models";
   private llama_url = "https://api.llama.com/v1/models";
-  private v0_url = "https://api.v0.dev/v1/user";
+  private v0_url = "https://ai-gateway.vercel.sh/v1/models";
   constructor(
     private apiKey: string,
     private provider: FlexiProvider

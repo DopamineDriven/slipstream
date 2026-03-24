@@ -1,50 +1,119 @@
 import type {
   AIChatRequest,
   AllModelsUnion,
+  BaseNanoBananaOutputAR,
+  GeminiImageQuality,
+  GeminiImageSize,
+  GeminiImgGenModels,
+  GeminiModelIdUnionImgGen,
   GetModelUtilRT,
   GoogleSafetyFilterLevel,
-  GrokModelAspectRatio,
-  OpenAIModelAspectRatio,
-  OutputSizeProps,
+  GrokImagineARUnion,
+  GrokImagineImgModelUnion,
+  GrokImgGenModels,
+  ImagenOutputSize,
+  NanoBanana2OutputAR,
+  OpenAIImgCapableModels,
+  OpenAIImgGenFacilitatingModels,
+  OpenAIImgGenModels,
+  OpenAINativeImgModelAspectRatioWorkup,
+  OpenAINativeImgModelQualityWorkup,
   Provider,
   Rm
 } from "@slipstream/types";
 
+export type AllPureImgGenModelsUnion =
+  | OpenAIImgGenModels
+  | Exclude<GeminiImgGenModels, "deep-research-pro-preview-12-2025">
+  | GrokImgGenModels;
+
+export type AllImgGenCapableModelUnion =
+  | OpenAIImgGenFacilitatingModels
+  | OpenAIImgGenModels
+  | GeminiImgGenModels
+  | GrokImgGenModels;
+
+export type ModelToAspectRatioOpts<T extends AllModelsUnion> =
+  T extends AllImgGenCapableModelUnion
+    ? T extends GeminiModelIdUnionImgGen
+      ? GeminiImageSize[GeminiModelIdUnionImgGen]
+      : T extends GrokImagineImgModelUnion
+        ? GrokImagineARUnion
+        : T extends OpenAIImgCapableModels
+          ? OpenAINativeImgModelAspectRatioWorkup["gpt-image-1.5"]
+          : undefined
+    : undefined;
+
+export type ModelToQualityOpts<T extends AllModelsUnion> =
+  T extends AllImgGenCapableModelUnion
+    ? T extends GeminiImgGenModels
+      ? T extends
+          | "gemini-3-pro-image-preview"
+          | "gemini-3.1-flash-image-preview"
+          | "deep-research-pro-preview-12-2025"
+        ? T extends "gemini-3.1-flash-image-preview"
+          ? GeminiImageQuality["gemini-3.1-flash-image-preview"]
+          : GeminiImageQuality[
+              | "gemini-3-pro-image-preview"
+              | "deep-research-pro-preview-12-2025"]
+        : T extends
+              | "imagen-4.0-generate-001"
+              | "imagen-4.0-fast-generate-001"
+              | "imagen-4.0-ultra-generate-001"
+          ? GeminiImageQuality["imagen-4.0-fast-generate-001"]
+          : undefined
+      : T extends GrokImagineImgModelUnion
+        ? "1k" | "2k" | "4k" | "auto"
+        : T extends OpenAIImgCapableModels
+          ? OpenAINativeImgModelQualityWorkup["gpt-image-1.5"]
+          : undefined
+    : undefined;
+
+export type ModelToOutputFormatOpts<Q extends AllModelsUnion> =
+  Q extends OpenAIImgCapableModels
+    ? "png" | "jpeg" | "webp" | undefined
+    : Q extends
+          | "imagen-4.0-generate-001"
+          | "imagen-4.0-fast-generate-001"
+          | "imagen-4.0-ultra-generate-001"
+      ? "image/png" | "image/jpeg" | undefined
+      : undefined;
+
+export type BackgroundFormattingOpts = {
+  background?: "auto" | "transparent" | "opaque";
+  format?: "png" | "jpeg" | "webp";
+};
+
+export type ModelToBackgroundFormatOpts<Q extends AllModelsUnion> =
+  Q extends OpenAIImgCapableModels ? BackgroundFormattingOpts : undefined;
+
+export type ModelToOutputFormatOptsProps<Q extends AllModelsUnion> = {
+  format: ModelToOutputFormatOpts<Q>;
+};
+
+export type ModelToQualityOptsProps<T extends AllModelsUnion> = {
+  output_quality: ModelToQualityOpts<T>;
+};
 export class ProviderValidation {
-  public grokImgGenCapable(m: AllModelsUnion) {
-    return this.grokNativeImageGenModel(m);
-  }
-
-  public grokImagineImgGenModel(m: AllModelsUnion) {
-    return m === "grok-imagine-image" || m === "grok-imagine-image-pro";
-  }
-
-  public grokNativeImageGenModel(m: AllModelsUnion) {
+  public grokImgGenCapable(m: string) {
     return this.grokImagineImgGenModel(m);
   }
 
-  public openAIDalle2(m: AllModelsUnion) {
-    return m === "dall-e-2";
+  public grokImagineImgGenModel(m: string) {
+    return m === "grok-imagine-image" || m === "grok-imagine-image-pro";
   }
 
-  public openAIDalle3(m: AllModelsUnion) {
-    return m === "dall-e-3";
-  }
-
-  public openAIGptImgModel(m: AllModelsUnion) {
+  public openAIGptImgModel(m: string) {
     return (
       m === "gpt-image-1" || m === "gpt-image-1-mini" || m === "gpt-image-1.5"
     );
   }
 
-  public openAINativeImgGenModel(m: AllModelsUnion) {
-    return (
-      this.openAIDalle2(m) || this.openAIDalle3(m) || this.openAIGptImgModel(m)
-    );
-  }
-  public openAIFacilitatingImgGenModel(model: AllModelsUnion) {
+  public openAIFacilitatingImgGenModel(model: string) {
     return (
       model === "gpt-5.4" ||
+      model === "gpt-5.4-mini" ||
+      model === "gpt-5.4-nano" ||
       model === "gpt-5.4-pro" ||
       model === "gpt-4.1" ||
       model === "gpt-4.1-mini" ||
@@ -62,21 +131,24 @@ export class ProviderValidation {
       model === "gpt-5.2"
     );
   }
-  public openAIImgGenCapable(model: AllModelsUnion) {
+  public openAIImgGenCapable(model: string) {
     return (
-      this.openAIFacilitatingImgGenModel(model) ||
-      this.openAINativeImgGenModel(model)
+      this.openAIFacilitatingImgGenModel(model) || this.openAIGptImgModel(model)
     );
   }
-  public geminiNanoBananasModel(m: AllModelsUnion) {
+
+  public geminiNanoBananaTwo(m: string) {
+    return m === "gemini-3.1-flash-image-preview";
+  }
+  public geminiNanoBananasModel(m: string) {
     return (
       m === "deep-research-pro-preview-12-2025" ||
-      m === "gemini-3.1-flash-image-preview" ||
+      this.geminiNanoBananaTwo(m) ||
       m === "gemini-2.5-flash-image" ||
       m === "gemini-3-pro-image-preview"
     );
   }
-  public geminiImageGenModel(m: AllModelsUnion) {
+  public geminiImageGenModel(m: string) {
     return (
       m === "imagen-4.0-fast-generate-001" ||
       m === "imagen-4.0-generate-001" ||
@@ -84,35 +156,45 @@ export class ProviderValidation {
     );
   }
 
-  public geminiImgGenCapable(m: AllModelsUnion) {
+  public geminiImgGenCapable(m: string) {
     return this.geminiNanoBananasModel(m) || this.geminiImageGenModel(m);
   }
-  public isImgGenCapableModel<const T extends Provider = Provider>(
-    provider: T,
-    model?: GetModelUtilRT<typeof provider>
+
+  public isImgGenCapableModel(model: AllImgGenCapableModelUnion): true;
+  public isImgGenCapableModel(
+    model: Exclude<AllModelsUnion, AllImgGenCapableModelUnion>
+  ): false;
+  public isImgGenCapableModel<const V extends AllModelsUnion = AllModelsUnion>(
+    model = "gpt-5.4" as V
   ) {
-    if (typeof model === "undefined") return false;
-    return (
+    if (
       this.grokImgGenCapable(model) ||
       this.geminiImgGenCapable(model) ||
       this.openAIImgGenCapable(model)
-    );
+    )
+      return true;
+    else return false;
   }
 
+  public isPureImgGenModel(model: AllPureImgGenModelsUnion): true;
   public isPureImgGenModel(
-    provider: Provider,
-    model?: GetModelUtilRT<typeof provider>
+    model: Exclude<AllModelsUnion, AllPureImgGenModelsUnion>
+  ): false;
+  public isPureImgGenModel<const V extends AllModelsUnion = AllModelsUnion>(
+    model = "gpt-5.4" as V
   ) {
-    if (!model) return false;
     if (
       !(
         this.grokImgGenCapable(model) ||
         this.geminiImgGenCapable(model) ||
-        this.openAINativeImgGenModel(model)
+        this.openAIGptImgModel(model)
       )
-    )
+    ) {
       return false;
-    else return true;
+    } else {
+      if (model === "deep-research-pro-preview-12-2025") return false;
+      else return true;
+    }
   }
 
   public handleGoogleSafetyFilter(
@@ -127,226 +209,86 @@ export class ProviderValidation {
     }
   }
 
-  public handleImgGenCount<const T extends Provider = Provider>(
-    provider: T,
-    model?: GetModelUtilRT<typeof provider>,
+  public handleImgGenCount(
+    model?: Exclude<
+      AllModelsUnion,
+      Exclude<AllModelsUnion, AllImgGenCapableModelUnion>
+    >,
+    data?: { n?: number }
+  ): number;
+  public handleImgGenCount(
+    model?: AllModelsUnion,
+    data?: { n?: number }
+  ): undefined;
+  public handleImgGenCount(
+    model: AllModelsUnion = "gpt-5.4",
     data?: { n?: number }
   ) {
-    const p = provider as Provider;
-    if (!model) return undefined;
-    switch (p) {
-      case "anthropic":
-      case "meta":
-      case "vercel": {
-        return undefined;
-      }
-      case "grok": {
-        if (this.grokImgGenCapable(model)) {
-          if (data?.n) {
-            if (data.n < 1) return 1;
-            if (data.n > 10) return 10;
-            return data.n;
-          } else return 1;
-        } else return undefined;
-      }
-      case "gemini": {
-        if (this.geminiImgGenCapable(model)) {
-          if (this.geminiImageGenModel(model)) {
-            if (data?.n) {
-              if (data.n < 1) return 1;
-              if (data.n > 4) return 4;
-              return data.n;
-            } else return 4;
-          } else {
-            if (data?.n) {
-              if (data.n < 1) return 1;
-              if (data.n > 10) return 10;
-              return data.n;
-            } else return 1;
-          }
-        } else return undefined;
-      }
-      case "openai": {
-        const m = model as GetModelUtilRT<typeof p>;
-        if (this.openAIImgGenCapable(m)) {
-          if (this.openAIDalle2(m) || this.openAIGptImgModel(m)) {
-            if (data?.n) {
-              if (data.n < 1) return 1;
-              if (data.n > 10) return 10;
-              return data.n;
-            } else return 1;
-          } else {
-            if (data?.n) {
-              if (data.n < 1) return 1;
-              if (data.n > 1) return 1;
-              return data.n;
-            } else return 1;
-          }
-        } else return undefined;
-      }
-      default: {
-        return undefined;
+    if (this.grokImgGenCapable(model)) {
+      if (data?.n) {
+        if (data.n < 1) return 1;
+        if (data.n > 10) return 10;
+        return data.n;
+      } else return 1;
+    }
+    if (this.geminiImgGenCapable(model)) {
+      if (this.geminiImageGenModel(model)) {
+        if (data?.n) {
+          if (data.n < 1) return 1;
+          if (data.n > 4) return 4;
+          return data.n;
+        } else return 1;
+      } else {
+        if (data?.n) {
+          if (data.n < 1) return 1;
+          if (data.n > 10) return 10;
+          return data.n;
+        } else return 1;
       }
     }
+
+    if (this.openAIImgGenCapable(model)) {
+      if (data?.n) {
+        if (data.n < 1) return 1;
+        if (data.n > 10) return 10;
+        return data.n;
+      } else return 1;
+    } else return undefined;
   }
 
-  public handleImgGenOutputFormat<const T extends Provider = Provider>(
-    provider: T,
-    model?: GetModelUtilRT<T>,
-    data?: {
-      format?: {
-        openai?: "png" | "jpeg" | "webp";
-        gemini?: "image/png" | "image/jpeg" | undefined;
-        grok?: undefined;
-        vercel?: undefined;
-        meta?: undefined;
-        anthropic?: undefined;
-      }[T];
+  public isValidGeminiOutputFormat(format: string) {
+    return format === "image/png" || format === "image/jpeg";
+  }
+  public isValidOpenAIOutputFormat(f: string) {
+    return f === "png" || f === "jpeg" || f === "webp";
+  }
+
+  public handleImgGenOutputFormat(
+    model: AllModelsUnion = "gpt-5.4",
+    data?: { format?: ModelToOutputFormatOpts<typeof model> }
+  ) {
+    const m = model;
+    const f = data?.format;
+    if (!m) return undefined;
+
+    if (!(this.openAIImgGenCapable(m) || this.geminiImageGenModel(m))) return;
+    if (f && this.isValidOpenAIOutputFormat(f)) {
+      return f;
     }
-  ): {
-    openai?: "png" | "jpeg" | "webp";
-    gemini?: "image/png" | "image/jpeg" | undefined;
-    grok?: undefined;
-    vercel?: undefined;
-    meta?: undefined;
-    anthropic?: undefined;
-  }[T] {
-    const p = provider as Provider;
-    switch (p) {
-      case "gemini": {
-        const m = (model as GetModelUtilRT<typeof p>) ?? "gemini-2.5-pro";
-        switch (m) {
-          case "imagen-4.0-fast-generate-001":
-          case "imagen-4.0-generate-001":
-          case "imagen-4.0-ultra-generate-001": {
-            if (data?.format)
-              return data.format as {
-                openai?: "png" | "jpeg" | "webp";
-                gemini?: "image/png" | "image/jpeg" | undefined;
-                grok?: undefined;
-                vercel?: undefined;
-                meta?: undefined;
-                anthropic?: undefined;
-              }[T];
-            else return;
-          }
-          case "gemini-3.1-flash-lite-preview":
-          case "deep-research-pro-preview-12-2025":
-          case "gemini-3-flash-preview":
-          case "gemini-3.1-flash-image-preview":
-          case "gemini-3.1-pro-preview":
-          case "gemini-3.1-pro-preview-customtools":
-          case "gemini-3-pro-image-preview":
-          case "gemini-2.0-flash":
-          case "gemini-2.0-flash-lite":
-          case "gemini-2.5-flash":
-          case "gemini-2.5-flash-image":
-          case "gemini-2.5-flash-lite":
-          case "gemini-2.5-pro":
-          case "veo-2.0-generate-001":
-          case "veo-3.0-fast-generate-001":
-          case "veo-3.0-generate-001":
-          case "veo-3.1-fast-generate-preview":
-          case "veo-3.1-generate-preview":
-          default: {
-            return;
-          }
-        }
-      }
-      case "openai": {
-        const m = model as GetModelUtilRT<typeof p>;
-        switch (m) {
-          case "gpt-image-1":
-          case "gpt-image-1-mini":
-          case "gpt-5.4":
-          case "gpt-5.4-pro":
-          case "gpt-4.1":
-          case "gpt-4.1-mini":
-          case "gpt-4.1-nano":
-          case "gpt-4o":
-          case "gpt-4o-mini":
-          case "o3":
-          case "gpt-5-chat-latest":
-          case "gpt-5-pro":
-          case "gpt-5-mini":
-          case "gpt-5-nano":
-          case "gpt-5.2":
-          case "gpt-5.2-pro":
-          case "gpt-image-1.5":
-          case "gpt-5":
-          case "gpt-5.1": {
-            if (
-              !(
-                data?.format === "png" ||
-                data?.format === "webp" ||
-                data?.format === "jpeg"
-              )
-            ) {
-              return;
-            } else
-              return data.format as {
-                openai?: "png" | "jpeg" | "webp";
-                gemini?: "image/png" | "image/jpeg" | undefined;
-                grok?: undefined;
-                vercel?: undefined;
-                meta?: undefined;
-                anthropic?: undefined;
-              }[T];
-          }
-          case "dall-e-2":
-          case "dall-e-3":
-          case "gpt-3.5-turbo":
-          case "gpt-4":
-          case "chatgpt-4o-latest":
-          case "gpt-5.2-codex":
-          case "gpt-5.3-codex":
-          case "gpt-5.1-chat-latest":
-          case "gpt-5.1-codex-max":
-          case "gpt-5.2-chat-latest":
-          case "gpt-5.1-codex":
-          case "gpt-5.1-codex-mini":
-          case "o1-pro":
-          case "sora-2":
-          case "sora-2-pro":
-          case "gpt-4-turbo":
-          case "gpt-5-codex":
-          case "o1":
-          case "o3-deep-research":
-          case "o4-mini-deep-research":
-          case "o3-mini":
-          case "o3-pro":
-          case "o4-mini":
-          default: {
-            return;
-          }
-        }
-      }
-      case "anthropic":
-      case "grok":
-      case "meta":
-      case "vercel":
-      default: {
-        return;
-      }
-    }
+    if (f && this.isValidGeminiOutputFormat(f)) {
+      return f;
+    } else return f;
   }
 
   public handleImgGenBg(
-    provider: Provider,
-    model?: GetModelUtilRT<typeof provider>,
+    model?: AllModelsUnion,
     data?: {
       background?: "transparent" | "opaque" | "auto";
       format?: "png" | "jpeg" | "webp";
     }
   ) {
     if (!model) return;
-    if (
-      !(
-        this.openAIFacilitatingImgGenModel(model) ||
-        this.openAIGptImgModel(model)
-      )
-    )
-      return;
+    if (!this.openAIImgGenCapable(model)) return;
     if (!data?.format) return;
     if (!(data?.format === "png" || data?.format === "webp")) return;
     if (
@@ -368,13 +310,7 @@ export class ProviderValidation {
     }
   ) {
     if (!model) return;
-    if (
-      !(
-        this.openAIFacilitatingImgGenModel(model) ||
-        this.openAIGptImgModel(model)
-      )
-    )
-      return;
+    if (!this.openAIImgGenCapable(model)) return;
 
     const d = data?.input_fidelity;
 
@@ -384,8 +320,7 @@ export class ProviderValidation {
   }
 
   public handleImgGenCompression(
-    provider: Provider,
-    model?: GetModelUtilRT<typeof provider>,
+    model?: AllModelsUnion,
     data?: {
       output_compression?: number | undefined;
       output_format?: "png" | "jpeg" | "webp" | (string & {}) | undefined;
@@ -426,9 +361,8 @@ export class ProviderValidation {
     }
   }
 
-  public handleModeration<const T extends Provider>(
-    provider: T,
-    model?: GetModelUtilRT<typeof provider>,
+  public handleModeration(
+    model?: AllModelsUnion,
     data?: { moderation?: "auto" | "low" | (string & {}) }
   ) {
     if (!model) return;
@@ -447,9 +381,8 @@ export class ProviderValidation {
     } else return "low";
   }
 
-  public handlePersonGeneration<const T extends Provider>(
-    provider: T,
-    model?: GetModelUtilRT<typeof provider>,
+  public handlePersonGeneration(
+    model?: AllModelsUnion,
     data?: {
       personGeneration?:
         | "DONT_ALLOW"
@@ -468,436 +401,161 @@ export class ProviderValidation {
     } else return "ALLOW_ADULT";
   }
 
-  public handleImgGenOutputQuality<const T extends Provider = Provider>(
-    provider: T,
-    model?: GetModelUtilRT<typeof provider>,
+  /**1:1 | 2:3 | 3:2 | 3:4 | 4:3 | 16:9 | 9:16 | 19\.5:9 | 9:19\.5 | 9:20 | 20:9 | 1:2 | 2:1 | auto */
+
+  public isValidGrokAR(ar: string) {
+    return (
+      ar === "1:1" ||
+      ar === "1:2" ||
+      ar === "2:1" ||
+      ar === "2:3" ||
+      ar === "3:2" ||
+      ar === "3:4" ||
+      ar === "4:3" ||
+      ar === "9:16" ||
+      ar === "16:9" ||
+      ar === "19.5:9" ||
+      ar === "9:19.5" ||
+      ar === "20:9" ||
+      ar === "9:20" ||
+      ar === "auto"
+    );
+  }
+
+  public isValidOpenAIQuality(ar: string) {
+    return ar === "low" || ar === "medium" || ar === "high" || ar === "auto";
+  }
+
+  public isValidGrokQuality(q: string) {
+    return q === "1k" || q === "2k";
+  }
+
+  public isValidImagenAR(ar: string) {
+    return (
+      ar === "1:1" ||
+      ar === "3:4" ||
+      ar === "4:3" ||
+      ar === "9:16" ||
+      ar === "16:9"
+    );
+  }
+
+  public isValidNanoBananaGenOneAR(ar: string) {
+    return (
+      this.isValidImagenAR(ar) ||
+      ar === "2:3" ||
+      ar === "3:2" ||
+      ar === "4:5" ||
+      ar === "5:4" ||
+      ar === "21:9"
+    );
+  }
+
+  public isValidNanoBananaGenTwoAR(ar: string) {
+    return (
+      this.isValidNanoBananaGenOneAR(ar) ||
+      ar === "1:4" ||
+      ar === "4:1" ||
+      ar === "8:1" ||
+      ar === "1:8"
+    );
+  }
+
+  public geminiAspectRatio(
+    m: "gemini-3.1-flash-image-preview",
+    data?: { output_size: NanoBanana2OutputAR }
+  ): NanoBanana2OutputAR | undefined;
+
+  public geminiAspectRatio(
+    m:
+      | "gemini-3-pro-image-preview"
+      | "gemini-2.5-flash-image"
+      | "deep-research-pro-preview-12-2025",
+    data?: { output_size: BaseNanoBananaOutputAR }
+  ): BaseNanoBananaOutputAR | undefined;
+  public geminiAspectRatio(
+    m:
+      | "imagen-4.0-generate-001"
+      | "imagen-4.0-fast-generate-001"
+      | "imagen-4.0-ultra-generate-001",
+    data?: { output_size: ImagenOutputSize }
+  ): ImagenOutputSize | undefined;
+  public geminiAspectRatio(
+    m: GeminiImgGenModels,
     data?: {
-      output_quality?: {
-        gemini?: "1K" | "2K" | "4K" | undefined;
-        openai?:
-          | "high"
-          | "medium"
-          | "low"
-          | "auto"
-          | "standard"
-          | "hd"
-          | undefined;
-        grok?: "1k" | "2k" | undefined;
-        meta?: undefined;
-        vercel?: undefined;
-        anthropic?: undefined;
-      }[typeof provider];
+      output_size:
+        | BaseNanoBananaOutputAR
+        | NanoBanana2OutputAR
+        | ImagenOutputSize;
     }
-  ): {
-    gemini?: "1K" | "2K" | "4K" | undefined;
-    openai?: "high" | "medium" | "low" | "auto" | "standard" | "hd" | undefined;
-    grok?: "1k" | "2k" | undefined;
-    meta?: undefined;
-    vercel?: undefined;
-    anthropic?: undefined;
-  }[T] {
-    switch (provider) {
-      case "gemini": {
-        const m = model as GetModelUtilRT<"gemini">;
-        switch (m) {
-          case "gemini-3.1-flash-image-preview":
-          case "deep-research-pro-preview-12-2025":
-          case "gemini-3-pro-image-preview":
-          case "gemini-2.5-flash-image": {
-            if (
-              data?.output_quality &&
-              /^(1|2|4)K$/gm.test(data.output_quality)
-            ) {
-              return data.output_quality as "1K" | "2K" | "4K" as {
-                gemini?: "1K" | "2K" | "4K" | undefined;
-                openai?:
-                  | "high"
-                  | "medium"
-                  | "low"
-                  | "auto"
-                  | "standard"
-                  | "hd"
-                  | undefined;
-                grok?: "1k" | "2k" | undefined;
-                meta?: undefined;
-                vercel?: undefined;
-                anthropic?: undefined;
-              }[T];
-            } else
-              return "1K" as {
-                gemini?: "1K" | "2K" | "4K" | undefined;
-                openai?:
-                  | "high"
-                  | "medium"
-                  | "low"
-                  | "auto"
-                  | "standard"
-                  | "hd"
-                  | undefined;
-                grok?: "1k" | "2k" | undefined;
-                meta?: undefined;
-                vercel?: undefined;
-                anthropic?: undefined;
-              }[T];
-          }
-          case "imagen-4.0-fast-generate-001":
-          case "imagen-4.0-generate-001":
-          case "imagen-4.0-ultra-generate-001": {
-            if (
-              data?.output_quality &&
-              /^(1|2)K$/gm.test(data.output_quality)
-            ) {
-              return data.output_quality as "1K" | "2K" as {
-                gemini?: "1K" | "2K" | "4K" | undefined;
-                openai?:
-                  | "high"
-                  | "medium"
-                  | "low"
-                  | "auto"
-                  | "standard"
-                  | "hd"
-                  | undefined;
-                grok?: "1k" | "2k" | undefined;
-                meta?: undefined;
-                vercel?: undefined;
-                anthropic?: undefined;
-              }[T];
-            } else
-              return "1K" as {
-                gemini?: "1K" | "2K" | "4K" | undefined;
-                openai?:
-                  | "high"
-                  | "medium"
-                  | "low"
-                  | "auto"
-                  | "standard"
-                  | "hd"
-                  | undefined;
-                grok?: "1k" | "2k" | undefined;
-                meta?: undefined;
-                vercel?: undefined;
-                anthropic?: undefined;
-              }[T];
-          }
-          case "gemini-3.1-flash-lite-preview":
-          case "gemini-3.1-pro-preview":
-          case "gemini-3.1-pro-preview-customtools":
-          case "gemini-3-flash-preview":
-          case "gemini-2.0-flash":
-          case "gemini-2.0-flash-lite":
-          case "gemini-2.5-flash":
-          case "gemini-2.5-flash-lite":
-          case "gemini-2.5-pro":
-          case "veo-2.0-generate-001":
-          case "veo-3.0-fast-generate-001":
-          case "veo-3.0-generate-001":
-          case "veo-3.1-fast-generate-preview":
-          case "veo-3.1-generate-preview":
-          default: {
-            return undefined as {
-              gemini?: "1K" | "2K" | "4K" | undefined;
-              openai?:
-                | "high"
-                | "medium"
-                | "low"
-                | "auto"
-                | "standard"
-                | "hd"
-                | undefined;
-              grok?: "1k" | "2k" | undefined;
-              meta?: undefined;
-              vercel?: undefined;
-              anthropic?: undefined;
-            }[T];
-          }
-        }
+  ) {
+    if (!data?.output_size) return;
+    if (this.geminiImageGenModel(m) && this.isValidImagenAR(data.output_size)) {
+      return data.output_size;
+    }
+    if (this.geminiNanoBananasModel(m)) {
+      if (
+        m === "gemini-3.1-flash-image-preview" &&
+        this.isValidNanoBananaGenTwoAR(data.output_size)
+      ) {
+        return data.output_size;
       }
-      case "grok": {
-        if (!model) return undefined;
-        const m = model as GetModelUtilRT<"grok">;
-        switch (m) {
-          case "grok-imagine-image":
-          case "grok-imagine-image-pro": {
-            if (
-              data?.output_quality &&
-              /^(1|2)k$/gm.test(data.output_quality)
-            ) {
-              return data.output_quality as "1k" | "2k" as {
-                gemini?: "1K" | "2K" | "4K" | undefined;
-                openai?:
-                  | "high"
-                  | "medium"
-                  | "low"
-                  | "auto"
-                  | "standard"
-                  | "hd"
-                  | undefined;
-                grok?: "1k" | "2k" | undefined;
-                meta?: undefined;
-                vercel?: undefined;
-                anthropic?: undefined;
-              }[T];
-            } else
-              return "2k" as {
-                gemini?: "1K" | "2K" | "4K" | undefined;
-                openai?:
-                  | "high"
-                  | "medium"
-                  | "low"
-                  | "auto"
-                  | "standard"
-                  | "hd"
-                  | undefined;
-                grok?: "1k" | "2k" | undefined;
-                meta?: undefined;
-                vercel?: undefined;
-                anthropic?: undefined;
-              }[T];
-          }
-          case "grok-4.20-experimental-beta-0304-non-reasoning":
-          case "grok-4.20-experimental-beta-0304-reasoning":
-          case "grok-4.20-multi-agent-experimental-beta-0304":
-          case "grok-3":
-          case "grok-3-mini":
-          case "grok-4-0709":
-          case "grok-4-1-fast-non-reasoning":
-          case "grok-4-1-fast-reasoning":
-          case "grok-4-fast-non-reasoning":
-          case "grok-4-fast-reasoning":
-          case "grok-code-fast-1":
-          case "grok-imagine-video":
-          default: {
-            return undefined as {
-              gemini?: "1K" | "2K" | "4K" | undefined;
-              openai?:
-                | "high"
-                | "medium"
-                | "low"
-                | "auto"
-                | "standard"
-                | "hd"
-                | undefined;
-              grok?: "1k" | "2k" | undefined;
-              meta?: undefined;
-              vercel?: undefined;
-              anthropic?: undefined;
-            }[T];
-          }
-        }
+      if (this.isValidNanoBananaGenOneAR(data.output_size)) {
+        return data.output_size;
       }
-      case "openai": {
-        if (!model) return undefined;
-        const m = model as GetModelUtilRT<"openai">;
-        switch (m) {
-          case "dall-e-2": {
-            if (
-              data?.output_quality &&
-              /^(standard|auto)$/gm.test(data.output_quality)
-            ) {
-              return data.output_quality as "standard" | "auto" as {
-                gemini?: "1K" | "2K" | "4K" | undefined;
-                openai?:
-                  | "high"
-                  | "medium"
-                  | "low"
-                  | "auto"
-                  | "standard"
-                  | "hd"
-                  | undefined;
-                grok?: "1k" | "2k" | undefined;
-                meta?: undefined;
-                vercel?: undefined;
-                anthropic?: undefined;
-              }[T];
-            } else
-              return "auto" as {
-                gemini?: "1K" | "2K" | "4K" | undefined;
-                openai?:
-                  | "high"
-                  | "medium"
-                  | "low"
-                  | "auto"
-                  | "standard"
-                  | "hd"
-                  | undefined;
-                grok?: "1k" | "2k" | undefined;
-                meta?: undefined;
-                vercel?: undefined;
-                anthropic?: undefined;
-              }[T];
-          }
-          case "dall-e-3": {
-            if (
-              data?.output_quality &&
-              /^(standard|auto|hd)$/gm.test(data.output_quality)
-            ) {
-              return data.output_quality as "standard" | "hd" | "auto" as {
-                gemini?: "1K" | "2K" | "4K" | undefined;
-                openai?:
-                  | "high"
-                  | "medium"
-                  | "low"
-                  | "auto"
-                  | "standard"
-                  | "hd"
-                  | undefined;
-                grok?: "1k" | "2k" | undefined;
-                meta?: undefined;
-                vercel?: undefined;
-                anthropic?: undefined;
-              }[T];
-            } else
-              return "auto" as {
-                gemini?: "1K" | "2K" | "4K" | undefined;
-                openai?:
-                  | "high"
-                  | "medium"
-                  | "low"
-                  | "auto"
-                  | "standard"
-                  | "hd"
-                  | undefined;
-                grok?: "1k" | "2k" | undefined;
-                meta?: undefined;
-                vercel?: undefined;
-                anthropic?: undefined;
-              }[T];
-          }
-          case "gpt-4.1":
-          case "gpt-4.1-mini":
-          case "gpt-4.1-nano":
-          case "gpt-4o":
-          case "gpt-4o-mini":
-          case "gpt-5.1":
-          case "gpt-5.4":
-          case "gpt-5.4-pro":
-          case "gpt-5":
-          case "gpt-5.2":
-          case "gpt-5.2-pro":
-          case "gpt-image-1.5":
-          case "gpt-5-mini":
-          case "gpt-5-chat-latest":
-          case "gpt-5-pro":
-          case "gpt-5-nano":
-          case "gpt-image-1":
-          case "gpt-image-1-mini":
-          case "o3": {
-            if (
-              data?.output_quality &&
-              /^(high|medium|low|auto)$/gm.test(data.output_quality)
-            ) {
-              return data.output_quality as
-                | "high"
-                | "medium"
-                | "low"
-                | "auto" as {
-                gemini?: "1K" | "2K" | "4K" | undefined;
-                openai?:
-                  | "high"
-                  | "medium"
-                  | "low"
-                  | "auto"
-                  | "standard"
-                  | "hd"
-                  | undefined;
-                grok?: "1k" | "2k" | undefined;
-                meta?: undefined;
-                vercel?: undefined;
-                anthropic?: undefined;
-              }[T];
-            } else
-              return "auto" as {
-                gemini?: "1K" | "2K" | "4K" | undefined;
-                openai?:
-                  | "high"
-                  | "medium"
-                  | "low"
-                  | "auto"
-                  | "standard"
-                  | "hd"
-                  | undefined;
-                grok?: "1k" | "2k" | undefined;
-                meta?: undefined;
-                vercel?: undefined;
-                anthropic?: undefined;
-              }[T];
-          }
-          case "gpt-5.2-codex":
-          case "gpt-5.3-codex":
-          case "gpt-5.1-chat-latest":
-          case "gpt-5.1-codex":
-          case "gpt-5.1-codex-mini":
-          case "gpt-3.5-turbo":
-          case "gpt-4":
-          case "gpt-4-turbo":
-          case "gpt-5.1-codex-max":
-          case "gpt-5.2-chat-latest":
-          case "chatgpt-4o-latest":
-          case "o1":
-          case "o3-deep-research":
-          case "o4-mini-deep-research":
-          case "o1-pro":
-          case "sora-2":
-          case "sora-2-pro":
-          case "gpt-5-codex":
-          case "o3-mini":
-          case "o3-pro":
-          case "o4-mini": {
-            return undefined as {
-              gemini?: "1K" | "2K" | "4K" | undefined;
-              openai?:
-                | "high"
-                | "medium"
-                | "low"
-                | "auto"
-                | "standard"
-                | "hd"
-                | undefined;
-              grok?: "1k" | "2k" | undefined;
-              meta?: undefined;
-              vercel?: undefined;
-              anthropic?: undefined;
-            }[T];
-          }
-          default: {
-            return "auto" as {
-              gemini?: "1K" | "2K" | "4K" | undefined;
-              openai?:
-                | "high"
-                | "medium"
-                | "low"
-                | "auto"
-                | "standard"
-                | "hd"
-                | undefined;
-              grok?: "1k" | "2k" | undefined;
-              meta?: undefined;
-              vercel?: undefined;
-              anthropic?: undefined;
-            }[T];
-          }
-        }
+    }
+  }
+
+  public isValidImagenOutputQuality(q: string) {
+    return q === "1K" || q === "2K";
+  }
+
+  public isValidNanoBananaProAndTwoOutputQuality(q: string) {
+    return this.isValidImagenOutputQuality(q) || q === "4K";
+  }
+
+  public isValidNanoBananaTwoOutputQuality(q: string) {
+    return this.isValidNanoBananaProAndTwoOutputQuality(q) || q === "0.5K";
+  }
+
+  public handleImgGenOutputQuality(
+    model: AllModelsUnion = "gpt-5.4",
+    data?: { output_quality: ModelToQualityOpts<typeof model> }
+  ) {
+    const q = data?.output_quality;
+    if (!model) return;
+    const m = model;
+
+    if (this.geminiNanoBananasModel(m) && m !== "gemini-2.5-flash-image") {
+      if (q && this.isValidNanoBananaProAndTwoOutputQuality(q)) {
+        return q;
+      } else return "2K";
+    }
+    if (this.geminiNanoBananaTwo(m)) {
+      if (q && this.isValidNanoBananaTwoOutputQuality(q)) {
+        return q;
+      } else {
+        return "2K" as const satisfies GeminiImageQuality["gemini-3.1-flash-image-preview"];
       }
-      case "anthropic":
-      case "meta":
-      case "vercel":
-      default: {
-        return undefined as {
-          gemini?: "1K" | "2K" | "4K" | undefined;
-          openai?:
-            | "high"
-            | "medium"
-            | "low"
-            | "auto"
-            | "standard"
-            | "hd"
-            | undefined;
-          grok?: "1k" | "2k" | undefined;
-          meta?: undefined;
-          vercel?: undefined;
-          anthropic?: undefined;
-        }[T];
+    }
+    if (this.geminiImageGenModel(m)) {
+      if (q && this.isValidImagenOutputQuality(q)) {
+        return q;
+      } else return "1K";
+    }
+    if (this.grokImagineImgGenModel(model)) {
+      if (q && this.isValidGrokQuality(q)) {
+        return q;
+      } else {
+        if (m === "grok-imagine-image-pro") {
+          return "2k";
+        } else return "1k";
       }
+    }
+    if (this.openAIImgGenCapable(model)) {
+      if (q && this.isValidOpenAIQuality(q)) {
+        return q;
+      } else return "auto";
     }
   }
 
@@ -910,7 +568,7 @@ export class ProviderValidation {
         return "grok-imagine-image" satisfies AllModelsUnion;
       }
       case "openai": {
-        return "gpt-5.2" satisfies AllModelsUnion;
+        return "gpt-5.4" satisfies AllModelsUnion;
       }
       case "anthropic":
       case "meta":
@@ -919,247 +577,86 @@ export class ProviderValidation {
         return undefined;
       }
     }
+  }
+
+  public isValidOpenAISize(ar: string) {
+    return (
+      ar === "1024x1024" ||
+      ar === "1024x1536" ||
+      ar === "1536x1024" ||
+      ar === "auto"
+    );
   }
 
   public handlePartialImgGen(
-    provider: Provider,
-    model?: AllModelsUnion,
+    model: AllModelsUnion = "gpt-5.4",
     data?: { partialImagesRequested?: number }
   ) {
-    switch (provider) {
-      case "openai": {
-        if (model) {
-          const m = model as GetModelUtilRT<typeof provider>;
-          switch (m) {
-            case "dall-e-2":
-            case "dall-e-3":
-            case "o3-mini":
-            case "o3-pro":
-            case "o4-mini":
-            case "gpt-3.5-turbo":
-            case "gpt-4":
-            case "chatgpt-4o-latest":
-            case "o3-deep-research":
-            case "o4-mini-deep-research":
-            case "o1-pro":
-            case "sora-2":
-            case "sora-2-pro":
-            case "gpt-5.1-codex-max":
-            case "gpt-5.2-chat-latest":
-            case "gpt-4-turbo":
-            case "gpt-5-codex":
-            case "gpt-5.1-chat-latest":
-            case "gpt-5.1-codex":
-            case "gpt-5.1-codex-mini":
-            case "gpt-5.2-codex":
-              case "gpt-5.3-codex":
-            case "o1": {
-              return undefined;
-            }
-            case "gpt-5.4":
-            case "gpt-5.4-pro":
-            case "gpt-5.2":
-            case "gpt-5.2-pro":
-            case "gpt-image-1.5":
-            case "gpt-4.1":
-            case "gpt-4.1-mini":
-            case "gpt-4.1-nano":
-            case "gpt-4o":
-            case "gpt-4o-mini":
-            case "gpt-5-chat-latest":
-            case "gpt-5-pro":
-            case "gpt-5.1":
-            case "gpt-5":
-            case "gpt-5-mini":
-            case "gpt-5-nano":
-            case "gpt-image-1":
-            case "gpt-image-1-mini":
-            case "o3": {
-              if (
-                data?.partialImagesRequested &&
-                data.partialImagesRequested >= 0 &&
-                data.partialImagesRequested <= 3
-              ) {
-                return data.partialImagesRequested;
-              } else return 0;
-            }
-            default: {
-              return undefined;
-            }
-          }
-        } else return undefined;
-      }
-      case "anthropic":
-      case "gemini":
-      case "grok":
-      case "meta":
-      case "vercel":
-      default: {
-        return undefined;
-      }
+    if (this.openAIImgGenCapable(model)) {
+      if (data?.partialImagesRequested) {
+        if (
+          data.partialImagesRequested >= 0 &&
+          data.partialImagesRequested <= 3
+        ) {
+          return data.partialImagesRequested;
+        }
+        if (data.partialImagesRequested > 3) {
+          return 3;
+        }
+        if (data.partialImagesRequested <= 0) {
+          return 0;
+        }
+      } else return 0;
     }
   }
 
-  public handleOutputSize<const T extends Provider = Provider>(
-    provider: T,
-    model?: GetModelUtilRT<T>,
-    data?: { output_size?: OutputSizeProps<typeof provider> }
-  ): OutputSizeProps<typeof provider> {
-    switch (provider) {
-      case "anthropic":
-      case "meta":
-      case "vercel": {
-        return undefined;
+  public handleOutputSize<const M extends AllModelsUnion = AllModelsUnion>(
+    model = "gpt-5.4" as M,
+    data?: { output_size?: ModelToAspectRatioOpts<typeof model> }
+  ) {
+    if (!model) return;
+    const m = model;
+    if (
+      !(
+        this.geminiImgGenCapable(m) ||
+        this.grokImagineImgGenModel(m) ||
+        this.openAIImgGenCapable(m)
+      )
+    )
+      return;
+
+    if (this.grokImagineImgGenModel(m)) {
+      const ar = data?.output_size;
+
+      if (ar && this.isValidGrokAR(ar)) {
+        return ar;
+      } else return "auto" as const;
+    }
+
+    if (this.geminiImgGenCapable(m)) {
+      const ar = data?.output_size;
+      if (this.geminiImageGenModel(m)) {
+        if (ar && this.isValidImagenAR(ar)) {
+          return ar;
+        } else return "1:1";
       }
-      case "gemini": {
-        const m = model as GetModelUtilRT<"gemini"> | undefined;
-        switch (m) {
-          case "deep-research-pro-preview-12-2025":
-          case "gemini-3.1-flash-image-preview":
-          case "gemini-3-pro-image-preview":
-          case "gemini-2.5-flash-image": {
-            if (
-              data?.output_size &&
-              /^(1:1|2:3|3:2|3:4|4:3|4:5|5:4|9:16|16:9|21:9)$/gm.test(
-                data.output_size
-              )
-            ) {
-              return data.output_size as OutputSizeProps<typeof provider>;
-            } else return "1:1" as OutputSizeProps<typeof provider>;
-          }
-          case "imagen-4.0-fast-generate-001":
-          case "imagen-4.0-generate-001":
-          case "imagen-4.0-ultra-generate-001": {
-            if (
-              data?.output_size &&
-              /^(1:1|3:4|4:3|9:16|16:9)$/gm.test(data.output_size)
-            ) {
-              return data.output_size as OutputSizeProps<typeof provider>;
-            } else return "1:1" as OutputSizeProps<typeof provider>;
-          }
-          case "gemini-3.1-flash-lite-preview":
-          case "gemini-3.1-pro-preview":
-          case "gemini-3.1-pro-preview-customtools":
-          case "gemini-3-flash-preview":
-          case "gemini-2.0-flash":
-          case "gemini-2.0-flash-lite":
-          case "gemini-2.5-flash":
-          case "gemini-2.5-flash-lite":
-          case "gemini-2.5-pro":
-          case "veo-2.0-generate-001":
-          case "veo-3.0-fast-generate-001":
-          case "veo-3.0-generate-001":
-          case "veo-3.1-fast-generate-preview":
-          case "veo-3.1-generate-preview": {
-            return undefined;
-          }
-          case undefined:
-          default: {
-            return "1:1" as OutputSizeProps<typeof provider>;
-          }
-        }
+
+      if (m === "gemini-3.1-flash-image-preview") {
+        if (ar && this.isValidNanoBananaGenTwoAR(ar)) {
+          return ar;
+        } else return "1:1";
       }
-      case "grok": {
-        const m = model as GetModelUtilRT<"grok"> | undefined;
-        if (!m || !this.grokImagineImgGenModel(m)) return undefined;
-        else {
-          if (
-            data?.output_size &&
-            /^(1:1|2:3|3:2|3:4|4:3|16:9|9:16|19\.5:9|9:19\.5|9:20|20:9|1:2|2:1|auto)$/gm.test(
-              data?.output_size
-            )
-          ) {
-            return data.output_size as GrokModelAspectRatio[GetModelUtilRT<"grok">] as OutputSizeProps<
-              typeof provider
-            >;
-          } else {
-            return "auto" as OutputSizeProps<typeof provider>;
-          }
-        }
-      }
-      case "openai": {
-        const m = model as GetModelUtilRT<"openai"> | undefined;
-        switch (m) {
-          case "dall-e-2": {
-            if (
-              data?.output_size &&
-              /^(256x256|512x512|1024x1024|auto)$/gm.test(data.output_size)
-            ) {
-              return data.output_size as OpenAIModelAspectRatio[GetModelUtilRT<"openai">] as OutputSizeProps<
-                typeof provider
-              >;
-            } else return "auto" as OutputSizeProps<typeof provider>;
-          }
-          case "dall-e-3": {
-            if (
-              data?.output_size &&
-              /^(1792x1024|1024x1792|1024x1024|auto)$/gm.test(data.output_size)
-            ) {
-              return data.output_size as OpenAIModelAspectRatio[GetModelUtilRT<"openai">] as OutputSizeProps<
-                typeof provider
-              >;
-            } else return "auto" as OutputSizeProps<typeof provider>;
-          }
-          case "gpt-4.1":
-          case "gpt-4.1-mini":
-          case "gpt-4.1-nano":
-          case "gpt-4o":
-          case "gpt-4o-mini":
-          case "gpt-5":
-          case "gpt-5.4":
-          case "gpt-5.4-pro":
-          case "gpt-5.2":
-          case "gpt-image-1.5":
-          case "gpt-5.2-pro":
-          case "gpt-5.1":
-          case "gpt-5-pro":
-          case "gpt-5-chat-latest":
-          case "gpt-5-mini":
-          case "gpt-5-nano":
-          case "gpt-image-1":
-          case "gpt-image-1-mini":
-          case "o3": {
-            if (
-              data?.output_size &&
-              /^(1536x1024|1024x1536|1024x1024|auto)$/gm.test(data.output_size)
-            ) {
-              return data.output_size as OpenAIModelAspectRatio[GetModelUtilRT<"openai">] as OutputSizeProps<
-                typeof provider
-              >;
-            } else return "auto" as OutputSizeProps<typeof provider>;
-          }
-          case "gpt-5.2-codex":
-          case "gpt-5.3-codex":
-          case "gpt-5.1-codex-max":
-          case "gpt-5.2-chat-latest":
-          case "gpt-3.5-turbo":
-          case "gpt-4":
-          case "gpt-5.1-chat-latest":
-          case "gpt-5.1-codex":
-          case "gpt-5.1-codex-mini":
-          case "gpt-4-turbo":
-          case "chatgpt-4o-latest":
-          case "o1":
-          case "o3-deep-research":
-          case "o4-mini-deep-research":
-          case "o1-pro":
-          case "sora-2":
-          case "sora-2-pro":
-          case "gpt-5-codex":
-          case "o3-mini":
-          case "o3-pro":
-          case "o4-mini": {
-            return undefined;
-          }
-          case undefined:
-          default: {
-            return "auto" as OutputSizeProps<typeof provider>;
-          }
-        }
-      }
-      default: {
-        return undefined;
-      }
+      if (this.geminiNanoBananasModel(m)) {
+        if (ar && this.isValidNanoBananaGenOneAR(ar)) {
+          return ar;
+        } else return "1:1";
+      } else return "1:1" satisfies NanoBanana2OutputAR;
+    }
+    if (this.openAIImgGenCapable(m)) {
+      const ar = data?.output_size;
+      if (ar && this.isValidOpenAISize(ar)) {
+        return data.output_size;
+      } else return "auto" as const;
     }
   }
 
@@ -1178,15 +675,14 @@ export class ProviderValidation {
     apiKey: string | null;
     keyId: string | null;
   }) {
-    const model = (data?.model ??
-        this.fallbackImgGenModelByProvider(provider)) satisfies
-        | AllModelsUnion
-        | undefined,
-      outputCompression = this.handleImgGenCompression(provider, model, {
+    const model =
+      data?.model ?? this.fallbackImgGenModelByProvider(provider) ?? "gpt-5.4";
+
+    const outputCompression = this.handleImgGenCompression(model, {
         output_compression: data.imgGenFields?.output_compression,
         output_format: data.imgGenFields?.output_format
       }),
-      outputBackground = this.handleImgGenBg(provider, model, {
+      outputBackground = this.handleImgGenBg(model, {
         background: data.imgGenFields?.output_background,
         format:
           (data.imgGenFields?.output_format as
@@ -1195,22 +691,22 @@ export class ProviderValidation {
             | "webp"
             | undefined) ?? "png"
       }),
-      moderation = this.handleModeration(provider, model, {
+      moderation = this.handleModeration(model, {
         moderation: data.imgGenFields?.moderation
       }),
       negativePrompt = data?.imgGenFields?.negativePrompt ?? undefined,
       seed = data?.imgGenFields?.seed ?? undefined,
-      nRequested = this.handleImgGenCount(provider, model, {
+      nRequested = this.handleImgGenCount(model, {
         n: data.imgGenFields?.n
       }),
       inputFidelity = this.handleInputFidelity(provider, model, {
         input_fidelity: data.imgGenFields?.input_fidelity
       }),
-      personGeneration = this.handlePersonGeneration(provider, model, {
+      personGeneration = this.handlePersonGeneration(model, {
         personGeneration: data.imgGenFields?.personGeneration
       }),
       progress = 0,
-      partialImagesRequested = this.handlePartialImgGen(provider, model, {
+      partialImagesRequested = this.handlePartialImgGen(model, {
         partialImagesRequested: data.imgGenFields?.output_partial_images
       }),
       outputFormat =
@@ -1218,11 +714,10 @@ export class ProviderValidation {
           ? "png"
           : (data?.imgGenFields?.output_format ?? "png"),
       outputSize = this.handleOutputSize(
-        provider,
         model,
         data.imgGenFields?.output_size as Parameters<
           typeof this.handleOutputSize
-        >["2"]
+        >["1"]
       ),
       stage = "QUEUED",
       temperature = data.temperature,
@@ -1231,12 +726,11 @@ export class ProviderValidation {
       prompt = data?.prompt,
       topP = data?.topP,
       nCompleted = 0,
-      outputQuality = this.handleImgGenOutputQuality<typeof provider>(
-        provider,
+      outputQuality = this.handleImgGenOutputQuality(
         model,
         data.imgGenFields?.output_quality as Parameters<
           typeof this.handleImgGenOutputQuality
-        >["2"]
+        >["1"]
       ),
       apiKey = data.apiKey,
       keyId = data.keyId,

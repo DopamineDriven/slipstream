@@ -1,3 +1,6 @@
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { xAIResponses } from "@/xai/event-types.ts";
 import type {
   CodeInterpreterTool,
@@ -5,6 +8,8 @@ import type {
   CreateResponseStreamProps,
   FileContentBlock,
   FileSearchTool,
+  FunctionCallContext,
+  FunctionCallOutput,
   HandleToolUsageParams,
   ImageContentBlock,
   ResponsesApiInputWorkupParams,
@@ -12,6 +17,8 @@ import type {
   ResponsesContentInputSingleton,
   ResponsesContentWorkup,
   ResponsesToolsParams,
+  SlatherUserStoreTool,
+  SlatherUserStoreToolInput,
   TextContentBlock,
   ToolUnion,
   WebSearchTool,
@@ -21,8 +28,6 @@ import type {
   FilesDbRegistryProps,
   xAIDocDbRegistryProps
 } from "@/xai/types.ts";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
 import { ResponsesStreamParser } from "@/xai/response-sse.ts";
 import { GrokWorkupService } from "@/xai/workup.ts";
 import type {
@@ -33,13 +38,17 @@ import type {
 } from "@slipstream/types";
 
 export class GrokCollectionsService extends GrokWorkupService {
+  protected userStore: UserStoreVectorService;
+
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
+    userStore: UserStoreVectorService,
     xaiKey: string,
     xaiManagementKey: string
   ) {
     super(logger, prisma, xaiKey, xaiManagementKey);
+    this.userStore = userStore;
   }
 
   protected async ensureXaiFile(
@@ -355,6 +364,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     management_api_key,
     payload: {
       collectionId,
+      round_input,
       tool_choice_input = "auto",
       logprobs,
       imgDetail = "auto",
@@ -375,6 +385,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     const mgmtApiKey = management_api_key ?? this.xaiManagementKey;
     const collection_id = this.collectionRegistry.get(userId);
     const cId = collection_id ?? collectionId;
+    const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
     const {
       input,
       instructions,
@@ -387,35 +398,62 @@ export class GrokCollectionsService extends GrokWorkupService {
       stream: streaming = stream,
       tools,
       user
-    } = await this.getResponsesApiInputWorkup({
-      isNewChat,
-      model: (m ?? "grok-4-1-fast-reasoning") as GrokModelIdUnion,
-      userId,
-      msgs,
-      keyFingerprint: keyId ?? "server",
-      systemPrompt,
-      max_output_tokens: max_tokens,
-      tool_choice: tool_choice_input,
-      detail: imgDetail,
-      keyId: keyId ?? undefined,
-      apiKey: key,
-      managementKey: mgmtApiKey,
-      collectionId: cId,
-      enableFileSearch,
-      fileSearchMaxResults,
-      enableCodeInterpreter,
-      enableWebSearch,
-      enableXSearch,
-      web_enable_image_understanding,
-      x_enable_image_understanding,
-      x_enable_video_understanding,
-      parallel_tool_calls: parallel_tool_calling ?? undefined,
-      include: ["reasoning.encrypted_content"]
-    });
+    } = typeof round_input !== "undefined"
+      ? {
+          input: round_input,
+          instructions: this.formatSystemInstruction(isNewChat, systemPrompt),
+          reasoning: undefined,
+          max_output_tokens: max_tokens,
+          model: (m ?? "grok-4.20-0309-reasoning") as GrokModelIdUnion,
+          parallel_tool_calls: parallel_tool_calling,
+          tool_choice: tool_choice_input,
+          store: false,
+          stream,
+          tools: this.handleTooling({
+            model: (m ?? "grok-4.20-0309-reasoning") as GrokModelIdUnion,
+            collectionId: cId,
+            enableFileSearch,
+            enableUserStoreSearch: hasUserStoreDocs,
+            fileSearchMaxResults,
+            enableCodeInterpreter,
+            enableWebSearch,
+            enableXSearch,
+            web_enable_image_understanding,
+            x_enable_image_understanding,
+            x_enable_video_understanding
+          }),
+          user: userId
+        }
+      : await this.getResponsesApiInputWorkup({
+          isNewChat,
+          model: (m ?? "grok-4.20-0309-reasoning") as GrokModelIdUnion,
+          userId,
+          msgs,
+          keyFingerprint: keyId ?? "server",
+          systemPrompt,
+          max_output_tokens: max_tokens,
+          tool_choice: tool_choice_input,
+          detail: imgDetail,
+          keyId: keyId ?? undefined,
+          apiKey: key,
+          managementKey: mgmtApiKey,
+          collectionId: cId,
+          enableFileSearch,
+          enableUserStoreSearch: hasUserStoreDocs,
+          fileSearchMaxResults,
+          enableCodeInterpreter,
+          enableWebSearch,
+          enableXSearch,
+          web_enable_image_understanding,
+          x_enable_image_understanding,
+          x_enable_video_understanding,
+          parallel_tool_calls: parallel_tool_calling ?? undefined,
+          include: ["reasoning.encrypted_content"]
+        });
 
     const requestBody = this.isMultiAgent(model)
       ? {
-          reasoning: reasoning ?? { effort: "high" },
+          reasoning: reasoning ?? { effort: "low" },
           model,
           input,
           store,
@@ -465,6 +503,322 @@ export class GrokCollectionsService extends GrokWorkupService {
     }
 
     return ResponsesStreamParser.createXAIResponsesParser(response);
+  }
+
+  protected slatherUserStore() {
+    return {
+      type: "function",
+      name: "slather_user_store",
+      description:
+        "This tool utilizes a 'Partitioned Foraging' approach which recognizes that for the 200,000+ years that humans have existed " +
+        "95%+ of it has been as foragers. Agents are trained exclusively on data aggregated/curated by humans; " +
+        "think of it as agentic foraging complete with Jaccard similarity scores for cross-analyzing your bounties. " +
+        "Slather (search) the user's uploaded documents. Uses semantic similarity by default. " +
+        "When search_terms is provided, execjtes fulltext keyword search and returns " +
+        "both result sets separately (semantic + fulltext) so you can reason about which signal " +
+        "is most relevant to the user's intent. " +
+        "Without search_terms: returns a flat JSON array of chunks. " +
+        "With search_terms: returns { semantic: [...], fulltext: [...], overlap: { chunkIds, jaccardSimilarity }, meta }. " +
+        "Call directly for single retrieval tasks, or from code_execution for multi-step programmatic workflows.",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The semantic search query"
+          },
+          max_results: {
+            type: "number",
+            description: "Maximum results to return (1-10, default 5)"
+          },
+          filename: {
+            type: "string",
+            description:
+              "Optional filename filter (fuzzy, case-insensitive). " +
+              "Only chunks from documents whose filename closely matches this string are returned. " +
+              "Example: 'Path to Hell Pt VIII' matches 'The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VIII.pdf'."
+          },
+          search_terms: {
+            type: "string",
+            description:
+              "Optional exact-match search terms for fulltext search. " +
+              "Supports quoted phrases and negation (-deprecated). " +
+              "When provided, returns partitioned semantic + fulltext results instead of a flat array."
+          }
+        },
+        required: ["query"]
+      },
+      strict: null
+    } as const satisfies SlatherUserStoreTool;
+  }
+
+  protected async searchStore(
+    userId: string,
+    query: string,
+    limit = 5,
+    threshold = 0,
+    filename?: string
+  ) {
+    return await this.userStore.searchUserStoreChunks({
+      userId,
+      query,
+      limit,
+      threshold,
+      filename
+    });
+  }
+
+  protected parseSlatherUserStoreInput(
+    rawArguments: string
+  ): SlatherUserStoreToolInput {
+    const parsed = this.parseSlatherUserStoreArguments(rawArguments);
+
+    if ("query" in parsed && typeof parsed.query === "string") {
+      const normalized = parsed.query.trim();
+      if (normalized.length > 0) {
+        const maxResults =
+          "max_results" in parsed && typeof parsed.max_results === "number"
+            ? parsed.max_results
+            : undefined;
+
+        const filenameInput =
+          "filename" in parsed && typeof parsed.filename === "string"
+            ? parsed.filename.trim() || undefined
+            : undefined;
+
+        const searchTermsInput =
+          "search_terms" in parsed && typeof parsed.search_terms === "string"
+            ? parsed.search_terms.trim() || undefined
+            : undefined;
+
+        return {
+          query: normalized,
+          max_results: maxResults,
+          filename: filenameInput,
+          search_terms: searchTermsInput
+        } satisfies SlatherUserStoreToolInput;
+      }
+    }
+
+    const queryList = Array.of<string>();
+    if ("queries" in parsed && Array.isArray(parsed.queries)) {
+      for (const query of parsed.queries) {
+        if (typeof query !== "string") continue;
+        const normalized = query.trim();
+        if (normalized.length === 0) continue;
+        queryList.push(normalized);
+      }
+    }
+
+    const uniqueQueries = Array.from(new Set(queryList)).slice(0, 5);
+    const firstQuery = uniqueQueries[0];
+    if (!firstQuery) {
+      throw new Error(
+        `slather_user_store input missing required "query": ${rawArguments}`
+      );
+    }
+
+    const maxResults =
+      "max_results" in parsed && typeof parsed.max_results === "number"
+        ? parsed.max_results
+        : undefined;
+
+    const filenameInput =
+      "filename" in parsed && typeof parsed.filename === "string"
+        ? parsed.filename.trim() || undefined
+        : undefined;
+
+    const searchTermsInput =
+      "search_terms" in parsed && typeof parsed.search_terms === "string"
+        ? parsed.search_terms.trim() || undefined
+        : undefined;
+
+    return {
+      queries: [firstQuery, ...uniqueQueries.slice(1)] as const,
+      max_results: maxResults,
+      filename: filenameInput,
+      search_terms: searchTermsInput
+    } satisfies SlatherUserStoreToolInput;
+  }
+
+  protected parseSlatherUserStoreArguments(rawArguments: string) {
+    const trimmed = rawArguments.trim();
+    if (trimmed.length === 0) {
+      return {} satisfies Record<string, unknown>;
+    }
+
+    try {
+      return JSON.parse<Record<string, unknown>>(trimmed);
+    } catch (error) {
+      const recovered = this.extractFirstJsonObject(trimmed);
+      if (!recovered) {
+        throw error;
+      }
+
+      this.logger.warn(
+        {
+          rawArgumentsPreview: trimmed.slice(0, 300),
+          recoveredPreview: recovered.slice(0, 300),
+          error: this.prisma.safeErrMsg(error)
+        },
+        "Recovered malformed xAI slather_user_store arguments"
+      );
+      return JSON.parse<Record<string, unknown>>(recovered);
+    }
+  }
+
+  protected extractFirstJsonObject(raw: string) {
+    let start = -1;
+    let depth = 0;
+    let inString = false;
+    let isEscaped = false;
+
+    for (const [index, char] of Array.from(raw).entries()) {
+      if (start === -1) {
+        if (char === "{") {
+          start = index;
+          depth = 1;
+        }
+        continue;
+      }
+
+      if (inString) {
+        if (isEscaped) {
+          isEscaped = false;
+        } else if (char === "\\") {
+          isEscaped = true;
+        } else if (char === '"') {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (char === '"') {
+        inString = true;
+        continue;
+      }
+
+      if (char === "{") {
+        depth += 1;
+        continue;
+      }
+
+      if (char === "}") {
+        depth -= 1;
+        if (depth === 0) {
+          return raw.slice(start, index + 1);
+        }
+      }
+    }
+
+    return undefined;
+  }
+
+  protected async executeSlatherUserStore(
+    userId: string,
+    input: SlatherUserStoreToolInput
+  ) {
+    const maxResults = Math.max(1, Math.min(input.max_results ?? 5, 10));
+
+    if (input.search_terms) {
+      const query = "query" in input ? input.query : input.queries[0];
+      const partitioned = await this.searchStoreHybrid(
+        userId,
+        query,
+        input.search_terms,
+        maxResults,
+        0,
+        input.filename
+      );
+      return this.userStore.formatPartitionedResults(partitioned, query);
+    }
+
+    const results =
+      "query" in input
+        ? await this.searchStore(
+            userId,
+            input.query,
+            maxResults,
+            0,
+            input.filename
+          )
+        : (
+            await Promise.all(
+              input.queries.map(query =>
+                this.searchStore(userId, query, maxResults, 0, input.filename)
+              )
+            )
+          ).flat();
+
+    if (results.length === 0) {
+      return "[]";
+    }
+
+    return JSON.stringify(
+      results.map(result => ({
+        filename: result.filename,
+        score: result.score != null ? Number(result.score.toFixed(4)) : 0,
+        content: result.content,
+        startOffset: result.startOffset,
+        endOffset: result.endOffset,
+        chunkIndex: result.chunkIndex
+      }))
+    );
+  }
+
+  protected async executeFunctionToolCall(
+    userId: string,
+    toolCall: FunctionCallContext
+  ) {
+    if (toolCall.name !== "slather_user_store") {
+      return {
+        type: "function_call_output",
+        call_id: toolCall.call_id,
+        output: `Unknown tool: ${toolCall.name}`
+      } as const satisfies FunctionCallOutput<string>;
+    }
+
+    try {
+      const input = this.parseSlatherUserStoreInput(toolCall.arguments);
+      const output = await this.executeSlatherUserStore(userId, input);
+      return {
+        type: "function_call_output",
+        call_id: toolCall.call_id,
+        output
+      } as const satisfies FunctionCallOutput<string>;
+    } catch (error) {
+      this.logger.error(
+        {
+          toolName: toolCall.name,
+          callId: toolCall.call_id,
+          error: this.prisma.safeErrMsg(error)
+        },
+        "xAI function tool execution failed"
+      );
+      return {
+        type: "function_call_output",
+        call_id: toolCall.call_id,
+        output: `slather_user_store error: ${this.prisma.safeErrMsg(error)}`
+      } as const satisfies FunctionCallOutput<string>;
+    }
+  }
+
+  protected async searchStoreHybrid(
+    userId: string,
+    query: string,
+    searchTerms: string,
+    limit = 10,
+    threshold = 0,
+    filename?: string
+  ) {
+    return await this.userStore.searchUserStoreChunksHybrid({
+      userId,
+      query,
+      searchTerms,
+      limit,
+      threshold,
+      filename
+    });
   }
 
   protected async formatxAIMsgHistory(
@@ -786,6 +1140,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     model,
     collectionId,
     enableFileSearch = true,
+    enableUserStoreSearch = false,
     fileSearchMaxResults = 10,
     enableCodeInterpreter = true,
     enableWebSearch = true,
@@ -794,24 +1149,33 @@ export class GrokCollectionsService extends GrokWorkupService {
     x_enable_image_understanding = true,
     x_enable_video_understanding = true
   }: HandleToolUsageParams) {
+    const tools = Array.of<ToolUnion>();
     if (this.canUseServerTools(model)) {
-      return this.resolveResponsesTools({
-        collectionId,
-        enableFileSearch,
-        fileSearchMaxResults,
-        enableCodeInterpreter,
-        enableWebSearch,
-        enableXSearch,
-        web_enable_image_understanding,
-        x_enable_image_understanding,
-        x_enable_video_understanding
-      });
+      tools.push(
+        ...this.resolveResponsesTools({
+          collectionId,
+          enableFileSearch,
+          fileSearchMaxResults,
+          enableCodeInterpreter,
+          enableWebSearch,
+          enableXSearch,
+          web_enable_image_understanding,
+          x_enable_image_understanding,
+          x_enable_video_understanding
+        })
+      );
     }
+
+    if (enableUserStoreSearch && this.canUseFunctionTools(model)) {
+      tools.push(this.slatherUserStore());
+    }
+
+    return tools.length > 0 ? tools : undefined;
   }
 
-  private async getResponsesApiInputWorkup({
+  protected async getResponsesApiInputWorkup({
     isNewChat,
-    model = "grok-4.20-multi-agent-experimental-beta-0304",
+    model = "grok-4.20-0309-reasoning",
     userId,
     msgs,
     keyFingerprint = "server",
@@ -824,6 +1188,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     managementKey = this.xaiManagementKey,
     collectionId,
     enableFileSearch = true,
+    enableUserStoreSearch,
     fileSearchMaxResults = 5,
     enableCodeInterpreter = true,
     enableWebSearch = true,
@@ -835,22 +1200,45 @@ export class GrokCollectionsService extends GrokWorkupService {
     parallel_tool_calls = true,
     include = ["reasoning.encrypted_content"]
   }: ResponsesApiInputWorkupParams) {
+    const hasUserStoreDocs =
+      enableUserStoreSearch ?? (await this.prisma.hasUserStoreDocs(userId));
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
       systemPrompt
     );
-    const tooling = this.handleTooling({
-      model,
-      collectionId,
-      enableFileSearch,
-      fileSearchMaxResults,
-      enableCodeInterpreter,
-      enableWebSearch,
-      enableXSearch,
-      web_enable_image_understanding,
-      x_enable_image_understanding,
-      x_enable_video_understanding
-    });
+    let toolHandler: ToolUnion[] | undefined;
+
+    // "grok-4.20-multi-agent-0309" doesn't support calling functional tools yet (2026-03-24)
+    // and will error if they are presen
+    if (this.isMultiAgent(model)) {
+      toolHandler = this.handleTooling({
+        model,
+        collectionId,
+        enableFileSearch,
+        enableUserStoreSearch: false,
+        fileSearchMaxResults,
+        enableCodeInterpreter,
+        enableWebSearch,
+        enableXSearch,
+        web_enable_image_understanding,
+        x_enable_image_understanding,
+        x_enable_video_understanding
+      });
+    } else {
+      toolHandler = this.handleTooling({
+        model,
+        collectionId,
+        enableFileSearch,
+        enableUserStoreSearch: hasUserStoreDocs,
+        fileSearchMaxResults,
+        enableCodeInterpreter,
+        enableWebSearch,
+        enableXSearch,
+        web_enable_image_understanding,
+        x_enable_image_understanding,
+        x_enable_video_understanding
+      });
+    }
 
     const history = await this.formatxAIMsgHistory(
       msgs,
@@ -863,14 +1251,13 @@ export class GrokCollectionsService extends GrokWorkupService {
       managementKey
     );
 
-    this.logger.info(history);
     if (this.isMultiAgent(model)) {
       return {
         input: history,
         model,
-        reasoning: reasoning ?? { effort: "high" },
+        reasoning: reasoning ?? { effort: "low" },
         instructions: systemInstruction,
-        tools: tooling,
+        tools: toolHandler,
         tool_choice: tool_choice ?? "auto",
         store: false,
         include,
@@ -884,7 +1271,7 @@ export class GrokCollectionsService extends GrokWorkupService {
         input: history,
         model,
         instructions: systemInstruction,
-        tools: tooling,
+        tools: toolHandler,
         tool_choice: tool_choice ?? "auto",
         store: false,
         include,

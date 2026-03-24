@@ -49,6 +49,10 @@ docker-out/
 .docker/
 *.pid
 
+apps/ws-server/src/test/__out__/
+
+apps/ws-server/src/__out__/
+
 # --- Ignore root lockfiles if only using workspace-level lockfiles ---
 # (Uncomment if you keep only pnpm-lock.yaml in the workspace root)
 # package-lock.json

@@ -100,10 +100,12 @@ class ServiceBase {
 export class PrismaDbService extends DbAccelerateMixin(
   DbServiceMixin(dbBaseMixin(ServiceBase))
 ) {
-  public p(withAccelerate?: false | undefined): typeof this.dbBase.prismaClient;
+  public p(
+    withAccelerate?: false | undefined
+  ): InstanceType<typeof DbService>["prismaClient"];
   public p(
     withAccelerate: true | undefined
-  ): typeof this.dbAccelerate.prismaClient;
+  ): InstanceType<typeof DbServiceAccelerate>["prismaClient"];
   public p<const T extends boolean = true>(accelerate = true as T) {
     if (accelerate) {
       return this.dbAccelerate.prismaClient;
@@ -116,4 +118,5 @@ export class PrismaDbService extends DbAccelerateMixin(
 export type Constructor<A extends unknown[] = any[], I = object> = new (
   ...args: A
 ) => I;
+
 export type { PrismaClient } from "./generated/prisma/client.ts";

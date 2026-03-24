@@ -1,8 +1,10 @@
+import type { LoggerService } from "@/logger/index.ts";
 import type {
   ImageGenPartialArr,
   OpenAIImgApiStreamFinal,
   OpenAIImgApiStreamPartial
 } from "@/openai/types.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
   ProviderOpenaiRequestEntity,
@@ -11,9 +13,9 @@ import type {
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { OpenAI } from "openai";
 import { Stream } from "openai/core/streaming.mjs";
-import { LoggerService } from "@/logger/index.ts";
 import { OpenAIServiceWorkup } from "@/openai/workup.ts";
-import { PrismaService } from "@/prisma/index.ts";
+import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AIChatResponseImgGenSubFields,
   EventTypeMap,
@@ -21,8 +23,6 @@ import type {
   OpenAIImgGenModels,
   OpenAiModelIdUnion
 } from "@slipstream/types";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import { S3Storage } from "@slipstream/storage-s3";
 
 export class OpenAIGPTImageService extends OpenAIServiceWorkup {
   constructor(
@@ -142,9 +142,10 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
       );
 
     if (
-      (m === "gpt-image-1" || m === "gpt-image-1-mini") &&
-      this.prisma.isImgGenModel("openai", m) &&
-      (resImg.model === "gpt-image-1" || resImg.model === "gpt-image-1-mini") &&
+      this.prisma.isPureImgGenModel(m) &&
+      (m === "gpt-image-1" ||
+        m === "gpt-image-1-mini" ||
+        m === "gpt-image-1.5") &&
       resImg.n === 1
     ) {
       const r = resImg satisfies GptImageAndFacilitatorsImgGenWorkupRT;
@@ -152,8 +153,8 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
       outputFormat = r.output_format;
       uploadtInitial = performance.now();
 
-      const _safeN = this.prisma.handleImgGenCount("openai", m, { n: r.n });
-      const partial_images = this.prisma.handlePartialImgGen("openai", m, {
+      const _safeN = this.prisma.handleImgGenCount(m, { n: r.n });
+      const partial_images = this.prisma.handlePartialImgGen(m, {
         partialImagesRequested: r.partialImagesRequested
       });
       const o = (await client.images.generate(

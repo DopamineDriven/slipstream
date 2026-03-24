@@ -1,6 +1,8 @@
 export const modelIdsByProvider = {
   openai: [
     "gpt-5.4",
+    "gpt-5.4-mini",
+    "gpt-5.4-nano",
     "gpt-5.2",
     "gpt-5.2-chat-latest",
     "gpt-5.1",
@@ -26,8 +28,6 @@ export const modelIdsByProvider = {
     "gpt-image-1.5",
     "gpt-image-1",
     "gpt-image-1-mini",
-    "dall-e-3",
-    "dall-e-2",
     "chatgpt-4o-latest",
     "o4-mini",
     "o4-mini-deep-research",
@@ -67,19 +67,15 @@ export const modelIdsByProvider = {
     "veo-2.0-generate-001"
   ],
   grok: [
-    "grok-4.20-multi-agent-experimental-beta-0304",
-    "grok-4.20-experimental-beta-0304-reasoning",
-    "grok-4.20-experimental-beta-0304-non-reasoning",
+    "grok-4.20-multi-agent-0309",
+    "grok-4.20-0309-reasoning",
+    "grok-4.20-0309-non-reasoning",
     "grok-4-1-fast-reasoning",
     "grok-4-1-fast-non-reasoning",
     "grok-4-fast-reasoning",
     "grok-4-fast-non-reasoning",
-    "grok-4-0709",
     "grok-imagine-image",
     "grok-imagine-image-pro",
-    "grok-code-fast-1",
-    "grok-3",
-    "grok-3-mini",
     "grok-imagine-video"
   ],
   anthropic: [
@@ -102,5 +98,5 @@ export const modelIdsByProvider = {
     "Cerebras-Llama-4-Scout-17B-16E-Instruct",
     "Groq-Llama-4-Maverick-17B-128E-Instruct"
   ],
-  vercel: ["v0-1.5-md", "v0-1.5-lg", "v0-1.0-md"]
+  vercel: ["v0-1.5-md", "v0-1.0-md"]
 } as const;

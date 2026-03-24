@@ -1,6 +1,8 @@
 export const displayNameModelsByProvider = {
   openai: [
     "GPT-5.4",
+    "GPT-5.4 mini",
+    "GPT-5.4 nano",
     "GPT-5.2",
     "GPT-5.2 Chat",
     "GPT-5.1",
@@ -26,8 +28,6 @@ export const displayNameModelsByProvider = {
     "GPT Image 1.5",
     "GPT Image 1",
     "GPT Image 1 mini",
-    "DALL·E 3",
-    "DALL·E 2",
     "chatgpt-4o-latest",
     "o4-mini",
     "o4-mini-deep-research",
@@ -67,19 +67,15 @@ export const displayNameModelsByProvider = {
     "Veo 2"
   ],
   grok: [
-    "Grok 4.20 Multi-Agent Beta",
-    "Grok 4.20 Reasoning Beta",
-    "Grok 4.20 Non-Reasoning Beta",
+    "Grok 4.20 Multi-Agent",
+    "Grok 4.20 Reasoning",
+    "Grok 4.20 Non-Reasoning",
     "Grok 4.1 Fast Reasoning",
     "Grok 4.1 Fast Non-Reasoning",
     "Grok 4 Fast Reasoning",
     "Grok 4 Fast Non-Reasoning",
-    "Grok 4",
     "Grok Imagine Image",
     "Grok Imagine Image Pro",
-    "Grok Code Fast 1",
-    "Grok 3",
-    "Grok 3 Mini",
     "Grok Imagine Video"
   ],
   anthropic: [
@@ -102,5 +98,5 @@ export const displayNameModelsByProvider = {
     "Llama 4 Scout (Cerebras, 17B/16E, Instruct)",
     "Llama 4 Maverick (Groq, 17B/128E, Instruct)"
   ],
-  vercel: ["v0 medium", "v0 large", "v0 medium (legacy)"]
+  vercel: ["v0 medium", "v0 medium (legacy)"]
 } as const;

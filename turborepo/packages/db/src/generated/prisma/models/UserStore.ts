@@ -1590,6 +1590,11 @@ export type UserStoreFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Skip the first `n` UserStores.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of UserStores.
+   */
   distinct?: Prisma.UserStoreScalarFieldEnum | Prisma.UserStoreScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

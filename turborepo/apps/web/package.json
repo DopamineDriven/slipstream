@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "catalog:aws",
-    "@base-ui-components/react": "catalog:bui",
+    "@base-ui/react": "catalog:bui",
     "@d0paminedriven/metadata": "catalog:dd",
     "@radix-ui/react-avatar": "catalog:radix",
     "@radix-ui/react-dialog": "catalog:radix",
@@ -52,6 +52,7 @@
     "js-cookie": "catalog:cookies",
     "katex": "catalog:katex",
     "motion": "catalog:motion",
+    "motion-plus": "file:.tarballs/motion-plus-2.8.0.tgz",
     "motion-plus-dom": "catalog:motion",
     "nanoid": "catalog:nanoid",
     "next": "catalog:next",

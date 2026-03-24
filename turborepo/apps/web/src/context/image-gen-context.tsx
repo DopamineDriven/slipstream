@@ -48,17 +48,13 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
           return true;
         }
         case "grok-imagine-video":
-        case "grok-4.20-experimental-beta-0304-non-reasoning":
-        case "grok-4.20-experimental-beta-0304-reasoning":
-        case "grok-4.20-multi-agent-experimental-beta-0304":
-        case "grok-3":
-        case "grok-4-0709":
+        case "grok-4.20-0309-non-reasoning":
+        case "grok-4.20-0309-reasoning":
+        case "grok-4.20-multi-agent-0309":
         case "grok-4-1-fast-non-reasoning":
         case "grok-4-1-fast-reasoning":
-        case "grok-3-mini":
         case "grok-4-fast-non-reasoning":
         case "grok-4-fast-reasoning":
-        case "grok-code-fast-1":
         default: {
           return false;
         }
@@ -76,6 +72,7 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
         case "imagen-4.0-ultra-generate-001": {
           return true;
         }
+
         case "gemini-3.1-flash-lite-preview":
         case "gemini-3.1-pro-preview":
         case "gemini-3.1-pro-preview-customtools":
@@ -101,8 +98,8 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
         case "gpt-5.4":
         case "gpt-5.4-pro":
         case "gpt-image-1.5":
-        case "dall-e-2":
-        case "dall-e-3":
+        case "gpt-5.4-mini":
+        case "gpt-5.4-nano":
         case "gpt-image-1":
         case "gpt-image-1-mini":
         case "gpt-4.1":
@@ -173,17 +170,13 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
           return true;
         }
         case "grok-imagine-video":
-        case "grok-4.20-experimental-beta-0304-non-reasoning":
-        case "grok-4.20-experimental-beta-0304-reasoning":
-        case "grok-4.20-multi-agent-experimental-beta-0304":
-        case "grok-3":
-        case "grok-3-mini":
-        case "grok-4-0709":
+        case "grok-4.20-0309-non-reasoning":
+        case "grok-4.20-0309-reasoning":
+        case "grok-4.20-multi-agent-0309":
         case "grok-4-1-fast-non-reasoning":
         case "grok-4-1-fast-reasoning":
         case "grok-4-fast-non-reasoning":
         case "grok-4-fast-reasoning":
-        case "grok-code-fast-1":
         default: {
           return false;
         }
@@ -224,12 +217,12 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
       const m = model as GetModelUtilRT<typeof p>;
       switch (m) {
         case "gpt-image-1.5":
-        case "dall-e-2":
-        case "dall-e-3":
         case "gpt-image-1":
         case "gpt-image-1-mini": {
           return true;
         }
+        case "gpt-5.4-mini":
+        case "gpt-5.4-nano":
         case "gpt-5.2-codex":
         case "gpt-5.3-codex":
         case "gpt-5.4":
@@ -354,25 +347,11 @@ function handleOutputSize(
     }
     case "openai": {
       switch (model) {
-        case "dall-e-2": {
-          if (
-            data?.output_size &&
-            /^(256x256|512x512|1024x1024|auto)$/gm.test(data.output_size)
-          ) {
-            return data.output_size;
-          } else return "auto";
-        }
-        case "dall-e-3": {
-          if (
-            data?.output_size &&
-            /^(1792x1024|1024x1792|1024x1024|auto)$/gm.test(data.output_size)
-          ) {
-            return data.output_size;
-          } else return "auto";
-        }
         case "gpt-image-1.5":
         case "gpt-5.4":
         case "gpt-5.4-pro":
+        case "gpt-5.4-mini":
+        case "gpt-5.4-nano":
         case "gpt-5.2":
         case "gpt-5.2-pro":
         case "gpt-5-chat-latest":
@@ -439,8 +418,6 @@ function _handlePartialImgGen(
       if (model) {
         const m = model as OpenAiModelIdUnion;
         switch (m) {
-          case "dall-e-2":
-          case "dall-e-3":
           case "o3-mini":
           case "o3-pro":
           case "o4-mini":
@@ -464,6 +441,8 @@ function _handlePartialImgGen(
           case "gpt-5-codex": {
             return undefined;
           }
+          case "gpt-5.4-mini":
+          case "gpt-5.4-nano":
           case "gpt-5.4":
           case "gpt-5.4-pro":
           case "gpt-image-1.5":
@@ -573,22 +552,8 @@ function handleImgGenOutputQuality(
       if (!model) return "auto";
       const m = model as GetModelUtilRT<typeof provider>;
       switch (m) {
-        case "dall-e-2": {
-          if (
-            data?.output_quality &&
-            /^(standard|auto)$/gm.test(data.output_quality)
-          ) {
-            return data.output_quality as "standard" | "auto";
-          } else return "auto";
-        }
-        case "dall-e-3": {
-          if (
-            data?.output_quality &&
-            /^(standard|auto|hd)$/gm.test(data.output_quality)
-          ) {
-            return data.output_quality as "standard" | "hd" | "auto";
-          } else return "auto";
-        }
+        case "gpt-5.4-mini":
+        case "gpt-5.4-nano":
         case "gpt-image-1.5":
         case "gpt-5.4":
         case "gpt-5.4-pro":

@@ -83,17 +83,6 @@ async function exe() {
 
     const { Resolver } = await import("@/resolver/index.ts");
 
-    const { xAIService } = await import("@/xai/index.ts");
-
-    const xai = new xAIService(
-      logger,
-      prisma,
-      redisInstance,
-      s3,
-      cfg.X_AI_KEY,
-      process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
-    );
-
     const { VoyageEmbeddingService } = await import("@/voyage/index.ts");
 
     const voyage = new VoyageEmbeddingService(cfg.VOYAGE_API_KEY);
@@ -112,6 +101,17 @@ async function exe() {
       cfg.VOYAGE_API_KEY
     );
 
+    const { xAIService } = await import("@/xai/index.ts");
+
+    const xai = new xAIService(
+      logger,
+      prisma,
+      redisInstance,
+      s3,
+      userStore,
+      cfg.X_AI_KEY,
+      process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
+    );
     const { LlamaService } = await import("@/meta/index.ts");
 
     const meta = new LlamaService(
@@ -129,7 +129,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
-      cfg.V0_API_KEY
+      cfg.AI_GATEWAY_API_KEY
     );
 
     const { PdfService } = await import("@/pdf/index.ts");
@@ -187,7 +187,7 @@ async function exe() {
         grok: cfg.X_AI_KEY,
         meta: cfg.LLAMA_API_KEY,
         openai: cfg.OPENAI_API_KEY,
-        vercel: cfg.V0_API_KEY,
+        vercel: process.env.AI_GATEWAY_API_KEY ?? cfg.AI_GATEWAY_API_KEY,
         grokMgmtKey:
           process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
       },

@@ -1473,6 +1473,11 @@ export type AudioMetadataFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Skip the first `n` AudioMetadata.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of AudioMetadata.
+   */
   distinct?: Prisma.AudioMetadataScalarFieldEnum | Prisma.AudioMetadataScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

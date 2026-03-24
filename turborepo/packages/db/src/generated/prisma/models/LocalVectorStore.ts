@@ -1623,6 +1623,11 @@ export type LocalVectorStoreFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Skip the first `n` LocalVectorStores.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of LocalVectorStores.
+   */
   distinct?: Prisma.LocalVectorStoreScalarFieldEnum | Prisma.LocalVectorStoreScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

@@ -53,7 +53,7 @@ export const providerObj = [
     provider: "vercel",
     text: "v0",
     icon: v0Icon,
-    value: "v0:team_******************:**************",
+    value: "vck_********************************",
     isDefault: false,
     isSet: false
   }

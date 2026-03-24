@@ -362,6 +362,7 @@ export function GrokMixin<
               deps.prisma,
               deps.redis,
               deps.s3,
+              deps.userStore,
               this.xaiApiKey ?? "",
               this.xaiManagementKey ?? ""
             );

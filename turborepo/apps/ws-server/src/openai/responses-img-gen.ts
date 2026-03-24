@@ -1,20 +1,19 @@
+import type { LoggerService } from "@/logger/index.ts";
 import type { ImageGenPartialArr, ImgGenResProps } from "@/openai/types.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { OpenAI } from "openai";
-import { LoggerService } from "@/logger/index.ts";
 import { OpenAIGPTImageService } from "@/openai/gpt-image.ts";
-import { PrismaService } from "@/prisma/index.ts";
+import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AIChatResponseImgGenSubFields,
   EventTypeMap,
   GptImageAndFacilitatorsImgGenWorkupRT,
-  OpenAIImgCapableModels,
   OpenAiModelIdUnion
 } from "@slipstream/types";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import { S3Storage } from "@slipstream/storage-s3";
 
 export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
   constructor(
@@ -51,9 +50,11 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     imgGenFields,
     user_location
   }: ProviderOpenaiRequestEntity) {
-    const m = this.prisma.openAIImgGenCapable(model as OpenAiModelIdUnion)
-      ? (model as OpenAIImgCapableModels)
-      : "gpt-5.4";
+    const mod = model as OpenAiModelIdUnion;
+    if (!this.isImgGenFacilitating(mod))
+      throw new Error(
+        `${mod} does not support openai's responses api image-gen tooling.`
+      );
 
     const provider = "openai" as const;
 
@@ -108,18 +109,20 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       }
     }
 
-    const resImg = this.responsesImgGen(
-      imgGenEnabled ?? false,
-      m,
-      imgGenFields,
-      currentMsgBoundAssets
-    );
+    const resImg =
+      this.responsesImgGen(
+        imgGenEnabled ?? false,
+        mod,
+        imgGenFields,
+        currentMsgBoundAssets
+      ) ?? {};
 
     const r = resImg as GptImageAndFacilitatorsImgGenWorkupRT;
+
     partialImgsRequested = typeof r.partialImagesRequested !== "undefined";
     outputFormat = r.output_format;
     const tools = this.handleTooling(
-      m,
+      mod,
       hasExistingOpenAIAssets,
       loc,
       vectorStoreId ? [vectorStoreId] : undefined,
@@ -146,9 +149,9 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
         input: formatted,
         instructions: this.buildInstructions(systemPrompt),
         store: false,
-        reasoning: this.openaiReasoning(m, "high", "auto", true),
-        model: m,
-        text: this.openAiVerbosity(m, "medium", imgGenEnabled),
+        reasoning: this.openaiReasoning(mod, "high", "auto", true),
+        model: mod,
+        text: this.openAiVerbosity(mod, "medium", imgGenEnabled),
         max_output_tokens: max_tokens,
         safety_identifier: userId,
         include: [

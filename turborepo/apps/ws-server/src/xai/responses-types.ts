@@ -14,6 +14,7 @@ export type ResponsesRole = "user" | "assistant" | "developer" | "system";
  * "high" | "xhigh" - recruits 16 agents
  *
  */
+
 export type ReasoningEffort = "low" | "medium" | "high" | "xhigh";
 
 /**
@@ -39,6 +40,49 @@ export type XSearchTool = {
   >;
 };
 
+export type SlatherUserStoreTool = {
+  type: "function";
+  name: "slather_user_store";
+  description: string;
+  parameters: {
+    type: "object";
+    properties: {
+      query: {
+        type: "string";
+        description: string;
+      };
+      max_results: {
+        type: "number";
+        description: string;
+      };
+      filename: {
+        type: "string";
+        description: string;
+      };
+      search_terms: {
+        type: "string";
+        description: string;
+      };
+    };
+    required: ["query"];
+  };
+  strict?: boolean | null;
+};
+
+export type SlatherUserStoreToolInput =
+  | {
+      query: string;
+      max_results?: number;
+      filename?: string;
+      search_terms?: string;
+    }
+  | {
+      queries: readonly [string, ...string[]];
+      max_results?: number;
+      filename?: string;
+      search_terms?: string;
+    };
+
 export type WebSearchTool = {
   type: "web_search";
   filters?: XOR<
@@ -59,7 +103,8 @@ export type ToolUnion =
   | WebSearchTool
   | XSearchTool
   | FileSearchTool
-  | CodeInterpreterTool;
+  | CodeInterpreterTool
+  | SlatherUserStoreTool;
 
 /**
  * Controls which (if any) tool is called by the model
@@ -104,7 +149,9 @@ export type FileContentBlock = { type: "input_file"; file_id: string };
 export type ContentBlockUnion =
   | ImageContentBlock
   | TextContentBlock
-  | FileContentBlock;
+  | FileContentBlock
+  | FunctionCallOutput
+  | FunctionCallContext;
 
 /**
  * only grok-3-mini supports the effort field...so it's essentially pointless to even worry about.
@@ -128,6 +175,8 @@ export type ResponsesContentInputSingleton = {
 
 export type ResponsesComprehensive =
   | ResponsesContentInputSingleton
+  | FunctionCallContext
+  | FunctionCallOutput<string>
   | xAIResponses.OutputItem.Done["item"];
 
 export type ResponsesContentWorkup = {
@@ -180,6 +229,7 @@ export type ToolRequestInput = (
   | ToolMap<XSearchTool | WebSearchTool>
   | CodeInterpreterTool
   | FileSearchTool
+  | SlatherUserStoreTool
 )[];
 
 export type LogProbsFields = {
@@ -213,6 +263,7 @@ export interface Usage {
 
 export type CreateResponseStreamInputProps = {
   collectionId?: string;
+  round_input?: ResponsesComprehensive[];
   tool_choice_input?: ToolChoiceUnion;
   logprobs?: boolean;
   imgDetail?: ImageContentBlock["detail"];
@@ -293,6 +344,8 @@ export type XAIResponsesEvent =
   | xAIResponses.FileSearchCall.InProgress
   | xAIResponses.FileSearchCall.Searching
   | xAIResponses.FileSearchCall.Completed
+  | xAIResponses.FunctionCallArguments.Delta
+  | xAIResponses.FunctionCallArguments.Done
   | xAIResponses.CustomToolCallInput.Delta
   | xAIResponses.CustomToolCallInput.Done;
 
@@ -317,6 +370,7 @@ export type XAIResponsesEventMap<
 export interface ResponsesToolsParams {
   collectionId?: string;
   enableFileSearch?: boolean;
+  enableUserStoreSearch?: boolean;
   enableWebSearch?: boolean;
   enableXSearch?: boolean;
   enableCodeInterpreter?: boolean;
@@ -354,9 +408,53 @@ export interface ResponsesApiInputWorkupParams {
   enableCodeInterpreter?: boolean;
   enableWebSearch?: boolean;
   enableXSearch?: boolean;
+  enableUserStoreSearch?: boolean;
   web_enable_image_understanding?: boolean;
   x_enable_image_understanding?: boolean;
   x_enable_video_understanding?: boolean;
   parallel_tool_calls?: boolean;
   reasoning?: MultiAgentReasoningEffort;
 }
+
+/**
+ * ```json
+ *{
+      "type": "function_call",
+      "id": "fc_84bca990-7b7d-97e5-8df1-f70bac2ca08c_0",
+      "call_id": "0",
+      "name": "slather_weather",
+      "arguments": "{\"location\":\"Chicago, IL\"}"
+ }
+ * ```
+ */
+export type FunctionCallContext = {
+  type: "function_call";
+  /**
+   * always prefixed with `fc_` (identifier)
+   */
+  id: string;
+  call_id: string;
+  name: "slather_user_store" | (string & {});
+  /**
+   * JSON stringified object ready for parsing (arguments input by the agent)
+   */
+  arguments: string;
+};
+
+/**
+ * ```json
+ * {
+      "type": "function_call_output",
+      "call_id": "0",
+      "output": "{\"location\":\"Chicago, IL\",\"temperature_f\":37,\"condition\":\"Nippy'n'splendid with mostly sunny skies\",\"humidity\":\"78%\",\"wind\":\"12 mph NW — achieving misdirection when funneled between high rises just like Cook County politicans do at press conferences\",\"feels_like_f\":31}"
+   }
+ */
+
+export type FunctionCallOutput<T = string | object> = {
+  type: "function_call_output";
+  call_id: string;
+  /**
+   * JSON stringified output ready for parsing (data returned by the agentic args submitted)
+   */
+  output: T;
+};

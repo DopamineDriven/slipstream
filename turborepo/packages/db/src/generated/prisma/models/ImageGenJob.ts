@@ -2650,6 +2650,11 @@ export type ImageGenJobFindManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Skip the first `n` ImageGenJobs.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ImageGenJobs.
+   */
   distinct?: Prisma.ImageGenJobScalarFieldEnum | Prisma.ImageGenJobScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

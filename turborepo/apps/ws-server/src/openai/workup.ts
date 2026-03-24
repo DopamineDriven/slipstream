@@ -97,11 +97,7 @@ export class OpenAIServiceWorkup {
 
   protected isImgGenModel(m: OpenAiModelIdUnion) {
     return (
-      m === "dall-e-2" ||
-      m === "dall-e-3" ||
-      m === "gpt-image-1" ||
-      m === "gpt-image-1-mini" ||
-      m === "gpt-image-1.5"
+      m === "gpt-image-1" || m === "gpt-image-1-mini" || m === "gpt-image-1.5"
     );
   }
 
@@ -119,6 +115,8 @@ export class OpenAIServiceWorkup {
 
   protected isImgGenFacilitating(m: OpenAiModelIdUnion) {
     return (
+      m === "gpt-5.4-mini" ||
+      m === "gpt-5.4-nano" ||
       m === "gpt-4.1" ||
       m === "gpt-4.1-mini" ||
       m === "gpt-4.1-nano" ||
@@ -144,14 +142,14 @@ export class OpenAIServiceWorkup {
 
   protected responsesImgGen(
     imgGenEnabled: AIChatRequest["imgGenEnabled"],
-    mo: AIChatRequest["model"],
+    mo: AIChatRequest["model"] = "gpt-5.4",
     imgFields?: AIChatRequest["imgGenFields"],
     currentMsgBoundAssets?: ProviderOpenaiRequestEntity["currentMsgBoundAssets"]
   ) {
-    const model = mo as OpenAiModelIdUnion;
+    const model = mo;
     if (imgGenEnabled === false) return undefined;
     if (!imgFields) return undefined;
-    if (!this.isImgGenCapable(model)) {
+    if (!this.prisma.openAIImgGenCapable(model)) {
       return;
     }
 
@@ -168,9 +166,7 @@ export class OpenAIServiceWorkup {
       n,
       input_fidelity,
       input_image_mask,
-      response_format,
       pureImgGenModel,
-      style,
       output_background,
       output_compression,
       output_format,
@@ -179,90 +175,11 @@ export class OpenAIServiceWorkup {
       output_size
     } = imgFields;
 
-    if (model === "dall-e-3") {
-      const dalle3Opts = {
-        /**
-         * **dall-e-2, dall-e-3, and grok-2-image-1212 only**
-         *
-         * "url" (default) | "b64_json"
-         */
-        response_format: response_format ?? "url",
-
-        isPureImgGenModel: true as const,
-        /**
-         * **dall-e-3 only**
-         *
-         * defaults to "vivid"
-         */
-        style: (style as "vivid" | "natural" | undefined) ?? ("vivid" as const),
-        msgBoundImgAssets,
-        /** dall-e-3 has max n of 1 */
-        n: 1,
-        model: model,
-        output_quality:
-          (this.prisma.handleImgGenOutputQuality("openai", model, {
-            output_quality: output_quality as
-              | "hd"
-              | "auto"
-              | "standard"
-              | undefined
-          }) as "auto" | "hd" | "standard" | undefined) ?? ("auto" as const),
-        output_size:
-          (this.prisma.handleOutputSize("openai", model, {
-            output_size: output_size as
-              | "1792x1024"
-              | "1024x1792"
-              | "1024x1024"
-              | "auto"
-              | undefined
-          }) as "auto" | "1024x1024" | "1792x1024" | "1024x1792" | undefined) ??
-          ("auto" as const),
-        targetApi: "images" as const
-      };
-      return dalle3Opts satisfies ImgGenWorkupResRT<"dall-e-3">;
-    }
-    if (model === "dall-e-2") {
-      const dalle2Opts = {
-        /**
-         * **dall-e-2, dall-e-3, and grok-2-image-1212 only**
-         *
-         * "url" (default) | "b64_json"
-         */
-        response_format: response_format ?? "url",
-        isPureImgGenModel: true as const,
-        msgBoundImgAssets,
-        /**
-         * count
-         *
-         * 1 (min)
-         * 10 (max)
-         */
-        n: this.prisma.handleImgGenCount("openai", model, { n }) ?? 1,
-        model: "dall-e-2" as const,
-        output_quality:
-          (this.prisma.handleImgGenOutputQuality("openai", model, {
-            output_quality: output_quality as "auto" | "standard" | undefined
-          }) as "auto" | "standard" | undefined) ?? ("auto" as const),
-        output_size:
-          (this.prisma.handleOutputSize("openai", model, {
-            output_size: output_size as
-              | "256x256"
-              | "512x512"
-              | "1024x1024"
-              | "auto"
-              | undefined
-          }) as "auto" | "256x256" | "512x512" | "1024x1024" | undefined) ??
-          ("auto" as const),
-        targetApi: "images" as const
-      };
-      return dalle2Opts satisfies ImgGenWorkupResRT<"dall-e-2">;
-    }
-
     const moderate = (moderation as "low" | "auto" | undefined) ?? "low";
     const outputFormat =
       (output_format as "jpeg" | "webp" | "png" | undefined) ??
       ("png" as const);
-    const bg = this.prisma.handleImgGenBg("openai", model, {
+    const bg = this.prisma.handleImgGenBg(model, {
       background: output_background,
       format: outputFormat
     });
@@ -270,45 +187,31 @@ export class OpenAIServiceWorkup {
       input_image_mask,
       isPureImgGenModel: pureImgGenModel ?? this.isImgGenModel(model),
       msgBoundImgAssets,
-      n: this.prisma.handleImgGenCount("openai", model, { n }),
+      n: this.prisma.handleImgGenCount(model, { n }),
       moderation: moderate,
       output_format: outputFormat,
-      output_compression: this.prisma.handleImgGenCompression("openai", model, {
+      output_compression: this.prisma.handleImgGenCompression(model, {
         output_compression,
         output_format
       }),
       model: model,
-      output_quality:
-        (this.prisma.handleImgGenOutputQuality("openai", model, {
-          output_quality: output_quality as
-            | "low"
-            | "medium"
-            | "high"
-            | "auto"
-            | undefined
-        }) as
-          | "low"
-          | "auto"
-          | "high"
-          | "standard"
-          | "hd"
-          | "medium"
-          | undefined) ?? ("high" as const),
-      output_size:
-        (this.prisma.handleOutputSize("openai", model, {
-          output_size: output_size as
-            | "1536x1024"
-            | "1024x1024"
-            | "1024x1536"
-            | "auto"
-            | undefined
-        }) as "1536x1024" | "1024x1536" | "1024x1024" | undefined) ??
-        ("auto" as const),
+      output_quality: this.prisma.handleImgGenOutputQuality(model, {
+        output_quality:
+          output_quality && this.prisma.isValidOpenAIQuality(output_quality)
+            ? output_quality
+            : "high"
+      }),
+      output_size: this.prisma.handleOutputSize(model, {
+        output_size:
+          output_size && this.prisma.isValidOpenAISize(output_size)
+            ? output_size
+            : "auto"
+      }),
       output_background: bg,
       targetApi: this.isImgGenFacilitating(model)
         ? ("responses" as const)
         : ("images" as const),
-      partialImagesRequested: this.prisma.handlePartialImgGen("openai", model, {
+      partialImagesRequested: this.prisma.handlePartialImgGen(model, {
         partialImagesRequested: output_partial_images
       }),
       input_fidelity:
@@ -316,7 +219,6 @@ export class OpenAIServiceWorkup {
           ? this.prisma.handleInputFidelity("openai", model, { input_fidelity })
           : undefined
     };
-    console.log(sharedOpts);
     return sharedOpts as ImgGenWorkupResRT<typeof model>;
   }
   private async ensureAssetUploadedToOpenAI(
@@ -362,9 +264,7 @@ export class OpenAIServiceWorkup {
     }
   }
 
-  private async encodeImageAsDataUrl(
-    attachment: AttachmentSingleton<true>
-  ): Promise<string> {
+  private async encodeImageAsDataUrl(attachment: AttachmentSingleton<true>) {
     const { absTmpPath, tmpUniquename, mime } =
       await this.prisma.fetchRemoteToTmp("OPENAI", attachment);
     try {
@@ -672,8 +572,8 @@ export class OpenAIServiceWorkup {
 
   protected buildInstructions(systemPrompt?: string) {
     return systemPrompt
-      ? `${systemPrompt}\n\nWhen formatting codeblocks, always fence them with proper language tags using backticks not tildes.\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
-      : "When formatting codeblocks, always fence them with proper language tags using backticks not tildes.\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+      ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
+      : "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
   }
 
   protected ensureUserVectorStoreId(
@@ -1033,7 +933,13 @@ export class OpenAIServiceWorkup {
 
     const results =
       "query" in input
-        ? await this.searchStore(userId, input.query, maxResults, 0, input.filename)
+        ? await this.searchStore(
+            userId,
+            input.query,
+            maxResults,
+            0,
+            input.filename
+          )
         : (
             await Promise.all(
               input.queries.map(query =>
@@ -1222,9 +1128,11 @@ export class OpenAIServiceWorkup {
         }
       }
       case "gpt-5.2":
-      case "gpt-5.4": {
+      case "gpt-5.4":
+      case "gpt-5.4-mini":
+      case "gpt-5.4-nano": {
         if (imgGenEnabled === true) {
-          return { effort: "low", summary } as const satisfies Reasoning;
+          return { effort: "medium", summary } as const satisfies Reasoning;
         } else {
           if (
             effort === "xhigh" ||
@@ -1234,6 +1142,12 @@ export class OpenAIServiceWorkup {
             effort === "none"
           ) {
             return { effort, summary } as const satisfies Reasoning;
+          }
+          if (m === "gpt-5.4-mini") {
+            return { effort: "high", summary } as const satisfies Reasoning;
+          }
+          if (m === "gpt-5.4-nano") {
+            return { effort: "medium", summary } as const satisfies Reasoning;
           } else {
             return { effort: "xhigh", summary } as const satisfies Reasoning;
           }
@@ -1269,6 +1183,8 @@ export class OpenAIServiceWorkup {
   protected isReasoningModel(m: OpenAiModelIdUnion) {
     return (
       m === "gpt-5.4" ||
+      m === "gpt-5.4-mini" ||
+      m === "gpt-5.4-nano" ||
       m === "gpt-5.2-codex" ||
       m === "gpt-5.3-codex" ||
       m === "gpt-5.4-pro" ||
@@ -1312,6 +1228,8 @@ export class OpenAIServiceWorkup {
     imgGenEnabled = false
   ) {
     switch (model) {
+      case "gpt-5.4-mini":
+      case "gpt-5.4-nano":
       case "gpt-5.2-codex":
       case "gpt-5.3-codex":
       case "gpt-5.4":
@@ -1348,13 +1266,11 @@ export class OpenAIServiceWorkup {
       case "gpt-4":
       case "gpt-4-turbo":
       case "gpt-4.1":
-      case "dall-e-2":
       case "chatgpt-4o-latest":
       case "o1":
       case "o1-pro":
       case "sora-2-pro":
       case "sora-2":
-      case "dall-e-3":
       case "gpt-image-1":
       case "gpt-image-1-mini":
       case "gpt-4.1-mini":

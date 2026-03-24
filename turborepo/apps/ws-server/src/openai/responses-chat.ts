@@ -34,7 +34,7 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     max_tokens,
     jobId,
     requestMessageId,
-    model = "gpt-5-mini" satisfies OpenAiModelIdUnion,
+    model = "gpt-5.4" satisfies OpenAiModelIdUnion,
     systemPrompt,
     temperature,
     title,
@@ -113,23 +113,27 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
                 ? "xhigh"
                 : m === "gpt-5.4"
                   ? "xhigh"
-                  : m === "gpt-5.2-codex"
-                    ? "xhigh"
-                    : m === "gpt-5.3-codex"
-                      ? "xhigh"
-                      : m === "gpt-5.4-pro"
+                  : m === "gpt-5.4-mini"
+                    ? "high"
+                    : m === "gpt-5.4-nano"
+                      ? "high"
+                      : m === "gpt-5.2-codex"
                         ? "xhigh"
-                        : m === "gpt-5-pro"
-                          ? "high"
-                          : m === "gpt-5.2-pro"
+                        : m === "gpt-5.3-codex"
+                          ? "xhigh"
+                          : m === "gpt-5.4-pro"
                             ? "xhigh"
-                            : m === "gpt-5.1"
+                            : m === "gpt-5-pro"
                               ? "high"
-                              : m === "gpt-5"
-                                ? "high"
-                                : m === "gpt-5.1-codex-max"
-                                  ? "xhigh"
-                                  : "medium",
+                              : m === "gpt-5.2-pro"
+                                ? "xhigh"
+                                : m === "gpt-5.1"
+                                  ? "high"
+                                  : m === "gpt-5"
+                                    ? "high"
+                                    : m === "gpt-5.1-codex-max"
+                                      ? "xhigh"
+                                      : "medium",
               "auto",
               false
             ),

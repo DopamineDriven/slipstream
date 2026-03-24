@@ -1,10 +1,10 @@
 "use client";
 
-import { ComponentPropsWithRef } from "react";
+import { SVGProps } from "react";
 
 export function LogoOld({
   ...svg
-}: Omit<ComponentPropsWithRef<"svg">, "viewBox" | "fill" | "xmlns">) {
+}: Omit<SVGProps<SVGSVGElement>, "fill" | "viewBox" | "xmlns">) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -17,9 +17,12 @@ export function LogoOld({
   );
 }
 
+/**
+ * AI Coalesce Logo
+ */
 export function Logo({
   ...svg
-}: Omit<ComponentPropsWithRef<"svg">, "viewBox" | "fill" | "xmlns">) {
+}: Omit<SVGProps<SVGSVGElement>, "fill" | "viewBox" | "xmlns">) {
   return (
     <svg
       viewBox="0 0 134 101"

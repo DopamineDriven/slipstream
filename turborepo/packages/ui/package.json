@@ -91,7 +91,7 @@
     "tailwindcss": "catalog:tw"
   },
   "dependencies": {
-    "@base-ui-components/react": "catalog:bui",
+    "@base-ui/react": "catalog:bui",
     "@radix-ui/react-accordion": "catalog:radix",
     "@radix-ui/react-alert-dialog": "catalog:radix",
     "@radix-ui/react-aspect-ratio": "catalog:radix",
@@ -117,7 +117,7 @@
     "class-variance-authority": "catalog:cva",
     "clsx": "catalog:clsx",
     "motion": "catalog:motion",
-    "motion-plus": "catalog:motion",
+    "motion-plus": "file:.tarballs/motion-plus-2.8.0.tgz",
     "motion-plus-dom": "catalog:motion",
     "tailwind-merge": "catalog:tw",
     "vaul": "catalog:react"

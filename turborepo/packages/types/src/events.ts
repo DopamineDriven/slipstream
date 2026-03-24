@@ -19,7 +19,7 @@ import type {
 import type {
   AllImgGenFacilitatingModelsUnion,
   AllImgGenModelsUnion,
-  GetModelUtilRT,
+  AllModelsUnion,
   ImageGenProviders,
   Provider
 } from "@/models.ts";
@@ -52,7 +52,7 @@ export type AIChatRequest = {
   conversationId: string;
   prompt: string;
   provider: Provider;
-  model?: GetModelUtilRT<Provider>;
+  model?: AllModelsUnion;
   systemPrompt?: string;
   temperature?: number;
   topP?: number;
@@ -467,29 +467,24 @@ export type ImageGenRequest = {
   batchId?: string;
   metadata?: UserMetadata;
   /**
-   * gpt-image-1 only
+   * gpt-image-1.5 & gpt-image-1 only
    *
    * values include "high" | "low" | null
    */
   input_fidelity?: string;
   /**
-   * gpt-image-1 & gpt-image-1-mini only
+   * gpt-image-1.5, gpt-image-1, and gpt-image-1-mini only
    *
    * values include "low" | "auto"
    */
   moderation?: string;
   /**
-   * gpt-image-1, gpt-image-1-mini, dall-e-2:
+   * gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * n=1 (default),
    * n=10 (max)
    *
-   * dall-e-3:
-   *
-   * n=1 (default),
-   * n=1 (max)
-   *
-   * gemini-2.5-flash-image:
+   * gemini-3.1-flash-image-preview (Nano Banana 2), gemini-3-pro-image-preview (Nano Banana Pro), and gemini-2.5-flash-image (Nano Banana):
    *
    * n=1 (default),
    * n=10 (max)
@@ -499,7 +494,7 @@ export type ImageGenRequest = {
    * n=1 (default),
    * n=4 (max)
    *
-   * grok-2-image-1212
+   * grok-imagine-image (uncertain as to how xAI caps grok-imagine-image-pro)
    *
    * n=1 (default),
    * n=10 (max)
@@ -507,7 +502,7 @@ export type ImageGenRequest = {
   n?: number;
   negativePrompt?: string;
   /**
-   * gpt-image-1 & gpt-image-1-mini only:
+   * gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * n=0 (default),
    * n=3 (max)
@@ -529,7 +524,7 @@ export type ImageGenRequest = {
   output_format?: string;
   /**
    *
-   * gpt-image-1, gpt-image-1-mini:
+   *  gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * output must be of type jpeg or webp
    *
@@ -543,7 +538,7 @@ export type ImageGenRequest = {
    */
   output_compression?: number;
   /**
-   * gpt-image-1, gpt-image-1-mini:
+   * gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * "auto" (default); "transparent" | "opaque" | "auto"
    *
@@ -551,17 +546,9 @@ export type ImageGenRequest = {
    */
   output_background?: "transparent" | "opaque" | "auto";
   /**
-   *  gpt-image-1, gpt-image-1-mini:
+   *  gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * "auto" (default); "low" | "medium" | "high" | "auto"
-   *
-   * dall-e-3:
-   *
-   * "auto" (default); "standard" | "hd" | "auto"
-   *
-   * dall-e-2:
-   *
-   * "auto" (default); "standard" | "auto"
    *
    * imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
@@ -569,17 +556,9 @@ export type ImageGenRequest = {
    */
   output_quality: string;
   /**
-   *  gpt-image-1, gpt-image-1-mini:
+   *  gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * "auto" (default); "1024x1024" | "1536x1024" | "1024x1536" | "auto"
-   *
-   * dall-e-3:
-   *
-   * "auto" (default); "1024x1024" | "1792x1024" | "1024x1792" | "auto"
-   *
-   * dall-e-2:
-   *
-   * "auto" (default); "1024x1024" | "256x256" | "512x512" | "auto"
    *
    *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *

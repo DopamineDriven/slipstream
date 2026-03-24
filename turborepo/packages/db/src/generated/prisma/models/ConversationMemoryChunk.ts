@@ -1898,6 +1898,11 @@ export type ConversationMemoryChunkFindManyArgs<ExtArgs extends runtime.Types.Ex
    * Skip the first `n` ConversationMemoryChunks.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ConversationMemoryChunks.
+   */
   distinct?: Prisma.ConversationMemoryChunkScalarFieldEnum | Prisma.ConversationMemoryChunkScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

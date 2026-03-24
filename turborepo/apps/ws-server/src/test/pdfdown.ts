@@ -48,20 +48,6 @@ const pdfChoiceArr = [
   "a11final-fltpln.pdf",
   "andrew_ross_organic_presentation_autumn_2014.pdf",
   "Ascension-Through-Fire---A-Sacred-Arrival-Above-Infernal-Gates.pdf",
-  "Candy-Flipping-Claudtullus-Part-I.pdf",
-  "Candy-Flipping-Claudtullus-Part-II.pdf",
-  "Candy-Flipping-Claudtullus-Part-III.pdf",
-  "Candy-Flipping-Claudtullus-Part-IV.pdf",
-  "Candy-Flipping-Claudtullus-Part-V.pdf",
-  "Candy-Flipping-Claudtullus-Part-VI.pdf",
-  "Candy-Flipping-Claudtullus-Part-VII.pdf",
-  "Candy-Flipping-Claudtullus-Pt-I.pdf",
-  "Candy-Flipping-Claudtullus-Pt-II.pdf",
-  "Candy-Flipping-Claudtullus-Pt-III.pdf",
-  "Candy-Flipping-Claudtullus.pdf",
-  "Cosmic-Spark-Encaased-in-a-Glass-Orb-Pt-I.pdf",
-  "Cosmic-Spark-Encaased-in-a-Glass-Orb-Pt-II.pdf",
-  "Cosmic-Spark-Encaased-in-a-Glass-Orb-Pt-III.pdf",
   "Fauxcket-Aside.pdf",
   "Fauxcket-Pt-I.pdf",
   "Fauxcket-Pt-II.pdf",
@@ -399,12 +385,17 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
     body: myData
   };
 }
+
+
 const perf = performance.now();
+
 const x =
   "The-Path-to-Hell-is-Paved-with-Good-Intentions.pdf" as const satisfies Unenumerate<
     typeof pdfChoiceArr
   >;
-readAndExtract(x).then(v => {
+
+  readAndExtract(x).then(v => {
+
   console.log(`ts script finished in: ${performance.now() - perf} ms`);
   if (v) {
     const imgSizes = v.imgWithSizeArr.map(t => t.size);
@@ -447,4 +438,4 @@ readAndExtract(x).then(v => {
     });
   }
 });
-// /home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/test/__out__/condensed/Self-Imposed-Chains.pdf
+

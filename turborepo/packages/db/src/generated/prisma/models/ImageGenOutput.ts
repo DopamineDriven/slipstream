@@ -1681,6 +1681,11 @@ export type ImageGenOutputFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Skip the first `n` ImageGenOutputs.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ImageGenOutputs.
+   */
   distinct?: Prisma.ImageGenOutputScalarFieldEnum | Prisma.ImageGenOutputScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

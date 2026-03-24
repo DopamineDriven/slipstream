@@ -18,6 +18,7 @@ import { UserStoreVectorService } from "@/store/vector-store.ts";
 import { UserStoreWorkupService } from "@/store/workup.ts";
 import { VoyageEmbeddingService } from "@/voyage/index.ts";
 import { PrismaDbService } from "@slipstream/db/factory";
+import { Client } from "pg";
 
 dotenv.config({ quiet: true });
 
@@ -759,6 +760,8 @@ describe("store workup offset cache (synthetic)", () => {
 
 describe("vector retrieval probe (real DB + Voyage)", () => {
   it("retrieves Claudtullus and Geminsea chunks from a default user store", async t => {
+  const pg = new Client(process.env.DATABASE_URL ?? "");
+ await pg.connect()
     const candidateRows = await db.p(false).$queryRaw<
       RetrievalProbeStoreCandidate[]
     >`

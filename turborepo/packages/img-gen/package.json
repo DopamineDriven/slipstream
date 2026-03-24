@@ -43,12 +43,13 @@
   },
   "scripts": {
     "build": "tsdown",
-    "prebuild":"pnpm test",
+    "prebuild": "pnpm test",
     "dev": "pnpm build",
     "lint": "eslint",
     "clean": "git clean -xdf .turbo dist node_modules",
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,css,html,md}\" --ignore-unknown --cache",
-    "test": "node --test --import tsx --test-reporter spec"
+    "test": "node --test --import tsx --test-reporter spec",
+    "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
     "@slipstream/types": "workspace:*"

@@ -36,6 +36,10 @@ export function ThinkingSection({
   const startTimeRef = useRef<number | undefined>(undefined);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const lastUpdateRef = useRef<number>(0);
+
+  useEffect(()=>{
+    lastUpdateRef.current=displayDuration
+  },[displayDuration])
   // Drive live timer based on isThinking only
   // This avoids loops from rapidly-changing duration
   useEffect(() => {

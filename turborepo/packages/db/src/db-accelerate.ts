@@ -6,8 +6,7 @@ export class DbServiceAccelerate {
   constructor(connectionString: string, _poolMax = 100, idleTimeoutMs = 20000) {
     this.prismaClient = new PrismaClient({
       accelerateUrl: connectionString,
-      transactionOptions: { timeout: idleTimeoutMs },
-      errorFormat: "pretty"
+      transactionOptions: { timeout: idleTimeoutMs }
     }).$extends(withAccelerate());
   }
 }

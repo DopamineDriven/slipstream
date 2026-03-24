@@ -66,7 +66,6 @@
     }
   ],
   "files.autoSave": "afterDelay",
-  "javascript.referencesCodeLens.showOnAllFunctions": true,
   "openInDefaultBrowser.run.openWithLocalHttpServer": false,
   "tailwindCSS.experimental.classRegex": [
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
@@ -82,16 +81,15 @@
     ".*variant.*",
     ".*Styles.*"
   ],
-  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
   "tailwindCSS.colorDecorators": true,
-  "typescript.tsserver.web.typeAcquisition.enabled": true,
-  "typescript.implementationsCodeLens.enabled": true,
-  "typescript.implementationsCodeLens.showOnInterfaceMethods": true,
-  "typescript.locale": "en",
-  "typescript.referencesCodeLens.enabled": true,
-  "typescript.referencesCodeLens.showOnAllFunctions": true,
-  "typescript.experimental.useTsgo": false,
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "js/ts.tsserver.web.typeAcquisition.enabled": true,
+  "js/ts.implementationsCodeLens.enabled": true,
+  "js/ts.implementationsCodeLens.showOnInterfaceMethods": true,
+  "js/ts.locale": "en",
+  "js/ts.referencesCodeLens.showOnAllFunctions": true,
+  "js/ts.experimental.useTsgo": false,
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
   "yaml.hover": true,
   "markdown-pdf.margin.top": "0.5in",
   "markdown-pdf.margin.bottom": "0.5in",
@@ -119,8 +117,9 @@
     "markdown": false,
     "scminput": false
   },
+  "prisma.trace.server": "messages",
   "[prisma]": {
-    "editor.defaultFormatter": "Prisma.prisma-insider"
+    "editor.defaultFormatter": "Prisma.prisma"
   },
   "python.analysis.enableColorPicker": false,
   "prisma.pinToPrisma6": false,

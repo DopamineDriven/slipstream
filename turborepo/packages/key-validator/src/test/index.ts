@@ -30,9 +30,9 @@ async function llamaFetcher() {
   return res;
 }
 async function v0Fetcher() {
-  return await fetch("https://api.v0.dev/v1/models", {
+  return await fetch("https://ai-gateway.vercel.sh/v1/models", {
     headers: {
-      Authorization: `Bearer ` + (process.env.V0_API_KEY ?? "")
+      Authorization: `Bearer ` + (process.env.AI_GATEWAY_API_KEY ?? "")
     }
   });
 }
@@ -129,3 +129,7 @@ function _prettyModelName(id: string): string {
     })
     .join(" ");
 }
+
+import * as DATA from "./__out__/v0-results.json" with {type: "json"};
+
+console.log(DATA.default.data.length)

@@ -2,6 +2,8 @@ import type {
   GeminiEventMap,
   GenerateContentResponseProps
 } from "@/gemini/types.ts";
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
@@ -15,8 +17,6 @@ import type {
   ToolConfig
 } from "@google/genai";
 import { FileSearchStoreService } from "@/gemini/fss.ts";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
 import {
   GoogleGenAI,
   Interactions,
@@ -27,7 +27,6 @@ import {
 import type {
   AttachmentSingleton,
   CTR,
-  GeminiImageSize as GeminiModelAspectRatioWorkup,
   GeminiModelIdUnion,
   MessageSingleton
 } from "@slipstream/types";
@@ -277,9 +276,9 @@ export class GeminiWorkupService extends FileSearchStoreService {
             for (const res of event.delta.result) {
               this.logger.info(
                 {
-                  store: res.file_search_store ?? "no-store",
-                  title: res.title,
-                  text: res.text
+                  store: res?.file_search_store ?? "no-store",
+                  title: res?.title,
+                  text: res?.text
                 },
                 "gemini_file_search_result"
               );
@@ -288,13 +287,10 @@ export class GeminiWorkupService extends FileSearchStoreService {
           }
           case "google_search_result": {
             for (const res of event.delta.result) {
-              if (res.url && res.title) {
+              if (res.search_suggestions) {
                 this.logger.info(
                   {
-                    url: res.url,
-                    title: res.title,
-                    renderedContent:
-                      res.rendered_content ?? "no rendered content"
+                    suggestions: res.search_suggestions
                   },
                   "gemini_url_context_result"
                 );
@@ -689,27 +685,15 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }
 
   private mediaModalities(model: GeminiModelIdUnion) {
-    if (
-      !(
-        model === "gemini-3.1-flash-image-preview" ||
-        model === "gemini-2.5-flash-image" ||
-        model === "gemini-3-pro-image-preview"
-      )
-    ) {
+    if (!this.prisma.geminiNanoBananasModel(model)) {
       return ["TEXT"];
     } else return ["TEXT", "IMAGE"];
   }
 
   private candidateCount(model: GeminiModelIdUnion, n = 1) {
-    if (
-      !(
-        model === "gemini-3.1-flash-image-preview" ||
-        model === "gemini-2.5-flash-image" ||
-        model === "gemini-3-pro-image-preview"
-      )
-    ) {
+    if (!this.prisma.geminiNanoBananasModel(model)) {
       return undefined;
-    } else return this.prisma.handleImgGenCount("gemini", model, { n });
+    } else return this.prisma.handleImgGenCount(model, { n });
   }
 
   protected userStoreSearchTool() {
@@ -758,23 +742,12 @@ export class GeminiWorkupService extends FileSearchStoreService {
     const [lat, lng] = this.prisma.handleLatLng(latlng);
 
     return {
+      // allows for mixing of google tools with custom tools
+      includeServerSideToolInvocations: true,
       retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
     } satisfies ToolConfig;
   }
-  /**
- The following models support File Search Tooling:
- ```json
-[
-  "deep-research-pro-preview-12-2025",
-  "gemini-3-flash-preview",
-  "gemini-3.1-pro-preview",
-  "gemini-3.1-pro-preview-customtools"
-  "gemini-2.5-pro",
-  "gemini-2.5-flash",
-  "gemini-2.5-flash-lite"
-]
-```
- */
+
   private getTools(
     userId: string,
     m: GeminiModelIdUnion = "gemini-3.1-pro-preview"
@@ -790,6 +763,8 @@ export class GeminiWorkupService extends FileSearchStoreService {
       case "gemini-2.5-flash-lite": {
         return [
           {
+            googleSearch: {},
+            urlContext: {},
             functionDeclarations: [this.userStoreSearchTool()]
           }
         ] satisfies GenerateContentConfig["tools"];
@@ -1010,6 +985,9 @@ export class GeminiWorkupService extends FileSearchStoreService {
     } satisfies GenerateContentParameters;
   }
 
+  /**
+   * 🍌 :3 🍌
+   */
   private async contentGenNanoBananas({
     userId,
     isNewChat,
@@ -1024,8 +1002,11 @@ export class GeminiWorkupService extends FileSearchStoreService {
     systemPrompt,
     imgGenFields
   }: GenerateContentResponseProps) {
-    const m = model as GeminiModelIdUnion;
-    // fallback to platform provided server api key for users that don't have a Google API Key on file
+    const m = model as
+      | "gemini-3-pro-image-preview"
+      | "gemini-3.1-flash-image-preview"
+      | "gemini-2.5-flash-image";
+
     const keyFingerprint = keyId ?? "server";
     const toolConfig = this.getToolConfig(latlng);
     const tools = this.getTools(userId, m);
@@ -1042,31 +1023,33 @@ export class GeminiWorkupService extends FileSearchStoreService {
         m
       );
 
-    const out = imgGenFields?.output_size as
-      | "1:1"
-      | "2:3"
-      | "3:2"
-      | "3:4"
-      | "4:3"
-      | "9:16"
-      | "16:9"
-      | "21:9"
-      | undefined satisfies
-      | GeminiModelAspectRatioWorkup[
-          | "gemini-3.1-flash-image-preview"
-          | "gemini-3-pro-image-preview"
-          | "gemini-2.5-flash-image"]
-      | undefined;
+    const out = imgGenFields?.output_size
+      ? m === "gemini-3.1-flash-image-preview"
+        ? this.prisma.geminiAspectRatio(m, {
+            output_size: this.prisma.isValidNanoBananaGenOneAR(
+              imgGenFields.output_size
+            )
+              ? imgGenFields.output_size
+              : "16:9"
+          })
+        : undefined
+      : undefined;
 
-    const aspectRatio = this.prisma.handleOutputSize("gemini", m, {
+    const aspectRatio = this.prisma.handleOutputSize(m, {
       output_size: out ?? "16:9"
     });
-    const imageSize = this.prisma.handleImgGenOutputQuality("gemini", m, {
-      output_quality: imgGenFields?.output_quality as
-        | "1K"
-        | "2K"
-        | "4K"
-        | undefined
+    const imageSize = this.prisma.handleImgGenOutputQuality(m, {
+      output_quality: imgGenFields?.output_quality
+        ? this.prisma.isValidNanoBananaProAndTwoOutputQuality(
+            imgGenFields.output_quality
+          )
+          ? imgGenFields.output_quality
+          : m === "gemini-3.1-flash-image-preview"
+            ? "2K"
+            : m === "gemini-3-pro-image-preview"
+              ? "2K"
+              : undefined
+        : undefined
     });
     const responseModalities = this.mediaModalities(m);
     const candidateCount = this.candidateCount(m, imgGenFields?.n);

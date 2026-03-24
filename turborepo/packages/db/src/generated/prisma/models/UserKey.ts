@@ -1682,6 +1682,11 @@ export type UserKeyFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Skip the first `n` UserKeys.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of UserKeys.
+   */
   distinct?: Prisma.UserKeyScalarFieldEnum | Prisma.UserKeyScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
