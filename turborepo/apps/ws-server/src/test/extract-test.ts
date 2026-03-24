@@ -188,7 +188,7 @@ class Data extends Fs {
         };
       });
 
-      const _media = (_target: keyof typeof $Enums.AssetType) =>
+      const _media = (_target: keyof $Enums.AssetType) =>
         (
           s.filter(
             t =>

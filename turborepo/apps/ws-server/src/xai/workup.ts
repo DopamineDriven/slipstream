@@ -64,6 +64,10 @@ export class GrokWorkupService {
     return m === "grok-4.20-multi-agent-0309";
   }
 
+  protected canUseFunctionTools(m: GrokModelIdUnion) {
+    return !this.isMultiAgent(m);
+  }
+
   protected is420BetaModel(m: GrokModelIdUnion) {
     return (
       m === "grok-4.20-0309-reasoning" ||

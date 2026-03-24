@@ -1,14 +1,14 @@
+import type { ExtractService } from "@/extract/index.ts";
 import type { UserData } from "@/types/index.ts";
-import { ExtractService } from "@/extract/index.ts";
+import { PrismaUtilsService } from "@/prisma/utils.ts";
 import * as dotenv from "dotenv";
+import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums, UserKey } from "@slipstream/db/node/generated/client";
 import type {
   ClientContextWorkupProps,
   RecordCountsProps
 } from "@slipstream/types";
-import { PrismaDbService } from "@slipstream/db/factory";
 import { EncryptionService } from "@slipstream/encryption";
-import { PrismaUtilsService } from "./utils.ts";
 
 dotenv.config({ quiet: true });
 
@@ -18,7 +18,11 @@ export class PrismaUserMetaService extends PrismaUtilsService {
     Lowercase<$Enums.Provider>,
     string | undefined
   >();
-  constructor(prisma: PrismaDbService, extractor: ExtractService, isProd: boolean) {
+  constructor(
+    prisma: PrismaDbService,
+    extractor: ExtractService,
+    isProd: boolean
+  ) {
     super(prisma, extractor, isProd);
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
   }
@@ -66,10 +70,7 @@ export class PrismaUserMetaService extends PrismaUtilsService {
   protected formatClientContextProps(props: RecordCountsProps) {
     const isDefault = Object.fromEntries(
       Object.entries(props.isDefault).map(([t, o]) => {
-        return [
-          t,
-          o === 0 ? false : true
-        ] as const;
+        return [t, o === 0 ? false : true] as const;
       })
     );
     const isSet = Object.fromEntries(

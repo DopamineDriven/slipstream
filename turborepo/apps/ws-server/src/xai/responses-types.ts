@@ -41,6 +41,7 @@ export type XSearchTool = {
 };
 
 export type SlatherUserStoreTool = {
+  type: "function";
   name: "slather_user_store";
   description: string;
   parameters: {
@@ -65,7 +66,22 @@ export type SlatherUserStoreTool = {
     };
     required: ["query"];
   };
+  strict?: boolean | null;
 };
+
+export type SlatherUserStoreToolInput =
+  | {
+      query: string;
+      max_results?: number;
+      filename?: string;
+      search_terms?: string;
+    }
+  | {
+      queries: readonly [string, ...string[]];
+      max_results?: number;
+      filename?: string;
+      search_terms?: string;
+    };
 
 export type WebSearchTool = {
   type: "web_search";
@@ -87,7 +103,8 @@ export type ToolUnion =
   | WebSearchTool
   | XSearchTool
   | FileSearchTool
-  | CodeInterpreterTool;
+  | CodeInterpreterTool
+  | SlatherUserStoreTool;
 
 /**
  * Controls which (if any) tool is called by the model
@@ -132,7 +149,9 @@ export type FileContentBlock = { type: "input_file"; file_id: string };
 export type ContentBlockUnion =
   | ImageContentBlock
   | TextContentBlock
-  | FileContentBlock | FunctionCallOutput | FunctionCallContext;
+  | FileContentBlock
+  | FunctionCallOutput
+  | FunctionCallContext;
 
 /**
  * only grok-3-mini supports the effort field...so it's essentially pointless to even worry about.
@@ -156,6 +175,8 @@ export type ResponsesContentInputSingleton = {
 
 export type ResponsesComprehensive =
   | ResponsesContentInputSingleton
+  | FunctionCallContext
+  | FunctionCallOutput<string>
   | xAIResponses.OutputItem.Done["item"];
 
 export type ResponsesContentWorkup = {
@@ -208,6 +229,7 @@ export type ToolRequestInput = (
   | ToolMap<XSearchTool | WebSearchTool>
   | CodeInterpreterTool
   | FileSearchTool
+  | SlatherUserStoreTool
 )[];
 
 export type LogProbsFields = {
@@ -241,6 +263,7 @@ export interface Usage {
 
 export type CreateResponseStreamInputProps = {
   collectionId?: string;
+  round_input?: ResponsesComprehensive[];
   tool_choice_input?: ToolChoiceUnion;
   logprobs?: boolean;
   imgDetail?: ImageContentBlock["detail"];
@@ -321,6 +344,8 @@ export type XAIResponsesEvent =
   | xAIResponses.FileSearchCall.InProgress
   | xAIResponses.FileSearchCall.Searching
   | xAIResponses.FileSearchCall.Completed
+  | xAIResponses.FunctionCallArguments.Delta
+  | xAIResponses.FunctionCallArguments.Done
   | xAIResponses.CustomToolCallInput.Delta
   | xAIResponses.CustomToolCallInput.Done;
 
@@ -345,6 +370,7 @@ export type XAIResponsesEventMap<
 export interface ResponsesToolsParams {
   collectionId?: string;
   enableFileSearch?: boolean;
+  enableUserStoreSearch?: boolean;
   enableWebSearch?: boolean;
   enableXSearch?: boolean;
   enableCodeInterpreter?: boolean;
@@ -382,6 +408,7 @@ export interface ResponsesApiInputWorkupParams {
   enableCodeInterpreter?: boolean;
   enableWebSearch?: boolean;
   enableXSearch?: boolean;
+  enableUserStoreSearch?: boolean;
   web_enable_image_understanding?: boolean;
   x_enable_image_understanding?: boolean;
   x_enable_video_understanding?: boolean;
@@ -423,7 +450,7 @@ export type FunctionCallContext = {
    }
  */
 
-export type FunctionCallOutput<T = Record<string, unknown>> = {
+export type FunctionCallOutput<T = string | object> = {
   type: "function_call_output";
   call_id: string;
   /**
