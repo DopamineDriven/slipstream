@@ -37,6 +37,7 @@ yarn-error.log*
 .idea
 dist
 notes.md
+notes/
 
 *.mermaid
 apps/CLAUDE.md

@@ -1,7 +1,9 @@
 {
   "extends": "@slipstream/tsconfig/base.json",
   "compilerOptions": {
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+      "types": ["*"],
+      "ignoreDeprecations": "6.0"
   },
   "include": ["."],
   "exclude": ["node_modules"]

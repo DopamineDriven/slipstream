@@ -1,20 +1,22 @@
 import { PassThrough, Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
+import type { ImageCompatService } from "@/image/index.ts";
+import type { LoggerService } from "@/logger/index.ts";
+import type { ProviderService } from "@/providers/index.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
   BigIntToCompatProps,
   BufferLike,
+  HandleAiChatRequestRT,
   ProviderChatRequestEntity,
   UserData
 } from "@/types/index.ts";
+import type { WSServer } from "@/ws-server/index.ts";
 import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { Responses } from "openai/resources/index.mjs";
 import type { Logger as PinoLogger } from "pino";
-import { ImageCompatService } from "@/image/index.ts";
-import { LoggerService } from "@/logger/index.ts";
-import { ProviderService } from "@/providers/index.ts";
-import { UserStoreVectorService } from "@/store/vector-store.ts";
-import { WSServer } from "@/ws-server/index.ts";
-import { WebSocket } from "ws";
+import type { WebSocket } from "ws";
+import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AllModelsUnion,
   AnyEvent,
@@ -28,7 +30,6 @@ import type {
   RTC
 } from "@slipstream/types";
 import { RedisChannels } from "@slipstream/redis-service";
-import { S3Storage } from "@slipstream/storage-s3";
 
 export class Resolver {
   private logger: PinoLogger;
@@ -184,9 +185,9 @@ export class Resolver {
       content.push({ type: "input_text", text: msgs.content });
       try {
         const res = await openai.responses.create({
-          model: "gpt-5-nano",
+          model: "gpt-5.4-nano",
           store: false,
-          reasoning: { effort: "minimal" },
+          reasoning: { effort: "medium" },
           instructions: `Generate a creative & descriptive yet concise title  ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
           temperature: 1,
           input: [
@@ -208,9 +209,9 @@ export class Resolver {
     content.push({ type: "input_text", text: prompt });
     try {
       const res = await openai.responses.create({
-        model: "gpt-5-nano",
+        model: "gpt-5.4-nano",
         store: false,
-        reasoning: { effort: "minimal" },
+        reasoning: { effort: "medium" },
         instructions: `Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
         temperature: 1,
         input: [
@@ -329,6 +330,39 @@ export class Resolver {
     }
   }
 
+  private getCurrentMsgAttCounts(res: HandleAiChatRequestRT) {
+    const userMsgAttCounts = {
+      imgCounts: 0,
+      docCounts: 0
+    };
+    const reqMsgId = res.requestMessageId;
+    if (!res.requestMessageId) {
+      const { docCounts, imgCounts } = userMsgAttCounts;
+      return { docCounts, imgCounts };
+    }
+    const findMsgBoundAtts = res.messages.findLastIndex(t => t.id === reqMsgId);
+    if (findMsgBoundAtts === -1) {
+      this.logger.warn(
+        `${reqMsgId} returned -1 when filtered for a match via findLastIndex....`
+      );
+      const { docCounts, imgCounts } = userMsgAttCounts;
+      return { docCounts, imgCounts };
+    } else {
+      const userMsg = res.messages[findMsgBoundAtts];
+      if (userMsg?.attachments) {
+        const v = userMsg.attachments.filter(o => o.assetType === "IMAGE");
+        const d = userMsg.attachments.filter(o => o.assetType === "DOCUMENT");
+        userMsgAttCounts.imgCounts = v.length;
+        userMsgAttCounts.docCounts = d.length;
+      } else {
+        userMsgAttCounts.imgCounts = 0;
+        userMsgAttCounts.docCounts = 0;
+      }
+    }
+    const { docCounts, imgCounts } = userMsgAttCounts;
+    return { imgCounts, docCounts };
+  }
+
   public async handleAIChat(
     event: EventTypeMap["ai_chat_request"],
     ws: WebSocket,
@@ -385,7 +419,15 @@ export class Resolver {
       model,
       metadata: userData
     });
-
+    const { docCounts, imgCounts } = this.getCurrentMsgAttCounts(res);
+    // res.attachments?.findLastIndex(t =>t.id === res.requestMessageId);
+    // if (res.attachments) {
+    // for (const att of res.attachments) {
+    // if (att.assetType==="IMAGE") imgAttachmentCount+=1;
+    // }
+    // } else {
+    //   imgAttachmentCount=0;
+    // }
     const user_location = {
       type: "approximate",
       city: userData?.city ?? "Barrington",
@@ -497,6 +539,8 @@ export class Resolver {
       userId,
       ws,
       apiKey,
+      docCounts,
+      imgCounts,
       jobId,
       requestMessageId,
       keyId,
