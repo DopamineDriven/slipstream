@@ -1,4 +1,9 @@
 import type {
+  GrokLanguageTTS,
+  GrokVoiceTTS,
+  TTSCodec
+} from "@/events-audio.ts";
+import type {
   AIChatRequestImgGenFields,
   AIChatResponseImgGenFieldsFinal,
   ImgGenStage
@@ -697,6 +702,60 @@ export type ImageGenProgress = {
   eta?: number;
 };
 
+export type UserTTSRequest = {
+  type: "user_tts_request";
+  conversationId: string;
+  messageId: string;
+  /**
+   * defaults to `"auto"`
+   */
+  language?: GrokLanguageTTS;
+  /**
+   * defaults to mp3
+   */
+  codec?: TTSCodec;
+  /**
+   * defaults to eve
+   */
+  voice?: GrokVoiceTTS;
+  /**
+   * defaults to 128000 (bps)
+   */
+  bitRate?: number;
+  /**
+   * defaults to 24000 (Hz)
+   */
+  sampleRate?: number;
+};
+
+export type UserTTSChunk = {
+  type: "user_tts_chunk";
+  conversationId: string;
+  messageId: string;
+  audioChunk: string; // base64 encoded string;
+};
+
+export type UserTTSError = {
+  type: "user_tts_error";
+  status: number;
+  statusText: string;
+  conversationId: string;
+  messageId: string;
+};
+
+export type UserTTSResponse = {
+  type: "user_tts_response";
+  ttsJobId: string;
+  attachmentId: string;
+  conversationId: string;
+  messageId: string;
+  durationMs: number;
+  generationMs: number;
+  size: number;
+  cdnUrl: string; // s3 / cloudfront persisted audio file
+  codec: TTSCodec;
+};
+
 /**
  * Batch upload notification
  */
@@ -745,7 +804,11 @@ export type AnyEvent =
   | ProviderContextPong
   | ProviderContextUpdate
   | ProviderContextUpdateAck
-  | TypingIndicator;
+  | TypingIndicator
+  | UserTTSChunk
+  | UserTTSRequest
+  | UserTTSError
+  | UserTTSResponse;
 
 export type AnyEventTypeUnion = AnyEvent["type"];
 
@@ -795,6 +858,10 @@ export type EventTypeMap = {
   provider_context_update: ProviderContextUpdate;
   provider_context_update_ack: ProviderContextUpdateAck;
   typing: TypingIndicator;
+  user_tts_chunk: UserTTSChunk;
+  user_tts_error: UserTTSError;
+  user_tts_request: UserTTSRequest;
+  user_tts_response: UserTTSResponse;
 };
 
 export type EventMap<T extends keyof EventTypeMap> = {

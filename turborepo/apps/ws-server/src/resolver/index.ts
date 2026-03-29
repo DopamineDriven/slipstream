@@ -30,6 +30,7 @@ import type {
   RTC
 } from "@slipstream/types";
 import { RedisChannels } from "@slipstream/redis-service";
+import { TTSService } from "@/tts/index.ts";
 
 export class Resolver {
   private logger: PinoLogger;
@@ -41,7 +42,8 @@ export class Resolver {
     private imgCompatService: ImageCompatService,
     private userVectorStore: UserStoreVectorService,
     private xaiManagementApikey: string,
-    logger: LoggerService
+    logger: LoggerService,
+  private ttsService: TTSService
   ) {
     this.logger = logger
       .getPinoInstance()
@@ -88,6 +90,7 @@ export class Resolver {
       "provider_context_ping",
       this.handleProviderContextPing.bind(this)
     );
+    this.wsServer.on("user_tts_request", this.handleUserTTSRequest.bind(this));
     this.wsServer.on(
       "provider_context_update",
       this.handleProviderContextUpdate.bind(this)
@@ -649,6 +652,13 @@ export class Resolver {
     }
   }
 
+  public async handleUserTTSRequest(
+    _event: EventTypeMap["user_tts_request"],
+    _ws: WebSocket,
+    _userId: string,
+    _userData?: UserData
+  ) {}
+
   protected async postHandleConnectionEstablishedJob(userId: string) {
     const gemini = this.providers.getInstance("gemini");
     const anthropic = this.providers.getInstance("anthropic");
@@ -730,6 +740,9 @@ export class Resolver {
       case "provider_context_update":
         await this.handleProviderContextUpdate(event, ws, userId, userData);
         break;
+      case "user_tts_request":
+        await this.handleUserTTSRequest(event, ws, userId, userData);
+        break;
       default:
         await this.wsServer.redis.publish(
           this.wsServer.channel,
@@ -773,7 +786,11 @@ export class Resolver {
     "provider_context_pong",
     "provider_context_update",
     "provider_context_update_ack",
-    "typing"
+    "typing",
+    "user_tts_chunk",
+    "user_tts_error",
+    "user_tts_request",
+    "user_tts_response"
   ] as const satisfies readonly AnyEventTypeUnion[];
 
   /** Parses a raw WebSocket message into an event */

@@ -407,6 +407,7 @@ export const ModelName = {
   ProviderStoreDocument: 'ProviderStoreDocument',
   User: 'User',
   Session: 'Session',
+  TTSJob: 'TTSJob',
   UserKey: 'UserKey',
   Settings: 'Settings',
   UserStore: 'UserStore',
@@ -429,7 +430,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "localVectorStore" | "localVectorStoreDoc" | "localVectorStoreDocChunk" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
+    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "localVectorStore" | "localVectorStoreDoc" | "localVectorStoreDocChunk" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2119,6 +2120,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TTSJob: {
+      payload: Prisma.$TTSJobPayload<ExtArgs>
+      fields: Prisma.TTSJobFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TTSJobFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TTSJobPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TTSJobFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TTSJobPayload>
+        }
+        findFirst: {
+          args: Prisma.TTSJobFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TTSJobPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TTSJobFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TTSJobPayload>
+        }
+        findMany: {
+          args: Prisma.TTSJobFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TTSJobPayload>[]
+        }
+        create: {
+          args: Prisma.TTSJobCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TTSJobPayload>
+        }
+        createMany: {
+          args: Prisma.TTSJobCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TTSJobCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TTSJobPayload>[]
+        }
+        delete: {
+          args: Prisma.TTSJobDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TTSJobPayload>
+        }
+        update: {
+          args: Prisma.TTSJobUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TTSJobPayload>
+        }
+        deleteMany: {
+          args: Prisma.TTSJobDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TTSJobUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TTSJobUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TTSJobPayload>[]
+        }
+        upsert: {
+          args: Prisma.TTSJobUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TTSJobPayload>
+        }
+        aggregate: {
+          args: Prisma.TTSJobAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTTSJob>
+        }
+        groupBy: {
+          args: Prisma.TTSJobGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TTSJobGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TTSJobCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TTSJobCountAggregateOutputType> | number
+        }
+      }
+    }
     UserKey: {
       payload: Prisma.$UserKeyPayload<ExtArgs>
       fields: Prisma.UserKeyFieldRefs
@@ -3256,6 +3331,31 @@ export const SessionScalarFieldEnum = {
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
 
 
+export const TTSJobScalarFieldEnum = {
+  id: 'id',
+  sourceMessageId: 'sourceMessageId',
+  userId: 'userId',
+  provider: 'provider',
+  voice: 'voice',
+  language: 'language',
+  codec: 'codec',
+  sampleRate: 'sampleRate',
+  bitrate: 'bitrate',
+  cdnUrl: 'cdnUrl',
+  charCount: 'charCount',
+  status: 'status',
+  durationMs: 'durationMs',
+  generationMs: 'generationMs',
+  sizeBytes: 'sizeBytes',
+  error: 'error',
+  attachmentId: 'attachmentId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TTSJobScalarFieldEnum = (typeof TTSJobScalarFieldEnum)[keyof typeof TTSJobScalarFieldEnum]
+
+
 export const UserKeyScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -3861,6 +3961,20 @@ export type ListEnumProviderDocStateFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'TTSStatus'
+ */
+export type EnumTTSStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TTSStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'TTSStatus[]'
+ */
+export type ListEnumTTSStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TTSStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'ThemePreference'
  */
 export type EnumThemePreferenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ThemePreference'>
@@ -4075,6 +4189,7 @@ export type GlobalOmitConfig = {
   providerStoreDocument?: Prisma.ProviderStoreDocumentOmit
   user?: Prisma.UserOmit
   session?: Prisma.SessionOmit
+  tTSJob?: Prisma.TTSJobOmit
   userKey?: Prisma.UserKeyOmit
   settings?: Prisma.SettingsOmit
   userStore?: Prisma.UserStoreOmit

@@ -49,7 +49,11 @@ class EventHandlerRegistry {
     "provider_context_pong",
     "provider_context_update",
     "provider_context_update_ack",
-    "typing"
+    "typing",
+    "user_tts_request",
+    "user_tts_chunk",
+    "user_tts_error",
+    "user_tts_response"
   ] as const satisfies AnyEventTypeUnion[];
 
   public register<const K extends keyof HandlerMap>(
@@ -333,6 +337,30 @@ class EventHandlerRegistry {
       typing: () => {
         const handler = this.handlers.typing;
         if (handler && event.type === "typing") {
+          handler(event, socket);
+        }
+      },
+      user_tts_chunk: () => {
+        const handler = this.handlers.user_tts_chunk;
+        if (handler && event.type === "user_tts_chunk") {
+          handler(event, socket);
+        }
+      },
+      user_tts_error: () => {
+        const handler = this.handlers.user_tts_error;
+        if (handler && event.type === "user_tts_error") {
+          handler(event, socket);
+        }
+      },
+      user_tts_request: () => {
+        const handler = this.handlers.user_tts_request;
+        if (handler && event.type === "user_tts_request") {
+          handler(event, socket);
+        }
+      },
+      user_tts_response: () => {
+        const handler = this.handlers.user_tts_response;
+        if (handler && event.type === "user_tts_response") {
           handler(event, socket);
         }
       }

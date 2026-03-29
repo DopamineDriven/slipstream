@@ -44,3 +44,8 @@ apps/CLAUDE.md
 IMPLEMENTATION_PLAN.md
 assets/*
 *.tgz
+
+
+
+plans/*
+~/*

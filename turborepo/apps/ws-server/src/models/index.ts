@@ -1,9 +1,7 @@
 import fsSync from "fs";
 import { join, relative, resolve } from "path";
 import type { InferTopLevelMime } from "@/types/index.ts";
-import type {
-  ExpandedDocSpecs,ExpandedImgSpecs
-} from "@d0paminedriven/fs";
+import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import { ByteCodec } from "@/byte-codec/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
@@ -21,7 +19,13 @@ export class ModelService extends ProviderValidation {
   constructor() {
     super();
   }
-
+  public mapParams = <const T extends readonly [string, string][] | string[][]>(params: T) =>
+    params
+      .reduce<string[]>((arr, [k, v]) => {
+        if (v) arr.push(`${k}=${encodeURIComponent(v)}`);
+        return arr;
+      }, [])
+      .join("&");
   public encodeUTF8(text: string) {
     return ByteCodec.encode(text);
   }
@@ -60,7 +64,6 @@ export class ModelService extends ProviderValidation {
     }
     return -1;
   }
-
 
   public toPathnameExtTuple(path: string) {
     const extAndPath = (path.split(/\//gim).at(-1) ?? "")?.split(/\./gm);

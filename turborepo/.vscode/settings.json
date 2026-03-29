@@ -119,7 +119,7 @@
   },
   "prisma.trace.server": "messages",
   "[prisma]": {
-    "editor.defaultFormatter": "Prisma.prisma"
+    "editor.defaultFormatter": "Prisma.prisma-insider"
   },
   "python.analysis.enableColorPicker": false,
   "prisma.pinToPrisma6": false,

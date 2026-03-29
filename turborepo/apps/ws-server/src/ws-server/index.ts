@@ -1,5 +1,7 @@
 import http from "node:http";
 import { TLSSocket } from "tls";
+import type { PdfService } from "@/pdf/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import type {
   BufferLike,
   HandlerMap,
@@ -8,12 +10,10 @@ import type {
   WSServerOptions
 } from "@/types/index.ts";
 import type { IncomingMessage } from "http";
-import type { RawData } from "ws";
-import { PdfService } from "@/pdf/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
+import type { RawData,  } from "ws";
 import { WebSocket, WebSocketServer } from "ws";
+import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { ClientContextWorkupProps, EventTypeMap } from "@slipstream/types";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class WSServer {
   private wss: WebSocketServer;

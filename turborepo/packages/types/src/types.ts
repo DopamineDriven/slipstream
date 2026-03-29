@@ -22,6 +22,7 @@ import type {
   ProviderStoreDocument,
   Session,
   Settings,
+  TTSJob,
   User,
   UserKey,
   UserStore,
@@ -78,6 +79,13 @@ export interface UserStoreDocSingleton<
   annots?: UserStoreDocAnnotSingleton<T>[];
   linkedFromAnnots?: UserStoreDocAnnotSingleton<T>[];
   chunks?: UserStoreDocChunkSingleton<T>[];
+}
+
+export interface TTSJobSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<TTSJob, T> {
+  message?: MessageSingleton<T>;
+  attachment?: AttachmentSingleton<T>;
 }
 
 export interface UserStoreDocAnnotSingleton<

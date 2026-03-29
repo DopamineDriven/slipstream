@@ -23,6 +23,10 @@ import { PrismaDbService } from "@slipstream/db/factory";
  *
  *  ⬆
  *
+ * `@/prisma/tts.ts`
+ *
+ *  ⬆
+ *
  * `@/prisma/provider-store.ts`
  *
  *  ⬆
