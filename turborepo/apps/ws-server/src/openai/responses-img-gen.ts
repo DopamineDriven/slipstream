@@ -34,6 +34,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     streamChannel,
     thinkingChunks,
     userId,
+    imgCounts,
     ws,
     userMsgId,
     apiKey,
@@ -91,8 +92,6 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
 
     const loc = this.normalizeLocation(user_location);
 
-    const hasImages = this.hasImages(formatted);
-
     const hasFiles = this.hasFiles(formatted);
     const hasExistingOpenAIAssets =
       hasFiles || (await this.prisma.hasProviderMessages(userId, "OPENAI"));
@@ -131,7 +130,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
         action: "auto",
         type: "image_generation",
         background: r.output_background,
-        input_fidelity: hasImages ? "high" : r.input_fidelity,
+        input_fidelity: imgCounts > 0 ? "high" : r.input_fidelity,
         model: "gpt-image-1.5",
         moderation: "low",
         output_compression: r.output_compression,
@@ -157,7 +156,6 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
         include: [
           "message.input_image.image_url",
           "web_search_call.action.sources",
-          "web_search_call.results",
           "reasoning.encrypted_content"
         ],
         truncation: "auto",

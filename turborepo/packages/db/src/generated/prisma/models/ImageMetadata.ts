@@ -328,7 +328,7 @@ export type ImageMetadataGroupByOutputType = {
   _max: ImageMetadataMaxAggregateOutputType | null
 }
 
-type GetImageMetadataGroupByPayload<T extends ImageMetadataGroupByArgs> = Prisma.PrismaPromise<
+export type GetImageMetadataGroupByPayload<T extends ImageMetadataGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ImageMetadataGroupByOutputType, T['by']> &
       {

@@ -249,7 +249,7 @@ export type UserStoreDocAnnotGroupByOutputType = {
   _max: UserStoreDocAnnotMaxAggregateOutputType | null
 }
 
-type GetUserStoreDocAnnotGroupByPayload<T extends UserStoreDocAnnotGroupByArgs> = Prisma.PrismaPromise<
+export type GetUserStoreDocAnnotGroupByPayload<T extends UserStoreDocAnnotGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<UserStoreDocAnnotGroupByOutputType, T['by']> &
       {

@@ -60,6 +60,7 @@ ENV MOTION_PLUS_TOKEN=$MOTION_PLUS_TOKEN
 
 # cp pruned pnpm files and sources
 COPY --from=builder /app/out/json/ ./
+COPY --from=builder /app/.npmrc ./
 
 RUN --mount=type=cache,id=pnpm-store,target=/root/.pnpm-store \
     --mount=type=cache,id=pnpm-registry,target=/root/.npm \

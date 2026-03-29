@@ -310,7 +310,7 @@ export type TTSJobGroupByOutputType = {
   _max: TTSJobMaxAggregateOutputType | null
 }
 
-type GetTTSJobGroupByPayload<T extends TTSJobGroupByArgs> = Prisma.PrismaPromise<
+export type GetTTSJobGroupByPayload<T extends TTSJobGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TTSJobGroupByOutputType, T['by']> &
       {

@@ -9,11 +9,11 @@ catalogs:
   auth:
     better-auth: ^1.5.6
   aws:
-    "@aws-sdk/client-s3": ^3.1017.0
-    "@aws-sdk/client-secrets-manager": ^3.1017.0
-    "@aws-sdk/credential-providers": ^3.1017.0
-    "@aws-sdk/lib-storage": ^3.1017.0
-    "@aws-sdk/s3-request-presigner": ^3.1017.0
+    "@aws-sdk/client-s3": ^3.1019.0
+    "@aws-sdk/client-secrets-manager": ^3.1019.0
+    "@aws-sdk/credential-providers": ^3.1019.0
+    "@aws-sdk/lib-storage": ^3.1019.0
+    "@aws-sdk/s3-request-presigner": ^3.1019.0
     "@aws-sdk/types": ^3.973.6
   babel:
     babel-plugin-react-compiler: ^1.0.0
@@ -56,14 +56,14 @@ catalogs:
   fflate:
     fflate: ^0.8.2
   google:
-    "@google/genai": ^1.46.0
+    "@google/genai": ^1.47.0
   gtag:
     "@types/gtag.js": ^0.0.20
   jiti:
     jiti: ^2.6.1
   katex:
     "@types/katex": ^0.16.8
-    katex: ^0.16.42
+    katex: ^0.16.44
   lightningcss:
     unplugin-lightningcss: ^0.4.5
   llama:
@@ -108,11 +108,11 @@ catalogs:
     prettier: ^3.8.1
     prettier-plugin-tailwindcss: ^0.7.2
   prisma:
-    "@prisma/adapter-pg": ^7.5.0
-    "@prisma/client": ^7.5.0
-    "@prisma/client-runtime-utils": ^7.5.0
+    "@prisma/adapter-pg": ^7.6.0
+    "@prisma/client": ^7.6.0
+    "@prisma/client-runtime-utils": ^7.6.0
     "@prisma/extension-accelerate": ^3.0.1
-    prisma: ^7.5.0
+    prisma: ^7.6.0
   py:
     pythonia: ^1.2.6
   radix:
@@ -144,7 +144,7 @@ catalogs:
     "@types/react-dom": ^19.2.3
     react: ^19.2.4
     react-dom: ^19.2.4
-    react-resizable-panels: ^4.7.6
+    react-resizable-panels: ^4.8.0
     vaul: ^1.1.2
   redis:
     redis: ^5.11.0
@@ -162,7 +162,7 @@ catalogs:
     remark-rehype: ^11.1.2
   rolldown:
     rolldown: ^1.0.0-rc.12
-    rolldown-plugin-dts: ^0.23.0
+    rolldown-plugin-dts: ^0.23.2
     rolldown-plugin-wasm: ^0.2.1
   safeql:
     "@ts-safeql/eslint-plugin": ^4.2.0
@@ -187,11 +187,11 @@ catalogs:
   ts:
     typescript: ^6.0.2
   tsdown:
-    tsdown: ^0.21.5
+    tsdown: ^0.21.7
   tseslint:
     typescript-eslint: ^8.57.2
   tsgo:
-    "@typescript/native-preview": ^7.0.0-dev.20260325.1
+    "@typescript/native-preview": ^7.0.0-dev.20260329.1
   tslib:
     tslib: ^2.8.1
   tsup:
@@ -201,9 +201,9 @@ catalogs:
   tsx:
     tsx: ^4.21.0
   turbo:
-    eslint-config-turbo: ^2.8.20
-    eslint-plugin-turbo: ^2.8.20
-    turbo: ^2.8.20
+    eslint-config-turbo: ^2.8.21
+    eslint-plugin-turbo: ^2.8.21
+    turbo: ^2.8.21
   tw:
     "@tailwindcss/forms": ^0.5.11
     "@tailwindcss/postcss": ^4.2.2
@@ -221,12 +221,12 @@ catalogs:
   utils:
     "@changesets/cli": ^2.30.0
     husky: ^9.1.7
-    knip: ^6.0.5
+    knip: ^6.1.0
     wait-on: ^9.0.4
   vercel:
     "@vercel/analytics": ^2.0.1
     "@vercel/functions": ^3.4.3
-    vercel: ^50.37.0
+    vercel: ^50.37.3
   vfile:
     vfile: ^6.0.3
   webpack:

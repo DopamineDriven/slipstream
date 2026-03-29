@@ -653,11 +653,79 @@ export class Resolver {
   }
 
   public async handleUserTTSRequest(
-    _event: EventTypeMap["user_tts_request"],
-    _ws: WebSocket,
-    _userId: string,
+    event: EventTypeMap["user_tts_request"],
+    ws: WebSocket,
+    userId: string,
     _userData?: UserData
-  ) {}
+  ) {
+    const { messageId, conversationId } = event;
+    const voice = event.voice ?? "eve";
+    const language = event.language ?? "auto";
+    const codec = event.codec ?? "mp3";
+    const sampleRate = event.sampleRate ?? 24000;
+    const bitRate = event.bitRate ?? 128000;
+
+    try {
+      const existing = await this.wsServer.prisma.findExistingTTSJob(messageId, userId);
+      if (existing?.status === "COUPLED" && existing.cdnUrl && existing.attachmentId) {
+        ws.send(
+          JSON.stringify({
+            type: "user_tts_response",
+            ttsJobId: existing.id,
+            attachmentId: existing.attachmentId,
+            conversationId,
+            messageId,
+            durationMs: existing.durationMs ?? 0,
+            generationMs: existing.generationMs ?? 0,
+            size: existing.sizeBytes,
+            cdnUrl: existing.cdnUrl,
+            codec: codec
+          } satisfies EventTypeMap["user_tts_response"])
+        );
+        return;
+      }
+
+      const message = await this.wsServer.prisma.getMsgContentForTTS(messageId);
+
+      const ttsJob = await this.wsServer.prisma.createTTSJob({
+        sourceMessageId: messageId,
+        userId,
+        provider: "GROK",
+        voice,
+        language,
+        codec,
+        sampleRate,
+        bitrate: bitRate,
+        charCount: message.content.length
+      });
+
+      this.ttsService.streamToClient(
+        ws,
+        conversationId,
+        messageId,
+        userId,
+        message.content,
+        ttsJob,
+        voice,
+        language,
+        codec,
+        sampleRate,
+        bitRate
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "TTS request failed";
+      this.logger.error({ messageId, userId, error: msg }, "handleUserTTSRequest failed");
+      ws.send(
+        JSON.stringify({
+          type: "user_tts_error",
+          status: 404,
+          statusText: msg,
+          conversationId,
+          messageId
+        } satisfies EventTypeMap["user_tts_error"])
+      );
+    }
+  }
 
   protected async postHandleConnectionEstablishedJob(userId: string) {
     const gemini = this.providers.getInstance("gemini");

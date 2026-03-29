@@ -1,5 +1,5 @@
 diff --git a/dist/node/node.d.ts b/dist/node/node.d.ts
-index caf239065965ca7aa97a136d00a3f0da18e3e97b..2e85314c6892c343ed5fe214eff57593d624a0f0 100644
+index caf239065965ca7aa97a136d00a3f0da18e3e97b..2507bdde10f6f7da52d868e46c908ac8787e6074 100644
 --- a/dist/node/node.d.ts
 +++ b/dist/node/node.d.ts
 @@ -1900,7 +1900,7 @@ declare namespace ContentDelta {
@@ -11,6 +11,15 @@ index caf239065965ca7aa97a136d00a3f0da18e3e97b..2e85314c6892c343ed5fe214eff57593
          type: 'function_result';
          is_error?: boolean;
          name?: string;
+@@ -2053,7 +2053,7 @@ declare namespace ContentDelta {
+          */
+         call_id: string;
+         type: 'file_search_result';
+-        result?: Array<unknown>;
++        result?: Array<Record<string, unknown>>;
+         /**
+          * A signature hash for backend validation.
+          */
 @@ -4199,7 +4199,7 @@ declare interface FunctionResultContent {
      /**
       * The result of the tool call.

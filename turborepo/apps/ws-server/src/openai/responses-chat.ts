@@ -1,12 +1,12 @@
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
 import type { OpenAI } from "openai";
-import { LoggerService } from "@/logger/index.ts";
 import { OpenAIResponsesImgGenService } from "@/openai/responses-img-gen.ts";
-import { PrismaService } from "@/prisma/index.ts";
+import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap, OpenAiModelIdUnion } from "@slipstream/types";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import { S3Storage } from "@slipstream/storage-s3";
 
 export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
   constructor(
@@ -97,11 +97,10 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
               false
             ),
             include: [
-              "web_search_call.action.sources",
               "reasoning.encrypted_content",
               "code_interpreter_call.outputs",
               "message.input_image.image_url",
-              "web_search_call.results",
+              "web_search_call.action.sources",
               "message.input_image.image_url"
             ],
             max_output_tokens: max_tokens,

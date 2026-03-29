@@ -12,7 +12,7 @@ import type {
 } from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { OpenAI } from "openai";
-import { Stream } from "openai/core/streaming.mjs";
+import type { Stream } from "openai/core/streaming.mjs";
 import { OpenAIServiceWorkup } from "@/openai/workup.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
@@ -20,6 +20,7 @@ import type {
   AIChatResponseImgGenSubFields,
   EventTypeMap,
   GptImageAndFacilitatorsImgGenWorkupRT,
+  MessageSingleton,
   OpenAIImgGenModels,
   OpenAiModelIdUnion
 } from "@slipstream/types";
@@ -36,6 +37,32 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
     super(logger, prisma, userStoreVector, apiKey, s3);
   }
 
+  protected async handleEdits(
+    imgCounts: number,
+    msgs: MessageSingleton<true>[],
+    requestMessageId?: string
+  ) {
+    if (imgCounts < 1) return;
+
+    const findUser = msgs.find(t => t.id === (requestMessageId ?? ""));
+    if (!findUser) return;
+    const rsArr = Array.of<Response>();
+    for (const x of findUser.attachments) {
+      if (x.assetType !== "IMAGE") continue;
+      let url: string | null;
+      if (x.compatStatus === "ACTIVE") {
+        url = x.compatCdnUrl ?? x.cdnUrl;
+      } else {
+        url = x.cdnUrl ?? x.compatCdnUrl;
+      }
+      if (!url) continue;
+
+      const fetcher = await fetch(url);
+      rsArr.push(fetcher);
+    }
+    return { images: rsArr, text: findUser.content };
+  }
+
   protected async handleOpenaiNativeImageRequestGptImage1({
     chunks,
     conversationId,
@@ -48,6 +75,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
     ws,
     apiKey,
     jobId,
+    imgCounts,
     requestMessageId,
     systemPrompt,
     temperature,
@@ -141,13 +169,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
         "image options must be defined for the image endpoint api!"
       );
 
-    if (
-      this.prisma.isPureImgGenModel(m) &&
-      (m === "gpt-image-1" ||
-        m === "gpt-image-1-mini" ||
-        m === "gpt-image-1.5") &&
-      resImg.n === 1
-    ) {
+    if (this.isImgGenNative(m) && resImg.n === 1) {
       const r = resImg satisfies GptImageAndFacilitatorsImgGenWorkupRT;
       partialImgsRequested = typeof r.partialImagesRequested !== "undefined";
       outputFormat = r.output_format;
@@ -157,46 +179,92 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
       const partial_images = this.prisma.handlePartialImgGen(m, {
         partialImagesRequested: r.partialImagesRequested
       });
-      const o = (await client.images.generate(
-        {
-          prompt: promptOnly.text,
-          background: r.output_background,
-          output_compression: r.output_compression,
-          user: userId,
-          output_format: r.output_format,
-          model: m,
-          moderation: r.moderation,
-          // n=1 for streaming, no higher; n = 10 max for non-streaming, coming soon
-          n: 1,
-          partial_images,
-          quality: r.output_quality ?? "high",
-          size: r.output_size ?? "auto",
-          stream: true
-        },
-        { stream: true }
-      )) satisfies Stream<OpenAI.Images.ImageGenStreamEvent> & {
-        _request_id?: string | null;
-      };
 
-      for await (const stream of o) {
+      const handleEditsOrGen = await this.handleEdits(
+        imgCounts,
+        msgs,
+        requestMessageId
+      );
+
+      let dualStream:
+        | (Stream<OpenAI.Images.ImageEditStreamEvent> & {
+            _request_id?: string | null;
+          })
+        | (Stream<OpenAI.Images.ImageGenStreamEvent> & {
+            _request_id?: string | null;
+          });
+
+      if (handleEditsOrGen?.images && handleEditsOrGen.images.length > 0) {
+        dualStream = (await client.images.edit(
+          {
+            image: handleEditsOrGen.images,
+            input_fidelity: r.input_fidelity,
+            prompt: handleEditsOrGen.text,
+            background: r.output_background,
+            output_compression: r.output_compression,
+            user: userId,
+            output_format: r.output_format,
+            model: m,
+            // n=1 for streaming, no higher; n = 10 max for non-streaming, coming soon
+            n: 1,
+            partial_images,
+            quality: r.output_quality ?? "high",
+            size: r.output_size ?? "auto",
+            stream: true
+          } satisfies OpenAI.Images.ImageEditParamsStreaming,
+          { stream: true }
+        )) satisfies Stream<OpenAI.Images.ImageEditStreamEvent> & {
+          _request_id?: string | null;
+        };
+      } else {
+        dualStream = (await client.images.generate(
+          {
+            prompt: promptOnly.text,
+            background: r.output_background,
+            output_compression: r.output_compression,
+            user: userId,
+            output_format: r.output_format,
+            model: m,
+            moderation: r.moderation,
+            // n=1 for streaming, no higher; n = 10 max for non-streaming, coming soon
+            n: 1,
+            partial_images,
+            quality: r.output_quality ?? "high",
+            size: r.output_size ?? "auto",
+            stream: true
+          },
+          { stream: true }
+        )) satisfies Stream<OpenAI.Images.ImageGenStreamEvent> & {
+          _request_id?: string | null;
+        };
+      }
+
+      let started = false;
+      for await (const stream of dualStream) {
         let text: string | undefined = undefined,
-          started = false,
           done = false,
           rtHelper: S3FinalizePayload | undefined;
+
+        streamPartial = null;
 
         if (started === false) {
           started = true;
           text = "Image generation in progress...";
         }
 
-        if (stream.type === "image_generation.partial_image") {
+        if (
+          stream.type === "image_generation.partial_image" ||
+          stream.type === "image_edit.partial_image"
+        ) {
           streamPartial = {
             ...stream
           };
         }
 
-        if (stream.type === "image_generation.completed") {
-          stream;
+        if (
+          stream.type === "image_generation.completed" ||
+          stream.type === "image_edit.completed"
+        ) {
           finalImgObj = stream;
           done = true;
         }
@@ -374,7 +442,6 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
             isThinking: undefined,
             done: false
           });
-          console.log(partialImgArr);
 
           tInitial = 0;
           tDelta = 0;
@@ -782,113 +849,3 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
     }
   }
 }
-// public async handleOpenaiAiNativeImageRequestDalle2({
-//   conversationId,
-//   isNewChat,
-//   msgs,
-//   streamChannel,
-//   userId,
-//   ws,
-//   apiKey,
-//   max_tokens,
-//   jobId,
-//   requestMessageId,
-//   keyId,
-//   model = "gpt-5-mini" satisfies OpenAiModelIdUnion,
-//   systemPrompt,
-//   temperature,
-//   title,
-//   topP,
-//   currentMsgBoundAssets,
-//   imgGenEnabled,
-//   imgGenFields,
-//   user_location
-// }: ProviderOpenaiRequestEntity) {
-//   // use most recent message id for image gen requests to update Im
-
-//   const m = model as OpenAiModelIdUnion;
-
-//   const provider = "openai" as const;
-
-//   let finalImgObj:
-//       | OpenAI.Responses.ResponseOutputItem.ImageGenerationCall
-//       | undefined,
-//     tInitial = 0,
-//     openaiResId: string | null = null,
-//     uploadtInitial = 0,
-//     uploadtDelta = 0,
-//     usage = 0;
-
-//   const client = this.getClient(apiKey ?? undefined);
-
-//   const formatted = await this.formatOpenAiWithUploads(
-//     isNewChat,
-//     msgs,
-//     client,
-//     userId,
-//     keyId ?? undefined
-//   );
-
-//   const loc = this.normalizeLocation(user_location);
-
-//   const _hasImages = this.hasImages(formatted);
-
-//   const hasFiles = this.hasFiles(formatted);
-
-//   const fileIds = this.fileIds(formatted);
-
-//   let vectorStoreId: string | undefined;
-//   if (fileIds.length > 0) {
-//     vectorStoreId = await this.ensureUserVectorStoreId(client, null, userId);
-//     await client.vectorStores.fileBatches.createAndPoll(vectorStoreId, {
-//       file_ids: fileIds
-//     });
-//   }
-
-//   const resImg = this.responsesImgGen(
-//     imgGenEnabled ?? false,
-//     m,
-//     imgGenFields,
-//     currentMsgBoundAssets
-//   );
-
-//   if (typeof resImg === "undefined")
-//     throw new Error(
-//       "image options must be defined for the image endpoint api!"
-//     );
-
-//   if (
-//     m === "dall-e-2" &&
-//     this.isPureImgGenModel("openai", m) &&
-//     resImg.model === "dall-e-2"
-//   ) {
-//     const r = resImg satisfies Dalle2ImgGenWorkupRT;
-
-//     const o = await client.images.generate({
-//       prompt: msgs?.[0]?.content ?? "",
-//       user: userId,
-//       model: m,
-//       n: r.n,
-//       stream: false,
-//       response_format: "b64_json",
-//       quality: r.output_quality,
-//       size: r.output_size
-//     });
-
-//     o.created;
-//     if (o.data) {
-
-//       let i = 0;
-//       i < r.n;
-//       for (const stream of o.data) {
-
-//         o?._request_id;
-
-//         let partialIndex: number | undefined,
-//           done = false;
-//         let rtHelper;
-
-//       }
-//     }
-//   }
-// }

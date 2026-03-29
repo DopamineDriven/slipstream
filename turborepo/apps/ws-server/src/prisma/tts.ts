@@ -1,10 +1,28 @@
 import type { ExtractService } from "@/extract/index.ts";
-import type { CreateUserStoreRT } from "@/prisma/types.ts";
 import { PrismaProviderStoreService } from "@/prisma/provider-store.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
-import type { DX, MessageSingleton, UserTTSRequest } from "@slipstream/types";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 
-export type TTSPropsCreate = DX<MessageSingleton<true> & UserTTSRequest>;
+export interface CreateTTSJobParams {
+  sourceMessageId: string;
+  userId: string;
+  provider: string;
+  voice: string;
+  language: string;
+  codec: string;
+  sampleRate: number;
+  bitrate: number;
+  charCount: number;
+}
+
+export interface UpdateTTSJobFields {
+  durationMs?: number;
+  generationMs?: number;
+  sizeBytes?: bigint;
+  error?: string;
+  cdnUrl?: string;
+  attachmentId?: string;
+}
 
 export class PrismaTTSService extends PrismaProviderStoreService {
   constructor(
@@ -15,12 +33,11 @@ export class PrismaTTSService extends PrismaProviderStoreService {
     super(prisma, extractor, isProd);
   }
 
-  private bigintToNum(data: CreateUserStoreRT<false>) {
-    const { totalBytes, ...rest } = data;
-    return {
-      totalBytes: totalBytes ? Number(totalBytes) : 0,
-      ...rest
-    } satisfies CreateUserStoreRT<true>;
+  private ttsJobBigIntToNum<const T extends { sizeBytes: bigint | null }>(
+    job: T
+  ) {
+    const { sizeBytes, ...rest } = job;
+    return { ...rest, sizeBytes: sizeBytes ? Number(sizeBytes) : 0 };
   }
 
   public async getMsgContentForTTS(msgId: string) {
@@ -30,19 +47,41 @@ export class PrismaTTSService extends PrismaProviderStoreService {
     });
   }
 
+  public async createTTSJob(params: CreateTTSJobParams) {
+    const job = await this.prismaClient.tTSJob.create({
+      data: {
+        sourceMessageId: params.sourceMessageId,
+        userId: params.userId,
+        provider: params.provider,
+        voice: params.voice,
+        language: params.language,
+        codec: params.codec,
+        sampleRate: params.sampleRate,
+        bitrate: params.bitrate,
+        charCount: params.charCount,
+        status: "QUEUED"
+      }
+    });
+    return this.ttsJobBigIntToNum(job);
+  }
 
-  // public async getManyTts(userId: string) {
-  //   const x = await this.prismaClient.message.findMany({
-  //     where: { userId, ttsJob: { isNot: undefined } },
-  //     include: {ttsJob: true},
-  //     take: 1000
-  //   });
-  //   for (const xx of x) {
-  //     if (!xx.ttsJob) continue;
-  //     xx.conversationId;
-  //     xx.id;
+  public async updateTTSJobStatus(
+    jobId: string,
+    status: $Enums.TTSStatus,
+    fields?: UpdateTTSJobFields
+  ) {
+    const job = await this.prismaClient.tTSJob.update({
+      where: { id: jobId },
+      data: { status, ...fields }
+    });
+    return this.ttsJobBigIntToNum(job);
+  }
 
-  //     xx.ttsJob.cdnUrl
-  //   }
-  // }
+  public async findExistingTTSJob(sourceMessageId: string, userId: string) {
+    const job = await this.prismaClient.tTSJob.findUnique({
+      where: { userId_sourceMessageId: { userId, sourceMessageId } }
+    });
+    if (!job) return null;
+    return this.ttsJobBigIntToNum(job);
+  }
 }

@@ -246,7 +246,7 @@ export type ConversationMemoryStoreGroupByOutputType = {
   _max: ConversationMemoryStoreMaxAggregateOutputType | null
 }
 
-type GetConversationMemoryStoreGroupByPayload<T extends ConversationMemoryStoreGroupByArgs> = Prisma.PrismaPromise<
+export type GetConversationMemoryStoreGroupByPayload<T extends ConversationMemoryStoreGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ConversationMemoryStoreGroupByOutputType, T['by']> &
       {

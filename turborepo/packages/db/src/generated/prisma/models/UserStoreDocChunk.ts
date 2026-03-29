@@ -363,7 +363,7 @@ export type UserStoreDocChunkGroupByOutputType = {
   _max: UserStoreDocChunkMaxAggregateOutputType | null
 }
 
-type GetUserStoreDocChunkGroupByPayload<T extends UserStoreDocChunkGroupByArgs> = Prisma.PrismaPromise<
+export type GetUserStoreDocChunkGroupByPayload<T extends UserStoreDocChunkGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<UserStoreDocChunkGroupByOutputType, T['by']> &
       {
