@@ -46,6 +46,7 @@ export type TTSJobSumAggregateOutputType = {
 
 export type TTSJobMinAggregateOutputType = {
   id: string | null
+  conversationId: string | null
   sourceMessageId: string | null
   userId: string | null
   provider: string | null
@@ -68,6 +69,7 @@ export type TTSJobMinAggregateOutputType = {
 
 export type TTSJobMaxAggregateOutputType = {
   id: string | null
+  conversationId: string | null
   sourceMessageId: string | null
   userId: string | null
   provider: string | null
@@ -90,6 +92,7 @@ export type TTSJobMaxAggregateOutputType = {
 
 export type TTSJobCountAggregateOutputType = {
   id: number
+  conversationId: number
   sourceMessageId: number
   userId: number
   provider: number
@@ -132,6 +135,7 @@ export type TTSJobSumAggregateInputType = {
 
 export type TTSJobMinAggregateInputType = {
   id?: true
+  conversationId?: true
   sourceMessageId?: true
   userId?: true
   provider?: true
@@ -154,6 +158,7 @@ export type TTSJobMinAggregateInputType = {
 
 export type TTSJobMaxAggregateInputType = {
   id?: true
+  conversationId?: true
   sourceMessageId?: true
   userId?: true
   provider?: true
@@ -176,6 +181,7 @@ export type TTSJobMaxAggregateInputType = {
 
 export type TTSJobCountAggregateInputType = {
   id?: true
+  conversationId?: true
   sourceMessageId?: true
   userId?: true
   provider?: true
@@ -285,6 +291,7 @@ export type TTSJobGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 
 export type TTSJobGroupByOutputType = {
   id: string
+  conversationId: string
   sourceMessageId: string
   userId: string
   provider: string
@@ -330,6 +337,7 @@ export type TTSJobWhereInput = {
   OR?: Prisma.TTSJobWhereInput[]
   NOT?: Prisma.TTSJobWhereInput | Prisma.TTSJobWhereInput[]
   id?: Prisma.StringFilter<"TTSJob"> | string
+  conversationId?: Prisma.StringFilter<"TTSJob"> | string
   sourceMessageId?: Prisma.StringFilter<"TTSJob"> | string
   userId?: Prisma.StringFilter<"TTSJob"> | string
   provider?: Prisma.StringFilter<"TTSJob"> | string
@@ -354,6 +362,7 @@ export type TTSJobWhereInput = {
 
 export type TTSJobOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
   sourceMessageId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
@@ -384,6 +393,7 @@ export type TTSJobWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.TTSJobWhereInput | Prisma.TTSJobWhereInput[]
   OR?: Prisma.TTSJobWhereInput[]
   NOT?: Prisma.TTSJobWhereInput | Prisma.TTSJobWhereInput[]
+  conversationId?: Prisma.StringFilter<"TTSJob"> | string
   userId?: Prisma.StringFilter<"TTSJob"> | string
   provider?: Prisma.StringFilter<"TTSJob"> | string
   voice?: Prisma.StringFilter<"TTSJob"> | string
@@ -406,6 +416,7 @@ export type TTSJobWhereUniqueInput = Prisma.AtLeast<{
 
 export type TTSJobOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
   sourceMessageId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
@@ -436,6 +447,7 @@ export type TTSJobScalarWhereWithAggregatesInput = {
   OR?: Prisma.TTSJobScalarWhereWithAggregatesInput[]
   NOT?: Prisma.TTSJobScalarWhereWithAggregatesInput | Prisma.TTSJobScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"TTSJob"> | string
+  conversationId?: Prisma.StringWithAggregatesFilter<"TTSJob"> | string
   sourceMessageId?: Prisma.StringWithAggregatesFilter<"TTSJob"> | string
   userId?: Prisma.StringWithAggregatesFilter<"TTSJob"> | string
   provider?: Prisma.StringWithAggregatesFilter<"TTSJob"> | string
@@ -458,6 +470,7 @@ export type TTSJobScalarWhereWithAggregatesInput = {
 
 export type TTSJobCreateInput = {
   id?: string
+  conversationId: string
   userId: string
   provider: string
   voice: string
@@ -480,6 +493,7 @@ export type TTSJobCreateInput = {
 
 export type TTSJobUncheckedCreateInput = {
   id?: string
+  conversationId: string
   sourceMessageId: string
   userId: string
   provider: string
@@ -502,6 +516,7 @@ export type TTSJobUncheckedCreateInput = {
 
 export type TTSJobUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   voice?: Prisma.StringFieldUpdateOperationsInput | string
@@ -524,6 +539,7 @@ export type TTSJobUpdateInput = {
 
 export type TTSJobUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMessageId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
@@ -546,6 +562,7 @@ export type TTSJobUncheckedUpdateInput = {
 
 export type TTSJobCreateManyInput = {
   id?: string
+  conversationId: string
   sourceMessageId: string
   userId: string
   provider: string
@@ -568,6 +585,7 @@ export type TTSJobCreateManyInput = {
 
 export type TTSJobUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   voice?: Prisma.StringFieldUpdateOperationsInput | string
@@ -588,6 +606,7 @@ export type TTSJobUpdateManyMutationInput = {
 
 export type TTSJobUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMessageId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
@@ -620,6 +639,7 @@ export type TTSJobUserIdSourceMessageIdCompoundUniqueInput = {
 
 export type TTSJobCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
   sourceMessageId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
@@ -651,6 +671,7 @@ export type TTSJobAvgOrderByAggregateInput = {
 
 export type TTSJobMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
   sourceMessageId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
@@ -673,6 +694,7 @@ export type TTSJobMaxOrderByAggregateInput = {
 
 export type TTSJobMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
   sourceMessageId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
@@ -772,6 +794,7 @@ export type EnumTTSStatusFieldUpdateOperationsInput = {
 
 export type TTSJobCreateWithoutAttachmentInput = {
   id?: string
+  conversationId: string
   userId: string
   provider: string
   voice: string
@@ -793,6 +816,7 @@ export type TTSJobCreateWithoutAttachmentInput = {
 
 export type TTSJobUncheckedCreateWithoutAttachmentInput = {
   id?: string
+  conversationId: string
   sourceMessageId: string
   userId: string
   provider: string
@@ -830,6 +854,7 @@ export type TTSJobUpdateToOneWithWhereWithoutAttachmentInput = {
 
 export type TTSJobUpdateWithoutAttachmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   voice?: Prisma.StringFieldUpdateOperationsInput | string
@@ -851,6 +876,7 @@ export type TTSJobUpdateWithoutAttachmentInput = {
 
 export type TTSJobUncheckedUpdateWithoutAttachmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceMessageId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
@@ -872,6 +898,7 @@ export type TTSJobUncheckedUpdateWithoutAttachmentInput = {
 
 export type TTSJobCreateWithoutSourceMessageInput = {
   id?: string
+  conversationId: string
   userId: string
   provider: string
   voice: string
@@ -893,6 +920,7 @@ export type TTSJobCreateWithoutSourceMessageInput = {
 
 export type TTSJobUncheckedCreateWithoutSourceMessageInput = {
   id?: string
+  conversationId: string
   userId: string
   provider: string
   voice: string
@@ -930,6 +958,7 @@ export type TTSJobUpdateToOneWithWhereWithoutSourceMessageInput = {
 
 export type TTSJobUpdateWithoutSourceMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   voice?: Prisma.StringFieldUpdateOperationsInput | string
@@ -951,6 +980,7 @@ export type TTSJobUpdateWithoutSourceMessageInput = {
 
 export type TTSJobUncheckedUpdateWithoutSourceMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   voice?: Prisma.StringFieldUpdateOperationsInput | string
@@ -974,6 +1004,7 @@ export type TTSJobUncheckedUpdateWithoutSourceMessageInput = {
 
 export type TTSJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  conversationId?: boolean
   sourceMessageId?: boolean
   userId?: boolean
   provider?: boolean
@@ -998,6 +1029,7 @@ export type TTSJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 
 export type TTSJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  conversationId?: boolean
   sourceMessageId?: boolean
   userId?: boolean
   provider?: boolean
@@ -1022,6 +1054,7 @@ export type TTSJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
 
 export type TTSJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  conversationId?: boolean
   sourceMessageId?: boolean
   userId?: boolean
   provider?: boolean
@@ -1046,6 +1079,7 @@ export type TTSJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 
 export type TTSJobSelectScalar = {
   id?: boolean
+  conversationId?: boolean
   sourceMessageId?: boolean
   userId?: boolean
   provider?: boolean
@@ -1066,7 +1100,7 @@ export type TTSJobSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TTSJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sourceMessageId" | "userId" | "provider" | "voice" | "language" | "codec" | "sampleRate" | "bitrate" | "cdnUrl" | "charCount" | "status" | "durationMs" | "generationMs" | "sizeBytes" | "error" | "attachmentId" | "createdAt" | "updatedAt", ExtArgs["result"]["tTSJob"]>
+export type TTSJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "sourceMessageId" | "userId" | "provider" | "voice" | "language" | "codec" | "sampleRate" | "bitrate" | "cdnUrl" | "charCount" | "status" | "durationMs" | "generationMs" | "sizeBytes" | "error" | "attachmentId" | "createdAt" | "updatedAt", ExtArgs["result"]["tTSJob"]>
 export type TTSJobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sourceMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
   attachment?: boolean | Prisma.TTSJob$attachmentArgs<ExtArgs>
@@ -1088,6 +1122,7 @@ export type $TTSJobPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    conversationId: string
     sourceMessageId: string
     userId: string
     provider: string
@@ -1550,6 +1585,7 @@ export interface Prisma__TTSJobClient<T, Null = never, ExtArgs extends runtime.T
  */
 export interface TTSJobFieldRefs {
   readonly id: Prisma.FieldRef<"TTSJob", 'String'>
+  readonly conversationId: Prisma.FieldRef<"TTSJob", 'String'>
   readonly sourceMessageId: Prisma.FieldRef<"TTSJob", 'String'>
   readonly userId: Prisma.FieldRef<"TTSJob", 'String'>
   readonly provider: Prisma.FieldRef<"TTSJob", 'String'>

@@ -16,6 +16,7 @@ import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { Responses } from "openai/resources/index.mjs";
 import type { Logger as PinoLogger } from "pino";
 import type { WebSocket } from "ws";
+import type { TTSService } from "@/tts/index.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AllModelsUnion,
@@ -30,7 +31,6 @@ import type {
   RTC
 } from "@slipstream/types";
 import { RedisChannels } from "@slipstream/redis-service";
-import { TTSService } from "@/tts/index.ts";
 
 export class Resolver {
   private logger: PinoLogger;
@@ -43,7 +43,7 @@ export class Resolver {
     private userVectorStore: UserStoreVectorService,
     private xaiManagementApikey: string,
     logger: LoggerService,
-  private ttsService: TTSService
+    private ttsService: TTSService
   ) {
     this.logger = logger
       .getPinoInstance()
@@ -666,23 +666,51 @@ export class Resolver {
     const bitRate = event.bitRate ?? 128000;
 
     try {
-      const existing = await this.wsServer.prisma.findExistingTTSJob(messageId, userId);
-      if (existing?.status === "COUPLED" && existing.cdnUrl && existing.attachmentId) {
+      const getIt = this.ttsService.ttsJobCache.get(
+        `${event.conversationId}:${event.messageId}`
+      );
+      if (getIt?.status === "COUPLED" && getIt?.cdnUrl && getIt?.attachmentId) {
         ws.send(
           JSON.stringify({
             type: "user_tts_response",
-            ttsJobId: existing.id,
-            attachmentId: existing.attachmentId,
+            ttsJobId: getIt.id,
+            attachmentId: getIt.attachmentId,
             conversationId,
             messageId,
-            durationMs: existing.durationMs ?? 0,
-            generationMs: existing.generationMs ?? 0,
-            size: existing.sizeBytes,
-            cdnUrl: existing.cdnUrl,
+            durationMs: getIt?.durationMs ?? 0,
+            generationMs: getIt?.generationMs ?? 0,
+            size: getIt?.sizeBytes ?? 0,
+            cdnUrl: getIt?.cdnUrl,
             codec: codec
           } satisfies EventTypeMap["user_tts_response"])
         );
         return;
+      } else {
+        const existing = await this.wsServer.prisma.findExistingTTSJob(
+          messageId,
+          userId
+        );
+        if (
+          existing?.status === "COUPLED" &&
+          existing.cdnUrl &&
+          existing.attachmentId
+        ) {
+          ws.send(
+            JSON.stringify({
+              type: "user_tts_response",
+              ttsJobId: existing.id,
+              attachmentId: existing.attachmentId,
+              conversationId,
+              messageId,
+              durationMs: existing.durationMs ?? 0,
+              generationMs: existing.generationMs ?? 0,
+              size: existing.sizeBytes,
+              cdnUrl: existing.cdnUrl,
+              codec: codec
+            } satisfies EventTypeMap["user_tts_response"])
+          );
+          return;
+        }
       }
 
       const message = await this.wsServer.prisma.getMsgContentForTTS(messageId);
@@ -691,6 +719,7 @@ export class Resolver {
         sourceMessageId: messageId,
         userId,
         provider: "GROK",
+        conversationId,
         voice,
         language,
         codec,
@@ -714,7 +743,10 @@ export class Resolver {
       );
     } catch (err) {
       const msg = err instanceof Error ? err.message : "TTS request failed";
-      this.logger.error({ messageId, userId, error: msg }, "handleUserTTSRequest failed");
+      this.logger.error(
+        { messageId, userId, error: msg },
+        "handleUserTTSRequest failed"
+      );
       ws.send(
         JSON.stringify({
           type: "user_tts_error",
@@ -735,7 +767,8 @@ export class Resolver {
       this.userVectorStore.syncUserStoreByName(userId),
       anthropic.syncFileRegistry(userId, true),
       gemini.syncFileRegistry(userId, true),
-      grok.syncFileRegistry(userId, false, this.xaiManagementApikey)
+      grok.syncFileRegistry(userId, false, this.xaiManagementApikey),
+      this.ttsService.syncTTSCache(userId)
     ]);
   }
 

@@ -3333,6 +3333,7 @@ export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeo
 
 export const TTSJobScalarFieldEnum = {
   id: 'id',
+  conversationId: 'conversationId',
   sourceMessageId: 'sourceMessageId',
   userId: 'userId',
   provider: 'provider',

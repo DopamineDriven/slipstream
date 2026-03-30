@@ -16,6 +16,10 @@ import type {
 } from "@slipstream/types";
 
 export class TTSService {
+  /**
+   * composite key -> `${conversationId}:${sourceMessageId}`
+   */
+  public ttsJobCache = new Map<string, TTSJobSingleton<true>>();
   protected readonly baseTTSUrl = "wss://api.x.ai/v1/tts";
   protected logger: PinoLogger;
   constructor(
@@ -275,7 +279,14 @@ export class TTSService {
         sampleRate
       );
 
-      const mime = s3Result.contentType ?? `audio/${codec}`;
+      const mime =
+        (s3Result.contentType ?? codec === "mp3")
+          ? "mpeg"
+          : codec === "mulaw"
+            ? "audio/basic"
+            : codec === "alaw"
+              ? "audio/basic"
+              : `audio/${codec}`;
 
       const attachment = await this.prisma.createAttachment({
         userId,
@@ -328,6 +339,16 @@ export class TTSService {
         durationMs,
         generationMs,
         sizeBytes: BigInt(audioBuffer.byteLength),
+        cdnUrl: s3Result.cdnUrl,
+        attachmentId: attachment.id
+      });
+
+      this.ttsJobCache.set(`${conversationId}:${messageId}`, {
+        ...ttsJob,
+        status: "COUPLED",
+        durationMs,
+        generationMs,
+        sizeBytes: audioBuffer.byteLength,
         cdnUrl: s3Result.cdnUrl,
         attachmentId: attachment.id
       });
@@ -473,6 +494,8 @@ export class TTSService {
           JSON.stringify({
             type: "user_tts_chunk",
             conversationId,
+            ttsJobId: ttsJob.id,
+            generationMs: performance.now() - t0,
             messageId,
             audioChunk
           } satisfies EventTypeMap["user_tts_chunk"])
@@ -509,5 +532,25 @@ export class TTSService {
     xaiWs.on("message", handleMessage);
     xaiWs.on("error", handleError);
     xaiWs.on("close", handleClose);
+  }
+
+  protected async syncCache(userId: string) {
+    this.ttsJobCache.clear();
+    const hasTTSJobs = await this.prisma.hasTTSJobsOnFile(userId);
+    if (!hasTTSJobs) return;
+    const allTTSJobs = await this.prisma.findAllTTSJobs(userId);
+    if (allTTSJobs.length < 1) return;
+    for (const m of allTTSJobs) {
+      const composite = `${m.conversationId}:${m.sourceMessageId}`;
+      this.ttsJobCache.set(composite, m);
+    }
+    this.logger.info(
+      { userId, jobCount: allTTSJobs.length },
+      "TTS cache synced"
+    );
+  }
+
+  public async syncTTSCache(userId: string) {
+    await this.syncCache(userId);
   }
 }
