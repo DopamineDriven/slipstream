@@ -16,6 +16,12 @@ import type {
 } from "@slipstream/types";
 
 export class TTSService {
+  /**
+   * composite key -> `${conversationId}:${sourceMessageId}`
+   */
+  public ttsJobCache = new Map<string, TTSJobSingleton<true>>();
+  /** Message IDs with in-flight TTS generation — prevents duplicate jobs */
+  public inflight = new Set<string>();
   protected readonly baseTTSUrl = "wss://api.x.ai/v1/tts";
   protected logger: PinoLogger;
   constructor(
@@ -210,6 +216,41 @@ export class TTSService {
     );
   }
 
+  /**
+   * Wraps raw PCM (16-bit signed LE, mono) in a 44-byte RIFF/WAV header
+   * so the CDN asset is directly browser-playable.
+   */
+  protected pcmToWav(pcmBuffer: Buffer, sampleRate: number) {
+    const numChannels = 1;
+    const bitsPerSample = 16;
+    const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+    const blockAlign = numChannels * (bitsPerSample / 8);
+    const dataLength = pcmBuffer.byteLength;
+
+    const header = Buffer.alloc(44);
+
+    // RIFF chunk descriptor
+    header.write("RIFF", 0, "ascii");
+    header.writeUInt32LE(36 + dataLength, 4);
+    header.write("WAVE", 8, "ascii");
+
+    // fmt sub-chunk
+    header.write("fmt ", 12, "ascii");
+    header.writeUInt32LE(16, 16); // Subchunk1Size (PCM = 16)
+    header.writeUInt16LE(1, 20); // AudioFormat (PCM = 1)
+    header.writeUInt16LE(numChannels, 22);
+    header.writeUInt32LE(sampleRate, 24);
+    header.writeUInt32LE(byteRate, 28);
+    header.writeUInt16LE(blockAlign, 32);
+    header.writeUInt16LE(bitsPerSample, 34);
+
+    // data sub-chunk
+    header.write("data", 36, "ascii");
+    header.writeUInt32LE(dataLength, 40);
+
+    return Buffer.concat([header, pcmBuffer]);
+  }
+
   public codecToContentType(codec: string) {
     if (codec === "mp3") return "audio/mpeg";
     if (codec === "wav") return "audio/wav";
@@ -246,22 +287,30 @@ export class TTSService {
     traceId: string
   ) {
     try {
-      const audioBuffer = Buffer.concat(
+      const rawPcmBuffer = Buffer.concat(
         audioChunks.map(c => Buffer.from(c, "base64"))
       );
       const generationMs = Math.round(performance.now() - t0);
-      const contentType = this.codecToContentType(codec);
-      const filename = `${ttsJob.id}.${codec === "mulaw" ? "ul" : codec}`;
+
+      // When codec is PCM, wrap in WAV so the CDN asset is browser-playable.
+      // Duration is estimated from the raw PCM size (before WAV header).
+      const isPcm = codec === "pcm";
+      const uploadBuffer = isPcm
+        ? this.pcmToWav(rawPcmBuffer, sampleRate)
+        : rawPcmBuffer;
+      const uploadCodec = isPcm ? "wav" : codec;
+      const contentType = this.codecToContentType(uploadCodec);
+      const filename = `${ttsJob.id}.${uploadCodec === "mulaw" ? "ul" : uploadCodec}`;
       const uploadDurInitial = performance.now();
       const s3Result = await this.s3.uploadGenerated(
-        audioBuffer,
+        uploadBuffer,
         this.prisma.isProd,
         {
           messageId,
           contentType,
           filename,
           userId,
-          size: audioBuffer.byteLength,
+          size: uploadBuffer.byteLength,
           conversationId,
           origin: "GENERATED"
         }
@@ -269,13 +318,20 @@ export class TTSService {
       const uploadDurFinal = performance.now();
 
       const durationMs = this.estimateDurationMs(
-        audioBuffer.byteLength,
+        rawPcmBuffer.byteLength,
         codec,
         bitRate,
         sampleRate
       );
 
-      const mime = s3Result.contentType ?? `audio/${codec}`;
+      const mime =
+        uploadCodec === "mp3"
+          ? "audio/mpeg"
+          : uploadCodec === "wav" || uploadCodec === "pcm"
+            ? "audio/wav"
+            : uploadCodec === "mulaw" || uploadCodec === "alaw"
+              ? "audio/basic"
+              : `audio/${uploadCodec}`;
 
       const attachment = await this.prisma.createAttachment({
         userId,
@@ -294,9 +350,9 @@ export class TTSService {
         cdnUrl: s3Result.cdnUrl,
         publicUrl: s3Result.publicUrl,
         mime,
-        ext: codec,
+        ext: uploadCodec,
         filename,
-        size: BigInt(s3Result.size ?? audioBuffer.byteLength),
+        size: BigInt(s3Result.size ?? uploadBuffer.byteLength),
         conversationId,
         messageId,
         compatStatus: "ALIASED",
@@ -309,7 +365,7 @@ export class TTSService {
         checksumSha256: s3Result.checksum?.value,
         uploadDuration: uploadDurFinal - uploadDurInitial,
         compatCdnUrl: s3Result.cdnUrl,
-        compatExt: codec,
+        compatExt: uploadCodec,
         compatMime: mime,
         contentDisposition: s3Result.contentDisposition,
         audio: {
@@ -320,14 +376,24 @@ export class TTSService {
           channels: 1,
           createdAt: new Date(Date.now()),
           year: new Date(Date.now()).getFullYear(),
-          codec
+          codec: uploadCodec
         }
       });
 
       await this.prisma.updateTTSJobStatus(ttsJob.id, "COUPLED", {
         durationMs,
         generationMs,
-        sizeBytes: BigInt(audioBuffer.byteLength),
+        sizeBytes: BigInt(uploadBuffer.byteLength),
+        cdnUrl: s3Result.cdnUrl,
+        attachmentId: attachment.id
+      });
+
+      this.ttsJobCache.set(`${conversationId}:${messageId}`, {
+        ...ttsJob,
+        status: "COUPLED",
+        durationMs,
+        generationMs,
+        sizeBytes: uploadBuffer.byteLength,
         cdnUrl: s3Result.cdnUrl,
         attachmentId: attachment.id
       });
@@ -341,9 +407,9 @@ export class TTSService {
           messageId,
           durationMs,
           generationMs,
-          size: audioBuffer.byteLength,
+          size: uploadBuffer.byteLength,
           cdnUrl: s3Result.cdnUrl,
-          codec: this.isValidCodec(codec) ? codec : "mp3"
+          codec: this.isValidCodec(uploadCodec) ? uploadCodec : "mp3"
         } satisfies EventTypeMap["user_tts_response"])
       );
 
@@ -353,11 +419,13 @@ export class TTSService {
           traceId,
           durationMs,
           generationMs,
-          size: audioBuffer.byteLength
+          size: uploadBuffer.byteLength
         },
         "TTS finalized"
       );
+      this.inflight.delete(messageId);
     } catch (err) {
+      this.inflight.delete(messageId);
       const msg = err instanceof Error ? err.message : "finalize failed";
       void this.handleStreamError(ws, ttsJob, conversationId, messageId, msg);
     }
@@ -370,6 +438,7 @@ export class TTSService {
     messageId: string,
     errorMsg: string
   ) {
+    this.inflight.delete(messageId);
     this.logger.error(
       { ttsJobId: ttsJob.id, error: errorMsg },
       "TTS stream error"
@@ -412,6 +481,7 @@ export class TTSService {
     bitRate = 128000
   ) {
     const t0 = performance.now();
+    this.inflight.add(messageId);
     const xaiWs = new TTSWebSocket(
       this.buildWssUrl(voice, language, {
         codec,
@@ -433,8 +503,17 @@ export class TTSService {
     };
 
     const handleMessage = (raw: RawData) => {
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
-      const event = JSON.parse<TTSTypes.Inbound>(raw.toString());
+      let event: TTSTypes.Inbound;
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
+        event = JSON.parse<TTSTypes.Inbound>(raw.toString());
+      } catch {
+        this.logger.warn(
+          { ttsJobId: ttsJob.id, rawLength: Buffer.isBuffer(raw) ? raw.byteLength : 0 },
+          "Non-JSON frame from xAI TTS, skipping"
+        );
+        return;
+      }
 
       if (event.type === "audio.delta") {
         audioChunk = event.delta;
@@ -473,6 +552,8 @@ export class TTSService {
           JSON.stringify({
             type: "user_tts_chunk",
             conversationId,
+            ttsJobId: ttsJob.id,
+            generationMs: performance.now() - t0,
             messageId,
             audioChunk
           } satisfies EventTypeMap["user_tts_chunk"])
@@ -509,5 +590,25 @@ export class TTSService {
     xaiWs.on("message", handleMessage);
     xaiWs.on("error", handleError);
     xaiWs.on("close", handleClose);
+  }
+
+  protected async syncCache(userId: string) {
+    this.ttsJobCache.clear();
+    const hasTTSJobs = await this.prisma.hasTTSJobsOnFile(userId);
+    if (!hasTTSJobs) return;
+    const allTTSJobs = await this.prisma.findAllTTSJobs(userId);
+    if (allTTSJobs.length < 1) return;
+    for (const m of allTTSJobs) {
+      const composite = `${m.conversationId}:${m.sourceMessageId}`;
+      this.ttsJobCache.set(composite, m);
+    }
+    this.logger.info(
+      { userId, jobCount: allTTSJobs.length },
+      "TTS cache synced"
+    );
+  }
+
+  public async syncTTSCache(userId: string) {
+    await this.syncCache(userId);
   }
 }

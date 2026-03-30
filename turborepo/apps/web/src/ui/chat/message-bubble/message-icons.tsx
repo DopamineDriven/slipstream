@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useCookiesCtx } from "@/context/cookie-context";
+import { useTTSContext } from "@/context/tts-context";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { useReaction } from "@/hooks/use-reaction";
 import { formatTime, getFirstName } from "@/lib/helpers";
@@ -24,27 +25,6 @@ import {
   ThumbsDown,
   ThumbsUp
 } from "@slipstream/ui";
-
-const IconMap = [
-  {
-    id: "read-aloud-action",
-    icon: ReadAloudIcon,
-    onClick: () => console.log("read aloud"),
-    isActive: false
-  },
-  {
-    id: "share-action",
-    icon: Share,
-    onClick: () => console.log("share action"),
-    isActive: false
-  },
-  {
-    id: "retry-action",
-    icon: RetryIcon,
-    onClick: () => console.log("try again"),
-    isActive: false
-  }
-];
 export function MessageIcons({
   user,
   message,
@@ -57,6 +37,19 @@ export function MessageIcons({
   const isMobile = useIsMobile();
   const { resolvedTheme } = useTheme();
   const { handleReaction, isPending, reactionState } = useReaction(message);
+  const tts = useTTSContext();
+
+  const isTTSActive =
+    tts.currentPlaybackMessageId === message.id ||
+    (tts.isGenerating && tts.activeMessageId === message.id);
+
+  const handleReadAloud = useCallback(() => {
+    if (isTTSActive) {
+      tts.stop();
+    } else {
+      tts.requestTTS(message.id, message.conversationId);
+    }
+  }, [isTTSActive, tts, message.id, message.conversationId]);
 
   const RxnIcons = useMemo(
     () =>
@@ -157,22 +150,44 @@ export function MessageIcons({
                 />
               </Button>
             ))}
-            {IconMap.map(action => (
-              <Button
-                key={action.id}
-                variant="ghost"
-                size="icon"
-                disabled={isStreaming === true || isPending}
-                className={cn(
-                  actionButtonVariants.default,
-                  resolvedTheme === "light" && action.isActive
-                    ? "text-white"
-                    : actionButtonVariants.reaction
-                )}
-                onClick={action.onClick}>
-                <action.icon className="size-3" />
-              </Button>
-            ))}
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isStreaming === true || (tts.isGenerating && !isTTSActive)}
+              className={cn(
+                actionButtonVariants.default,
+                isTTSActive
+                  ? resolvedTheme === "light"
+                    ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
+                    : "text-foreground drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
+                  : actionButtonVariants.reaction,
+                tts.isGenerating && tts.activeMessageId === message.id && "animate-pulse"
+              )}
+              onClick={handleReadAloud}>
+              <ReadAloudIcon className="size-3" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isStreaming === true || isPending}
+              className={cn(
+                actionButtonVariants.default,
+                actionButtonVariants.reaction
+              )}
+              onClick={() => console.log("share action")}>
+              <Share className="size-3" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isStreaming === true || isPending}
+              className={cn(
+                actionButtonVariants.default,
+                actionButtonVariants.reaction
+              )}
+              onClick={() => console.log("try again")}>
+              <RetryIcon className="size-3" />
+            </Button>
           </div>
           <div className="flex items-center gap-2">
             <span>{formatTime(message.createdAt, locale, tz)}</span>

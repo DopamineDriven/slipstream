@@ -730,15 +730,18 @@ export type UserTTSRequest = {
 
 export type UserTTSChunk = {
   type: "user_tts_chunk";
+  ttsJobId: string;
   conversationId: string;
   messageId: string;
-  audioChunk: string; // base64 encoded string;
+  audioChunk: string;
+  generationMs: number;
 };
 
 export type UserTTSError = {
   type: "user_tts_error";
   status: number;
   statusText: string;
+  ttsJobId?: string;
   conversationId: string;
   messageId: string;
 };
@@ -752,7 +755,7 @@ export type UserTTSResponse = {
   durationMs: number;
   generationMs: number;
   size: number;
-  cdnUrl: string; // s3 / cloudfront persisted audio file
+  cdnUrl: string;
   codec: TTSCodec;
 };
 
