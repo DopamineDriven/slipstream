@@ -686,6 +686,9 @@ export class Resolver {
         );
         return;
       } else {
+        // In-flight guard — skip if already streaming for this message
+        if (this.ttsService.inflight.has(messageId)) return;
+
         const existing = await this.wsServer.prisma.findExistingTTSJob(
           messageId,
           userId
@@ -710,6 +713,10 @@ export class Resolver {
             } satisfies EventTypeMap["user_tts_response"])
           );
           return;
+        }
+        // FAILED — delete stale record before retry
+        if (existing?.status === "FAILED") {
+          await this.wsServer.prisma.deleteTTSJob(existing.id);
         }
       }
 

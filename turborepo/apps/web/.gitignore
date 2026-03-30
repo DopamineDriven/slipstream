@@ -8,3 +8,4 @@ docs/*
 public/ideation/*
 src/utils/anonymous-name-gen.ts
 
+claude-read*

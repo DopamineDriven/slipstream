@@ -11,6 +11,8 @@ import {
   useState
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
+import { PCMStreamPlayer } from "@/lib/pcm-stream-player";
+import { pcmChunksToWavBlob } from "@/lib/pcm-to-wav";
 import { isValidCodec, isValidLanguage, isValidVoice } from "@/lib/tts-helpers";
 import type {
   EventTypeMap,
@@ -20,37 +22,6 @@ import type {
   TTSCodec
 } from "@slipstream/types";
 
-// ---------------------------------------------------------------------------
-// Module-scope helpers
-// ---------------------------------------------------------------------------
-
-function codecToMime(codec: string) {
-  if (codec === "mp3") return "audio/mpeg";
-  if (codec === "wav") return "audio/wav";
-  if (codec === "pcm") return "audio/pcm";
-  if (codec === "opus") return "audio/opus";
-  if (codec === "aac") return "audio/aac";
-  if (codec === "flac") return "audio/flac";
-  if (codec === "mulaw" || codec === "alaw") return "audio/basic";
-  return "audio/mpeg";
-}
-
-function base64ChunksToBlobUrl(chunks: string[], mimeType: string) {
-  const binaryArrays = chunks.map(chunk => {
-    const binary = atob(chunk);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes;
-  });
-  return URL.createObjectURL(new Blob(binaryArrays, { type: mimeType }));
-}
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 interface TTSCacheEntry {
   cdnUrl: string;
   blobUrl: string | null;
@@ -59,21 +30,16 @@ interface TTSCacheEntry {
 }
 
 interface TTSContextValue {
-  // Generation state
   isGenerating: boolean;
   activeMessageId: string | null;
   error: string | null;
-
-  // Playback state
   isPlaying: boolean;
   currentPlaybackMessageId: string | null;
 
-  // Preferences
   voice: GrokVoiceTTS;
   language: GrokLanguageTTS;
   codec: GrokAudioCodecTTS;
 
-  // Actions
   requestTTS: (messageId: string, conversationId: string) => void;
   play: (messageId: string) => void;
   pause: () => void;
@@ -82,19 +48,12 @@ interface TTSContextValue {
   setLanguage: (l: string) => void;
   setCodec: (c: string) => void;
 
-  // Cache check
   hasCachedAudio: (messageId: string) => boolean;
 }
 
-// ---------------------------------------------------------------------------
-// Context
-// ---------------------------------------------------------------------------
-
 const TTSContext = createContext<TTSContextValue | undefined>(undefined);
 
-// ---------------------------------------------------------------------------
-// Provider
-// ---------------------------------------------------------------------------
+const STREAM_SAMPLE_RATE = 24000;
 
 export function TTSProvider({
   children
@@ -102,8 +61,6 @@ export function TTSProvider({
   children: ReactNode;
 }>) {
   const { client, sendEvent } = useChatWebSocketContext();
-
-  // -- State (renders) -------------------------------------------------------
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeMessageId, setActiveMessageId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -115,15 +72,16 @@ export function TTSProvider({
   const [language, setLanguageState] = useState<GrokLanguageTTS>("auto");
   const [codec, setCodecState] = useState<GrokAudioCodecTTS>("mp3");
 
-  // -- Refs (no renders) -----------------------------------------------------
-  const audioChunksRef = useRef<string[]>([]);
   const activeTtsJobIdRef = useRef<string | null>(null);
   const activeMessageIdRef = useRef<string | null>(null);
   const isGeneratingRef = useRef(false);
   const cacheRef = useRef<Map<string, TTSCacheEntry>>(new Map());
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // -- Ref mirroring ---------------------------------------------------------
+  // PCM streaming refs
+  const playerRef = useRef<PCMStreamPlayer | null>(null);
+  const rawChunksRef = useRef<Uint8Array[]>(Array.of<Uint8Array>());
+
   useEffect(() => {
     activeMessageIdRef.current = activeMessageId;
   }, [activeMessageId]);
@@ -132,18 +90,13 @@ export function TTSProvider({
     isGeneratingRef.current = isGenerating;
   }, [isGenerating]);
 
-  // -- Internal playback helper ----------------------------------------------
-  const playFromUrl = useCallback(
-    (url: string | null, messageId: string) => {
-      if (!url || !audioRef.current) return;
-      audioRef.current.src = url;
-      void audioRef.current.play();
-      setCurrentPlaybackMessageId(messageId);
-    },
-    []
-  );
+  const playFromUrl = useCallback((url: string | null, messageId: string) => {
+    if (!url || !audioRef.current) return;
+    audioRef.current.src = url;
+    void audioRef.current.play();
+    setCurrentPlaybackMessageId(messageId);
+  }, []);
 
-  // -- WS event subscription -------------------------------------------------
   useEffect(() => {
     const handleChunk = (evt: EventTypeMap["user_tts_chunk"]) => {
       // Capture ttsJobId from first chunk
@@ -153,18 +106,30 @@ export function TTSProvider({
       ) {
         activeTtsJobIdRef.current = evt.ttsJobId;
       }
-      // Guard: stale chunk
+
       if (evt.ttsJobId !== activeTtsJobIdRef.current) return;
-      audioChunksRef.current.push(evt.audioChunk);
+
+      // Decode base64 → raw bytes for WAV conversion later
+      const binary = atob(evt.audioChunk);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      rawChunksRef.current.push(bytes);
+
+      // Stream immediately via Web Audio
+      playerRef.current?.pushChunk(evt.audioChunk);
     };
 
     const handleResponse = (evt: EventTypeMap["user_tts_response"]) => {
       if (evt.ttsJobId !== activeTtsJobIdRef.current) return;
 
-      const blobUrl = base64ChunksToBlobUrl(
-        audioChunksRef.current,
-        codecToMime(evt.codec)
+      // Build WAV blob from accumulated raw PCM for cached replay
+      const wavBlob = pcmChunksToWavBlob(
+        rawChunksRef.current,
+        STREAM_SAMPLE_RATE
       );
+      const blobUrl = URL.createObjectURL(wavBlob);
 
       cacheRef.current.set(evt.messageId, {
         cdnUrl: evt.cdnUrl,
@@ -173,26 +138,39 @@ export function TTSProvider({
         codec: evt.codec
       });
 
-      // Reset generation state
       setIsGenerating(false);
       setActiveMessageId(null);
       setError(null);
-      audioChunksRef.current = [];
+      rawChunksRef.current = Array.of<Uint8Array>();
       activeTtsJobIdRef.current = null;
 
-      // Auto-play: prefer CDN, fall back to blob
-      playFromUrl(evt.cdnUrl ?? blobUrl, evt.messageId);
+      // Let scheduled audio finish playing, then clean up
+      const player = playerRef.current;
+      if (player) {
+        void player.drain().then(() => {
+          player.stop();
+          setIsPlaying(false);
+          setCurrentPlaybackMessageId(null);
+        });
+      } else {
+        setIsPlaying(false);
+        setCurrentPlaybackMessageId(null);
+      }
     };
 
     const handleError = (evt: EventTypeMap["user_tts_error"]) => {
-      // Match by ttsJobId if present, otherwise by messageId
       if (evt.ttsJobId && evt.ttsJobId !== activeTtsJobIdRef.current) return;
       if (!evt.ttsJobId && evt.messageId !== activeMessageIdRef.current) return;
+
+      // Stop streaming player on error
+      playerRef.current?.stop();
 
       setError(`TTS Error ${evt.status}: ${evt.statusText}`);
       setIsGenerating(false);
       setActiveMessageId(null);
-      audioChunksRef.current = [];
+      setIsPlaying(false);
+      setCurrentPlaybackMessageId(null);
+      rawChunksRef.current = Array.of<Uint8Array>();
       activeTtsJobIdRef.current = null;
     };
 
@@ -205,27 +183,30 @@ export function TTSProvider({
       client.off("user_tts_response");
       client.off("user_tts_error");
     };
-  }, [client, playFromUrl]);
+  }, [client]);
 
-  // -- Cleanup on unmount ----------------------------------------------------
+  // Cleanup on unmount: revoke blob URLs, close player
   useEffect(() => {
+    const cache = cacheRef.current;
+    const audio = audioRef.current;
     return () => {
-      cacheRef.current.forEach(entry => {
+      cache.forEach(entry => {
         if (entry.blobUrl) URL.revokeObjectURL(entry.blobUrl);
       });
-      cacheRef.current.clear();
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
+      cache.clear();
+      if (audio) {
+        audio.pause();
+        audio.src = "";
       }
+      void playerRef.current?.close();
     };
   }, []);
 
-  // -- Actions ---------------------------------------------------------------
   const play = useCallback(
     (messageId: string) => {
       const entry = cacheRef.current.get(messageId);
       if (!entry) return;
+      // Cached replay: prefer CDN (WAV on CloudFront, survives sessions), fall back to local blob
       playFromUrl(entry.cdnUrl ?? entry.blobUrl, messageId);
     },
     [playFromUrl]
@@ -233,7 +214,7 @@ export function TTSProvider({
 
   const requestTTS = useCallback(
     (messageId: string, conversationId: string) => {
-      // Cache hit — instant replay
+      // Cache hit → instant replay via <audio>
       if (cacheRef.current.has(messageId)) {
         play(messageId);
         return;
@@ -241,11 +222,15 @@ export function TTSProvider({
       // Double-request guard
       if (isGeneratingRef.current) return;
 
-      // Set generation state
+      // Create PCM stream player (must be in user gesture call stack)
+      playerRef.current = new PCMStreamPlayer(STREAM_SAMPLE_RATE);
+
       setIsGenerating(true);
       setActiveMessageId(messageId);
       setError(null);
-      audioChunksRef.current = [];
+      setIsPlaying(true);
+      setCurrentPlaybackMessageId(messageId);
+      rawChunksRef.current = Array.of<Uint8Array>();
       activeTtsJobIdRef.current = null;
 
       sendEvent("user_tts_request", {
@@ -254,10 +239,10 @@ export function TTSProvider({
         messageId,
         voice,
         language,
-        codec
+        codec: "pcm"
       } satisfies EventTypeMap["user_tts_request"]);
     },
-    [sendEvent, voice, language, codec, play]
+    [sendEvent, voice, language, play]
   );
 
   const pause = useCallback(() => {
@@ -267,6 +252,11 @@ export function TTSProvider({
   }, []);
 
   const stop = useCallback(() => {
+    // Stop streaming player if active
+    if (playerRef.current?.isActive) {
+      playerRef.current.stop();
+    }
+    // Stop <audio> element if playing cached replay
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -274,6 +264,10 @@ export function TTSProvider({
     }
     setCurrentPlaybackMessageId(null);
     setIsPlaying(false);
+    setIsGenerating(false);
+    setActiveMessageId(null);
+    rawChunksRef.current = Array.of<Uint8Array>();
+    activeTtsJobIdRef.current = null;
   }, []);
 
   const updateVoice = useCallback((v: string) => {
@@ -293,7 +287,6 @@ export function TTSProvider({
     []
   );
 
-  // -- Context value ---------------------------------------------------------
   const value = useMemo<TTSContextValue>(
     () => ({
       isGenerating,
@@ -350,10 +343,6 @@ export function TTSProvider({
     </TTSContext.Provider>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Hook
-// ---------------------------------------------------------------------------
 
 export function useTTSContext() {
   const context = useContext(TTSContext);

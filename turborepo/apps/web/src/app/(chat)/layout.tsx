@@ -5,6 +5,7 @@ import { ApiKeysProvider } from "@/context/api-keys-context";
 import { AssetProvider } from "@/context/asset-context";
 import { ChatWebSocketProvider } from "@/context/chat-ws-context";
 import { ImageGenProvider } from "@/context/image-gen-context";
+import { TTSProvider } from "@/context/tts-context";
 import { ModelSelectionProvider } from "@/context/model-selection-context";
 import { SettingsDrawerProvider } from "@/context/settings-drawer-context";
 import { getSession } from "@/utils/auth";
@@ -23,9 +24,11 @@ export default async function AuthedLayout({
           <SettingsDrawerProvider>
             <AssetProvider userId={session.user.id}>
               <ImageGenProvider>
-                <AIChatProvider userId={session.user.id}>
-                  {children}
-                </AIChatProvider>
+                <TTSProvider>
+                  <AIChatProvider userId={session.user.id}>
+                    {children}
+                  </AIChatProvider>
+                </TTSProvider>
               </ImageGenProvider>
             </AssetProvider>
           </SettingsDrawerProvider>

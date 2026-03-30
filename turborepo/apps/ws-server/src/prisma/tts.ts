@@ -80,6 +80,10 @@ export class PrismaTTSService extends PrismaProviderStoreService {
     return this.ttsJobBigIntToNum(job);
   }
 
+  public async deleteTTSJob(jobId: string) {
+    await this.prismaClient.tTSJob.delete({ where: { id: jobId } });
+  }
+
   public async findExistingTTSJob(sourceMessageId: string, userId: string) {
     const job = await this.prismaClient.tTSJob.findUnique({
       where: { userId_sourceMessageId: { userId, sourceMessageId } }
