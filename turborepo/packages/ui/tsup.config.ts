@@ -2,22 +2,9 @@ import { relative } from "node:path";
 import type { Options } from "tsup";
 import { defineConfig } from "tsup";
 
-const tsupConfig = (
-  options: Omit<
-    Options,
-    | "entry"
-    | "dts"
-    | "external"
-    | "watch"
-    | "keepNames"
-    | "format"
-    | "sourcemap"
-    | "tsconfig"
-    | "clean"
-    | "outDir"
-  >
-) =>
+const tsupConfig = (options: Options) =>
   ({
+    ...options,
     entry: [
       "src/base/*.tsx",
       "src/globals.css",
@@ -37,8 +24,7 @@ const tsupConfig = (
     sourcemap: true,
     tsconfig: relative(process.cwd(), "tsconfig.json"),
     clean: true,
-    outDir: "dist",
-    ...options
+    outDir: "dist"
   }) satisfies Options;
 
 export default defineConfig(tsupConfig);

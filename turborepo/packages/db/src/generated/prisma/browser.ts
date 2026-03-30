@@ -133,6 +133,11 @@ export type User = Prisma.UserModel
  */
 export type Session = Prisma.SessionModel
 /**
+ * Model TTSJob
+ * 
+ */
+export type TTSJob = Prisma.TTSJobModel
+/**
  * Model UserKey
  * 
  */

@@ -7,7 +7,7 @@
 Monorepo for a multi‑provider AI chat application with streaming over WebSockets, resumable streams via Redis, and asset uploads to S3. Built with Next.js (web), a Node `ws` server, and shared TypeScript packages.
 
 ## Overview
-
+ 
 - Apps
   - `apps/web`: Next.js 15 + React 19 web client, NextAuth v5 auth, Prisma (Edge) + Accelerate, rich chat UI and asset attachment.
   - `apps/ws-server`: Node WebSocket server (ws) that authenticates users, routes AI chat to providers, handles asset presigned uploads, persists state via Prisma, and broadcasts via Redis.

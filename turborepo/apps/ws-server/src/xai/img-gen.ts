@@ -1,24 +1,37 @@
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { ImageGenPartialArr, xAIImgGenResponse } from "@/xai/types.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
 import { GrokCollectionsService } from "@/xai/collections.ts";
+import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AIChatRequestImgGenFields,
   AIChatResponseImgGenSubFields,
   EventTypeMap,
   GrokImagineARUnion,
+  GrokImagineImageGenOpts,
+  GrokImagineImgModelUnion,
   GrokImgGenModels,
   GrokModelIdUnion,
   MessageSingleton
 } from "@slipstream/types";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import { S3Storage } from "@slipstream/storage-s3";
-import type { UserStoreVectorService } from "@/store/vector-store.ts";
+
 type xAIImageEditsInput = {
-  readonly url: string;
+  url: string;
 };
+
+export interface xAIImgGenFields {
+  readonly model: GrokImagineImgModelUnion;
+  readonly prompt: string;
+  readonly n: number;
+  readonly aspect_ratio: GrokImagineARUnion;
+  readonly resolution: GrokImagineImageGenOpts["resolution"];
+  readonly response_format: "b64_json";
+  readonly user: string;
+}
 
 export class GrokImgGenService extends GrokCollectionsService {
   protected nanoid: Promise<(typeof import("nanoid"))["nanoid"]>;
@@ -35,35 +48,16 @@ export class GrokImgGenService extends GrokCollectionsService {
     this.nanoid = import("nanoid").then(d => d.nanoid);
   }
 
-  private isValidAr(r: string) {
-    return (
-      r === "1:1" ||
-      r === "2:3" ||
-      r === "3:2" ||
-      r === "3:4" ||
-      r === "4:3" ||
-      r === "16:9" ||
-      r === "9:16" ||
-      r === "19.5:9" ||
-      r === "9:19.5" ||
-      r === "9:20" ||
-      r === "20:9" ||
-      r === "2:1" ||
-      r === "1:2" ||
-      r === "auto"
-    );
-  }
+  private handleMostRecentImagineMsg(
+    msgs: MessageSingleton<true>[],
+    requestMessageId: string
+  ) {
+    const getUserMsg = msgs.find(t => t.id === requestMessageId);
 
-  private isValidImgRes(res: string) {
-    return res === "1k" || res === "2k";
-  }
-
-  private handleMostRecentImagineMsg(msgs: MessageSingleton<true>[]) {
-    const mostRecentMsg = msgs.slice(-1)?.[0];
-    if (!mostRecentMsg) throw new Error("no message found for grok image gen");
+    if (!getUserMsg) throw new Error("no message found for grok image gen");
 
     const images = Array.of<xAIImageEditsInput>();
-    for (const att of mostRecentMsg.attachments) {
+    for (const att of getUserMsg.attachments) {
       const url = att.compatStatus === "ACTIVE" ? att.compatCdnUrl : att.cdnUrl;
       const mime = att.compatStatus === "ACTIVE" ? att.compatMime : att.mime;
 
@@ -79,28 +73,25 @@ export class GrokImgGenService extends GrokCollectionsService {
     }
 
     return {
-      prompt: mostRecentMsg.content,
+      prompt: getUserMsg.content,
       images
     } as const;
   }
 
-  private resolveGrokImagineImgOpts(
-    model: "grok-imagine-image" | "grok-imagine-image-pro",
-    imgGenFields?: AIChatRequestImgGenFields
-  ) {
+  private resolveGrokImagineImgOpts(imgGenFields?: AIChatRequestImgGenFields) {
     const rawAspectRatio = imgGenFields?.output_size;
     const rawResolution = imgGenFields?.output_quality;
 
     let ar: GrokImagineARUnion;
     let r: "1k" | "2k";
 
-    if (rawAspectRatio && this.isValidAr(rawAspectRatio)) {
+    if (rawAspectRatio && this.prisma.isValidGrokAR(rawAspectRatio)) {
       ar = rawAspectRatio;
     } else {
       ar = "auto" as const;
     }
 
-    if (rawResolution && this.isValidImgRes(rawResolution)) {
+    if (rawResolution && this.prisma.isValidGrokQuality(rawResolution)) {
       r = rawResolution;
     } else {
       r = "2k";
@@ -140,21 +131,21 @@ export class GrokImgGenService extends GrokCollectionsService {
   private async handleImgGen(
     model = "grok-imagine-image" satisfies GrokImgGenModels,
     n = 1,
+    imageCount: number,
     messages: MessageSingleton<true>[],
     userId: string,
+    requestMessageId: string,
     imgGenFields?: AIChatRequestImgGenFields,
     apiKey?: string
   ) {
     const key = apiKey ?? this.xaiKey;
-    if (
-      model === ("grok-imagine-image" satisfies GrokImgGenModels) ||
-      model === ("grok-imagine-image-pro" satisfies GrokImgGenModels)
-    ) {
-      const { prompt, images } = this.handleMostRecentImagineMsg(messages);
-      const { aspect_ratio, resolution } = this.resolveGrokImagineImgOpts(
-        model,
-        imgGenFields
+    if (this.prisma.grokImagineImgGenModel(model)) {
+      const { prompt, images } = this.handleMostRecentImagineMsg(
+        messages,
+        requestMessageId
       );
+      const { aspect_ratio, resolution } =
+        this.resolveGrokImagineImgOpts(imgGenFields);
       const baseBody = {
         model,
         prompt,
@@ -173,7 +164,7 @@ export class GrokImgGenService extends GrokCollectionsService {
         user: string;
       };
 
-      if (images.length > 0) {
+      if (imageCount > 0) {
         return await this.handleImgGenReq(key, this.baseImgEditsUrl, {
           ...baseBody,
           images
@@ -347,6 +338,7 @@ export class GrokImgGenService extends GrokCollectionsService {
     model = "grok-imagine-image",
     systemPrompt,
     temperature,
+    imgCounts,
     imgGenEnabled,
     imgGenFields,
     userMsgId,
@@ -381,8 +373,10 @@ export class GrokImgGenService extends GrokCollectionsService {
       const res = await this.handleImgGen(
         m,
         n,
+        imgCounts,
         msgs,
         userId,
+        requestMessageId ?? "",
         imgGenFields,
         apiKey ?? undefined
       );

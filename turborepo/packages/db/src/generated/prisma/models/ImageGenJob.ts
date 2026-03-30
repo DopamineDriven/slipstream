@@ -428,7 +428,7 @@ export type ImageGenJobGroupByOutputType = {
   _max: ImageGenJobMaxAggregateOutputType | null
 }
 
-type GetImageGenJobGroupByPayload<T extends ImageGenJobGroupByArgs> = Prisma.PrismaPromise<
+export type GetImageGenJobGroupByPayload<T extends ImageGenJobGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ImageGenJobGroupByOutputType, T['by']> &
       {

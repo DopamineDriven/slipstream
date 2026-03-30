@@ -19,6 +19,28 @@ export type {
 } from "@/codegen-types.ts";
 
 export type {
+  GeminiCodecTTS,
+  GrokAudioCodecTTS,
+  GrokBitRateTTS,
+  GrokLanguageTTS,
+  GrokOutputFormatTTS,
+  GrokSampleRateTTS,
+  GrokVoiceDisplayNameTTS,
+  GrokVoiceTTS,
+  GrokTTSReqShape,
+  OpenAICodecTTS,
+  TTSCodec
+} from "@/events-audio.ts";
+
+export {
+  grokVoiceDisplayNameToIdTTS,
+  grokVoiceDisplayNamesTTS,
+  grokVoiceIdToDisplayNameTTS,
+  grokVoiceIdsTTS,
+  grokVoices
+} from "@/events-audio.ts";
+
+export type {
   AIChatRequestImgGenFields,
   AIChatResponseImgGenFields,
   AIChatResponseImgGenFieldsFinal,
@@ -154,7 +176,11 @@ export type {
   ProviderContextPong,
   ProviderContextUpdate,
   ProviderContextUpdateAck,
-  TypingIndicator
+  TypingIndicator,
+  UserTTSChunk,
+  UserTTSError,
+  UserTTSRequest,
+  UserTTSResponse
 } from "@/events.ts";
 
 /**
@@ -353,6 +379,7 @@ export type {
   ProviderStoreSingleton,
   SessionSingleton,
   SettingsSingleton,
+  TTSJobSingleton,
   UserKeySingleton,
   UserSingleton,
   UserStoreDocAnnotSingleton,

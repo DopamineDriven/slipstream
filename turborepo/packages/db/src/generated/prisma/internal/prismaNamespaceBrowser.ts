@@ -74,6 +74,7 @@ export const ModelName = {
   ProviderStoreDocument: 'ProviderStoreDocument',
   User: 'User',
   Session: 'Session',
+  TTSJob: 'TTSJob',
   UserKey: 'UserKey',
   Settings: 'Settings',
   UserStore: 'UserStore',
@@ -673,6 +674,31 @@ export const SessionScalarFieldEnum = {
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const TTSJobScalarFieldEnum = {
+  id: 'id',
+  sourceMessageId: 'sourceMessageId',
+  userId: 'userId',
+  provider: 'provider',
+  voice: 'voice',
+  language: 'language',
+  codec: 'codec',
+  sampleRate: 'sampleRate',
+  bitrate: 'bitrate',
+  cdnUrl: 'cdnUrl',
+  charCount: 'charCount',
+  status: 'status',
+  durationMs: 'durationMs',
+  generationMs: 'generationMs',
+  sizeBytes: 'sizeBytes',
+  error: 'error',
+  attachmentId: 'attachmentId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TTSJobScalarFieldEnum = (typeof TTSJobScalarFieldEnum)[keyof typeof TTSJobScalarFieldEnum]
 
 
 export const UserKeyScalarFieldEnum = {

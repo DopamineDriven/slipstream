@@ -1,0 +1,44 @@
+enum TTSStatus {
+  NONE
+  QUEUED
+  PROCESSING
+  COUPLED
+  FAILED
+}
+
+model TTSJob {
+  id              String    @id @default(cuid(2))
+  sourceMessageId String    @unique
+  userId          String
+  provider        String
+  /// xAI voice ids -> "eve" | "ara" | "rex" | "sal" | "leo" | "una"
+  voice           String
+  /// BCP-47 language codes | "auto"
+  language        String
+  /// wav | mp3 | pcm | aac | opus | flac | mulaw | alaw, etc
+  codec           String
+  /// xAI sample rates -> 8000 | 16000 | 22050 | 24000 | 44100 | 48000
+  sampleRate      Int?
+  /// xAI bitrates -> 32000 | 64000 | 96000 | 128000 | 192000
+  bitrate         Int?
+  cdnUrl          String?
+  /// input character count
+  charCount       Int
+  status          TTSStatus @default(QUEUED)
+  durationMs      Int?
+  generationMs    Int?
+  sizeBytes       BigInt?
+  error           String?
+
+  attachmentId String?  @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sourceMessage Message     @relation("TTSJobToMessage", fields: [sourceMessageId], references: [id], onDelete: Cascade)
+  attachment    Attachment? @relation("TTSJobToAttachment", fields: [attachmentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sourceMessageId])
+  @@index([attachmentId])
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+}

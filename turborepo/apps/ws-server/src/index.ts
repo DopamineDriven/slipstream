@@ -207,6 +207,16 @@ async function exe() {
       vercel: v0
     });
 
+    const { TTSService } = await import("@/tts/index.ts");
+
+    const ttsService = new TTSService(
+      redisInstance,
+      s3,
+      logger,
+      prisma,
+      cfg.X_AI_KEY
+    );
+
     const { ImageCompatService } = await import("@/image/index.ts");
 
     const imgCompatService = new ImageCompatService(s3, prisma);
@@ -219,7 +229,8 @@ async function exe() {
       imgCompatService,
       userStore,
       process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY,
-      logger
+      logger,
+      ttsService
     );
 
     resolver.registerAll();

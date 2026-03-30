@@ -1,20 +1,22 @@
 import { PassThrough, Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
+import type { ImageCompatService } from "@/image/index.ts";
+import type { LoggerService } from "@/logger/index.ts";
+import type { ProviderService } from "@/providers/index.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
   BigIntToCompatProps,
   BufferLike,
+  HandleAiChatRequestRT,
   ProviderChatRequestEntity,
   UserData
 } from "@/types/index.ts";
+import type { WSServer } from "@/ws-server/index.ts";
 import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { Responses } from "openai/resources/index.mjs";
 import type { Logger as PinoLogger } from "pino";
-import { ImageCompatService } from "@/image/index.ts";
-import { LoggerService } from "@/logger/index.ts";
-import { ProviderService } from "@/providers/index.ts";
-import { UserStoreVectorService } from "@/store/vector-store.ts";
-import { WSServer } from "@/ws-server/index.ts";
-import { WebSocket } from "ws";
+import type { WebSocket } from "ws";
+import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AllModelsUnion,
   AnyEvent,
@@ -28,7 +30,7 @@ import type {
   RTC
 } from "@slipstream/types";
 import { RedisChannels } from "@slipstream/redis-service";
-import { S3Storage } from "@slipstream/storage-s3";
+import { TTSService } from "@/tts/index.ts";
 
 export class Resolver {
   private logger: PinoLogger;
@@ -40,7 +42,8 @@ export class Resolver {
     private imgCompatService: ImageCompatService,
     private userVectorStore: UserStoreVectorService,
     private xaiManagementApikey: string,
-    logger: LoggerService
+    logger: LoggerService,
+  private ttsService: TTSService
   ) {
     this.logger = logger
       .getPinoInstance()
@@ -87,6 +90,7 @@ export class Resolver {
       "provider_context_ping",
       this.handleProviderContextPing.bind(this)
     );
+    this.wsServer.on("user_tts_request", this.handleUserTTSRequest.bind(this));
     this.wsServer.on(
       "provider_context_update",
       this.handleProviderContextUpdate.bind(this)
@@ -184,9 +188,9 @@ export class Resolver {
       content.push({ type: "input_text", text: msgs.content });
       try {
         const res = await openai.responses.create({
-          model: "gpt-5-nano",
+          model: "gpt-5.4-nano",
           store: false,
-          reasoning: { effort: "minimal" },
+          reasoning: { effort: "medium" },
           instructions: `Generate a creative & descriptive yet concise title  ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
           temperature: 1,
           input: [
@@ -208,9 +212,9 @@ export class Resolver {
     content.push({ type: "input_text", text: prompt });
     try {
       const res = await openai.responses.create({
-        model: "gpt-5-nano",
+        model: "gpt-5.4-nano",
         store: false,
-        reasoning: { effort: "minimal" },
+        reasoning: { effort: "medium" },
         instructions: `Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
         temperature: 1,
         input: [
@@ -329,6 +333,39 @@ export class Resolver {
     }
   }
 
+  private getCurrentMsgAttCounts(res: HandleAiChatRequestRT) {
+    const userMsgAttCounts = {
+      imgCounts: 0,
+      docCounts: 0
+    };
+    const reqMsgId = res.requestMessageId;
+    if (!res.requestMessageId) {
+      const { docCounts, imgCounts } = userMsgAttCounts;
+      return { docCounts, imgCounts };
+    }
+    const findMsgBoundAtts = res.messages.findLastIndex(t => t.id === reqMsgId);
+    if (findMsgBoundAtts === -1) {
+      this.logger.warn(
+        `${reqMsgId} returned -1 when filtered for a match via findLastIndex....`
+      );
+      const { docCounts, imgCounts } = userMsgAttCounts;
+      return { docCounts, imgCounts };
+    } else {
+      const userMsg = res.messages[findMsgBoundAtts];
+      if (userMsg?.attachments) {
+        const v = userMsg.attachments.filter(o => o.assetType === "IMAGE");
+        const d = userMsg.attachments.filter(o => o.assetType === "DOCUMENT");
+        userMsgAttCounts.imgCounts = v.length;
+        userMsgAttCounts.docCounts = d.length;
+      } else {
+        userMsgAttCounts.imgCounts = 0;
+        userMsgAttCounts.docCounts = 0;
+      }
+    }
+    const { docCounts, imgCounts } = userMsgAttCounts;
+    return { imgCounts, docCounts };
+  }
+
   public async handleAIChat(
     event: EventTypeMap["ai_chat_request"],
     ws: WebSocket,
@@ -385,7 +422,15 @@ export class Resolver {
       model,
       metadata: userData
     });
-
+    const { docCounts, imgCounts } = this.getCurrentMsgAttCounts(res);
+    // res.attachments?.findLastIndex(t =>t.id === res.requestMessageId);
+    // if (res.attachments) {
+    // for (const att of res.attachments) {
+    // if (att.assetType==="IMAGE") imgAttachmentCount+=1;
+    // }
+    // } else {
+    //   imgAttachmentCount=0;
+    // }
     const user_location = {
       type: "approximate",
       city: userData?.city ?? "Barrington",
@@ -497,6 +542,8 @@ export class Resolver {
       userId,
       ws,
       apiKey,
+      docCounts,
+      imgCounts,
       jobId,
       requestMessageId,
       keyId,
@@ -605,6 +652,81 @@ export class Resolver {
     }
   }
 
+  public async handleUserTTSRequest(
+    event: EventTypeMap["user_tts_request"],
+    ws: WebSocket,
+    userId: string,
+    _userData?: UserData
+  ) {
+    const { messageId, conversationId } = event;
+    const voice = event.voice ?? "eve";
+    const language = event.language ?? "auto";
+    const codec = event.codec ?? "mp3";
+    const sampleRate = event.sampleRate ?? 24000;
+    const bitRate = event.bitRate ?? 128000;
+
+    try {
+      const existing = await this.wsServer.prisma.findExistingTTSJob(messageId, userId);
+      if (existing?.status === "COUPLED" && existing.cdnUrl && existing.attachmentId) {
+        ws.send(
+          JSON.stringify({
+            type: "user_tts_response",
+            ttsJobId: existing.id,
+            attachmentId: existing.attachmentId,
+            conversationId,
+            messageId,
+            durationMs: existing.durationMs ?? 0,
+            generationMs: existing.generationMs ?? 0,
+            size: existing.sizeBytes,
+            cdnUrl: existing.cdnUrl,
+            codec: codec
+          } satisfies EventTypeMap["user_tts_response"])
+        );
+        return;
+      }
+
+      const message = await this.wsServer.prisma.getMsgContentForTTS(messageId);
+
+      const ttsJob = await this.wsServer.prisma.createTTSJob({
+        sourceMessageId: messageId,
+        userId,
+        provider: "GROK",
+        voice,
+        language,
+        codec,
+        sampleRate,
+        bitrate: bitRate,
+        charCount: message.content.length
+      });
+
+      this.ttsService.streamToClient(
+        ws,
+        conversationId,
+        messageId,
+        userId,
+        message.content,
+        ttsJob,
+        voice,
+        language,
+        codec,
+        sampleRate,
+        bitRate
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "TTS request failed";
+      this.logger.error({ messageId, userId, error: msg }, "handleUserTTSRequest failed");
+      ws.send(
+        JSON.stringify({
+          type: "user_tts_error",
+          status: 404,
+          statusText: msg,
+          conversationId,
+          messageId
+        } satisfies EventTypeMap["user_tts_error"])
+      );
+    }
+  }
+
   protected async postHandleConnectionEstablishedJob(userId: string) {
     const gemini = this.providers.getInstance("gemini");
     const anthropic = this.providers.getInstance("anthropic");
@@ -686,6 +808,9 @@ export class Resolver {
       case "provider_context_update":
         await this.handleProviderContextUpdate(event, ws, userId, userData);
         break;
+      case "user_tts_request":
+        await this.handleUserTTSRequest(event, ws, userId, userData);
+        break;
       default:
         await this.wsServer.redis.publish(
           this.wsServer.channel,
@@ -729,7 +854,11 @@ export class Resolver {
     "provider_context_pong",
     "provider_context_update",
     "provider_context_update_ack",
-    "typing"
+    "typing",
+    "user_tts_chunk",
+    "user_tts_error",
+    "user_tts_request",
+    "user_tts_response"
   ] as const satisfies readonly AnyEventTypeUnion[];
 
   /** Parses a raw WebSocket message into an event */

@@ -398,7 +398,7 @@ export type LocalVectorStoreDocGroupByOutputType = {
   _max: LocalVectorStoreDocMaxAggregateOutputType | null
 }
 
-type GetLocalVectorStoreDocGroupByPayload<T extends LocalVectorStoreDocGroupByArgs> = Prisma.PrismaPromise<
+export type GetLocalVectorStoreDocGroupByPayload<T extends LocalVectorStoreDocGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<LocalVectorStoreDocGroupByOutputType, T['by']> &
       {

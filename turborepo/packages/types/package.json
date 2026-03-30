@@ -81,6 +81,7 @@
     "./utils": "./dist/utils.js",
     "./types": "./dist/types.js",
     "./models": "./dist/models.js",
+    "./events-audio": "./dist/events-audio.js",
     "./events-images": "./dist/events-images.js",
     "./events-workup": "./dist/events-workup.js",
     "./events": "./dist/events.js",
@@ -102,7 +103,6 @@
   },
   "dependencies": {
     "@d0paminedriven/fs": "catalog:dd",
-    "@d0paminedriven/metadata": "catalog:dd",
     "@slipstream/db": "workspace:*",
     "dotenv": "catalog:dotenv"
   },

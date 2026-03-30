@@ -21,14 +21,12 @@ enum AssetStatus {
   DELETED
 }
 
-
 enum CompatStatus {
   PENDING
   ACTIVE
   FAILED
   ALIASED
 }
-
 
 enum AssetType {
   DOCUMENT
@@ -108,6 +106,7 @@ model Attachment {
   deletedAt            DateTime? // soft deletes
   createdAt            DateTime                @default(now())
   updatedAt            DateTime                @updatedAt
+  ttsJob               TTSJob?                 @relation("TTSJobToAttachment")
   localVectorStoreDocs LocalVectorStoreDoc[]
   conversation         Conversation?           @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   message              Message?                @relation(fields: [messageId], references: [id], onDelete: SetNull)

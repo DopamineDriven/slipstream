@@ -309,7 +309,7 @@ export type LocalVectorStoreDocChunkGroupByOutputType = {
   _max: LocalVectorStoreDocChunkMaxAggregateOutputType | null
 }
 
-type GetLocalVectorStoreDocChunkGroupByPayload<T extends LocalVectorStoreDocChunkGroupByArgs> = Prisma.PrismaPromise<
+export type GetLocalVectorStoreDocChunkGroupByPayload<T extends LocalVectorStoreDocChunkGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<LocalVectorStoreDocChunkGroupByOutputType, T['by']> &
       {

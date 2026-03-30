@@ -386,7 +386,7 @@ export type ConversationMemoryChunkGroupByOutputType = {
   _max: ConversationMemoryChunkMaxAggregateOutputType | null
 }
 
-type GetConversationMemoryChunkGroupByPayload<T extends ConversationMemoryChunkGroupByArgs> = Prisma.PrismaPromise<
+export type GetConversationMemoryChunkGroupByPayload<T extends ConversationMemoryChunkGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ConversationMemoryChunkGroupByOutputType, T['by']> &
       {

@@ -3,7 +3,7 @@ import type { UserConfig } from "tsdown";
 import { defineConfig } from "tsdown";
 
 export default defineConfig(
-  (options: UserConfig) =>
+  options =>
     ({
       ...options,
       entry: [
@@ -25,6 +25,7 @@ export default defineConfig(
         "src/meta/index.ts",
         "src/mixins/index.ts",
         "src/models/index.ts",
+        "src/openai/base.ts",
         "src/openai/gpt-image.ts",
         "src/openai/index.ts",
         "src/openai/responses-chat.ts",
@@ -37,6 +38,7 @@ export default defineConfig(
         "src/prisma/chat.ts",
         "src/prisma/index.ts",
         "src/prisma/provider-store.ts",
+        "src/prisma/tts.ts",
         "src/prisma/types.ts",
         "src/prisma/user-meta.ts",
         "src/prisma/user-store.ts",
@@ -47,6 +49,8 @@ export default defineConfig(
         "src/store/types.ts",
         "src/store/vector-store.ts",
         "src/store/workup.ts",
+        "src/tts/index.ts",
+        "src/tts/types.ts",
         "src/types/index.ts",
         "src/vercel/index.ts",
         "src/vercel/sse.ts",

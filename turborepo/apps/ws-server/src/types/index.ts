@@ -416,6 +416,8 @@ export interface ProviderChatRequestEntity {
   requestMessageId?: string;
   partialImgArr?: { b64image_url: string }[];
   imgGenFields?: AIChatRequestImgGenFields;
+  docCounts: number;
+  imgCounts: number;
 }
 
 export interface ImageGenReqDbRes<

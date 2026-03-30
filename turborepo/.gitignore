@@ -37,9 +37,15 @@ yarn-error.log*
 .idea
 dist
 notes.md
+notes/
 
 *.mermaid
 apps/CLAUDE.md
 IMPLEMENTATION_PLAN.md
 assets/*
 *.tgz
+
+
+
+plans/*
+~/*

@@ -5,7 +5,7 @@ import type {
   PdfDocSpecs as PdfSpecs,
   PresentationDocSpecs as PresentationSpecs,
   SpreadSheetDocSpecs as SpreadSheetSpecs
-} from "@d0paminedriven/metadata";
+} from "@d0paminedriven/fs";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 
 export type SpreadSheetExtensions = "xlsx" | "xls" | "ods" | "csv";

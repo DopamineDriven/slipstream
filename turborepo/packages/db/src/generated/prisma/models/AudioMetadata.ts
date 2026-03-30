@@ -278,7 +278,7 @@ export type AudioMetadataGroupByOutputType = {
   _max: AudioMetadataMaxAggregateOutputType | null
 }
 
-type GetAudioMetadataGroupByPayload<T extends AudioMetadataGroupByArgs> = Prisma.PrismaPromise<
+export type GetAudioMetadataGroupByPayload<T extends AudioMetadataGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<AudioMetadataGroupByOutputType, T['by']> &
       {

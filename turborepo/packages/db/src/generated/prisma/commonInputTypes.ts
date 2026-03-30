@@ -738,6 +738,23 @@ export type EnumProviderDocStateWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumProviderDocStateFilter<$PrismaModel>
 }
 
+export type EnumTTSStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.TTSStatus | Prisma.EnumTTSStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.TTSStatus[] | Prisma.ListEnumTTSStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TTSStatus[] | Prisma.ListEnumTTSStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTTSStatusFilter<$PrismaModel> | $Enums.TTSStatus
+}
+
+export type EnumTTSStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TTSStatus | Prisma.EnumTTSStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.TTSStatus[] | Prisma.ListEnumTTSStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TTSStatus[] | Prisma.ListEnumTTSStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTTSStatusWithAggregatesFilter<$PrismaModel> | $Enums.TTSStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTTSStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTTSStatusFilter<$PrismaModel>
+}
+
 export type EnumThemePreferenceNullableFilter<$PrismaModel = never> = {
   equals?: $Enums.ThemePreference | Prisma.EnumThemePreferenceFieldRefInput<$PrismaModel> | null
   in?: $Enums.ThemePreference[] | Prisma.ListEnumThemePreferenceFieldRefInput<$PrismaModel> | null
@@ -1581,6 +1598,23 @@ export type NestedEnumProviderDocStateWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumProviderDocStateFilter<$PrismaModel>
   _max?: Prisma.NestedEnumProviderDocStateFilter<$PrismaModel>
+}
+
+export type NestedEnumTTSStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.TTSStatus | Prisma.EnumTTSStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.TTSStatus[] | Prisma.ListEnumTTSStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TTSStatus[] | Prisma.ListEnumTTSStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTTSStatusFilter<$PrismaModel> | $Enums.TTSStatus
+}
+
+export type NestedEnumTTSStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TTSStatus | Prisma.EnumTTSStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.TTSStatus[] | Prisma.ListEnumTTSStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TTSStatus[] | Prisma.ListEnumTTSStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTTSStatusWithAggregatesFilter<$PrismaModel> | $Enums.TTSStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTTSStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTTSStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumThemePreferenceNullableFilter<$PrismaModel = never> = {

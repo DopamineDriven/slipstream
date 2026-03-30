@@ -29,6 +29,7 @@ export interface $DbEnums {
   ProviderAssetState: "PENDING" | "ACTIVE" | "EXPIRED" | "FAILED" | "DELETED"
   ProviderDocState: "PENDING" | "PROCESSING" | "ACTIVE" | "FAILED"
   Provider: "OPENAI" | "GROK" | "GEMINI" | "ANTHROPIC" | "META" | "VERCEL"
+  TTSStatus: "NONE" | "QUEUED" | "PROCESSING" | "COUPLED" | "FAILED"
   ThemePreference: "LIGHT" | "DARK" | "SYSTEM"
   AnnotSubtype: "LINK" | "TEXT" | "HIGHLIGHT" | "WIDGET" | "MARKUP" | "REFERENCE" | "AUTOLINK"
   VisualMediaContent: "PHOTOS" | "CHARTS" | "DIAGRAMS" | "SLIDES" | "TABLES" | "VIDEO" | "MIXED" | "AUDIO"

@@ -4,10 +4,9 @@ import type {
   CreateUserStoreRT
 } from "@/prisma/types.ts";
 import type { Voyage } from "@/voyage/types.ts";
-import { ExtractService } from "@/extract/index.ts";
-import { PrismaLocalStoreService } from "@/prisma/local-store.ts";
+import type { ExtractService } from "@/extract/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import { PrismaDbService } from "@slipstream/db/factory";
+import type { PrismaDbService } from "@slipstream/db/factory";
 import {
   searchUserStoreChunksByStore,
   searchUserStoreChunksByStoreAndModel,
@@ -15,8 +14,9 @@ import {
   updateUserStoreChunkState,
   updateUserStoreDocState
 } from "@slipstream/db/sql-node";
+import { PrismaTTSService } from "./tts.ts";
 
-export class PrismaUserStoreService extends PrismaLocalStoreService {
+export class PrismaUserStoreService extends PrismaTTSService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,

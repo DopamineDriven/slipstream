@@ -46,7 +46,7 @@ WORKDIR /app
 
 # --- Builder ---
 FROM base AS builder
-RUN npm install -g turbo@2.8.20 pnpm@10.32.1
+RUN npm install -g turbo@2.8.21 pnpm@10.33.0
 COPY turbo.json pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
 COPY . .
 ENV TURBO_TELEMETRY=0
@@ -60,6 +60,7 @@ ENV MOTION_PLUS_TOKEN=$MOTION_PLUS_TOKEN
 
 # cp pruned pnpm files and sources
 COPY --from=builder /app/out/json/ ./
+COPY --from=builder /app/.npmrc ./
 
 RUN --mount=type=cache,id=pnpm-store,target=/root/.pnpm-store \
     --mount=type=cache,id=pnpm-registry,target=/root/.npm \

@@ -283,7 +283,7 @@ export type AttachmentProviderGroupByOutputType = {
   _max: AttachmentProviderMaxAggregateOutputType | null
 }
 
-type GetAttachmentProviderGroupByPayload<T extends AttachmentProviderGroupByArgs> = Prisma.PrismaPromise<
+export type GetAttachmentProviderGroupByPayload<T extends AttachmentProviderGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<AttachmentProviderGroupByOutputType, T['by']> &
       {

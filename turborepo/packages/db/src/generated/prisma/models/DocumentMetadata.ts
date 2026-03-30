@@ -287,7 +287,7 @@ export type DocumentMetadataGroupByOutputType = {
   _max: DocumentMetadataMaxAggregateOutputType | null
 }
 
-type GetDocumentMetadataGroupByPayload<T extends DocumentMetadataGroupByArgs> = Prisma.PrismaPromise<
+export type GetDocumentMetadataGroupByPayload<T extends DocumentMetadataGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<DocumentMetadataGroupByOutputType, T['by']> &
       {

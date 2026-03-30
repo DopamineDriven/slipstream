@@ -312,6 +312,17 @@ export const Provider = {
 export type Provider = (typeof Provider)[keyof typeof Provider]
 
 
+export const TTSStatus = {
+  NONE: 'NONE',
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  COUPLED: 'COUPLED',
+  FAILED: 'FAILED'
+} as const
+
+export type TTSStatus = (typeof TTSStatus)[keyof typeof TTSStatus]
+
+
 export const ThemePreference = {
   LIGHT: 'LIGHT',
   DARK: 'DARK',

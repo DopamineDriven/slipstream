@@ -92,7 +92,7 @@ class ScriptGen extends Fs {
         [id]
       );
 
-      console.log(messagesResult.rows.length);
+      console.log(`message count: ${messagesResult.rows.length}`);
 
       const msgIds = messagesResult.rows.map(i => i.id);
 
@@ -404,10 +404,17 @@ if (
   process.argv[5] &&
   /^[a-z0-9]{24}$/.test(process.argv[5])
 ) {
+  const t0 = performance.now();
   const scriptGen = new ScriptGen();
   if (process.argv[7] && process.argv[7] === "true") {
-    scriptGen.gen(process.argv[3], process.argv[5], process.argv[7]);
+    scriptGen
+      .gen(process.argv[3], process.argv[5], process.argv[7])
+      .then(() => {
+        console.log(`completed in ${performance.now() - t0} ms`);
+      });
   } else {
-    scriptGen.gen(process.argv[3], process.argv[5]);
+    scriptGen.gen(process.argv[3], process.argv[5]).then(() => {
+      console.log(`completed in ${performance.now() - t0} ms`);
+    });
   }
 }

@@ -1,14 +1,15 @@
 import { relative } from "node:path";
-import type { UserConfig as Options } from "tsdown";
+import type { InlineConfig } from "tsdown";
 import { defineConfig } from "tsdown";
 
 export default defineConfig(
-  (options: Options) =>
+  options =>
     ({
       ...options,
       entry: [
         "src/index.ts",
         "src/codegen-types.ts",
+        "src/events-audio.ts",
         "src/events-images.ts",
         "src/events-workup.ts",
         "src/events.ts",
@@ -28,5 +29,5 @@ export default defineConfig(
       clean: true,
       outDir: "dist",
       unbundle: true
-    }) satisfies Options
+    }) satisfies InlineConfig
 );

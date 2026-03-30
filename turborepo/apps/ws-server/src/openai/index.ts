@@ -1,11 +1,10 @@
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
-import { LoggerService } from "@/logger/index.ts";
 import { OpenAIResponsesChatService } from "@/openai/responses-chat.ts";
-import { PrismaService } from "@/prisma/index.ts";
-import type { OpenAiModelIdUnion } from "@slipstream/types";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import { S3Storage } from "@slipstream/storage-s3";
+import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import type { S3Storage } from "@slipstream/storage-s3";
 
 export class OpenAIService extends OpenAIResponsesChatService {
   constructor(
@@ -19,20 +18,20 @@ export class OpenAIService extends OpenAIResponsesChatService {
     super(logger, prisma, userStoreVector, s3, redis, apiKey);
   }
   public async routeOpenAI({ model, ...rest }: ProviderOpenaiRequestEntity) {
-    const m = model as OpenAiModelIdUnion;
-    if (this.isImgGenModel(m)) {
+    if (!model || !this.isOpenAIModel(model)) return;
+    if (this.isImgGenNative(model)) {
       return this.handleOpenaiNativeImageRequestGptImage1({
-        model: m,
-        ...rest
+        ...rest,
+        model
       });
     } else if (
-      this.isImgGenFacilitating(m) &&
+      this.isImgGenFacilitating(model) &&
       typeof rest.imgGenFields !== "undefined" &&
       rest.imgGenEnabled === true
     ) {
-      return this.handleOpenaiResponsesImgGen({ model: m, ...rest });
+      return this.handleOpenaiResponsesImgGen({ model, ...rest });
     } else {
-      return this.handleOpenaiChatRequest({ model: m, ...rest });
+      return this.handleOpenaiChatRequest({ model, ...rest });
     }
   }
 }
