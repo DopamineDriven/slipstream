@@ -88,7 +88,7 @@
   "js/ts.implementationsCodeLens.showOnInterfaceMethods": true,
   "js/ts.locale": "en",
   "js/ts.referencesCodeLens.showOnAllFunctions": true,
-  "js/ts.experimental.useTsgo": false,
+  "js/ts.experimental.useTsgo": true,
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "yaml.hover": true,
   "markdown-pdf.margin.top": "0.5in",

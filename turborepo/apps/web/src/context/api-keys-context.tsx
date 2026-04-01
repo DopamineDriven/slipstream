@@ -36,6 +36,7 @@ function equalityCheck(
   const p = [
     "anthropic",
     "gemini",
+    "mistral",
     "openai",
     "meta",
     "vercel",

@@ -451,7 +451,7 @@ export class PrismaAttachmentProviderService extends PrismaUserMetaService {
       })
     );
   }
-  
+
   public async hasProviderAttachmentFile(
     attachmentId: string,
     providerRef: string,
@@ -466,7 +466,7 @@ export class PrismaAttachmentProviderService extends PrismaUserMetaService {
   public async getTargetedAtt(id: string) {
     const attachment = await this.prismaClient.attachment.findUniqueOrThrow({
       where: { id },
-      include: { image: true, document: true, imageGenOutput: true }
+      include: { image: true, document: true, imageGenOutput: true, audio: true }
     });
     const att = {
       ...attachment,
@@ -478,7 +478,7 @@ export class PrismaAttachmentProviderService extends PrismaUserMetaService {
   public async getManyAttachments(ids: string[]) {
     const attachments = await this.prismaClient.attachment.findMany({
       where: { id: { in: ids } },
-      include: { image: true, document: true, imageGenOutput: true }
+      include: { image: true, document: true, audio: true, imageGenOutput: true }
     });
 
     return attachments.map(v => {

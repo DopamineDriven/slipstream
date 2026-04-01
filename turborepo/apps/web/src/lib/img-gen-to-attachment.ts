@@ -4,6 +4,7 @@ import type {
   AttachmentSingleton
 } from "@slipstream/types";
 
+
 function imgGenToAttachmentWorkup(
   tt:
     | AIChatResponseImgGenSubFields[]
@@ -26,6 +27,7 @@ function imgGenToAttachmentWorkup(
         checksumAlgo: t.checksumAlgo,
         checksumSha256: t.checksumSha256,
         compatCdnUrl: t.compatCdnUrl,
+        audio: null,
         compatExt: t.compatExt,
         id: `attachment-${t.itemId ?? t.seriesId}-${t.index}`,
         compatKey: t.compatKey,
@@ -87,7 +89,7 @@ function imgGenToAttachmentWorkup(
       batchId: null,
       bucket: t.bucket,
       cacheControl: t.cacheControl,
-      cdnUrl: t.cdnUrl,
+      cdnUrl: t.cdnUrl,audio: null,
       checksumAlgo: t.checksumAlgo,
       checksumSha256: t.checksumSha256,
       compatCdnUrl: t.compatCdnUrl,

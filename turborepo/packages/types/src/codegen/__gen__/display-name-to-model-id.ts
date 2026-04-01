@@ -107,5 +107,10 @@ export const displayNameToModelId = {
   vercel: {
     "v0 medium": "v0-1.5-md",
     "v0 medium (legacy)": "v0-1.0-md"
+  },
+  mistral: {
+    "Mistral Small 4": "mistral-small-latest",
+    "Mistral Medium Latest": "mistral-medium-latest",
+    "Mistral Large Latest": "mistral-large-latest"
   }
 } as const;

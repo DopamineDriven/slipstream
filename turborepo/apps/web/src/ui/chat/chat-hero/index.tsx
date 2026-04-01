@@ -51,9 +51,9 @@ function getTimeOfDay(tz = "america/chicago", username?: string | null) {
   const [hour, _min, _sec] = time.split(/:/).map(t => Number.parseInt(t));
   if (!hour) return `What's on your mind, ${u}?`;
   else if (hour >= 5 && hour < 12) return `Ask away, ${u}.`;
-  else if (hour >= 12 && hour < 17) return `What's on your mind today, ${u}?`;
+  else if (hour >= 12 && hour < 17) return `Turtles all the way down, ${u}?`;
   else if (hour >= 17 && hour <= 23)
-    return `What's on your mind tonight, ${u}?`;
+    return `Penny for your thoughts?`;
   else return `Hello, Nightowl!`;
 }
 export function ChatHero({
@@ -73,13 +73,13 @@ export function ChatHero({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-      
+
         className="mb-8 text-center">
         <Logo className="mx-auto mb-4 size-16 stroke-current text-current sm:size-20 lg:size-24 [&_path]:stroke-current" />
-        <h1 className="text-foreground/95 mb-2 text-base font-medium sm:text-lg">
+        <h1 className="text-foreground/95 mb-2 text-sm font-medium sm:text-base">
           {getTimeOfDay(tz, user.name)}
         </h1>
-        <p className="text-foreground/85 text-lg sm:text-xl">
+        <p className="text-foreground/85 text-md sm:text-lg">
           {`Start a conversation with ${selectedModel.displayName}`}
         </p>
       </motion.div>

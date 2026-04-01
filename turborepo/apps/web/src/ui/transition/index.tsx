@@ -10,6 +10,7 @@ import {
   AnthropicIcon,
   GeminiIcon,
   MetaIcon,
+  MistralIcon,
   OpenAiIcon,
   VercelIcon as v0Icon,
   XAiIcon
@@ -26,6 +27,7 @@ const PROVIDERS = [
   { id: "openai", label: "OpenAI", colorVar: "var(--hue-3)", Icon: OpenAiIcon },
   { id: "grok", label: "grok", colorVar: "var(--hue-4)", Icon: XAiIcon },
   { id: "vercel", label: "vercel", colorVar: "#000000", Icon: v0Icon },
+  { id: "mistral", label: "Mistral", colorVar: "#FF7000", Icon: MistralIcon },
   {
     id: "meta",
     label: "meta",
@@ -39,6 +41,7 @@ const initialOrder = [
   "gemini",
   "openai",
   "grok",
+  "mistral",
   "meta",
   "vercel"
 ] satisfies Provider[];
@@ -59,7 +62,8 @@ export function Reordering() {
       openai: PROVIDERS[2],
       grok: PROVIDERS[3],
       vercel: PROVIDERS[4],
-      meta: PROVIDERS[5]
+      meta: PROVIDERS[6],
+      mistral: PROVIDERS[5]
     };
     return map;
   }, []);

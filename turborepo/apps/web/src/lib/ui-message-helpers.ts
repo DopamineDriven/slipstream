@@ -2,9 +2,43 @@
 import type {
   AIChatResponseImgGenFieldsFinal,
   AttachmentSingleton,
+  ChatChunkAndResMsgBlock,
+  MessageBlockSingleton,
   MessageSingleton
 } from "@slipstream/types";
 import { normalizeImgGenFields } from "./img-gen-to-attachment";
+
+export function toMessageBlocks(
+  messageId: string,
+  blocks?: ChatChunkAndResMsgBlock[] | MessageBlockSingleton<true>[] | null
+) {
+  if (!blocks || blocks.length === 0) {
+    return undefined;
+  }
+
+  const now = new Date();
+
+  return blocks.map(block => {
+    if ("messageId" in block) {
+      return {
+        ...block,
+        messageId
+      } satisfies MessageBlockSingleton<true>;
+    }
+
+    return {
+      id: `${messageId}-block-${block.ordinal}`,
+      conversationId: block.conversationId,
+      messageId,
+      ordinal: block.ordinal,
+      content: block.content,
+      type: block.type,
+      durationMs: block.durationMs,
+      createdAt: now,
+      updatedAt: now
+    } satisfies MessageBlockSingleton<true>;
+  });
+}
 
 /**
  * Creates a properly typed MessageSingleton for user messages
@@ -39,7 +73,8 @@ export function createUserMessage(
     disliked: params.disliked ?? null,
     tryAgain: params.tryAgain ?? null,
     imageGenJob: params.imageGenJob ?? null,
-    attachments: params.attachments ?? []
+    attachments: params.attachments ?? [],
+    messageBlocks: params.messageBlocks
   };
 }
 
@@ -76,7 +111,8 @@ export function createAIMessage(
     tryAgain: params.tryAgain ?? null,
     messageType: params.messageType,
     imageGenJob: params.imageGenJob ?? null,
-    attachments: params.attachments ?? []
+    attachments: params.attachments ?? [],
+    messageBlocks: params.messageBlocks
   };
 }
 
@@ -92,6 +128,7 @@ export function finalizeStreamingMessage(
     aiMsgId?: string;
     imgGenAttachmentId?: string;
     imgGenFields?: AIChatResponseImgGenFieldsFinal | null;
+    messageBlocks?: MessageBlockSingleton<true>[];
   }
 ): MessageSingleton<true> {
   const arr = Array.of<AttachmentSingleton<true>>();
@@ -124,6 +161,12 @@ export function finalizeStreamingMessage(
     thinkingText: additionalData?.thinkingText ?? streamingMessage.thinkingText,
     thinkingDuration:
       additionalData?.thinkingDuration ?? streamingMessage.thinkingDuration,
+    messageBlocks:
+      additionalData?.messageBlocks ??
+      toMessageBlocks(
+        additionalData?.aiMsgId ?? streamingMessage.id.replace("streaming-", ""),
+        streamingMessage.messageBlocks
+      ),
     updatedAt: new Date(),
     attachments: arr.length > 0 ? arr : streamingMessage.attachments
   };

@@ -401,6 +401,7 @@ export const ModelName = {
   ConversationMemoryContext: 'ConversationMemoryContext',
   ConversationMemoryChunk: 'ConversationMemoryChunk',
   Message: 'Message',
+  MessageBlock: 'MessageBlock',
   Profile: 'Profile',
   AttachmentProvider: 'AttachmentProvider',
   ProviderStore: 'ProviderStore',
@@ -430,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "localVectorStore" | "localVectorStoreDoc" | "localVectorStoreDocChunk" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
+    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "localVectorStore" | "localVectorStoreDoc" | "localVectorStoreDocChunk" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "messageBlock" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1673,6 +1674,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.MessageCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.MessageCountAggregateOutputType> | number
+        }
+      }
+    }
+    MessageBlock: {
+      payload: Prisma.$MessageBlockPayload<ExtArgs>
+      fields: Prisma.MessageBlockFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MessageBlockFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageBlockPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MessageBlockFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageBlockPayload>
+        }
+        findFirst: {
+          args: Prisma.MessageBlockFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageBlockPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MessageBlockFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageBlockPayload>
+        }
+        findMany: {
+          args: Prisma.MessageBlockFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageBlockPayload>[]
+        }
+        create: {
+          args: Prisma.MessageBlockCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageBlockPayload>
+        }
+        createMany: {
+          args: Prisma.MessageBlockCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MessageBlockCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageBlockPayload>[]
+        }
+        delete: {
+          args: Prisma.MessageBlockDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageBlockPayload>
+        }
+        update: {
+          args: Prisma.MessageBlockUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageBlockPayload>
+        }
+        deleteMany: {
+          args: Prisma.MessageBlockDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MessageBlockUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MessageBlockUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageBlockPayload>[]
+        }
+        upsert: {
+          args: Prisma.MessageBlockUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageBlockPayload>
+        }
+        aggregate: {
+          args: Prisma.MessageBlockAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMessageBlock>
+        }
+        groupBy: {
+          args: Prisma.MessageBlockGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MessageBlockGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MessageBlockCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MessageBlockCountAggregateOutputType> | number
         }
       }
     }
@@ -3223,6 +3298,21 @@ export const MessageScalarFieldEnum = {
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
 
 
+export const MessageBlockScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  messageId: 'messageId',
+  ordinal: 'ordinal',
+  content: 'content',
+  type: 'type',
+  durationMs: 'durationMs',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MessageBlockScalarFieldEnum = (typeof MessageBlockScalarFieldEnum)[keyof typeof MessageBlockScalarFieldEnum]
+
+
 export const ProfileScalarFieldEnum = {
   id: 'id',
   bio: 'bio',
@@ -3934,6 +4024,20 @@ export type ListEnumMessageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'MessageBlockType'
+ */
+export type EnumMessageBlockTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageBlockType'>
+    
+
+
+/**
+ * Reference to a field of type 'MessageBlockType[]'
+ */
+export type ListEnumMessageBlockTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageBlockType[]'>
+    
+
+
+/**
  * Reference to a field of type 'ProviderAssetState'
  */
 export type EnumProviderAssetStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProviderAssetState'>
@@ -4184,6 +4288,7 @@ export type GlobalOmitConfig = {
   conversationMemoryContext?: Prisma.ConversationMemoryContextOmit
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkOmit
   message?: Prisma.MessageOmit
+  messageBlock?: Prisma.MessageBlockOmit
   profile?: Prisma.ProfileOmit
   attachmentProvider?: Prisma.AttachmentProviderOmit
   providerStore?: Prisma.ProviderStoreOmit

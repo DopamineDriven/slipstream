@@ -47,7 +47,7 @@ export function ImageGenCostSlider({
         min={min}
         max={max}
         step={1}>
-        <Slider.Track className="bg-muted-foreground relative h-[3px] grow rounded-full">
+        <Slider.Track className="bg-muted-foreground relative h-0.75 grow rounded-full">
           <Slider.Range className="bg-primary absolute h-full rounded-full" />
         </Slider.Track>
         <Slider.Thumb

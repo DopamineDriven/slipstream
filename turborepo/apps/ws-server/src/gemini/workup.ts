@@ -277,7 +277,8 @@ export class GeminiWorkupService extends FileSearchStoreService {
               ) {
                 if (
                   m === "gemini-3.1-pro-preview" ||
-                  m === "gemini-3.1-pro-preview-customtools"
+                  m === "gemini-3.1-pro-preview-customtools" ||
+                  m === "gemini-3.1-flash-lite-preview"
                 ) {
                   const { fileUri, mimeType } = await this.ensureAssetUploaded(
                     attachment,
@@ -309,7 +310,19 @@ export class GeminiWorkupService extends FileSearchStoreService {
             }
           }
         }
-        partArr.push({ text: msg.content });
+        const blockAgg = Array.of<string>();
+        if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+          for (const block of msg.messageBlocks) {
+            if (block.type === "TEXT") {
+              blockAgg.push(block.content);
+            }
+          }
+        }
+        if (blockAgg.length > 0) {
+          partArr.push({ text: blockAgg.join(`\n`) });
+        } else {
+          partArr.push({ text: msg.content });
+        }
         formatted.push({ role: "user", parts: partArr } as const);
       } else {
         // AI message - may have AI-generated attachments
@@ -348,11 +361,19 @@ export class GeminiWorkupService extends FileSearchStoreService {
             }
           }
         }
-
-        partArr.push({
-          text: `${modelIdentifier}\n${msg.content}`
-        });
-
+        const blockAgg = Array.of<string>();
+        if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+          for (const block of msg.messageBlocks) {
+            if (block.type === "TEXT") {
+              blockAgg.push(block.content);
+            }
+          }
+        }
+        if (blockAgg.length > 0) {
+          partArr.push({ text: `${modelIdentifier}\n${blockAgg.join(`\n`)}` });
+        } else {
+          partArr.push({ text: `${modelIdentifier}\n${msg.content}` });
+        }
         formatted.push({
           role: "model",
           parts: partArr
@@ -593,13 +614,16 @@ export class GeminiWorkupService extends FileSearchStoreService {
     return {
       name: "user_store_search",
       description:
-        "Search the user's uploaded documents. Uses semantic similarity by default. " +
-        "When search_terms is provided, also performs fulltext keyword search and returns " +
+        "This tool utilizes a 'Partitioned Foraging' approach which recognizes that for the 200,000+ years that humans have existed " +
+        "95%+ of it has been as foragers. Agents are trained exclusively on data aggregated/curated by humans; " +
+        "think of it as agentic foraging complete with Jaccard similarity scores for cross-analyzing your bounties. " +
+        "Search the user's uploaded documents. The tool uses semantic similarity by default. " +
+        "When search_terms is provided, the tool also performs fulltext keyword search and returns " +
         "both result sets separately (semantic + fulltext) so you can reason about which signal " +
         "is most relevant to the user's intent. " +
         "Without search_terms: returns a flat JSON array of chunks. " +
         "With search_terms: returns { semantic: [...], fulltext: [...], overlap: { chunkIds, jaccardSimilarity }, meta }. " +
-        "Call directly for single retrieval tasks, or from code_execution for multi-step programmatic workflows.",
+        "Use as liberally or conservatively as you see fit.",
       parameters: {
         type: Type.OBJECT,
         properties: {
@@ -971,9 +995,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }: GenerateContentResponseProps) {
     const m = model as GeminiModelIdUnion;
     if (
-      (m === "gemini-2.5-flash-image" ||
-        m === "gemini-3-pro-image-preview" ||
-        m === "gemini-3.1-flash-image-preview") &&
+      this.prisma.geminiNanoBananasModel(m) &&
       typeof imgGenFields !== "undefined"
     ) {
       return this.contentGenNanoBananas({

@@ -328,6 +328,7 @@ export type MessageWhereInput = {
   tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
+  messageBlocks?: Prisma.MessageBlockListRelationFilter
   ttsJob?: Prisma.XOR<Prisma.TTSJobNullableScalarRelationFilter, Prisma.TTSJobWhereInput> | null
   userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
   attachments?: Prisma.AttachmentListRelationFilter
@@ -356,6 +357,7 @@ export type MessageOrderByWithRelationInput = {
   tryAgain?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  messageBlocks?: Prisma.MessageBlockOrderByRelationAggregateInput
   ttsJob?: Prisma.TTSJobOrderByWithRelationInput
   userKey?: Prisma.UserKeyOrderByWithRelationInput
   attachments?: Prisma.AttachmentOrderByRelationAggregateInput
@@ -387,6 +389,7 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
+  messageBlocks?: Prisma.MessageBlockListRelationFilter
   ttsJob?: Prisma.XOR<Prisma.TTSJobNullableScalarRelationFilter, Prisma.TTSJobWhereInput> | null
   userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
   attachments?: Prisma.AttachmentListRelationFilter
@@ -464,6 +467,7 @@ export type MessageCreateInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutSourceMessageInput
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
@@ -492,6 +496,7 @@ export type MessageUncheckedCreateInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
@@ -514,6 +519,7 @@ export type MessageUpdateInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUpdateOneWithoutSourceMessageNestedInput
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
@@ -542,6 +548,7 @@ export type MessageUncheckedUpdateInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
@@ -812,6 +819,20 @@ export type EnumMessageTypeFieldUpdateOperationsInput = {
   set?: $Enums.MessageType
 }
 
+export type MessageCreateNestedOneWithoutMessageBlocksInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutMessageBlocksInput, Prisma.MessageUncheckedCreateWithoutMessageBlocksInput>
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutMessageBlocksInput
+  connect?: Prisma.MessageWhereUniqueInput
+}
+
+export type MessageUpdateOneRequiredWithoutMessageBlocksNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutMessageBlocksInput, Prisma.MessageUncheckedCreateWithoutMessageBlocksInput>
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutMessageBlocksInput
+  upsert?: Prisma.MessageUpsertWithoutMessageBlocksInput
+  connect?: Prisma.MessageWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutMessageBlocksInput, Prisma.MessageUpdateWithoutMessageBlocksInput>, Prisma.MessageUncheckedUpdateWithoutMessageBlocksInput>
+}
+
 export type MessageCreateNestedOneWithoutTtsJobInput = {
   create?: Prisma.XOR<Prisma.MessageCreateWithoutTtsJobInput, Prisma.MessageUncheckedCreateWithoutTtsJobInput>
   connectOrCreate?: Prisma.MessageCreateOrConnectWithoutTtsJobInput
@@ -885,6 +906,7 @@ export type MessageCreateWithoutAttachmentsInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutSourceMessageInput
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
@@ -912,6 +934,7 @@ export type MessageUncheckedCreateWithoutAttachmentsInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
 }
@@ -949,6 +972,7 @@ export type MessageUpdateWithoutAttachmentsInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUpdateOneWithoutSourceMessageNestedInput
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
@@ -976,6 +1000,7 @@ export type MessageUncheckedUpdateWithoutAttachmentsInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
 }
@@ -997,6 +1022,7 @@ export type MessageCreateWithoutConversationInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutSourceMessageInput
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
@@ -1023,6 +1049,7 @@ export type MessageUncheckedCreateWithoutConversationInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
@@ -1096,6 +1123,7 @@ export type MessageCreateWithoutImageGenJobInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutSourceMessageInput
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
@@ -1123,6 +1151,7 @@ export type MessageUncheckedCreateWithoutImageGenJobInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
 }
@@ -1160,6 +1189,7 @@ export type MessageUpdateWithoutImageGenJobInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUpdateOneWithoutSourceMessageNestedInput
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
@@ -1187,6 +1217,7 @@ export type MessageUncheckedUpdateWithoutImageGenJobInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
 }
@@ -1208,6 +1239,7 @@ export type MessageCreateWithoutConversationMemoryChunkInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutSourceMessageInput
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
@@ -1234,6 +1266,7 @@ export type MessageUncheckedCreateWithoutConversationMemoryChunkInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
@@ -1265,6 +1298,122 @@ export type MessageUpdateManyWithWhereWithoutConversationMemoryChunkInput = {
   data: Prisma.XOR<Prisma.MessageUpdateManyMutationInput, Prisma.MessageUncheckedUpdateManyWithoutConversationMemoryChunkInput>
 }
 
+export type MessageCreateWithoutMessageBlocksInput = {
+  id?: string
+  userId?: string | null
+  senderType?: $Enums.SenderType
+  provider: $Enums.Provider
+  model?: string | null
+  content: string
+  thinkingText?: string | null
+  thinkingDuration?: number | null
+  responseOutput?: string | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ttsJob?: Prisma.TTSJobCreateNestedOneWithoutSourceMessageInput
+  userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
+  imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
+}
+
+export type MessageUncheckedCreateWithoutMessageBlocksInput = {
+  id?: string
+  conversationId: string
+  userId?: string | null
+  senderType?: $Enums.SenderType
+  provider: $Enums.Provider
+  model?: string | null
+  userKeyId?: string | null
+  content: string
+  conversationMemoryChunkId?: string | null
+  thinkingText?: string | null
+  thinkingDuration?: number | null
+  responseOutput?: string | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
+  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+}
+
+export type MessageCreateOrConnectWithoutMessageBlocksInput = {
+  where: Prisma.MessageWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessageCreateWithoutMessageBlocksInput, Prisma.MessageUncheckedCreateWithoutMessageBlocksInput>
+}
+
+export type MessageUpsertWithoutMessageBlocksInput = {
+  update: Prisma.XOR<Prisma.MessageUpdateWithoutMessageBlocksInput, Prisma.MessageUncheckedUpdateWithoutMessageBlocksInput>
+  create: Prisma.XOR<Prisma.MessageCreateWithoutMessageBlocksInput, Prisma.MessageUncheckedCreateWithoutMessageBlocksInput>
+  where?: Prisma.MessageWhereInput
+}
+
+export type MessageUpdateToOneWithWhereWithoutMessageBlocksInput = {
+  where?: Prisma.MessageWhereInput
+  data: Prisma.XOR<Prisma.MessageUpdateWithoutMessageBlocksInput, Prisma.MessageUncheckedUpdateWithoutMessageBlocksInput>
+}
+
+export type MessageUpdateWithoutMessageBlocksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ttsJob?: Prisma.TTSJobUpdateOneWithoutSourceMessageNestedInput
+  userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
+  imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
+}
+
+export type MessageUncheckedUpdateWithoutMessageBlocksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
+  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+}
+
 export type MessageCreateWithoutTtsJobInput = {
   id?: string
   userId?: string | null
@@ -1282,6 +1431,7 @@ export type MessageCreateWithoutTtsJobInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockCreateNestedManyWithoutMessageInput
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
@@ -1309,6 +1459,7 @@ export type MessageUncheckedCreateWithoutTtsJobInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedCreateNestedManyWithoutMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
 }
@@ -1346,6 +1497,7 @@ export type MessageUpdateWithoutTtsJobInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUpdateManyWithoutMessageNestedInput
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
@@ -1373,6 +1525,7 @@ export type MessageUncheckedUpdateWithoutTtsJobInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedUpdateManyWithoutMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
 }
@@ -1394,6 +1547,7 @@ export type MessageCreateWithoutUserKeyInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
@@ -1420,6 +1574,7 @@ export type MessageUncheckedCreateWithoutUserKeyInput = {
   tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
@@ -1489,6 +1644,7 @@ export type MessageUpdateWithoutConversationInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUpdateOneWithoutSourceMessageNestedInput
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
@@ -1515,6 +1671,7 @@ export type MessageUncheckedUpdateWithoutConversationInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
@@ -1558,6 +1715,7 @@ export type MessageUpdateWithoutConversationMemoryChunkInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUpdateOneWithoutSourceMessageNestedInput
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
@@ -1584,6 +1742,7 @@ export type MessageUncheckedUpdateWithoutConversationMemoryChunkInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
@@ -1669,6 +1828,7 @@ export type MessageUpdateWithoutUserKeyInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
@@ -1695,6 +1855,7 @@ export type MessageUncheckedUpdateWithoutUserKeyInput = {
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
@@ -1727,10 +1888,12 @@ export type MessageUncheckedUpdateManyWithoutUserKeyInput = {
  */
 
 export type MessageCountOutputType = {
+  messageBlocks: number
   attachments: number
 }
 
 export type MessageCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  messageBlocks?: boolean | MessageCountOutputTypeCountMessageBlocksArgs
   attachments?: boolean | MessageCountOutputTypeCountAttachmentsArgs
 }
 
@@ -1742,6 +1905,13 @@ export type MessageCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
    * Select specific fields to fetch from the MessageCountOutputType
    */
   select?: Prisma.MessageCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * MessageCountOutputType without action
+ */
+export type MessageCountOutputTypeCountMessageBlocksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageBlockWhereInput
 }
 
 /**
@@ -1772,6 +1942,7 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   tryAgain?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  messageBlocks?: boolean | Prisma.Message$messageBlocksArgs<ExtArgs>
   ttsJob?: boolean | Prisma.Message$ttsJobArgs<ExtArgs>
   userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
   attachments?: boolean | Prisma.Message$attachmentsArgs<ExtArgs>
@@ -1855,6 +2026,7 @@ export type MessageSelectScalar = {
 
 export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "senderType" | "provider" | "model" | "userKeyId" | "content" | "conversationMemoryChunkId" | "thinkingText" | "thinkingDuration" | "responseOutput" | "isImageGen" | "messageType" | "liked" | "disliked" | "tryAgain" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  messageBlocks?: boolean | Prisma.Message$messageBlocksArgs<ExtArgs>
   ttsJob?: boolean | Prisma.Message$ttsJobArgs<ExtArgs>
   userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
   attachments?: boolean | Prisma.Message$attachmentsArgs<ExtArgs>
@@ -1877,6 +2049,7 @@ export type MessageIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Message"
   objects: {
+    messageBlocks: Prisma.$MessageBlockPayload<ExtArgs>[]
     ttsJob: Prisma.$TTSJobPayload<ExtArgs> | null
     userKey: Prisma.$UserKeyPayload<ExtArgs> | null
     attachments: Prisma.$AttachmentPayload<ExtArgs>[]
@@ -2298,6 +2471,7 @@ readonly fields: MessageFieldRefs;
  */
 export interface Prisma__MessageClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  messageBlocks<T extends Prisma.Message$messageBlocksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$messageBlocksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessageBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ttsJob<T extends Prisma.Message$ttsJobArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$ttsJobArgs<ExtArgs>>): Prisma.Prisma__TTSJobClient<runtime.Types.Result.GetResult<Prisma.$TTSJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   userKey<T extends Prisma.Message$userKeyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$userKeyArgs<ExtArgs>>): Prisma.Prisma__UserKeyClient<runtime.Types.Result.GetResult<Prisma.$UserKeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   attachments<T extends Prisma.Message$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2759,6 +2933,30 @@ export type MessageDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Messages to delete.
    */
   limit?: number
+}
+
+/**
+ * Message.messageBlocks
+ */
+export type Message$messageBlocksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessageBlock
+   */
+  select?: Prisma.MessageBlockSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MessageBlock
+   */
+  omit?: Prisma.MessageBlockOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageBlockInclude<ExtArgs> | null
+  where?: Prisma.MessageBlockWhereInput
+  orderBy?: Prisma.MessageBlockOrderByWithRelationInput | Prisma.MessageBlockOrderByWithRelationInput[]
+  cursor?: Prisma.MessageBlockWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageBlockScalarFieldEnum | Prisma.MessageBlockScalarFieldEnum[]
 }
 
 /**

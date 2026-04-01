@@ -73,7 +73,7 @@ export class GrokImgGenService extends GrokCollectionsService {
     }
 
     return {
-      prompt: getUserMsg.content,
+      prompt: this.messageText(getUserMsg),
       images
     } as const;
   }
@@ -356,6 +356,15 @@ export class GrokImgGenService extends GrokCollectionsService {
       totalDur = 0,
       grokAgg = "",
       grokChunks = Array.of<string>();
+    let nextOrdinal = 0;
+
+    const roundTrack = Array.of<{
+      type: "TEXT";
+      content: string;
+      durationMs: number;
+      ordinal: number;
+      conversationId: string;
+    }>();
 
     const provider = "grok" as const;
 
@@ -385,6 +394,15 @@ export class GrokImgGenService extends GrokCollectionsService {
       grokChunks.push(grokAgg);
       // fire off the very first message for UX
       if (text) {
+        const currentMessageBlock = {
+          type: "TEXT",
+          content: text,
+          durationMs: 0,
+          ordinal: nextOrdinal,
+          conversationId
+        } as const;
+        roundTrack.push(currentMessageBlock);
+        nextOrdinal += 1;
         grokAgg += text;
         grokChunks.push(grokAgg);
 
@@ -404,6 +422,7 @@ export class GrokImgGenService extends GrokCollectionsService {
             model: m,
             imgGenEnabled: true,
             chunk: grokAgg,
+            messageBlocks: currentMessageBlock,
             done: false
           } satisfies EventTypeMap["ai_chat_chunk"])
         );
@@ -569,6 +588,7 @@ export class GrokImgGenService extends GrokCollectionsService {
           systemPrompt,
           thinkingDuration: undefined,
           thinkingText: undefined,
+          messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
           temperature,
           topP,
           imgGenEnabled: true,
@@ -622,6 +642,7 @@ export class GrokImgGenService extends GrokCollectionsService {
             model: m,
             chunk: grokAgg,
             done: true,
+            messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
             imgGenEnabled: true,
             imgGenFields: {
               partialImages: undefined,
@@ -663,6 +684,7 @@ export class GrokImgGenService extends GrokCollectionsService {
           title,
           thinkingDuration: undefined,
           thinkingText: undefined,
+          messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
           topP,
           provider,
           model: m,

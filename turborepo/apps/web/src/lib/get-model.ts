@@ -18,7 +18,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "gemini-2.5-flash" as const as NonNullable<K>;
+      } else return "gemini-3.1-pro-preview" as const as NonNullable<K>;
     }
     case "grok": {
       if (
@@ -26,7 +26,7 @@ export const getModel = <
         providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"grok">)
       ) {
         return model;
-      } else return "grok-4-fast-reasoning" as const as NonNullable<K>;
+      } else return "grok-4.20-0309-reasoning" as const as NonNullable<K>;
     }
     case "anthropic": {
       if (
@@ -36,7 +36,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "claude-sonnet-4-5-20250929" as const as NonNullable<K>;
+      } else return "claude-sonnet-4-6" as const as NonNullable<K>;
     }
     case "meta": {
       if (
@@ -54,7 +54,17 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "v0-1.0-md" as const as NonNullable<K>;
+      } else return "v0-1.5-md" as const as NonNullable<K>;
+    }
+        case "mistral": {
+      if (
+        model &&
+        providerModelChatApi[xTarget].includes(
+          model as GetModelUtilRT<"mistral">
+        )
+      ) {
+        return model;
+      } else return "mistral-small-latest" as const as NonNullable<K>;
     }
     case "openai":
     default: {
@@ -65,7 +75,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "gpt-5-nano" as const as NonNullable<K>;
+      } else return "gpt-5.4" as const as NonNullable<K>;
     }
   }
 };

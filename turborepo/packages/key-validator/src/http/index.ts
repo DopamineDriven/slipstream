@@ -15,6 +15,7 @@ export class KeyValidator {
     "https://generativelanguage.googleapis.com/v1beta/models";
   private llama_url = "https://api.llama.com/v1/models";
   private v0_url = "https://ai-gateway.vercel.sh/v1/models";
+  private mistral_url = "https://api.mistral.ai/v1/models";
   constructor(
     private apiKey: string,
     private provider: FlexiProvider
@@ -35,6 +36,16 @@ export class KeyValidator {
       case "gemini": {
         return (await fetch(`${url}?key=${apiKey}`)) satisfies Response;
       }
+      case "GROK":
+      case "grok":
+      case "META":
+      case "MISTRAL":
+      case "mistral":
+      case "meta":
+      case "OPENAI":
+      case "openai":
+      case "VERCEL":
+      case "vercel":
       default: {
         return (await fetch(url, {
           headers: { Authorization: `Bearer ${apiKey}` }
@@ -74,6 +85,26 @@ export class KeyValidator {
       return {
         isValid: false,
         message: `invalid_api_key__vercel__${res.status}`
+      };
+    }
+  }
+
+  private async mistral() {
+    const res = await this.callRest(this.apiKey, this.mistral_url);
+    if (res.ok) {
+      return {
+        isValid: true,
+        message: `valid_api_key__mistral__${res.status}`
+      };
+    } else if (res.status === 429) {
+      return {
+        isValid: true,
+        message: `valid_api_key__mistral__${res.status}`
+      };
+    } else {
+      return {
+        isValid: false,
+        message: `invalid_api_key__mistral__${res.status}`
       };
     }
   }
@@ -203,6 +234,10 @@ export class KeyValidator {
       case "VERCEL":
       case "vercel": {
         return await this.v0();
+      }
+      case "MISTRAL":
+      case "mistral": {
+        return await this.mistral();
       }
       case "GROK":
       case "grok":

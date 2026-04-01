@@ -39,7 +39,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
     return await this.prismaClient.conversation.findUnique({
       where: { id: conversationId },
       include: {
-        messages: { orderBy: { createdAt: "asc" } },
+        messages: { orderBy: { createdAt: "asc" },include: {messageBlocks: true} },
         conversationSettings: true
       }
     });
@@ -142,9 +142,10 @@ export class PrismaUserMessageService extends ErrorHelperService {
           orderBy: { createdAt: "asc" },
           include: {
             imageGenJob: true,
+            messageBlocks: true,
             attachments: {
               orderBy: { createdAt: "asc" },
-              include: { image: true, document: true, imageGenOutput: true }
+              include: { image: true, document: true, imageGenOutput: true, audio: true }
             }
           }
         },

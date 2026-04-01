@@ -6,6 +6,7 @@ import {
 } from "@/types/index.ts";
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
+import * as DATA from "./__out__/v0-results.json" with { type: "json" };
 
 dotenv.config({ quiet: true });
 
@@ -52,6 +53,14 @@ async function grokFetcher() {
   });
 }
 
+async function mistralFetcher() {
+  return await fetch("https://api.mistral.ai/v1/models", {
+    headers: {
+      Authorization: `Bearer ${process.env.MISTRAL_API_KEY ?? ""}`
+    }
+  });
+}
+
 async function geminiFetcher() {
   const gemini = await fetch(
     `https://generativelanguage.googleapis.com/v1alpha/models?key=${process.env.GOOGLE_API_KEY ?? ""}&pageSize=1000`
@@ -62,19 +71,24 @@ async function geminiFetcher() {
 
 const fs = new Fs(process.cwd());
 (async () => {
-  const v0Data = (await v0Fetcher()) as Response;
-  const llamaData = (await llamaFetcher()) as Response;
+  const v0Data = await v0Fetcher();
+  const llamaData = await llamaFetcher();
   const data = await anthropicFetcher();
   const openAiData = await openAiFetcher();
   const geminiData = await geminiFetcher();
   const grokData = await grokFetcher();
-  const parseV0 = JSON.parse(await v0Data.text()) as Record<string, any>;
-  const parseLlama = JSON.parse(await llamaData.text()) as Record<string, any>;
+  const mistralData = await mistralFetcher();
+
+  const parseV0 = JSON.parse<Record<string, any>>(await v0Data.text());
+  const parseLlama = JSON.parse<Record<string, any>>(await llamaData.text());
+  const parseMistral = JSON.parse<Record<string, any>>(
+    await mistralData.text()
+  );
   const parseGemini = JSON.parse(await geminiData.text()) as GeminiResponse;
   const parseOpenAi = JSON.parse(await openAiData.text()) as OpenAiResponse;
   const parseGrok = JSON.parse(await grokData.text()) as GrokModelsResponse;
   const parseIt = JSON.parse(await data.text()) as AnthropicResponse;
-const openaiSorted = parseOpenAi.data?.sort((o,p) => o.created - p.created);
+  const openaiSorted = parseOpenAi.data?.sort((o, p) => o.created - p.created);
   fs.withWs(
     "src/test/__out__/llama-results.json",
     JSON.stringify(parseLlama, null, 2)
@@ -98,6 +112,10 @@ const openaiSorted = parseOpenAi.data?.sort((o,p) => o.created - p.created);
   fs.withWs(
     "src/test/__out__/grok-results.json",
     JSON.stringify(parseGrok, null, 2)
+  );
+  fs.withWs(
+    "src/test/__out__/mistral-results.json",
+    JSON.stringify(parseMistral, null, 2)
   );
   return parseIt;
 })();
@@ -130,6 +148,4 @@ function _prettyModelName(id: string): string {
     .join(" ");
 }
 
-import * as DATA from "./__out__/v0-results.json" with {type: "json"};
-
-console.log(DATA.default.data.length)
+console.log(DATA.default.data.length);

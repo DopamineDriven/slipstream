@@ -2,6 +2,7 @@ import { AnthropicService } from "@/anthropic/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { LlamaService } from "@/meta/index.ts";
+import { MistralService } from "@/mistral/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -23,7 +24,9 @@ export type ProviderNarrowing<P extends Provider> = P extends "openai"
           ? v0Service
           : P extends "meta"
             ? LlamaService
-            : never;
+            : P extends "mistral"
+              ? MistralService
+              : never;
 
 export interface ProviderMap {
   anthropic: AnthropicService;
@@ -32,6 +35,7 @@ export interface ProviderMap {
   meta: LlamaService;
   vercel: v0Service;
   grok: xAIService;
+  mistral: MistralService;
 }
 
 export type ProviderNarrowed<T extends keyof ProviderMap> = {
@@ -88,6 +92,7 @@ export interface ProviderOpts extends Partial<ProviderMap> {
     vercel?: string;
     grok?: string;
     grokMgmtKey?: string;
+    mistral?: string;
   };
 }
 export function ProviderBaseMixin<TBase extends Constructor>(Base: TBase) {
@@ -245,6 +250,72 @@ export function GeminiMixin<
       return !!(
         this.gem ??
         (this.constructor as typeof GeminiServiceMixin)?.sharedGemini ??
+        this.getDependencies()
+      );
+    }
+  };
+}
+export function MistralMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = MistralService;
+  return class MistralServiceMixin extends Base {
+    mist?: S;
+    mistralApiKey?: string;
+    static sharedMistral?: S;
+    static mistralFactory?: ProviderFactory<S>;
+    constructor(...args: any[]) {
+      super(...(args as (ProviderOpts | undefined)[]));
+
+      const opts = this.opts;
+
+      if (opts?.mistral) this.mist = opts.mistral;
+
+      this.mistralApiKey = opts?.apiKeys?.mistral;
+    }
+    public get mistral() {
+      if (!this.mist) {
+        const shared = (this.constructor as typeof MistralServiceMixin)
+          .sharedMistral;
+        if (shared) {
+          this.mist = shared;
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "Mistral deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
+          }
+
+          const factory = (this.constructor as typeof MistralServiceMixin)
+            .mistralFactory;
+
+          this.mist =
+            factory?.(deps, this.mistralApiKey) ??
+            new MistralService(
+              deps.logger,
+              deps.prisma,
+              deps.redis,
+              deps.userStore,
+              this.mistralApiKey ?? ""
+            );
+        }
+      }
+      return this.mist;
+    }
+
+    static setSharedMistral(instance: S) {
+      this.sharedMistral = instance;
+    }
+
+    static setMistralFactory(factory: ProviderFactory<S>) {
+      this.mistralFactory = factory;
+    }
+
+    public hasMistral() {
+      return !!(
+        this.mist ??
+        (this.constructor as typeof MistralServiceMixin)?.sharedMistral ??
         this.getDependencies()
       );
     }

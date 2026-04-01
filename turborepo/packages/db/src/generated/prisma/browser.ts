@@ -103,6 +103,11 @@ export type ConversationMemoryChunk = Prisma.ConversationMemoryChunkModel
  */
 export type Message = Prisma.MessageModel
 /**
+ * Model MessageBlock
+ * 
+ */
+export type MessageBlock = Prisma.MessageBlockModel
+/**
  * Model Profile
  * 
  */

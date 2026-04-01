@@ -98,5 +98,6 @@ export const displayNameModelsByProvider = {
     "Llama 4 Scout (Cerebras, 17B/16E, Instruct)",
     "Llama 4 Maverick (Groq, 17B/128E, Instruct)"
   ],
-  vercel: ["v0 medium", "v0 medium (legacy)"]
+  vercel: ["v0 medium", "v0 medium (legacy)"],
+  mistral: ["Mistral Small 4", "Mistral Medium Latest", "Mistral Large Latest"]
 } as const;

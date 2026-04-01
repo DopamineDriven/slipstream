@@ -3,6 +3,7 @@ import {
   AnthropicIcon,
   GeminiIcon,
   MetaIcon,
+  MistralIcon,
   OpenAiIcon,
   VercelIcon as v0Icon,
   XAiIcon
@@ -54,6 +55,14 @@ export const providerObj = [
     text: "v0",
     icon: v0Icon,
     value: "vck_********************************",
+    isDefault: false,
+    isSet: false
+  },
+  {
+    provider: "mistral",
+    text: "Mistral",
+    icon: MistralIcon,
+    value: `SwM*****************************`,
     isDefault: false,
     isSet: false
   }

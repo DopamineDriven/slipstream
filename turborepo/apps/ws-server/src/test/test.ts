@@ -12,7 +12,7 @@ type MapItRT =
       content: string;
       timestamp: Date;
       id: string;
-      provider: "openai" | "gemini" | "grok" | "anthropic" | "meta" | "vercel";
+      provider: "openai" | "gemini" | "grok" | "anthropic" | "meta" | "vercel" | "mistral";
       model: string;
       sender: "USER" | "AI" | "SYSTEM";
       assetUrl: {

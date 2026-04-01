@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useModelSelection } from "@/context/model-selection-context";
-import { providerMetadata } from "@/lib/models";
+import { defaultModelByProvider, providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import {
   Drawer,
@@ -44,17 +44,43 @@ export function MobileModelSelectorDrawer() {
   } = useModelSelection();
 
   // local draft state so we don’t overwrite context until commit
-  const [draftProvider, setDraftProvider] = useState<Provider>(
-    selectedModel.provider
+  const [draftProvider, setDraftProvider] = useState<Provider | null>(null);
+
+  const visibleProviders = useMemo(
+    () =>
+      providers.filter(
+        (provider): provider is Exclude<Provider, "vercel"> =>
+          provider !== "vercel"
+      ),
+    [providers]
   );
 
+  const activeSelectedProvider =
+    selectedModel.provider === "vercel" ? "mistral" : selectedModel.provider;
+  const activeSelectedDisplayName =
+    selectedModel.provider === "vercel"
+      ? defaultModelByProvider.mistral
+      : selectedModel.displayName;
+  const activeDraftProvider =
+    draftProvider == null || draftProvider === "vercel"
+      ? activeSelectedProvider
+      : draftProvider;
+
   useEffect(() => {
-    // eslint-disable-next-line
-    setDraftProvider(selectedModel.provider);
-  }, [selectedModel.provider]);
+    if (selectedModel.provider === "vercel") {
+      handleModelSelect("mistral", defaultModelByProvider.mistral);
+    }
+  }, [handleModelSelect, selectedModel.provider]);
 
   return (
-    <Drawer open={isDrawerOpen} onOpenChange={open => !open && closeDrawer()}>
+    <Drawer
+      open={isDrawerOpen}
+      onOpenChange={open => {
+        if (!open) {
+          setDraftProvider(null);
+          closeDrawer();
+        }
+      }}>
       <DrawerContent className="bg-brand-component border-brand-border text-brand-text flex h-[85vh] flex-col">
         <div className="mx-auto flex h-full w-full max-w-2xl flex-col overflow-hidden">
           <DrawerHeader className="shrink-0 pb-4">
@@ -67,11 +93,11 @@ export function MobileModelSelectorDrawer() {
           </DrawerHeader>
           <div className="flex-1 overflow-hidden px-4">
             <Tabs
-              value={draftProvider}
+              value={activeDraftProvider}
               onValueChange={prov => setDraftProvider(prov as Provider)}
               className="flex h-full flex-col">
               <TabsList className="bg-brand-sidebar border-brand-border mb-6 grid h-12 w-full shrink-0 grid-cols-6 border">
-                {providers.map(provider => {
+                {visibleProviders.map(provider => {
                   const Icon = providerMetadata[provider].icon;
                   return (
                     <TabsTrigger
@@ -86,7 +112,7 @@ export function MobileModelSelectorDrawer() {
                   );
                 })}
               </TabsList>
-              {providers.map(provider => {
+              {visibleProviders.map(provider => {
                 const {
                   description,
                   icon: Icon,
@@ -113,8 +139,8 @@ export function MobileModelSelectorDrawer() {
                         {provider === "anthropic" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =
-                              selectedModel.provider === provider &&
-                              selectedModel.displayName === model;
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
                             return (
                               <Button
                                 key={displayNameToModelId[provider][model]}
@@ -125,9 +151,10 @@ export function MobileModelSelectorDrawer() {
                                     ? cxStyles.isSelected
                                     : cxStyles.isNotSelected
                                 )}
-                                onClick={() =>
-                                  handleModelSelect(provider, model)
-                                }>
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
                                 <ModelUI
                                   model={model}
                                   provider={provider}
@@ -136,11 +163,11 @@ export function MobileModelSelectorDrawer() {
                               </Button>
                             );
                           })
-                        ) : provider === "vercel" ? (
+                        ) : provider === "mistral" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =
-                              selectedModel.provider === provider &&
-                              selectedModel.displayName === model;
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
                             return (
                               <Button
                                 key={displayNameToModelId[provider][model]}
@@ -151,9 +178,10 @@ export function MobileModelSelectorDrawer() {
                                     ? cxStyles.isSelected
                                     : cxStyles.isNotSelected
                                 )}
-                                onClick={() =>
-                                  handleModelSelect(provider, model)
-                                }>
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
                                 <ModelUI
                                   model={model}
                                   provider={provider}
@@ -165,8 +193,8 @@ export function MobileModelSelectorDrawer() {
                         ) : provider === "meta" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =
-                              selectedModel.provider === provider &&
-                              selectedModel.displayName === model;
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
                             return (
                               <Button
                                 key={displayNameToModelId[provider][model]}
@@ -177,9 +205,10 @@ export function MobileModelSelectorDrawer() {
                                     ? cxStyles.isSelected
                                     : cxStyles.isNotSelected
                                 )}
-                                onClick={() =>
-                                  handleModelSelect(provider, model)
-                                }>
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
                                 <ModelUI
                                   model={model}
                                   provider={provider}
@@ -191,8 +220,8 @@ export function MobileModelSelectorDrawer() {
                         ) : provider === "gemini" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =
-                              selectedModel.provider === provider &&
-                              selectedModel.displayName === model;
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
                             return (
                               <Button
                                 key={displayNameToModelId[provider][model]}
@@ -203,9 +232,10 @@ export function MobileModelSelectorDrawer() {
                                     ? cxStyles.isSelected
                                     : cxStyles.isNotSelected
                                 )}
-                                onClick={() =>
-                                  handleModelSelect(provider, model)
-                                }>
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
                                 <ModelUI
                                   model={model}
                                   provider={provider}
@@ -217,8 +247,8 @@ export function MobileModelSelectorDrawer() {
                         ) : provider === "grok" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =
-                              selectedModel.provider === provider &&
-                              selectedModel.displayName === model;
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
                             return (
                               <Button
                                 key={displayNameToModelId[provider][model]}
@@ -229,9 +259,10 @@ export function MobileModelSelectorDrawer() {
                                     ? cxStyles.isSelected
                                     : cxStyles.isNotSelected
                                 )}
-                                onClick={() =>
-                                  handleModelSelect(provider, model)
-                                }>
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
                                 <ModelUI
                                   model={model}
                                   provider={provider}
@@ -243,8 +274,8 @@ export function MobileModelSelectorDrawer() {
                         ) : provider === "openai" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =
-                              selectedModel.provider === provider &&
-                              selectedModel.displayName === model;
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
                             return (
                               <Button
                                 key={displayNameToModelId[provider][model]}
@@ -255,9 +286,10 @@ export function MobileModelSelectorDrawer() {
                                     ? cxStyles.isSelected
                                     : cxStyles.isNotSelected
                                 )}
-                                onClick={() =>
-                                  handleModelSelect(provider, model)
-                                }>
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
                                 <ModelUI
                                   model={model}
                                   provider={provider}

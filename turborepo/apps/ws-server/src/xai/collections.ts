@@ -821,6 +821,26 @@ export class GrokCollectionsService extends GrokWorkupService {
     });
   }
 
+  protected messageText(
+    msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
+  ) {
+    const textBlocks = Array.of<string>();
+
+    if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+      for (const block of msg.messageBlocks) {
+        if (block.type === "TEXT") {
+          textBlocks.push(block.content);
+        }
+      }
+    }
+
+    if (textBlocks.length > 0) {
+      return textBlocks.join("\n");
+    }
+
+    return msg.content;
+  }
+
   protected async formatxAIMsgHistory(
     msgs: MessageSingleton<true>[],
     model: GrokModelIdUnion,
@@ -933,7 +953,7 @@ export class GrokCollectionsService extends GrokWorkupService {
         } catch (err) {
           console.error(this.prisma.safeErrMsg(err));
         } finally {
-          textParts.push(msg.content);
+          textParts.push(this.messageText(msg));
         }
         content.push({
           type: "input_text",
@@ -996,7 +1016,7 @@ export class GrokCollectionsService extends GrokWorkupService {
         } catch (err) {
           console.error(this.prisma.safeErrMsg(err));
         } finally {
-          textParts.push(`${modelIdentifier}\n\n${msg.content}`);
+          textParts.push(`${modelIdentifier}\n\n${this.messageText(msg)}`);
         }
         content.push({
           type: "input_text",

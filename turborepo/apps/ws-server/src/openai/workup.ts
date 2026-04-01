@@ -140,6 +140,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
       const first = msgs[0];
       if (!first)
         return [{ role: "user", content: "" }] as const satisfies ResponseInput;
+      const firstText = this.messageText(first);
       const attContent = await this.buildAttachmentContentAsync(
         first.attachments,
         client,
@@ -151,17 +152,18 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
               role: "user",
               content: [
                 ...attContent,
-                { type: "input_text", text: first.content }
+                { type: "input_text", text: firstText }
               ]
             }
           ] as const satisfies ResponseInput)
         : ([
-            { role: "user", content: first.content }
+            { role: "user", content: firstText }
           ] as const satisfies ResponseInput);
     } else {
       if (opts?.onlyMostRecentUser) {
         const lastUser = [...msgs].reverse().find(t => t.senderType === "USER");
         if (lastUser) {
+          const lastUserText = this.messageText(lastUser);
           const attContent = await this.buildAttachmentContentAsync(
             lastUser.attachments,
             client,
@@ -173,18 +175,19 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
                   role: "user",
                   content: [
                     ...attContent,
-                    { type: "input_text", text: lastUser.content }
+                    { type: "input_text", text: lastUserText }
                   ]
                 }
               ] as const satisfies ResponseInput)
             : ([
-                { role: "user", content: lastUser.content }
+                { role: "user", content: lastUserText }
               ] as const satisfies ResponseInput);
         }
       }
       const history = this.prependProviderModelTag(msgs.slice(0, -1));
       const last = msgs.at(-1);
       if (last?.senderType === "USER") {
+        const lastText = this.messageText(last);
         const attContent = await this.buildAttachmentContentAsync(
           last.attachments,
           client,
@@ -197,34 +200,57 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
                 role: "user",
                 content: [
                   ...attContent,
-                  { type: "input_text", text: last.content }
+                  { type: "input_text", text: lastText }
                 ]
               }
             ] as const satisfies ResponseInput)
           : ([
               ...history,
-              { role: "user", content: last.content }
+              { role: "user", content: lastText }
             ] as const satisfies ResponseInput);
       }
       return this.formatMsgs(this.prependProviderModelTag(msgs));
     }
   }
+
+  protected messageText(
+    msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
+  ) {
+    const textBlocks = Array.of<string>();
+
+    if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+      for (const block of msg.messageBlocks) {
+        if (block.type === "TEXT") {
+          textBlocks.push(block.content);
+        }
+      }
+    }
+
+    if (textBlocks.length > 0) {
+      return textBlocks.join("\n");
+    }
+
+    return msg.content;
+  }
+
   private prependProviderModelTag(
     msgs: Pick<
       MessageSingleton<true>,
-      "senderType" | "provider" | "model" | "content"
+      "senderType" | "provider" | "model" | "content" | "messageBlocks"
     >[]
   ) {
     return msgs.map(msg => {
+      const text = this.messageText(msg);
+
       if (msg.senderType === "USER") {
-        return { role: "user", content: msg.content } as const;
+        return { role: "user", content: text } as const;
       } else {
         const provider = msg.provider.toLowerCase();
         const model = msg.model ?? "";
         const modelIdentifier = `[${provider}/${model}]`;
         return {
           role: "assistant",
-          content: `${modelIdentifier} \n` + msg.content
+          content: `${modelIdentifier} \n${text}`
         } as const;
       }
     }) satisfies ResponseInput;
@@ -355,6 +381,9 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
       type: "function",
       name: "file_search",
       description:
+              "This tool utilizes a 'Partitioned Foraging' approach which recognizes that for the 200,000+ years that humans have existed " +
+        "95%+ of it has been as foragers. Agents are trained exclusively on data aggregated/curated by humans; " +
+        "think of it as agentic foraging complete with Jaccard similarity scores for cross-analyzing your bounties. " +
         "Search the user's uploaded documents. Uses semantic similarity by default. " +
         "When search_terms is provided, also performs fulltext keyword search and returns " +
         "both result sets separately (semantic + fulltext) so you can reason about which signal is most relevant. " +

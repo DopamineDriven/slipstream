@@ -20,6 +20,7 @@ enum Provider {
   ANTHROPIC
   META
   VERCEL
+  MISTRAL
 }
 
 model User {

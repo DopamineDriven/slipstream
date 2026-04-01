@@ -23,6 +23,8 @@ import type {
   UserMetadata as AIChatRequestUserMetadata,
   AIChatResponseImgGenFieldsFinal,
   AllModelsUnion,
+  ChatChunkAndResMsgBlock,
+  ClientContextWorkupProps,
   EventTypeMap,
   Provider
 } from "@slipstream/types";
@@ -30,6 +32,7 @@ import type {
 interface StreamingMessage {
   id: string;
   content: string;
+  messageBlocks?: ChatChunkAndResMsgBlock[];
   provider: Provider;
   model: string;
   timestamp: Date;
@@ -60,6 +63,7 @@ interface AIChatContextValue {
 
   // Message tracking
   currentStreamingMessage: StreamingMessage | null;
+  streamingMessageBlocks: ChatChunkAndResMsgBlock[];
   currentUserMsgId: string | null;
   currentAiMsgId: string | null;
   currentImgGenAttachmentId: string | null;
@@ -87,12 +91,54 @@ interface AIChatContextValue {
 
 const AIChatContext = createContext<AIChatContextValue | undefined>(undefined);
 
+const orderMessageBlocks = (blocks: ChatChunkAndResMsgBlock[]) => {
+  return [...blocks].sort((left, right) => left.ordinal - right.ordinal);
+};
+
+const isThinkingBlock = (block: ChatChunkAndResMsgBlock) => {
+  return block.type === "THINKING" || block.type === "ENCRYPTED_THINKING";
+};
+
+const mergeStreamingMessageBlocks = (
+  currentBlocks: ChatChunkAndResMsgBlock[],
+  incomingBlock: ChatChunkAndResMsgBlock
+) => {
+  const nextBlocks = currentBlocks.filter(
+    block => block.ordinal !== incomingBlock.ordinal
+  );
+  nextBlocks.push(incomingBlock);
+  return orderMessageBlocks(nextBlocks);
+};
+
+const textFromMessageBlocks = (blocks: ChatChunkAndResMsgBlock[]) => {
+  return blocks
+    .filter(block => block.type === "TEXT")
+    .map(block => block.content)
+    .join("");
+};
+
+const thinkingTextFromMessageBlocks = (blocks: ChatChunkAndResMsgBlock[]) => {
+  return blocks
+    .filter(isThinkingBlock)
+    .map(block => block.content)
+    .join("\n\n");
+};
+
+const thinkingDurationFromMessageBlocks = (blocks: ChatChunkAndResMsgBlock[]) => {
+  const totalDuration = blocks
+    .filter(isThinkingBlock)
+    .reduce((sum, block) => sum + block.durationMs, 0);
+
+  return totalDuration > 0 ? totalDuration : null;
+};
+
 // Note: Track active user streams within the provider to avoid module-scope writes
 const fallbackApiKeys = {
   isDefault: {
     anthropic: false,
     gemini: false,
     grok: false,
+    mistral: false,
     meta: false,
     openai: false,
     vercel: false
@@ -101,11 +147,12 @@ const fallbackApiKeys = {
     anthropic: false,
     gemini: false,
     grok: false,
+    mistral: false,
     meta: false,
     openai: false,
     vercel: false
   }
-};
+} satisfies ClientContextWorkupProps;
 
 export function AIChatProvider({
   children,
@@ -140,6 +187,9 @@ export function AIChatProvider({
   const [isWaitingForRealId, setIsWaitingForRealId] = useState<boolean>(false);
   const [currentStreamingMessage, setCurrentStreamingMessage] =
     useState<StreamingMessage | null>(null);
+  const [streamingMessageBlocks, setStreamingMessageBlocks] = useState<
+    ChatChunkAndResMsgBlock[]
+  >([]);
 
   // Thinking state
   const [thinkingText, setThinkingText] = useState<string>("");
@@ -188,6 +238,7 @@ export function AIChatProvider({
       setThinkingText("");
       setIsThinking(false);
       setThinkingDuration(null);
+      setStreamingMessageBlocks([]);
       setCurrentStreamingMessage(null);
       setIsWaitingForRealId(false);
       firstChunkReceivedRef.current = false;
@@ -207,6 +258,7 @@ export function AIChatProvider({
   const currentUserMsgIdRef = useRef<string | null>(null);
   const currentAiMsgIdRef = useRef<string | null>(null);
   const currentImgGenAttachmentIdRef = useRef<string | null>(null);
+  const streamingMessageBlocksRef = useRef<ChatChunkAndResMsgBlock[]>([]);
 
   // Update refs when state changes
   useEffect(() => {
@@ -258,6 +310,10 @@ export function AIChatProvider({
   }, [currentImgGenAttachmentId]);
 
   useEffect(() => {
+    streamingMessageBlocksRef.current = streamingMessageBlocks;
+  }, [streamingMessageBlocks]);
+
+  useEffect(() => {
     isNewChatRef.current = isNewChat;
   }, [isNewChat]);
 
@@ -278,6 +334,47 @@ export function AIChatProvider({
 
   // WebSocket event handlers - only depend on stable references
   useEffect(() => {
+    const syncStreamingStateFromBlocks = (
+      nextBlocks: ChatChunkAndResMsgBlock[],
+      evt: EventTypeMap["ai_chat_chunk"] | EventTypeMap["ai_chat_response"]
+    ) => {
+      const orderedBlocks = orderMessageBlocks(nextBlocks);
+      const nextStreamedText = textFromMessageBlocks(orderedBlocks);
+      const nextThinkingText = thinkingTextFromMessageBlocks(orderedBlocks);
+      const nextThinkingDuration =
+        thinkingDurationFromMessageBlocks(orderedBlocks);
+      const latestBlock = orderedBlocks.at(-1);
+      const nextIsThinking =
+        "isThinking" in evt && typeof evt.isThinking === "boolean"
+          ? evt.isThinking
+          : latestBlock
+            ? isThinkingBlock(latestBlock)
+            : false;
+
+      setStreamingMessageBlocks(orderedBlocks);
+      setStreamedText(nextStreamedText);
+      setThinkingText(nextThinkingText);
+      setThinkingDuration(nextThinkingDuration);
+      setIsThinking(nextIsThinking);
+
+      setCurrentStreamingMessage({
+        id: `streaming-${evt.conversationId}`,
+        content: nextStreamedText,
+        messageBlocks: orderedBlocks,
+        thinkingText: nextThinkingText || undefined,
+        thinkingDuration: nextThinkingDuration ?? undefined,
+        provider: evt.provider ?? selectedModel.provider,
+        model: evt.model ?? selectedModel.modelId,
+        timestamp: new Date(),
+        isUser: false,
+        imgGenEnabled: imgGenEnabledRef.current || evt.imgGenEnabled,
+        imgGenFields: imgGenFieldsRef.current ?? evt.imgGenFields,
+        userMsgId: evt.userMsgId ?? currentUserMsgIdRef.current ?? undefined,
+        imgGenAttachmentId: undefined,
+        aiMsgId: undefined
+      });
+    };
+
     const handleChunk = (evt: EventTypeMap["ai_chat_chunk"]) => {
       // Capture message IDs from the event, only update if different
       if (evt.userMsgId && currentUserMsgIdRef.current !== evt.userMsgId) {
@@ -324,29 +421,6 @@ export function AIChatProvider({
         setIsStreaming(true);
       }
 
-      // Handle thinking chunks differently
-      if (evt.isThinking && evt.thinkingText) {
-        setThinkingText(prev => prev + evt.thinkingText);
-        setIsThinking(true);
-        setThinkingDuration(evt.thinkingDuration ?? null);
-      } else if (evt.chunk) {
-        // Regular chunk - if we were thinking, we're done now
-        if (isThinkingRef.current) {
-          setIsThinking(false);
-          // Capture thinking duration if provided
-          if (evt.thinkingDuration) {
-            setThinkingDuration(evt.thinkingDuration);
-          }
-        }
-        setStreamedText(prev => prev + evt.chunk);
-      }
-
-      // Always update thinking duration if provided
-      // This handles both initial capture and updates during streaming
-      if (evt.thinkingDuration) {
-        setThinkingDuration(evt.thinkingDuration);
-      }
-
       setIsComplete(false);
 
       // Image generation progressive updates - accumulate the complete fields
@@ -367,14 +441,51 @@ export function AIChatProvider({
         }));
       }
 
-      // Update streaming message with all relevant data using refs
-      // Keep the streaming ID pattern during active streaming
+      if (evt.messageBlocks) {
+        const nextBlocks = mergeStreamingMessageBlocks(
+          streamingMessageBlocksRef.current,
+          evt.messageBlocks
+        );
+
+        syncStreamingStateFromBlocks(nextBlocks, evt);
+        return;
+      }
+
+      // Backwards compatibility for providers still emitting only legacy chunk fields
+      let nextThinkingText = thinkingTextRef.current;
+      let nextStreamedText = streamedTextRef.current;
+      let nextThinkingDuration = thinkingDurationRef.current;
+
+      if (evt.isThinking && evt.thinkingText) {
+        nextThinkingText += evt.thinkingText;
+        nextThinkingDuration = evt.thinkingDuration ?? null;
+        setThinkingText(nextThinkingText);
+        setIsThinking(true);
+        setThinkingDuration(nextThinkingDuration);
+      } else if (evt.chunk) {
+        if (isThinkingRef.current) {
+          setIsThinking(false);
+          if (evt.thinkingDuration) {
+            nextThinkingDuration = evt.thinkingDuration;
+            setThinkingDuration(evt.thinkingDuration);
+          }
+        }
+
+        nextStreamedText += evt.chunk;
+        setStreamedText(nextStreamedText);
+      }
+
+      if (evt.thinkingDuration) {
+        nextThinkingDuration = evt.thinkingDuration;
+        setThinkingDuration(evt.thinkingDuration);
+      }
+
       setCurrentStreamingMessage({
         id: `streaming-${evt.conversationId}`,
-        content: streamedTextRef.current + (evt.chunk ?? ""),
-        thinkingText: thinkingTextRef.current + (evt.thinkingText ?? ""),
-        thinkingDuration:
-          evt.thinkingDuration ?? thinkingDurationRef.current ?? undefined,
+        content: nextStreamedText,
+        messageBlocks: undefined,
+        thinkingText: nextThinkingText || undefined,
+        thinkingDuration: nextThinkingDuration ?? undefined,
         provider: evt.provider ?? selectedModel.provider,
         model: evt.model ?? selectedModel.modelId,
         timestamp: new Date(),
@@ -382,8 +493,8 @@ export function AIChatProvider({
         imgGenEnabled: imgGenEnabledRef.current || evt.imgGenEnabled,
         imgGenFields: imgGenFieldsRef.current ?? evt.imgGenFields,
         userMsgId: evt.userMsgId ?? currentUserMsgIdRef.current ?? undefined,
-        imgGenAttachmentId: undefined, // Don't pass imgGenAttachmentId during streaming chunks
-        aiMsgId: undefined // Don't pass aiMsgId during streaming chunks
+        imgGenAttachmentId: undefined,
+        aiMsgId: undefined
       });
     };
 
@@ -407,6 +518,7 @@ export function AIChatProvider({
       setIsStreaming(false);
       setIsComplete(true);
       setIsWaitingForRealId(false);
+      setStreamingMessageBlocks([]);
       setCurrentStreamingMessage(null);
 
       // Update active conversation ID to match the event
@@ -464,6 +576,10 @@ export function AIChatProvider({
         setImgGenFields(evt.imgGenFields);
       }
 
+      if (evt.messageBlocks && evt.messageBlocks.length > 0) {
+        syncStreamingStateFromBlocks(evt.messageBlocks, evt);
+      }
+
       setTimeout(() => {
         setIsComplete(evt.done);
       }, 200);
@@ -478,7 +594,7 @@ export function AIChatProvider({
           setThinkingDuration(evt.thinkingDuration);
         }
 
-        if (evt.thinkingText) {
+        if (evt.thinkingText && (!evt.messageBlocks || evt.messageBlocks.length === 0)) {
           setThinkingText(evt.thinkingText);
         }
 
@@ -642,6 +758,7 @@ export function AIChatProvider({
       setError(null);
       setImgGenEnabled(false);
       setImgGenFields(null);
+      setStreamingMessageBlocks([]);
       setIsComplete(false);
       setIsStreaming(true);
       setCurrentStreamingMessage(null);
@@ -717,6 +834,7 @@ export function AIChatProvider({
     setThinkingText("");
     setIsThinking(false);
     setThinkingDuration(null);
+    setStreamingMessageBlocks([]);
     setCurrentStreamingMessage(null);
     setIsStreaming(false);
     setIsComplete(false);
@@ -745,6 +863,7 @@ export function AIChatProvider({
         isThinking,
         thinkingDuration,
         currentStreamingMessage,
+        streamingMessageBlocks,
         currentUserMsgId,
         currentImgGenAttachmentId,
         currentAiMsgId,

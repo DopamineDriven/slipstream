@@ -1,6 +1,5 @@
 "use client";
 
-import type { AllModelsUnion, Provider } from "@slipstream/types";
 import {
   createContext,
   ReactNode,
@@ -12,6 +11,7 @@ import {
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { defaultModelSelection, ModelSelection } from "@/lib/models";
+import type { AllModelsUnion, Provider } from "@slipstream/types";
 import {
   displayNameToModelId,
   getAllProviders,
@@ -27,7 +27,8 @@ interface ModelSelectionContextType {
     "grok",
     "openai",
     "meta",
-    "vercel"
+    "vercel",
+    "mistral"
   ];
   setSelectedModel: (m: ModelSelection) => void;
   updateProvider: (p: Provider) => void;
@@ -83,7 +84,7 @@ export function ModelSelectionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!lastEvent) return;
     if (lastEvent.type === "ai_chat_error") {
-        // eslint-disable-next-line
+      // eslint-disable-next-line
       setSelectedModel(defaultModelSelection);
     }
     // etc.

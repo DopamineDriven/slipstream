@@ -1,4 +1,6 @@
+import type { LoggerService } from "@/logger/index.ts";
 import type { OpenAIFileSearchToolInput } from "@/openai/types.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type {
@@ -12,15 +14,27 @@ import type {
   UserMessage
 } from "llama-api-client/resources/index.mjs";
 import type { Logger as PinoLogger } from "pino";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
 import { LlamaAPIClient } from "llama-api-client";
+import type { $Enums } from "@slipstream/db/node/generated/client";
+import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type {
   EventTypeMap,
   MessageSingleton,
   MetaModelIdUnion
 } from "@slipstream/types";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
+
+interface MetaActiveMessageBlock {
+  content: string;
+  startedAt: number;
+  type: "TEXT";
+}
+
+interface MetaFinalizedMessageBlock {
+  content: string;
+  durationMs: number;
+  ordinal: number;
+  type: $Enums.MessageBlockType;
+}
 
 interface LlamaFunctionTool {
   type: "function";
@@ -100,15 +114,37 @@ export class LlamaService {
     return historyNote;
   }
 
+  private messageText(
+    msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
+  ) {
+    const textBlocks = Array.of<string>();
+
+    if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+      for (const block of msg.messageBlocks) {
+        if (block.type === "TEXT") {
+          textBlocks.push(block.content);
+        }
+      }
+    }
+
+    if (textBlocks.length > 0) {
+      return textBlocks.join("\n");
+    }
+
+    return msg.content;
+  }
+
   private prependProviderModelTag(
     msgs: Pick<
       MessageSingleton<true>,
-      "senderType" | "provider" | "model" | "content"
+      "senderType" | "provider" | "model" | "content" | "messageBlocks"
     >[]
   ) {
     return msgs.map(msg => {
+      const text = this.messageText(msg);
+
       if (msg.senderType === "USER") {
-        return { role: "user", content: msg.content } as const;
+        return { role: "user", content: text } as const;
       }
 
       const provider = msg.provider.toLowerCase();
@@ -116,7 +152,7 @@ export class LlamaService {
       const modelIdentifier = `[${provider}/${model}]`;
       return {
         role: "assistant",
-        content: `${modelIdentifier} \n${msg.content}`
+        content: `${modelIdentifier} \n${text}`
       } as const;
     }) satisfies (UserMessage | CompletionMessage)[];
   }
@@ -229,7 +265,9 @@ export class LlamaService {
     });
   }
 
-  private parseFileSearchInput(rawArguments: string): OpenAIFileSearchToolInput {
+  private parseFileSearchInput(
+    rawArguments: string
+  ): OpenAIFileSearchToolInput {
     const parsed = rawArguments.trim().length
       ? JSON.parse<Record<string, unknown>>(rawArguments)
       : {};
@@ -307,7 +345,13 @@ export class LlamaService {
 
     const results =
       "query" in input
-        ? await this.searchStore(userId, input.query, maxResults, 0, input.filename)
+        ? await this.searchStore(
+            userId,
+            input.query,
+            maxResults,
+            0,
+            input.filename
+          )
         : (
             await Promise.all(
               input.queries.map(query =>
@@ -425,7 +469,9 @@ export class LlamaService {
     fileSearchEnabled = false
   ) {
     const buildUserContent = (m: MessageSingleton<true>) => {
-      const parts = Array.of<MessageTextContentItem | MessageImageContentItem>();
+      const parts = Array.of<
+        MessageTextContentItem | MessageImageContentItem
+      >();
       if (m.attachments?.length > 0) {
         for (const att of m.attachments) {
           const url = att.compatCdnUrl ?? att.cdnUrl ?? att.sourceUrl;
@@ -435,7 +481,7 @@ export class LlamaService {
           }
         }
       }
-      parts.push({ type: "text", text: m.content });
+      parts.push({ type: "text", text: this.messageText(m) });
       return parts;
     };
 
@@ -526,8 +572,8 @@ export class LlamaService {
     }
 
     if (Array.isArray(content)) {
-      const textParts = content
-        .flatMap(item => ("text" in item ? [item.text] : []))
+      const textParts = (content as object[])
+        .flatMap(item => ("text" in item ? [item.text] : [""]))
         .join(" ");
       return this.previewText(textParts);
     }
@@ -605,7 +651,7 @@ export class LlamaService {
         } else if (current.name !== incomingName) {
           this.logger.warn(
             {
-              toolCallId: current.id || incomingId || null,
+              toolCallId: current.id ?? incomingId ?? null,
               currentName: current.name,
               incomingName
             },
@@ -621,7 +667,9 @@ export class LlamaService {
     registry.set(activeKey, current);
   }
 
-  private materializeToolCalls(registry: Map<string, LlamaAccumulatedToolCall>) {
+  private materializeToolCalls(
+    registry: Map<string, LlamaAccumulatedToolCall>
+  ) {
     const materialized = Array.of<CompletionMessage.ToolCall>();
 
     for (const toolCall of Array.from(registry.values()).sort(
@@ -667,7 +715,64 @@ export class LlamaService {
   }: ProviderChatRequestEntity) {
     const provider = "meta" as const;
     let metaAgg = "";
+    const trackedBlocks = Array.of<MetaFinalizedMessageBlock>();
+    let activeBlock: MetaActiveMessageBlock | undefined = undefined;
+    let nextOrdinal = 0;
+    const roundTrack = Array.of<{
+      type: $Enums.MessageBlockType;
+      content: string;
+      durationMs: number;
+      ordinal: number;
+      conversationId: string;
+    }>();
     const client = this.llamaClient(apiKey ?? undefined);
+
+    const finalizeActiveBlock = () => {
+      if (!activeBlock || activeBlock.content.length === 0) {
+        activeBlock = undefined;
+        return;
+      }
+
+      trackedBlocks.push({
+        content: activeBlock.content,
+        durationMs: Math.max(
+          0,
+          Math.round(performance.now() - activeBlock.startedAt)
+        ),
+        ordinal: nextOrdinal,
+        type: activeBlock.type
+      });
+
+      nextOrdinal += 1;
+      activeBlock = undefined;
+    };
+
+    const ensureActiveBlock = () => {
+      activeBlock ??= {
+        content: "",
+        startedAt: performance.now(),
+        type: "TEXT"
+      };
+
+      return activeBlock;
+    };
+
+    const currentChunkMessageBlock = () => {
+      if (!activeBlock) {
+        return undefined;
+      }
+
+      return {
+        type: activeBlock.type,
+        content: activeBlock.content,
+        ordinal: nextOrdinal,
+        conversationId,
+        durationMs: Math.max(
+          0,
+          Math.round(performance.now() - activeBlock.startedAt)
+        )
+      } as const;
+    };
 
     const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
     const tools = hasUserStoreDocs
@@ -731,6 +836,7 @@ export class LlamaService {
           text = chunk.event.delta.text;
         }
         if (chunk.event.delta.type === "tool_call") {
+          finalizeActiveBlock();
           this.accumulateToolCallDelta(roundToolCalls, chunk.event.delta);
         }
         if (chunk.event.event_type === "complete") {
@@ -738,6 +844,8 @@ export class LlamaService {
         }
 
         if (text) {
+          const block = ensureActiveBlock();
+          block.content += text;
           chunks.push(text);
           metaAgg += text;
           ws.send(
@@ -753,6 +861,7 @@ export class LlamaService {
               topP,
               model,
               chunk: text,
+              messageBlocks: currentChunkMessageBlock(),
               done: false
             } satisfies EventTypeMap["ai_chat_chunk"])
           );
@@ -768,6 +877,7 @@ export class LlamaService {
             topP,
             provider,
             chunk: text,
+            messageBlocks: currentChunkMessageBlock(),
             done: false
           });
           if (chunks.length % 10 === 0) {
@@ -790,6 +900,8 @@ export class LlamaService {
         }
       }
 
+      finalizeActiveBlock();
+
       const materializedToolCalls = this.materializeToolCalls(roundToolCalls);
       const shouldContinueWithTools =
         stopReason === "tool_calls" || materializedToolCalls.length > 0;
@@ -802,7 +914,10 @@ export class LlamaService {
             toolCalls: materializedToolCalls.map(toolCall => ({
               id: toolCall.id,
               name: toolCall.function.name,
-              argumentsPreview: this.previewText(toolCall.function.arguments, 160)
+              argumentsPreview: this.previewText(
+                toolCall.function.arguments,
+                160
+              )
             }))
           },
           "llama streamed tool calls materialized"
@@ -899,6 +1014,23 @@ export class LlamaService {
       metaAgg =
         "I ran document search multiple times but kept hitting a tool loop before a stable answer was produced. " +
         "Please rephrase with a narrower query, such as an exact filename or section title, and I will retry.";
+      trackedBlocks.push({
+        type: "TEXT",
+        content: metaAgg,
+        durationMs: 0,
+        ordinal: nextOrdinal
+      });
+      nextOrdinal += 1;
+    }
+
+    for (const block of trackedBlocks) {
+      roundTrack.push({
+        type: block.type,
+        content: block.content,
+        durationMs: block.durationMs,
+        ordinal: block.ordinal,
+        conversationId
+      });
     }
 
     const d = await this.prisma.handleAiChatResponse({
@@ -912,7 +1044,8 @@ export class LlamaService {
       provider,
       title,
       userId,
-      model
+      model,
+      messageBlocks: roundTrack.length > 0 ? roundTrack : undefined
     });
     ws.send(
       JSON.stringify({
@@ -928,6 +1061,7 @@ export class LlamaService {
         topP,
         model,
         chunk: metaAgg,
+        messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
         done: true
       } satisfies EventTypeMap["ai_chat_response"])
     );
@@ -944,6 +1078,7 @@ export class LlamaService {
       provider,
       model,
       chunk: metaAgg,
+      messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
       done: true
     });
     void this.redis.del(`stream:state:${conversationId}`);

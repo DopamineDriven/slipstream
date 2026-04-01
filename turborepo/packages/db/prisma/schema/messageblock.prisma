@@ -1,0 +1,24 @@
+enum MessageBlockType {
+  ENCRYPTED_THINKING
+  THINKING
+  TEXT
+}
+
+model MessageBlock {
+  id             String           @id @default(cuid(2))
+  conversationId String
+  messageId      String
+  ordinal        Int
+  content        String
+  type           MessageBlockType
+  durationMs     Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  message Message @relation("MessageBlocks", fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, ordinal])
+  @@index([messageId, ordinal])
+  @@index(conversationId)
+  @@index(type)
+}

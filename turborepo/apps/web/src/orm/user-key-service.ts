@@ -32,10 +32,12 @@ export class PrismaUserKeyService extends ErrorHelperService {
         gemini: 0,
         anthropic: 0,
         vercel: 0,
+        mistral: 0,
         meta: 0
       },
       isDefault: {
         vercel: 0,
+        mistral: 0,
         meta: 0,
         openai: 0,
         grok: 0,

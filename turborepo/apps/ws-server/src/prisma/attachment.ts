@@ -5,6 +5,7 @@ import type {
 } from "@/types/index.ts";
 import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import { ExtractService } from "@/extract/index.ts";
+import { PrismaUserStoreService } from "@/prisma/user-store.ts";
 import type {
   $Enums,
   Attachment,
@@ -15,7 +16,6 @@ import type {
 } from "@slipstream/db/node/generated/client";
 import type { CTR, Rm, RTC, XOR } from "@slipstream/types";
 import { PrismaDbService } from "@slipstream/db/factory";
-import { PrismaUserStoreService } from "@/prisma/user-store.ts";
 
 export class PrismaAttachmentService extends PrismaUserStoreService {
   constructor(
@@ -165,7 +165,7 @@ export class PrismaAttachmentService extends PrismaUserStoreService {
       where: {
         id: rest.id
       },
-      include: { image: true, document: true },
+      include: { image: true, document: true, audio: true },
       data: {
         ...rest,
         image:
@@ -185,6 +185,16 @@ export class PrismaAttachmentService extends PrismaUserStoreService {
                   where: { attachmentId: rest.id },
                   create: { ...metadata.doc },
                   update: { ...metadata.doc }
+                }
+              }
+            : undefined,
+        audio:
+          metadata?.type === "AUDIO" && metadata.audio
+            ? {
+                upsert: {
+                  where: { attachmentId: rest.id },
+                  create: { ...metadata.audio },
+                  update: { ...metadata.audio }
                 }
               }
             : undefined,

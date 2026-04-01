@@ -23,6 +23,7 @@ export default defineConfig(
         "src/image/index.ts",
         "src/logger/index.ts",
         "src/meta/index.ts",
+        "src/mistral/index.ts",
         "src/mixins/index.ts",
         "src/models/index.ts",
         "src/openai/base.ts",

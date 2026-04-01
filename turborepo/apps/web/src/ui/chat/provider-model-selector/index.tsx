@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { useModelSelection } from "@/context/model-selection-context";
 import { defaultModelByProvider, providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
@@ -9,9 +9,9 @@ import type {
   GeminiDisplayNameUnion,
   GrokDisplayNameUnion,
   MetaDisplayNameUnion,
+  MistralDisplayNameUnion,
   OpenAiDisplayNameUnion,
-  Provider,
-  VercelDisplayNameUnion
+  Provider
 } from "@slipstream/types";
 import {
   getModelIdByDisplayName,
@@ -38,8 +38,34 @@ export function ProviderModelSelector({
   const { selectedModel, updateProvider, updateModel, providers, openDrawer } =
     useModelSelection();
 
-  const availableModels = getModelsForProvider(selectedModel.provider);
-  const currentMeta = providerMetadata[selectedModel.provider];
+  const visibleProviders = useMemo(
+    () =>
+      providers.filter(
+        (provider): provider is Exclude<Provider, "vercel"> =>
+          provider !== "vercel"
+      ),
+    [providers]
+  );
+
+  useEffect(() => {
+    if (selectedModel.provider !== "vercel") {
+      return;
+    }
+
+    const displayName = defaultModelByProvider.mistral;
+    updateProvider("mistral");
+    updateModel(displayName, getModelIdByDisplayName("mistral", displayName));
+  }, [selectedModel.provider, updateModel, updateProvider]);
+
+  const activeProvider =
+    selectedModel.provider === "vercel" ? "mistral" : selectedModel.provider;
+  const activeDisplayName =
+    selectedModel.provider === "vercel"
+      ? defaultModelByProvider.mistral
+      : selectedModel.displayName;
+
+  const availableModels = getModelsForProvider(activeProvider);
+  const currentMeta = providerMetadata[activeProvider];
 
   const handleProviderChange = (prov: Provider) => {
     switch (prov) {
@@ -58,12 +84,12 @@ export function ProviderModelSelector({
         updateModel(displayName, getModelIdByDisplayName("meta", displayName));
         break;
       }
-      case "vercel": {
-        const displayName = defaultModelByProvider.vercel;
-        updateProvider("vercel");
+      case "mistral": {
+        const displayName = defaultModelByProvider.mistral;
+        updateProvider("mistral");
         updateModel(
           displayName,
-          getModelIdByDisplayName("vercel", displayName)
+          getModelIdByDisplayName("mistral", displayName)
         );
         break;
       }
@@ -96,7 +122,7 @@ export function ProviderModelSelector({
   };
 
   const handleModelChange = (name: string) => {
-    const prov = selectedModel.provider;
+    const prov = activeProvider;
     switch (prov) {
       case "anthropic": {
         const dn = name as AnthropicDisplayNameUnion;
@@ -108,9 +134,9 @@ export function ProviderModelSelector({
         updateModel(dn, getModelIdByDisplayName("gemini", dn));
         break;
       }
-      case "vercel": {
-        const dn = name as VercelDisplayNameUnion;
-        updateModel(dn, getModelIdByDisplayName("vercel", dn));
+      case "mistral": {
+        const dn = name as MistralDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("mistral", dn));
         break;
       }
       case "meta": {
@@ -136,9 +162,9 @@ export function ProviderModelSelector({
     return (
       <div className={cn("flex items-center space-x-2", className)}>
         <Select
-          value={selectedModel.provider}
+          value={activeProvider}
           onValueChange={v => handleProviderChange(v as Provider)}>
-          <SelectTrigger className="bg-brand-component border-brand-border w-[140px]">
+          <SelectTrigger className="bg-brand-component border-brand-border w-35">
             <div className="flex items-center">
               {React.createElement(currentMeta.icon, {
                 className: "mr-2 size-4"
@@ -147,7 +173,7 @@ export function ProviderModelSelector({
             </div>
           </SelectTrigger>
           <SelectContent className="bg-brand-component border-brand-border">
-            {providers.map(prov => {
+            {visibleProviders.map(prov => {
               const Icon = providerMetadata[prov].icon;
               return (
                 <SelectItem key={prov} value={prov}>
@@ -162,9 +188,9 @@ export function ProviderModelSelector({
         </Select>
 
         <Select
-          value={selectedModel.displayName}
+          value={activeDisplayName}
           onValueChange={handleModelChange}>
-          <SelectTrigger className="bg-brand-component border-brand-border w-[180px]">
+          <SelectTrigger className="bg-brand-component border-brand-border w-48">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-brand-component border-brand-border">
@@ -190,7 +216,7 @@ export function ProviderModelSelector({
       <currentMeta.icon className="mr-2 size-4 shrink-0" />
       <div className="flex min-w-0 flex-1 overflow-x-hidden">
         <span className="max-w-[10ch] truncate sm:max-w-[16ch] lg:max-w-[20ch]">
-          {selectedModel.displayName}
+          {activeDisplayName}
         </span>
       </div>
       <ChevronDown className="ml-1 size-4" />
