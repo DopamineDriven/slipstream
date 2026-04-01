@@ -1,1 +1,2 @@
 src/test/**/*.json
+src/test/filter.ts

@@ -25,6 +25,7 @@ import {
   ThumbsDown,
   ThumbsUp
 } from "@slipstream/ui";
+
 export function MessageIcons({
   user,
   message,
@@ -153,7 +154,9 @@ export function MessageIcons({
             <Button
               variant="ghost"
               size="icon"
-              disabled={isStreaming === true || (tts.isGenerating && !isTTSActive)}
+              disabled={
+                isStreaming === true || (tts.isGenerating && !isTTSActive)
+              }
               className={cn(
                 actionButtonVariants.default,
                 isTTSActive
@@ -161,7 +164,9 @@ export function MessageIcons({
                     ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
                     : "text-foreground drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
                   : actionButtonVariants.reaction,
-                tts.isGenerating && tts.activeMessageId === message.id && "animate-pulse"
+                tts.isGenerating &&
+                  tts.activeMessageId === message.id &&
+                  "animate-pulse"
               )}
               onClick={handleReadAloud}>
               <ReadAloudIcon className="size-3" />

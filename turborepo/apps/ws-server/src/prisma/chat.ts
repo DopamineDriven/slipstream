@@ -10,6 +10,7 @@ import type {
   HandleAiChatReqUpdateWithImgGenSansAttachmentsProps
 } from "@/types/index.ts";
 import { ExtractService } from "@/extract/index.ts";
+import { PrismaAttachmentService } from "@/prisma/attachment.ts";
 import type { ImageGenOutputCreateNestedOneWithoutAttachmentInput } from "@slipstream/db/node/generated/models";
 import type {
   AIChatRequest,
@@ -19,7 +20,6 @@ import type {
   Rm
 } from "@slipstream/types";
 import { PrismaDbService } from "@slipstream/db/factory";
-import { PrismaAttachmentService } from "@/prisma/attachment.ts";
 
 export class PrismaChatService extends PrismaAttachmentService {
   constructor(
@@ -27,7 +27,7 @@ export class PrismaChatService extends PrismaAttachmentService {
     extractor: ExtractService,
     isProd: boolean
   ) {
-    super(prisma, extractor,isProd);
+    super(prisma, extractor, isProd);
   }
 
   private async handleAiChatReqCreateWithAttachments({
@@ -42,7 +42,7 @@ export class PrismaChatService extends PrismaAttachmentService {
         where: { batchId, userId },
         take: 10,
         orderBy: [{ createdAt: "desc" }],
-        include: { image: true, document: true }
+        include: { image: true, document: true, audio: true }
       });
       const connectById = attachments.map(({ id }) => ({ id }));
       const extended = attachments.map(t => {
@@ -109,27 +109,40 @@ export class PrismaChatService extends PrismaAttachmentService {
     apiKey,
     keyId
   }: HandleAiChatReqCreateWithImgGenAndAttachmentsProps) {
-    const conversationSettings = { create };
     const { connectById, withAssetInfo } =
       await this.handleAiChatReqCreateWithAttachments({ userId, batchId });
-
-    const createConvo = await this.prismaClient.conversation.create({
+    const convo = await this.prismaClient.conversation.create({
+      data: {
+        userId,
+        userKeyId: keyId,
+        conversationSettings: { create }
+      }
+    });
+    const createConvo = await this.prismaClient.conversation.update({
+      where: { id: convo.id },
       include: includeWithAttachments,
       data: {
         attachments: { connect: connectById },
         messages: {
           create: {
+            messageBlocks: {
+              create: {
+                content: messageData.content,
+                conversationId: convo.id,
+                ordinal: 0,
+                type: "TEXT"
+              }
+            },
             attachments: { connect: connectById },
             ...messageData
           }
-        },
-        conversationSettings,
-        userKeyId: keyId,
-        userId
+        }
       }
     });
 
     const lastMsg = createConvo.messages.at(-1);
+    if (!lastMsg) throw new Error("no last message found");
+
     return this.toCompatPropsExtened(
       "image_gen_request",
       this.bigintToNumber("image_gen_request", {
@@ -153,17 +166,31 @@ export class PrismaChatService extends PrismaAttachmentService {
     keyId
   }: HandleAiChatReqCreateWithImgGenSansAttachmentsProps) {
     const conversationSettings = { create };
-    const p = await this.prismaClient.conversation.create({
+
+    const convo = await this.prismaClient.conversation.create({
+      data: {
+        userId,
+        userKeyId: keyId,
+        conversationSettings
+      }
+    });
+    const p = await this.prismaClient.conversation.update({
+      where: { id: convo.id },
       include: includeSansAttachments,
       data: {
         messages: {
           create: {
+            messageBlocks: {
+              create: {
+                content: messageData.content,
+                conversationId: convo.id,
+                ordinal: 0,
+                type: "TEXT"
+              }
+            },
             ...messageData
           }
-        },
-        conversationSettings,
-        userKeyId: keyId,
-        userId
+        }
       }
     });
 
@@ -190,13 +217,22 @@ export class PrismaChatService extends PrismaAttachmentService {
     userId,
     model
   }: HandleAiChatReqCreateSansImgGenSansAttachmentsProps) {
-    const p = await this.prismaClient.conversation.create({
+    const convo = await this.prismaClient.conversation.create({
+      data: {
+        userId,
+        userKeyId: keyId,
+        conversationSettings: { create }
+      }
+    });
+    const p = await this.prismaClient.conversation.update({
+      where: { id: convo.id },
       include: {
         conversationSettings: true,
         messages: {
           orderBy: { createdAt: "asc" },
           include: {
             imageGenJob: true,
+            messageBlocks: true,
             attachments: {
               where: {
                 OR: [
@@ -212,6 +248,7 @@ export class PrismaChatService extends PrismaAttachmentService {
               orderBy: { createdAt: "asc" },
               include: {
                 image: true,
+                audio: true,
                 document: true,
                 imageGenOutput: true
               }
@@ -222,6 +259,14 @@ export class PrismaChatService extends PrismaAttachmentService {
       data: {
         messages: {
           create: {
+            messageBlocks: {
+              create: {
+                content: prompt,
+                conversationId: convo.id,
+                ordinal: 0,
+                type: "TEXT"
+              }
+            },
             content: prompt,
             provider: this.providerToPrismaFormat(provider),
             senderType: "USER",
@@ -229,12 +274,7 @@ export class PrismaChatService extends PrismaAttachmentService {
             userId,
             userKeyId: keyId
           }
-        },
-        conversationSettings: {
-          create
-        },
-        userKeyId: keyId,
-        userId
+        }
       }
     });
     const apiKeyAndRes = { apiKey, ...p };
@@ -264,12 +304,26 @@ export class PrismaChatService extends PrismaAttachmentService {
     const { connectById, withAssetInfo } =
       await this.handleAiChatReqCreateWithAttachments({ userId, batchId });
     const conversationSettings = { create };
-
+    const convo = await this.prismaClient.conversation.create({
+      data: {
+        userId,
+        userKeyId: keyId,
+        conversationSettings
+      }
+    });
     const dataConvoCreate = {
       attachments: { connect: connectById },
       messages: {
         create: {
           attachments: { connect: connectById },
+          messageBlocks: {
+            create: {
+              content: prompt,
+              conversationId: convo.id,
+              ordinal: 0,
+              type: "TEXT"
+            }
+          },
           content: prompt,
           provider: this.providerToPrismaFormat(provider),
           senderType: "USER",
@@ -277,18 +331,17 @@ export class PrismaChatService extends PrismaAttachmentService {
           userId,
           userKeyId: keyId
         }
-      },
-      conversationSettings,
-      userKeyId: keyId,
-      userId
+      }
     } as const;
-    const dat = await this.prismaClient.conversation.create({
+    const dat = await this.prismaClient.conversation.update({
+      where: { id: convo.id },
       include: {
         conversationSettings: true,
         messages: {
           orderBy: { createdAt: "asc" },
           include: {
             imageGenJob: true,
+            messageBlocks: true,
             attachments: {
               where: {
                 OR: [
@@ -305,6 +358,7 @@ export class PrismaChatService extends PrismaAttachmentService {
               include: {
                 image: true,
                 document: true,
+                audio: true,
                 imageGenOutput: true
               }
             }
@@ -346,6 +400,7 @@ export class PrismaChatService extends PrismaAttachmentService {
         conversationId,
         userId
       });
+
     const d = await this.prismaClient.conversation.update({
       include: {
         conversationSettings: true,
@@ -353,6 +408,7 @@ export class PrismaChatService extends PrismaAttachmentService {
           orderBy: { createdAt: "asc" },
           include: {
             imageGenJob: true,
+            messageBlocks: true,
             attachments: {
               where: {
                 OR: [
@@ -369,6 +425,7 @@ export class PrismaChatService extends PrismaAttachmentService {
               include: {
                 image: true,
                 document: true,
+                audio: true,
                 imageGenOutput: true
               }
             }
@@ -380,6 +437,14 @@ export class PrismaChatService extends PrismaAttachmentService {
         attachments: { connect: connectById },
         messages: {
           create: {
+            messageBlocks: {
+              create: {
+                content: prompt,
+                conversationId,
+                ordinal: 0,
+                type: "TEXT"
+              }
+            },
             attachments: { connect: connectById },
             content: prompt,
             senderType: "USER",
@@ -437,6 +502,14 @@ export class PrismaChatService extends PrismaAttachmentService {
         attachments: { connect: connectById },
         messages: {
           create: {
+            messageBlocks: {
+              create: {
+                content: messageData.content,
+                conversationId,
+                ordinal: 0,
+                type: "TEXT"
+              }
+            },
             attachments: { connect: connectById },
             ...messageData
           }
@@ -480,6 +553,14 @@ export class PrismaChatService extends PrismaAttachmentService {
       data: {
         messages: {
           create: {
+            messageBlocks: {
+              create: {
+                content: messageData.content,
+                conversationId,
+                ordinal: 0,
+                type: "TEXT"
+              }
+            },
             ...messageData
           }
         },
@@ -518,6 +599,7 @@ export class PrismaChatService extends PrismaAttachmentService {
         messages: {
           orderBy: { createdAt: "asc" },
           include: {
+            messageBlocks: true,
             imageGenJob: true,
             attachments: {
               where: {
@@ -535,6 +617,7 @@ export class PrismaChatService extends PrismaAttachmentService {
               include: {
                 image: true,
                 document: true,
+                audio: true,
                 imageGenOutput: true
               }
             }
@@ -545,6 +628,14 @@ export class PrismaChatService extends PrismaAttachmentService {
       data: {
         messages: {
           create: {
+            messageBlocks: {
+              create: {
+                content: prompt,
+                conversationId,
+                ordinal: 0,
+                type: "TEXT"
+              }
+            },
             content: prompt,
             senderType: "USER",
             provider: this.providerToPrismaFormat(provider),
@@ -810,6 +901,7 @@ export class PrismaChatService extends PrismaAttachmentService {
     mime?: string;
   }) {
     const { keyId } = await this.handleApiKeyLookup(provider, userId);
+
     const mapImgs = data.imgGenFields?.images
       ?.concat(data.imgGenFields?.partialImages ?? [])
       ?.map(t => {
@@ -901,6 +993,7 @@ export class PrismaChatService extends PrismaAttachmentService {
             orderBy: { createdAt: "desc" },
             take: 1,
             include: {
+              messageBlocks: true,
               attachments: { include: { imageGenOutput: true, image: true } }
             }
           },
@@ -912,7 +1005,20 @@ export class PrismaChatService extends PrismaAttachmentService {
             create: {
               messageType: data?.imgGenEnabled === true ? "IMAGE_GEN" : "TEXT",
               attachments: mapImgs ? { create: mapImgs } : undefined,
-              senderType: "AI",responseOutput: data.responseOutput ?? undefined,
+              messageBlocks:
+                data.messageBlocks && data.messageBlocks.length > 0
+                  ? {
+                      create: data.messageBlocks.map(block => ({
+                        content: block.content,
+                        conversationId: data.conversationId,
+                        durationMs: block.durationMs,
+                        ordinal: block.ordinal,
+                        type: block.type
+                      }))
+                    }
+                  : undefined,
+              senderType: "AI",
+              responseOutput: data.responseOutput ?? undefined,
               provider: this.providerToPrismaFormat(provider),
               model: data.model,
               thinkingDuration: data.thinkingDuration,

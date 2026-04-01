@@ -48,6 +48,7 @@ interface ChatMessageProps {
 
 // Global cache for processed markdown
 const markdownCache = new Map<string, ReactNode>();
+const ENCRYPTED_THINKING_PLACEHOLDER = "*encrypted output...*";
 
 function formatAttmntLabel(message: MessageSingleton<true>) {
   if (message.attachments.length === 1) return "Attachment";
@@ -84,6 +85,9 @@ export function MessageBubble({
 
   const [renderedThinkingContent, setRenderedThinkingContent] =
     useState<ReactNode | null>(null);
+  const [renderedBlockContent, setRenderedBlockContent] = useState<
+    Record<number, ReactNode>
+  >({});
 
   const processingRef = useRef(false);
 
@@ -107,7 +111,37 @@ export function MessageBubble({
     [message.provider]
   );
 
-  const contentToCopy = message.content;
+  const orderedMessageBlocks = useMemo(() => {
+    if (
+      message.senderType !== "AI" ||
+      !message.messageBlocks ||
+      message.messageBlocks.length === 0
+    ) {
+      return Array.of<
+        NonNullable<MessageSingleton<true>["messageBlocks"]>[number]
+      >();
+    }
+
+    return [...message.messageBlocks].sort(
+      (left, right) => left.ordinal - right.ordinal
+    );
+  }, [message.messageBlocks, message.senderType]);
+
+  const hasRenderableMessageBlocks = orderedMessageBlocks.length > 0;
+  const latestMessageBlock = orderedMessageBlocks.at(-1);
+
+  const contentToCopy = useMemo(() => {
+    if (!hasRenderableMessageBlocks) {
+      return message.content;
+    }
+
+    const textContent = orderedMessageBlocks
+      .filter(block => block.type === "TEXT")
+      .map(block => block.content)
+      .join("");
+
+    return textContent.length > 0 ? textContent : message.content;
+  }, [hasRenderableMessageBlocks, message.content, orderedMessageBlocks]);
 
   // Lightweight, derived thinking content during live streaming to avoid setState in effects
   const streamingThinkingRenderedContent = useMemo(() => {
@@ -377,6 +411,127 @@ export function MessageBubble({
     })();
   }, [message.thinkingText, message.id, isStreaming, liveIsThinking]);
 
+  useEffect(() => {
+    if (!hasRenderableMessageBlocks) {
+      setRenderedBlockContent({});
+      return;
+    }
+
+    if (isStreaming) {
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      const nextRendered = {} satisfies Record<number, ReactNode>;
+
+      try {
+        const { processMarkdownToReact } = await import("@/lib/processor");
+
+        for (const block of orderedMessageBlocks) {
+          const blockContent =
+            block.type === "ENCRYPTED_THINKING"
+              ? ENCRYPTED_THINKING_PLACEHOLDER
+              : block.content;
+
+          if (!blockContent) {
+            continue;
+          }
+
+          const cacheKey = `block-${message.id}-${block.ordinal}-${block.type}-${blockContent.length}`;
+          const cached = markdownCache.get(cacheKey);
+
+          if (cached) {
+            nextRendered[block.ordinal] = cached;
+            continue;
+          }
+
+          const processed = await processMarkdownToReact(blockContent);
+          markdownCache.set(cacheKey, processed);
+          nextRendered[block.ordinal] = processed;
+        }
+
+        if (!cancelled) {
+          setRenderedBlockContent(nextRendered);
+          if (markdownCache.size > 50) {
+            const firstKey = markdownCache.keys().next().value;
+            if (firstKey) markdownCache.delete(firstKey);
+          }
+        }
+      } catch (error) {
+        console.error("Message block markdown processing error:", error);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [hasRenderableMessageBlocks, isStreaming, message.id, orderedMessageBlocks]);
+
+  const renderedMessageBlocks = useMemo(() => {
+    if (!hasRenderableMessageBlocks) {
+      return null;
+    }
+
+    const rendered = Array.of<ReactNode>();
+
+    for (const block of orderedMessageBlocks) {
+      const blockContent =
+        block.type === "ENCRYPTED_THINKING"
+          ? ENCRYPTED_THINKING_PLACEHOLDER
+          : block.content;
+      const isThinkingBlock =
+        block.type === "THINKING" || block.type === "ENCRYPTED_THINKING";
+      const isActiveThinkingBlock =
+        isThinkingBlock &&
+        isStreaming &&
+        liveIsThinking === true &&
+        latestMessageBlock?.ordinal === block.ordinal;
+
+      if (isThinkingBlock) {
+        rendered.push(
+          <ThinkingSection
+            key={`${message.id}-thinking-${block.ordinal}`}
+            isThinking={isActiveThinkingBlock}
+            thinkingContent={
+              isStreaming
+                ? processStreamingMarkdown(blockContent)
+                : (renderedBlockContent[block.ordinal] ?? blockContent)
+            }
+            duration={block.durationMs}
+            isStreaming={isActiveThinkingBlock}
+          />
+        );
+        continue;
+      }
+
+      if (!blockContent) {
+        continue;
+      }
+
+      rendered.push(
+        <div
+          key={`${message.id}-text-${block.ordinal}`}
+          className="leading-relaxed text-pretty whitespace-pre-wrap">
+          {isStreaming
+            ? processStreamingMarkdown(blockContent)
+            : (renderedBlockContent[block.ordinal] ?? blockContent)}
+        </div>
+      );
+    }
+
+    return rendered;
+  }, [
+    hasRenderableMessageBlocks,
+    isStreaming,
+    latestMessageBlock?.ordinal,
+    liveIsThinking,
+    message.id,
+    orderedMessageBlocks,
+    renderedBlockContent
+  ]);
+
   return (
     <>
       <div
@@ -423,40 +578,46 @@ export function MessageBubble({
               <span className="sr-only">Message options</span>
             </Button>
           )}
-          {liveIsThinking || liveThinkingText ? (
-            <ThinkingSection
-              isThinking={liveIsThinking}
-              thinkingContent={
-                streamingThinkingRenderedContent ??
-                renderedThinkingContent ??
-                message.thinkingText
-              }
-              duration={
-                liveThinkingDuration ?? message?.thinkingDuration ?? undefined
-              }
-              isStreaming={isStreaming ?? liveIsThinking ?? false}
-            />
-          ) : message.thinkingText ? (
-            <ThinkingSection
-              isThinking={liveIsThinking}
-              thinkingContent={
-                streamingThinkingRenderedContent ??
-                renderedThinkingContent ??
-                message.thinkingText
-              }
-              duration={
-                liveThinkingDuration ?? message?.thinkingDuration ?? undefined
-              }
-              isStreaming={isStreaming ?? liveIsThinking ?? false}
-            />
+          {hasRenderableMessageBlocks ? (
+            renderedMessageBlocks
           ) : (
-            <></>
+            <>
+              {liveIsThinking || liveThinkingText ? (
+                <ThinkingSection
+                  isThinking={liveIsThinking}
+                  thinkingContent={
+                    streamingThinkingRenderedContent ??
+                    renderedThinkingContent ??
+                    message.thinkingText
+                  }
+                  duration={
+                    liveThinkingDuration ?? message?.thinkingDuration ?? undefined
+                  }
+                  isStreaming={isStreaming ?? liveIsThinking ?? false}
+                />
+              ) : message.thinkingText ? (
+                <ThinkingSection
+                  isThinking={liveIsThinking}
+                  thinkingContent={
+                    streamingThinkingRenderedContent ??
+                    renderedThinkingContent ??
+                    message.thinkingText
+                  }
+                  duration={
+                    liveThinkingDuration ?? message?.thinkingDuration ?? undefined
+                  }
+                  isStreaming={isStreaming ?? liveIsThinking ?? false}
+                />
+              ) : (
+                <></>
+              )}
+              <div className="leading-relaxed text-pretty whitespace-pre-wrap">
+                {isStreaming
+                  ? streamingRenderedContent
+                  : (renderedContent ?? message.content)}
+              </div>
+            </>
           )}
-          <div className="leading-relaxed text-pretty whitespace-pre-wrap">
-            {isStreaming
-              ? streamingRenderedContent
-              : (renderedContent ?? message.content)}
-          </div>
           {message.senderType !== "USER" &&
             (imageGenerationData ? (
               <ImageGenerationCanvasTest

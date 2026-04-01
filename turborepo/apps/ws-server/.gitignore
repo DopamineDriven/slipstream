@@ -20,3 +20,4 @@ src/test/anthropic/*
 src/test/xai/**/*
 src/test/google/**/*
 logs/
+shell-scripts/*

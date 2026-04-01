@@ -60,6 +60,9 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       name: "file_search",
       allowed_callers: ["direct", "code_execution_20250825"],
       description:
+        "This tool utilizes a 'Partitioned Foraging' approach which recognizes that for the 200,000+ years that humans have existed " +
+        "95%+ of it has been as foragers. Agents are trained exclusively on data aggregated/curated by humans; " +
+        "think of it as agentic foraging complete with Jaccard similarity scores for cross-analyzing your bounties. " +
         "Search the user's uploaded documents. Uses semantic similarity by default. " +
         "When search_terms is provided, also performs fulltext keyword search and returns " +
         "both result sets separately (semantic + fulltext) so you can reason about which signal " +
@@ -318,8 +321,19 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
             }
           }
         }
-
-        textParts.push(msg.content);
+        const blockAgg = Array.of<string>();
+        if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+          for (const block of msg.messageBlocks) {
+            if (block.type === "TEXT") {
+              blockAgg.push(block.content);
+            }
+          }
+        }
+        if (blockAgg.length > 0) {
+          textParts.push(blockAgg.join(`\n`));
+        } else {
+          textParts.push(msg.content);
+        }
         content.push({
           type: "text",
           text: textParts.join("\n\n")
@@ -328,7 +342,19 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
         messages.push({ role: "user", content });
       } else {
         const textParts = Array.of<string>();
-        textParts.push(msg.content);
+        const blockAgg = Array.of<string>();
+        if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+          for (const block of msg.messageBlocks) {
+            if (block.type === "TEXT") {
+              blockAgg.push(block.content);
+            }
+          }
+        }
+        if (blockAgg.length > 0) {
+          textParts.push(blockAgg.join(`\n`));
+        } else {
+          textParts.push(msg.content);
+        }
         if (msg.attachments && msg.attachments.length > 0) {
           for (const attachment of msg.attachments) {
             const url =
@@ -363,9 +389,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       }
     }
 
-    const systemNote = `Note: Previous responses may be tagged with their source provider-model combo for context.
-
-        Attachments marked [seen] have already been reviewed in earlier turns; re-fetch or re-extract previously seen assets as warranted (as context needs arise).`;
+    const systemNote = `Note: Previous responses may be tagged with their source provider-model combo for context.`;
 
     const enhancedSystemPrompt = systemPrompt
       ? `${systemPrompt}\n\n${systemNote}`
@@ -412,8 +436,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       keyId ?? undefined,
       apiKey
     );
-
-    this.logger.info(messages);
 
     const { max_tokens: maxTokens, thinking } = this.handleMaxTokensAndThinking(
       model,

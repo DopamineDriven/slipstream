@@ -167,7 +167,12 @@ const providerModelChatApi = {
     "Cerebras-Llama-4-Scout-17B-16E-Instruct",
     "Groq-Llama-4-Maverick-17B-128E-Instruct"
   ],
-  vercel: ["v0-1.5-md", "v0-1.0-md"]
+  vercel: ["v0-1.5-md", "v0-1.0-md"],
+  mistral: [
+    "mistral-small-latest",
+    "mistral-medium-latest",
+    "mistral-large-latest"
+  ]
 } as const;
 
 async function anthropicFetcher() {
@@ -233,6 +238,22 @@ const GROK_NAME_OVERRIDES = {
   "grok-4.20-0309-reasoning": "Grok 4.20 Reasoning",
   "grok-4.20-0309-non-reasoning": "Grok 4.20 Non-Reasoning"
 } satisfies Record<string, string>;
+
+const MISTRAL_NAME_OVERRIDES = {
+  "mistral-small-latest": "Mistral Small 4",
+  "mistral-medium-latest": "Mistral Medium Latest",
+  "mistral-large-latest": "Mistral Large Latest"
+};
+
+function mistralDisplayName(id: string) {
+  return id === "mistral-small-latest"
+    ? MISTRAL_NAME_OVERRIDES[id]
+    : id === "mistral-medium-latest"
+      ? MISTRAL_NAME_OVERRIDES[id]
+      : id === "mistral-large-latest"
+        ? MISTRAL_NAME_OVERRIDES[id]
+        : id;
+}
 
 function grokDisplayName(id: string) {
   // Start from your generic formatter (already fixes 4-digit suffix dates etc.)
@@ -542,6 +563,17 @@ const modelMapper = async (modelKeys = true) => {
           });
           return helper;
         }
+        case "mistral": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            const name = mistralDisplayName(model);
+            modelKeys === true
+              ? helper.push([model, name])
+              : helper.push([name, model]);
+          });
+          return helper;
+        }
+        case "openai":
         default: {
           let helper = Array.of<[string, string]>();
           models.forEach(function (model) {
@@ -695,8 +727,9 @@ async function displayNameModelIdGen<
   const vercel = mapper[5];
   const grok = mapper[2];
   const anthropic = mapper[3];
+  const mistral = mapper[6];
 
-  if (!openai || !gemini || !grok || !anthropic || !meta || !vercel)
+  if (!openai || !gemini || !grok || !anthropic || !meta || !vercel || !mistral)
     throw new Error("empty data in displayNameModelIdGen");
 
   if (typeof arrayOnly !== "undefined") {
@@ -708,7 +741,8 @@ async function displayNameModelIdGen<
           grok: grok.map(([keys, _]) => keys),
           anthropic: anthropic.map(([keys, _]) => keys),
           meta: meta.map(([keys, _v]) => keys),
-          vercel: vercel.map(([keys, _v]) => keys)
+          vercel: vercel.map(([keys, _v]) => keys),
+          mistral: mistral.map(([keys, _v]) => keys)
         };
       } else {
         return {
@@ -717,7 +751,8 @@ async function displayNameModelIdGen<
           grok: grok.map(([_, vals]) => vals),
           anthropic: anthropic.map(([_, vals]) => vals),
           meta: meta.map(([_, vals]) => vals),
-          vercel: vercel.map(([_, vals]) => vals)
+          vercel: vercel.map(([_, vals]) => vals),
+          mistral: mistral.map(([_, vals]) => vals)
         };
       }
     } else {
@@ -728,7 +763,8 @@ async function displayNameModelIdGen<
           grok: grok.map(([_, vals]) => vals),
           anthropic: anthropic.map(([_, vals]) => vals),
           meta: meta.map(([_, vals]) => vals),
-          vercel: vercel.map(([_, vals]) => vals)
+          vercel: vercel.map(([_, vals]) => vals),
+          mistral: mistral.map(([_, vals]) => vals)
         };
       } else {
         return {
@@ -737,7 +773,8 @@ async function displayNameModelIdGen<
           grok: grok.map(([keys, _]) => keys),
           anthropic: anthropic.map(([keys, _]) => keys),
           meta: meta.map(([keys, _v]) => keys),
-          vercel: vercel.map(([keys, _v]) => keys)
+          vercel: vercel.map(([keys, _v]) => keys),
+          mistral: mistral.map(([keys, _v]) => keys)
         };
       }
     }
@@ -748,7 +785,8 @@ async function displayNameModelIdGen<
     grok: Object.fromEntries(grok),
     anthropic: Object.fromEntries(anthropic),
     meta: Object.fromEntries(meta),
-    vercel: Object.fromEntries(vercel)
+    vercel: Object.fromEntries(vercel),
+    mistral: Object.fromEntries(mistral)
   };
 }
 

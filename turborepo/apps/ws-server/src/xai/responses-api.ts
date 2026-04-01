@@ -4,13 +4,18 @@ import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
   FunctionCallContext,
   FunctionCallOutput,
+  GrokActiveMessageBlock,
+  GrokFinalizedMessageBlock,
   ResponsesComprehensive
 } from "@/xai/responses-types.ts";
 import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
 import { GrokImgGenService } from "@/xai/img-gen.ts";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap, GrokModelIdUnion } from "@slipstream/types";
+
+const ENCRYPTED_THINKING_PLACEHOLDER = "*encrypted output...*";
 
 export class GrokResponsesApiService extends GrokImgGenService {
   constructor(
@@ -53,12 +58,186 @@ export class GrokResponsesApiService extends GrokImgGenService {
   }: GrokProviderChatRequestEntity) {
     const provider = "grok" as const;
     const mgmtKey = management_api_key ?? this.xaiManagementKey;
-    let activeThinkingStartTime: number | null = null,
-      grokThinkingDuration = 0,
-      grokIsCurrentlyThinking = false,
-      grokThinkingAgg = "",
+    let grokThinkingDuration = 0,
+      grokThinkingDisplayAgg = "",
       grokAgg = "",
       usage = 0;
+    const trackedBlocks = Array.of<GrokFinalizedMessageBlock>();
+    const encryptedReasoningByItemId = new Map<string, string>();
+    const displayedReasoningItemIds = new Set<string>();
+    let activeBlock: GrokActiveMessageBlock | undefined = undefined;
+    let nextOrdinal = 0;
+
+    const roundTrack = Array.of<{
+      type: $Enums.MessageBlockType;
+      content: string;
+      durationMs: number;
+      ordinal: number;
+      conversationId: string;
+    }>();
+
+    const pushItemId = (itemIds: string[], itemId: string) => {
+      if (!itemIds.includes(itemId)) {
+        itemIds.push(itemId);
+      }
+    };
+
+    const appendEncryptedThinkingPlaceholder = (itemId: string) => {
+      if (displayedReasoningItemIds.has(itemId)) {
+        return undefined;
+      }
+
+      displayedReasoningItemIds.add(itemId);
+      grokThinkingDisplayAgg =
+        grokThinkingDisplayAgg.length > 0
+          ? grokThinkingDisplayAgg
+              .concat("\n")
+              .concat(ENCRYPTED_THINKING_PLACEHOLDER)
+          : ENCRYPTED_THINKING_PLACEHOLDER;
+      thinkingChunks.push(ENCRYPTED_THINKING_PLACEHOLDER);
+      return ENCRYPTED_THINKING_PLACEHOLDER;
+    };
+
+    const applyEncryptedReasoning = (
+      itemId: string,
+      encryptedContent: string
+    ) => {
+      encryptedReasoningByItemId.set(itemId, encryptedContent);
+
+      let matchedBlock = false;
+      for (const block of trackedBlocks) {
+        if (!block.itemIds.includes(itemId)) {
+          continue;
+        }
+
+        matchedBlock = true;
+        const encryptedParts = block.itemIds
+          .map(id => encryptedReasoningByItemId.get(id))
+          .filter(
+            (content): content is string =>
+              typeof content === "string" && content.length > 0
+          );
+
+        if (encryptedParts.length > 0) {
+          block.type = "ENCRYPTED_THINKING";
+          block.content = encryptedParts.join("\n");
+          block.previewContent = ENCRYPTED_THINKING_PLACEHOLDER;
+        }
+      }
+
+      if (matchedBlock === false && !activeBlock?.itemIds.includes(itemId)) {
+        trackedBlocks.push({
+          content: encryptedContent,
+          durationMs: 0,
+          itemIds: [itemId],
+          ordinal: nextOrdinal,
+          previewContent: ENCRYPTED_THINKING_PLACEHOLDER,
+          type: "ENCRYPTED_THINKING"
+        });
+        nextOrdinal += 1;
+      }
+    };
+
+    const finalizeActiveBlock = () => {
+      if (!activeBlock) {
+        return;
+      }
+
+      const previewContent = activeBlock.content;
+      const encryptedParts =
+        activeBlock.type === "ENCRYPTED_THINKING"
+          ? activeBlock.itemIds
+              .map(itemId => encryptedReasoningByItemId.get(itemId))
+              .filter(
+                (content): content is string =>
+                  typeof content === "string" && content.length > 0
+              )
+          : Array.of<string>();
+
+      if (
+        activeBlock.type === "TEXT" &&
+        previewContent.length === 0 &&
+        encryptedParts.length === 0
+      ) {
+        activeBlock = undefined;
+        return;
+      }
+
+      const durationMs = Math.max(
+        0,
+        Math.round(performance.now() - activeBlock.startedAt)
+      );
+
+      trackedBlocks.push({
+        content:
+          encryptedParts.length > 0
+            ? encryptedParts.join("\n")
+            : previewContent,
+        durationMs,
+        itemIds: Array.from(activeBlock.itemIds),
+        ordinal: nextOrdinal,
+        previewContent:
+          activeBlock.type === "ENCRYPTED_THINKING"
+            ? ENCRYPTED_THINKING_PLACEHOLDER
+            : previewContent,
+        type: activeBlock.type
+      });
+
+      if (activeBlock.type === "ENCRYPTED_THINKING") {
+        grokThinkingDuration += durationMs;
+      }
+
+      nextOrdinal += 1;
+      activeBlock = undefined;
+    };
+
+    const ensureActiveBlock = (
+      type: GrokActiveMessageBlock["type"],
+      itemId: string
+    ) => {
+      if (activeBlock?.type !== type) {
+        finalizeActiveBlock();
+        activeBlock = {
+          content: "",
+          itemIds: [itemId],
+          startedAt: performance.now(),
+          type
+        };
+        return activeBlock;
+      }
+
+      pushItemId(activeBlock.itemIds, itemId);
+      return activeBlock;
+    };
+
+    const currentThinkingDuration = () => {
+      const activeThinkingDuration =
+        activeBlock?.type === "ENCRYPTED_THINKING"
+          ? Math.round(performance.now() - activeBlock.startedAt)
+          : 0;
+
+      return grokThinkingDuration + activeThinkingDuration;
+    };
+
+    const currentChunkMessageBlock = () => {
+      if (!activeBlock) {
+        return undefined;
+      }
+
+      return {
+        type: activeBlock.type,
+        content:
+          activeBlock.type === "ENCRYPTED_THINKING"
+            ? ENCRYPTED_THINKING_PLACEHOLDER
+            : activeBlock.content,
+        ordinal: nextOrdinal,
+        conversationId,
+        durationMs: Math.max(
+          0,
+          Math.round(performance.now() - activeBlock.startedAt)
+        )
+      } as const;
+    };
 
     const m = model as GrokModelIdUnion;
     const supportsFunctionTools = this.canUseFunctionTools(m);
@@ -169,20 +348,9 @@ export class GrokResponsesApiService extends GrokImgGenService {
 
           if (chunk.event === "response.output_item.added") {
             if (chunk.data.item.type === "reasoning") {
-              if (!grokIsCurrentlyThinking) {
-                grokIsCurrentlyThinking = true;
-                activeThinkingStartTime = performance.now();
-              }
-            }
-
-            if (chunk.data.item.type === "message") {
-              if (grokIsCurrentlyThinking && activeThinkingStartTime !== null) {
-                grokThinkingDuration += Math.round(
-                  performance.now() - activeThinkingStartTime
-                );
-                activeThinkingStartTime = null;
-                grokIsCurrentlyThinking = false;
-              }
+              ensureActiveBlock("ENCRYPTED_THINKING", chunk.data.item.id);
+            } else {
+              finalizeActiveBlock();
             }
 
             if (chunk.data.item.type === "function_call") {
@@ -232,7 +400,13 @@ export class GrokResponsesApiService extends GrokImgGenService {
 
           if (chunk.event === "response.output_item.done") {
             if (chunk.data.item.type === "reasoning") {
-              thinkingText = chunk.data.item.encrypted_content;
+              applyEncryptedReasoning(
+                chunk.data.item.id,
+                chunk.data.item.encrypted_content
+              );
+              thinkingText = appendEncryptedThinkingPlaceholder(
+                chunk.data.item.id
+              );
             }
 
             if (chunk.data.item.type === "file_search_call") {
@@ -268,10 +442,14 @@ export class GrokResponsesApiService extends GrokImgGenService {
           }
 
           if (chunk.event === "response.reasoning_summary_text.delta") {
-            thinkingText = chunk.data.delta;
+            thinkingText = appendEncryptedThinkingPlaceholder(
+              chunk.data.item_id
+            );
           }
 
           if (chunk.event === "response.output_text.delta") {
+            const block = ensureActiveBlock("TEXT", chunk.data.item_id);
+            block.content += chunk.data.delta;
             text = chunk.data.delta;
           }
 
@@ -290,14 +468,16 @@ export class GrokResponsesApiService extends GrokImgGenService {
             }
 
             responseOutput = JSON.stringify(chunk.data.response.output);
-
-            if (grokIsCurrentlyThinking && activeThinkingStartTime !== null) {
-              grokThinkingDuration += Math.round(
-                performance.now() - activeThinkingStartTime
-              );
-              activeThinkingStartTime = null;
-              grokIsCurrentlyThinking = false;
+            for (const output of chunk.data.response.output) {
+              if (
+                output.type === "reasoning" &&
+                output.encrypted_content.length > 0
+              ) {
+                applyEncryptedReasoning(output.id, output.encrypted_content);
+                appendEncryptedThinkingPlaceholder(output.id);
+              }
             }
+            finalizeActiveBlock();
 
             for (const output of chunk.data.response.output) {
               if (
@@ -317,16 +497,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
             }
           }
 
-          if (thinkingText && grokIsCurrentlyThinking) {
-            grokThinkingAgg += thinkingText;
-            thinkingChunks.push(thinkingText);
-
-            const currentThinkingDuration =
-              grokThinkingDuration +
-              (activeThinkingStartTime !== null
-                ? performance.now() - activeThinkingStartTime
-                : 0);
-
+          if (thinkingText) {
             ws.send(
               JSON.stringify({
                 type: "ai_chat_chunk",
@@ -340,7 +511,11 @@ export class GrokResponsesApiService extends GrokImgGenService {
                 temperature,
                 thinkingText,
                 isThinking: true,
-                thinkingDuration: currentThinkingDuration,
+                messageBlocks: currentChunkMessageBlock(),
+                thinkingDuration:
+                  currentThinkingDuration() > 0
+                    ? currentThinkingDuration()
+                    : undefined,
                 topP,
                 model: m,
                 done: false
@@ -356,8 +531,12 @@ export class GrokResponsesApiService extends GrokImgGenService {
               imgGenEnabled: false,
               title,
               isThinking: true,
-              thinkingDuration: currentThinkingDuration,
+              thinkingDuration:
+                currentThinkingDuration() > 0
+                  ? currentThinkingDuration()
+                  : undefined,
               thinkingText,
+              messageBlocks: currentChunkMessageBlock(),
               systemPrompt,
               temperature,
               topP,
@@ -383,7 +562,8 @@ export class GrokResponsesApiService extends GrokImgGenService {
                 temperature,
                 thinkingDuration:
                   grokThinkingDuration !== 0 ? grokThinkingDuration : undefined,
-                isThinking: grokIsCurrentlyThinking,
+                isThinking: false,
+                messageBlocks: currentChunkMessageBlock(),
                 topP,
                 model: m,
                 chunk: text,
@@ -401,8 +581,12 @@ export class GrokResponsesApiService extends GrokImgGenService {
               title,
               thinkingDuration:
                 grokThinkingDuration !== 0 ? grokThinkingDuration : undefined,
-              isThinking: grokIsCurrentlyThinking,
-              thinkingText: grokThinkingAgg,
+              isThinking: false,
+              thinkingText:
+                grokThinkingDisplayAgg.length > 0
+                  ? grokThinkingDisplayAgg
+                  : undefined,
+              messageBlocks: currentChunkMessageBlock(),
               systemPrompt,
               temperature,
               topP,
@@ -476,6 +660,25 @@ export class GrokResponsesApiService extends GrokImgGenService {
         grokAgg =
           "I ran document search multiple times but kept hitting a tool loop before a stable answer was produced. " +
           "Please rephrase with a narrower query, such as an exact filename or section title, and I will retry.";
+        trackedBlocks.push({
+          content: grokAgg,
+          durationMs: 0,
+          itemIds: Array.of<string>(),
+          ordinal: nextOrdinal,
+          previewContent: grokAgg,
+          type: "TEXT"
+        });
+        nextOrdinal += 1;
+      }
+
+      for (const block of trackedBlocks) {
+        roundTrack.push({
+          type: block.type,
+          content: block.content,
+          durationMs: block.durationMs,
+          ordinal: block.ordinal,
+          conversationId
+        });
       }
 
       const d = await this.prisma.handleAiChatResponse({
@@ -495,7 +698,11 @@ export class GrokResponsesApiService extends GrokImgGenService {
         systemPrompt,
         thinkingDuration:
           grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
-        thinkingText: grokThinkingAgg,
+        thinkingText:
+          grokThinkingDisplayAgg.length > 0
+            ? grokThinkingDisplayAgg
+            : undefined,
+        messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
         temperature,
         topP
       });
@@ -513,12 +720,16 @@ export class GrokResponsesApiService extends GrokImgGenService {
           usage,
           thinkingDuration:
             grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
-          thinkingText: grokThinkingAgg,
+          thinkingText:
+            grokThinkingDisplayAgg.length > 0
+              ? grokThinkingDisplayAgg
+              : undefined,
           title,
           temperature,
           topP,
           model: m,
           chunk: grokAgg,
+          messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
           done: true
         } satisfies EventTypeMap["ai_chat_response"])
       );
@@ -536,7 +747,11 @@ export class GrokResponsesApiService extends GrokImgGenService {
         imgGenEnabled: false,
         thinkingDuration:
           grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
-        thinkingText: grokThinkingAgg,
+        thinkingText:
+          grokThinkingDisplayAgg.length > 0
+            ? grokThinkingDisplayAgg
+            : undefined,
+        messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
         topP,
         provider,
         model: m,

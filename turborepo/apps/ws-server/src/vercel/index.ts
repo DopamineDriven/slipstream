@@ -16,6 +16,7 @@ import type {
   MessageSingleton,
   VercelModelIdUnion
 } from "@slipstream/types";
+import { $Enums } from "@slipstream/db/node/generated/client";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 interface V0FunctionTool {
@@ -77,6 +78,21 @@ type V0AccumulatedToolCall = {
   name: string;
   arguments: string;
 };
+
+interface V0ActiveMessageBlock {
+  content: string;
+  reasoningChunkCount: number;
+  sawAggregateTail: boolean;
+  startedAt: number;
+  type: "THINKING" | "TEXT";
+}
+
+interface V0FinalizedMessageBlock {
+  content: string;
+  durationMs: number;
+  ordinal: number;
+  type: $Enums.MessageBlockType;
+}
 
 type V0ForcedLoopStopReason =
   | "MAX_ROUNDS"
@@ -167,15 +183,37 @@ export class v0Service {
       : `${historyNote}`;
   }
 
+  private messageText(
+    msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
+  ) {
+    const textBlocks = Array.of<string>();
+
+    if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+      for (const block of msg.messageBlocks) {
+        if (block.type === "TEXT") {
+          textBlocks.push(block.content);
+        }
+      }
+    }
+
+    if (textBlocks.length > 0) {
+      return textBlocks.join("\n");
+    }
+
+    return msg.content;
+  }
+
   private prependProviderModelTag(
     msgs: Pick<
       MessageSingleton<true>,
-      "senderType" | "provider" | "model" | "content"
+      "senderType" | "provider" | "model" | "content" | "messageBlocks"
     >[]
   ) {
     return msgs.map(msg => {
+      const text = this.messageText(msg);
+
       if (msg.senderType === "USER") {
-        return { role: "user", content: msg.content } as const;
+        return { role: "user", content: text } as const;
       }
 
       const provider = msg.provider.toLowerCase();
@@ -183,7 +221,7 @@ export class v0Service {
       const modelIdentifier = `[${provider}/${model}]`;
       return {
         role: "assistant",
-        content: `${modelIdentifier} \n${msg.content}`
+        content: `${modelIdentifier} \n${text}`
       } as const;
     }) satisfies V0BaseMessage[];
   }
@@ -210,7 +248,7 @@ export class v0Service {
   ) {
     if (isNewChat) {
       const first = msgs[0];
-      const userContent = first ? first.content : "";
+      const userContent = first ? this.messageText(first) : "";
       return [
         {
           role: "system",
@@ -604,14 +642,121 @@ export class v0Service {
     topP
   }: ProviderChatRequestEntity) {
     const provider = "vercel" as const;
-    let v0ThinkingStartTime: number | null = null,
-      v0ThinkingDuration = 0,
-      v0IsCurrentlyThinking = false,
+    let v0ThinkingDuration = 0,
       v0ThinkingAgg = "",
       v0Agg = "",
-      iThink = 0,
-      v0HasThinkingAggregateFinal = false,
       totalUsage = 0;
+    const trackedBlocks = Array.of<V0FinalizedMessageBlock>();
+    let activeBlock: V0ActiveMessageBlock | undefined = undefined;
+    let nextOrdinal = 0;
+
+    const roundTrack = Array.of<{
+      type: $Enums.MessageBlockType;
+      content: string;
+      durationMs: number;
+      ordinal: number;
+      conversationId: string;
+    }>();
+
+    const finalizeActiveBlock = () => {
+      if (!activeBlock || activeBlock.content.length === 0) {
+        activeBlock = undefined;
+        return;
+      }
+
+      const durationMs = Math.max(
+        0,
+        Math.round(performance.now() - activeBlock.startedAt)
+      );
+
+      trackedBlocks.push({
+        content: activeBlock.content,
+        durationMs,
+        ordinal: nextOrdinal,
+        type: activeBlock.type
+      });
+
+      if (activeBlock.type === "THINKING") {
+        v0ThinkingDuration += durationMs;
+      }
+
+      nextOrdinal += 1;
+      activeBlock = undefined;
+    };
+
+    const ensureActiveBlock = (type: V0ActiveMessageBlock["type"]) => {
+      if (activeBlock?.type !== type) {
+        finalizeActiveBlock();
+        activeBlock = {
+          content: "",
+          reasoningChunkCount: 0,
+          sawAggregateTail: false,
+          startedAt: performance.now(),
+          type
+        };
+      }
+
+      return activeBlock;
+    };
+
+    const currentThinkingDuration = () => {
+      const activeThinkingDuration =
+        activeBlock?.type === "THINKING"
+          ? Math.round(performance.now() - activeBlock.startedAt)
+          : 0;
+
+      return v0ThinkingDuration + activeThinkingDuration;
+    };
+
+    const currentChunkMessageBlock = () => {
+      if (!activeBlock) {
+        return undefined;
+      }
+
+      return {
+        type: activeBlock.type,
+        content: activeBlock.content,
+        ordinal: nextOrdinal,
+        conversationId,
+        durationMs: Math.max(
+          0,
+          Math.round(performance.now() - activeBlock.startedAt)
+        )
+      } as const;
+    };
+
+    const appendReasoningDelta = (reasoningText: string) => {
+      const block = ensureActiveBlock("THINKING");
+      block.reasoningChunkCount += 1;
+
+      let emittedThinkingText = reasoningText;
+      if (
+        block.reasoningChunkCount > 3 &&
+        Math.abs(block.content.length - reasoningText.length) <=
+          4 * block.reasoningChunkCount
+      ) {
+        block.sawAggregateTail = true;
+        const prependNew = `\n${reasoningText}`;
+        emittedThinkingText =
+          block.content.length < prependNew.length
+            ? prependNew.substring(block.content.length)
+            : "";
+      }
+
+      if (emittedThinkingText.length === 0) {
+        return undefined;
+      }
+
+      const appendedText = block.sawAggregateTail
+        ? emittedThinkingText
+        : reasoningText;
+
+      block.content += appendedText;
+      v0ThinkingAgg += appendedText;
+      thinkingChunks.push(appendedText);
+
+      return emittedThinkingText;
+    };
 
     const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
     const tools = hasUserStoreDocs
@@ -645,47 +790,15 @@ export class v0Service {
         for (const choice of chunk.choices ?? []) {
           if (choice.finish_reason === "tool_calls") {
             sawToolCallFinish = true;
-          }
-
-          if (hasToolCallDelta(choice.delta)) {
-            this.accumulateToolCallDelta(
-              roundToolCalls,
-              choice.delta.tool_calls
-            );
+            finalizeActiveBlock();
           }
 
           if (isReasoningDelta(choice.delta)) {
-            const thinkingText = choice.delta.reasoning_content;
-            if (typeof v0ThinkingStartTime !== "number") {
-              v0ThinkingStartTime = performance.now();
-            }
-            if (v0IsCurrentlyThinking === false) {
-              v0IsCurrentlyThinking = true;
-            }
+            const emittedThinkingText = appendReasoningDelta(
+              choice.delta.reasoning_content
+            );
 
-            iThink += 1;
-            let emittedThinkingText = thinkingText;
-            if (
-              iThink > 3 &&
-              Math.abs(v0ThinkingAgg.length - thinkingText.length) <= 4 * iThink
-            ) {
-              v0HasThinkingAggregateFinal = true;
-              const prependNew = `\n${thinkingText}`;
-              emittedThinkingText =
-                v0ThinkingAgg.length < prependNew.length
-                  ? prependNew.substring(v0ThinkingAgg.length)
-                  : "";
-            }
-
-            if (emittedThinkingText.length > 0) {
-              if (v0HasThinkingAggregateFinal) {
-                v0ThinkingAgg += emittedThinkingText;
-                thinkingChunks.push(emittedThinkingText);
-              } else {
-                v0ThinkingAgg += thinkingText;
-                thinkingChunks.push(thinkingText);
-              }
-
+            if (emittedThinkingText && emittedThinkingText.length > 0) {
               ws.send(
                 JSON.stringify({
                   type: "ai_chat_chunk",
@@ -698,9 +811,10 @@ export class v0Service {
                   systemPrompt,
                   temperature,
                   thinkingText: emittedThinkingText,
-                  isThinking: v0IsCurrentlyThinking,
-                  thinkingDuration: v0ThinkingStartTime
-                    ? performance.now() - v0ThinkingStartTime
+                  messageBlocks: currentChunkMessageBlock(),
+                  isThinking: true,
+                  thinkingDuration: currentThinkingDuration() > 0
+                    ? currentThinkingDuration()
                     : undefined,
                   topP,
                   model,
@@ -719,11 +833,12 @@ export class v0Service {
                   userMsgId,
                   imgGenEnabled: false,
                   title,
-                  isThinking: v0IsCurrentlyThinking,
-                  thinkingDuration: v0ThinkingStartTime
-                    ? performance.now() - v0ThinkingStartTime
+                  isThinking: true,
+                  thinkingDuration: currentThinkingDuration() > 0
+                    ? currentThinkingDuration()
                     : undefined,
                   thinkingText: emittedThinkingText,
+                  messageBlocks: currentChunkMessageBlock(),
                   systemPrompt,
                   temperature,
                   topP,
@@ -754,15 +869,8 @@ export class v0Service {
 
           if (isContentDelta(choice.delta)) {
             const text = choice.delta.content;
-            if (
-              v0IsCurrentlyThinking === true &&
-              v0ThinkingStartTime !== null
-            ) {
-              v0IsCurrentlyThinking = false;
-              v0ThinkingDuration = Math.round(
-                performance.now() - v0ThinkingStartTime
-              );
-            }
+            const block = ensureActiveBlock("TEXT");
+            block.content += text;
 
             chunks.push(text);
             v0Agg += text;
@@ -781,6 +889,7 @@ export class v0Service {
                 thinkingDuration:
                   v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
                 isThinking: false,
+                messageBlocks: currentChunkMessageBlock(),
                 topP,
                 model,
                 chunk: text,
@@ -801,6 +910,7 @@ export class v0Service {
               isThinking: false,
               thinkingText:
                 v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+              messageBlocks: currentChunkMessageBlock(),
               systemPrompt,
               temperature,
               topP,
@@ -827,8 +937,18 @@ export class v0Service {
               );
             }
           }
+
+          if (hasToolCallDelta(choice.delta)) {
+            this.accumulateToolCallDelta(
+              roundToolCalls,
+              choice.delta.tool_calls
+            );
+            finalizeActiveBlock();
+          }
         }
       }
+
+      finalizeActiveBlock();
 
       if (roundUsage) {
         totalUsage += roundUsage.total_tokens;
@@ -885,6 +1005,23 @@ export class v0Service {
       v0Agg =
         "I ran document search multiple times but kept hitting a tool loop before a stable answer was produced. " +
         "Please rephrase with a narrower query, such as an exact filename or section title, and I will retry.";
+      trackedBlocks.push({
+        content: v0Agg,
+        durationMs: 0,
+        ordinal: nextOrdinal,
+        type: "TEXT"
+      });
+      nextOrdinal += 1;
+    }
+
+    for (const block of trackedBlocks) {
+      roundTrack.push({
+        type: block.type,
+        content: block.content,
+        durationMs: block.durationMs,
+        ordinal: block.ordinal,
+        conversationId
+      });
     }
 
     const finalUsage = totalUsage > 0 ? totalUsage : undefined;
@@ -901,6 +1038,7 @@ export class v0Service {
       systemPrompt,
       thinkingDuration: v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
       thinkingText: v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+      messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
       temperature,
       usage: finalUsage,
       topP
@@ -925,6 +1063,7 @@ export class v0Service {
         model,
         usage: finalUsage,
         chunk: v0Agg,
+        messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
         done: true
       } satisfies EventTypeMap["ai_chat_response"])
     );
@@ -941,6 +1080,7 @@ export class v0Service {
       title,
       thinkingDuration: v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
       thinkingText: v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+      messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
       topP,
       usage: finalUsage,
       provider,

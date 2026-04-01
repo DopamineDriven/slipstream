@@ -14,7 +14,7 @@ import {
   updateUserStoreChunkState,
   updateUserStoreDocState
 } from "@slipstream/db/sql-node";
-import { PrismaTTSService } from "./tts.ts";
+import { PrismaTTSService } from "@/prisma/tts.ts";
 
 export class PrismaUserStoreService extends PrismaTTSService {
   constructor(

@@ -12,6 +12,7 @@ import type {
   Part
 } from "@google/genai";
 import { GeminiWorkupService } from "@/gemini/workup.ts";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
@@ -19,6 +20,19 @@ import type {
   EventTypeMap,
   GeminiModelIdUnion
 } from "@slipstream/types";
+
+interface GeminiActiveMessageBlock {
+  content: string;
+  startedAt: number;
+  type: "THINKING" | "TEXT";
+}
+
+interface GeminiFinalizedMessageBlock {
+  content: string;
+  durationMs: number;
+  ordinal: number;
+  type: $Enums.MessageBlockType;
+}
 
 export class GeminiChatService extends GeminiWorkupService {
   constructor(
@@ -190,9 +204,7 @@ export class GeminiChatService extends GeminiWorkupService {
     const MAX_ROUNDS = 10;
     const maxUserStoreSearchCalls = 10;
 
-    let geminiThinkingStartTime: number | null = null,
-      geminiThinkingDuration = 0,
-      geminiIsCurrentlyThinking = false,
+    let geminiThinkingDuration = 0,
       geminiThinkingAgg = "",
       usage = 0,
       resId: string | undefined = undefined,
@@ -201,6 +213,17 @@ export class GeminiChatService extends GeminiWorkupService {
       uploadtDelta = 0,
       geminiAgg = "",
       geminiDataPart: Blob | undefined = undefined;
+    const trackedBlocks = Array.of<GeminiFinalizedMessageBlock>();
+    let activeBlock: GeminiActiveMessageBlock | undefined = undefined;
+    let nextOrdinal = 0;
+
+    const roundTrack = Array.of<{
+      type: $Enums.MessageBlockType;
+      content: string;
+      durationMs: number;
+      ordinal: number;
+      conversationId: string;
+    }>();
 
     let roundContents = Array.of<Content>(...params.contents);
     let forcedLoopStopReason:
@@ -215,14 +238,203 @@ export class GeminiChatService extends GeminiWorkupService {
 
     const gemini = this.getClient(apiKey);
 
-    const getThinkingDuration = () => {
-      if (typeof geminiThinkingStartTime === "number") {
-        return (
-          geminiThinkingDuration + (performance.now() - geminiThinkingStartTime)
-        );
+    const finalizeActiveBlock = () => {
+      if (!activeBlock || activeBlock.content.length === 0) {
+        activeBlock = undefined;
+        return;
       }
 
-      return geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined;
+      const durationMs = Math.max(
+        0,
+        Math.round(performance.now() - activeBlock.startedAt)
+      );
+
+      trackedBlocks.push({
+        content: activeBlock.content,
+        durationMs,
+        ordinal: nextOrdinal,
+        type: activeBlock.type
+      });
+
+      if (activeBlock.type === "THINKING") {
+        geminiThinkingDuration += durationMs;
+      }
+
+      nextOrdinal += 1;
+      activeBlock = undefined;
+    };
+
+    const ensureActiveBlock = (type: GeminiActiveMessageBlock["type"]) => {
+      if (activeBlock?.type !== type) {
+        finalizeActiveBlock();
+        activeBlock = {
+          content: "",
+          startedAt: performance.now(),
+          type
+        };
+      }
+
+      return activeBlock;
+    };
+
+    const getThinkingDuration = () => {
+      const activeThinkingDuration =
+        activeBlock?.type === "THINKING"
+          ? Math.round(performance.now() - activeBlock.startedAt)
+          : 0;
+
+      const totalThinkingDuration =
+        geminiThinkingDuration + activeThinkingDuration;
+
+      return totalThinkingDuration > 0 ? totalThinkingDuration : undefined;
+    };
+
+    const currentChunkMessageBlock = () => {
+      if (!activeBlock) {
+        return undefined;
+      }
+
+      return {
+        type: activeBlock.type,
+        content: activeBlock.content,
+        ordinal: nextOrdinal,
+        conversationId,
+        durationMs: Math.max(
+          0,
+          Math.round(performance.now() - activeBlock.startedAt)
+        )
+      } as const;
+    };
+
+    const emitThinkingChunk = (thinkingText: string) => {
+      geminiThinkingAgg += thinkingText;
+      thinkingChunks.push(thinkingText);
+      const thinkingDuration = getThinkingDuration();
+
+      ws.send(
+        JSON.stringify({
+          type: "ai_chat_chunk",
+          conversationId,
+          userId,
+          userMsgId,
+          model,
+          title,
+          systemPrompt,
+          isThinking: true,
+          temperature,
+          topP,
+          provider,
+          thinkingDuration,
+          thinkingText,
+          messageBlocks: currentChunkMessageBlock(),
+          done: false,
+          imgGenEnabled
+        } satisfies EventTypeMap["ai_chat_chunk"])
+      );
+
+      void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
+        type: "ai_chat_chunk",
+        conversationId,
+        userId,
+        model,
+        title,
+        systemPrompt,
+        userMsgId,
+        temperature,
+        topP,
+        provider,
+        isThinking: true,
+        thinkingDuration,
+        thinkingText,
+        messageBlocks: currentChunkMessageBlock(),
+        done: false,
+        imgGenEnabled
+      });
+
+      if (chunks.length % 10 === 0) {
+        void this.redis.saveStreamState(
+          conversationId,
+          chunks,
+          {
+            model,
+            provider,
+            title,
+            totalChunks: chunks.length,
+            completed: false,
+            systemPrompt,
+            temperature,
+            topP
+          },
+          thinkingChunks
+        );
+      }
+    };
+
+    const emitTextChunk = (textPart: string) => {
+      chunks.push(textPart);
+      geminiAgg += textPart;
+
+      ws.send(
+        JSON.stringify({
+          type: "ai_chat_chunk",
+          conversationId,
+          userId,
+          model,
+          title,
+          userMsgId,
+          systemPrompt,
+          isThinking: false,
+          temperature,
+          topP,
+          provider,
+          thinkingText: geminiThinkingAgg,
+          chunk: textPart,
+          messageBlocks: currentChunkMessageBlock(),
+          thinkingDuration:
+            geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
+          done: false,
+          imgGenEnabled
+        } satisfies EventTypeMap["ai_chat_chunk"])
+      );
+
+      void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
+        type: "ai_chat_chunk",
+        conversationId,
+        userId,
+        model,
+        title,
+        isThinking: false,
+        systemPrompt,
+        userMsgId,
+        temperature,
+        topP,
+        thinkingText: geminiThinkingAgg,
+        provider,
+        messageBlocks: currentChunkMessageBlock(),
+        thinkingDuration:
+          geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
+        chunk: textPart,
+        done: false,
+        imgGenEnabled
+      });
+
+      if (chunks.length % 10 === 0) {
+        void this.redis.saveStreamState(
+          conversationId,
+          chunks,
+          {
+            model,
+            provider,
+            title,
+            totalChunks: chunks.length,
+            completed: false,
+            systemPrompt,
+            temperature,
+            topP
+          },
+          thinkingChunks
+        );
+      }
     };
 
     for (let round = 0; round <= MAX_ROUNDS; round++) {
@@ -237,10 +449,6 @@ export class GeminiChatService extends GeminiWorkupService {
       })) satisfies AsyncGenerator<GenerateContentResponse>;
 
       for await (const chunk of stream) {
-        let dataPart: Blob | undefined = undefined,
-          textPart: string | undefined = undefined,
-          thinkingPart: string | undefined = undefined;
-
         if (tInitial === 0) {
           tInitial = performance.now();
         }
@@ -260,6 +468,7 @@ export class GeminiChatService extends GeminiWorkupService {
             if (candidate.content?.parts) {
               for (const part of candidate.content.parts) {
                 if (part.functionCall) {
+                  finalizeActiveBlock();
                   const functionCallKey = JSON.stringify({
                     id: part.functionCall.id ?? null,
                     name: part.functionCall.name ?? null,
@@ -305,202 +514,55 @@ export class GeminiChatService extends GeminiWorkupService {
 
                 if (part.text) {
                   if (part.thought) {
-                    if (
-                      geminiIsCurrentlyThinking === false &&
-                      typeof geminiThinkingStartTime !== "number"
-                    ) {
-                      geminiIsCurrentlyThinking = true;
-                      geminiThinkingStartTime = performance.now();
-                    }
-                    thinkingPart = part.text;
+                    const block = ensureActiveBlock("THINKING");
+                    block.content += part.text;
+                    emitThinkingChunk(part.text);
                   } else {
-                    if (
-                      geminiIsCurrentlyThinking === true &&
-                      typeof geminiThinkingStartTime === "number"
-                    ) {
-                      geminiThinkingDuration += Math.round(
-                        performance.now() - geminiThinkingStartTime
-                      );
-                      geminiIsCurrentlyThinking = false;
-                      geminiThinkingStartTime = null;
-                    }
-                    textPart = part.text;
+                    const block = ensureActiveBlock("TEXT");
+                    block.content += part.text;
+                    emitTextChunk(part.text);
                   }
                 }
                 if (part.fileData) {
+                  finalizeActiveBlock();
                   this.logger.debug(part.fileData, "part.fileData");
                 }
                 if (part.inlineData) {
+                  finalizeActiveBlock();
                   this.logger.debug(
                     part.inlineData.displayName,
                     "part.inlineData"
                   );
-                  dataPart = part.inlineData;
+                  geminiDataArr.push(part.inlineData);
+                  geminiDataPart = part.inlineData;
+                  const _dataUrl =
+                    `data:${part.inlineData.mimeType};base64,${part.inlineData.data?.length}` as const;
+                  ws.send(
+                    JSON.stringify({
+                      type: "ai_chat_inline_data",
+                      conversationId,
+                      userMsgId,
+                      data: _dataUrl,
+                      userId,
+                      done: false,
+                      model,
+                      chunk: geminiAgg,
+                      systemPrompt,
+                      temperature,
+                      title,
+                      topP,
+                      provider,
+                      imgGenEnabled
+                    } satisfies EventTypeMap["ai_chat_inline_data"])
+                  );
                 }
               }
             }
           }
         }
-
-        if (thinkingPart) {
-          thinkingChunks.push(thinkingPart);
-          geminiThinkingAgg += thinkingPart;
-          const thinkingDuration = getThinkingDuration();
-
-          ws.send(
-            JSON.stringify({
-              type: "ai_chat_chunk",
-              conversationId,
-              userId,
-              userMsgId,
-              model,
-              title,
-              systemPrompt,
-              isThinking: true,
-              temperature,
-              topP,
-              provider,
-              thinkingDuration,
-              thinkingText: thinkingPart,
-              done: false,
-              imgGenEnabled
-            } satisfies EventTypeMap["ai_chat_chunk"])
-          );
-
-          void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
-            type: "ai_chat_chunk",
-            conversationId,
-            userId,
-            model,
-            title,
-            systemPrompt,
-            userMsgId,
-            temperature,
-            topP,
-            provider,
-            isThinking: true,
-            thinkingDuration,
-            thinkingText: thinkingPart,
-            done: false,
-            imgGenEnabled
-          });
-          if (chunks.length % 10 === 0) {
-            void this.redis.saveStreamState(
-              conversationId,
-              chunks,
-              {
-                model,
-                provider,
-                title,
-                totalChunks: chunks.length,
-                completed: false,
-                systemPrompt,
-                temperature,
-                topP
-              },
-              thinkingChunks
-            );
-          }
-        }
-        if (textPart) {
-          chunks.push(textPart);
-          geminiAgg += textPart;
-
-          ws.send(
-            JSON.stringify({
-              type: "ai_chat_chunk",
-              conversationId,
-              userId,
-              model,
-              title,
-              userMsgId,
-              systemPrompt,
-              isThinking: geminiIsCurrentlyThinking,
-              temperature,
-              topP,
-              provider,
-              thinkingText: geminiThinkingAgg,
-              chunk: textPart,
-              thinkingDuration:
-                geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
-              done: false,
-              imgGenEnabled
-            } satisfies EventTypeMap["ai_chat_chunk"])
-          );
-
-          void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
-            type: "ai_chat_chunk",
-            conversationId,
-            userId,
-            model,
-            title,
-            isThinking: geminiIsCurrentlyThinking,
-            systemPrompt,
-            userMsgId,
-            temperature,
-            topP,
-            thinkingText: geminiThinkingAgg,
-            provider,
-            thinkingDuration:
-              geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
-            chunk: textPart,
-            done: false,
-            imgGenEnabled
-          });
-          if (chunks.length % 10 === 0) {
-            void this.redis.saveStreamState(
-              conversationId,
-              chunks,
-              {
-                model,
-                provider,
-                title,
-                totalChunks: chunks.length,
-                completed: false,
-                systemPrompt,
-                temperature,
-                topP
-              },
-              thinkingChunks
-            );
-          }
-        }
-        if (dataPart) {
-          geminiDataArr.push(dataPart);
-          geminiDataPart = dataPart;
-          const _dataUrl =
-            `data:${dataPart.mimeType};base64,${dataPart.data?.length}` as const;
-          ws.send(
-            JSON.stringify({
-              type: "ai_chat_inline_data",
-              conversationId,
-              userMsgId,
-              data: _dataUrl,
-              userId,
-              done: false,
-              model,
-              chunk: geminiAgg,
-              systemPrompt,
-              temperature,
-              title,
-              topP,
-              provider,
-              imgGenEnabled
-            } satisfies EventTypeMap["ai_chat_inline_data"])
-          );
-        }
       }
 
-      if (
-        geminiIsCurrentlyThinking === true &&
-        typeof geminiThinkingStartTime === "number"
-      ) {
-        geminiThinkingDuration += Math.round(
-          performance.now() - geminiThinkingStartTime
-        );
-        geminiIsCurrentlyThinking = false;
-        geminiThinkingStartTime = null;
-      }
+      finalizeActiveBlock();
 
       if (roundFunctionCalls.length === 0) {
         break;
@@ -599,6 +661,23 @@ export class GeminiChatService extends GeminiWorkupService {
       geminiAgg =
         "I ran document search multiple times but kept hitting a tool loop before a stable answer was produced. " +
         "Please rephrase with a narrower query, such as an exact filename or section title, and I will retry.";
+      trackedBlocks.push({
+        content: geminiAgg,
+        durationMs: 0,
+        ordinal: nextOrdinal,
+        type: "TEXT"
+      });
+      nextOrdinal += 1;
+    }
+
+    for (const block of trackedBlocks) {
+      roundTrack.push({
+        type: block.type,
+        content: block.content,
+        durationMs: block.durationMs,
+        ordinal: block.ordinal,
+        conversationId
+      });
     }
 
     const finalImg = geminiDataArr.at(-1);
@@ -781,7 +860,8 @@ export class GeminiChatService extends GeminiWorkupService {
         thinkingText: geminiThinkingAgg,
         thinkingDuration:
           geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
-        imgGenEnabled: true
+        imgGenEnabled: true,
+        messageBlocks: roundTrack.length > 0 ? roundTrack : undefined
       });
       ws.send(
         JSON.stringify({
@@ -828,7 +908,8 @@ export class GeminiChatService extends GeminiWorkupService {
           thinkingText: geminiThinkingAgg,
           thinkingDuration:
             geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
-          imgGenEnabled: true
+          imgGenEnabled: true,
+          messageBlocks: roundTrack.length > 0 ? roundTrack : undefined
         } satisfies EventTypeMap["ai_chat_response"])
       );
       void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
@@ -875,7 +956,8 @@ export class GeminiChatService extends GeminiWorkupService {
         thinkingText: geminiThinkingAgg,
         thinkingDuration:
           geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
-        imgGenEnabled: true
+        imgGenEnabled: true,
+        messageBlocks: roundTrack.length > 0 ? roundTrack : undefined
       });
       void this.redis.del(`stream:state:${conversationId}`);
       return;
@@ -900,7 +982,8 @@ export class GeminiChatService extends GeminiWorkupService {
       thinkingText: geminiThinkingAgg,
       thinkingDuration:
         geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
-      imgGenEnabled
+      imgGenEnabled,
+      messageBlocks: roundTrack.length > 0 ? roundTrack : undefined
     });
     ws.send(
       JSON.stringify({
@@ -924,6 +1007,7 @@ export class GeminiChatService extends GeminiWorkupService {
         thinkingText: geminiThinkingAgg,
         thinkingDuration:
           geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
+        messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
         done: true
       } satisfies EventTypeMap["ai_chat_response"])
     );
@@ -945,6 +1029,7 @@ export class GeminiChatService extends GeminiWorkupService {
       title,
       topP,
       thinkingText: geminiThinkingAgg,
+      messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
       provider,
       model,
       chunk: geminiAgg,

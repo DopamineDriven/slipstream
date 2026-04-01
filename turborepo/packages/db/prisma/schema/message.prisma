@@ -34,6 +34,7 @@ model Message {
   tryAgain                  Boolean?                 @default(false) // resubmit previous prompt to output a new (branched?) response
   createdAt                 DateTime                 @default(now())
   updatedAt                 DateTime                 @updatedAt
+  messageBlocks             MessageBlock[]           @relation("MessageBlocks")
   ttsJob                    TTSJob?                  @relation("TTSJobToMessage")
   userKey                   UserKey?                 @relation("MessageToUserKey", fields: [userKeyId], references: [id], onDelete: SetNull)
   attachments               Attachment[]

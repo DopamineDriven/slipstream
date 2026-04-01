@@ -81,16 +81,19 @@ export type OutputSizeProps<P extends Provider = Provider> = {
     OpenAiModelIdUnion,
     OpenAIImgCapableModels
   >];
+  mistral?: {
+    [M in GetModelUtilRT<"mistral">]: undefined;
+  }[GetModelUtilRT<"mistral">];
   anthropic?: {
     [M in GetModelUtilRT<"anthropic">]: undefined;
   }[GetModelUtilRT<"anthropic">];
   grok?: GrokModelAspectRatio[GetModelUtilRT<"grok">];
   meta?: {
-    [P in GetModelUtilRT<"meta">]?: undefined;
+    [P in GetModelUtilRT<"meta">]: undefined;
   }[GetModelUtilRT<"meta">];
   gemini?: GeminiModelAspectRatio[GetModelUtilRT<"gemini">];
   vercel?: {
-    [P in GetModelUtilRT<"vercel">]?: undefined;
+    [P in GetModelUtilRT<"vercel">]: undefined;
   }[GetModelUtilRT<"vercel">];
 }[P];
 

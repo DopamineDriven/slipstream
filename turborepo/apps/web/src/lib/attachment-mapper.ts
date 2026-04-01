@@ -172,6 +172,7 @@ export function buildOptimisticAttachment(
     userId,
     messageId: null,
     s3ObjectId: null,
+    audio: null,
     seriesId: seriesId ?? "",
     // Status fields
     origin: origin as "UPLOAD" | "GENERATED",

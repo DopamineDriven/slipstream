@@ -424,6 +424,7 @@ const data = async () => {
         providerLinks: { include: { userKey: true } },
         document: true,
         image: true,
+        audio: true,
         imageGenOutput: true
       }
     });

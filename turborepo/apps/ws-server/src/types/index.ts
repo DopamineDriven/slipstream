@@ -14,7 +14,7 @@ import type {
   S3StorageClass
 } from "@slipstream/types";
 
-export type Include<T, U extends T> =  Exclude<T, Exclude<T, U>>;
+export type Include<T, U extends T> = Exclude<T, Exclude<T, U>>;
 
 export type S3FinalizePayload = {
   bucket: string;
@@ -85,6 +85,7 @@ export type IncludeCreateConvoWithImgGenProps = {
     };
     include: {
       imageGenJob: true;
+      messageBlocks: true;
       attachments: {
         orderBy: {
           createdAt: "asc";
@@ -92,6 +93,7 @@ export type IncludeCreateConvoWithImgGenProps = {
         include: {
           image: true;
           document: true;
+          audio: true;
           imageGenOutput: true;
         };
       };
@@ -284,6 +286,8 @@ export type BigIntToCompatProps<
       };
     };
 
+
+
 export type UpdateAttachmentMetadata = {
   img?:
     | {
@@ -330,7 +334,26 @@ export type UpdateAttachmentMetadata = {
         wordCount: number | undefined;
       }
     | undefined;
-  type: "IMAGE" | "DOCUMENT";
+  audio:
+    | {
+        createdAt: Date;
+        updatedAt: Date;
+        attachmentId: string;
+        codec: string | null;
+        sampleRate: number | null;
+        bitrate: number | null;
+        format: string;
+        title: string | null;
+        duration: number;
+        channels: number | null;
+        artist: string | null;
+        album: string | null;
+        year: number | null;
+        genre: string | null;
+        waveformPeaks: number[];
+      }
+    | undefined;
+  type: "IMAGE" | "DOCUMENT" | "AUDIO";
 };
 
 export type UpdateAttachmentCompatProps = {

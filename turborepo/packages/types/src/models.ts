@@ -222,6 +222,8 @@ export type VercelChatModels = ModelMap["vercel"];
 
 export type MetaChatModels = ModelMap["meta"];
 
+export type MistralChatModels = ModelMap["mistral"];
+
 export type AllModelsUnion = ModelMap[Provider];
 
 export type AllDisplayNamesUnion = DisplayNameModelMap[Provider];
@@ -238,7 +240,9 @@ export type GetModelUtilRT<T = Provider> = T extends "openai"
           ? MetaChatModels
           : T extends "vercel"
             ? VercelChatModels
-            : never;
+            : T extends "mistral"
+              ? MistralChatModels
+              : never;
 
 export function toPrismaFormat<const T extends Providers>(provider: T) {
   return provider.toUpperCase() as Uppercase<T>;
@@ -292,6 +296,14 @@ export const getModelIdByDisplayName = <
       if (model && model in displayNameToModelId[xTarget]) {
         return displayNameToModelId[xTarget][
           model as ModelDisplayNameToModelId<"vercel">
+        ] as (typeof displayNameToModelId)[V][K];
+      } else
+        return defaultModelIdByProvider.anthropic as (typeof displayNameToModelId)[V][K];
+    }
+    case "mistral": {
+      if (model && model in displayNameToModelId[xTarget]) {
+        return displayNameToModelId[xTarget][
+          model as ModelDisplayNameToModelId<"mistral">
         ] as (typeof displayNameToModelId)[V][K];
       } else
         return defaultModelIdByProvider.anthropic as (typeof displayNameToModelId)[V][K];
@@ -359,6 +371,14 @@ export const getDisplayNameByModelId = <
       } else
         return defaultModelDisplayNameByProvider.anthropic as (typeof modelIdToDisplayName)[V][K];
     }
+    case "mistral": {
+      if (model && model in modelIdToDisplayName[xTarget]) {
+        return modelIdToDisplayName[xTarget][
+          model as ModelIdToModelDisplayName<"mistral">
+        ] as (typeof modelIdToDisplayName)[V][K];
+      } else
+        return defaultModelDisplayNameByProvider.anthropic as (typeof modelIdToDisplayName)[V][K];
+    }
     case "openai":
     default: {
       if (model && model in modelIdToDisplayName[xTarget]) {
@@ -377,7 +397,8 @@ export const defaultModelDisplayNameByProvider = {
   grok: "Grok 4.1 Fast Reasoning" satisfies GrokDisplayNameUnion,
   anthropic: "Claude Sonnet 4.6" satisfies AnthropicDisplayNameUnion,
   meta: "Llama 3.3 (70B, Instruct)" satisfies MetaDisplayNameUnion,
-  vercel: "v0 medium" satisfies VercelDisplayNameUnion
+  vercel: "v0 medium" satisfies VercelDisplayNameUnion,
+  mistral: "Mistral Small 4" satisfies MistralDisplayNameUnion
 } as const;
 
 export const defaultModelIdByProvider = {
@@ -386,7 +407,8 @@ export const defaultModelIdByProvider = {
   grok: "grok-4-1-fast-reasoning" satisfies GrokModelIdUnion,
   anthropic: "claude-sonnet-4-6" satisfies AnthropicModelIdUnion,
   meta: "Llama-3.3-70B-Instruct" satisfies MetaModelIdUnion,
-  vercel: "v0-1.5-md" satisfies VercelModelIdUnion
+  vercel: "v0-1.5-md" satisfies VercelModelIdUnion,
+  mistral: "mistral-small-latest" satisfies MistralModelIdUnion
 } as const;
 
 export type ModelDisplayNameToModelId<T extends Provider> =
@@ -467,6 +489,11 @@ export type MetaDisplayNameUnion = ModelDisplayNameToModelId<"meta">;
 export type VercelDisplayNameUnion = ModelDisplayNameToModelId<"vercel">;
 
 /**
+ * valid mistral model display names
+ */
+export type MistralDisplayNameUnion = ModelDisplayNameToModelId<"mistral">;
+
+/**
  * valid grok img models to call
  */
 export type GrokModelIdUnionImgGen = ModelIdToModelDisplayNameImgGen<"grok">;
@@ -519,6 +546,10 @@ export type MetaModelIdUnion = ModelIdToModelDisplayName<"meta">;
  * valid v0 models to call
  */
 export type VercelModelIdUnion = ModelIdToModelDisplayName<"vercel">;
+/**
+ * valid mistral models to call
+ */
+export type MistralModelIdUnion = ModelIdToModelDisplayName<"mistral">;
 
 // re-export for consumer apps
 export {
@@ -549,7 +580,9 @@ export type GetModelsForProviderRTImgGen<T extends Provider> =
             ? undefined
             : T extends "vercel"
               ? undefined
-              : never;
+              : T extends "mistral"
+                ? undefined
+                : never;
 
 export type GetModelsForProviderRTVideoGen<T extends Provider> =
   T extends "gemini"
@@ -564,7 +597,9 @@ export type GetModelsForProviderRTVideoGen<T extends Provider> =
             ? undefined
             : T extends "vercel"
               ? undefined
-              : never;
+              : T extends "mistral"
+                ? undefined
+                : never;
 
 export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
   T extends "gemini"
@@ -579,7 +614,9 @@ export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
             ? undefined
             : T extends "vercel"
               ? undefined
-              : never;
+              : T extends "mistral"
+                ? undefined
+                : never;
 
 export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
   ? AnthropicModelIdUnion
@@ -593,7 +630,9 @@ export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
           ? VercelModelIdUnion
           : T extends "meta"
             ? MetaModelIdUnion
-            : never;
+            : T extends "mistral"
+              ? MistralModelIdUnion
+              : never;
 
 export type GetDisplayNamesForProviderRTVideoGen<T extends Provider> =
   T extends "gemini"
@@ -608,7 +647,9 @@ export type GetDisplayNamesForProviderRTVideoGen<T extends Provider> =
             ? undefined
             : T extends "vercel"
               ? undefined
-              : never;
+              : T extends "mistral"
+                ? undefined
+                : never;
 
 export type GetDisplayNamesForProviderRT<T extends Provider> =
   T extends "anthropic"
@@ -623,7 +664,9 @@ export type GetDisplayNamesForProviderRT<T extends Provider> =
             ? VercelDisplayNameUnion
             : T extends "meta"
               ? MetaDisplayNameUnion
-              : never;
+              : T extends "mistral"
+                ? MistralDisplayNameUnion
+                : never;
 
 export function getModelsForProvider<const T extends Provider>(provider: T) {
   return Object.entries(displayNameToModelId[provider])
@@ -696,7 +739,15 @@ export function getDisplayNamesForProviderVideoGen<
 }
 
 export function allProviders() {
-  return ["anthropic", "gemini", "grok", "openai", "meta", "vercel"] as const;
+  return [
+    "anthropic",
+    "gemini",
+    "grok",
+    "openai",
+    "meta",
+    "vercel",
+    "mistral"
+  ] as const;
 }
 export function allImgGenProviders() {
   return ["gemini", "grok", "openai"] as const;
@@ -726,7 +777,8 @@ export const imgMimeSupportByProvider = {
    * https://ai.google.dev/gemini-api/docs/image-understanding#supported-formats
    */
   gemini: ["image/png", "image/jpeg", "image/webp", "image/heic", "image/heif"],
-  anthropic: ["image/jpeg", "image/png", "image/webp", "image/gif"]
+  anthropic: ["image/jpeg", "image/png", "image/webp", "image/gif"],
+  mistral: ["image/jpeg", "image/png", "image/webp"]
 } as const;
 
 // direct input -- I have a document conversion pipeline set up
@@ -737,6 +789,7 @@ export const docMimeSupportByProvider = {
   grok: ["application/pdf", "text/markdown", "text/plain"],
   openai: ["application/pdf"],
   vercel: ["application/pdf"],
+  mistral: ["application/pdf"],
   /**
    * https://ai.google.dev/gemini-api/docs/document-processing#technical-details
    */
@@ -749,6 +802,7 @@ export const audioMimeSupportByProvider = {
   grok: [],
   openai: [],
   vercel: [],
+  mistral: [],
   /**
    * https://ai.google.dev/gemini-api/docs/audio#supported-formats
    */
@@ -766,6 +820,7 @@ export const audioMimeSupportByProvider = {
 export const videoMimeSupportByProvider = {
   meta: [],
   grok: [],
+  mistral: [],
   openai: ["video/mp4"],
   vercel: ["video/mp4", "video/mov", "video/avi", "video/webm"],
   /**

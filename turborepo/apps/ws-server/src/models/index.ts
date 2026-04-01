@@ -19,7 +19,9 @@ export class ModelService extends ProviderValidation {
   constructor() {
     super();
   }
-  public mapParams = <const T extends readonly [string, string][] | string[][]>(params: T) =>
+  public mapParams = <const T extends readonly [string, string][] | string[][]>(
+    params: T
+  ) =>
     params
       .reduce<string[]>((arr, [k, v]) => {
         if (v) arr.push(`${k}=${encodeURIComponent(v)}`);
@@ -115,7 +117,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "gemini-2.5-flash" as const as NonNullable<K>;
+        } else return "gemini-3.1-pro-preview" as const as NonNullable<K>;
       }
       case "grok": {
         if (
@@ -125,7 +127,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "grok-4-fast-reasoning" as const as NonNullable<K>;
+        } else return "grok-4.20-0309-reasoning" as const as NonNullable<K>;
       }
       case "anthropic": {
         if (
@@ -135,7 +137,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "claude-haiku-4-5-20251001" as const as NonNullable<K>;
+        } else return "claude-opus-4-6" as const as NonNullable<K>;
       }
       case "meta": {
         if (
@@ -155,7 +157,17 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "v0-1.0-md" as const as NonNullable<K>;
+        } else return "v0-1.5-md" as const as NonNullable<K>;
+      }
+      case "mistral": {
+        if (
+          model &&
+          providerModelChatApi[xTarget].includes(
+            model as GetModelUtilRT<"mistral">
+          )
+        ) {
+          return model;
+        } else return "mistral-small-latest" as const as NonNullable<K>;
       }
       case "openai":
       default: {
@@ -166,7 +178,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "gpt-5-mini" as const as NonNullable<K>;
+        } else return "gpt-5.4" as const as NonNullable<K>;
       }
     }
   };
@@ -333,6 +345,8 @@ export class ModelService extends ProviderValidation {
         return "Meta";
       case "vercel":
         return "Vercel";
+      case "mistral":
+        return "Mistral";
       case "openai":
       default:
         return "OpenAI";

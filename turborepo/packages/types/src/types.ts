@@ -17,6 +17,7 @@ import type {
   LocalVectorStoreDoc,
   LocalVectorStoreDocChunk,
   Message,
+  MessageBlock,
   Profile,
   ProviderStore,
   ProviderStoreDocument,
@@ -75,7 +76,6 @@ export interface UserStoreDocSingleton<
 > extends SerializeBigInt<UserStoreDoc, T> {
   store?: UserStoreSingleton<T>;
   attachment?: AttachmentSingleton<T>;
-
   annots?: UserStoreDocAnnotSingleton<T>[];
   linkedFromAnnots?: UserStoreDocAnnotSingleton<T>[];
   chunks?: UserStoreDocChunkSingleton<T>[];
@@ -132,6 +132,11 @@ export interface AttachmentProviderSingleton<
 > extends SerializeBigInt<AttachmentProvider, T> {
   attachment?: AttachmentSingleton<T>;
   userKey?: UserKeySingleton<T>;
+}
+export interface MessageBlockSingleton<
+  T extends boolean = false
+> extends MessageBlock {
+  message?: MessageSingleton<T>;
 }
 
 export interface ProviderStoreSingleton<
@@ -195,8 +200,10 @@ export interface AttachmentSingleton<
   providerStoreDocs?: ProviderStoreDocumentSingleton<T>[];
   image: ImageSingleton | null;
   document: DocumentSingleton | null;
+  audio: AudioSingleton | null;
   imageGenOutput: ImageGenOutputSingleton<T> | null;
   userStoreDoc?: UserStoreDocSingleton<T>;
+  ttsJob?: TTSJobSingleton<T>;
 }
 
 export interface UserKeySingleton<T extends boolean = false> extends UserKey {
@@ -211,6 +218,8 @@ export interface MessageSingleton<T extends boolean = false> extends Message {
   userKey?: UserKeySingleton<T> | null;
   attachments: AttachmentSingleton<T>[];
   conversationMemoryChunk?: ConversationMemoryChunkSingleton<T>;
+  ttsJob?: TTSJobSingleton<T>;
+  messageBlocks?: MessageBlockSingleton<T>[];
 }
 
 export interface ConversationSingleton<

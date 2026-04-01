@@ -45,7 +45,11 @@ export class PrismaTTSService extends PrismaProviderStoreService {
   public async getMsgContentForTTS(msgId: string) {
     return await this.prismaClient.message.findUniqueOrThrow({
       where: { id: msgId },
-      select: { content: true, conversationId: true }
+      select: {
+        content: true,
+        conversationId: true,
+        messageBlocks: true
+      }
     });
   }
 

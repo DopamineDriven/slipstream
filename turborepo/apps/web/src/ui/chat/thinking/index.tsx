@@ -30,7 +30,7 @@ export function ThinkingSection({
   className,
   isThinking = false
 }: ThinkingSectionProps) {
-  const [value, setValue] = useState<string | undefined>(undefined);
+  const [value, setValue] = useState("");
   const isExpanded = value === "thinking";
   const [displayDuration, setDisplayDuration] = useState(0);
   const startTimeRef = useRef<number | undefined>(undefined);

@@ -178,6 +178,16 @@ async function exe() {
       cfg.GOOGLE_API_KEY
     );
 
+    const { MistralService } = await import("@/mistral/index.ts");
+
+    const mistral = new MistralService(
+      logger,
+      prisma,
+      redisInstance,
+      userStore,
+      cfg.MISTRAL_API_KEY
+    );
+
     const { ProviderService } = await import("@/providers/index.ts");
 
     const providers = new ProviderService({
@@ -189,7 +199,8 @@ async function exe() {
         openai: cfg.OPENAI_API_KEY,
         vercel: process.env.AI_GATEWAY_API_KEY ?? cfg.AI_GATEWAY_API_KEY,
         grokMgmtKey:
-          process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
+          process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY,
+        mistral: cfg.MISTRAL_API_KEY
       },
       dependencies: {
         logger,
@@ -204,7 +215,8 @@ async function exe() {
       grok: xai,
       meta,
       openai,
-      vercel: v0
+      vercel: v0,
+      mistral
     });
 
     const { TTSService } = await import("@/tts/index.ts");

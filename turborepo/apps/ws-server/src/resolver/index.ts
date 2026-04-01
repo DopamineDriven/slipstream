@@ -4,6 +4,7 @@ import type { ImageCompatService } from "@/image/index.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ProviderService } from "@/providers/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { TTSService } from "@/tts/index.ts";
 import type {
   BigIntToCompatProps,
   BufferLike,
@@ -16,7 +17,6 @@ import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { Responses } from "openai/resources/index.mjs";
 import type { Logger as PinoLogger } from "pino";
 import type { WebSocket } from "ws";
-import type { TTSService } from "@/tts/index.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AllModelsUnion,
@@ -185,7 +185,9 @@ export class Resolver {
         }
         break;
       }
-      content.push({ type: "input_text", text: msgs.content });
+      const text =
+        msgs.messageBlocks?.map(t => t.content).join("\n") ?? msgs.content;
+      content.push({ type: "input_text", text });
       try {
         const res = await openai.responses.create({
           model: "gpt-5.4-nano",
@@ -209,7 +211,11 @@ export class Resolver {
         /**fall through */
       }
     }
-    content.push({ type: "input_text", text: prompt });
+    const text =
+      msgs?.messageBlocks?.map(t => t.content).join("\n") ??
+      msgs?.content ??
+      prompt;
+    content.push({ type: "input_text", text });
     try {
       const res = await openai.responses.create({
         model: "gpt-5.4-nano",
@@ -476,8 +482,29 @@ export class Resolver {
     if (existingState && !existingState.metadata.completed) {
       chunks = existingState.chunks;
       resumedFromChunk = chunks.length;
-      if (existingState.thinkingChunks)
+      if (existingState.thinkingChunks) {
         thinkingChunks = existingState.thinkingChunks;
+        thinkingAgg = existingState.thinkingChunks.join("");
+      }
+      const replayChunk = chunks.join("");
+      const replayMessageBlock =
+        replayChunk.length > 0
+          ? ({
+              type: "TEXT",
+              content: replayChunk,
+              ordinal: 0,
+              conversationId,
+              durationMs: 0
+            } as const)
+          : thinkingAgg.length > 0
+            ? ({
+                type: "THINKING",
+                content: thinkingAgg,
+                ordinal: 0,
+                conversationId,
+                durationMs: 0
+              } as const)
+            : undefined;
       // Send resume event
       void this.wsServer.redis.publishTypedEvent(
         streamChannel,
@@ -501,9 +528,11 @@ export class Resolver {
           userId,
           userMsgId,
           imgGenEnabled: isImgGenEnabled,
-          chunk: chunks.join(""),
-          thinkingText: thinkingAgg,
-          thinkingDuration,
+          chunk: replayChunk.length > 0 ? replayChunk : undefined,
+          thinkingText: thinkingAgg.length > 0 ? thinkingAgg : undefined,
+          thinkingDuration: thinkingDuration > 0 ? thinkingDuration : undefined,
+          isThinking: replayMessageBlock?.type === "THINKING",
+          messageBlocks: replayMessageBlock,
           done: false,
           model: existingState.metadata.model,
           provider: existingState.metadata.provider as Provider,
@@ -559,6 +588,11 @@ export class Resolver {
         case "gemini": {
           const svc = this.providers.getRequiredInstance("gemini");
           await svc.routeGemini({ ...commonProps, userData });
+          break;
+        }
+        case "mistral": {
+          const svc = this.providers.getRequiredInstance("mistral");
+          await svc.handleMistralAiChatRequest(commonProps);
           break;
         }
         case "anthropic": {
@@ -721,6 +755,7 @@ export class Resolver {
       }
 
       const message = await this.wsServer.prisma.getMsgContentForTTS(messageId);
+      const messageText = this.ttsService.messageText(message);
 
       const ttsJob = await this.wsServer.prisma.createTTSJob({
         sourceMessageId: messageId,
@@ -732,7 +767,7 @@ export class Resolver {
         codec,
         sampleRate,
         bitrate: bitRate,
-        charCount: message.content.length
+        charCount: messageText.length
       });
 
       this.ttsService.streamToClient(
@@ -740,7 +775,7 @@ export class Resolver {
         conversationId,
         messageId,
         userId,
-        message.content,
+        messageText,
         ttsJob,
         voice,
         language,
@@ -1716,7 +1751,6 @@ export class Resolver {
       versionId,
       etag
     } = event;
-
     const redisChannel = this.resolveChannel(conversationId, userId);
     try {
       const {
@@ -1749,6 +1783,7 @@ export class Resolver {
         cdnUrl,
         64 * 4096
       );
+
       const compatStatus = this.handleCompatStatus(specs, extension);
 
       const {
@@ -1810,6 +1845,7 @@ export class Resolver {
         metadata:
           specs?.type === "IMAGE"
             ? {
+                audio: undefined,
                 type: "IMAGE",
                 img: {
                   animated: specs.animated,
@@ -1840,33 +1876,57 @@ export class Resolver {
                 },
                 doc: undefined
               }
-            : {
-                type: "DOCUMENT",
-                img: undefined,
-                doc: {
-                  author: specs.author ?? undefined,
-                  createdAt: specs.createdDate
-                    ? new Date(specs.createdDate)
-                    : undefined,
-                  updatedAt: specs.modifiedDate
-                    ? new Date(specs.modifiedDate)
-                    : undefined,
-                  encoding: specs.encoding ?? undefined,
-                  format: specs.format ?? ext,
-                  isEncrypted: specs.isEncrypted ?? undefined,
-                  isLinearized: specs.isLinearized ?? false,
-                  language: specs.language ?? undefined,
-                  subject: specs.subject ?? undefined,
-                  textPreview: specs.textPreview ?? undefined,
-                  title: undefined,
-                  isSearchable: specs.isSearchable ?? true,
-                  wordCount: specs.wordCount ?? undefined,
-                  lineCount: specs.lineCount ?? undefined,
-                  keywords: specs.keywords ?? undefined,
-                  pageCount: specs.pageCount ?? undefined,
-                  pdfVersion: specs.pdfVersion ?? undefined
+            : specs.type === "DOCUMENT"
+              ? {
+                  type: "DOCUMENT",
+                  img: undefined,
+                  audio: undefined,
+                  doc: {
+                    author: specs.author ?? undefined,
+                    createdAt: specs.createdDate
+                      ? new Date(specs.createdDate)
+                      : undefined,
+                    updatedAt: specs.modifiedDate
+                      ? new Date(specs.modifiedDate)
+                      : undefined,
+                    encoding: specs.encoding ?? undefined,
+                    format: specs.format ?? ext,
+                    isEncrypted: specs.isEncrypted ?? undefined,
+                    isLinearized: specs.isLinearized ?? false,
+                    language: specs.language ?? undefined,
+                    subject: specs.subject ?? undefined,
+                    textPreview: specs.textPreview ?? undefined,
+                    title: undefined,
+                    isSearchable: specs.isSearchable ?? true,
+                    wordCount: specs.wordCount ?? undefined,
+                    lineCount: specs.lineCount ?? undefined,
+                    keywords: specs.keywords ?? undefined,
+                    pageCount: specs.pageCount ?? undefined,
+                    pdfVersion: specs.pdfVersion ?? undefined
+                  }
                 }
-              }
+              : {
+                  img: undefined,
+                  doc: undefined,
+                  type: "AUDIO",
+                  audio: {
+                    duration: 0,
+                    format: cdnUrl.slice(cdnUrl.lastIndexOf(".") + 1),
+                    genre: null,
+                    sampleRate: null,
+                    title: null,
+                    updatedAt: new Date(Date.now()),
+                    waveformPeaks: [0],
+                    year: null,
+                    createdAt: new Date(Date.now()),
+                    album: null,
+                    artist: null,
+                    attachmentId,
+                    bitrate: null,
+                    channels: null,
+                    codec: cdnUrl.slice(cdnUrl.lastIndexOf(".") + 1)
+                  }
+                }
       });
 
       const meta = (

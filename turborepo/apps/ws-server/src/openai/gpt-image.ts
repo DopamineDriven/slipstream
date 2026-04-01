@@ -60,7 +60,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
       const fetcher = await fetch(url);
       rsArr.push(fetcher);
     }
-    return { images: rsArr, text: findUser.content };
+    return { images: rsArr, text: this.messageText(findUser) };
   }
 
   protected async handleOpenaiNativeImageRequestGptImage1({
@@ -101,6 +101,15 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
       uploadtDelta = 0,
       usage = 0,
       partialArr = Array.of<OpenAIImgApiStreamPartial>();
+    let nextOrdinal = 0;
+
+    const roundTrack = Array.of<{
+      type: "TEXT";
+      content: string;
+      durationMs: number;
+      ordinal: number;
+      conversationId: string;
+    }>();
 
     let streamPartial: OpenAIImgApiStreamPartial | null = null;
 
@@ -449,6 +458,15 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
         }
 
         if (text) {
+          const currentMessageBlock = {
+            type: "TEXT",
+            content: text,
+            durationMs: 0,
+            ordinal: nextOrdinal,
+            conversationId
+          } as const;
+          roundTrack.push(currentMessageBlock);
+          nextOrdinal += 1;
           openaiAgg += text;
           chunks.push(text);
           ws.send(
@@ -477,6 +495,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
               topP,
               chunk: text,
               isThinking: false,
+              messageBlocks: currentMessageBlock,
               thinkingDuration: undefined,
               done: false
             } satisfies EventTypeMap["ai_chat_chunk"])
@@ -506,6 +525,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
               ).find(t => t.index === partialImgArr.length - 1)
             },
             provider,
+            messageBlocks: currentMessageBlock,
 
             chunk: text,
             done: false
@@ -738,7 +758,8 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
               activeImage: imgFinal
             },
             thinkingText: undefined,
-            thinkingDuration: undefined
+            thinkingDuration: undefined,
+            messageBlocks: roundTrack.length > 0 ? roundTrack : undefined
           });
           ws.send(
             JSON.stringify({
@@ -784,14 +805,15 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
                 partialImages: remapPartials,
                 images: [imgFinal],
                 activeImage: imgFinal
-              },
-              topP,
-              chunk: openaiAgg,
-              thinkingText: undefined,
-              thinkingDuration: undefined,
-              done: true
-            } satisfies EventTypeMap["ai_chat_response"])
-          );
+            },
+            topP,
+            chunk: openaiAgg,
+            thinkingText: undefined,
+            thinkingDuration: undefined,
+            messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
+            done: true
+          } satisfies EventTypeMap["ai_chat_response"])
+        );
 
           void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
             type: "ai_chat_response",
@@ -836,6 +858,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
             title,
             thinkingText: undefined,
             thinkingDuration: undefined,
+            messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
             topP,
             provider,
             model,

@@ -18,7 +18,7 @@ function getInclude(assetType: "DOCUMENT" | "IMAGE" | "BOTH") {
     ? ({ imageGenOutput: true, document: true } as const)
     : assetType === "IMAGE"
       ? ({ imageGenOutput: true, image: true } as const)
-      : ({ imageGenOutput: true, document: true, image: true } as const);
+      : ({ imageGenOutput: true, document: true, image: true, audio: true } as const);
 }
 
 function getWhere(assetType: "DOCUMENT" | "IMAGE" | "BOTH") {

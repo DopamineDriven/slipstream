@@ -43,6 +43,9 @@
       "meta": [
         "dist/meta/index.d.ts"
       ],
+      "mistral": [
+        "dist/mistral/index.d.ts"
+      ],
       "mixins": [
         "dist/mixins/index.d.ts"
       ],
@@ -65,8 +68,8 @@
         "dist/prisma/attachment.d.ts",
         "dist/prisma/chat.d.ts",
         "dist/prisma/index.d.ts",
-        "dist/prisma/local-store.d.ts",
         "dist/prisma/provider-store.d.ts",
+        "dist/prisma/tts.d.ts",
         "dist/prisma/types.d.ts",
         "dist/prisma/user-meta.d.ts",
         "dist/prisma/user-store.d.ts",
@@ -75,8 +78,20 @@
       "providers": [
         "dist/providers/index.d.ts"
       ],
+      "sharp": [
+        "dist/sharp/index.ts"
+      ],
+      "store": [
+        "dist/store/vector-store.ts",
+        "dist/store/types.ts",
+        "dist/store/workup.ts"
+      ],
       "resolver": [
         "dist/resolver/index.d.ts"
+      ],
+      "tts": [
+        "dist/tts/types.ts",
+        "dist/tts/index.ts"
       ],
       "types": [
         "dist/types/index.d.ts"
@@ -133,6 +148,7 @@
     "@d0paminedriven/metadata": "catalog:dd",
     "@d0paminedriven/pdfdown": "catalog:dd",
     "@google/genai": "catalog:google",
+    "@mistralai/mistralai": "catalog:mistral",
     "@napi-rs/canvas": "catalog:napi",
     "@modelcontextprotocol/sdk": "catalog:mcp",
     "@paralleldrive/cuid2": "catalog:cuid2",

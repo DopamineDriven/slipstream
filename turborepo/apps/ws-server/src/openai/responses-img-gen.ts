@@ -6,6 +6,7 @@ import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { OpenAI } from "openai";
 import { OpenAIGPTImageService } from "@/openai/gpt-image.ts";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
@@ -14,6 +15,22 @@ import type {
   GptImageAndFacilitatorsImgGenWorkupRT,
   OpenAiModelIdUnion
 } from "@slipstream/types";
+
+interface OpenAIImgGenActiveMessageBlock {
+  content: string;
+  itemIds: string[];
+  startedAt: number;
+  type: "THINKING" | "TEXT";
+}
+
+interface OpenAIImgGenFinalizedMessageBlock {
+  content: string;
+  durationMs: number;
+  itemIds: string[];
+  ordinal: number;
+  previewContent: string;
+  type: $Enums.MessageBlockType;
+}
 
 export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
   constructor(
@@ -64,12 +81,10 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     let finalImgObj:
         | OpenAI.Responses.ResponseOutputItem.ImageGenerationCall
         | undefined,
-      openaiThinkingStartTime: number | null = null,
       openaiThinkingDuration = 0,
-      openaiIsCurrentlyThinking = false,
       openaiThinkingAgg = "",
       tInitial = 0,
-      openaiResId: string | null = null,
+      openaiResId: string | undefined = undefined,
       openaiAgg = "",
       partialImgsRequested = false,
       outputFormat: "png" | "jpeg" | "webp" = "png",
@@ -79,6 +94,155 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       uploadtInitial = 0,
       uploadtDelta = 0,
       usage = 0;
+    const trackedBlocks = Array.of<OpenAIImgGenFinalizedMessageBlock>();
+    const encryptedReasoningByItemId = new Map<string, string>();
+    let activeBlock: OpenAIImgGenActiveMessageBlock | undefined = undefined;
+    let nextOrdinal = 0;
+
+    const roundTrack = Array.of<{
+      type: $Enums.MessageBlockType;
+      content: string;
+      durationMs: number;
+      ordinal: number;
+      conversationId: string;
+    }>();
+
+    const pushItemId = (itemIds: string[], itemId: string) => {
+      if (!itemIds.includes(itemId)) {
+        itemIds.push(itemId);
+      }
+    };
+
+    const applyEncryptedReasoning = (
+      itemId: string,
+      encryptedContent: string
+    ) => {
+      encryptedReasoningByItemId.set(itemId, encryptedContent);
+
+      let matchedBlock = false;
+      for (const block of trackedBlocks) {
+        if (!block.itemIds.includes(itemId)) {
+          continue;
+        }
+
+        matchedBlock = true;
+        const encryptedParts = block.itemIds
+          .map(id => encryptedReasoningByItemId.get(id))
+          .filter(
+            (content): content is string =>
+              typeof content === "string" && content.length > 0
+          );
+
+        if (encryptedParts.length > 0) {
+          block.type = "ENCRYPTED_THINKING";
+          block.content = encryptedParts.join("\n");
+        }
+      }
+
+      if (matchedBlock === false && !activeBlock?.itemIds?.includes(itemId)) {
+        trackedBlocks.push({
+          content: encryptedContent,
+          durationMs: 0,
+          itemIds: [itemId],
+          ordinal: nextOrdinal,
+          previewContent: "",
+          type: "ENCRYPTED_THINKING"
+        });
+        nextOrdinal += 1;
+      }
+    };
+
+    const finalizeActiveBlock = () => {
+      if (!activeBlock) {
+        return;
+      }
+
+      const previewContent = activeBlock.content;
+      const encryptedParts =
+        activeBlock.type === "THINKING"
+          ? activeBlock.itemIds
+              .map(itemId => encryptedReasoningByItemId.get(itemId))
+              .filter(
+                (content): content is string =>
+                  typeof content === "string" && content.length > 0
+              )
+          : Array.of<string>();
+
+      if (previewContent.length === 0 && encryptedParts.length === 0) {
+        activeBlock = undefined;
+        return;
+      }
+
+      const durationMs = Math.max(
+        0,
+        Math.round(performance.now() - activeBlock.startedAt)
+      );
+
+      trackedBlocks.push({
+        content:
+          encryptedParts.length > 0
+            ? encryptedParts.join("\n")
+            : previewContent,
+        durationMs,
+        itemIds: Array.from(activeBlock.itemIds),
+        ordinal: nextOrdinal,
+        previewContent,
+        type:
+          encryptedParts.length > 0 ? "ENCRYPTED_THINKING" : activeBlock.type
+      });
+
+      if (activeBlock.type === "THINKING") {
+        openaiThinkingDuration += durationMs;
+      }
+
+      nextOrdinal += 1;
+      activeBlock = undefined;
+    };
+
+    const ensureActiveBlock = (
+      type: OpenAIImgGenActiveMessageBlock["type"],
+      itemId: string
+    ) => {
+      if (activeBlock?.type !== type) {
+        finalizeActiveBlock();
+        activeBlock = {
+          content: "",
+          itemIds: [itemId],
+          startedAt: performance.now(),
+          type
+        };
+        return activeBlock;
+      }
+
+      pushItemId(activeBlock.itemIds, itemId);
+      return activeBlock;
+    };
+
+    const currentThinkingDuration = () => {
+      const activeThinkingDuration =
+        activeBlock?.type === "THINKING"
+          ? Math.round(performance.now() - activeBlock.startedAt)
+          : 0;
+
+      return openaiThinkingDuration + activeThinkingDuration;
+    };
+
+    const currentChunkMessageBlock = () => {
+      if (!activeBlock) {
+        return undefined;
+      }
+
+      return {
+        type: activeBlock.type,
+        content: activeBlock.content,
+        ordinal: nextOrdinal,
+        conversationId,
+        durationMs: Math.max(
+          0,
+          Math.round(performance.now() - activeBlock.startedAt)
+        )
+      } as const;
+    };
 
     const client = this.getClient(apiKey ?? undefined);
 
@@ -175,15 +339,21 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
         if (imgGenEnabled) text = "Image generation in progress...";
         tInitial = performance.now();
       }
+
+      if (s.type === "response.output_item.added") {
+        if (s.item.type === "reasoning") {
+          ensureActiveBlock("THINKING", s.item.id);
+        } else {
+          finalizeActiveBlock();
+        }
+      }
+
       if (
         s.type === "response.reasoning_text.delta" ||
         s.type === "response.reasoning_summary_text.delta"
       ) {
-        if (!openaiIsCurrentlyThinking && openaiThinkingStartTime === null) {
-          openaiIsCurrentlyThinking = true;
-          openaiThinkingStartTime = performance.now();
-        }
-
+        const block = ensureActiveBlock("THINKING", s.item_id);
+        block.content += s.delta;
         thinkingText = s.delta;
       }
       if (
@@ -208,21 +378,33 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       }
 
       if (s.type === "response.output_text.delta") {
-        if (
-          openaiIsCurrentlyThinking === true &&
-          openaiThinkingStartTime !== null
-        ) {
-          const endTime = performance.now();
-          openaiThinkingDuration = Math.round(
-            endTime - openaiThinkingStartTime
-          );
-          // Mark thinking as finished once output text begins
-          openaiIsCurrentlyThinking = false;
-        }
+        const block = ensureActiveBlock("TEXT", s.item_id);
+        block.content += s.delta;
         text = s.delta;
       }
+
+      if (
+        s.type === "response.output_item.done" &&
+        s.item.type === "reasoning" &&
+        typeof s.item.encrypted_content === "string" &&
+        s.item.encrypted_content.length > 0
+      ) {
+        applyEncryptedReasoning(s.item.id, s.item.encrypted_content);
+      }
+
       if (s.type === "response.completed") {
         openaiResId = s.response.id;
+        for (const output of s.response.output) {
+          if (
+            output.type === "reasoning" &&
+            typeof output.encrypted_content === "string" &&
+            output.encrypted_content.length > 0
+          ) {
+            applyEncryptedReasoning(output.id, output.encrypted_content);
+          }
+        }
+
+        finalizeActiveBlock();
         for (const r of s.response.output) {
           if (r.type === "image_generation_call" && r.result) {
             if (r.result !== null) {
@@ -369,9 +551,11 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
             temperature,
             title,
             topP,
-            thinkingDuration: openaiThinkingStartTime
-              ? performance.now() - openaiThinkingStartTime
-              : undefined,
+            messageBlocks: currentChunkMessageBlock(),
+            thinkingDuration:
+              currentThinkingDuration() > 0
+                ? currentThinkingDuration()
+                : undefined,
             isThinking: true
           } satisfies EventTypeMap["ai_chat_chunk"])
         );
@@ -381,9 +565,10 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
           userId,
           userMsgId,
           model,
-          thinkingDuration: openaiThinkingStartTime
-            ? performance.now() - openaiThinkingStartTime
-            : undefined,
+          thinkingDuration:
+            currentThinkingDuration() > 0
+              ? currentThinkingDuration()
+              : undefined,
           title,
           imgGenEnabled: true,
           systemPrompt,
@@ -404,6 +589,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
           topP,
           provider,
           thinkingText: thinkingText,
+          messageBlocks: currentChunkMessageBlock(),
           isThinking: true,
           done: false
         });
@@ -440,9 +626,11 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
             title,
             topP,
             thinkingText: thinkingText,
-            thinkingDuration: openaiThinkingStartTime
-              ? performance.now() - openaiThinkingStartTime
-              : undefined,
+            messageBlocks: currentChunkMessageBlock(),
+            thinkingDuration:
+              currentThinkingDuration() > 0
+                ? currentThinkingDuration()
+                : undefined,
             isThinking: true
           } satisfies EventTypeMap["ai_chat_chunk"])
         );
@@ -451,9 +639,10 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
           conversationId,
           userId,
           model,
-          thinkingDuration: openaiThinkingStartTime
-            ? performance.now() - openaiThinkingStartTime
-            : undefined,
+          thinkingDuration:
+            currentThinkingDuration() > 0
+              ? currentThinkingDuration()
+              : undefined,
           userMsgId,
           title,
           systemPrompt,
@@ -474,6 +663,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
           topP,
           provider,
           thinkingText: thinkingText,
+          messageBlocks: currentChunkMessageBlock(),
           isThinking: true,
           done: false
         });
@@ -510,6 +700,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
             topP,
             chunk: text,
             isThinking: false,
+            messageBlocks: currentChunkMessageBlock(),
             thinkingDuration:
               openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined,
             done: false
@@ -543,6 +734,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
           provider,
           thinkingText:
             openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+          messageBlocks: currentChunkMessageBlock(),
           thinkingDuration:
             openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined,
 
@@ -733,6 +925,16 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
         const height = getIt?.height ?? 0,
           width = getIt?.width ?? 0;
 
+        for (const block of trackedBlocks) {
+          roundTrack.push({
+            type: block.type,
+            content: block.content,
+            durationMs: block.durationMs,
+            ordinal: block.ordinal,
+            conversationId
+          });
+        }
+
         const d = await this.prisma.handleAiChatResponse({
           chunk: openaiAgg,
           conversationId,
@@ -794,7 +996,8 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
           thinkingText:
             openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
           thinkingDuration:
-            openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined
+            openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined,
+          messageBlocks: roundTrack.length > 0 ? roundTrack : undefined
         });
         ws.send(
           JSON.stringify({
@@ -854,6 +1057,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
             chunk: openaiAgg,
             thinkingText:
               openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+            messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
             thinkingDuration:
               openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined,
             done: true
@@ -912,6 +1116,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
           title,
           thinkingText:
             openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+          messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
           thinkingDuration:
             openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined,
           topP,

@@ -8,6 +8,8 @@ import type {
   GrokModelIdUnion,
   MetaDisplayNameUnion,
   MetaModelIdUnion,
+  MistralDisplayNameUnion,
+  MistralModelIdUnion,
   OpenAiDisplayNameUnion,
   OpenAiModelIdUnion,
   VercelDisplayNameUnion,
@@ -24,6 +26,7 @@ import {
   AnthropicIcon,
   GeminiIcon,
   MetaIcon,
+  MistralIcon,
   OpenAiIcon,
   VercelIcon as v0Icon,
   XAiIcon
@@ -62,6 +65,12 @@ export const providerMetadata = {
     description: "Industry Leading, Open-Source AI",
     color: "#0081FB"
   },
+  mistral: {
+    name: "Mistral AI",
+    icon: MistralIcon,
+    description: "Open and portable generative AI",
+    color: "#FF7000"
+  },
   vercel: {
     name: "Vercel v0",
     icon: v0Icon,
@@ -82,7 +91,11 @@ export type DisplayNameWorkup<T extends Provider> = T extends "openai"
           ? ReturnType<typeof getDisplayNameByModelId<T, MetaModelIdUnion>>
           : T extends "vercel"
             ? ReturnType<typeof getDisplayNameByModelId<T, VercelModelIdUnion>>
-            : never;
+            : T extends "mistral"
+              ? ReturnType<
+                  typeof getDisplayNameByModelId<T, MistralModelIdUnion>
+                >
+              : never;
 
 export type ModelIdWorkup<T extends Provider> = T extends "openai"
   ? ReturnType<typeof getModelIdByDisplayName<T, OpenAiDisplayNameUnion>>
@@ -98,7 +111,11 @@ export type ModelIdWorkup<T extends Provider> = T extends "openai"
             ? ReturnType<
                 typeof getModelIdByDisplayName<T, VercelDisplayNameUnion>
               >
-            : never;
+            : T extends "mistral"
+              ? ReturnType<
+                  typeof getModelIdByDisplayName<T, MistralDisplayNameUnion>
+                >
+              : never;
 /**
  * use this in client components where the select options are
  * the display names (the keys of the object) which, on select, outputs the
@@ -124,6 +141,7 @@ export let defaultProvider:
   | "openai"
   | "gemini"
   | "grok"
+  | "mistral"
   | "anthropic"
   | "meta"
   | "vercel";
@@ -156,10 +174,15 @@ export const defaultModelSelection: ModelSelection = {
                   (defaultProvider = "vercel"),
                   defaultModelByProvider[defaultProvider]
                 )
-              : getModelIdByDisplayName(
-                  (defaultProvider = "openai"),
-                  defaultModelByProvider[defaultProvider]
-                )
+              : defaultProvider === "mistral"
+                ? getModelIdByDisplayName(
+                    (defaultProvider = "mistral"),
+                    defaultModelByProvider[defaultProvider]
+                  )
+                : getModelIdByDisplayName(
+                    (defaultProvider = "openai"),
+                    defaultModelByProvider[defaultProvider]
+                  )
 };
 export function getModelDisplayName(
   toProvider: Provider,
@@ -178,5 +201,18 @@ export function getModelDisplayName(
           ? getDisplayNameByModelId(toProvider, model as MetaModelIdUnion)
           : toProvider === "vercel"
             ? getDisplayNameByModelId(toProvider, model as VercelModelIdUnion)
-            : getDisplayNameByModelId(toProvider, model as OpenAiModelIdUnion);
+            : toProvider === "mistral"
+              ? getDisplayNameByModelId(
+                  toProvider,
+                  model as MistralModelIdUnion
+                )
+              : toProvider === "openai"
+                ? getDisplayNameByModelId(
+                    toProvider,
+                    model as OpenAiModelIdUnion
+                  )
+                : getDisplayNameByModelId(
+                    "openai",
+                    model as OpenAiModelIdUnion
+                  );
 }

@@ -32,6 +32,14 @@ import type { DocumentSingleton, ImageSingleton } from "@/types.ts";
 import type { CTR, DX, Rm } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 
+export type ChatChunkAndResMsgBlock = {
+  type: $Enums.MessageBlockType;
+  content: string;
+  ordinal: number;
+  conversationId: string;
+  durationMs: number;
+};
+
 export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   type: T;
   conversationId: string;
@@ -47,6 +55,9 @@ export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   temperature?: number;
   topP?: number;
   aiMsgId?: string;
+  messageBlocks?: T extends "ai_chat_response"
+    ? ChatChunkAndResMsgBlock[]
+    : ChatChunkAndResMsgBlock;
   imgGenAttachmentId?: string;
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatResponseImgGenFieldsFinal;

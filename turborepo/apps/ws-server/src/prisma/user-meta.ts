@@ -92,7 +92,8 @@ export class PrismaUserMetaService extends PrismaUtilsService {
         gemini: 0,
         anthropic: 0,
         vercel: 0,
-        meta: 0
+        meta: 0,
+        mistral: 0
       },
       isDefault: {
         vercel: 0,
@@ -100,7 +101,8 @@ export class PrismaUserMetaService extends PrismaUtilsService {
         openai: 0,
         grok: 0,
         gemini: 0,
-        anthropic: 0
+        anthropic: 0,
+        mistral: 0
       }
     };
     props.forEach(function (res) {

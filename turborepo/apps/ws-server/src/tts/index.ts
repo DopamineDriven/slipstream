@@ -12,6 +12,7 @@ import type {
   GrokBitRateTTS,
   GrokSampleRateTTS,
   GrokVoiceTTS,
+  MessageSingleton,
   TTSJobSingleton
 } from "@slipstream/types";
 
@@ -112,6 +113,26 @@ export class TTSService {
       l === "tr" ||
       l === "vi"
     );
+  }
+
+  public messageText(
+    msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
+  ) {
+    const textBlocks = Array.of<string>();
+
+    if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+      for (const block of msg.messageBlocks) {
+        if (block.type === "TEXT") {
+          textBlocks.push(block.content);
+        }
+      }
+    }
+
+    if (textBlocks.length > 0) {
+      return textBlocks.join("\n");
+    }
+
+    return msg.content;
   }
 
   protected buildWssUrl(

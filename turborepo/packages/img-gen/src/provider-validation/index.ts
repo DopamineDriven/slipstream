@@ -570,6 +570,7 @@ export class ProviderValidation {
       case "openai": {
         return "gpt-5.4" satisfies AllModelsUnion;
       }
+      case "mistral":
       case "anthropic":
       case "meta":
       case "vercel":
@@ -764,6 +765,17 @@ export class ProviderValidation {
           provider: this.providerToPrismaFormat(provider)
         }
       } as const,
+      messageBlocks = {
+        create: [
+          {
+            content: prompt,
+            durationMs: 0,
+            type: "TEXT",
+            conversationId,
+            ordinal: 0
+          }
+        ]
+      } as const,
       messageData = {
         content: prompt,
         provider: this.providerToPrismaFormat(provider),
@@ -773,7 +785,8 @@ export class ProviderValidation {
         userId,
         userKeyId,
         isImageGen,
-        imageGenJob
+        imageGenJob,
+        messageBlocks
       } as const,
       includeWithAttachments = {
         conversationSettings: true,
@@ -781,6 +794,7 @@ export class ProviderValidation {
           orderBy: { createdAt: "asc" },
           include: {
             imageGenJob: true,
+            messageBlocks: true,
             attachments: {
               where: {
                 OR: [
@@ -797,6 +811,7 @@ export class ProviderValidation {
               include: {
                 image: true,
                 document: true,
+                audio: true,
                 imageGenOutput: true
               }
             }
@@ -809,6 +824,7 @@ export class ProviderValidation {
           orderBy: { createdAt: "asc" },
           include: {
             imageGenJob: true,
+            messageBlocks: true,
             attachments: {
               where: {
                 OR: [
@@ -825,6 +841,7 @@ export class ProviderValidation {
               include: {
                 image: true,
                 document: true,
+                audio: true,
                 imageGenOutput: true
               }
             }

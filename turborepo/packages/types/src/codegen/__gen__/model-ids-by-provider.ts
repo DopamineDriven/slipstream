@@ -98,5 +98,10 @@ export const modelIdsByProvider = {
     "Cerebras-Llama-4-Scout-17B-16E-Instruct",
     "Groq-Llama-4-Maverick-17B-128E-Instruct"
   ],
-  vercel: ["v0-1.5-md", "v0-1.0-md"]
+  vercel: ["v0-1.5-md", "v0-1.0-md"],
+  mistral: [
+    "mistral-small-latest",
+    "mistral-medium-latest",
+    "mistral-large-latest"
+  ]
 } as const;

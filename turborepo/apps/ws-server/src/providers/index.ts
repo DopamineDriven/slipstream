@@ -9,6 +9,7 @@ import {
   GeminiMixin,
   GrokMixin,
   MetaMixin,
+  MistralMixin,
   OpenAIMixin,
   ProviderBaseMixin,
   VercelMixin
@@ -70,6 +71,7 @@ export class ProviderStore<M extends Provider = Provider> {
 class ProviderServiceBase {
   public readonly providers = [
     "anthropic",
+    "mistral",
     "gemini",
     "grok",
     "meta",
@@ -80,11 +82,13 @@ class ProviderServiceBase {
   constructor(protected opts?: ProviderOpts) {}
 }
 
-export class ProviderService extends VercelMixin(
-  MetaMixin(
-    OpenAIMixin(
-      GeminiMixin(
-        GrokMixin(AnthropicMixin(ProviderBaseMixin(ProviderServiceBase)))
+export class ProviderService extends MistralMixin(
+  VercelMixin(
+    MetaMixin(
+      OpenAIMixin(
+        GeminiMixin(
+          GrokMixin(AnthropicMixin(ProviderBaseMixin(ProviderServiceBase)))
+        )
       )
     )
   )
@@ -166,6 +170,31 @@ export class ProviderService extends VercelMixin(
           hasProviderApiKeySet: false,
           initialized: true,
           provider: "gemini",
+          initTime: performance.now(),
+          lastAccessed: performance.now()
+        }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return direct;
+      }
+      case "mistral": {
+        const storeCheck = this.#store.get("mistral") as
+          | ProviderEntry<"mistral">
+          | undefined;
+        if (
+          typeof storeCheck?.instance !== "undefined" &&
+          storeCheck.available
+        ) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          return storeCheck.instance;
+        }
+        const direct = this.mistral;
+        this.#store.set("mistral", {
+          instance: direct,
+          available: true,
+          hasProviderApiKeySet: false,
+          initialized: true,
+          provider: "mistral",
           initTime: performance.now(),
           lastAccessed: performance.now()
         }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment

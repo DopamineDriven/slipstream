@@ -11,8 +11,23 @@ import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { AnthropicVectorStoreWorkup } from "@/anthropic/vector-store.ts";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { AnthropicModelIdUnion, EventTypeMap } from "@slipstream/types";
+
+interface AnthropicActiveMessageBlock {
+  blockIndex: number;
+  content: string;
+  startedAt: number;
+  type: "THINKING" | "TEXT";
+}
+
+interface AnthropicFinalizedMessageBlock {
+  content: string;
+  durationMs: number;
+  ordinal: number;
+  type: $Enums.MessageBlockType;
+}
 
 export class AnthropicService extends AnthropicVectorStoreWorkup {
   /**
@@ -174,14 +189,105 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
     const reqMsgId = userMsgId ?? "";
     const model = m as AnthropicModelIdUnion;
     const provider = "anthropic" as const;
-    let anthropicThinkingStartTime: number | null = null,
-      anthropicThinkingDuration = 0,
-      anthropicIsCurrentlyThinking = false,
+    let anthropicThinkingDuration = 0,
       anthropicThinkingAgg = "",
       anthropicAgg = "",
       anthropicWebsearchToolUse = false,
       anthropicCi = 0;
+    const trackedBlocks = Array.of<AnthropicFinalizedMessageBlock>();
+    let activeBlock: AnthropicActiveMessageBlock | undefined = undefined;
+    let nextOrdinal = 0;
+    const roundTrack = Array.of<{
+      type: $Enums.MessageBlockType;
+      content: string;
+      durationMs: number;
+      ordinal: number;
+      conversationId: string;
+    }>();
     const anthropic = this.getClient(apiKey ?? undefined);
+
+    const finalizeActiveBlock = () => {
+      if (!activeBlock || activeBlock.content.length === 0) {
+        activeBlock = undefined;
+        return;
+      }
+
+      const durationMs = Math.max(
+        0,
+        Math.round(performance.now() - activeBlock.startedAt)
+      );
+
+      trackedBlocks.push({
+        content: activeBlock.content,
+        durationMs,
+        ordinal: nextOrdinal,
+        type: activeBlock.type
+      });
+
+      if (activeBlock.type === "THINKING") {
+        anthropicThinkingDuration += durationMs;
+      }
+
+      nextOrdinal += 1;
+      activeBlock = undefined;
+    };
+
+    const ensureActiveBlock = (
+      type: AnthropicActiveMessageBlock["type"],
+      blockIndex: number
+    ) => {
+      if (
+        activeBlock?.type !== type ||
+        activeBlock.blockIndex !== blockIndex
+      ) {
+        finalizeActiveBlock();
+        activeBlock = {
+          blockIndex,
+          content: "",
+          startedAt: performance.now(),
+          type
+        };
+      }
+
+      return activeBlock;
+    };
+
+    const getThinkingDuration = () => {
+      const activeThinkingDuration =
+        activeBlock?.type === "THINKING"
+          ? Math.round(performance.now() - activeBlock.startedAt)
+          : 0;
+
+      const totalThinkingDuration =
+        anthropicThinkingDuration + activeThinkingDuration;
+
+      return totalThinkingDuration > 0 ? totalThinkingDuration : undefined;
+    };
+
+    const currentChunkMessageBlock = () => {
+      if (!activeBlock) {
+        return undefined;
+      }
+
+      return {
+        type: activeBlock.type,
+        content: activeBlock.content,
+        ordinal: nextOrdinal,
+        conversationId,
+        durationMs: Math.max(
+          0,
+          Math.round(performance.now() - activeBlock.startedAt)
+        )
+      } as const;
+    };
+
+    const activeBlockMatchesIndex = (blockIndex: number) => {
+      if (!activeBlock) {
+        return false;
+      }
+
+      return activeBlock.blockIndex === blockIndex;
+    };
 
     let { params } = await this.createStreamWorkup({
       isNewChat,
@@ -364,6 +470,13 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
             bb.thinking = "";
           }
 
+          if (
+            chunk.content_block.type !== "text" &&
+            chunk.content_block.type !== "thinking"
+          ) {
+            finalizeActiveBlock();
+          }
+
           if (chunk.content_block.type === "web_search_tool_result") {
             if ("error" in chunk.content_block.content) {
               this.logger.info(chunk.content_block.content.error);
@@ -398,27 +511,14 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
           if (chunk.delta.type === "thinking_delta") {
             thinkingText = chunk.delta.thinking;
             if (bb) bb.thinking = (bb.thinking ?? "") + chunk.delta.thinking;
-            if (
-              !anthropicIsCurrentlyThinking &&
-              anthropicThinkingStartTime === null
-            ) {
-              anthropicThinkingStartTime = performance.now();
-              anthropicIsCurrentlyThinking = true;
-            }
+            const block = ensureActiveBlock("THINKING", chunk.index);
+            block.content += chunk.delta.thinking;
           }
           if (chunk.delta.type === "text_delta") {
             text = chunk.delta.text;
             if (bb) bb.text = (bb.text ?? "") + chunk.delta.text;
-            if (
-              anthropicIsCurrentlyThinking &&
-              anthropicThinkingStartTime !== null
-            ) {
-              const endTime = performance.now();
-              anthropicThinkingDuration = Math.round(
-                endTime - anthropicThinkingStartTime
-              );
-              anthropicIsCurrentlyThinking = false;
-            }
+            const block = ensureActiveBlock("TEXT", chunk.index);
+            block.content += chunk.delta.text;
           }
           if (chunk.delta.type === "citations_delta") {
             this.logger.info(chunk.delta.citation);
@@ -573,6 +673,13 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
             usage += chunk.usage.output_tokens;
         }
 
+        if (
+          chunk.type === "content_block_stop" &&
+          activeBlockMatchesIndex(chunk.index)
+        ) {
+          finalizeActiveBlock();
+        }
+
         // — Stream thinking text to client (unchanged logic)
         if (thinkingText) {
           if (webSearchRes) {
@@ -614,10 +721,9 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               temperature,
               topP,
               thinkingText: thinkingText,
-              thinkingDuration: anthropicThinkingStartTime
-                ? performance.now() - anthropicThinkingStartTime
-                : undefined,
+              thinkingDuration: getThinkingDuration(),
               isThinking: true,
+              messageBlocks: currentChunkMessageBlock(),
               done: false
             } satisfies EventTypeMap["ai_chat_chunk"])
           );
@@ -628,9 +734,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
             userId,
             userMsgId,
             model,
-            thinkingDuration: anthropicThinkingStartTime
-              ? performance.now() - anthropicThinkingStartTime
-              : undefined,
+            thinkingDuration: getThinkingDuration(),
             title,
             systemPrompt,
             temperature,
@@ -639,6 +743,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
             provider,
             thinkingText: thinkingText,
             isThinking: true,
+            messageBlocks: currentChunkMessageBlock(),
             done: false
           });
         }
@@ -679,7 +784,8 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               temperature,
               topP,
               chunk: text,
-              isThinking: anthropicIsCurrentlyThinking,
+              isThinking: false,
+              messageBlocks: currentChunkMessageBlock(),
               thinkingDuration:
                 anthropicThinkingDuration > 0
                   ? anthropicThinkingDuration
@@ -706,9 +812,9 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               anthropicThinkingDuration > 0
                 ? anthropicThinkingDuration
                 : undefined,
-
             chunk: text,
-            isThinking: anthropicIsCurrentlyThinking,
+            isThinking: false,
+            messageBlocks: currentChunkMessageBlock(),
             done: false
           });
           if (chunks.length % 10 === 0) {
@@ -732,17 +838,29 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
 
         // — Break inner loop on tool_use to handle PTC continuation
         if (done === "tool_use" && toolAccumulators.size > 0) {
+          finalizeActiveBlock();
           break;
         }
 
         // — Break inner loop on pause_turn (no tool results needed, just continue)
         if (done === "pause_turn") {
+          finalizeActiveBlock();
           break;
         }
 
         // — Finalize on end_turn / max_tokens / stop_sequence / refusal
         // (tool_use and pause_turn already broke out above)
         if (done) {
+          finalizeActiveBlock();
+          for (const block of trackedBlocks) {
+            roundTrack.push({
+              type: block.type,
+              content: block.content,
+              durationMs: block.durationMs,
+              ordinal: block.ordinal,
+              conversationId
+            });
+          }
           const d = await this.prisma.handleAiChatResponse({
             chunk: anthropicAgg,
             conversationId,
@@ -760,6 +878,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               containerId,
               rounds: this.roundRegistry.get(reqMsgId) ?? []
             }),
+            messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
             thinkingText:
               anthropicThinkingAgg.length > 0
                 ? anthropicThinkingAgg
@@ -784,6 +903,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               temperature,
               topP,
               chunk: anthropicAgg,
+              messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
               thinkingText: anthropicThinkingAgg || undefined,
               thinkingDuration:
                 anthropicThinkingDuration > 0
@@ -804,6 +924,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
             aiMsgId: d.aiMsgId,
             topP,
             provider,
+            messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
             thinkingText: anthropicThinkingAgg || undefined,
             thinkingDuration:
               anthropicThinkingDuration > 0

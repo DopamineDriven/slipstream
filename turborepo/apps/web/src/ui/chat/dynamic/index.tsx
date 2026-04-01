@@ -21,7 +21,8 @@ import { normalizeImgGenFields } from "@/lib/img-gen-to-attachment";
 import {
   createAIMessage,
   createUserMessage,
-  finalizeStreamingMessage
+  finalizeStreamingMessage,
+  toMessageBlocks
 } from "@/lib/ui-message-helpers";
 import { cn } from "@/lib/utils";
 import { ChatFeed } from "@/ui/chat/chat-feed";
@@ -50,6 +51,7 @@ export function ChatInterface({
     thinkingText,
     isThinking,
     thinkingDuration,
+    streamingMessageBlocks,
     imgGenEnabled,
     imgGenFields,
     currentUserMsgId,
@@ -340,7 +342,11 @@ export function ChatInterface({
         tryAgain: null,
         updatedAt: new Date(),
         userKeyId: null,
-        imageGenJob: null
+        imageGenJob: null,
+        messageBlocks: toMessageBlocks(
+          `streaming-${activeConversationId}`,
+          streamingMessageBlocks
+        )
       });
 
       if (existingStreamIndex >= 0) {
@@ -363,6 +369,8 @@ export function ChatInterface({
     isThinking,
     thinkingText,
     thinkingDuration
+    ,
+    streamingMessageBlocks
   ]);
 
   // Handle completion
@@ -411,7 +419,12 @@ export function ChatInterface({
                 thinkingDuration: thinkingDuration ?? undefined,
                 aiMsgId: currentAiMsgId ?? undefined,
                 imgGenAttachmentId: currentImgGenAttachmentId ?? undefined,
-                imgGenFields: imgGenFields ?? undefined
+                imgGenFields: imgGenFields ?? undefined,
+                messageBlocks: toMessageBlocks(
+                  currentAiMsgId ??
+                    streamingMsg.id.replace("streaming-", ""),
+                  streamingMessageBlocks
+                )
               }
             );
           }
@@ -434,7 +447,8 @@ export function ChatInterface({
     imgGenFields,
     thinkingDuration,
     currentAiMsgId,
-    currentUserMsgId
+    currentUserMsgId,
+    streamingMessageBlocks
   ]);
 
   // Reset processed flag when navigating away from new-chat

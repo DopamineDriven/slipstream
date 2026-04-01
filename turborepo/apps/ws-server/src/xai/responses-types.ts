@@ -5,6 +5,24 @@ import type {
   MessageSingleton,
   XOR
 } from "@slipstream/types";
+import type { $Enums } from "@slipstream/db/node/generated/client";
+
+
+export interface GrokActiveMessageBlock {
+  content: string;
+  itemIds: string[];
+  startedAt: number;
+  type: "ENCRYPTED_THINKING" | "TEXT";
+}
+
+export interface GrokFinalizedMessageBlock {
+  content: string;
+  durationMs: number;
+  itemIds: string[];
+  ordinal: number;
+  previewContent: string;
+  type: $Enums.MessageBlockType;
+}
 
 export type ResponsesRole = "user" | "assistant" | "developer" | "system";
 /**

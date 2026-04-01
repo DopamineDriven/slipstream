@@ -52,6 +52,7 @@ export { MessageSquare } from "@/icons/message-square";
 export { MessageSquareText } from "@/icons/message-square-text";
 export { MetaIcon } from "@/icons/meta";
 export { Mic } from "@/icons/mic";
+export { MistralIcon } from "@/icons/mistral";
 export { Moon } from "@/icons/moon";
 export { OpenAiIcon } from "@/icons/openai";
 export { Package } from "@/icons/package";

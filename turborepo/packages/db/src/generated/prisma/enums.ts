@@ -279,6 +279,15 @@ export const SenderType = {
 export type SenderType = (typeof SenderType)[keyof typeof SenderType]
 
 
+export const MessageBlockType = {
+  ENCRYPTED_THINKING: 'ENCRYPTED_THINKING',
+  THINKING: 'THINKING',
+  TEXT: 'TEXT'
+} as const
+
+export type MessageBlockType = (typeof MessageBlockType)[keyof typeof MessageBlockType]
+
+
 export const ProviderAssetState = {
   PENDING: 'PENDING',
   ACTIVE: 'ACTIVE',
@@ -306,7 +315,8 @@ export const Provider = {
   GEMINI: 'GEMINI',
   ANTHROPIC: 'ANTHROPIC',
   META: 'META',
-  VERCEL: 'VERCEL'
+  VERCEL: 'VERCEL',
+  MISTRAL: 'MISTRAL'
 } as const
 
 export type Provider = (typeof Provider)[keyof typeof Provider]

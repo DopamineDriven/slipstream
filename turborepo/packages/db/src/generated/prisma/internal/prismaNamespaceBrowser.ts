@@ -68,6 +68,7 @@ export const ModelName = {
   ConversationMemoryContext: 'ConversationMemoryContext',
   ConversationMemoryChunk: 'ConversationMemoryChunk',
   Message: 'Message',
+  MessageBlock: 'MessageBlock',
   Profile: 'Profile',
   AttachmentProvider: 'AttachmentProvider',
   ProviderStore: 'ProviderStore',
@@ -566,6 +567,21 @@ export const MessageScalarFieldEnum = {
 } as const
 
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+export const MessageBlockScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  messageId: 'messageId',
+  ordinal: 'ordinal',
+  content: 'content',
+  type: 'type',
+  durationMs: 'durationMs',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MessageBlockScalarFieldEnum = (typeof MessageBlockScalarFieldEnum)[keyof typeof MessageBlockScalarFieldEnum]
 
 
 export const ProfileScalarFieldEnum = {

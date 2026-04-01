@@ -26,10 +26,16 @@ export async function rxnAction(
     where: { id: msgId },
     data: rxnObject[action],
     include: {
+      messageBlocks: true,
       imageGenJob: true,
       attachments: {
         orderBy: { createdAt: "asc" },
-        include: { image: true, document: true, imageGenOutput: true }
+        include: {
+          image: true,
+          document: true,
+          imageGenOutput: true,
+          audio: true
+        }
       }
     }
   });
