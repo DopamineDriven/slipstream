@@ -86,7 +86,7 @@ export function MessageBubble({
   const [renderedThinkingContent, setRenderedThinkingContent] =
     useState<ReactNode | null>(null);
   const [renderedBlockContent, setRenderedBlockContent] = useState<
-    Record<number, ReactNode>
+    Record<string, ReactNode>
   >({});
 
   const processingRef = useRef(false);
@@ -129,6 +129,7 @@ export function MessageBubble({
 
   const hasRenderableMessageBlocks = orderedMessageBlocks.length > 0;
   const latestMessageBlock = orderedMessageBlocks.at(-1);
+  const blockOrdinalKey = useCallback((ordinal: number) => String(ordinal), []);
 
   const contentToCopy = useMemo(() => {
     if (!hasRenderableMessageBlocks) {
@@ -424,7 +425,7 @@ export function MessageBubble({
     let cancelled = false;
 
     (async () => {
-      const nextRendered = {} satisfies Record<number, ReactNode>;
+      const nextRendered: Record<string, ReactNode> = {};
 
       try {
         const { processMarkdownToReact } = await import("@/lib/processor");
@@ -443,13 +444,13 @@ export function MessageBubble({
           const cached = markdownCache.get(cacheKey);
 
           if (cached) {
-            nextRendered[block.ordinal] = cached;
+            nextRendered[blockOrdinalKey(block.ordinal)] = cached;
             continue;
           }
 
           const processed = await processMarkdownToReact(blockContent);
           markdownCache.set(cacheKey, processed);
-          nextRendered[block.ordinal] = processed;
+          nextRendered[blockOrdinalKey(block.ordinal)] = processed;
         }
 
         if (!cancelled) {
@@ -497,7 +498,8 @@ export function MessageBubble({
             thinkingContent={
               isStreaming
                 ? processStreamingMarkdown(blockContent)
-                : (renderedBlockContent[block.ordinal] ?? blockContent)
+                : (renderedBlockContent[blockOrdinalKey(block.ordinal)] ??
+                    blockContent)
             }
             duration={block.durationMs}
             isStreaming={isActiveThinkingBlock}
@@ -516,7 +518,8 @@ export function MessageBubble({
           className="leading-relaxed text-pretty whitespace-pre-wrap">
           {isStreaming
             ? processStreamingMarkdown(blockContent)
-            : (renderedBlockContent[block.ordinal] ?? blockContent)}
+            : (renderedBlockContent[blockOrdinalKey(block.ordinal)] ??
+                blockContent)}
         </div>
       );
     }
@@ -528,6 +531,7 @@ export function MessageBubble({
     latestMessageBlock?.ordinal,
     liveIsThinking,
     message.id,
+    blockOrdinalKey,
     orderedMessageBlocks,
     renderedBlockContent
   ]);
