@@ -48,7 +48,10 @@ export class PrismaTTSService extends PrismaProviderStoreService {
       select: {
         content: true,
         conversationId: true,
-        messageBlocks: true
+        model: true,
+        messageBlocks: true,
+        provider: true,
+        senderType: true
       }
     });
   }

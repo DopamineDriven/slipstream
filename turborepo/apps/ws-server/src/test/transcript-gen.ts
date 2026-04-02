@@ -6,8 +6,9 @@ import type {
   AllModelsUnion,
   AttachmentSingleton,
   ConversationSingleton,
-  ImageGenJobSingleton,
-  MessageSingleton
+  MessageBlockSingleton,
+  MessageSingleton,
+  TTSJobSingleton
 } from "@slipstream/types";
 
 dotenv.config({ quiet: true });
@@ -23,6 +24,8 @@ type MapItRT = {
   provider: Lowercase<$Enums.Provider>;
   model: AllModelsUnion | (string & {});
   sender: $Enums.SenderType;
+  messageBlocks?: MessageBlockSingleton<true>[];
+  ttsJob?: TTSJobSingleton<true>;
   asset: {
     cdnUrl: string;
     ext: string;
@@ -32,12 +35,22 @@ type MapItRT = {
     assetType: $Enums.AssetType;
     size: number;
     msgType: $Enums.MessageType;
+    duration: number;
   }[];
 };
 
 class ScriptGen extends Fs {
   constructor() {
     super(process.cwd());
+  }
+
+  private sanitizeBlockContent(content: string, model = "claude-opus-4-6") {
+    const out = content
+      .replace(/<model\s+provider="[^"]*"\s+name="[^"]*"\s*>/g, "")
+      .replace(/<\/model>/g, "")
+      .trim();
+
+    return `<model provider="anthropic" name="${model}">\n\n${out}\n\n</model>`;
   }
 
   private safeErrMsg(err: unknown) {
@@ -77,15 +90,21 @@ class ScriptGen extends Fs {
         );
       }
 
-      const messagesResult = await client.query<
-        MessageSingleton<true> & { imageGenJob: ImageGenJobSingleton<true> }
-      >(
+      const messagesResult = await client.query<MessageSingleton<true>>(
         `
   SELECT
     m.*,
-    row_to_json(igj.*) AS "imageGenJob"
+    row_to_json(igj.*) AS "imageGenJob",
+    row_to_json(tts.*) AS "ttsJob",
+    COALESCE(
+      (SELECT json_agg(mb ORDER BY mb."ordinal" ASC)
+       FROM "MessageBlock" mb
+       WHERE mb."messageId" = m."id"),
+      '[]'::json
+    ) AS "messageBlocks"
   FROM "Message" m
   LEFT JOIN "ImageGenJob" igj ON igj."requestMessageId" = m."id"
+  LEFT JOIN "TTSJob" tts ON tts."sourceMessageId" = m."id"
   WHERE m."conversationId" = $1
   ORDER BY m."createdAt" ASC
     `,
@@ -101,16 +120,19 @@ class ScriptGen extends Fs {
     SELECT
       a.*,
       row_to_json(img.*) AS "image",
+      row_to_json(audio.*) AS "audio",
       row_to_json(doc.*) AS "document",
       row_to_json(igo.*) AS "imageGenOutput"
     FROM "Attachment" a
-    LEFT JOIN "ImageMetadata"   img ON img."attachmentId" = a."id"
+    LEFT JOIN "ImageMetadata" img ON img."attachmentId" = a."id"
+    LEFT JOIN "AudioMetadata" audio ON audio."attachmentId" = a."id"
     LEFT JOIN "DocumentMetadata" doc ON doc."attachmentId" = a."id"
     LEFT JOIN "ImageGenOutput"  igo ON igo."attachmentId" = a."id"
     WHERE a."messageId" = ANY($1::text[])
       AND (
         a."origin" != 'GENERATED'
-        OR (a."origin" = 'GENERATED' AND igo."kind" = 'FINAL')
+        OR (a."origin" = 'GENERATED' AND a."assetType" != 'IMAGE')
+        OR (a."origin" = 'GENERATED' AND a."assetType" = 'IMAGE' AND igo."kind" = 'FINAL')
       )
     ORDER BY a."createdAt" ASC
     `,
@@ -134,16 +156,18 @@ class ScriptGen extends Fs {
 
       // 5) Assemble hydrated messages
       const messages = messagesResult.rows.map(
-        ({ imageGenJob, ...msgRest }) => {
+        ({ imageGenJob, messageBlocks, ttsJob, ...msgRest }) => {
           const rawAttachments = attachmentsByMessageId.get(msgRest.id) ?? [];
 
           const attachments = rawAttachments.map(
-            ({ image, document, imageGenOutput, ...attRest }) => ({
+            ({ image, audio, document, imageGenOutput, ...attRest }) => ({
               ...attRest,
               size: Number(attRest.size ?? 0),
               // row_to_json of an all-NULL join row gives {"attachmentId":null,...}
               // normalise to null when the PK field is null
+
               image: image?.attachmentId ? image : null,
+              audio: audio?.attachmentId ? audio : null,
               document: document?.attachmentId ? document : null,
               imageGenOutput: imageGenOutput?.id ? imageGenOutput : null
             })
@@ -152,10 +176,19 @@ class ScriptGen extends Fs {
           return {
             ...msgRest,
             imageGenJob: imageGenJob?.id ? imageGenJob : null,
-            attachments
+            messageBlocks,
+            attachments,
+            ttsJob: ttsJob
+              ? {
+                  ...ttsJob,
+                  sizeBytes: ttsJob?.sizeBytes ? Number(ttsJob.sizeBytes) : null
+                }
+              : undefined
           };
         }
       );
+      console.log(messages.map((t)=>t.ttsJob?.cdnUrl).filter((t)=>typeof t!=="undefined"));
+      console.log(messages.map((t)=>t.attachments.filter((t)=>t.assetType==="AUDIO").map((o)=>o.cdnUrl).filter((v)=>v!==null)));
       return {
         ...conversation,
         conversationSettings: null,
@@ -226,14 +259,35 @@ class ScriptGen extends Fs {
     return data?.messages.map((msg, i) => {
       ++i;
       const asset = Array.of<MapItRT["asset"][number]>();
-      const content = msg.content,
+      let thinkingDur = 0;
+      const thinkingContent = Array.of<string>();
+      const textContent = Array.of<string>();
+      if (msg.messageBlocks) {
+        for (const b of msg.messageBlocks) {
+          if (b.type === "THINKING" || b.type === "ENCRYPTED_THINKING") {
+            thinkingDur += b.durationMs;
+            thinkingContent.push(b.content);
+          }
+          if (b.type === "TEXT") {
+            if (msg.provider === "ANTHROPIC" && msg.senderType === "AI") {
+              textContent.push(
+                this.sanitizeBlockContent(b.content, msg.model ?? undefined)
+              );
+            } else {
+              textContent.push(b.content);
+            }
+          }
+        }
+      }
+      const content = textContent.join(`\n`),
         timestamp = new Date(msg.createdAt),
         id = msg.id,
-        thoughtFor = msg.senderType === "USER" ? null : msg.thinkingDuration,
+        thoughtFor = msg.senderType === "USER" ? null : thinkingDur,
         provider = msg.provider.toLowerCase() as Lowercase<$Enums.Provider>,
         model = msg.model ?? "",
         sender = msg.senderType,
-        thinking = msg.thinkingText ?? null;
+        thinking =
+          thinkingContent.length > 0 ? thinkingContent.join(`\n`) : null;
       msg.attachments.length > 0
         ? msg.attachments.map(t => {
             const attObj = {
@@ -244,9 +298,19 @@ class ScriptGen extends Fs {
               size: 0,
               assetType: "UNKNOWN" as $Enums.AssetType,
               batchOrSeriesId: "",
-              msgType: msg.messageType
+              msgType: msg.messageType,
+              duration: 0
             };
             attObj.assetType = t.assetType;
+            if (msg?.ttsJob?.cdnUrl) {
+              console.log(msg.ttsJob);
+              attObj.cdnUrl = msg.ttsJob.cdnUrl;
+              attObj.batchOrSeriesId = msg.ttsJob.id;
+              attObj.assetType = "AUDIO";
+              attObj.size = msg.ttsJob.sizeBytes ?? 0;
+              attObj.ext = msg.ttsJob.codec;
+              attObj.duration = msg.ttsJob.durationMs ?? 0;
+            }
             if (t.compatStatus === "ACTIVE") {
               if (t.compatCdnUrl) {
                 attObj.cdnUrl = t.compatCdnUrl;
@@ -276,8 +340,11 @@ class ScriptGen extends Fs {
                 attObj.cdnUrl = t.cdnUrl;
               }
               if (t.filename) {
+                if (t.assetType==="DOCUMENT" && t.audio?.duration) {
+                  attObj.filename=`duration: ${t.audio.duration/1000/60} min`
+                } else {
                 attObj.filename = t.filename;
-              }
+                }}
               if (t.ext) {
                 attObj.ext = t.ext;
               }
@@ -310,6 +377,7 @@ class ScriptGen extends Fs {
         provider,
         model,
         sender,
+        messageBlocks: msg.messageBlocks,
         asset
       };
     });
@@ -320,6 +388,8 @@ class ScriptGen extends Fs {
       .map(v => {
         if (v.assetType === "IMAGE") {
           return `![${v.filename}](${v.cdnUrl})`;
+        } else if (v.assetType==="AUDIO"){
+          return `[duration: ${(v.duration/1000/60).toPrecision(6)} min](${v.cdnUrl})`
         } else {
           return `[${v.filename}](${v.cdnUrl})`;
         }
