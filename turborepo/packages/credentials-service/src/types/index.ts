@@ -77,6 +77,8 @@ export interface CredentialEntity {
   AI_GATEWAY_API_KEY?: string;
   MOTION_PLUS_TOKEN?: string;
   MISTRAL_API_KEY?: string;
+  COHERE_API_KEY?: string;
+  COHERE_TRIAL_KEY?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

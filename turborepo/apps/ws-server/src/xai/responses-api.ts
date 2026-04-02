@@ -140,7 +140,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
 
     const finalizeActiveBlock = () => {
       if (!activeBlock) {
-        return;
+        return undefined;
       }
 
       const previewContent = activeBlock.content;
@@ -160,7 +160,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
         encryptedParts.length === 0
       ) {
         activeBlock = undefined;
-        return;
+        return undefined;
       }
 
       const durationMs = Math.max(
@@ -168,7 +168,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
         Math.round(performance.now() - activeBlock.startedAt)
       );
 
-      trackedBlocks.push({
+      const finalizedBlock = {
         content:
           encryptedParts.length > 0
             ? encryptedParts.join("\n")
@@ -181,7 +181,9 @@ export class GrokResponsesApiService extends GrokImgGenService {
             ? ENCRYPTED_THINKING_PLACEHOLDER
             : previewContent,
         type: activeBlock.type
-      });
+      } satisfies GrokFinalizedMessageBlock;
+
+      trackedBlocks.push(finalizedBlock);
 
       if (activeBlock.type === "ENCRYPTED_THINKING") {
         grokThinkingDuration += durationMs;
@@ -189,6 +191,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
 
       nextOrdinal += 1;
       activeBlock = undefined;
+      return finalizedBlock;
     };
 
     const ensureActiveBlock = (
@@ -236,6 +239,24 @@ export class GrokResponsesApiService extends GrokImgGenService {
           0,
           Math.round(performance.now() - activeBlock.startedAt)
         )
+      } as const;
+    };
+
+    const finalizedChunkMessageBlock = (
+      block: Pick<
+        GrokFinalizedMessageBlock,
+        "type" | "previewContent" | "ordinal" | "durationMs"
+      >
+    ) => {
+      const type =
+        block.type === "ENCRYPTED_THINKING" ? "ENCRYPTED_THINKING" : "TEXT";
+
+      return {
+        type,
+        content: block.previewContent,
+        ordinal: block.ordinal,
+        conversationId,
+        durationMs: block.durationMs
       } as const;
     };
 
@@ -338,6 +359,12 @@ export class GrokResponsesApiService extends GrokImgGenService {
         for await (const chunk of parser) {
           let text: string | undefined = undefined;
           let thinkingText: string | undefined = undefined;
+          let thinkingMessageBlock:
+            | ReturnType<typeof currentChunkMessageBlock>
+            | undefined = undefined;
+          let textMessageBlock:
+            | ReturnType<typeof currentChunkMessageBlock>
+            | undefined = undefined;
 
           if (chunk.event === "response.created") {
             this.logger.info(
@@ -407,6 +434,11 @@ export class GrokResponsesApiService extends GrokImgGenService {
               thinkingText = appendEncryptedThinkingPlaceholder(
                 chunk.data.item.id
               );
+              const finalizedBlock = finalizeActiveBlock();
+              if (finalizedBlock) {
+                thinkingMessageBlock =
+                  finalizedChunkMessageBlock(finalizedBlock);
+              }
             }
 
             if (chunk.data.item.type === "file_search_call") {
@@ -445,12 +477,14 @@ export class GrokResponsesApiService extends GrokImgGenService {
             thinkingText = appendEncryptedThinkingPlaceholder(
               chunk.data.item_id
             );
+            thinkingMessageBlock = currentChunkMessageBlock();
           }
 
           if (chunk.event === "response.output_text.delta") {
             const block = ensureActiveBlock("TEXT", chunk.data.item_id);
             block.content += chunk.data.delta;
             text = chunk.data.delta;
+            textMessageBlock = currentChunkMessageBlock();
           }
 
           if (chunk.event === "response.output_text.annotation.added") {
@@ -497,7 +531,13 @@ export class GrokResponsesApiService extends GrokImgGenService {
             }
           }
 
-          if (thinkingText) {
+          const nextThinkingMessageBlock =
+            thinkingMessageBlock ?? currentChunkMessageBlock();
+
+          if (
+            thinkingText ||
+            nextThinkingMessageBlock?.type === "ENCRYPTED_THINKING"
+          ) {
             ws.send(
               JSON.stringify({
                 type: "ai_chat_chunk",
@@ -511,7 +551,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
                 temperature,
                 thinkingText,
                 isThinking: true,
-                messageBlocks: currentChunkMessageBlock(),
+                messageBlocks: nextThinkingMessageBlock,
                 thinkingDuration:
                   currentThinkingDuration() > 0
                     ? currentThinkingDuration()
@@ -536,7 +576,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
                   ? currentThinkingDuration()
                   : undefined,
               thinkingText,
-              messageBlocks: currentChunkMessageBlock(),
+              messageBlocks: nextThinkingMessageBlock,
               systemPrompt,
               temperature,
               topP,
@@ -548,6 +588,8 @@ export class GrokResponsesApiService extends GrokImgGenService {
           if (text) {
             chunks.push(text);
             grokAgg += text;
+            const nextTextMessageBlock =
+              textMessageBlock ?? currentChunkMessageBlock();
 
             ws.send(
               JSON.stringify({
@@ -563,7 +605,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
                 thinkingDuration:
                   grokThinkingDuration !== 0 ? grokThinkingDuration : undefined,
                 isThinking: false,
-                messageBlocks: currentChunkMessageBlock(),
+                messageBlocks: nextTextMessageBlock,
                 topP,
                 model: m,
                 chunk: text,
@@ -586,7 +628,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
                 grokThinkingDisplayAgg.length > 0
                   ? grokThinkingDisplayAgg
                   : undefined,
-              messageBlocks: currentChunkMessageBlock(),
+              messageBlocks: nextTextMessageBlock,
               systemPrompt,
               temperature,
               topP,

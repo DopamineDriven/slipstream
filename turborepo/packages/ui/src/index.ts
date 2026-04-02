@@ -19,6 +19,7 @@ export { ChevronUp } from "@/icons/chevron-up";
 export { CirclePlus } from "@/icons/circle-plus";
 export { Circle } from "@/icons/circle";
 export { Code } from "@/icons/code";
+export { CohereIcon, CohereIconCurrentColor } from "@/icons/cohere";
 export { Compass } from "@/icons/compass";
 export { Copy } from "@/icons/copy";
 export { Download } from "@/icons/download";

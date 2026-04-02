@@ -14,6 +14,7 @@ import { ChevronUp } from "@/icons/chevron-up";
 import { Circle } from "@/icons/circle";
 import { CirclePlus } from "@/icons/circle-plus";
 import { Code } from "@/icons/code";
+import { CohereIcon, CohereIconCurrentColor } from "@/icons/cohere";
 import { Compass } from "@/icons/compass";
 import { Copy } from "@/icons/copy";
 import { Download } from "@/icons/download";
@@ -47,7 +48,7 @@ import { MessageSquare } from "@/icons/message-square";
 import { MessageSquareText } from "@/icons/message-square-text";
 import { MetaIcon } from "@/icons/meta";
 import { Mic } from "@/icons/mic";
-import {MistralIcon} from "@/icons/mistral";
+import { MistralIcon } from "@/icons/mistral";
 import { Moon } from "@/icons/moon";
 import { OpenAiIcon } from "@/icons/openai";
 import { Package } from "@/icons/package";
@@ -99,6 +100,8 @@ const IconComponents = {
   CirclePlus,
   Circle,
   Code,
+  CohereIcon,
+  CohereIconCurrentColor,
   Compass,
   Copy,
   Download,
@@ -218,6 +221,8 @@ export {
   CirclePlus,
   Circle,
   Code,
+  CohereIcon,
+  CohereIconCurrentColor,
   Compass,
   Copy,
   Download,
