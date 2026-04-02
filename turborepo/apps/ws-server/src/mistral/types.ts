@@ -2,7 +2,7 @@ import type {
   AssistantMessage,
   GuardrailConfig,
   Prediction,
-  ResponseFormat,ContentChunk,
+  ResponseFormat,
   SystemMessage,
   Tool,
   ToolChoice,

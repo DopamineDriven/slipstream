@@ -1,185 +1,35 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type {
+  MistralAccumulatedToolCall,
+  MistralActiveMessageBlock,
+  MistralAssistantToolCallMessage,
+  MistralFinalizedMessageBlock,
+  MistralForcedLoopStopReason,
+  MistralFunctionTool,
+  MistralFunctionToolCall,
+  MistralMessageReq,
+  MistralToolMessage
+} from "@/mistral/types.ts";
 import type { OpenAIFileSearchToolInput } from "@/openai/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type {
-  AssistantMessage,
   ContentChunk,
-  GuardrailConfig,
-  Prediction,
-  ResponseFormat,
   SystemMessage,
+  ThinkChunk,
   Tool,
-  ToolCall,
-  ToolChoice,
-  ToolMessage,
-  UserMessage
+  ToolCall
 } from "@mistralai/mistralai/models/components";
 import type { Logger as PinoLogger } from "pino";
 import { Mistral } from "@mistralai/mistralai";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type {
   EventTypeMap,
   MessageSingleton,
   MistralModelIdUnion
 } from "@slipstream/types";
-import { $Enums } from "@slipstream/db/node/generated/client";
-import { MistralMessageReq } from "./types.ts";
-
-export type ChatCompletionRequest = {
-  model: MistralModelIdUnion;
-  temperature?: number | null | undefined;
-  top_p?: number | undefined;
-  max_tokens?: number | null | undefined;
-  stream: boolean;
-  stop?: string | string[] | undefined;
-  random_seed?: number | null | undefined;
-  metadata?: { [k: string]: any } | null | undefined;
-  messages: (
-    | (AssistantMessage & { role: "assistant" })
-    | SystemMessage
-    | ToolMessage
-    | UserMessage
-  )[];
-  response_format?: ResponseFormat | undefined;
-  tools?: Tool[] | null | undefined;
-  tool_choice?: ToolChoice | string | undefined;
-  presence_penalty?: number | undefined;
-  frequency_penalty?: number | undefined;
-  n?: number | null | undefined;
-  prediction?: Prediction | undefined;
-  parallel_tool_calls?: boolean | undefined;
-  reasoning_effort?: string | null | undefined;
-  prompt_mode?: string | null | undefined;
-  guardrails?: GuardrailConfig[] | null | undefined;
-  safe_prompt?: boolean | undefined;
-};
-
-type MistralReqMessage = (
-  | SystemMessage
-  | ToolMessage
-  | UserMessage
-  | (AssistantMessage & { role: "assistant" })
-)[];
-
-type MistralMessageContentChunk = Exclude<
-  UserMessage["content"],
-  string | null
->[number];
-
-interface MistralFunctionTool {
-  type: "function";
-  function: {
-    name: string;
-    description: string;
-    parameters: {
-      type: "object";
-      properties: Record<
-        string,
-        {
-          type: "string" | "number" | "array";
-          description: string;
-          items?: { type: "string" };
-          minItems?: number;
-          maxItems?: number;
-        }
-      >;
-      required: string[];
-      additionalProperties: boolean;
-    };
-  };
-}
-
-type MistralFunctionToolCall = {
-  id: string;
-  type: "function";
-  function: {
-    name: string;
-    arguments: string;
-  };
-  index: number;
-};
-
-type MistralBaseMessage =
-  | UserMessage
-  | (AssistantMessage & { role: "assistant" });
-
-type MistralAssistantToolCallMessage = {
-  role: "assistant";
-  content: "";
-  toolCalls: readonly MistralFunctionToolCall[];
-  prefix?: false;
-};
-
-type MistralToolMessage = {
-  role: "tool";
-  toolCallId: string;
-  content: string;
-  name?: string;
-};
-
-type MistralAccumulatedToolCall = {
-  id: string;
-  name: string;
-  arguments: string;
-  index: number;
-};
-
-interface MistralActiveMessageBlock {
-  content: string;
-  reasoningChunkCount: number;
-  sawAggregateTail: boolean;
-  startedAt: number;
-  type: "THINKING" | "TEXT";
-}
-
-interface MistralFinalizedMessageBlock {
-  content: string;
-  durationMs: number;
-  ordinal: number;
-  type: $Enums.MessageBlockType;
-}
-
-type MistralForcedLoopStopReason = "MAX_ROUNDS" | null;
-
-type MistralTextChunk = {
-  type?: "text";
-  text: string;
-};
-
-type MistralReferenceChunk = {
-  type?: "reference";
-  referenceIds: readonly (number | string)[];
-};
-
-type MistralToolReferenceChunk = {
-  type?: "tool_reference";
-  tool: string;
-  title: string;
-  url?: string | null;
-  favicon?: string | null;
-  description?: string | null;
-};
-
-type MistralThinkingChunk = {
-  type?: "thinking";
-  thinking: readonly (
-    | MistralReferenceChunk
-    | MistralTextChunk
-    | MistralToolReferenceChunk
-  )[];
-  closed?: boolean;
-};
-
-type MistralContentChunk =
-  | MistralTextChunk
-  | MistralThinkingChunk
-  | MistralReferenceChunk
-  | MistralToolReferenceChunk
-  | {
-      type?: string;
-    };
 
 export class MistralService {
   protected defaultClient: Mistral;
@@ -229,112 +79,33 @@ export class MistralService {
     return "mistral-small-latest" satisfies MistralModelIdUnion;
   }
 
+  private handleReasoning(m: MistralModelIdUnion) {
+    if (m === "mistral-small-latest") return "high";
+    else return;
+  }
+
   private async stream(
     model: MistralModelIdUnion,
-    messages: MistralReqMessage,
+    messages: MistralMessageReq[],
     apiKey?: string,
     options?: {
       temperature?: number;
       topP?: number;
       maxTokens?: number;
-      tools?: readonly MistralFunctionTool[];
+      tools?: Tool[];
     }
   ) {
     const client = this.getClient(apiKey);
 
     return await client.chat.stream({
       model,
-      messages: [...messages],
-      reasoningEffort: "high",
-
+      messages,
+      reasoningEffort: this.handleReasoning(model),
+      temperature: options?.temperature ?? 0.7,
+      tools: options?.tools,
       stream: true,
-      ...(typeof options?.temperature === "number"
-        ? { temperature: options.temperature }
-        : {}),
-      ...(options?.tools && options.tools.length > 0
-        ? { tools: [...options.tools] }
-        : {})
+      safePrompt: false
     });
-  }
-
-  private buildSystemPrompt(
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
-    _fileSearchEnabled = false
-  ) {
-    const historyNote =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
-
-    return systemPrompt
-      ? `${systemPrompt}\n\n${historyNote}`
-      : `${historyNote}`;
-  }
-
-  private messageText(
-    msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
-  ) {
-    const textBlocks = Array.of<string>();
-
-    if (msg.messageBlocks && msg.messageBlocks.length > 0) {
-      for (const block of msg.messageBlocks) {
-        if (block.type === "TEXT") {
-          textBlocks.push(block.content);
-        }
-      }
-    }
-
-    if (textBlocks.length > 0) {
-      return textBlocks.join("\n");
-    }
-
-    return msg.content;
-  }
-
-  private buildUserContent(msg: MessageSingleton<true>) {
-    const content = Array.of<MistralMessageContentChunk>();
-
-    for (const attachment of msg.attachments) {
-      const url =
-        attachment.compatStatus === "ACTIVE"
-          ? (attachment.compatCdnUrl ??
-            attachment.cdnUrl ??
-            attachment.sourceUrl)
-          : (attachment.cdnUrl ??
-            attachment.compatCdnUrl ??
-            attachment.sourceUrl);
-
-      if (!url) continue;
-
-      if (attachment.assetType === "IMAGE") {
-        content.push({
-          type: "image_url",
-          imageUrl: url
-        } satisfies MistralMessageContentChunk);
-        continue;
-      }
-
-      if (attachment.assetType === "DOCUMENT") {
-        content.push({
-          type: "document_url",
-          documentUrl: url,
-          ...(attachment.filename ? { documentName: attachment.filename } : {})
-        } satisfies MistralMessageContentChunk);
-      }
-    }
-
-    const text = this.messageText(msg);
-
-    if (content.length === 0) {
-      return text;
-    }
-
-    if (text.trim().length > 0) {
-      content.push({
-        type: "text",
-        text
-      } satisfies MistralMessageContentChunk);
-    }
-
-    return content;
   }
 
   protected formatHistory(msgs: MessageSingleton<true>[]) {
@@ -393,7 +164,10 @@ export class MistralService {
                   }
                 } else if (att.assetType === "IMAGE") {
                   if (isFreshContext && isCurrentUserMsg) {
-                    content.push({ type: "image_url", imageUrl: url });
+                    content.push({
+                      type: "image_url",
+                      imageUrl: { url, detail: "high" }
+                    });
                   } else {
                     textParts.push(`![${name}](${url})`);
                   }
@@ -466,7 +240,7 @@ export class MistralService {
                 textBlocks.push(x.content);
               }
             }
-            textParts.push(textBlocks.join(`\n`));
+            textParts.push(textBlocks.join(`\n\n`));
           } else {
             textParts.push(msg.content);
           }
@@ -477,6 +251,7 @@ export class MistralService {
     }
     return formatted;
   }
+
   protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
     if (isNewChat) {
       return systemPrompt;
@@ -485,175 +260,7 @@ export class MistralService {
     const note =
       "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
 
-    return (
-      systemPrompt ? `${systemPrompt}\n\n${note}` : note
-    )
-  }
-  private attachmentUrl(
-    attachment: Pick<
-      MessageSingleton<true>["attachments"][number],
-      "cdnUrl" | "compatCdnUrl" | "compatStatus" | "sourceUrl"
-    >
-  ) {
-    return attachment.compatStatus === "ACTIVE"
-      ? (attachment.compatCdnUrl ?? attachment.cdnUrl ?? attachment.sourceUrl)
-      : (attachment.cdnUrl ?? attachment.compatCdnUrl ?? attachment.sourceUrl);
-  }
-
-  private attachmentMarkdown(
-    attachment: Pick<
-      MessageSingleton<true>["attachments"][number],
-      "assetType" | "compatStatus" | "filename"
-    >,
-    url: string
-  ) {
-    const fallbackName = (() => {
-      try {
-        const [filename, ext] = this.prisma.filenameToHexExtTuple(
-          url,
-          attachment.compatStatus,
-          false
-        );
-        return `${filename}.${ext}`;
-      } catch {
-        return "attachment";
-      }
-    })();
-
-    const name = attachment.filename ?? fallbackName;
-
-    if (attachment.assetType === "IMAGE") {
-      return `![${name}](${url})`;
-    }
-
-    if (attachment.assetType === "DOCUMENT") {
-      return `[${name}](${url})`;
-    }
-
-    return undefined;
-  }
-
-  private buildHistoricalUserContent(
-    msg: Pick<
-      MessageSingleton<true>,
-      "attachments" | "content" | "messageBlocks"
-    >
-  ) {
-    const textParts = Array.of<string>();
-
-    for (const attachment of msg.attachments) {
-      const url = this.attachmentUrl(attachment);
-
-      if (!url) continue;
-
-      const markdown = this.attachmentMarkdown(attachment, url);
-
-      if (!markdown) continue;
-
-      textParts.push(markdown);
-    }
-
-    const text = this.messageText(msg);
-
-    if (text.trim().length > 0 || textParts.length === 0) {
-      textParts.push(text);
-    }
-
-    return textParts.join("\n\n");
-  }
-
-  private buildAssistantHistoryContent(msg: MessageSingleton<true>) {
-    const provider = msg.provider.toLowerCase();
-    const model = msg.model ?? "";
-    const modelIdentifier = `[${provider}/${model}]`;
-    const textParts = Array.of<string>();
-
-    for (const attachment of msg.attachments) {
-      const url = this.attachmentUrl(attachment);
-
-      if (!url) continue;
-
-      const markdown = this.attachmentMarkdown(attachment, url);
-
-      if (!markdown) continue;
-
-      textParts.push(markdown);
-    }
-
-    const text = this.messageText(msg);
-
-    if (text.trim().length > 0 || textParts.length === 0) {
-      textParts.push(text);
-    }
-
-    return `${modelIdentifier}\n${textParts.join("\n\n")}`;
-  }
-
-  private prependProviderModelTag(msgs: MessageSingleton<true>[]) {
-    const lastMistralIndex = msgs.findLastIndex(
-      msg => msg.senderType === "AI" && msg.provider.toLowerCase() === "mistral"
-    );
-    const isFirstMistralMsg = lastMistralIndex === -1;
-
-    return msgs.map((msg, msgIndex) => {
-      const isFreshContext = isFirstMistralMsg || msgIndex > lastMistralIndex;
-      const isCurrentUserMsg = msgIndex === msgs.length - 1;
-
-      if (msg.senderType === "USER") {
-        return {
-          role: "user",
-          content:
-            isFreshContext && isCurrentUserMsg
-              ? this.buildUserContent(msg)
-              : this.buildHistoricalUserContent(msg)
-        } as const;
-      }
-
-      return {
-        role: "assistant",
-        content: this.buildAssistantHistoryContent(msg)
-      } as const;
-    }) satisfies MistralBaseMessage[];
-  }
-
-  private formatMsgs(
-    msgs: readonly MistralBaseMessage[],
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
-    fileSearchEnabled = false
-  ) {
-    return Array.of<MistralReqMessage[number]>(
-      {
-        role: "system",
-        content: this.buildSystemPrompt(systemPrompt, fileSearchEnabled)
-      },
-      ...msgs
-    );
-  }
-
-  private mistralFormat(
-    isNewChat: boolean,
-    msgs: ProviderChatRequestEntity["msgs"],
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
-    fileSearchEnabled = false
-  ) {
-    if (isNewChat) {
-      const first = msgs[0];
-      const userContent = first ? this.buildUserContent(first) : "";
-
-      return Array.of<MistralReqMessage[number]>(
-        {
-          role: "system",
-          content: this.buildSystemPrompt(systemPrompt, fileSearchEnabled)
-        },
-        { role: "user", content: userContent }
-      );
-    }
-
-    return this.formatMsgs(
-      this.prependProviderModelTag(msgs),
-      systemPrompt,
-      fileSearchEnabled
-    );
+    return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
   }
 
   private fileSearchFunctionTool() {
@@ -1055,17 +662,15 @@ export class MistralService {
     return materialized;
   }
 
-  private isTextChunk(chunk: MistralContentChunk): chunk is MistralTextChunk {
-    return chunk.type === "text" && "text" in chunk;
+  private isTextChunk(chunk: ContentChunk) {
+    return chunk.type === "text";
   }
 
-  private isThinkingChunk(
-    chunk: MistralContentChunk
-  ): chunk is MistralThinkingChunk {
-    return chunk.type === "thinking" && "thinking" in chunk;
+  private isThinkingChunk(chunk: ContentChunk) {
+    return chunk.type === "thinking";
   }
 
-  private thinkingChunkText(chunk: MistralThinkingChunk) {
+  private thinkingChunkText(chunk: ThinkChunk) {
     const textAgg = Array.of<string>();
 
     for (const item of chunk.thinking) {
@@ -1358,7 +963,7 @@ export class MistralService {
     };
 
     const processDeltaContent = (
-      content: string | readonly MistralContentChunk[] | null | undefined
+      content: string | readonly ContentChunk[] | null | undefined
     ) => {
       if (typeof content === "string") {
         emitTextChunk(content);
@@ -1396,12 +1001,20 @@ export class MistralService {
     const tools = hasUserStoreDocs
       ? [this.fileSearchFunctionTool()]
       : undefined;
-
-    let roundMessages = this.mistralFormat(
+    const systemInstruction = this.formatSystemInstruction(
       isNewChat,
-      msgs,
-      systemPrompt,
-      hasUserStoreDocs
+      systemPrompt
+    );
+    let roundMessages = Array.of<MistralMessageReq>(
+      ...(systemInstruction
+        ? [
+            {
+              role: "system",
+              content: systemInstruction
+            } satisfies SystemMessage
+          ]
+        : []),
+      ...this.formatHistory(msgs)
     );
 
     const MAX_TOOL_ROUNDS = 10;
@@ -1492,7 +1105,7 @@ export class MistralService {
         ...roundMessages,
         assistantToolMessage,
         ...toolMessages
-      ] satisfies MistralReqMessage;
+      ] satisfies MistralMessageReq[];
 
       this.logger.info(
         {
