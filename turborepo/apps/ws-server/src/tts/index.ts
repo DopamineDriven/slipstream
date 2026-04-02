@@ -4,6 +4,7 @@ import type { TTSTypes } from "@/tts/types.ts";
 import type { Logger as PinoLogger } from "pino";
 import type { RawData, WebSocket } from "ws";
 import { WebSocket as TTSWebSocket } from "ws";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
@@ -114,9 +115,26 @@ export class TTSService {
       l === "vi"
     );
   }
+  private sanitizeBlockContent(
+    content: string,
+    provider: $Enums.Provider | null,
+    model = "claude-opus-4-6"
+  ) {
+    if (provider !== "ANTHROPIC") return content;
+
+    const out = content
+      .replace(/<model\s+provider="[^"]*"\s+name="[^"]*"\s*>/g, "")
+      .replace(/<\/model>/g, "")
+      .trim();
+
+    return `<model provider="anthropic" name="${model}">\n\n${out}\n\n</model>`;
+  }
 
   public messageText(
-    msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
+    msg: Pick<
+      MessageSingleton<true>,
+      "content" | "messageBlocks" | "model" | "provider" | "senderType"
+    >
   ) {
     const textBlocks = Array.of<string>();
 
@@ -129,10 +147,23 @@ export class TTSService {
     }
 
     if (textBlocks.length > 0) {
-      return textBlocks.join("\n");
+      const content = textBlocks.join("\n");
+      return msg.senderType === "AI"
+        ? this.sanitizeBlockContent(
+            content,
+            msg.provider,
+            msg.model ?? undefined
+          )
+        : content;
     }
 
-    return msg.content;
+    return msg.senderType === "AI"
+      ? this.sanitizeBlockContent(
+          msg.content,
+          msg.provider,
+          msg.model ?? undefined
+        )
+      : msg.content;
   }
 
   protected buildWssUrl(
@@ -530,7 +561,10 @@ export class TTSService {
         event = JSON.parse<TTSTypes.Inbound>(raw.toString());
       } catch {
         this.logger.warn(
-          { ttsJobId: ttsJob.id, rawLength: Buffer.isBuffer(raw) ? raw.byteLength : 0 },
+          {
+            ttsJobId: ttsJob.id,
+            rawLength: Buffer.isBuffer(raw) ? raw.byteLength : 0
+          },
           "Non-JSON frame from xAI TTS, skipping"
         );
         return;
