@@ -61,6 +61,14 @@ async function mistralFetcher() {
   });
 }
 
+async function cohereFetcher() {
+  return await fetch("https://api.cohere.com/v1/models?page_size=1000", {
+    headers: {
+      Authorization: `Bearer ${process.env.COHERE_TRIAL_KEY ?? ""}`
+    }
+  });
+}
+
 async function geminiFetcher() {
   const gemini = await fetch(
     `https://generativelanguage.googleapis.com/v1alpha/models?key=${process.env.GOOGLE_API_KEY ?? ""}&pageSize=1000`
@@ -78,16 +86,18 @@ const fs = new Fs(process.cwd());
   const geminiData = await geminiFetcher();
   const grokData = await grokFetcher();
   const mistralData = await mistralFetcher();
+  const cohereData = await cohereFetcher();
 
   const parseV0 = JSON.parse<Record<string, any>>(await v0Data.text());
   const parseLlama = JSON.parse<Record<string, any>>(await llamaData.text());
   const parseMistral = JSON.parse<Record<string, any>>(
     await mistralData.text()
   );
-  const parseGemini = JSON.parse(await geminiData.text()) as GeminiResponse;
-  const parseOpenAi = JSON.parse(await openAiData.text()) as OpenAiResponse;
-  const parseGrok = JSON.parse(await grokData.text()) as GrokModelsResponse;
-  const parseIt = JSON.parse(await data.text()) as AnthropicResponse;
+  const parseCohere = JSON.parse<Record<string, any>>(await cohereData.text());
+  const parseGemini = JSON.parse<GeminiResponse>(await geminiData.text());
+  const parseOpenAi = JSON.parse<OpenAiResponse>(await openAiData.text());
+  const parseGrok = JSON.parse<GrokModelsResponse>(await grokData.text());
+  const parseIt = JSON.parse<AnthropicResponse>(await data.text());
   const openaiSorted = parseOpenAi.data?.sort((o, p) => o.created - p.created);
   fs.withWs(
     "src/test/__out__/llama-results.json",
@@ -116,6 +126,10 @@ const fs = new Fs(process.cwd());
   fs.withWs(
     "src/test/__out__/mistral-results.json",
     JSON.stringify(parseMistral, null, 2)
+  );
+    fs.withWs(
+    "src/test/__out__/cohere-results.json",
+    JSON.stringify(parseCohere, null, 2)
   );
   return parseIt;
 })();

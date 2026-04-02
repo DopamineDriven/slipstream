@@ -5,8 +5,14 @@ import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type {
   AssistantMessage,
+  ContentChunk,
+  GuardrailConfig,
+  Prediction,
+  ResponseFormat,
   SystemMessage,
+  Tool,
   ToolCall,
+  ToolChoice,
   ToolMessage,
   UserMessage
 } from "@mistralai/mistralai/models/components";
@@ -19,6 +25,36 @@ import type {
   MistralModelIdUnion
 } from "@slipstream/types";
 import { $Enums } from "@slipstream/db/node/generated/client";
+import { MistralMessageReq } from "./types.ts";
+
+export type ChatCompletionRequest = {
+  model: MistralModelIdUnion;
+  temperature?: number | null | undefined;
+  top_p?: number | undefined;
+  max_tokens?: number | null | undefined;
+  stream: boolean;
+  stop?: string | string[] | undefined;
+  random_seed?: number | null | undefined;
+  metadata?: { [k: string]: any } | null | undefined;
+  messages: (
+    | (AssistantMessage & { role: "assistant" })
+    | SystemMessage
+    | ToolMessage
+    | UserMessage
+  )[];
+  response_format?: ResponseFormat | undefined;
+  tools?: Tool[] | null | undefined;
+  tool_choice?: ToolChoice | string | undefined;
+  presence_penalty?: number | undefined;
+  frequency_penalty?: number | undefined;
+  n?: number | null | undefined;
+  prediction?: Prediction | undefined;
+  parallel_tool_calls?: boolean | undefined;
+  reasoning_effort?: string | null | undefined;
+  prompt_mode?: string | null | undefined;
+  guardrails?: GuardrailConfig[] | null | undefined;
+  safe_prompt?: boolean | undefined;
+};
 
 type MistralReqMessage = (
   | SystemMessage
@@ -26,6 +62,11 @@ type MistralReqMessage = (
   | UserMessage
   | (AssistantMessage & { role: "assistant" })
 )[];
+
+type MistralMessageContentChunk = Exclude<
+  UserMessage["content"],
+  string | null
+>[number];
 
 interface MistralFunctionTool {
   type: "function";
@@ -60,10 +101,9 @@ type MistralFunctionToolCall = {
   index: number;
 };
 
-type MistralBaseMessage = {
-  role: "system" | "user" | "assistant";
-  content: string;
-};
+type MistralBaseMessage =
+  | UserMessage
+  | (AssistantMessage & { role: "assistant" });
 
 type MistralAssistantToolCallMessage = {
   role: "assistant";
@@ -141,35 +181,6 @@ type MistralContentChunk =
       type?: string;
     };
 
-type MistralToolCallDelta = {
-  id?: string;
-  type?: "function";
-  index?: number;
-  function: {
-    name: string;
-    arguments: string | Record<string, unknown>;
-  };
-};
-
-type MistralChoiceDelta = {
-  role?: string | null;
-  content?: string | readonly MistralContentChunk[] | null;
-  toolCalls?: readonly MistralToolCallDelta[] | null;
-};
-
-type MistralStreamChoice = {
-  index: number;
-  delta: MistralChoiceDelta;
-  finishReason?: string | null;
-};
-
-type _MistralStreamChunk = {
-  choices: readonly MistralStreamChoice[];
-  usage?: {
-    totalTokens?: number;
-  };
-};
-
 export class MistralService {
   protected defaultClient: Mistral;
   protected logger: PinoLogger;
@@ -202,7 +213,7 @@ export class MistralService {
     return this.defaultClient;
   }
 
-  private isMistralModel(model: string | undefined) {
+  private isMistralModel(model = "mistral-small-latest") {
     return (
       model === "mistral-small-latest" ||
       model === "mistral-medium-latest" ||
@@ -210,7 +221,7 @@ export class MistralService {
     );
   }
 
-  private resolveModel(model: string | undefined) {
+  private resolveModel(model = "mistral-small-latest") {
     if (this.isMistralModel(model)) {
       return model;
     }
@@ -234,13 +245,11 @@ export class MistralService {
     return await client.chat.stream({
       model,
       messages: [...messages],
+      reasoningEffort: "high",
+
       stream: true,
       ...(typeof options?.temperature === "number"
         ? { temperature: options.temperature }
-        : {}),
-      ...(typeof options?.topP === "number" ? { topP: options.topP } : {}),
-      ...(typeof options?.maxTokens === "number"
-        ? { maxTokens: options.maxTokens }
         : {}),
       ...(options?.tools && options.tools.length > 0
         ? { tools: [...options.tools] }
@@ -280,26 +289,329 @@ export class MistralService {
     return msg.content;
   }
 
-  private prependProviderModelTag(
-    msgs: Pick<
-      MessageSingleton<true>,
-      "senderType" | "provider" | "model" | "content" | "messageBlocks"
-    >[]
-  ) {
-    return msgs.map(msg => {
-      const text = this.messageText(msg);
+  private buildUserContent(msg: MessageSingleton<true>) {
+    const content = Array.of<MistralMessageContentChunk>();
 
-      if (msg.senderType === "USER") {
-        return { role: "user", content: text } as const;
+    for (const attachment of msg.attachments) {
+      const url =
+        attachment.compatStatus === "ACTIVE"
+          ? (attachment.compatCdnUrl ??
+            attachment.cdnUrl ??
+            attachment.sourceUrl)
+          : (attachment.cdnUrl ??
+            attachment.compatCdnUrl ??
+            attachment.sourceUrl);
+
+      if (!url) continue;
+
+      if (attachment.assetType === "IMAGE") {
+        content.push({
+          type: "image_url",
+          imageUrl: url
+        } satisfies MistralMessageContentChunk);
+        continue;
       }
 
-      const provider = msg.provider.toLowerCase();
-      const model = msg.model ?? "";
-      const modelIdentifier = `[${provider}/${model}]`;
+      if (attachment.assetType === "DOCUMENT") {
+        content.push({
+          type: "document_url",
+          documentUrl: url,
+          ...(attachment.filename ? { documentName: attachment.filename } : {})
+        } satisfies MistralMessageContentChunk);
+      }
+    }
+
+    const text = this.messageText(msg);
+
+    if (content.length === 0) {
+      return text;
+    }
+
+    if (text.trim().length > 0) {
+      content.push({
+        type: "text",
+        text
+      } satisfies MistralMessageContentChunk);
+    }
+
+    return content;
+  }
+
+  protected formatHistory(msgs: MessageSingleton<true>[]) {
+    const formatted = Array.of<MistralMessageReq>();
+    const lastIndex = msgs.findLastIndex(
+      m => m.provider === "MISTRAL" && m.senderType === "AI"
+    );
+
+    const isFirstMistralMsg = lastIndex === -1;
+
+    for (const [msgIndex, msg] of msgs.entries()) {
+      const isFreshContext = isFirstMistralMsg || msgIndex > lastIndex;
+      const isCurrentUserMsg = msgIndex === msgs.length - 1;
+      if (msg.senderType === "USER") {
+        const content = Array.of<ContentChunk>();
+        const textParts = Array.of<string>();
+        try {
+          if (msg.attachments && msg.attachments.length > 0) {
+            for (const att of msg.attachments) {
+              const {
+                cdnUrl,
+                mime: ogMime,
+                compatStatus,
+                compatCdnUrl,
+                compatMime
+              } = att;
+              const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
+              const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
+              if (url && mime) {
+                const [filename, ext] = this.prisma.filenameToHexExtTuple(
+                  url,
+                  att.compatStatus,
+                  false
+                );
+                const name = `${filename}.${ext}`;
+                if (att.assetType === "DOCUMENT") {
+                  try {
+                    if (isFreshContext) {
+                      try {
+                        if (!isCurrentUserMsg) {
+                          textParts.push(`[${name}](${url})`);
+                        } else {
+                          content.push({
+                            documentUrl: url,
+                            type: "document_url"
+                          });
+                        }
+                      } catch {
+                        textParts.push(`[${name}](${url})`);
+                      }
+                    } else {
+                      textParts.push(`[${name}](${url})`);
+                    }
+                  } catch {
+                    textParts.push(`[${name}](${url})`);
+                  }
+                } else if (att.assetType === "IMAGE") {
+                  if (isFreshContext && isCurrentUserMsg) {
+                    content.push({ type: "image_url", imageUrl: url });
+                  } else {
+                    textParts.push(`![${name}](${url})`);
+                  }
+                } else {
+                  textParts.push(`[${name}](${url})`);
+                }
+              }
+            }
+          }
+        } catch (err) {
+          throw new Error(this.prisma.safeErrMsg(err));
+        } finally {
+          if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+            const textBlocks = Array.of<string>();
+            for (const x of msg.messageBlocks) {
+              if (x.type === "TEXT") {
+                textBlocks.push(x.content);
+              }
+            }
+            textParts.push(textBlocks.join(`\n`));
+          } else {
+            textParts.push(msg.content);
+          }
+        }
+        content.push({ type: "text", text: textParts.join(`\n\n`) });
+        formatted.push({ role: "user", content });
+      } else {
+        const content = Array.of<ContentChunk>();
+        const textParts = Array.of<string>();
+        const modelIdentifier = `[${msg.provider.toLowerCase()}/${msg.model ?? "model"}]`;
+
+        try {
+          if (msg.attachments && msg.attachments.length > 0) {
+            for (const att of msg.attachments) {
+              const {
+                cdnUrl,
+                mime: ogMime,
+                compatStatus,
+                assetType,
+                compatCdnUrl,
+                compatMime
+              } = att;
+              const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
+              const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
+
+              if (url && mime) {
+                const [filename, ext] = this.prisma.filenameToHexExtTuple(
+                  url,
+                  att.compatStatus,
+                  false
+                );
+
+                const name = `${filename}.${ext}`;
+
+                if (assetType === "IMAGE") {
+                  textParts.push(`${modelIdentifier}\n![${name}](${url})`);
+                } else {
+                  textParts.push(`${modelIdentifier}\n[${name}](${url})`);
+                }
+              }
+            }
+          }
+        } catch (err) {
+          this.logger.info(this.prisma.safeErrMsg(err));
+        } finally {
+          if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+            const textBlocks = Array.of<string>();
+            for (const x of msg.messageBlocks) {
+              if (x.type === "TEXT") {
+                textBlocks.push(x.content);
+              }
+            }
+            textParts.push(textBlocks.join(`\n`));
+          } else {
+            textParts.push(msg.content);
+          }
+        }
+        content.push({ type: "text", text: textParts.join(`\n\n`) });
+        formatted.push({ role: "assistant", content });
+      }
+    }
+    return formatted;
+  }
+  protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
+    if (isNewChat) {
+      return systemPrompt;
+    }
+
+    const note =
+      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+
+    return (
+      systemPrompt ? `${systemPrompt}\n\n${note}` : note
+    )
+  }
+  private attachmentUrl(
+    attachment: Pick<
+      MessageSingleton<true>["attachments"][number],
+      "cdnUrl" | "compatCdnUrl" | "compatStatus" | "sourceUrl"
+    >
+  ) {
+    return attachment.compatStatus === "ACTIVE"
+      ? (attachment.compatCdnUrl ?? attachment.cdnUrl ?? attachment.sourceUrl)
+      : (attachment.cdnUrl ?? attachment.compatCdnUrl ?? attachment.sourceUrl);
+  }
+
+  private attachmentMarkdown(
+    attachment: Pick<
+      MessageSingleton<true>["attachments"][number],
+      "assetType" | "compatStatus" | "filename"
+    >,
+    url: string
+  ) {
+    const fallbackName = (() => {
+      try {
+        const [filename, ext] = this.prisma.filenameToHexExtTuple(
+          url,
+          attachment.compatStatus,
+          false
+        );
+        return `${filename}.${ext}`;
+      } catch {
+        return "attachment";
+      }
+    })();
+
+    const name = attachment.filename ?? fallbackName;
+
+    if (attachment.assetType === "IMAGE") {
+      return `![${name}](${url})`;
+    }
+
+    if (attachment.assetType === "DOCUMENT") {
+      return `[${name}](${url})`;
+    }
+
+    return undefined;
+  }
+
+  private buildHistoricalUserContent(
+    msg: Pick<
+      MessageSingleton<true>,
+      "attachments" | "content" | "messageBlocks"
+    >
+  ) {
+    const textParts = Array.of<string>();
+
+    for (const attachment of msg.attachments) {
+      const url = this.attachmentUrl(attachment);
+
+      if (!url) continue;
+
+      const markdown = this.attachmentMarkdown(attachment, url);
+
+      if (!markdown) continue;
+
+      textParts.push(markdown);
+    }
+
+    const text = this.messageText(msg);
+
+    if (text.trim().length > 0 || textParts.length === 0) {
+      textParts.push(text);
+    }
+
+    return textParts.join("\n\n");
+  }
+
+  private buildAssistantHistoryContent(msg: MessageSingleton<true>) {
+    const provider = msg.provider.toLowerCase();
+    const model = msg.model ?? "";
+    const modelIdentifier = `[${provider}/${model}]`;
+    const textParts = Array.of<string>();
+
+    for (const attachment of msg.attachments) {
+      const url = this.attachmentUrl(attachment);
+
+      if (!url) continue;
+
+      const markdown = this.attachmentMarkdown(attachment, url);
+
+      if (!markdown) continue;
+
+      textParts.push(markdown);
+    }
+
+    const text = this.messageText(msg);
+
+    if (text.trim().length > 0 || textParts.length === 0) {
+      textParts.push(text);
+    }
+
+    return `${modelIdentifier}\n${textParts.join("\n\n")}`;
+  }
+
+  private prependProviderModelTag(msgs: MessageSingleton<true>[]) {
+    const lastMistralIndex = msgs.findLastIndex(
+      msg => msg.senderType === "AI" && msg.provider.toLowerCase() === "mistral"
+    );
+    const isFirstMistralMsg = lastMistralIndex === -1;
+
+    return msgs.map((msg, msgIndex) => {
+      const isFreshContext = isFirstMistralMsg || msgIndex > lastMistralIndex;
+      const isCurrentUserMsg = msgIndex === msgs.length - 1;
+
+      if (msg.senderType === "USER") {
+        return {
+          role: "user",
+          content:
+            isFreshContext && isCurrentUserMsg
+              ? this.buildUserContent(msg)
+              : this.buildHistoricalUserContent(msg)
+        } as const;
+      }
 
       return {
         role: "assistant",
-        content: `${modelIdentifier} \n${text}`
+        content: this.buildAssistantHistoryContent(msg)
       } as const;
     }) satisfies MistralBaseMessage[];
   }
@@ -326,7 +638,7 @@ export class MistralService {
   ) {
     if (isNewChat) {
       const first = msgs[0];
-      const userContent = first ? this.messageText(first) : "";
+      const userContent = first ? this.buildUserContent(first) : "";
 
       return Array.of<MistralReqMessage[number]>(
         {
