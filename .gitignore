@@ -1,16 +1,56 @@
-.env
-ecs-task-trust.json
-ws-server-taskdef.json
-python-service-taskdef.json
-remote/**/*
-inspect/**/*
-ffmpeg/*
-schema-taskdef.json
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# testing
+coverage
+
+# next.js
+.next/
+out/
+build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+.env*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# turbo
+.turbo
+.vercel
+.npmrc
+
+.idea
+dist
 notes.md
-.certs
-oac-*
-dist-arn-*
-dist-domain-*
-bucket-policy-*
-dist-config-prod*.json
-claude-notes.md
+notes/
+
+*.mermaid
+apps/CLAUDE.md
+IMPLEMENTATION_PLAN.md
+assets/*
+*.tgz
+
+
+
+plans/*
+~/*
+.certs/*
+infra/remote/*
+infra/*.json
+infra/*.txt
+infra/*.md
