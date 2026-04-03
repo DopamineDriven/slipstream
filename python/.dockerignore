@@ -1,8 +1,0 @@
-# python/.dockerignore
-.venv
-__pycache__/
-*.pyc
-*.pyo
-.python-version
-.env
-tests/
