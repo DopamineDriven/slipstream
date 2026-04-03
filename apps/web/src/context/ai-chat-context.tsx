@@ -124,7 +124,9 @@ const thinkingTextFromMessageBlocks = (blocks: ChatChunkAndResMsgBlock[]) => {
     .join("\n\n");
 };
 
-const thinkingDurationFromMessageBlocks = (blocks: ChatChunkAndResMsgBlock[]) => {
+const thinkingDurationFromMessageBlocks = (
+  blocks: ChatChunkAndResMsgBlock[]
+) => {
   const totalDuration = blocks
     .filter(isThinkingBlock)
     .reduce((sum, block) => sum + block.durationMs, 0);
@@ -136,6 +138,7 @@ const thinkingDurationFromMessageBlocks = (blocks: ChatChunkAndResMsgBlock[]) =>
 const fallbackApiKeys = {
   isDefault: {
     anthropic: false,
+    cohere: false,
     gemini: false,
     grok: false,
     mistral: false,
@@ -145,6 +148,7 @@ const fallbackApiKeys = {
   },
   isSet: {
     anthropic: false,
+    cohere: false,
     gemini: false,
     grok: false,
     mistral: false,
@@ -594,7 +598,10 @@ export function AIChatProvider({
           setThinkingDuration(evt.thinkingDuration);
         }
 
-        if (evt.thinkingText && (!evt.messageBlocks || evt.messageBlocks.length === 0)) {
+        if (
+          evt.thinkingText &&
+          (!evt.messageBlocks || evt.messageBlocks.length === 0)
+        ) {
           setThinkingText(evt.thinkingText);
         }
 

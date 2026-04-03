@@ -595,6 +595,11 @@ export class Resolver {
           await svc.handleMistralAiChatRequest(commonProps);
           break;
         }
+        case "cohere": {
+          const svg = this.providers.getRequiredInstance("cohere");
+          await svg.handleCohereAIChatRequest(commonProps);
+          break;
+        }
         case "anthropic": {
           const svc = this.providers.getRequiredInstance("anthropic");
           await svc.handleAnthropicAiChatRequest({

@@ -28,7 +28,8 @@ interface ModelSelectionContextType {
     "openai",
     "meta",
     "vercel",
-    "mistral"
+    "mistral",
+    "cohere"
   ];
   setSelectedModel: (m: ModelSelection) => void;
   updateProvider: (p: Provider) => void;

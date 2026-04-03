@@ -570,6 +570,7 @@ export class ProviderValidation {
       case "openai": {
         return "gpt-5.4" satisfies AllModelsUnion;
       }
+      case "cohere":
       case "mistral":
       case "anthropic":
       case "meta":

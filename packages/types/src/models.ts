@@ -11,6 +11,7 @@ import { modelIdToDisplayName } from "@/codegen/__gen__/model-id-to-display-name
 import { modelIdsByProviderImgGen } from "@/codegen/__gen__/model-ids-by-provider-img-gen.ts";
 import { modelIdsByProviderVideoGen } from "@/codegen/__gen__/model-ids-by-provider-video-gen.ts";
 import { modelIdsByProvider } from "@/codegen/__gen__/model-ids-by-provider.ts";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 
 export type ImageGenModels =
   | "gpt-image-1"
@@ -210,6 +211,8 @@ export type DisplayNameModelMap = {
   >;
 };
 
+export type CohereChatModels = ModelMap["cohere"];
+
 export type OpenAIChatModels = ModelMap["openai"];
 
 export type GeminiChatModels = ModelMap["gemini"];
@@ -242,10 +245,12 @@ export type GetModelUtilRT<T = Provider> = T extends "openai"
             ? VercelChatModels
             : T extends "mistral"
               ? MistralChatModels
-              : never;
+              : T extends "cohere"
+                ? CohereChatModels
+                : never;
 
 export function toPrismaFormat<const T extends Providers>(provider: T) {
-  return provider.toUpperCase() as Uppercase<T>;
+  return provider.toUpperCase() as Uppercase<T> satisfies $Enums.Provider;
 }
 
 /**
@@ -290,7 +295,7 @@ export const getModelIdByDisplayName = <
           model as ModelDisplayNameToModelId<"meta">
         ] as (typeof displayNameToModelId)[V][K];
       } else
-        return defaultModelIdByProvider.anthropic as (typeof displayNameToModelId)[V][K];
+        return defaultModelIdByProvider.meta as (typeof displayNameToModelId)[V][K];
     }
     case "vercel": {
       if (model && model in displayNameToModelId[xTarget]) {
@@ -298,7 +303,7 @@ export const getModelIdByDisplayName = <
           model as ModelDisplayNameToModelId<"vercel">
         ] as (typeof displayNameToModelId)[V][K];
       } else
-        return defaultModelIdByProvider.anthropic as (typeof displayNameToModelId)[V][K];
+        return defaultModelIdByProvider.vercel as (typeof displayNameToModelId)[V][K];
     }
     case "mistral": {
       if (model && model in displayNameToModelId[xTarget]) {
@@ -306,7 +311,15 @@ export const getModelIdByDisplayName = <
           model as ModelDisplayNameToModelId<"mistral">
         ] as (typeof displayNameToModelId)[V][K];
       } else
-        return defaultModelIdByProvider.anthropic as (typeof displayNameToModelId)[V][K];
+        return defaultModelIdByProvider.mistral as (typeof displayNameToModelId)[V][K];
+    }
+    case "cohere": {
+      if (model && model in displayNameToModelId[xTarget]) {
+        return displayNameToModelId[xTarget][
+          model as ModelDisplayNameToModelId<"cohere">
+        ] as (typeof displayNameToModelId)[V][K];
+      } else
+        return defaultModelIdByProvider.vercel as (typeof displayNameToModelId)[V][K];
     }
     case "openai":
     default: {
@@ -361,7 +374,7 @@ export const getDisplayNameByModelId = <
           model as ModelIdToModelDisplayName<"meta">
         ] as (typeof modelIdToDisplayName)[V][K];
       } else
-        return defaultModelDisplayNameByProvider.anthropic as (typeof modelIdToDisplayName)[V][K];
+        return defaultModelDisplayNameByProvider.meta as (typeof modelIdToDisplayName)[V][K];
     }
     case "vercel": {
       if (model && model in modelIdToDisplayName[xTarget]) {
@@ -369,7 +382,7 @@ export const getDisplayNameByModelId = <
           model as ModelIdToModelDisplayName<"vercel">
         ] as (typeof modelIdToDisplayName)[V][K];
       } else
-        return defaultModelDisplayNameByProvider.anthropic as (typeof modelIdToDisplayName)[V][K];
+        return defaultModelDisplayNameByProvider.vercel as (typeof modelIdToDisplayName)[V][K];
     }
     case "mistral": {
       if (model && model in modelIdToDisplayName[xTarget]) {
@@ -377,7 +390,15 @@ export const getDisplayNameByModelId = <
           model as ModelIdToModelDisplayName<"mistral">
         ] as (typeof modelIdToDisplayName)[V][K];
       } else
-        return defaultModelDisplayNameByProvider.anthropic as (typeof modelIdToDisplayName)[V][K];
+        return defaultModelDisplayNameByProvider.mistral as (typeof modelIdToDisplayName)[V][K];
+    }
+    case "cohere": {
+      if (model && model in modelIdToDisplayName[xTarget]) {
+        return modelIdToDisplayName[xTarget][
+          model as ModelIdToModelDisplayName<"cohere">
+        ] as (typeof modelIdToDisplayName)[V][K];
+      } else
+        return defaultModelDisplayNameByProvider.cohere as (typeof modelIdToDisplayName)[V][K];
     }
     case "openai":
     default: {
@@ -392,23 +413,25 @@ export const getDisplayNameByModelId = <
 };
 
 export const defaultModelDisplayNameByProvider = {
-  openai: "GPT-5 nano" satisfies OpenAiDisplayNameUnion,
+  openai: "GPT-5.4 nano" satisfies OpenAiDisplayNameUnion,
   gemini: "Gemini 3.1 Flash Lite Preview" satisfies GeminiDisplayNameUnion,
-  grok: "Grok 4.1 Fast Reasoning" satisfies GrokDisplayNameUnion,
+  grok: "Grok 4.20 Reasoning" satisfies GrokDisplayNameUnion,
   anthropic: "Claude Sonnet 4.6" satisfies AnthropicDisplayNameUnion,
   meta: "Llama 3.3 (70B, Instruct)" satisfies MetaDisplayNameUnion,
   vercel: "v0 medium" satisfies VercelDisplayNameUnion,
-  mistral: "Mistral Small 4" satisfies MistralDisplayNameUnion
+  mistral: "Mistral Small 4" satisfies MistralDisplayNameUnion,
+  cohere: "Command A Reasoning" satisfies CohereDisplayNameUnion
 } as const;
 
 export const defaultModelIdByProvider = {
-  openai: "gpt-5-nano" satisfies OpenAiModelIdUnion,
+  openai: "gpt-5.4-nano" satisfies OpenAiModelIdUnion,
   gemini: "gemini-3.1-flash-lite-preview" satisfies GeminiModelIdUnion,
-  grok: "grok-4-1-fast-reasoning" satisfies GrokModelIdUnion,
+  grok: "grok-4.20-0309-reasoning" satisfies GrokModelIdUnion,
   anthropic: "claude-sonnet-4-6" satisfies AnthropicModelIdUnion,
   meta: "Llama-3.3-70B-Instruct" satisfies MetaModelIdUnion,
   vercel: "v0-1.5-md" satisfies VercelModelIdUnion,
-  mistral: "mistral-small-latest" satisfies MistralModelIdUnion
+  mistral: "mistral-small-latest" satisfies MistralModelIdUnion,
+  cohere: "command-a-reasoning-08-2025" satisfies CohereModelIdUnion
 } as const;
 
 export type ModelDisplayNameToModelId<T extends Provider> =
@@ -462,7 +485,10 @@ export type GeminiDisplayNameUnionImgGen =
  */
 export type GrokDisplayNameUnionImgGen =
   ModelDisplayNameToModelIdImgGen<"grok">;
-
+/**
+ * valid cohere model display names
+ */
+export type CohereDisplayNameUnion = ModelDisplayNameToModelId<"cohere">;
 /**
  * valid grok model display names
  */
@@ -522,6 +548,11 @@ export type GeminiModelIdUnionVideoGen =
  */
 export type GrokModelIdUnionVideoGen =
   ModelIdToModelDisplayNameVideoGen<"grok">;
+
+/**
+ * valid cohere models to call
+ */
+export type CohereModelIdUnion = ModelIdToModelDisplayName<"cohere">;
 /**
  * valid grok models to call
  */
@@ -582,7 +613,9 @@ export type GetModelsForProviderRTImgGen<T extends Provider> =
               ? undefined
               : T extends "mistral"
                 ? undefined
-                : never;
+                : T extends "cohere"
+                  ? undefined
+                  : never;
 
 export type GetModelsForProviderRTVideoGen<T extends Provider> =
   T extends "gemini"
@@ -599,7 +632,9 @@ export type GetModelsForProviderRTVideoGen<T extends Provider> =
               ? undefined
               : T extends "mistral"
                 ? undefined
-                : never;
+                : T extends "cohere"
+                  ? undefined
+                  : never;
 
 export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
   T extends "gemini"
@@ -616,7 +651,9 @@ export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
               ? undefined
               : T extends "mistral"
                 ? undefined
-                : never;
+                : T extends "cohere"
+                  ? undefined
+                  : never;
 
 export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
   ? AnthropicModelIdUnion
@@ -632,7 +669,9 @@ export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
             ? MetaModelIdUnion
             : T extends "mistral"
               ? MistralModelIdUnion
-              : never;
+              : T extends "cohere"
+                ? CohereModelIdUnion
+                : never;
 
 export type GetDisplayNamesForProviderRTVideoGen<T extends Provider> =
   T extends "gemini"
@@ -649,7 +688,9 @@ export type GetDisplayNamesForProviderRTVideoGen<T extends Provider> =
               ? undefined
               : T extends "mistral"
                 ? undefined
-                : never;
+                : T extends "cohere"
+                  ? undefined
+                  : never;
 
 export type GetDisplayNamesForProviderRT<T extends Provider> =
   T extends "anthropic"
@@ -666,7 +707,9 @@ export type GetDisplayNamesForProviderRT<T extends Provider> =
               ? MetaDisplayNameUnion
               : T extends "mistral"
                 ? MistralDisplayNameUnion
-                : never;
+                : T extends "cohere"
+                  ? CohereDisplayNameUnion
+                  : never;
 
 export function getModelsForProvider<const T extends Provider>(provider: T) {
   return Object.entries(displayNameToModelId[provider])
@@ -746,7 +789,8 @@ export function allProviders() {
     "openai",
     "meta",
     "vercel",
-    "mistral"
+    "mistral",
+    "cohere"
   ] as const;
 }
 export function allImgGenProviders() {
@@ -778,7 +822,8 @@ export const imgMimeSupportByProvider = {
    */
   gemini: ["image/png", "image/jpeg", "image/webp", "image/heic", "image/heif"],
   anthropic: ["image/jpeg", "image/png", "image/webp", "image/gif"],
-  mistral: ["image/jpeg", "image/png", "image/webp"]
+  mistral: ["image/jpeg", "image/png", "image/webp"],
+  cohere: ["image/jpeg", "image/png", "image/webp"]
 } as const;
 
 // direct input -- I have a document conversion pipeline set up
@@ -790,6 +835,7 @@ export const docMimeSupportByProvider = {
   openai: ["application/pdf"],
   vercel: ["application/pdf"],
   mistral: ["application/pdf"],
+  cohere: ["application/pdf"],
   /**
    * https://ai.google.dev/gemini-api/docs/document-processing#technical-details
    */
@@ -803,6 +849,7 @@ export const audioMimeSupportByProvider = {
   openai: [],
   vercel: [],
   mistral: [],
+  cohere: [],
   /**
    * https://ai.google.dev/gemini-api/docs/audio#supported-formats
    */
@@ -821,6 +868,7 @@ export const videoMimeSupportByProvider = {
   meta: [],
   grok: [],
   mistral: [],
+  cohere: [],
   openai: ["video/mp4"],
   vercel: ["video/mp4", "video/mov", "video/avi", "video/webm"],
   /**

@@ -25,12 +25,13 @@ const PROVIDERS = [
   },
   { id: "gemini", label: "Gemini", colorVar: "var(--hue-2)", Icon: GeminiIcon },
   { id: "openai", label: "OpenAI", colorVar: "var(--hue-3)", Icon: OpenAiIcon },
-  { id: "grok", label: "grok", colorVar: "var(--hue-4)", Icon: XAiIcon },
-  { id: "vercel", label: "vercel", colorVar: "#000000", Icon: v0Icon },
+  { id: "grok", label: "Grok", colorVar: "var(--hue-4)", Icon: XAiIcon },
+  { id: "vercel", label: "Vercel", colorVar: "#000000", Icon: v0Icon },
   { id: "mistral", label: "Mistral", colorVar: "#FF7000", Icon: MistralIcon },
+  { id: "cohere", label: "Cohere", colorVar: "#FF7759", Icon: MistralIcon },
   {
     id: "meta",
-    label: "meta",
+    label: "Meta",
     colorVar: providerMetadata.meta.color,
     Icon: MetaIcon
   }
@@ -38,6 +39,7 @@ const PROVIDERS = [
 
 const initialOrder = [
   "anthropic",
+  "cohere",
   "gemini",
   "openai",
   "grok",
@@ -62,8 +64,9 @@ export function Reordering() {
       openai: PROVIDERS[2],
       grok: PROVIDERS[3],
       vercel: PROVIDERS[4],
-      meta: PROVIDERS[6],
-      mistral: PROVIDERS[5]
+      meta: PROVIDERS[7],
+      mistral: PROVIDERS[5],
+      cohere: PROVIDERS[6]
     };
     return map;
   }, []);

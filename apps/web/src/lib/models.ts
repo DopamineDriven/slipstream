@@ -2,6 +2,8 @@ import type {
   AllModelsUnion,
   AnthropicDisplayNameUnion,
   AnthropicModelIdUnion,
+  CohereDisplayNameUnion,
+  CohereModelIdUnion,
   GeminiDisplayNameUnion,
   GeminiModelIdUnion,
   GrokDisplayNameUnion,
@@ -24,6 +26,7 @@ import {
 } from "@slipstream/types";
 import {
   AnthropicIcon,
+  CohereIconCurrentColor as CohereIcon,
   GeminiIcon,
   MetaIcon,
   MistralIcon,
@@ -71,6 +74,12 @@ export const providerMetadata = {
     description: "Open and portable generative AI",
     color: "#FF7000"
   },
+  cohere: {
+    name: "Cohere",
+    icon: CohereIcon,
+    color: "#FF7759",
+    description: "Enterprise AI built for retrieval and reasoning"
+  },
   vercel: {
     name: "Vercel v0",
     icon: v0Icon,
@@ -95,7 +104,11 @@ export type DisplayNameWorkup<T extends Provider> = T extends "openai"
               ? ReturnType<
                   typeof getDisplayNameByModelId<T, MistralModelIdUnion>
                 >
-              : never;
+              : T extends "cohere"
+                ? ReturnType<
+                    typeof getDisplayNameByModelId<T, CohereModelIdUnion>
+                  >
+                : never;
 
 export type ModelIdWorkup<T extends Provider> = T extends "openai"
   ? ReturnType<typeof getModelIdByDisplayName<T, OpenAiDisplayNameUnion>>
@@ -115,7 +128,11 @@ export type ModelIdWorkup<T extends Provider> = T extends "openai"
               ? ReturnType<
                   typeof getModelIdByDisplayName<T, MistralDisplayNameUnion>
                 >
-              : never;
+              : T extends "cohere"
+                ? ReturnType<
+                    typeof getModelIdByDisplayName<T, CohereDisplayNameUnion>
+                  >
+                : never;
 /**
  * use this in client components where the select options are
  * the display names (the keys of the object) which, on select, outputs the
@@ -137,14 +154,7 @@ export const defaultModelByProvider = defaultModelDisplayNameByProvider;
 
 export { defaultModelIdByProvider };
 
-export let defaultProvider:
-  | "openai"
-  | "gemini"
-  | "grok"
-  | "mistral"
-  | "anthropic"
-  | "meta"
-  | "vercel";
+export let defaultProvider: Provider;
 export const defaultModelSelection: ModelSelection = {
   provider: (defaultProvider = "anthropic"),
   displayName: defaultModelByProvider[defaultProvider],
@@ -179,10 +189,15 @@ export const defaultModelSelection: ModelSelection = {
                     (defaultProvider = "mistral"),
                     defaultModelByProvider[defaultProvider]
                   )
-                : getModelIdByDisplayName(
-                    (defaultProvider = "openai"),
-                    defaultModelByProvider[defaultProvider]
-                  )
+                : defaultProvider === "cohere"
+                  ? getModelIdByDisplayName(
+                      (defaultProvider = "cohere"),
+                      defaultModelByProvider[defaultProvider]
+                    )
+                  : getModelIdByDisplayName(
+                      (defaultProvider = "openai"),
+                      defaultModelByProvider[defaultProvider]
+                    )
 };
 export function getModelDisplayName(
   toProvider: Provider,
@@ -206,13 +221,18 @@ export function getModelDisplayName(
                   toProvider,
                   model as MistralModelIdUnion
                 )
-              : toProvider === "openai"
+              : toProvider === "cohere"
                 ? getDisplayNameByModelId(
                     toProvider,
-                    model as OpenAiModelIdUnion
+                    model as CohereModelIdUnion
                   )
-                : getDisplayNameByModelId(
-                    "openai",
-                    model as OpenAiModelIdUnion
-                  );
+                : toProvider === "openai"
+                  ? getDisplayNameByModelId(
+                      toProvider,
+                      model as OpenAiModelIdUnion
+                    )
+                  : getDisplayNameByModelId(
+                      "openai",
+                      model as OpenAiModelIdUnion
+                    );
 }

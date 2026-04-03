@@ -54,6 +54,7 @@ const toProviderContext = (providerObj: ApiKeyData[]) => {
       vercel: false,
       mistral: false,
       openai: false,
+      cohere: false,
       anthropic: false
     },
     isSet: {
@@ -63,6 +64,7 @@ const toProviderContext = (providerObj: ApiKeyData[]) => {
       meta: false,
       vercel: false,
       openai: false,
+      cohere: false,
       anthropic: false
     }
   };
@@ -83,6 +85,7 @@ function equalityCheck(
 
   const p = [
     "anthropic",
+    "cohere",
     "gemini",
     "openai",
     "meta",
@@ -499,6 +502,8 @@ export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
         return "AIza********************";
       case "mistral":
         return `SwM*****************************`;
+      case "cohere":
+        return "QlQ*************************************";
       case "openai":
       default:
         return "sk-************************************************";

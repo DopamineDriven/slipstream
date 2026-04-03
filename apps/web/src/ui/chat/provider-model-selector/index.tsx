@@ -6,9 +6,9 @@ import { defaultModelByProvider, providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import type {
   AnthropicDisplayNameUnion,
+  CohereDisplayNameUnion,
   GeminiDisplayNameUnion,
   GrokDisplayNameUnion,
-  MetaDisplayNameUnion,
   MistralDisplayNameUnion,
   OpenAiDisplayNameUnion,
   Provider
@@ -78,10 +78,13 @@ export function ProviderModelSelector({
         );
         break;
       }
-      case "meta": {
-        const displayName = defaultModelByProvider.meta;
-        updateProvider("meta");
-        updateModel(displayName, getModelIdByDisplayName("meta", displayName));
+      case "cohere": {
+        const displayName = defaultModelByProvider.cohere;
+        updateProvider("cohere");
+        updateModel(
+          displayName,
+          getModelIdByDisplayName("cohere", displayName)
+        );
         break;
       }
       case "mistral": {
@@ -139,9 +142,9 @@ export function ProviderModelSelector({
         updateModel(dn, getModelIdByDisplayName("mistral", dn));
         break;
       }
-      case "meta": {
-        const dn = name as MetaDisplayNameUnion;
-        updateModel(dn, getModelIdByDisplayName("meta", dn));
+      case "cohere": {
+        const dn = name as CohereDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("cohere", dn));
         break;
       }
       case "grok": {
@@ -187,9 +190,7 @@ export function ProviderModelSelector({
           </SelectContent>
         </Select>
 
-        <Select
-          value={activeDisplayName}
-          onValueChange={handleModelChange}>
+        <Select value={activeDisplayName} onValueChange={handleModelChange}>
           <SelectTrigger className="bg-brand-component border-brand-border w-48">
             <SelectValue />
           </SelectTrigger>

@@ -10,13 +10,15 @@ export type FlexiProvider =
   | "meta"
   | "vercel"
   | "mistral"
+  | "cohere"
   | "OPENAI"
   | "ANTHROPIC"
   | "GEMINI"
   | "GROK"
   | "META"
   | "VERCEL"
-  | "MISTRAL";
+  | "MISTRAL"
+  | "COHERE";
 
 /**
  * helper workup for use in XOR type below

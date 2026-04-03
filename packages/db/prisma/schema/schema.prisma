@@ -21,6 +21,7 @@ enum Provider {
   META
   VERCEL
   MISTRAL
+  COHERE
 }
 
 model User {

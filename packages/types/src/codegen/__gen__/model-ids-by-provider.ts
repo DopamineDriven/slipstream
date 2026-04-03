@@ -103,5 +103,6 @@ export const modelIdsByProvider = {
     "mistral-small-latest",
     "mistral-medium-latest",
     "mistral-large-latest"
-  ]
+  ],
+  cohere: ["command-a-reasoning-08-2025", "command-a-03-2025"]
 } as const;
