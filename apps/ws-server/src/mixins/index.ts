@@ -1,4 +1,5 @@
 import { AnthropicService } from "@/anthropic/index.ts";
+import { CohereService } from "@/cohere/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { LlamaService } from "@/meta/index.ts";
@@ -26,7 +27,9 @@ export type ProviderNarrowing<P extends Provider> = P extends "openai"
             ? LlamaService
             : P extends "mistral"
               ? MistralService
-              : never;
+              : P extends "cohere"
+                ? CohereService
+                : never;
 
 export interface ProviderMap {
   anthropic: AnthropicService;
@@ -36,6 +39,7 @@ export interface ProviderMap {
   vercel: v0Service;
   grok: xAIService;
   mistral: MistralService;
+  cohere: CohereService;
 }
 
 export type ProviderNarrowed<T extends keyof ProviderMap> = {
@@ -93,6 +97,7 @@ export interface ProviderOpts extends Partial<ProviderMap> {
     grok?: string;
     grokMgmtKey?: string;
     mistral?: string;
+    cohere?: string;
   };
 }
 export function ProviderBaseMixin<TBase extends Constructor>(Base: TBase) {
@@ -316,6 +321,71 @@ export function MistralMixin<
       return !!(
         this.mist ??
         (this.constructor as typeof MistralServiceMixin)?.sharedMistral ??
+        this.getDependencies()
+      );
+    }
+  };
+}
+export function CohereMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = CohereService;
+  return class CohereServiceMixin extends Base {
+    co?: S;
+    coApiKey?: string;
+    static sharedCo?: S;
+    static coFactory?: ProviderFactory<S>;
+    constructor(...args: any[]) {
+      super(...(args as (ProviderOpts | undefined)[]));
+
+      const opts = this.opts;
+
+      if (opts?.cohere) this.co = opts.cohere;
+
+      this.coApiKey = opts?.apiKeys?.cohere;
+    }
+    public get cohere() {
+      if (!this.co) {
+        const shared = (this.constructor as typeof CohereServiceMixin).sharedCo;
+        if (shared) {
+          this.co = shared;
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "Cohere deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
+          }
+
+          const factory = (this.constructor as typeof CohereServiceMixin)
+            .coFactory;
+
+          this.co =
+            factory?.(deps, this.coApiKey) ??
+            new CohereService(
+              deps.logger,
+              deps.prisma,
+              deps.redis,
+              deps.userStore,
+              this.coApiKey ?? ""
+            );
+        }
+      }
+      return this.co;
+    }
+
+    static setSharedCohere(instance: S) {
+      this.sharedCo = instance;
+    }
+
+    static setCohereFactory(factory: ProviderFactory<S>) {
+      this.coFactory = factory;
+    }
+
+    public hasCohere() {
+      return !!(
+        this.co ??
+        (this.constructor as typeof CohereServiceMixin)?.sharedCo ??
         this.getDependencies()
       );
     }

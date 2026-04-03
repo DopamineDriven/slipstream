@@ -33,6 +33,7 @@ export class PrismaUserKeyService extends ErrorHelperService {
         anthropic: 0,
         vercel: 0,
         mistral: 0,
+        cohere: 0,
         meta: 0
       },
       isDefault: {
@@ -42,6 +43,7 @@ export class PrismaUserKeyService extends ErrorHelperService {
         openai: 0,
         grok: 0,
         gemini: 0,
+        cohere: 0,
         anthropic: 0
       }
     };

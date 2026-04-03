@@ -316,7 +316,8 @@ export const Provider = {
   ANTHROPIC: 'ANTHROPIC',
   META: 'META',
   VERCEL: 'VERCEL',
-  MISTRAL: 'MISTRAL'
+  MISTRAL: 'MISTRAL',
+  COHERE: 'COHERE'
 } as const
 
 export type Provider = (typeof Provider)[keyof typeof Provider]

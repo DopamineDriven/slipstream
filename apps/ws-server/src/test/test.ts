@@ -1,6 +1,6 @@
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
-import type { AssetType, MessageType } from "@slipstream/db/enums-node";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { Provider } from "@slipstream/types";
 
 dotenv.config({ quiet: true });
@@ -12,18 +12,18 @@ type MapItRT =
       content: string;
       timestamp: Date;
       id: string;
-      provider: "openai" | "gemini" | "grok" | "anthropic" | "meta" | "vercel" | "mistral";
+      provider: Lowercase<$Enums.Provider>;
       model: string;
-      sender: "USER" | "AI" | "SYSTEM";
+      sender: $Enums.SenderType;
       assetUrl: {
         cdnUrl: string;
         ext: string;
         msgId: string;
         filename: string;
         batchId: string;
-        assetType: AssetType;
+        assetType: $Enums.AssetType;
         size: number;
-        msgType: MessageType;
+        msgType: $Enums.MessageType;
       }[];
     }[]
   | undefined;
@@ -138,9 +138,9 @@ class ScriptGen extends Fs {
         msgId: string;
         filename: string;
         batchId: string;
-        assetType: AssetType;
+        assetType: $Enums.AssetType;
         size: number;
-        msgType: MessageType;
+        msgType: $Enums.MessageType;
       }>();
       const content = msg.content,
         timestamp = new Date(msg.createdAt),
@@ -157,7 +157,7 @@ class ScriptGen extends Fs {
               filename: "",
               ext: "",
               size: 0,
-              assetType: "UNKNOWN" as AssetType,
+              assetType: "UNKNOWN" as $Enums.AssetType,
               batchOrSeriesId: "",
               msgType: msg.messageType
             };
@@ -260,9 +260,9 @@ class ScriptGen extends Fs {
           msgId: string;
           filename: string;
           batchId: string;
-          assetType: AssetType;
+          assetType: $Enums.AssetType;
           size: number;
-          msgType: MessageType;
+          msgType: $Enums.MessageType;
         }[]
       ) => {
         return target

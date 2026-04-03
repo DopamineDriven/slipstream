@@ -112,5 +112,9 @@ export const displayNameToModelId = {
     "Mistral Small 4": "mistral-small-latest",
     "Mistral Medium Latest": "mistral-medium-latest",
     "Mistral Large Latest": "mistral-large-latest"
+  },
+  cohere: {
+    "Command A Reasoning": "command-a-reasoning-08-2025",
+    "Command A": "command-a-03-2025"
   }
 } as const;

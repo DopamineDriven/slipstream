@@ -49,9 +49,8 @@ export function MobileModelSelectorDrawer() {
   const visibleProviders = useMemo(
     () =>
       providers.filter(
-        (provider): provider is Exclude<Provider, "vercel"> =>
-          provider !== "vercel"
-      ),
+        provider => provider !== "vercel" && provider !== "meta"
+      ) satisfies Exclude<Provider, "vercel" | "meta">[],
     [providers]
   );
 
@@ -190,7 +189,7 @@ export function MobileModelSelectorDrawer() {
                               </Button>
                             );
                           })
-                        ) : provider === "meta" ? (
+                        ) : provider === "cohere" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =
                               activeSelectedProvider === provider &&

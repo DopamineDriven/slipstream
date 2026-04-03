@@ -188,6 +188,14 @@ async function exe() {
       cfg.MISTRAL_API_KEY
     );
 
+    const { CohereService } = await import("@/cohere/index.ts");
+    const cohere = new CohereService(
+      logger,
+      prisma,
+      redisInstance,
+      userStore,
+      cfg.COHERE_API_KEY
+    );
     const { ProviderService } = await import("@/providers/index.ts");
 
     const providers = new ProviderService({
@@ -200,7 +208,8 @@ async function exe() {
         vercel: process.env.AI_GATEWAY_API_KEY ?? cfg.AI_GATEWAY_API_KEY,
         grokMgmtKey:
           process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY,
-        mistral: cfg.MISTRAL_API_KEY
+        mistral: cfg.MISTRAL_API_KEY,
+        cohere: cfg.COHERE_API_KEY
       },
       dependencies: {
         logger,
@@ -216,7 +225,8 @@ async function exe() {
       meta,
       openai,
       vercel: v0,
-      mistral
+      mistral,
+      cohere
     });
 
     const { TTSService } = await import("@/tts/index.ts");

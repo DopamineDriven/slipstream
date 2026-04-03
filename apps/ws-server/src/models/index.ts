@@ -169,6 +169,16 @@ export class ModelService extends ProviderValidation {
           return model;
         } else return "mistral-small-latest" as const as NonNullable<K>;
       }
+      case "cohere": {
+        if (
+          model &&
+          providerModelChatApi[xTarget].includes(
+            model as GetModelUtilRT<"cohere">
+          )
+        ) {
+          return model;
+        } else return "command-a-reasoning-08-2025" as const as NonNullable<K>;
+      }
       case "openai":
       default: {
         if (

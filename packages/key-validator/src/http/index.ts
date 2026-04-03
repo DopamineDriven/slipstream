@@ -16,6 +16,7 @@ export class KeyValidator {
   private llama_url = "https://api.llama.com/v1/models";
   private v0_url = "https://ai-gateway.vercel.sh/v1/models";
   private mistral_url = "https://api.mistral.ai/v1/models";
+  private cohere_url = "https://api.cohere.com/v1/models";
   constructor(
     private apiKey: string,
     private provider: FlexiProvider
@@ -36,6 +37,8 @@ export class KeyValidator {
       case "gemini": {
         return (await fetch(`${url}?key=${apiKey}`)) satisfies Response;
       }
+      case "COHERE":
+      case "cohere":
       case "GROK":
       case "grok":
       case "META":
@@ -105,6 +108,26 @@ export class KeyValidator {
       return {
         isValid: false,
         message: `invalid_api_key__mistral__${res.status}`
+      };
+    }
+  }
+
+  private async cohere() {
+    const res = await this.callRest(this.apiKey, this.cohere_url);
+    if (res.ok) {
+      return {
+        isValid: true,
+        message: `valid_api_key__cohere__${res.status}`
+      };
+    } else if (res.status === 429) {
+      return {
+        isValid: true,
+        message: `valid_api_key__cohere__${res.status}`
+      };
+    } else {
+      return {
+        isValid: false,
+        message: `invalid_api_key__cohere__${res.status}`
       };
     }
   }
@@ -238,6 +261,10 @@ export class KeyValidator {
       case "MISTRAL":
       case "mistral": {
         return await this.mistral();
+      }
+      case "COHERE":
+      case "cohere": {
+        return await this.cohere();
       }
       case "GROK":
       case "grok":

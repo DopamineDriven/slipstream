@@ -118,7 +118,6 @@
     "typescript-eslint": "catalog:tseslint",
     "unist-util-remove": "catalog:unist",
     "unist-util-visit": "catalog:unist",
-    "urlpattern-polyfill": "catalog:polyfill",
-    "webpack": "catalog:webpack"
+    "urlpattern-polyfill": "catalog:polyfill"
   }
 }

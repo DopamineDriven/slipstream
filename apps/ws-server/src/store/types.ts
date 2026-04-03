@@ -1,9 +1,9 @@
 import type { PageAnnotation, PageBox } from "@d0paminedriven/pdfdown";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   searchUserStoreChunksByStore,
   searchUserStoreChunksHybrid
 } from "@slipstream/db/sql-node";
-import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { Rm } from "@slipstream/types";
 
 export interface CdnCacheEntry {
@@ -153,7 +153,6 @@ export type AttScopedImages<T extends boolean = boolean> = {
   img: AttScopedImgCache<T>;
 };
 
-
 export interface AttScopedPageBoxCache extends PageBox {
   coverage: number;
 }
@@ -215,9 +214,25 @@ export type UserStoreIndexSuccess = {
 
 export type UserStoreIndexResult = UserStoreIndexSuccess | UserStoreIndexSkip;
 
-export interface FileSearchToolInput<T extends string | readonly [string, ...string[]] = string> {
+export interface FileSearchToolInput<
+  T extends string | readonly [string, ...string[]] = string
+> {
   query: T;
   max_results?: number;
   filename?: string;
   search_terms?: string;
 }
+
+export type FileSearchInput =
+  | {
+      query: string;
+      max_results?: number;
+      filename?: string;
+      search_terms?: string;
+    }
+  | {
+      queries: readonly [string, ...string[]];
+      max_results?: number;
+      filename?: string;
+      search_terms?: string;
+    };

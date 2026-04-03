@@ -172,7 +172,8 @@ const providerModelChatApi = {
     "mistral-small-latest",
     "mistral-medium-latest",
     "mistral-large-latest"
-  ]
+  ],
+  cohere: ["command-a-reasoning-08-2025", "command-a-03-2025"]
 } as const;
 
 async function anthropicFetcher() {
@@ -245,6 +246,11 @@ const MISTRAL_NAME_OVERRIDES = {
   "mistral-large-latest": "Mistral Large Latest"
 };
 
+const COHERE_NAME_OVERRIDES = {
+  "command-a-reasoning-08-2025": "Command A Reasoning",
+  "command-a-03-2025": "Command A"
+};
+
 function mistralDisplayName(id: string) {
   return id === "mistral-small-latest"
     ? MISTRAL_NAME_OVERRIDES[id]
@@ -253,6 +259,14 @@ function mistralDisplayName(id: string) {
       : id === "mistral-large-latest"
         ? MISTRAL_NAME_OVERRIDES[id]
         : id;
+}
+
+function cohereDisplayName(id: string) {
+  return id === "command-a-reasoning-08-2025"
+    ? COHERE_NAME_OVERRIDES[id]
+    : id === "command-a-03-2025"
+      ? COHERE_NAME_OVERRIDES[id]
+      : id;
 }
 
 function grokDisplayName(id: string) {
@@ -573,6 +587,16 @@ const modelMapper = async (modelKeys = true) => {
           });
           return helper;
         }
+        case "cohere": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            const name = cohereDisplayName(model);
+            modelKeys === true
+              ? helper.push([model, name])
+              : helper.push([name, model]);
+          });
+          return helper;
+        }
         case "openai":
         default: {
           let helper = Array.of<[string, string]>();
@@ -728,8 +752,18 @@ async function displayNameModelIdGen<
   const grok = mapper[2];
   const anthropic = mapper[3];
   const mistral = mapper[6];
+  const cohere = mapper[7];
 
-  if (!openai || !gemini || !grok || !anthropic || !meta || !vercel || !mistral)
+  if (
+    !openai ||
+    !gemini ||
+    !grok ||
+    !anthropic ||
+    !meta ||
+    !vercel ||
+    !mistral ||
+    !cohere
+  )
     throw new Error("empty data in displayNameModelIdGen");
 
   if (typeof arrayOnly !== "undefined") {
@@ -742,7 +776,8 @@ async function displayNameModelIdGen<
           anthropic: anthropic.map(([keys, _]) => keys),
           meta: meta.map(([keys, _v]) => keys),
           vercel: vercel.map(([keys, _v]) => keys),
-          mistral: mistral.map(([keys, _v]) => keys)
+          mistral: mistral.map(([keys, _v]) => keys),
+          cohere: cohere.map(([keys, _v]) => keys)
         };
       } else {
         return {
@@ -752,7 +787,8 @@ async function displayNameModelIdGen<
           anthropic: anthropic.map(([_, vals]) => vals),
           meta: meta.map(([_, vals]) => vals),
           vercel: vercel.map(([_, vals]) => vals),
-          mistral: mistral.map(([_, vals]) => vals)
+          mistral: mistral.map(([_, vals]) => vals),
+          cohere: cohere.map(([_, vals]) => vals)
         };
       }
     } else {
@@ -764,7 +800,8 @@ async function displayNameModelIdGen<
           anthropic: anthropic.map(([_, vals]) => vals),
           meta: meta.map(([_, vals]) => vals),
           vercel: vercel.map(([_, vals]) => vals),
-          mistral: mistral.map(([_, vals]) => vals)
+          mistral: mistral.map(([_, vals]) => vals),
+          cohere: cohere.map(([_, vals]) => vals)
         };
       } else {
         return {
@@ -774,7 +811,8 @@ async function displayNameModelIdGen<
           anthropic: anthropic.map(([keys, _]) => keys),
           meta: meta.map(([keys, _v]) => keys),
           vercel: vercel.map(([keys, _v]) => keys),
-          mistral: mistral.map(([keys, _v]) => keys)
+          mistral: mistral.map(([keys, _v]) => keys),
+          cohere: cohere.map(([keys, _v]) => keys)
         };
       }
     }
@@ -786,7 +824,8 @@ async function displayNameModelIdGen<
     anthropic: Object.fromEntries(anthropic),
     meta: Object.fromEntries(meta),
     vercel: Object.fromEntries(vercel),
-    mistral: Object.fromEntries(mistral)
+    mistral: Object.fromEntries(mistral),
+    cohere: Object.fromEntries(cohere)
   };
 }
 

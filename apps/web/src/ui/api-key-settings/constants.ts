@@ -1,6 +1,7 @@
 import type { ApiKeyData } from "@/ui/api-key-settings/types";
 import {
   AnthropicIcon,
+  CohereIconCurrentColor,
   GeminiIcon,
   MetaIcon,
   MistralIcon,
@@ -65,6 +66,12 @@ export const providerObj = [
     value: `SwM*****************************`,
     isDefault: false,
     isSet: false
+  },
+  {
+    provider: "cohere",
+    text: "Cohere",
+    icon: CohereIconCurrentColor,
+    value: "QlQ*************************************"
   }
 ] as ApiKeyData[];
 

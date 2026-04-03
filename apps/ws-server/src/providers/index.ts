@@ -6,6 +6,7 @@ import type {
 } from "@/mixins/index.ts";
 import {
   AnthropicMixin,
+  CohereMixin,
   GeminiMixin,
   GrokMixin,
   MetaMixin,
@@ -72,6 +73,7 @@ class ProviderServiceBase {
   public readonly providers = [
     "anthropic",
     "mistral",
+    "cohere",
     "gemini",
     "grok",
     "meta",
@@ -83,11 +85,13 @@ class ProviderServiceBase {
 }
 
 export class ProviderService extends MistralMixin(
-  VercelMixin(
-    MetaMixin(
-      OpenAIMixin(
-        GeminiMixin(
-          GrokMixin(AnthropicMixin(ProviderBaseMixin(ProviderServiceBase)))
+  CohereMixin(
+    VercelMixin(
+      MetaMixin(
+        OpenAIMixin(
+          GeminiMixin(
+            GrokMixin(AnthropicMixin(ProviderBaseMixin(ProviderServiceBase)))
+          )
         )
       )
     )
@@ -170,6 +174,31 @@ export class ProviderService extends MistralMixin(
           hasProviderApiKeySet: false,
           initialized: true,
           provider: "gemini",
+          initTime: performance.now(),
+          lastAccessed: performance.now()
+        }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return direct;
+      }
+      case "cohere": {
+        const storeCheck = this.#store.get("cohere") as
+          | ProviderEntry<"cohere">
+          | undefined;
+        if (
+          typeof storeCheck?.instance !== "undefined" &&
+          storeCheck.available
+        ) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          return storeCheck.instance;
+        }
+        const direct = this.cohere;
+        this.#store.set("cohere", {
+          instance: direct,
+          available: true,
+          hasProviderApiKeySet: false,
+          initialized: true,
+          provider: "cohere",
           initTime: performance.now(),
           lastAccessed: performance.now()
         }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment

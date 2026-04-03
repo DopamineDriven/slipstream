@@ -36,7 +36,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "claude-sonnet-4-6" as const as NonNullable<K>;
+      } else return "claude-opus-4-6" as const as NonNullable<K>;
     }
     case "meta": {
       if (
@@ -56,7 +56,7 @@ export const getModel = <
         return model;
       } else return "v0-1.5-md" as const as NonNullable<K>;
     }
-        case "mistral": {
+    case "mistral": {
       if (
         model &&
         providerModelChatApi[xTarget].includes(
@@ -65,6 +65,16 @@ export const getModel = <
       ) {
         return model;
       } else return "mistral-small-latest" as const as NonNullable<K>;
+    }
+    case "cohere": {
+      if (
+        model &&
+        providerModelChatApi[xTarget].includes(
+          model as GetModelUtilRT<"cohere">
+        )
+      ) {
+        return model;
+      } else return "command-a-reasoning-08-2025" as const as NonNullable<K>;
     }
     case "openai":
     default: {

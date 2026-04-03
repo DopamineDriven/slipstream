@@ -84,6 +84,9 @@ export type OutputSizeProps<P extends Provider = Provider> = {
   mistral?: {
     [M in GetModelUtilRT<"mistral">]: undefined;
   }[GetModelUtilRT<"mistral">];
+    cohere?: {
+    [M in GetModelUtilRT<"cohere">]: undefined;
+  }[GetModelUtilRT<"cohere">];
   anthropic?: {
     [M in GetModelUtilRT<"anthropic">]: undefined;
   }[GetModelUtilRT<"anthropic">];
