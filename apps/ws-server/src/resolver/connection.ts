@@ -8,10 +8,7 @@ import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
 import { ResolverAssetCompleteService } from "@/resolver/asset-complete.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type {
-  ClientContextWorkupProps,
-  EventTypeMap
-} from "@slipstream/types";
+import type { ClientContextWorkupProps, EventTypeMap } from "@slipstream/types";
 
 export class ResolverConnectionService extends ResolverAssetCompleteService {
   constructor(
