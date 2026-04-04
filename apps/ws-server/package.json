@@ -24,6 +24,10 @@
       "byte-codec": [
         "dist/byte-codec/index.d.ts"
       ],
+      "cohere": [
+        "dist/cohere/index.d.ts",
+        "dist/cohere/types.d.ts"
+      ],
       "extract": [
         "dist/extract/index.d.ts"
       ],
@@ -44,7 +48,8 @@
         "dist/meta/index.d.ts"
       ],
       "mistral": [
-        "dist/mistral/index.d.ts"
+        "dist/mistral/index.d.ts",
+        "dist/mistral/types.d.ts"
       ],
       "mixins": [
         "dist/mixins/index.d.ts"
@@ -78,6 +83,19 @@
       "providers": [
         "dist/providers/index.d.ts"
       ],
+      "resolver": [
+        "dist/resolver/asset-attach-or-paste.d.ts",
+        "dist/resolver/asset-compat.d.ts",
+        "dist/resolver/asset-complete.d.ts",
+        "dist/resolver/asset-fetch.d.ts",
+        "dist/resolver/chat-utils.d.ts",
+        "dist/resolver/chat.d.ts",
+        "dist/resolver/connection.d.ts",
+        "dist/resolver/dispatch.d.ts",
+        "dist/resolver/index.d.ts",
+        "dist/resolver/tts.d.ts",
+        "dist/resolver/utils.d.ts"
+      ],
       "sharp": [
         "dist/sharp/index.ts"
       ],
@@ -85,9 +103,6 @@
         "dist/store/vector-store.ts",
         "dist/store/types.ts",
         "dist/store/workup.ts"
-      ],
-      "resolver": [
-        "dist/resolver/index.d.ts"
       ],
       "tts": [
         "dist/tts/types.ts",
