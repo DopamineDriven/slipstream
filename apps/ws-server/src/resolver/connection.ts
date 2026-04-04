@@ -10,8 +10,7 @@ import { ResolverAssetCompleteService } from "@/resolver/asset-complete.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   ClientContextWorkupProps,
-  EventTypeMap,
-  Provider
+  EventTypeMap
 } from "@slipstream/types";
 
 export class ResolverConnectionService extends ResolverAssetCompleteService {
@@ -118,63 +117,6 @@ export class ResolverConnectionService extends ResolverAssetCompleteService {
       userRecord.providerContext = providerContext;
       this.wsServer.userDataMap.set(userId, userRecord);
       return;
-    }
-  }
-
-  protected async handleFreeMsgQuota(
-    ws: WebSocket,
-    userId: string,
-    conversationIdInitial: string,
-    userMsgId: string,
-    provider?: Provider,
-    model?: string,
-    systemPrompt?: string,
-    temperature?: number,
-    topP?: number
-  ) {
-    try {
-      const MAX_FREE_MSGS_PER_24H = 25;
-      const used = await this.wsServer.prisma.countFallbackUserMessages(
-        userId,
-        24 * 60 * 60 * 1000
-      );
-      if (used >= MAX_FREE_MSGS_PER_24H) {
-        const friendly =
-          `Free tier limit reached: You have sent ${used} messages in the last 24 hours using default API keys. ` +
-          `To continue without limits, add your own API key in Settings.`;
-        const errEvt = {
-          type: "ai_chat_error" as const,
-          provider,
-          conversationId: conversationIdInitial,
-          model,
-          systemPrompt,
-          temperature,
-          topP,
-          title: this.wsServer.prisma.formatProvider(provider),
-          userId,
-          userMsgId,
-          done: true,
-          message: friendly
-        } satisfies EventTypeMap["ai_chat_error"];
-
-        // Notify the requesting client immediately
-        ws.send(JSON.stringify(errEvt));
-
-        // Best-effort notify via Redis on the user channel
-        void this.wsServer.redis.publishTypedEvent(
-          this.redisChannels.user(userId),
-          "ai_chat_error",
-          errEvt
-        );
-
-        return; // stop processing
-      }
-    } catch (e) {
-      // If the guardrail check fails for any reason, fall through to normal handling
-      console.warn(
-        "rate-limit check failed",
-        this.wsServer.prisma.safeErrMsg(e)
-      );
     }
   }
 }

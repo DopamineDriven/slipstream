@@ -5,15 +5,18 @@ import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { TTSService } from "@/tts/index.ts";
 import type {
   BigIntToCompatProps,
-  HandleAiChatRequestRT,
-  UserData
+  HandleAiChatRequestRT
 } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
 import type { Responses } from "openai/resources";
 import type { WebSocket } from "ws";
 import { ResolverConnectionService } from "@/resolver/connection.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type { EventTypeMap, MessageSingleton } from "@slipstream/types";
+import type {
+  EventTypeMap,
+  MessageSingleton,
+  Provider
+} from "@slipstream/types";
 
 export class ResolverChatUtilsService extends ResolverConnectionService {
   constructor(
@@ -177,28 +180,6 @@ export class ResolverChatUtilsService extends ResolverConnectionService {
     }
   }
 
-  protected async handleProviderContextUpdate(
-    _event: EventTypeMap["provider_context_update"],
-    ws: WebSocket,
-    userId: string,
-    _userData?: UserData
-  ) {
-    const providerContext =
-      await this.wsServer.prisma.injectClientApiKeyProps(userId);
-    const userRecord = this.wsServer.userDataMap.get(userId);
-
-    const payload = {
-      type: "provider_context_update_ack",
-      providerContext
-    } satisfies EventTypeMap["provider_context_update_ack"];
-    ws.send(JSON.stringify(payload));
-    if (userRecord?.providerContext) {
-      userRecord.providerContext = providerContext;
-      this.wsServer.userDataMap.set(userId, userRecord);
-      return;
-    }
-  }
-
   protected getCurrentMsgAttCounts(res: HandleAiChatRequestRT) {
     const userMsgAttCounts = {
       imgCounts: 0,
@@ -230,5 +211,62 @@ export class ResolverChatUtilsService extends ResolverConnectionService {
     }
     const { docCounts, imgCounts } = userMsgAttCounts;
     return { imgCounts, docCounts };
+  }
+
+  protected async handleFreeMsgQuota(
+    ws: WebSocket,
+    userId: string,
+    conversationIdInitial: string,
+    userMsgId: string,
+    provider?: Provider,
+    model?: string,
+    systemPrompt?: string,
+    temperature?: number,
+    topP?: number
+  ) {
+    try {
+      const MAX_FREE_MSGS_PER_24H = 25;
+      const used = await this.wsServer.prisma.countFallbackUserMessages(
+        userId,
+        24 * 60 * 60 * 1000
+      );
+      if (used >= MAX_FREE_MSGS_PER_24H) {
+        const friendly =
+          `Free tier limit reached: You have sent ${used} messages in the last 24 hours using default API keys. ` +
+          `To continue without limits, add your own API key in Settings.`;
+        const errEvt = {
+          type: "ai_chat_error" as const,
+          provider,
+          conversationId: conversationIdInitial,
+          model,
+          systemPrompt,
+          temperature,
+          topP,
+          title: this.wsServer.prisma.formatProvider(provider),
+          userId,
+          userMsgId,
+          done: true,
+          message: friendly
+        } satisfies EventTypeMap["ai_chat_error"];
+
+        // Notify the requesting client immediately
+        ws.send(JSON.stringify(errEvt));
+
+        // Best-effort notify via Redis on the user channel
+        void this.wsServer.redis.publishTypedEvent(
+          this.redisChannels.user(userId),
+          "ai_chat_error",
+          errEvt
+        );
+
+        return; // stop processing
+      }
+    } catch (e) {
+      // If the guardrail check fails for any reason, fall through to normal handling
+      console.warn(
+        "rate-limit check failed",
+        this.wsServer.prisma.safeErrMsg(e)
+      );
+    }
   }
 }
