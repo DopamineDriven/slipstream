@@ -7,10 +7,11 @@ import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { TTSService } from "@/tts/index.ts";
 import type { UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
+import type { WebSocket } from "ws";
 import { ResolverAssetAttachOrPasteService } from "@/resolver/asset-attach-or-paste.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap } from "@slipstream/types";
-import type {WebSocket} from "ws";
+
 export class ResolverAssetFetchService extends ResolverAssetAttachOrPasteService {
   constructor(
     wsServer: WSServer,

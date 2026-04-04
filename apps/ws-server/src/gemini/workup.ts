@@ -145,6 +145,61 @@ export class GeminiWorkupService extends FileSearchStoreService {
 
     return undefined;
   }
+  protected isGemini3ChatModel(m: string) {
+    return (
+      m === "gemini-3.1-pro-preview" ||
+      m === "gemini-3.1-pro-preview-customtools" ||
+      m === "gemini-3.1-flash-lite-preview" ||
+      m === "gemini-3-flash-preview"
+    );
+  }
+
+  protected isDeepResearch(m: string) {
+    return m === "deep-research-pro-preview-12-2025";
+  }
+
+  protected isGemini2dot5Model(m: string) {
+    return (
+      m === "gemini-2.5-pro" ||
+      m === "gemini-2.5-flash-lite" ||
+      m === "gemini-2.5-flash"
+    );
+  }
+  protected isValidImgMime(s: string) {
+    return (
+      s === "image/jpeg" ||
+      s === "image/png" ||
+      s === "image/webp" ||
+      s === "image/heic" ||
+      s === "image/heif"
+    );
+  }
+
+  protected isValidVideoMime(s: string) {
+    return (
+      s === "video/mp4" ||
+      s === "video/mpeg" ||
+      s === "video/mpg" ||
+      s === "video/mov" ||
+      s === "video/webm" ||
+      s === "video/avi" ||
+      s === "video/x-flv" ||
+      s === "video/wmv" ||
+      s === "video/3gpp"
+    );
+  }
+
+  protected isNanoBanana2(m: string) {
+    return m === "gemini-3.1-flash-image-preview";
+  }
+
+  protected isNanoBananaPro(m: string) {
+    return m === "gemini-3-pro-image-preview";
+  }
+
+  protected isNanoBanana1(m: string) {
+    return m === "gemini-2.5-flash-image";
+  }
 
   protected async formatHistoryForDeepResearch(
     msgs: MessageSingleton<true>[],
@@ -262,9 +317,17 @@ export class GeminiWorkupService extends FileSearchStoreService {
     m: GeminiModelIdUnion = "gemini-3.1-pro-preview"
   ) {
     const formatted = Array.of<Content>();
-    for (const msg of msgs) {
+    const lastIndex = msgs.findLastIndex(
+      m => m.provider === "GEMINI" && m.senderType === "AI"
+    );
+
+    const isFirstGemMsg = lastIndex === -1;
+    for (const [msgIndex, msg] of msgs.entries()) {
+      const isFreshContext = isFirstGemMsg || msgIndex > lastIndex;
+      const isCurrentUserMsg = msgIndex === msgs.length - 1;
       if (msg.senderType === "USER") {
         const partArr = Array.of<Part>();
+        const textParts = Array.of<string>();
         if (msg.attachments.length > 0) {
           for (const attachment of msg.attachments) {
             try {
@@ -275,31 +338,67 @@ export class GeminiWorkupService extends FileSearchStoreService {
                 attachment?.compatMime &&
                 attachment?.compatStatus
               ) {
-                if (
-                  m === "gemini-3.1-pro-preview" ||
-                  m === "gemini-3.1-pro-preview-customtools" ||
-                  m === "gemini-3.1-flash-lite-preview"
-                ) {
+                const url =
+                  attachment.compatStatus === "ACTIVE"
+                    ? attachment.compatCdnUrl
+                    : attachment.cdnUrl;
+
+                const [filename, ext] = this.prisma.filenameToHexExtTuple(
+                  url,
+                  attachment.compatStatus,
+                  false
+                );
+                const name = `${filename}.${ext}`;
+                const { fileUri, mimeType } = await this.ensureAssetUploaded(
+                  attachment,
+                  keyFingerprint,
+                  keyId ?? undefined,
+                  apiKey
+                );
+
+                if (attachment.assetType === "DOCUMENT") {
+                  if (isFreshContext) {
+                    if (isCurrentUserMsg) {
+                      if (this.isGemini3ChatModel(m)) {
+                        partArr.push({
+                          fileData: { fileUri, mimeType },
+                          mediaResolution: this.mediaResolutionLevel(mimeType)
+                        });
+                      } else {
+                        partArr.push({
+                          fileData: { fileUri, mimeType }
+                        });
+                      }
+                    } else {
+                      partArr.push({ fileData: { fileUri, mimeType } });
+                    }
+                  } else {
+                    textParts.push(`[${name}](${fileUri})`);
+                  }
+                } else if (attachment.assetType === "IMAGE") {
                   const { fileUri, mimeType } = await this.ensureAssetUploaded(
                     attachment,
                     keyFingerprint,
                     keyId ?? undefined,
                     apiKey
                   );
-                  partArr.push({
-                    fileData: { fileUri, mimeType },
-                    mediaResolution: this.mediaResolutionLevel(mimeType)
-                  });
+                  if (isFreshContext) {
+                    if (isCurrentUserMsg) {
+                      if (this.isGemini3ChatModel(m)) {
+                        partArr.push({
+                          fileData: { fileUri, mimeType },
+                          mediaResolution: this.mediaResolutionLevel(mimeType)
+                        });
+                      } else {
+                        partArr.push({ fileData: { fileUri, mimeType } });
+                      }
+                    }
+                    textParts.push(`![${name}](${fileUri})`);
+                  } else {
+                    textParts.push(`![${name}](${fileUri})`);
+                  }
                 } else {
-                  const { fileUri, mimeType } = await this.ensureAssetUploaded(
-                    attachment,
-                    keyFingerprint,
-                    keyId ?? undefined,
-                    apiKey
-                  );
-                  partArr.push({
-                    fileData: { fileUri, mimeType }
-                  });
+                  textParts.push(`[${name}](${url})`);
                 }
               }
             } catch (err) {
@@ -319,14 +418,16 @@ export class GeminiWorkupService extends FileSearchStoreService {
           }
         }
         if (blockAgg.length > 0) {
-          partArr.push({ text: blockAgg.join(`\n`) });
+          textParts.push(blockAgg.join(`\n`));
         } else {
-          partArr.push({ text: msg.content });
+          textParts.push(msg.content);
         }
+        partArr.push({ text: textParts.join(`\n\n`) });
         formatted.push({ role: "user", parts: partArr } as const);
       } else {
         // AI message - may have AI-generated attachments
         const partArr = Array.of<Part>();
+        const textParts = Array.of<string>();
         const model = msg.model ?? "unknown";
         const modelIdentifier = `[${msg.provider.toLowerCase()}/${model}]`;
 
@@ -344,15 +445,43 @@ export class GeminiWorkupService extends FileSearchStoreService {
                 attachment?.mime &&
                 attachment.origin === "GENERATED"
               ) {
-                const { fileUri, mimeType } = await this.ensureAssetUploaded(
-                  attachment,
-                  keyFingerprint,
-                  keyId,
-                  apiKey
-                );
-                partArr.push({
-                  fileData: { fileUri, mimeType }
-                });
+                if (attachment.assetType === "IMAGE") {
+                  const { fileUri, mimeType } = await this.ensureAssetUploaded(
+                    attachment,
+                    keyFingerprint,
+                    keyId,
+                    apiKey
+                  );
+                  if (isFreshContext) {
+                    partArr.push({
+                      fileData: { fileUri, mimeType }
+                    });
+                  } else {
+                    textParts.push(
+                      `![${modelIdentifier}, ${attachment.mime}](${attachment.cdnUrl})`
+                    );
+                  }
+                } else if (attachment.assetType === "DOCUMENT") {
+                  const { fileUri, mimeType } = await this.ensureAssetUploaded(
+                    attachment,
+                    keyFingerprint,
+                    keyId,
+                    apiKey
+                  );
+                  if (isFreshContext) {
+                    partArr.push({
+                      fileData: { fileUri, mimeType }
+                    });
+                  } else {
+                    textParts.push(
+                      `[${modelIdentifier}, ${attachment.mime}](${attachment.cdnUrl})`
+                    );
+                  }
+                } else {
+                  textParts.push(
+                    `[${modelIdentifier}, ${attachment.mime}](${attachment.cdnUrl})`
+                  );
+                }
               }
             } catch (err) {
               this.logger.warn(
@@ -370,10 +499,11 @@ export class GeminiWorkupService extends FileSearchStoreService {
           }
         }
         if (blockAgg.length > 0) {
-          partArr.push({ text: `${modelIdentifier}\n${blockAgg.join(`\n`)}` });
+          textParts.push(`${modelIdentifier}\n${blockAgg.join(`\n`)}`);
         } else {
-          partArr.push({ text: `${modelIdentifier}\n${msg.content}` });
+          textParts.push(`${modelIdentifier}\n${msg.content}`);
         }
+        partArr.push({ text: textParts.join("\n\n") });
         formatted.push({
           role: "model",
           parts: partArr
@@ -655,116 +785,81 @@ export class GeminiWorkupService extends FileSearchStoreService {
     } satisfies FunctionDeclaration;
   }
 
-  private getToolConfig(latlng?: string) {
-    const [lat, lng] = this.prisma.handleLatLng(latlng);
-
-    return {
-      // allows for mixing of google tools with custom tools
-      includeServerSideToolInvocations: true,
-      retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
-    } satisfies ToolConfig;
-  }
-
-  private getTools(
-    userId: string,
+  private getToolConfig(
+    latlng?: string,
     m: GeminiModelIdUnion = "gemini-3.1-pro-preview"
   ) {
-    switch (m) {
-      case "gemini-2.5-pro":
-      case "gemini-3.1-pro-preview":
-      case "gemini-3.1-pro-preview-customtools":
-      case "gemini-3.1-flash-lite-preview":
-      case "gemini-3-flash-preview":
-      case "deep-research-pro-preview-12-2025":
-      case "gemini-2.5-flash":
-      case "gemini-2.5-flash-lite": {
-        return [
-          {
-            googleSearch: {},
-            urlContext: {},
-            functionDeclarations: [this.userStoreSearchTool()]
-          }
-        ] satisfies GenerateContentConfig["tools"];
-      }
-      case "gemini-3.1-flash-image-preview":
-      case "gemini-3-pro-image-preview": {
-        return [{ googleSearch: {} }] satisfies GenerateContentConfig["tools"];
-      }
-      case "gemini-2.5-flash-image": {
-        return [] satisfies GenerateContentConfig["tools"];
-      }
-      case "gemini-2.0-flash": {
-        return [
-          {
-            functionDeclarations: [this.userStoreSearchTool()]
-          }
-        ] satisfies GenerateContentConfig["tools"];
-      }
-      case "gemini-2.0-flash-lite": {
-        return [
-          {
-            functionDeclarations: [this.userStoreSearchTool()]
-          }
-        ] satisfies GenerateContentConfig["tools"];
-      }
-      case "imagen-4.0-fast-generate-001":
-      case "imagen-4.0-generate-001":
-      case "imagen-4.0-ultra-generate-001":
-      case "veo-2.0-generate-001":
-      case "veo-3.0-fast-generate-001":
-      case "veo-3.0-generate-001":
-      case "veo-3.1-fast-generate-preview":
-      case "veo-3.1-generate-preview":
-      default: {
-        return undefined satisfies GenerateContentConfig["tools"];
-      }
+    const [lat, lng] = this.prisma.handleLatLng(latlng);
+    if (
+      this.isGemini3ChatModel(m) ||
+      this.isDeepResearch(m) ||
+      this.isGemini2dot5Model(m)
+    ) {
+      return {
+        // allows for mixing of google tools with custom tools
+        includeServerSideToolInvocations: true,
+        retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
+      } satisfies ToolConfig;
+    } else {
+      return {
+        // allows for mixing of google tools with custom tools
+        retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
+      } satisfies ToolConfig;
+    }
+  }
+
+  private getTools(m: GeminiModelIdUnion = "gemini-3.1-pro-preview") {
+    if (
+      this.isGemini3ChatModel(m) ||
+      this.isDeepResearch(m) ||
+      this.isGemini2dot5Model(m)
+    ) {
+      return [
+        {
+          googleSearch: {},
+          urlContext: {},
+          functionDeclarations: [this.userStoreSearchTool()]
+        }
+      ] satisfies GenerateContentConfig["tools"];
+    }
+    if (this.isNanoBanana2(m) || this.isNanoBananaPro(m)) {
+      return [{ googleSearch: {} }] satisfies GenerateContentConfig["tools"];
+    }
+    if (m === "gemini-2.0-flash" || m === "gemini-2.0-flash-lite") {
+      return [
+        {
+          functionDeclarations: [this.userStoreSearchTool()]
+        }
+      ] satisfies GenerateContentConfig["tools"];
+    } else {
+      return [] satisfies GenerateContentConfig["tools"];
     }
   }
 
   private getThinkingConfig(m: GeminiModelIdUnion = "gemini-3.1-pro-preview") {
-    switch (m) {
-      /**
-       * gemini-3* only
-       */
-      case "deep-research-pro-preview-12-2025":
-      case "gemini-3-flash-preview":
-      case "gemini-3.1-flash-image-preview":
-      case "gemini-3.1-flash-lite-preview":
-      case "gemini-3.1-pro-preview":
-      case "gemini-3.1-pro-preview-customtools": {
-        return {
-          includeThoughts: true,
-          thinkingLevel: ThinkingLevel.HIGH
-        } satisfies GenerateContentConfig["thinkingConfig"];
-      }
-      case "gemini-3-pro-image-preview":
-      case "gemini-2.5-flash":
-      case "gemini-2.5-flash-lite":
-      case "gemini-2.5-pro": {
-        return {
-          includeThoughts: true,
-          thinkingBudget: -1
-        } satisfies GenerateContentConfig["thinkingConfig"];
-      }
-      case "gemini-2.0-flash":
-      case "gemini-2.0-flash-lite":
-      case "imagen-4.0-fast-generate-001":
-      case "imagen-4.0-generate-001":
-      case "imagen-4.0-ultra-generate-001":
-      case "veo-2.0-generate-001":
-      case "veo-3.0-fast-generate-001":
-      case "veo-3.0-generate-001":
-      case "veo-3.1-fast-generate-preview":
-      case "veo-3.1-generate-preview":
-      default: {
-        return {
-          includeThoughts: false,
-          thinkingBudget: 0
-        } satisfies GenerateContentConfig["thinkingConfig"];
-      }
-      case "gemini-2.5-flash-image": {
-        return undefined satisfies GenerateContentConfig["thinkingConfig"];
-      }
+    if (
+      this.isGemini3ChatModel(m) ||
+      this.isDeepResearch(m) ||
+      this.isNanoBanana2(m)
+    ) {
+      return {
+        includeThoughts: true,
+        thinkingLevel: ThinkingLevel.HIGH
+      } satisfies GenerateContentConfig["thinkingConfig"];
+    }
+    if (this.isGemini2dot5Model(m) || this.isNanoBananaPro(m)) {
+      return {
+        includeThoughts: true,
+        thinkingBudget: -1
+      } satisfies GenerateContentConfig["thinkingConfig"];
+    }
+    if (this.isNanoBanana1(m)) {
+      return;
+    } else {
+      return {
+        includeThoughts: false,
+        thinkingBudget: 0
+      } satisfies GenerateContentConfig["thinkingConfig"];
     }
   }
   protected async generateId(target: "seriesId" | "generationGroupId") {
@@ -852,7 +947,6 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }
 
   private async contentGenChat({
-    userId,
     isNewChat,
     keyId,
     model,
@@ -867,8 +961,8 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }: GenerateContentResponseProps) {
     const m = model as GeminiModelIdUnion;
     const keyFingerprint = keyId ?? "server";
-    const toolConfig = this.getToolConfig(latlng);
-    const tools = this.getTools(userId, m);
+    const toolConfig = this.getToolConfig(latlng, m);
+    const tools = this.getTools(m);
     const thinkingConfig = this.getThinkingConfig(m);
     const maxOutputTokens = max_tokens;
     const { history: contents, systemInstruction } =
@@ -906,7 +1000,6 @@ export class GeminiWorkupService extends FileSearchStoreService {
    * 🍌 :3 🍌
    */
   private async contentGenNanoBananas({
-    userId,
     isNewChat,
     keyId,
     model,
@@ -925,8 +1018,8 @@ export class GeminiWorkupService extends FileSearchStoreService {
       | "gemini-2.5-flash-image";
 
     const keyFingerprint = keyId ?? "server";
-    const toolConfig = this.getToolConfig(latlng);
-    const tools = this.getTools(userId, m);
+    const toolConfig = this.getToolConfig(latlng, m);
+    const tools = this.getTools(m);
     const thinkingConfig = this.getThinkingConfig(m);
     const maxOutputTokens = max_tokens;
     const { history: contents, systemInstruction } =
@@ -995,7 +1088,9 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }: GenerateContentResponseProps) {
     const m = model as GeminiModelIdUnion;
     if (
-      this.prisma.geminiNanoBananasModel(m) &&
+      (this.isNanoBanana1(m) ||
+        this.isNanoBanana2(m) ||
+        this.isNanoBananaPro(m)) &&
       typeof imgGenFields !== "undefined"
     ) {
       return this.contentGenNanoBananas({

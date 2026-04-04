@@ -5,11 +5,12 @@ import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { TTSService } from "@/tts/index.ts";
 import type { UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
+import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
+import type { WebSocket } from "ws";
 import { ResolverAssetFetchService } from "@/resolver/asset-fetch.ts";
-import { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap } from "@slipstream/types";
-import type {WebSocket} from "ws";
+
 export class ResolverAssetCompleteService extends ResolverAssetFetchService {
   constructor(
     wsServer: WSServer,
@@ -37,7 +38,7 @@ export class ResolverAssetCompleteService extends ResolverAssetFetchService {
 
   protected async handleAssetProgress(
     event: EventTypeMap["asset_upload_progress"],
-    ws: WebSocket,
+    _ws: WebSocket,
     userId: string,
     _userData?: UserData
   ) {
