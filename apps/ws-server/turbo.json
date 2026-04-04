@@ -9,7 +9,7 @@
         "src/**/*.ts",
         "tsconfig.json",
         "package.json",
-        "eslint.config.mjs",
+        "eslint.config.ts",
         "tsdown.config.ts"
       ]
     }
