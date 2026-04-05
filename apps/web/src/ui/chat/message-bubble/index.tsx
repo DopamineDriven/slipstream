@@ -711,6 +711,9 @@ export function MessageBubble({
         open={showMobileActions}
         onOpenChange={setShowMobileActions}
         messageContent={contentToCopy}
+        messageId={message.id}
+        conversationId={message.conversationId}
+        senderType={message.senderType}
       />
     </>
   );

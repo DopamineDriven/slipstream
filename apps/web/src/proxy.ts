@@ -34,10 +34,11 @@ function detectDeviceAndSetCookies(
   const ip = request.headers.get("x-vercel-forwarded-for") ?? "127.0.0.1";
 
   const tz = request.headers.get("x-vercel-ip-timezone") ?? "America/Chicago";
-  const { os, device, ua } = userAgent(request);
+  const { os, device, ua, browser } = userAgent(request);
   const isMac = /(mac)/gim.test(os?.name ?? "") ?? false;
   const latlng = `${lat},${lng}` as const;
-
+  const browserName = browser.name ?? "Chrome";
+  const browserVersion = browser.version ?? "147.0.7727.49";
   const { hostname } = request.nextUrl;
 
   const accept = request.headers.get("accept-language") ?? "";
@@ -95,7 +96,12 @@ function detectDeviceAndSetCookies(
   if (request.cookies.has("userId")) {
     response.cookies.delete("userId");
   }
-
+  if (request.cookies.has("browserName")) {
+    response.cookies.delete("browserName");
+  }
+  if (request.cookies.has("browserVersion")) {
+    response.cookies.delete("browserVersion");
+  }
   const isIOS = /(ios|iphone|ipad|iwatch)/i.test(ua);
 
   const ios = `${isIOS}` as const;
@@ -110,6 +116,8 @@ function detectDeviceAndSetCookies(
   }
 
   // Set cookies
+  response.cookies.set("browserName", browserName, config);
+  response.cookies.set("browserVersion", browserVersion, config);
   response.cookies.set("hostname", hostname, config);
   response.cookies.set("locale", locale, config);
   response.cookies.set("viewport", viewport, config);

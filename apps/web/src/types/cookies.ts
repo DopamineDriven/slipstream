@@ -1,4 +1,6 @@
 export const COOKIES = {
+  browserVersion: "browserVersion",
+  browserName: "browserName",
   hostname: "hostname",
   viewport: "viewport",
   ios: "ios",
@@ -17,6 +19,8 @@ export const COOKIES = {
 
 export type CookieValue = {
   hostname: string;
+  browserName: string;
+  browserVersion: string;
   viewport: "mobile" | "desktop";
   ip: string;
   ua: string;

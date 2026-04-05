@@ -57,7 +57,9 @@ import { PanelLeft } from "@/icons/panel-left";
 import { PanelLeftClose } from "@/icons/panel-left-close";
 import { PanelRightClose } from "@/icons/panel-right-close";
 import { Paperclip } from "@/icons/paperclip";
+import { Pause } from "@/icons/pause";
 import { PenLine } from "@/icons/pen-line";
+import { Play } from "@/icons/play";
 import { Plus } from "@/icons/plus";
 import { QuestionMark } from "@/icons/question-mark";
 import { QuoteIcon } from "@/icons/quote";
@@ -71,6 +73,7 @@ import { Settings } from "@/icons/settings";
 import { ShareIcon } from "@/icons/share-icon";
 import { Sparkles } from "@/icons/sparkles";
 import { SquarePen } from "@/icons/square-pen";
+import { Stop } from "@/icons/stop";
 import { Sun } from "@/icons/sun";
 import { Terminal } from "@/icons/terminal";
 import { ThumbsDown } from "@/icons/thumbs-down";
@@ -144,7 +147,9 @@ const IconComponents = {
   PanelLeftClose,
   PanelRightClose,
   Paperclip,
+  Pause,
   PenLine,
+  Play,
   Plus,
   QuestionMark,
   QuoteIcon,
@@ -158,6 +163,7 @@ const IconComponents = {
   ShareIcon,
   Sparkles,
   SquarePen,
+  Stop,
   Sun,
   Terminal,
   ThumbsDown,
@@ -265,7 +271,9 @@ export {
   PanelLeftClose,
   PanelRightClose,
   Paperclip,
+  Pause,
   PenLine,
+  Play,
   Plus,
   QuestionMark,
   QuoteIcon,
@@ -279,6 +287,7 @@ export {
   ShareIcon,
   Sparkles,
   SquarePen,
+  Stop,
   Sun,
   Terminal,
   ThumbsDown,

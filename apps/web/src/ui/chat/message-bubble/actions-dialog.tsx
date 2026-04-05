@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useTTSContext } from "@/context/tts-context";
+import { cn } from "@/lib/utils";
 import { AnimatedCopyButtonWithText } from "@/ui/atoms/animated-copy-button-with-text";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import {
   Button,
   Dialog,
@@ -9,32 +12,47 @@ import {
   DialogHeader,
   DialogTitle,
   EllipsisHorizontal,
-  ShareIcon as Share
+  ReadAloud as ReadAloudIcon
 } from "@slipstream/ui";
 
 interface MessageActionsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   messageContent: string;
+  messageId: string;
+  conversationId: string;
+  senderType: $Enums.SenderType;
 }
 
 export function MessageActionsDialog({
   open,
   onOpenChange,
-  messageContent
+  messageContent,
+  messageId,
+  conversationId,
+  senderType
 }: MessageActionsDialogProps) {
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const handleShare = () => {
+  const tts = useTTSContext();
+
+  const isTTSActive =
+    tts.currentPlaybackMessageId === messageId ||
+    (tts.isGenerating && tts.activeMessageId === messageId);
+
+  const handleReadAloud = useCallback(() => {
+    if (isTTSActive) {
+      tts.stop();
+    } else {
+      tts.requestTTS(messageId, conversationId);
+    }
     onOpenChange(false);
-  };
+  }, [isTTSActive, tts, messageId, conversationId, onOpenChange]);
 
   const handleCopyComplete = () => {
-    // Clear any existing timer
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
     }
 
-    // Set new timer to close dialog
     closeTimerRef.current = setTimeout(() => {
       onOpenChange(false);
       closeTimerRef.current = null;
@@ -42,7 +60,6 @@ export function MessageActionsDialog({
   };
 
   const handleMoreOptions = () => {
-    console.log("More options clicked");
     onOpenChange(false);
   };
 
@@ -60,11 +77,16 @@ export function MessageActionsDialog({
     };
   }, [open]);
 
+  const isReadAloudDisabled = useMemo(
+    () => tts.isGenerating && !isTTSActive,
+    [tts.isGenerating, isTTSActive]
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="mx-0.5 sm:max-w-md"
-        aria-description="copy, share, or more opts">
+        aria-description="copy, read aloud, or more opts">
         <DialogHeader>
           <DialogTitle className="text-center">Message Actions</DialogTitle>
         </DialogHeader>
@@ -82,19 +104,24 @@ export function MessageActionsDialog({
             </AnimatedCopyButtonWithText>
           </div>
 
-          {/* Share Action */}
-          {
+          {/* Read Aloud Action (AI messages only) */}
+          {senderType === "AI" && (
             <div className="flex flex-col items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-12 w-12 rounded-full bg-transparent"
-                onClick={handleShare}>
-                <Share className="h-9 w-9" />
+                disabled={isReadAloudDisabled}
+                className={cn(
+                  "h-12 w-12 rounded-full bg-transparent",
+                  isTTSActive && "text-foreground drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]",
+                  tts.isGenerating && tts.activeMessageId === messageId && "animate-pulse"
+                )}
+                onClick={handleReadAloud}>
+                <ReadAloudIcon className="h-9 w-9" />
               </Button>
-              <span className="sr-only">Share</span>
+              <span className="sr-only">Read Aloud</span>
             </div>
-          }
+          )}
 
           {/* More Options Action */}
           <div className="flex flex-col items-center gap-2">
