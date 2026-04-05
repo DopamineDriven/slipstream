@@ -34,6 +34,24 @@ export function MessageActionsDialog({
 }: MessageActionsDialogProps) {
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
   const tts = useTTSContext();
+  const primerRef = useRef<HTMLAudioElement | null>(null);
+  const hasPlayedPrimer = useRef(false);
+
+  useEffect(() => {
+    const el = new Audio("/cassette-shortened.mp3");
+    el.volume = 0.1;
+    el.preload = "auto";
+    el.onended = () => {
+      hasPlayedPrimer.current = true;
+    };
+    primerRef.current = el;
+
+    return () => {
+      el.onended = null;
+      el.pause();
+      primerRef.current = null;
+    };
+  }, []);
 
   const isTTSActive =
     tts.currentPlaybackMessageId === messageId ||
@@ -43,6 +61,9 @@ export function MessageActionsDialog({
     if (isTTSActive) {
       tts.stop();
     } else {
+      if (primerRef.current && !hasPlayedPrimer.current) {
+        void primerRef.current.play().catch(() => {});
+      }
       tts.requestTTS(messageId, conversationId);
     }
     onOpenChange(false);
