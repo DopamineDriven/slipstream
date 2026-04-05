@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useTTSContext } from "@/context/tts-context";
 import { useIsMobile } from "@/hooks/use-is-mobile";
@@ -26,6 +26,8 @@ import {
   ThumbsUp
 } from "@slipstream/ui";
 
+const primerAudio = "/cassette-shortened.mp3";
+
 export function MessageIcons({
   user,
   message,
@@ -44,13 +46,38 @@ export function MessageIcons({
     tts.currentPlaybackMessageId === message.id ||
     (tts.isGenerating && tts.activeMessageId === message.id);
 
+  const primerRef = useRef<HTMLAudioElement | null>(null);
+  const hasPlayedPrimer = useRef(false);
+
+  useEffect(() => {
+    const el = new Audio(primerAudio);
+    el.volume = 0.1;
+    el.preload = "auto";
+    el.onended = () => {
+      hasPlayedPrimer.current = true;
+    };
+    primerRef.current = el;
+
+    return () => {
+      el.onended = null;
+      el.pause();
+      primerRef.current = null;
+    };
+  }, []);
+
   const handleReadAloud = useCallback(() => {
     if (isTTSActive) {
       tts.stop();
     } else {
+      if (primerRef.current && !hasPlayedPrimer.current) {
+        void primerRef.current.play().catch(() => {});
+      }
       tts.requestTTS(message.id, message.conversationId);
     }
   }, [isTTSActive, tts, message.id, message.conversationId]);
+
+
+
 
   const RxnIcons = useMemo(
     () =>
@@ -70,6 +97,7 @@ export function MessageIcons({
       ] as const,
     [reactionState.liked, reactionState.disliked, handleReaction]
   );
+
   const { get } = useCookiesCtx();
 
   const tz = get("tz") ?? "america/chicago";
