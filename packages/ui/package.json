@@ -5,7 +5,7 @@
   "files": [
     "dist/**/*.{js,mjs,cjs,d.mts,d.ts,d.cts,css}"
   ],
-  "license": "MIT",
+  "license": "BUSL-1.1",
   "sideEffects": [
     "**/*.css"
   ],

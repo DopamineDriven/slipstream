@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "license": "MIT",
+  "license": "BUSL-1.1",
   "prettier": "@slipstream/prettier-config",
   "scripts": {
     "dev": "next dev -p 3030",
