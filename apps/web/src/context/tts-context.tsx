@@ -11,6 +11,8 @@ import {
   useState
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
+import { useCookiesCtx } from "@/context/cookie-context";
+import { isSafariAudioSessionSupported } from "@/lib/audio-session";
 import { PCMStreamPlayer } from "@/lib/pcm-stream-player";
 import { pcmChunksToWavBlob } from "@/lib/pcm-to-wav";
 import { isValidCodec, isValidLanguage, isValidVoice } from "@/lib/tts-helpers";
@@ -61,6 +63,12 @@ export function TTSProvider({
   children: ReactNode;
 }>) {
   const { client, sendEvent } = useChatWebSocketContext();
+  const { get } = useCookiesCtx();
+
+  const safariAudioSession = useMemo(
+    () => isSafariAudioSessionSupported(get("browserName"), get("browserVersion")),
+    [get]
+  );
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeMessageId, setActiveMessageId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -92,10 +100,13 @@ export function TTSProvider({
 
   const playFromUrl = useCallback((url: string | null, messageId: string) => {
     if (!url || !audioRef.current) return;
+    if (safariAudioSession) {
+      PCMStreamPlayer.enablePlaybackAudioSession();
+    }
     audioRef.current.src = url;
     void audioRef.current.play();
     setCurrentPlaybackMessageId(messageId);
-  }, []);
+  }, [safariAudioSession]);
 
   useEffect(() => {
     const handleChunk = (evt: EventTypeMap["user_tts_chunk"]) => {
@@ -223,7 +234,7 @@ export function TTSProvider({
       if (isGeneratingRef.current) return;
 
       // Create PCM stream player (must be in user gesture call stack)
-      playerRef.current = new PCMStreamPlayer(STREAM_SAMPLE_RATE);
+      playerRef.current = new PCMStreamPlayer(STREAM_SAMPLE_RATE, safariAudioSession);
 
       setIsGenerating(true);
       setActiveMessageId(messageId);
@@ -242,7 +253,7 @@ export function TTSProvider({
         codec: "pcm"
       } satisfies EventTypeMap["user_tts_request"]);
     },
-    [sendEvent, voice, language, play]
+    [sendEvent, voice, language, play, safariAudioSession]
   );
 
   const pause = useCallback(() => {

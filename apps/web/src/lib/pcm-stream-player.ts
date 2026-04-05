@@ -12,9 +12,23 @@ export class PCMStreamPlayer {
   private readonly sampleRate: number;
   private _stopped = false;
 
-  constructor(sampleRate = 24000) {
+  constructor(sampleRate = 24000, safariAudioSession = false) {
     this.sampleRate = sampleRate;
+    if (safariAudioSession) {
+      PCMStreamPlayer.enablePlaybackAudioSession();
+    }
     this.ctx = new AudioContext({ sampleRate });
+  }
+
+  /**
+   * Sets the audio session type to "playback" so iOS Safari
+   * plays audio even when the hardware mute switch is on.
+   * No-ops on non-Safari browsers. Zero latency.
+   */
+  static enablePlaybackAudioSession() {
+    if (navigator.audioSession != null) {
+      navigator.audioSession.type = "playback";
+    }
   }
 
   /**
