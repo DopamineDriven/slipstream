@@ -8,7 +8,7 @@
     "./next": "./next.mjs",
     "./react": "./react.mjs"
   },
-  "license": "MIT",
+  "license": "BUSL-1.1",
   "scripts": {
     "clean": "git clean -xdf .cache .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
