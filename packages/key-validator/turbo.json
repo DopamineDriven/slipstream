@@ -10,7 +10,7 @@
         "src/types/index.ts",
         "tsconfig.json",
         "package.json",
-        "eslint.config.mjs",
+        "eslint.config.ts",
         "tsdown.config.ts"
       ]
     }

@@ -29,4 +29,4 @@ curl https://ai-gateway.vercel.sh/v1/responses \
       }
     }
   }' \
-  > responses/sse-deepseek-responses.txt
+  > notes/sse-deepseek-responses.txt

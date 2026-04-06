@@ -29,4 +29,4 @@ curl https://ai-gateway.vercel.sh/v1/responses \
       }
     }
   }' \
-  > src/test/__out__/moonshot/sse-1.txt
+  > notes/sse-kimi-k2-5.txt

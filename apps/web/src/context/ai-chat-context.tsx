@@ -144,7 +144,10 @@ const fallbackApiKeys = {
     mistral: false,
     meta: false,
     openai: false,
-    vercel: false
+    vercel: false,
+    deepseek: false,
+    moonshotai: false,
+    zai: false
   },
   isSet: {
     anthropic: false,
@@ -154,7 +157,10 @@ const fallbackApiKeys = {
     mistral: false,
     meta: false,
     openai: false,
-    vercel: false
+    vercel: false,
+    deepseek: false,
+    moonshotai: false,
+    zai: false
   }
 } satisfies ClientContextWorkupProps;
 
