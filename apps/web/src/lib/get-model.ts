@@ -76,6 +76,34 @@ export const getModel = <
         return model;
       } else return "command-a-reasoning-08-2025" as const as NonNullable<K>;
     }
+    case "deepseek": {
+      if (
+        model &&
+        providerModelChatApi[xTarget].includes(
+          model as GetModelUtilRT<"deepseek">
+        )
+      ) {
+        return model;
+      } else return "deepseek-r1" as const as NonNullable<K>;
+    }
+    case "moonshotai": {
+      if (
+        model &&
+        providerModelChatApi[xTarget].includes(
+          model as GetModelUtilRT<"moonshotai">
+        )
+      ) {
+        return model;
+      } else return "kimi-k2.5" as const as NonNullable<K>;
+    }
+    case "zai": {
+      if (
+        model &&
+        providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"zai">)
+      ) {
+        return model;
+      } else return "glm-5" as const as NonNullable<K>;
+    }
     case "openai":
     default: {
       if (

@@ -201,6 +201,9 @@ export type {
   CohereChatModels,
   CohereDisplayNameUnion,
   CohereModelIdUnion,
+  DeepSeekChatModels,
+  DeepSeekDisplayNameUnion,
+  DeepSeekModelIdUnion,
   DisplayNameModelMap,
   GeminiChatModels,
   GeminiDisplayNameUnion,
@@ -239,6 +242,9 @@ export type {
   ImageGenModelsByProvider,
   ImageGenProviders,
   ImgGenModelMap,
+  KimiChatModels,
+  KimiDisplayNameUnion,
+  KimiModelIdUnion,
   MetaChatModels,
   MetaDisplayNameUnion,
   MetaModelIdUnion,
@@ -269,7 +275,10 @@ export type {
   VercelDisplayNameUnion,
   VercelModelIdUnion,
   VideoGenModelMap,
-  VideoGenProviders
+  VideoGenProviders,
+  ZaiChatModels,
+  ZaiDisplayNameUnion,
+  ZaiModelIdUnion
 } from "@/models.ts";
 
 export {
@@ -377,9 +386,6 @@ export type {
   ImageGenJobSingleton,
   ImageGenOutputSingleton,
   ImageSingleton,
-  LocalVectorStoreDocChunkSingleton,
-  LocalVectorStoreDocSingleton,
-  LocalVectorStoreSingleton,
   MessageBlockSingleton,
   MessageSingleton,
   ProfileSingleton,

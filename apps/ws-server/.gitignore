@@ -21,4 +21,4 @@ src/test/xai/**/*
 src/test/google/**/*
 logs/
 shell-scripts/*
-probe.sh
+

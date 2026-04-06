@@ -281,6 +281,21 @@ export class ResolverChatService extends ResolverTTSService {
           await svc.handleV0AiChatRequest(commonProps);
           break;
         }
+        case "deepseek": {
+          const svc = this.providers.getRequiredInstance("deepseek");
+          await svc.handleDeepSeekAiChatRequest(commonProps);
+          break;
+        }
+        case "moonshotai": {
+          const svc = this.providers.getRequiredInstance("moonshotai");
+          await svc.handleKimiAiChatRequest(commonProps);
+          break;
+        }
+        case "zai": {
+          const svc = this.providers.getRequiredInstance("zai");
+          await svc.handleZaiAiChatRequest(commonProps);
+          break;
+        }
         case "meta": {
           const svc = this.providers.getRequiredInstance("meta");
           await svc.handleMetaAiChatRequest(commonProps);

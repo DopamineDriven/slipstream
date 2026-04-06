@@ -565,7 +565,6 @@ export type AttachmentWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   ttsJob?: Prisma.XOR<Prisma.TTSJobNullableScalarRelationFilter, Prisma.TTSJobWhereInput> | null
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocListRelationFilter
   conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
   message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
   providerLinks?: Prisma.AttachmentProviderListRelationFilter
@@ -629,7 +628,6 @@ export type AttachmentOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ttsJob?: Prisma.TTSJobOrderByWithRelationInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocOrderByRelationAggregateInput
   conversation?: Prisma.ConversationOrderByWithRelationInput
   message?: Prisma.MessageOrderByWithRelationInput
   providerLinks?: Prisma.AttachmentProviderOrderByRelationAggregateInput
@@ -696,7 +694,6 @@ export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   ttsJob?: Prisma.XOR<Prisma.TTSJobNullableScalarRelationFilter, Prisma.TTSJobWhereInput> | null
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocListRelationFilter
   conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
   message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
   providerLinks?: Prisma.AttachmentProviderListRelationFilter
@@ -867,7 +864,6 @@ export type AttachmentCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
@@ -931,7 +927,6 @@ export type AttachmentUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
@@ -989,7 +984,6 @@ export type AttachmentUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
@@ -1053,7 +1047,6 @@ export type AttachmentUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -1541,20 +1534,6 @@ export type AttachmentUpdateOneRequiredWithoutImageGenOutputNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutImageGenOutputInput, Prisma.AttachmentUpdateWithoutImageGenOutputInput>, Prisma.AttachmentUncheckedUpdateWithoutImageGenOutputInput>
 }
 
-export type AttachmentCreateNestedOneWithoutLocalVectorStoreDocsInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutLocalVectorStoreDocsInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-}
-
-export type AttachmentUpdateOneRequiredWithoutLocalVectorStoreDocsNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutLocalVectorStoreDocsInput
-  upsert?: Prisma.AttachmentUpsertWithoutLocalVectorStoreDocsInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUpdateWithoutLocalVectorStoreDocsInput>, Prisma.AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput>
-}
-
 export type AttachmentCreateNestedManyWithoutMessageInput = {
   create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
   connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
@@ -1744,7 +1723,6 @@ export type AttachmentCreateWithoutImageInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
@@ -1807,7 +1785,6 @@ export type AttachmentUncheckedCreateWithoutImageInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
@@ -1880,7 +1857,6 @@ export type AttachmentUpdateWithoutImageInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
@@ -1943,7 +1919,6 @@ export type AttachmentUncheckedUpdateWithoutImageInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -2000,7 +1975,6 @@ export type AttachmentCreateWithoutVideoInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
@@ -2063,7 +2037,6 @@ export type AttachmentUncheckedCreateWithoutVideoInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
@@ -2136,7 +2109,6 @@ export type AttachmentUpdateWithoutVideoInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
@@ -2199,7 +2171,6 @@ export type AttachmentUncheckedUpdateWithoutVideoInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -2256,7 +2227,6 @@ export type AttachmentCreateWithoutAudioInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
@@ -2319,7 +2289,6 @@ export type AttachmentUncheckedCreateWithoutAudioInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
@@ -2392,7 +2361,6 @@ export type AttachmentUpdateWithoutAudioInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
@@ -2455,7 +2423,6 @@ export type AttachmentUncheckedUpdateWithoutAudioInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -2512,7 +2479,6 @@ export type AttachmentCreateWithoutDocumentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
@@ -2575,7 +2541,6 @@ export type AttachmentUncheckedCreateWithoutDocumentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
@@ -2648,7 +2613,6 @@ export type AttachmentUpdateWithoutDocumentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
@@ -2711,7 +2675,6 @@ export type AttachmentUncheckedUpdateWithoutDocumentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -2768,7 +2731,6 @@ export type AttachmentCreateWithoutConversationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
@@ -2830,7 +2792,6 @@ export type AttachmentUncheckedCreateWithoutConversationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
@@ -2968,7 +2929,6 @@ export type AttachmentCreateWithoutImageGenOutputInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
@@ -3031,7 +2991,6 @@ export type AttachmentUncheckedCreateWithoutImageGenOutputInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
@@ -3104,7 +3063,6 @@ export type AttachmentUpdateWithoutImageGenOutputInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
@@ -3167,7 +3125,6 @@ export type AttachmentUncheckedUpdateWithoutImageGenOutputInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -3175,262 +3132,6 @@ export type AttachmentUncheckedUpdateWithoutImageGenOutputInput = {
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-}
-
-export type AttachmentCreateWithoutLocalVectorStoreDocsInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
-  bucket: string
-  key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
-  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
-  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
-}
-
-export type AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
-  bucket: string
-  key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
-}
-
-export type AttachmentCreateOrConnectWithoutLocalVectorStoreDocsInput = {
-  where: Prisma.AttachmentWhereUniqueInput
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput>
-}
-
-export type AttachmentUpsertWithoutLocalVectorStoreDocsInput = {
-  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput>
-  create: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput>
-  where?: Prisma.AttachmentWhereInput
-}
-
-export type AttachmentUpdateToOneWithWhereWithoutLocalVectorStoreDocsInput = {
-  where?: Prisma.AttachmentWhereInput
-  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput>
-}
-
-export type AttachmentUpdateWithoutLocalVectorStoreDocsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
-}
-
-export type AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentCreateWithoutMessageInput = {
@@ -3480,7 +3181,6 @@ export type AttachmentCreateWithoutMessageInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
@@ -3542,7 +3242,6 @@ export type AttachmentUncheckedCreateWithoutMessageInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
@@ -3626,7 +3325,6 @@ export type AttachmentCreateWithoutProviderLinksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
@@ -3689,7 +3387,6 @@ export type AttachmentUncheckedCreateWithoutProviderLinksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -3762,7 +3459,6 @@ export type AttachmentUpdateWithoutProviderLinksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
@@ -3825,7 +3521,6 @@ export type AttachmentUncheckedUpdateWithoutProviderLinksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -3882,7 +3577,6 @@ export type AttachmentCreateWithoutProviderStoreDocsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
@@ -3945,7 +3639,6 @@ export type AttachmentUncheckedCreateWithoutProviderStoreDocsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -4018,7 +3711,6 @@ export type AttachmentUpdateWithoutProviderStoreDocsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
@@ -4081,7 +3773,6 @@ export type AttachmentUncheckedUpdateWithoutProviderStoreDocsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -4138,7 +3829,6 @@ export type AttachmentCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
@@ -4200,7 +3890,6 @@ export type AttachmentUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
@@ -4283,7 +3972,6 @@ export type AttachmentCreateWithoutTtsJobInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
@@ -4346,7 +4034,6 @@ export type AttachmentUncheckedCreateWithoutTtsJobInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
@@ -4419,7 +4106,6 @@ export type AttachmentUpdateWithoutTtsJobInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
@@ -4482,7 +4168,6 @@ export type AttachmentUncheckedUpdateWithoutTtsJobInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -4540,7 +4225,6 @@ export type AttachmentCreateWithoutUserStoreDocInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
@@ -4603,7 +4287,6 @@ export type AttachmentUncheckedCreateWithoutUserStoreDocInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -4676,7 +4359,6 @@ export type AttachmentUpdateWithoutUserStoreDocInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
@@ -4739,7 +4421,6 @@ export type AttachmentUncheckedUpdateWithoutUserStoreDocInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -4846,7 +4527,6 @@ export type AttachmentUpdateWithoutConversationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
@@ -4908,7 +4588,6 @@ export type AttachmentUncheckedUpdateWithoutConversationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -5066,7 +4745,6 @@ export type AttachmentUpdateWithoutMessageInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
@@ -5128,7 +4806,6 @@ export type AttachmentUncheckedUpdateWithoutMessageInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -5286,7 +4963,6 @@ export type AttachmentUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
@@ -5348,7 +5024,6 @@ export type AttachmentUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
   providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -5415,13 +5090,11 @@ export type AttachmentUncheckedUpdateManyWithoutUserInput = {
  */
 
 export type AttachmentCountOutputType = {
-  localVectorStoreDocs: number
   providerLinks: number
   providerStoreDocs: number
 }
 
 export type AttachmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  localVectorStoreDocs?: boolean | AttachmentCountOutputTypeCountLocalVectorStoreDocsArgs
   providerLinks?: boolean | AttachmentCountOutputTypeCountProviderLinksArgs
   providerStoreDocs?: boolean | AttachmentCountOutputTypeCountProviderStoreDocsArgs
 }
@@ -5434,13 +5107,6 @@ export type AttachmentCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.E
    * Select specific fields to fetch from the AttachmentCountOutputType
    */
   select?: Prisma.AttachmentCountOutputTypeSelect<ExtArgs> | null
-}
-
-/**
- * AttachmentCountOutputType without action
- */
-export type AttachmentCountOutputTypeCountLocalVectorStoreDocsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LocalVectorStoreDocWhereInput
 }
 
 /**
@@ -5508,7 +5174,6 @@ export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   createdAt?: boolean
   updatedAt?: boolean
   ttsJob?: boolean | Prisma.Attachment$ttsJobArgs<ExtArgs>
-  localVectorStoreDocs?: boolean | Prisma.Attachment$localVectorStoreDocsArgs<ExtArgs>
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
   providerLinks?: boolean | Prisma.Attachment$providerLinksArgs<ExtArgs>
@@ -5685,7 +5350,6 @@ export type AttachmentSelectScalar = {
 export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "draftId" | "batchId" | "generationGroupId" | "seriesId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "assetType" | "uploadDuration" | "cdnUrl" | "publicUrl" | "sourceUrl" | "thumbnailKey" | "compatMime" | "compatExt" | "compatVersionId" | "compatKey" | "compatS3ObjectId" | "compatStatus" | "compatReadyAt" | "compatCdnUrl" | "bucket" | "key" | "versionId" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
 export type AttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ttsJob?: boolean | Prisma.Attachment$ttsJobArgs<ExtArgs>
-  localVectorStoreDocs?: boolean | Prisma.Attachment$localVectorStoreDocsArgs<ExtArgs>
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
   providerLinks?: boolean | Prisma.Attachment$providerLinksArgs<ExtArgs>
@@ -5714,7 +5378,6 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
   name: "Attachment"
   objects: {
     ttsJob: Prisma.$TTSJobPayload<ExtArgs> | null
-    localVectorStoreDocs: Prisma.$LocalVectorStoreDocPayload<ExtArgs>[]
     conversation: Prisma.$ConversationPayload<ExtArgs> | null
     message: Prisma.$MessagePayload<ExtArgs> | null
     providerLinks: Prisma.$AttachmentProviderPayload<ExtArgs>[]
@@ -6171,7 +5834,6 @@ readonly fields: AttachmentFieldRefs;
 export interface Prisma__AttachmentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   ttsJob<T extends Prisma.Attachment$ttsJobArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$ttsJobArgs<ExtArgs>>): Prisma.Prisma__TTSJobClient<runtime.Types.Result.GetResult<Prisma.$TTSJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  localVectorStoreDocs<T extends Prisma.Attachment$localVectorStoreDocsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$localVectorStoreDocsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocalVectorStoreDocPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   conversation<T extends Prisma.Attachment$conversationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$conversationArgs<ExtArgs>>): Prisma.Prisma__ConversationClient<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   message<T extends Prisma.Attachment$messageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$messageArgs<ExtArgs>>): Prisma.Prisma__MessageClient<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   providerLinks<T extends Prisma.Attachment$providerLinksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$providerLinksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentProviderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -6686,30 +6348,6 @@ export type Attachment$ttsJobArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   include?: Prisma.TTSJobInclude<ExtArgs> | null
   where?: Prisma.TTSJobWhereInput
-}
-
-/**
- * Attachment.localVectorStoreDocs
- */
-export type Attachment$localVectorStoreDocsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the LocalVectorStoreDoc
-   */
-  select?: Prisma.LocalVectorStoreDocSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the LocalVectorStoreDoc
-   */
-  omit?: Prisma.LocalVectorStoreDocOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.LocalVectorStoreDocInclude<ExtArgs> | null
-  where?: Prisma.LocalVectorStoreDocWhereInput
-  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[]
-  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.LocalVectorStoreDocScalarFieldEnum | Prisma.LocalVectorStoreDocScalarFieldEnum[]
 }
 
 /**

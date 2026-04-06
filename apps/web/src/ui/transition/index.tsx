@@ -4,16 +4,20 @@ import type { Transition } from "motion/react";
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { providerMetadata } from "@/lib/models";
-import * as motion from "motion/react-client";
-import { Provider } from "@slipstream/types";
+import motion from "motion/react-client";
+import type { Provider } from "@slipstream/types";
 import {
   AnthropicIcon,
+  CohereIconCurrentColor,
+  DeepSeek,
   GeminiIcon,
+  Kimi,
   MetaIcon,
   MistralIcon,
   OpenAiIcon,
   VercelIcon as v0Icon,
-  XAiIcon
+  XAiIcon,
+  Zai
 } from "@slipstream/ui";
 
 const PROVIDERS = [
@@ -28,7 +32,15 @@ const PROVIDERS = [
   { id: "grok", label: "Grok", colorVar: "var(--hue-4)", Icon: XAiIcon },
   { id: "vercel", label: "Vercel", colorVar: "#000000", Icon: v0Icon },
   { id: "mistral", label: "Mistral", colorVar: "#FF7000", Icon: MistralIcon },
-  { id: "cohere", label: "Cohere", colorVar: "#FF7759", Icon: MistralIcon },
+  {
+    id: "cohere",
+    label: "Cohere",
+    colorVar: "#FF7759",
+    Icon: CohereIconCurrentColor
+  },
+  { id: "deepseek", label: "DeepSeek", colorVar: "#4D6BFE", Icon: DeepSeek },
+  { id: "moonshotai", label: "Moonshot AI", colorVar: "#4645F5", Icon: Kimi },
+  { id: "zai", label: "Z.ai", colorVar: "#3B5CFF", Icon: Zai },
   {
     id: "meta",
     label: "Meta",
@@ -45,7 +57,10 @@ const initialOrder = [
   "grok",
   "mistral",
   "meta",
-  "vercel"
+  "vercel",
+  "deepseek",
+  "moonshotai",
+  "zai"
 ] satisfies Provider[];
 
 export function Reordering() {
@@ -66,7 +81,10 @@ export function Reordering() {
       vercel: PROVIDERS[4],
       meta: PROVIDERS[7],
       mistral: PROVIDERS[5],
-      cohere: PROVIDERS[6]
+      cohere: PROVIDERS[6],
+      deepseek: PROVIDERS[7],
+      moonshotai: PROVIDERS[8],
+      zai: PROVIDERS[9]
     };
     return map;
   }, []);

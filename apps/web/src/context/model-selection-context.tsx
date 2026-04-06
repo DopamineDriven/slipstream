@@ -29,7 +29,10 @@ interface ModelSelectionContextType {
     "meta",
     "vercel",
     "mistral",
-    "cohere"
+    "cohere",
+    "deepseek",
+    "moonshotai",
+    "zai"
   ];
   setSelectedModel: (m: ModelSelection) => void;
   updateProvider: (p: Provider) => void;

@@ -189,45 +189,6 @@ export const ImageGenStage = {
 export type ImageGenStage = (typeof ImageGenStage)[keyof typeof ImageGenStage]
 
 
-export const VisualMediaHint = {
-  animations: 'animations',
-  charts: 'charts',
-  drawings: 'drawings',
-  images: 'images',
-  mixed: 'mixed',
-  slides: 'slides'
-} as const
-
-export type VisualMediaHint = (typeof VisualMediaHint)[keyof typeof VisualMediaHint]
-
-
-export const LocalStoreDocState = {
-  QUEUED: 'QUEUED',
-  PENDING: 'PENDING',
-  PROCESSING: 'PROCESSING',
-  ACTIVE: 'ACTIVE',
-  FAILED: 'FAILED'
-} as const
-
-export type LocalStoreDocState = (typeof LocalStoreDocState)[keyof typeof LocalStoreDocState]
-
-
-export const LocalStoreChunkState = {
-  QUEUED: 'QUEUED',
-  READY: 'READY',
-  ERROR: 'ERROR'
-} as const
-
-export type LocalStoreChunkState = (typeof LocalStoreChunkState)[keyof typeof LocalStoreChunkState]
-
-
-export const LocalStoreSchemaVersion = {
-  v1_0: 'v1_0'
-} as const
-
-export type LocalStoreSchemaVersion = (typeof LocalStoreSchemaVersion)[keyof typeof LocalStoreSchemaVersion]
-
-
 export const MemoryChunkingState = {
   QUEUED: 'QUEUED',
   CHUNKING: 'CHUNKING',
@@ -317,7 +278,10 @@ export const Provider = {
   META: 'META',
   VERCEL: 'VERCEL',
   MISTRAL: 'MISTRAL',
-  COHERE: 'COHERE'
+  COHERE: 'COHERE',
+  MOONSHOTAI: 'MOONSHOTAI',
+  DEEPSEEK: 'DEEPSEEK',
+  ZAI: 'ZAI'
 } as const
 
 export type Provider = (typeof Provider)[keyof typeof Provider]

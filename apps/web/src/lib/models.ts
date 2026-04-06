@@ -4,10 +4,14 @@ import type {
   AnthropicModelIdUnion,
   CohereDisplayNameUnion,
   CohereModelIdUnion,
+  DeepSeekDisplayNameUnion,
+  DeepSeekModelIdUnion,
   GeminiDisplayNameUnion,
   GeminiModelIdUnion,
   GrokDisplayNameUnion,
   GrokModelIdUnion,
+  KimiDisplayNameUnion,
+  KimiModelIdUnion,
   MetaDisplayNameUnion,
   MetaModelIdUnion,
   MistralDisplayNameUnion,
@@ -15,7 +19,9 @@ import type {
   OpenAiDisplayNameUnion,
   OpenAiModelIdUnion,
   VercelDisplayNameUnion,
-  VercelModelIdUnion
+  VercelModelIdUnion,
+  ZaiDisplayNameUnion,
+  ZaiModelIdUnion
 } from "@slipstream/types";
 import {
   defaultModelDisplayNameByProvider,
@@ -27,12 +33,15 @@ import {
 import {
   AnthropicIcon,
   CohereIconCurrentColor as CohereIcon,
+  DeepSeek,
   GeminiIcon,
+  Kimi,
   MetaIcon,
   MistralIcon,
   OpenAiIcon,
   VercelIcon as v0Icon,
-  XAiIcon
+  XAiIcon,
+  Zai
 } from "@slipstream/ui";
 
 export type Provider = keyof typeof displayNameToModelId;
@@ -71,20 +80,38 @@ export const providerMetadata = {
   mistral: {
     name: "Mistral AI",
     icon: MistralIcon,
-    description: "Open and portable generative AI",
+    description: "Open and Portable Generative AI",
     color: "#FF7000"
   },
   cohere: {
     name: "Cohere",
     icon: CohereIcon,
     color: "#FF7759",
-    description: "Enterprise AI built for retrieval and reasoning"
+    description: "Enterprise AI Built for Retrieval and Reasoning"
   },
   vercel: {
     name: "Vercel v0",
     icon: v0Icon,
     color: "#000000",
     description: "The AI Powered App Builder."
+  },
+  deepseek: {
+    name: "DeepSeek",
+    icon: DeepSeek,
+    color: "#4D6BFE",
+    description: "Open-Weight Reasoning and Coding Models"
+  },
+  moonshotai: {
+    name: "Moonshot AI",
+    icon: Kimi,
+    color: "#4645F5",
+    description: "Agentic AI for Deep Tool Use"
+  },
+  zai: {
+    name: "Z.ai",
+    icon: Zai,
+    color: "#3B5CFF",
+    description: "Open-Source GLM Models for Coding and Agents"
   }
 } as const;
 
@@ -108,7 +135,19 @@ export type DisplayNameWorkup<T extends Provider> = T extends "openai"
                 ? ReturnType<
                     typeof getDisplayNameByModelId<T, CohereModelIdUnion>
                   >
-                : never;
+                : T extends "deepseek"
+                  ? ReturnType<
+                      typeof getDisplayNameByModelId<T, DeepSeekModelIdUnion>
+                    >
+                  : T extends "moonshotai"
+                    ? ReturnType<
+                        typeof getDisplayNameByModelId<T, KimiModelIdUnion>
+                      >
+                    : T extends "zai"
+                      ? ReturnType<
+                          typeof getDisplayNameByModelId<T, ZaiModelIdUnion>
+                        >
+                      : never;
 
 export type ModelIdWorkup<T extends Provider> = T extends "openai"
   ? ReturnType<typeof getModelIdByDisplayName<T, OpenAiDisplayNameUnion>>
@@ -132,7 +171,22 @@ export type ModelIdWorkup<T extends Provider> = T extends "openai"
                 ? ReturnType<
                     typeof getModelIdByDisplayName<T, CohereDisplayNameUnion>
                   >
-                : never;
+                : T extends "deepseek"
+                  ? ReturnType<
+                      typeof getModelIdByDisplayName<
+                        T,
+                        DeepSeekDisplayNameUnion
+                      >
+                    >
+                  : T extends "moonshotai"
+                    ? ReturnType<
+                        typeof getModelIdByDisplayName<T, KimiDisplayNameUnion>
+                      >
+                    : T extends "zai"
+                      ? ReturnType<
+                          typeof getModelIdByDisplayName<T, ZaiDisplayNameUnion>
+                        >
+                      : never;
 /**
  * use this in client components where the select options are
  * the display names (the keys of the object) which, on select, outputs the
@@ -194,10 +248,25 @@ export const defaultModelSelection: ModelSelection = {
                       (defaultProvider = "cohere"),
                       defaultModelByProvider[defaultProvider]
                     )
-                  : getModelIdByDisplayName(
-                      (defaultProvider = "openai"),
-                      defaultModelByProvider[defaultProvider]
-                    )
+                  : defaultProvider === "deepseek"
+                    ? getModelIdByDisplayName(
+                        (defaultProvider = "deepseek"),
+                        defaultModelByProvider[defaultProvider]
+                      )
+                    : defaultProvider === "moonshotai"
+                      ? getModelIdByDisplayName(
+                          (defaultProvider = "moonshotai"),
+                          defaultModelByProvider[defaultProvider]
+                        )
+                      : defaultProvider === "zai"
+                        ? getModelIdByDisplayName(
+                            (defaultProvider = "zai"),
+                            defaultModelByProvider[defaultProvider]
+                          )
+                        : getModelIdByDisplayName(
+                            (defaultProvider = "openai"),
+                            defaultModelByProvider[defaultProvider]
+                          )
 };
 export function getModelDisplayName(
   toProvider: Provider,
@@ -226,13 +295,28 @@ export function getModelDisplayName(
                     toProvider,
                     model as CohereModelIdUnion
                   )
-                : toProvider === "openai"
+                : toProvider === "deepseek"
                   ? getDisplayNameByModelId(
                       toProvider,
-                      model as OpenAiModelIdUnion
+                      model as DeepSeekModelIdUnion
                     )
-                  : getDisplayNameByModelId(
-                      "openai",
-                      model as OpenAiModelIdUnion
-                    );
+                  : toProvider === "zai"
+                    ? getDisplayNameByModelId(
+                        toProvider,
+                        model as ZaiModelIdUnion
+                      )
+                    : toProvider === "moonshotai"
+                      ? getDisplayNameByModelId(
+                          toProvider,
+                          model as KimiModelIdUnion
+                        )
+                      : toProvider === "openai"
+                        ? getDisplayNameByModelId(
+                            toProvider,
+                            model as OpenAiModelIdUnion
+                          )
+                        : getDisplayNameByModelId(
+                            "openai",
+                            model as OpenAiModelIdUnion
+                          );
 }

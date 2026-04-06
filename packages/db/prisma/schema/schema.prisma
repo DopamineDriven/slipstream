@@ -22,6 +22,9 @@ enum Provider {
   VERCEL
   MISTRAL
   COHERE
+  MOONSHOTAI
+  DEEPSEEK
+  ZAI
 }
 
 model User {
@@ -41,7 +44,6 @@ model User {
   conversations           Conversation[]
   conversationMemoryStore ConversationMemoryStore?
   providerStores          ProviderStore[]
-  localVectorStores       LocalVectorStore[]
   settings                Settings?
   userStores              UserStore[]
   createdAt               DateTime                 @default(now())

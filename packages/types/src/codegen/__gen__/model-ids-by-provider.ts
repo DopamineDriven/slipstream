@@ -104,5 +104,8 @@ export const modelIdsByProvider = {
     "mistral-medium-latest",
     "mistral-large-latest"
   ],
-  cohere: ["command-a-reasoning-08-2025", "command-a-03-2025"]
+  cohere: ["command-a-reasoning-08-2025", "command-a-03-2025"],
+  moonshotai: ["kimi-k2.5", "kimi-k2-thinking"],
+  deepseek: ["deepseek-r1"],
+  zai: ["glm-5", "glm-4.7", "glm-4.6", "glm-4.5"]
 } as const;

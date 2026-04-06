@@ -230,7 +230,6 @@ export type UserWhereInput = {
   conversations?: Prisma.ConversationListRelationFilter
   conversationMemoryStore?: Prisma.XOR<Prisma.ConversationMemoryStoreNullableScalarRelationFilter, Prisma.ConversationMemoryStoreWhereInput> | null
   providerStores?: Prisma.ProviderStoreListRelationFilter
-  localVectorStores?: Prisma.LocalVectorStoreListRelationFilter
   settings?: Prisma.XOR<Prisma.SettingsNullableScalarRelationFilter, Prisma.SettingsWhereInput> | null
   userStores?: Prisma.UserStoreListRelationFilter
 }
@@ -254,7 +253,6 @@ export type UserOrderByWithRelationInput = {
   conversations?: Prisma.ConversationOrderByRelationAggregateInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreOrderByWithRelationInput
   providerStores?: Prisma.ProviderStoreOrderByRelationAggregateInput
-  localVectorStores?: Prisma.LocalVectorStoreOrderByRelationAggregateInput
   settings?: Prisma.SettingsOrderByWithRelationInput
   userStores?: Prisma.UserStoreOrderByRelationAggregateInput
 }
@@ -281,7 +279,6 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   conversations?: Prisma.ConversationListRelationFilter
   conversationMemoryStore?: Prisma.XOR<Prisma.ConversationMemoryStoreNullableScalarRelationFilter, Prisma.ConversationMemoryStoreWhereInput> | null
   providerStores?: Prisma.ProviderStoreListRelationFilter
-  localVectorStores?: Prisma.LocalVectorStoreListRelationFilter
   settings?: Prisma.XOR<Prisma.SettingsNullableScalarRelationFilter, Prisma.SettingsWhereInput> | null
   userStores?: Prisma.UserStoreListRelationFilter
 }, "id" | "email">
@@ -337,7 +334,6 @@ export type UserCreateInput = {
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreCreateNestedManyWithoutUserInput
 }
@@ -361,7 +357,6 @@ export type UserUncheckedCreateInput = {
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreUncheckedCreateNestedManyWithoutUserInput
 }
@@ -385,7 +380,6 @@ export type UserUpdateInput = {
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUpdateManyWithoutUserNestedInput
 }
@@ -409,7 +403,6 @@ export type UserUncheckedUpdateInput = {
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -539,20 +532,6 @@ export type UserUpdateOneRequiredWithoutConversationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutConversationsInput, Prisma.UserUpdateWithoutConversationsInput>, Prisma.UserUncheckedUpdateWithoutConversationsInput>
 }
 
-export type UserCreateNestedOneWithoutLocalVectorStoresInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutLocalVectorStoresInput, Prisma.UserUncheckedCreateWithoutLocalVectorStoresInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLocalVectorStoresInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneRequiredWithoutLocalVectorStoresNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutLocalVectorStoresInput, Prisma.UserUncheckedCreateWithoutLocalVectorStoresInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLocalVectorStoresInput
-  upsert?: Prisma.UserUpsertWithoutLocalVectorStoresInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLocalVectorStoresInput, Prisma.UserUpdateWithoutLocalVectorStoresInput>, Prisma.UserUncheckedUpdateWithoutLocalVectorStoresInput>
-}
-
 export type UserCreateNestedOneWithoutConversationMemoryStoreInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutConversationMemoryStoreInput, Prisma.UserUncheckedCreateWithoutConversationMemoryStoreInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutConversationMemoryStoreInput
@@ -669,7 +648,6 @@ export type UserCreateWithoutAccountsInput = {
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreCreateNestedManyWithoutUserInput
 }
@@ -692,7 +670,6 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreUncheckedCreateNestedManyWithoutUserInput
 }
@@ -731,7 +708,6 @@ export type UserUpdateWithoutAccountsInput = {
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUpdateManyWithoutUserNestedInput
 }
@@ -754,7 +730,6 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -777,7 +752,6 @@ export type UserCreateWithoutAttachmentsInput = {
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreCreateNestedManyWithoutUserInput
 }
@@ -800,7 +774,6 @@ export type UserUncheckedCreateWithoutAttachmentsInput = {
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreUncheckedCreateNestedManyWithoutUserInput
 }
@@ -839,7 +812,6 @@ export type UserUpdateWithoutAttachmentsInput = {
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUpdateManyWithoutUserNestedInput
 }
@@ -862,7 +834,6 @@ export type UserUncheckedUpdateWithoutAttachmentsInput = {
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -885,7 +856,6 @@ export type UserCreateWithoutConversationsInput = {
   attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreCreateNestedManyWithoutUserInput
 }
@@ -908,7 +878,6 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreUncheckedCreateNestedManyWithoutUserInput
 }
@@ -947,7 +916,6 @@ export type UserUpdateWithoutConversationsInput = {
   attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUpdateManyWithoutUserNestedInput
 }
@@ -968,115 +936,6 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
-  userStores?: Prisma.UserStoreUncheckedUpdateManyWithoutUserNestedInput
-}
-
-export type UserCreateWithoutLocalVectorStoresInput = {
-  id?: string
-  name?: string | null
-  email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
-  userStores?: Prisma.UserStoreCreateNestedManyWithoutUserInput
-}
-
-export type UserUncheckedCreateWithoutLocalVectorStoresInput = {
-  id?: string
-  name?: string | null
-  email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
-  userStores?: Prisma.UserStoreUncheckedCreateNestedManyWithoutUserInput
-}
-
-export type UserCreateOrConnectWithoutLocalVectorStoresInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutLocalVectorStoresInput, Prisma.UserUncheckedCreateWithoutLocalVectorStoresInput>
-}
-
-export type UserUpsertWithoutLocalVectorStoresInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutLocalVectorStoresInput, Prisma.UserUncheckedUpdateWithoutLocalVectorStoresInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutLocalVectorStoresInput, Prisma.UserUncheckedCreateWithoutLocalVectorStoresInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutLocalVectorStoresInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutLocalVectorStoresInput, Prisma.UserUncheckedUpdateWithoutLocalVectorStoresInput>
-}
-
-export type UserUpdateWithoutLocalVectorStoresInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
-  userStores?: Prisma.UserStoreUpdateManyWithoutUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutLocalVectorStoresInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
@@ -1101,7 +960,6 @@ export type UserCreateWithoutConversationMemoryStoreInput = {
   attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
   providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreCreateNestedManyWithoutUserInput
 }
@@ -1124,7 +982,6 @@ export type UserUncheckedCreateWithoutConversationMemoryStoreInput = {
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
   providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1163,7 +1020,6 @@ export type UserUpdateWithoutConversationMemoryStoreInput = {
   attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUpdateManyWithoutUserNestedInput
 }
@@ -1186,7 +1042,6 @@ export type UserUncheckedUpdateWithoutConversationMemoryStoreInput = {
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1209,7 +1064,6 @@ export type UserCreateWithoutProfileInput = {
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreCreateNestedManyWithoutUserInput
 }
@@ -1232,7 +1086,6 @@ export type UserUncheckedCreateWithoutProfileInput = {
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1271,7 +1124,6 @@ export type UserUpdateWithoutProfileInput = {
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUpdateManyWithoutUserNestedInput
 }
@@ -1294,7 +1146,6 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1317,7 +1168,6 @@ export type UserCreateWithoutProviderStoresInput = {
   attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreCreateNestedManyWithoutUserInput
 }
@@ -1340,7 +1190,6 @@ export type UserUncheckedCreateWithoutProviderStoresInput = {
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1379,7 +1228,6 @@ export type UserUpdateWithoutProviderStoresInput = {
   attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUpdateManyWithoutUserNestedInput
 }
@@ -1402,7 +1250,6 @@ export type UserUncheckedUpdateWithoutProviderStoresInput = {
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1425,7 +1272,6 @@ export type UserCreateWithoutSessionsInput = {
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreCreateNestedManyWithoutUserInput
 }
@@ -1448,7 +1294,6 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1487,7 +1332,6 @@ export type UserUpdateWithoutSessionsInput = {
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUpdateManyWithoutUserNestedInput
 }
@@ -1510,7 +1354,6 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1533,7 +1376,6 @@ export type UserCreateWithoutKeysInput = {
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreCreateNestedManyWithoutUserInput
 }
@@ -1556,7 +1398,6 @@ export type UserUncheckedCreateWithoutKeysInput = {
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
   userStores?: Prisma.UserStoreUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1595,7 +1436,6 @@ export type UserUpdateWithoutKeysInput = {
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUpdateManyWithoutUserNestedInput
 }
@@ -1618,7 +1458,6 @@ export type UserUncheckedUpdateWithoutKeysInput = {
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
   userStores?: Prisma.UserStoreUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1642,7 +1481,6 @@ export type UserCreateWithoutSettingsInput = {
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
   userStores?: Prisma.UserStoreCreateNestedManyWithoutUserInput
 }
 
@@ -1665,7 +1503,6 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
   userStores?: Prisma.UserStoreUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1704,7 +1541,6 @@ export type UserUpdateWithoutSettingsInput = {
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
   userStores?: Prisma.UserStoreUpdateManyWithoutUserNestedInput
 }
 
@@ -1727,7 +1563,6 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
   userStores?: Prisma.UserStoreUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1750,7 +1585,6 @@ export type UserCreateWithoutUserStoresInput = {
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
 }
 
@@ -1773,7 +1607,6 @@ export type UserUncheckedCreateWithoutUserStoresInput = {
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
   providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -1812,7 +1645,6 @@ export type UserUpdateWithoutUserStoresInput = {
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -1835,7 +1667,6 @@ export type UserUncheckedUpdateWithoutUserStoresInput = {
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
   conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
   providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -1851,7 +1682,6 @@ export type UserCountOutputType = {
   attachments: number
   conversations: number
   providerStores: number
-  localVectorStores: number
   userStores: number
 }
 
@@ -1862,7 +1692,6 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   attachments?: boolean | UserCountOutputTypeCountAttachmentsArgs
   conversations?: boolean | UserCountOutputTypeCountConversationsArgs
   providerStores?: boolean | UserCountOutputTypeCountProviderStoresArgs
-  localVectorStores?: boolean | UserCountOutputTypeCountLocalVectorStoresArgs
   userStores?: boolean | UserCountOutputTypeCountUserStoresArgs
 }
 
@@ -1921,13 +1750,6 @@ export type UserCountOutputTypeCountProviderStoresArgs<ExtArgs extends runtime.T
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountLocalVectorStoresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LocalVectorStoreWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
 export type UserCountOutputTypeCountUserStoresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.UserStoreWhereInput
 }
@@ -1952,7 +1774,6 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs>
   conversationMemoryStore?: boolean | Prisma.User$conversationMemoryStoreArgs<ExtArgs>
   providerStores?: boolean | Prisma.User$providerStoresArgs<ExtArgs>
-  localVectorStores?: boolean | Prisma.User$localVectorStoresArgs<ExtArgs>
   settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
   userStores?: boolean | Prisma.User$userStoresArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -2007,7 +1828,6 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs>
   conversationMemoryStore?: boolean | Prisma.User$conversationMemoryStoreArgs<ExtArgs>
   providerStores?: boolean | Prisma.User$providerStoresArgs<ExtArgs>
-  localVectorStores?: boolean | Prisma.User$localVectorStoresArgs<ExtArgs>
   settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
   userStores?: boolean | Prisma.User$userStoresArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -2026,7 +1846,6 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     conversations: Prisma.$ConversationPayload<ExtArgs>[]
     conversationMemoryStore: Prisma.$ConversationMemoryStorePayload<ExtArgs> | null
     providerStores: Prisma.$ProviderStorePayload<ExtArgs>[]
-    localVectorStores: Prisma.$LocalVectorStorePayload<ExtArgs>[]
     settings: Prisma.$SettingsPayload<ExtArgs> | null
     userStores: Prisma.$UserStorePayload<ExtArgs>[]
   }
@@ -2443,7 +2262,6 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   conversations<T extends Prisma.User$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   conversationMemoryStore<T extends Prisma.User$conversationMemoryStoreArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$conversationMemoryStoreArgs<ExtArgs>>): Prisma.Prisma__ConversationMemoryStoreClient<runtime.Types.Result.GetResult<Prisma.$ConversationMemoryStorePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   providerStores<T extends Prisma.User$providerStoresArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$providerStoresArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProviderStorePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  localVectorStores<T extends Prisma.User$localVectorStoresArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$localVectorStoresArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocalVectorStorePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   settings<T extends Prisma.User$settingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$settingsArgs<ExtArgs>>): Prisma.Prisma__SettingsClient<runtime.Types.Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   userStores<T extends Prisma.User$userStoresArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$userStoresArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserStorePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -3066,30 +2884,6 @@ export type User$providerStoresArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.ProviderStoreScalarFieldEnum | Prisma.ProviderStoreScalarFieldEnum[]
-}
-
-/**
- * User.localVectorStores
- */
-export type User$localVectorStoresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the LocalVectorStore
-   */
-  select?: Prisma.LocalVectorStoreSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the LocalVectorStore
-   */
-  omit?: Prisma.LocalVectorStoreOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.LocalVectorStoreInclude<ExtArgs> | null
-  where?: Prisma.LocalVectorStoreWhereInput
-  orderBy?: Prisma.LocalVectorStoreOrderByWithRelationInput | Prisma.LocalVectorStoreOrderByWithRelationInput[]
-  cursor?: Prisma.LocalVectorStoreWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.LocalVectorStoreScalarFieldEnum | Prisma.LocalVectorStoreScalarFieldEnum[]
 }
 
 /**

@@ -6,6 +6,9 @@ export type FlexiProvider =
   | "openai"
   | "anthropic"
   | "gemini"
+  | "moonshotai"
+  | "deepseek"
+  | "zai"
   | "grok"
   | "meta"
   | "vercel"
@@ -18,7 +21,10 @@ export type FlexiProvider =
   | "META"
   | "VERCEL"
   | "MISTRAL"
-  | "COHERE";
+  | "COHERE"
+  | "MOONSHOTAI"
+  | "DEEPSEEK"
+  | "ZAI";
 
 /**
  * helper workup for use in XOR type below

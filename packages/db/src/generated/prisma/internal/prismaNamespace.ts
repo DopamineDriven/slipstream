@@ -394,9 +394,6 @@ export const ModelName = {
   ConversationSettings: 'ConversationSettings',
   ImageGenJob: 'ImageGenJob',
   ImageGenOutput: 'ImageGenOutput',
-  LocalVectorStore: 'LocalVectorStore',
-  LocalVectorStoreDoc: 'LocalVectorStoreDoc',
-  LocalVectorStoreDocChunk: 'LocalVectorStoreDocChunk',
   ConversationMemoryStore: 'ConversationMemoryStore',
   ConversationMemoryContext: 'ConversationMemoryContext',
   ConversationMemoryChunk: 'ConversationMemoryChunk',
@@ -431,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "localVectorStore" | "localVectorStoreDoc" | "localVectorStoreDocChunk" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "messageBlock" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
+    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "messageBlock" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1172,228 +1169,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ImageGenOutputCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ImageGenOutputCountAggregateOutputType> | number
-        }
-      }
-    }
-    LocalVectorStore: {
-      payload: Prisma.$LocalVectorStorePayload<ExtArgs>
-      fields: Prisma.LocalVectorStoreFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.LocalVectorStoreFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStorePayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.LocalVectorStoreFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStorePayload>
-        }
-        findFirst: {
-          args: Prisma.LocalVectorStoreFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStorePayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.LocalVectorStoreFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStorePayload>
-        }
-        findMany: {
-          args: Prisma.LocalVectorStoreFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStorePayload>[]
-        }
-        create: {
-          args: Prisma.LocalVectorStoreCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStorePayload>
-        }
-        createMany: {
-          args: Prisma.LocalVectorStoreCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.LocalVectorStoreCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStorePayload>[]
-        }
-        delete: {
-          args: Prisma.LocalVectorStoreDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStorePayload>
-        }
-        update: {
-          args: Prisma.LocalVectorStoreUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStorePayload>
-        }
-        deleteMany: {
-          args: Prisma.LocalVectorStoreDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.LocalVectorStoreUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.LocalVectorStoreUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStorePayload>[]
-        }
-        upsert: {
-          args: Prisma.LocalVectorStoreUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStorePayload>
-        }
-        aggregate: {
-          args: Prisma.LocalVectorStoreAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateLocalVectorStore>
-        }
-        groupBy: {
-          args: Prisma.LocalVectorStoreGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.LocalVectorStoreGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.LocalVectorStoreCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.LocalVectorStoreCountAggregateOutputType> | number
-        }
-      }
-    }
-    LocalVectorStoreDoc: {
-      payload: Prisma.$LocalVectorStoreDocPayload<ExtArgs>
-      fields: Prisma.LocalVectorStoreDocFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.LocalVectorStoreDocFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.LocalVectorStoreDocFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocPayload>
-        }
-        findFirst: {
-          args: Prisma.LocalVectorStoreDocFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.LocalVectorStoreDocFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocPayload>
-        }
-        findMany: {
-          args: Prisma.LocalVectorStoreDocFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocPayload>[]
-        }
-        create: {
-          args: Prisma.LocalVectorStoreDocCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocPayload>
-        }
-        createMany: {
-          args: Prisma.LocalVectorStoreDocCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.LocalVectorStoreDocCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocPayload>[]
-        }
-        delete: {
-          args: Prisma.LocalVectorStoreDocDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocPayload>
-        }
-        update: {
-          args: Prisma.LocalVectorStoreDocUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocPayload>
-        }
-        deleteMany: {
-          args: Prisma.LocalVectorStoreDocDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.LocalVectorStoreDocUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.LocalVectorStoreDocUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocPayload>[]
-        }
-        upsert: {
-          args: Prisma.LocalVectorStoreDocUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocPayload>
-        }
-        aggregate: {
-          args: Prisma.LocalVectorStoreDocAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateLocalVectorStoreDoc>
-        }
-        groupBy: {
-          args: Prisma.LocalVectorStoreDocGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.LocalVectorStoreDocGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.LocalVectorStoreDocCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.LocalVectorStoreDocCountAggregateOutputType> | number
-        }
-      }
-    }
-    LocalVectorStoreDocChunk: {
-      payload: Prisma.$LocalVectorStoreDocChunkPayload<ExtArgs>
-      fields: Prisma.LocalVectorStoreDocChunkFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.LocalVectorStoreDocChunkFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.LocalVectorStoreDocChunkFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>
-        }
-        findFirst: {
-          args: Prisma.LocalVectorStoreDocChunkFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.LocalVectorStoreDocChunkFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>
-        }
-        findMany: {
-          args: Prisma.LocalVectorStoreDocChunkFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>[]
-        }
-        create: {
-          args: Prisma.LocalVectorStoreDocChunkCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>
-        }
-        createMany: {
-          args: Prisma.LocalVectorStoreDocChunkCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.LocalVectorStoreDocChunkCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>[]
-        }
-        delete: {
-          args: Prisma.LocalVectorStoreDocChunkDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>
-        }
-        update: {
-          args: Prisma.LocalVectorStoreDocChunkUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>
-        }
-        deleteMany: {
-          args: Prisma.LocalVectorStoreDocChunkDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.LocalVectorStoreDocChunkUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.LocalVectorStoreDocChunkUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>[]
-        }
-        upsert: {
-          args: Prisma.LocalVectorStoreDocChunkUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>
-        }
-        aggregate: {
-          args: Prisma.LocalVectorStoreDocChunkAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateLocalVectorStoreDocChunk>
-        }
-        groupBy: {
-          args: Prisma.LocalVectorStoreDocChunkGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.LocalVectorStoreDocChunkGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.LocalVectorStoreDocChunkCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.LocalVectorStoreDocChunkCountAggregateOutputType> | number
         }
       }
     }
@@ -3108,88 +2883,6 @@ export const ImageGenOutputScalarFieldEnum = {
 export type ImageGenOutputScalarFieldEnum = (typeof ImageGenOutputScalarFieldEnum)[keyof typeof ImageGenOutputScalarFieldEnum]
 
 
-export const LocalVectorStoreScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  provider: 'provider',
-  storeName: 'storeName',
-  defaultEmbeddingModel: 'defaultEmbeddingModel',
-  embeddingDim: 'embeddingDim',
-  fileCount: 'fileCount',
-  totalBytes: 'totalBytes',
-  totalChunks: 'totalChunks',
-  schemaVersion: 'schemaVersion',
-  lastSyncedAt: 'lastSyncedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type LocalVectorStoreScalarFieldEnum = (typeof LocalVectorStoreScalarFieldEnum)[keyof typeof LocalVectorStoreScalarFieldEnum]
-
-
-export const LocalVectorStoreDocScalarFieldEnum = {
-  id: 'id',
-  storeId: 'storeId',
-  attachmentId: 'attachmentId',
-  conversationId: 'conversationId',
-  messageId: 'messageId',
-  provider: 'provider',
-  provenanceId: 'provenanceId',
-  filename: 'filename',
-  mimeType: 'mimeType',
-  ext: 'ext',
-  size: 'size',
-  schemaVersion: 'schemaVersion',
-  embeddingModel: 'embeddingModel',
-  embeddingDim: 'embeddingDim',
-  hasVisualMedia: 'hasVisualMedia',
-  visualMediaHint: 'visualMediaHint',
-  pageCount: 'pageCount',
-  extractedTextLength: 'extractedTextLength',
-  imageCount: 'imageCount',
-  imagePages: 'imagePages',
-  annotPages: 'annotPages',
-  modelSelectionReason: 'modelSelectionReason',
-  indexedAt: 'indexedAt',
-  errorMessage: 'errorMessage',
-  lastAccessed: 'lastAccessed',
-  state: 'state',
-  chunkCount: 'chunkCount',
-  tokenCount: 'tokenCount',
-  deletedAt: 'deletedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type LocalVectorStoreDocScalarFieldEnum = (typeof LocalVectorStoreDocScalarFieldEnum)[keyof typeof LocalVectorStoreDocScalarFieldEnum]
-
-
-export const LocalVectorStoreDocChunkScalarFieldEnum = {
-  id: 'id',
-  docId: 'docId',
-  storeId: 'storeId',
-  chunkProvenanceId: 'chunkProvenanceId',
-  provenanceId: 'provenanceId',
-  attachmentId: 'attachmentId',
-  conversationId: 'conversationId',
-  messageId: 'messageId',
-  chunkIndex: 'chunkIndex',
-  content: 'content',
-  contentHash: 'contentHash',
-  tokenCount: 'tokenCount',
-  startOffset: 'startOffset',
-  endOffset: 'endOffset',
-  state: 'state',
-  errorMessage: 'errorMessage',
-  schemaVersion: 'schemaVersion',
-  deletedAt: 'deletedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type LocalVectorStoreDocChunkScalarFieldEnum = (typeof LocalVectorStoreDocChunkScalarFieldEnum)[keyof typeof LocalVectorStoreDocChunkScalarFieldEnum]
-
-
 export const ConversationMemoryStoreScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -3898,62 +3591,6 @@ export type ListEnumImageGenOutputKindFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
- * Reference to a field of type 'LocalStoreSchemaVersion'
- */
-export type EnumLocalStoreSchemaVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LocalStoreSchemaVersion'>
-    
-
-
-/**
- * Reference to a field of type 'LocalStoreSchemaVersion[]'
- */
-export type ListEnumLocalStoreSchemaVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LocalStoreSchemaVersion[]'>
-    
-
-
-/**
- * Reference to a field of type 'VisualMediaHint'
- */
-export type EnumVisualMediaHintFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisualMediaHint'>
-    
-
-
-/**
- * Reference to a field of type 'VisualMediaHint[]'
- */
-export type ListEnumVisualMediaHintFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisualMediaHint[]'>
-    
-
-
-/**
- * Reference to a field of type 'LocalStoreDocState'
- */
-export type EnumLocalStoreDocStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LocalStoreDocState'>
-    
-
-
-/**
- * Reference to a field of type 'LocalStoreDocState[]'
- */
-export type ListEnumLocalStoreDocStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LocalStoreDocState[]'>
-    
-
-
-/**
- * Reference to a field of type 'LocalStoreChunkState'
- */
-export type EnumLocalStoreChunkStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LocalStoreChunkState'>
-    
-
-
-/**
- * Reference to a field of type 'LocalStoreChunkState[]'
- */
-export type ListEnumLocalStoreChunkStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LocalStoreChunkState[]'>
-    
-
-
-/**
  * Reference to a field of type 'MemorySchemaVersion'
  */
 export type EnumMemorySchemaVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemorySchemaVersion'>
@@ -4281,9 +3918,6 @@ export type GlobalOmitConfig = {
   conversationSettings?: Prisma.ConversationSettingsOmit
   imageGenJob?: Prisma.ImageGenJobOmit
   imageGenOutput?: Prisma.ImageGenOutputOmit
-  localVectorStore?: Prisma.LocalVectorStoreOmit
-  localVectorStoreDoc?: Prisma.LocalVectorStoreDocOmit
-  localVectorStoreDocChunk?: Prisma.LocalVectorStoreDocChunkOmit
   conversationMemoryStore?: Prisma.ConversationMemoryStoreOmit
   conversationMemoryContext?: Prisma.ConversationMemoryContextOmit
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkOmit

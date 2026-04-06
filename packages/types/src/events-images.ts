@@ -84,9 +84,18 @@ export type OutputSizeProps<P extends Provider = Provider> = {
   mistral?: {
     [M in GetModelUtilRT<"mistral">]: undefined;
   }[GetModelUtilRT<"mistral">];
-    cohere?: {
+  cohere?: {
     [M in GetModelUtilRT<"cohere">]: undefined;
   }[GetModelUtilRT<"cohere">];
+  moonshotai?: {
+    [M in GetModelUtilRT<"moonshotai">]: undefined;
+  }[GetModelUtilRT<"moonshotai">];
+  deepseek?: {
+    [M in GetModelUtilRT<"deepseek">]: undefined;
+  }[GetModelUtilRT<"deepseek">];
+  zai?: {
+    [M in GetModelUtilRT<"zai">]: undefined;
+  }[GetModelUtilRT<"zai">];
   anthropic?: {
     [M in GetModelUtilRT<"anthropic">]: undefined;
   }[GetModelUtilRT<"anthropic">];

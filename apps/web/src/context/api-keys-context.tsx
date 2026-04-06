@@ -11,6 +11,7 @@ import {
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import type { ClientContextWorkupProps, EventTypeMap } from "@slipstream/types";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 
 interface ApiKeysContextValue {
   sendProviderContextPing: () => void;
@@ -41,8 +42,11 @@ function equalityCheck(
     "openai",
     "meta",
     "vercel",
-    "grok"
-  ] as const;
+    "grok",
+    "deepseek",
+    "moonshotai",
+    "zai"
+  ] as const satisfies Lowercase<$Enums.Provider>[];
 
   for (const provider of p) {
     if (isSet.o[provider] !== isSet.t[provider]) return false;
@@ -83,9 +87,7 @@ export function ApiKeysProvider({
 
   useEffect(() => {
     const handleConnection = (ev: EventTypeMap["connection_established"]) => {
-      if (
-        eqCheck(providerContextRef.current, ev.providerContext) === false
-      ) {
+      if (eqCheck(providerContextRef.current, ev.providerContext) === false) {
         setProviderContext(ev.providerContext);
         setIsAwaitingInitial(false);
       } else {
@@ -96,9 +98,7 @@ export function ApiKeysProvider({
     const handleProviderContextUpdateAck = (
       ev: EventTypeMap["provider_context_update_ack"]
     ) => {
-      if (
-        eqCheck(providerContextRef.current, ev.providerContext) === false
-      ) {
+      if (eqCheck(providerContextRef.current, ev.providerContext) === false) {
         setProviderContext(ev.providerContext);
         setIsAwaitingUpdateAck(false);
       } else {
@@ -109,10 +109,7 @@ export function ApiKeysProvider({
     const handleProviderContextPong = (
       ev: EventTypeMap["provider_context_pong"]
     ) => {
-      if (
-
-        eqCheck(providerContextRef.current, ev.providerContext) === false
-      ) {
+      if (eqCheck(providerContextRef.current, ev.providerContext) === false) {
         setProviderContext(ev.providerContext);
         setIsAwaitingPong(false);
       } else {

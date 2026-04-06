@@ -28,6 +28,11 @@
         "dist/cohere/index.d.ts",
         "dist/cohere/types.d.ts"
       ],
+      "deepseek": [
+        "dist/deepseek/index.d.ts",
+        "dist/deepseek/sse.d.ts",
+        "dist/deepseek/types.d.ts"
+      ],
       "extract": [
         "dist/extract/index.d.ts"
       ],
@@ -40,6 +45,11 @@
       ],
       "image": [
         "dist/image/index.d.ts"
+      ],
+      "kimi": [
+        "dist/kimi/index.d.ts",
+        "dist/kimi/sse.d.ts",
+        "dist/kimi/types.d.ts"
       ],
       "logger": [
         "dist/logger/index.d.ts"
@@ -132,6 +142,11 @@
         "dist/xai/responses-types.d.ts",
         "dist/xai/types.d.ts",
         "dist/xai/workup.d.ts"
+      ],
+      "zai": [
+        "dist/zai/index.d.ts",
+        "dist/zai/sse.d.ts",
+        "dist/zai/types.d.ts"
       ]
     }
   },

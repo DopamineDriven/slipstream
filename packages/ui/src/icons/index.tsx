@@ -17,6 +17,7 @@ import { Code } from "@/icons/code";
 import { CohereIcon, CohereIconCurrentColor } from "@/icons/cohere";
 import { Compass } from "@/icons/compass";
 import { Copy } from "@/icons/copy";
+import { DeepSeek } from "@/icons/deepseek";
 import { Download } from "@/icons/download";
 import { Edit } from "@/icons/edit";
 import { EditIcon } from "@/icons/edit-icon";
@@ -36,6 +37,7 @@ import { ImageGen } from "@/icons/image-gen";
 import { ImageIcon } from "@/icons/image-icon";
 import { Key } from "@/icons/key";
 import { KeyRound } from "@/icons/key-round";
+import { Kimi } from "@/icons/kimi";
 import { Layers } from "@/icons/layers";
 import { Loader } from "@/icons/loader";
 import { LoaderCircle } from "@/icons/loader-circle";
@@ -85,6 +87,7 @@ import { User } from "@/icons/user";
 import { VercelIcon } from "@/icons/vercel";
 import { X } from "@/icons/x";
 import { XAiIcon } from "@/icons/xai";
+import { Zai } from "@/icons/zai";
 import { Zap } from "@/icons/zap";
 
 const IconComponents = {
@@ -107,6 +110,7 @@ const IconComponents = {
   CohereIconCurrentColor,
   Compass,
   Copy,
+  DeepSeek,
   Download,
   Edit,
   EditIcon,
@@ -126,6 +130,7 @@ const IconComponents = {
   ImageIcon,
   Key,
   KeyRound,
+  Kimi,
   Layers,
   LoaderCircle,
   LoaderPinwheel,
@@ -175,6 +180,7 @@ const IconComponents = {
   VercelIcon,
   X,
   XAiIcon,
+  Zai,
   Zap
 } as const;
 
@@ -231,6 +237,7 @@ export {
   CohereIconCurrentColor,
   Compass,
   Copy,
+  DeepSeek,
   Download,
   Edit,
   EditIcon,
@@ -250,6 +257,7 @@ export {
   ImageIcon,
   Key,
   KeyRound,
+  Kimi,
   Layers,
   LoaderCircle,
   LoaderPinwheel,
@@ -299,5 +307,6 @@ export {
   VercelIcon,
   X,
   XAiIcon,
+  Zai,
   Zap
 };

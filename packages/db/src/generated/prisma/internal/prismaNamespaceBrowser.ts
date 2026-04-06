@@ -61,9 +61,6 @@ export const ModelName = {
   ConversationSettings: 'ConversationSettings',
   ImageGenJob: 'ImageGenJob',
   ImageGenOutput: 'ImageGenOutput',
-  LocalVectorStore: 'LocalVectorStore',
-  LocalVectorStoreDoc: 'LocalVectorStoreDoc',
-  LocalVectorStoreDocChunk: 'LocalVectorStoreDocChunk',
   ConversationMemoryStore: 'ConversationMemoryStore',
   ConversationMemoryContext: 'ConversationMemoryContext',
   ConversationMemoryChunk: 'ConversationMemoryChunk',
@@ -377,88 +374,6 @@ export const ImageGenOutputScalarFieldEnum = {
 } as const
 
 export type ImageGenOutputScalarFieldEnum = (typeof ImageGenOutputScalarFieldEnum)[keyof typeof ImageGenOutputScalarFieldEnum]
-
-
-export const LocalVectorStoreScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  provider: 'provider',
-  storeName: 'storeName',
-  defaultEmbeddingModel: 'defaultEmbeddingModel',
-  embeddingDim: 'embeddingDim',
-  fileCount: 'fileCount',
-  totalBytes: 'totalBytes',
-  totalChunks: 'totalChunks',
-  schemaVersion: 'schemaVersion',
-  lastSyncedAt: 'lastSyncedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type LocalVectorStoreScalarFieldEnum = (typeof LocalVectorStoreScalarFieldEnum)[keyof typeof LocalVectorStoreScalarFieldEnum]
-
-
-export const LocalVectorStoreDocScalarFieldEnum = {
-  id: 'id',
-  storeId: 'storeId',
-  attachmentId: 'attachmentId',
-  conversationId: 'conversationId',
-  messageId: 'messageId',
-  provider: 'provider',
-  provenanceId: 'provenanceId',
-  filename: 'filename',
-  mimeType: 'mimeType',
-  ext: 'ext',
-  size: 'size',
-  schemaVersion: 'schemaVersion',
-  embeddingModel: 'embeddingModel',
-  embeddingDim: 'embeddingDim',
-  hasVisualMedia: 'hasVisualMedia',
-  visualMediaHint: 'visualMediaHint',
-  pageCount: 'pageCount',
-  extractedTextLength: 'extractedTextLength',
-  imageCount: 'imageCount',
-  imagePages: 'imagePages',
-  annotPages: 'annotPages',
-  modelSelectionReason: 'modelSelectionReason',
-  indexedAt: 'indexedAt',
-  errorMessage: 'errorMessage',
-  lastAccessed: 'lastAccessed',
-  state: 'state',
-  chunkCount: 'chunkCount',
-  tokenCount: 'tokenCount',
-  deletedAt: 'deletedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type LocalVectorStoreDocScalarFieldEnum = (typeof LocalVectorStoreDocScalarFieldEnum)[keyof typeof LocalVectorStoreDocScalarFieldEnum]
-
-
-export const LocalVectorStoreDocChunkScalarFieldEnum = {
-  id: 'id',
-  docId: 'docId',
-  storeId: 'storeId',
-  chunkProvenanceId: 'chunkProvenanceId',
-  provenanceId: 'provenanceId',
-  attachmentId: 'attachmentId',
-  conversationId: 'conversationId',
-  messageId: 'messageId',
-  chunkIndex: 'chunkIndex',
-  content: 'content',
-  contentHash: 'contentHash',
-  tokenCount: 'tokenCount',
-  startOffset: 'startOffset',
-  endOffset: 'endOffset',
-  state: 'state',
-  errorMessage: 'errorMessage',
-  schemaVersion: 'schemaVersion',
-  deletedAt: 'deletedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type LocalVectorStoreDocChunkScalarFieldEnum = (typeof LocalVectorStoreDocChunkScalarFieldEnum)[keyof typeof LocalVectorStoreDocChunkScalarFieldEnum]
 
 
 export const ConversationMemoryStoreScalarFieldEnum = {

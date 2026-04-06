@@ -45,8 +45,6 @@ export default defineConfig(
       unbundle: true,
       outputOptions: out => ({
         ...out,
-        cssEntryFileNames: asset =>
-          asset.name.startsWith("globals") ? "globals.css" : "[name][extname]",
         chunkFileNames: chunk =>
           chunk.isEntry && chunk.name.startsWith("globals")
             ? "globals.css"

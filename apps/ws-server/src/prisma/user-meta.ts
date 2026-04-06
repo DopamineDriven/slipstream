@@ -94,7 +94,10 @@ export class PrismaUserMetaService extends PrismaUtilsService {
         vercel: 0,
         meta: 0,
         mistral: 0,
-        cohere: 0
+        cohere: 0,
+        moonshotai: 0,
+        deepseek: 0,
+        zai: 0
       },
       isDefault: {
         vercel: 0,
@@ -104,7 +107,10 @@ export class PrismaUserMetaService extends PrismaUtilsService {
         gemini: 0,
         anthropic: 0,
         mistral: 0,
-        cohere: 0
+        cohere: 0,
+        moonshotai: 0,
+        deepseek: 0,
+        zai: 0
       }
     };
     props.forEach(function (res) {

@@ -95,22 +95,29 @@ export function MobileModelSelectorDrawer() {
               value={activeDraftProvider}
               onValueChange={prov => setDraftProvider(prov as Provider)}
               className="flex h-full flex-col">
-              <TabsList className="bg-brand-sidebar border-brand-border mb-6 grid h-12 w-full shrink-0 grid-cols-6 border">
-                {visibleProviders.map(provider => {
-                  const Icon = providerMetadata[provider].icon;
-                  return (
-                    <TabsTrigger
-                      key={provider}
-                      value={provider}
-                      className="data-[state=active]:bg-brand-primary data-[state=active]:text-brand-primary-foreground flex h-full items-center justify-center gap-2 text-xs sm:text-sm">
-                      <Icon className="size-4 shrink-0" />
-                      <span className="sr-only sm:not-sr-only sm:inline">
-                        {providerMetadata[provider].name.split(" ")[0]}
-                      </span>
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
+              {/* Scrollable provider carousel for mobile */}
+              <div className="relative mb-6 shrink-0">
+                {/* Fade indicators for scroll hint */}
+                <div className="from-brand-component pointer-events-none absolute top-0 right-0 z-10 h-full w-8 bg-linear-to-l to-transparent" />
+                <div className="from-brand-component pointer-events-none absolute top-0 left-0 z-10 h-full w-8 bg-linear-to-r to-transparent" />
+
+                <TabsList className="bg-brand-sidebar border-brand-border scrollbar-none flex h-12 w-full gap-1 overflow-x-auto border px-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {visibleProviders.map(provider => {
+                    const Icon = providerMetadata[provider].icon;
+                    return (
+                      <TabsTrigger
+                        key={provider}
+                        value={provider}
+                        className="data-[state=active]:bg-brand-primary data-[state=active]:text-brand-primary-foreground flex h-9 shrink-0 items-center justify-center gap-2 rounded-md px-3 text-xs transition-all sm:px-4 sm:text-sm">
+                        <Icon className="size-4 shrink-0" />
+                        <span className="sr-only sm:not-sr-only sm:inline">
+                          {providerMetadata[provider].name.split(" ")[0]}
+                        </span>
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
+              </div>
               {visibleProviders.map(provider => {
                 const {
                   description,
@@ -190,6 +197,87 @@ export function MobileModelSelectorDrawer() {
                             );
                           })
                         ) : provider === "cohere" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  cxStyles.default,
+                                  isSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
+                                )}
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
+                        ) : provider === "deepseek" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  cxStyles.default,
+                                  isSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
+                                )}
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
+                        ) : provider === "moonshotai" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  cxStyles.default,
+                                  isSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
+                                )}
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
+                        ) : provider === "zai" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =
                               activeSelectedProvider === provider &&
