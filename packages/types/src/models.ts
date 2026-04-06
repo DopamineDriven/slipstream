@@ -211,6 +211,12 @@ export type DisplayNameModelMap = {
   >;
 };
 
+export type DeepSeekChatModels = ModelMap["deepseek"];
+
+export type KimiChatModels = ModelMap["moonshotai"];
+
+export type ZaiChatModels = ModelMap["zai"];
+
 export type CohereChatModels = ModelMap["cohere"];
 
 export type OpenAIChatModels = ModelMap["openai"];
@@ -247,7 +253,13 @@ export type GetModelUtilRT<T = Provider> = T extends "openai"
               ? MistralChatModels
               : T extends "cohere"
                 ? CohereChatModels
-                : never;
+                : T extends "deepseek"
+                  ? DeepSeekChatModels
+                  : T extends "moonshotai"
+                    ? KimiChatModels
+                    : T extends "zai"
+                      ? ZaiChatModels
+                      : never;
 
 export function toPrismaFormat<const T extends Providers>(provider: T) {
   return provider.toUpperCase() as Uppercase<T> satisfies $Enums.Provider;
@@ -319,7 +331,31 @@ export const getModelIdByDisplayName = <
           model as ModelDisplayNameToModelId<"cohere">
         ] as (typeof displayNameToModelId)[V][K];
       } else
-        return defaultModelIdByProvider.vercel as (typeof displayNameToModelId)[V][K];
+        return defaultModelIdByProvider.cohere as (typeof displayNameToModelId)[V][K];
+    }
+    case "deepseek": {
+      if (model && model in displayNameToModelId[xTarget]) {
+        return displayNameToModelId[xTarget][
+          model as ModelDisplayNameToModelId<"deepseek">
+        ] as (typeof displayNameToModelId)[V][K];
+      } else
+        return defaultModelIdByProvider.deepseek as (typeof displayNameToModelId)[V][K];
+    }
+    case "moonshotai": {
+      if (model && model in displayNameToModelId[xTarget]) {
+        return displayNameToModelId[xTarget][
+          model as ModelDisplayNameToModelId<"moonshotai">
+        ] as (typeof displayNameToModelId)[V][K];
+      } else
+        return defaultModelIdByProvider.moonshotai as (typeof displayNameToModelId)[V][K];
+    }
+    case "zai": {
+      if (model && model in displayNameToModelId[xTarget]) {
+        return displayNameToModelId[xTarget][
+          model as ModelDisplayNameToModelId<"zai">
+        ] as (typeof displayNameToModelId)[V][K];
+      } else
+        return defaultModelIdByProvider.zai as (typeof displayNameToModelId)[V][K];
     }
     case "openai":
     default: {
@@ -400,6 +436,30 @@ export const getDisplayNameByModelId = <
       } else
         return defaultModelDisplayNameByProvider.cohere as (typeof modelIdToDisplayName)[V][K];
     }
+    case "deepseek": {
+      if (model && model in modelIdToDisplayName[xTarget]) {
+        return modelIdToDisplayName[xTarget][
+          model as ModelIdToModelDisplayName<"deepseek">
+        ] as (typeof modelIdToDisplayName)[V][K];
+      } else
+        return defaultModelDisplayNameByProvider.deepseek as (typeof modelIdToDisplayName)[V][K];
+    }
+    case "moonshotai": {
+      if (model && model in modelIdToDisplayName[xTarget]) {
+        return modelIdToDisplayName[xTarget][
+          model as ModelIdToModelDisplayName<"moonshotai">
+        ] as (typeof modelIdToDisplayName)[V][K];
+      } else
+        return defaultModelDisplayNameByProvider.moonshotai as (typeof modelIdToDisplayName)[V][K];
+    }
+    case "zai": {
+      if (model && model in modelIdToDisplayName[xTarget]) {
+        return modelIdToDisplayName[xTarget][
+          model as ModelIdToModelDisplayName<"zai">
+        ] as (typeof modelIdToDisplayName)[V][K];
+      } else
+        return defaultModelDisplayNameByProvider.zai as (typeof modelIdToDisplayName)[V][K];
+    }
     case "openai":
     default: {
       if (model && model in modelIdToDisplayName[xTarget]) {
@@ -413,26 +473,58 @@ export const getDisplayNameByModelId = <
 };
 
 export const defaultModelDisplayNameByProvider = {
-  openai: "GPT-5.4 nano" satisfies OpenAiDisplayNameUnion,
-  gemini: "Gemini 3.1 Flash Lite Preview" satisfies GeminiDisplayNameUnion,
-  grok: "Grok 4.20 Reasoning" satisfies GrokDisplayNameUnion,
-  anthropic: "Claude Sonnet 4.6" satisfies AnthropicDisplayNameUnion,
-  meta: "Llama 3.3 (70B, Instruct)" satisfies MetaDisplayNameUnion,
-  vercel: "v0 medium" satisfies VercelDisplayNameUnion,
-  mistral: "Mistral Small 4" satisfies MistralDisplayNameUnion,
-  cohere: "Command A Reasoning" satisfies CohereDisplayNameUnion
-} as const;
+  openai: "GPT-5.4 nano",
+  gemini: "Gemini 3.1 Flash Lite Preview",
+  grok: "Grok 4.20 Reasoning",
+  anthropic: "Claude Sonnet 4.6",
+  meta: "Llama 3.3 (70B, Instruct)",
+  vercel: "v0 medium",
+  mistral: "Mistral Small 4",
+  cohere: "Command A Reasoning",
+  deepseek: "DeepSeek R1",
+  moonshotai: "Kimi K2.5",
+  zai: "GLM 5"
+} as const satisfies Record<
+  Provider,
+  | OpenAiDisplayNameUnion
+  | GeminiDisplayNameUnion
+  | GrokDisplayNameUnion
+  | AnthropicDisplayNameUnion
+  | MetaDisplayNameUnion
+  | VercelDisplayNameUnion
+  | MistralDisplayNameUnion
+  | CohereDisplayNameUnion
+  | DeepSeekDisplayNameUnion
+  | KimiDisplayNameUnion
+  | ZaiDisplayNameUnion
+>;
 
 export const defaultModelIdByProvider = {
-  openai: "gpt-5.4-nano" satisfies OpenAiModelIdUnion,
-  gemini: "gemini-3.1-flash-lite-preview" satisfies GeminiModelIdUnion,
-  grok: "grok-4.20-0309-reasoning" satisfies GrokModelIdUnion,
-  anthropic: "claude-sonnet-4-6" satisfies AnthropicModelIdUnion,
-  meta: "Llama-3.3-70B-Instruct" satisfies MetaModelIdUnion,
-  vercel: "v0-1.5-md" satisfies VercelModelIdUnion,
-  mistral: "mistral-small-latest" satisfies MistralModelIdUnion,
-  cohere: "command-a-reasoning-08-2025" satisfies CohereModelIdUnion
-} as const;
+  openai: "gpt-5.4-nano",
+  gemini: "gemini-3.1-flash-lite-preview",
+  grok: "grok-4.20-0309-reasoning",
+  anthropic: "claude-sonnet-4-6",
+  meta: "Llama-3.3-70B-Instruct",
+  vercel: "v0-1.5-md",
+  mistral: "mistral-small-latest",
+  cohere: "command-a-reasoning-08-2025",
+  deepseek: "deepseek-r1",
+  moonshotai: "kimi-k2.5",
+  zai: "glm-5"
+} as const satisfies Record<
+  Providers,
+  | OpenAiModelIdUnion
+  | GeminiModelIdUnion
+  | GrokModelIdUnion
+  | AnthropicModelIdUnion
+  | MetaModelIdUnion
+  | VercelModelIdUnion
+  | MistralModelIdUnion
+  | CohereModelIdUnion
+  | DeepSeekModelIdUnion
+  | KimiModelIdUnion
+  | ZaiModelIdUnion
+>;
 
 export type ModelDisplayNameToModelId<T extends Provider> =
   keyof (typeof displayNameToModelId)[T];
@@ -485,6 +577,18 @@ export type GeminiDisplayNameUnionImgGen =
  */
 export type GrokDisplayNameUnionImgGen =
   ModelDisplayNameToModelIdImgGen<"grok">;
+/**
+ * valid deepseek model display names
+ */
+export type DeepSeekDisplayNameUnion = ModelDisplayNameToModelId<"deepseek">;
+/**
+ * valid moonshotai model display names
+ */
+export type KimiDisplayNameUnion = ModelDisplayNameToModelId<"moonshotai">;
+/**
+ * valid zai model display names
+ */
+export type ZaiDisplayNameUnion = ModelDisplayNameToModelId<"zai">;
 /**
  * valid cohere model display names
  */
@@ -548,7 +652,18 @@ export type GeminiModelIdUnionVideoGen =
  */
 export type GrokModelIdUnionVideoGen =
   ModelIdToModelDisplayNameVideoGen<"grok">;
-
+/**
+ * valid deepseek models to call
+ */
+export type DeepSeekModelIdUnion = ModelIdToModelDisplayName<"deepseek">;
+/**
+ * valid kimi models to call
+ */
+export type KimiModelIdUnion = ModelIdToModelDisplayName<"moonshotai">;
+/**
+ * valid zai models to call
+ */
+export type ZaiModelIdUnion = ModelIdToModelDisplayName<"zai">;
 /**
  * valid cohere models to call
  */
@@ -615,7 +730,13 @@ export type GetModelsForProviderRTImgGen<T extends Provider> =
                 ? undefined
                 : T extends "cohere"
                   ? undefined
-                  : never;
+                  : T extends "deepseek"
+                    ? undefined
+                    : T extends "moonshotai"
+                      ? undefined
+                      : T extends "zai"
+                        ? undefined
+                        : never;
 
 export type GetModelsForProviderRTVideoGen<T extends Provider> =
   T extends "gemini"
@@ -634,7 +755,13 @@ export type GetModelsForProviderRTVideoGen<T extends Provider> =
                 ? undefined
                 : T extends "cohere"
                   ? undefined
-                  : never;
+                  : T extends "deepseek"
+                    ? undefined
+                    : T extends "moonshotai"
+                      ? undefined
+                      : T extends "zai"
+                        ? undefined
+                        : never;
 
 export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
   T extends "gemini"
@@ -653,7 +780,13 @@ export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
                 ? undefined
                 : T extends "cohere"
                   ? undefined
-                  : never;
+                  : T extends "deepseek"
+                    ? undefined
+                    : T extends "moonshotai"
+                      ? undefined
+                      : T extends "zai"
+                        ? undefined
+                        : never;
 
 export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
   ? AnthropicModelIdUnion
@@ -671,7 +804,13 @@ export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
               ? MistralModelIdUnion
               : T extends "cohere"
                 ? CohereModelIdUnion
-                : never;
+                : T extends "deepseek"
+                  ? DeepSeekModelIdUnion
+                  : T extends "moonshotai"
+                    ? KimiModelIdUnion
+                    : T extends "zai"
+                      ? ZaiModelIdUnion
+                      : never;
 
 export type GetDisplayNamesForProviderRTVideoGen<T extends Provider> =
   T extends "gemini"
@@ -690,7 +829,13 @@ export type GetDisplayNamesForProviderRTVideoGen<T extends Provider> =
                 ? undefined
                 : T extends "cohere"
                   ? undefined
-                  : never;
+                  : T extends "deepseek"
+                    ? undefined
+                    : T extends "moonshotai"
+                      ? undefined
+                      : T extends "zai"
+                        ? undefined
+                        : never;
 
 export type GetDisplayNamesForProviderRT<T extends Provider> =
   T extends "anthropic"
@@ -709,7 +854,13 @@ export type GetDisplayNamesForProviderRT<T extends Provider> =
                 ? MistralDisplayNameUnion
                 : T extends "cohere"
                   ? CohereDisplayNameUnion
-                  : never;
+                  : T extends "deepseek"
+                    ? DeepSeekDisplayNameUnion
+                    : T extends "moonshotai"
+                      ? KimiDisplayNameUnion
+                      : T extends "zai"
+                        ? ZaiDisplayNameUnion
+                        : never;
 
 export function getModelsForProvider<const T extends Provider>(provider: T) {
   return Object.entries(displayNameToModelId[provider])
@@ -790,8 +941,11 @@ export function allProviders() {
     "meta",
     "vercel",
     "mistral",
-    "cohere"
-  ] as const;
+    "cohere",
+    "deepseek",
+    "moonshotai",
+    "zai"
+  ] as const satisfies readonly Providers[];
 }
 export function allImgGenProviders() {
   return ["gemini", "grok", "openai"] as const;
@@ -823,7 +977,10 @@ export const imgMimeSupportByProvider = {
   gemini: ["image/png", "image/jpeg", "image/webp", "image/heic", "image/heif"],
   anthropic: ["image/jpeg", "image/png", "image/webp", "image/gif"],
   mistral: ["image/jpeg", "image/png", "image/webp"],
-  cohere: ["image/jpeg", "image/png", "image/webp"]
+  cohere: ["image/jpeg", "image/png", "image/webp"],
+  moonshotai: ["image/jpeg", "image/png", "image/webp"],
+  deepseek: ["image/jpeg", "image/png", "image/webp"],
+  zai: ["image/jpeg", "image/png", "image/webp"]
 } as const;
 
 // direct input -- I have a document conversion pipeline set up
@@ -836,6 +993,9 @@ export const docMimeSupportByProvider = {
   vercel: ["application/pdf"],
   mistral: ["application/pdf"],
   cohere: ["application/pdf"],
+  moonshotai: ["application/pdf"],
+  deepseek: ["application/pdf"],
+  zai: ["application/pdf"],
   /**
    * https://ai.google.dev/gemini-api/docs/document-processing#technical-details
    */
@@ -850,6 +1010,9 @@ export const audioMimeSupportByProvider = {
   vercel: [],
   mistral: [],
   cohere: [],
+  moonshotai: [],
+  deepseek: [],
+  zai: [],
   /**
    * https://ai.google.dev/gemini-api/docs/audio#supported-formats
    */
@@ -885,5 +1048,8 @@ export const videoMimeSupportByProvider = {
     "video/wmv",
     "video/3gpp"
   ],
+  moonshotai: ["video/mpeg", "video/mp4"],
+  deepseek: [],
+  zai: [],
   anthropic: []
 } as const;

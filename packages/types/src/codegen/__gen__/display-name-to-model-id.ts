@@ -116,5 +116,18 @@ export const displayNameToModelId = {
   cohere: {
     "Command A Reasoning": "command-a-reasoning-08-2025",
     "Command A": "command-a-03-2025"
+  },
+  moonshotai: {
+    "Kimi K2.5": "kimi-k2.5",
+    "Kimi K2 Thinking": "kimi-k2-thinking"
+  },
+  deepseek: {
+    "DeepSeek R1": "deepseek-r1"
+  },
+  zai: {
+    "GLM 5": "glm-5",
+    "GLM 4.7": "glm-4.7",
+    "GLM 4.6": "glm-4.6",
+    "GLM 4.5": "glm-4.5"
   }
 } as const;

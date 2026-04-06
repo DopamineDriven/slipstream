@@ -573,6 +573,9 @@ export class ProviderValidation {
       case "cohere":
       case "mistral":
       case "anthropic":
+      case "deepseek":
+      case "moonshotai":
+      case "zai":
       case "meta":
       case "vercel":
       default: {

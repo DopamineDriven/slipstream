@@ -18,19 +18,7 @@ export interface CreateUserStoreChunkParams {
   embeddingModel?: Voyage.ModelUnion;
   schemaVersion?: $Enums.UserStoreSchemaVersion;
 }
-export interface CreateLocalStoreParams {
-  provider: $Enums.Provider;
-  userId: string;
-  storeName: string;
-  createdAt: string | Date;
-  lastSyncedAt?: Date | string;
-  defaultEmbeddingModel?: Voyage.ModelUnion;
-  embeddingDim?: Voyage.EmbeddingDims;
-  schemaVersion?: $Enums.LocalStoreSchemaVersion;
-  documentsCount?: number;
-  totalChunks?: number;
-  totalBytes?: bigint;
-}
+
 export interface CreateUserStoreParams {
   userId: string;
   storeName: string;
@@ -52,67 +40,6 @@ export interface CreateUserStoreRT<T extends boolean = false> {
   lastSyncedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
-}
-export interface CreateLocalStoreRT<T extends boolean = boolean> {
-  id: string;
-  createdAt: Date;
-  provider: $Enums.Provider;
-  storeName: string;
-  userId: string;
-  defaultEmbeddingModel: string;
-  embeddingDim: number;
-  lastSyncedAt: Date | null;
-  schemaVersion: $Enums.LocalStoreSchemaVersion;
-  totalBytes: T extends true ? number | null : bigint | null;
-  totalChunks: number;
-  fileCount: number;
-  updatedAt: Date;
-}
-
-export interface ChunkArrShape {
-  id: string;
-  errorMessage: string | null;
-  state: $Enums.LocalStoreChunkState;
-  chunkProvenanceId: string;
-  chunkIndex: number;
-  content: string;
-  contentHash: string;
-  startOffset: number | null;
-  endOffset: number | null;
-}
-
-export interface FindManyLocalStoreDocsShape {
-  id: string;
-  size: number | null;
-  filename: string;
-  createdAt: Date;
-  updatedAt: Date;
-  attachmentId: string;
-  provider: $Enums.Provider;
-  state: $Enums.LocalStoreDocState;
-  schemaVersion: $Enums.LocalStoreSchemaVersion;
-  errorMessage: string | null;
-  storeId: string;
-  imageCount: number | null;
-  storeName: string;
-  provenanceId: string;
-  conversationId: string;
-  messageId: string;
-  modelSelectionReason: string | null;
-  indexedAt: Date | null;
-  mimeType: string;
-  ext: string;
-  chunkCount: number;
-  tokenCount: number;
-  lastAccessed: Date | null;
-  embeddingModel: string;
-  embeddingDim: number;
-  hasVisualMedia: boolean;
-  visualMediaHint: $Enums.VisualMediaHint | null;
-  pageCount: number | null;
-  imagePages: number[] | null;
-  annotPages: number[] | null;
-  chunks: ChunkArrShape[];
 }
 
 export interface UserStoreChunkArrShape {

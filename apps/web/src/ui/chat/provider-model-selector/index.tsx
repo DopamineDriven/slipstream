@@ -7,11 +7,14 @@ import { cn } from "@/lib/utils";
 import type {
   AnthropicDisplayNameUnion,
   CohereDisplayNameUnion,
+  DeepSeekDisplayNameUnion,
   GeminiDisplayNameUnion,
   GrokDisplayNameUnion,
+  KimiDisplayNameUnion,
   MistralDisplayNameUnion,
   OpenAiDisplayNameUnion,
-  Provider
+  Provider,
+  ZaiDisplayNameUnion
 } from "@slipstream/types";
 import {
   getModelIdByDisplayName,
@@ -96,6 +99,30 @@ export function ProviderModelSelector({
         );
         break;
       }
+      case "deepseek": {
+        const displayName = defaultModelByProvider.deepseek;
+        updateProvider("deepseek");
+        updateModel(
+          displayName,
+          getModelIdByDisplayName("deepseek", displayName)
+        );
+        break;
+      }
+      case "moonshotai": {
+        const displayName = defaultModelByProvider.moonshotai;
+        updateProvider("moonshotai");
+        updateModel(
+          displayName,
+          getModelIdByDisplayName("moonshotai", displayName)
+        );
+        break;
+      }
+      case "zai": {
+        const displayName = defaultModelByProvider.zai;
+        updateProvider("zai");
+        updateModel(displayName, getModelIdByDisplayName("zai", displayName));
+        break;
+      }
       case "gemini": {
         const displayName = defaultModelByProvider.gemini;
         updateProvider("gemini");
@@ -145,6 +172,21 @@ export function ProviderModelSelector({
       case "cohere": {
         const dn = name as CohereDisplayNameUnion;
         updateModel(dn, getModelIdByDisplayName("cohere", dn));
+        break;
+      }
+      case "moonshotai": {
+        const dn = name as KimiDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("moonshotai", dn));
+        break;
+      }
+      case "deepseek": {
+        const dn = name as DeepSeekDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("deepseek", dn));
+        break;
+      }
+      case "zai": {
+        const dn = name as ZaiDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("zai", dn));
         break;
       }
       case "grok": {

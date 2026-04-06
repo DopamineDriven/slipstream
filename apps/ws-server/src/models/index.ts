@@ -35,7 +35,78 @@ export class ModelService extends ProviderValidation {
   public decodeUTF8(bytes: Uint8Array | NodeJS.NonSharedUint8Array) {
     return ByteCodec.decode(bytes);
   }
+  public isOpenAIModel(m: string) {
+    return (
+      m === "gpt-5.4-mini" ||
+      m === "gpt-5.4-nano" ||
+      m === "gpt-4.1" ||
+      m === "gpt-4.1-mini" ||
+      m === "gpt-4.1-nano" ||
+      m === "gpt-5" ||
+      m === "gpt-5.2-chat-latest" ||
+      m === "gpt-5.1-chat-latest" ||
+      m === "o4-mini" ||
+      m === "gpt-5-chat-latest" ||
+      m === "gpt-5-mini" ||
+      m === "gpt-5-nano" ||
+      m === "gpt-5-pro" ||
+      m === "gpt-5.1" ||
+      m === "gpt-5.2" ||
+      m === "gpt-5.2-pro" ||
+      m === "gpt-5.4" ||
+      m === "gpt-5.4-pro" ||
+      m === "o3" ||
+      m === "gpt-4o" ||
+      m === "gpt-4o-mini" ||
+      m === "o1-pro" ||
+      m === "o3-pro" ||
+      m === "o3-deep-research" ||
+      m === "o4-mini-deep-research" ||
+      m === "gpt-image-1" ||
+      m === "gpt-image-1-mini" ||
+      m === "gpt-image-1.5" ||
+      m === "sora-2" ||
+      m === "sora-2-pro" ||
+      m === "gpt-5.3-codex" ||
+      m === "gpt-5.2-codex" ||
+      m === "gpt-5.1-codex-max" ||
+      m === "gpt-5.1-codex-mini" ||
+      m === "gpt-5.1-codex" ||
+      m === "gpt-5-codex" ||
+      m === "gpt-3.5-turbo" ||
+      m === "gpt-4-turbo" ||
+      m === "gpt-4" ||
+      m === "o1" ||
+      m === "o3-mini" ||
+      m === "chatgpt-4o-latest"
+    );
+  }
 
+  public isGeminiModel(m: string) {
+    return (
+      m === "gemini-3.1-pro-preview" ||
+      m === "gemini-3.1-pro-preview-customtools" ||
+      m === "gemini-3.1-flash-lite-preview" ||
+      m === "gemini-3-flash-preview" ||
+      m === "gemini-2.5-pro" ||
+      m === "gemini-2.5-flash-lite" ||
+      m === "gemini-2.5-flash" ||
+      m === "deep-research-pro-preview-12-2025" ||
+      m === "gemini-3-pro-image-preview" ||
+      m === "gemini-3.1-flash-image-preview" ||
+      m === "gemini-2.5-flash-image" ||
+      m === "gemini-2.0-flash" ||
+      m === "gemini-2.0-flash-lite" ||
+      m === "imagen-4.0-fast-generate-001" ||
+      m === "imagen-4.0-ultra-generate-001" ||
+      m === "imagen-4.0-generate-001" ||
+      m === "veo-3.0-fast-generate-001" ||
+      m === "veo-3.0-generate-001" ||
+      m === "veo-2.0-generate-001" ||
+      m === "veo-3.1-fast-generate-preview" ||
+      m === "veo-3.1-generate-preview"
+    );
+  }
   public concatBytes(arrays: Uint8Array[]) {
     const totalLength = arrays.reduce((sum, arr) => sum + arr.length, 0);
     const result = new Uint8Array(totalLength);
@@ -100,6 +171,7 @@ export class ModelService extends ProviderValidation {
     | "font" {
     return target.split("/")?.[0] as InferTopLevelMime<typeof target>;
   }
+
   public getModel = <
     const V extends Provider,
     const K extends GetModelUtilRT<V>
@@ -178,6 +250,34 @@ export class ModelService extends ProviderValidation {
         ) {
           return model;
         } else return "command-a-reasoning-08-2025" as const as NonNullable<K>;
+      }
+      case "deepseek": {
+        if (
+          model &&
+          providerModelChatApi[xTarget].includes(
+            model as GetModelUtilRT<"deepseek">
+          )
+        ) {
+          return model;
+        } else return "deepseek-r1" as const as NonNullable<K>;
+      }
+      case "moonshotai": {
+        if (
+          model &&
+          providerModelChatApi[xTarget].includes(
+            model as GetModelUtilRT<"moonshotai">
+          )
+        ) {
+          return model;
+        } else return "kimi-k2.5" as const as NonNullable<K>;
+      }
+      case "zai": {
+        if (
+          model &&
+          providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"zai">)
+        ) {
+          return model;
+        } else return "glm-5" as const as NonNullable<K>;
       }
       case "openai":
       default: {

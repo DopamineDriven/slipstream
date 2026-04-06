@@ -68,21 +68,6 @@ export type ImageGenJob = Prisma.ImageGenJobModel
  */
 export type ImageGenOutput = Prisma.ImageGenOutputModel
 /**
- * Model LocalVectorStore
- * 
- */
-export type LocalVectorStore = Prisma.LocalVectorStoreModel
-/**
- * Model LocalVectorStoreDoc
- * 
- */
-export type LocalVectorStoreDoc = Prisma.LocalVectorStoreDocModel
-/**
- * Model LocalVectorStoreDocChunk
- * 
- */
-export type LocalVectorStoreDocChunk = Prisma.LocalVectorStoreDocChunkModel
-/**
  * Model ConversationMemoryStore
  * 
  */

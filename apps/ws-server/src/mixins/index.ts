@@ -1,17 +1,20 @@
+import type { LoggerService } from "@/logger/index.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { CohereService } from "@/cohere/index.ts";
+import { DeepSeekService } from "@/deepseek/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
-import { LoggerService } from "@/logger/index.ts";
+import { KimiService } from "@/kimi/index.ts";
 import { LlamaService } from "@/meta/index.ts";
 import { MistralService } from "@/mistral/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { UserStoreVectorService } from "@/store/vector-store.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { xAIService } from "@/xai/index.ts";
+import { ZaiService } from "@/zai/index.ts";
+import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import type { S3Storage } from "@slipstream/storage-s3";
 import type { Provider } from "@slipstream/types";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import { S3Storage } from "@slipstream/storage-s3";
 
 export type ProviderNarrowing<P extends Provider> = P extends "openai"
   ? OpenAIService
@@ -29,7 +32,13 @@ export type ProviderNarrowing<P extends Provider> = P extends "openai"
               ? MistralService
               : P extends "cohere"
                 ? CohereService
-                : never;
+                : P extends "moonshotai"
+                  ? KimiService
+                  : P extends "deepseek"
+                    ? DeepSeekService
+                    : P extends "zai"
+                      ? ZaiService
+                      : never;
 
 export interface ProviderMap {
   anthropic: AnthropicService;
@@ -40,6 +49,9 @@ export interface ProviderMap {
   grok: xAIService;
   mistral: MistralService;
   cohere: CohereService;
+  moonshotai: KimiService;
+  deepseek: DeepSeekService;
+  zai: ZaiService;
 }
 
 export type ProviderNarrowed<T extends keyof ProviderMap> = {
@@ -98,8 +110,12 @@ export interface ProviderOpts extends Partial<ProviderMap> {
     grokMgmtKey?: string;
     mistral?: string;
     cohere?: string;
+    moonshotai?: string;
+    deepseek?: string;
+    zai?: string;
   };
 }
+
 export function ProviderBaseMixin<TBase extends Constructor>(Base: TBase) {
   return class ProviderBase extends Base implements HasDependencies, HasOpts {
     readonly opts?: ProviderOpts | undefined;
@@ -260,6 +276,7 @@ export function GeminiMixin<
     }
   };
 }
+
 export function MistralMixin<
   TBase extends Constructor<any[], HasDependencies & HasOpts>
 >(Base: TBase) {
@@ -326,6 +343,7 @@ export function MistralMixin<
     }
   };
 }
+
 export function CohereMixin<
   TBase extends Constructor<any[], HasDependencies & HasOpts>
 >(Base: TBase) {
@@ -386,6 +404,204 @@ export function CohereMixin<
       return !!(
         this.co ??
         (this.constructor as typeof CohereServiceMixin)?.sharedCo ??
+        this.getDependencies()
+      );
+    }
+  };
+}
+
+export function DeepSeekMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = DeepSeekService;
+  return class DeepSeekServiceMixin extends Base {
+    ds?: S;
+    dsApiKey?: string;
+    static sharedDs?: S;
+    static dsFactory?: ProviderFactory<S>;
+    constructor(...args: any[]) {
+      super(...(args as (ProviderOpts | undefined)[]));
+
+      const opts = this.opts;
+
+      if (opts?.deepseek) this.ds = opts.deepseek;
+
+      this.dsApiKey = opts?.apiKeys?.deepseek;
+    }
+    public get deepseek() {
+      if (!this.ds) {
+        const shared = (this.constructor as typeof DeepSeekServiceMixin)
+          .sharedDs;
+        if (shared) {
+          this.ds = shared;
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "DeepSeek deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
+          }
+
+          const factory = (this.constructor as typeof DeepSeekServiceMixin)
+            .dsFactory;
+
+          this.ds =
+            factory?.(deps, this.dsApiKey) ??
+            new DeepSeekService(
+              deps.logger,
+              deps.prisma,
+              deps.redis,
+              deps.userStore,
+              this.dsApiKey ?? ""
+            );
+        }
+      }
+      return this.ds;
+    }
+
+    static setSharedDeepSeek(instance: S) {
+      this.sharedDs = instance;
+    }
+
+    static setDeepSeekFactory(factory: ProviderFactory<S>) {
+      this.dsFactory = factory;
+    }
+
+    public hasDeepSeek() {
+      return !!(
+        this.ds ??
+        (this.constructor as typeof DeepSeekServiceMixin)?.sharedDs ??
+        this.getDependencies()
+      );
+    }
+  };
+}
+
+export function ZaiMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = ZaiService;
+  return class ZaiServiceMixin extends Base {
+    z?: S;
+    zApiKey?: string;
+    static sharedZ?: S;
+    static zFactory?: ProviderFactory<S>;
+    constructor(...args: any[]) {
+      super(...(args as (ProviderOpts | undefined)[]));
+
+      const opts = this.opts;
+
+      if (opts?.zai) this.z = opts.zai;
+
+      this.zApiKey = opts?.apiKeys?.zai;
+    }
+    public get zai() {
+      if (!this.z) {
+        const shared = (this.constructor as typeof ZaiServiceMixin).sharedZ;
+        if (shared) {
+          this.z = shared;
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "Zai deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
+          }
+
+          const factory = (this.constructor as typeof ZaiServiceMixin).zFactory;
+
+          this.z =
+            factory?.(deps, this.zApiKey) ??
+            new ZaiService(
+              deps.logger,
+              deps.prisma,
+              deps.redis,
+              deps.userStore,
+              this.zApiKey ?? ""
+            );
+        }
+      }
+      return this.z;
+    }
+
+    static setSharedZai(instance: S) {
+      this.sharedZ = instance;
+    }
+
+    static setZaiFactory(factory: ProviderFactory<S>) {
+      this.zFactory = factory;
+    }
+
+    public hasZai() {
+      return !!(
+        this.z ??
+        (this.constructor as typeof ZaiServiceMixin)?.sharedZ ??
+        this.getDependencies()
+      );
+    }
+  };
+}
+
+export function KimiMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = KimiService;
+  return class KimiServiceMixin extends Base {
+    kimi?: S;
+    kimiApiKey?: string;
+    static sharedKimi?: S;
+    static kimiFactory?: ProviderFactory<S>;
+    constructor(...args: any[]) {
+      super(...(args as (ProviderOpts | undefined)[]));
+
+      const opts = this.opts;
+
+      if (opts?.moonshotai) this.kimi = opts.moonshotai;
+
+      this.kimiApiKey = opts?.apiKeys?.moonshotai;
+    }
+    public get moonshotai() {
+      if (!this.kimi) {
+        const shared = (this.constructor as typeof KimiServiceMixin).sharedKimi;
+        if (shared) {
+          this.kimi = shared;
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "Kimi deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
+          }
+
+          const factory = (this.constructor as typeof KimiServiceMixin)
+            .kimiFactory;
+
+          this.kimi =
+            factory?.(deps, this.kimiApiKey) ??
+            new KimiService(
+              deps.logger,
+              deps.prisma,
+              deps.redis,
+              deps.userStore,
+              this.kimiApiKey ?? ""
+            );
+        }
+      }
+      return this.kimi;
+    }
+
+    static setSharedMoonshotai(instance: S) {
+      this.sharedKimi = instance;
+    }
+
+    static setMoonshotaiFactory(factory: ProviderFactory<S>) {
+      this.kimiFactory = factory;
+    }
+
+    public hasMoonshotai() {
+      return !!(
+        this.kimi ??
+        (this.constructor as typeof KimiServiceMixin)?.sharedKimi ??
         this.getDependencies()
       );
     }

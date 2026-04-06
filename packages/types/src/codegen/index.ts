@@ -173,7 +173,10 @@ const providerModelChatApi = {
     "mistral-medium-latest",
     "mistral-large-latest"
   ],
-  cohere: ["command-a-reasoning-08-2025", "command-a-03-2025"]
+  cohere: ["command-a-reasoning-08-2025", "command-a-03-2025"],
+  moonshotai: ["kimi-k2.5", "kimi-k2-thinking"],
+  deepseek: ["deepseek-r1"],
+  zai: ["glm-5", "glm-4.7", "glm-4.6", "glm-4.5"]
 } as const;
 
 async function anthropicFetcher() {
@@ -250,6 +253,54 @@ const COHERE_NAME_OVERRIDES = {
   "command-a-reasoning-08-2025": "Command A Reasoning",
   "command-a-03-2025": "Command A"
 };
+
+const ZAI_NAME_OVERRIDES = {
+  "glm-5": "GLM 5",
+  "glm-4.7": "GLM 4.7",
+  "glm-4.6": "GLM 4.6",
+  "glm-4.5": "GLM 4.5"
+};
+
+const KIMI_NAME_OVERRIDES = {
+  "kimi-k2-thinking": "Kimi K2 Thinking",
+  "kimi-k2.5": "Kimi K2.5"
+} as const;
+
+const DEEPSEEK_NAME_OVERRIDES = {
+  "deepseek-r1": "DeepSeek R1"
+};
+
+function filterForKimi(id: string) {
+  return id === "kimi-k2-thinking" || id === "kimi-k2.5";
+}
+
+function filterForDeepseek(id: string) {
+  return id === "deepseek-r1";
+}
+
+function filterForZai(id: string) {
+  return (
+    id === "glm-5" || id === "glm-4.7" || id === "glm-4.6" || id === "glm-4.5"
+  );
+}
+
+function kimiDisplayName(id: string) {
+  if (filterForKimi(id)) {
+    return KIMI_NAME_OVERRIDES[id];
+  } else return id;
+}
+
+function deepseekDisplayName(id: string) {
+  if (filterForDeepseek(id)) {
+    return DEEPSEEK_NAME_OVERRIDES[id];
+  } else return id;
+}
+
+function zaiDisplayNames(id: string) {
+  if (filterForZai(id)) {
+    return ZAI_NAME_OVERRIDES[id];
+  } else return id;
+}
 
 function mistralDisplayName(id: string) {
   return id === "mistral-small-latest"
@@ -597,6 +648,36 @@ const modelMapper = async (modelKeys = true) => {
           });
           return helper;
         }
+        case "deepseek": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            const name = deepseekDisplayName(model);
+            modelKeys === true
+              ? helper.push([model, name])
+              : helper.push([name, model]);
+          });
+          return helper;
+        }
+        case "moonshotai": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            const name = kimiDisplayName(model);
+            modelKeys === true
+              ? helper.push([model, name])
+              : helper.push([name, model]);
+          });
+          return helper;
+        }
+        case "zai": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            const name = zaiDisplayNames(model);
+            modelKeys === true
+              ? helper.push([model, name])
+              : helper.push([name, model]);
+          });
+          return helper;
+        }
         case "openai":
         default: {
           let helper = Array.of<[string, string]>();
@@ -753,6 +834,9 @@ async function displayNameModelIdGen<
   const anthropic = mapper[3];
   const mistral = mapper[6];
   const cohere = mapper[7];
+  const moonshotai = mapper[8];
+  const deepseek = mapper[9];
+  const zai = mapper[10];
 
   if (
     !openai ||
@@ -762,7 +846,10 @@ async function displayNameModelIdGen<
     !meta ||
     !vercel ||
     !mistral ||
-    !cohere
+    !cohere ||
+    !moonshotai ||
+    !deepseek ||
+    !zai
   )
     throw new Error("empty data in displayNameModelIdGen");
 
@@ -777,7 +864,10 @@ async function displayNameModelIdGen<
           meta: meta.map(([keys, _v]) => keys),
           vercel: vercel.map(([keys, _v]) => keys),
           mistral: mistral.map(([keys, _v]) => keys),
-          cohere: cohere.map(([keys, _v]) => keys)
+          cohere: cohere.map(([keys, _v]) => keys),
+          moonshotai: moonshotai.map(([keys, _v]) => keys),
+          deepseek: deepseek.map(([keys, _v]) => keys),
+          zai: zai.map(([keys, _v]) => keys)
         };
       } else {
         return {
@@ -788,7 +878,10 @@ async function displayNameModelIdGen<
           meta: meta.map(([_, vals]) => vals),
           vercel: vercel.map(([_, vals]) => vals),
           mistral: mistral.map(([_, vals]) => vals),
-          cohere: cohere.map(([_, vals]) => vals)
+          cohere: cohere.map(([_, vals]) => vals),
+          moonshotai: moonshotai.map(([_, vals]) => vals),
+          deepseek: deepseek.map(([_, vals]) => vals),
+          zai: zai.map(([_, vals]) => vals)
         };
       }
     } else {
@@ -801,7 +894,10 @@ async function displayNameModelIdGen<
           meta: meta.map(([_, vals]) => vals),
           vercel: vercel.map(([_, vals]) => vals),
           mistral: mistral.map(([_, vals]) => vals),
-          cohere: cohere.map(([_, vals]) => vals)
+          cohere: cohere.map(([_, vals]) => vals),
+          moonshotai: moonshotai.map(([_, vals]) => vals),
+          deepseek: deepseek.map(([_, vals]) => vals),
+          zai: zai.map(([_, vals]) => vals)
         };
       } else {
         return {
@@ -812,7 +908,10 @@ async function displayNameModelIdGen<
           meta: meta.map(([keys, _v]) => keys),
           vercel: vercel.map(([keys, _v]) => keys),
           mistral: mistral.map(([keys, _v]) => keys),
-          cohere: cohere.map(([keys, _v]) => keys)
+          cohere: cohere.map(([keys, _v]) => keys),
+          moonshotai: moonshotai.map(([keys, _v]) => keys),
+          deepseek: deepseek.map(([keys, _v]) => keys),
+          zai: zai.map(([keys, _v]) => keys)
         };
       }
     }
@@ -825,7 +924,10 @@ async function displayNameModelIdGen<
     meta: Object.fromEntries(meta),
     vercel: Object.fromEntries(vercel),
     mistral: Object.fromEntries(mistral),
-    cohere: Object.fromEntries(cohere)
+    cohere: Object.fromEntries(cohere),
+    moonshotai: Object.fromEntries(moonshotai),
+    deepseek: Object.fromEntries(deepseek),
+    zai: Object.fromEntries(zai)
   };
 }
 

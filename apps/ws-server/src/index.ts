@@ -196,6 +196,33 @@ async function exe() {
       userStore,
       cfg.COHERE_API_KEY
     );
+
+    const { KimiService } = await import("@/kimi/index.ts");
+    const moonshotai = new KimiService(
+      logger,
+      prisma,
+      redisInstance,
+      userStore,
+      cfg.AI_GATEWAY_API_KEY
+    );
+
+    const { DeepSeekService } = await import("@/deepseek/index.ts");
+    const deepseek = new DeepSeekService(
+      logger,
+      prisma,
+      redisInstance,
+      userStore,
+      cfg.AI_GATEWAY_API_KEY
+    );
+
+    const { ZaiService } = await import("@/zai/index.ts");
+    const zai = new ZaiService(
+      logger,
+      prisma,
+      redisInstance,
+      userStore,
+      cfg.AI_GATEWAY_API_KEY
+    );
     const { ProviderService } = await import("@/providers/index.ts");
 
     const providers = new ProviderService({
@@ -209,7 +236,10 @@ async function exe() {
         grokMgmtKey:
           process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY,
         mistral: cfg.MISTRAL_API_KEY,
-        cohere: cfg.COHERE_API_KEY
+        cohere: cfg.COHERE_API_KEY,
+        deepseek: cfg.AI_GATEWAY_API_KEY,
+        moonshotai: cfg.AI_GATEWAY_API_KEY,
+        zai: cfg.AI_GATEWAY_API_KEY
       },
       dependencies: {
         logger,
@@ -226,7 +256,10 @@ async function exe() {
       openai,
       vercel: v0,
       mistral,
-      cohere
+      cohere,
+      deepseek,
+      moonshotai,
+      zai
     });
 
     const { TTSService } = await import("@/tts/index.ts");

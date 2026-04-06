@@ -1,23 +1,23 @@
+import type { LoggerService } from "@/logger/index.ts";
 import type { OpenAIFileSearchToolInput } from "@/openai/types.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { v0ChatCompletionsRes, v0Usage } from "@/vercel/sse.ts";
 import type { Logger as PinoLogger } from "pino";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
 import {
   createV0SSEParser,
   hasToolCallDelta,
   isContentDelta,
   isReasoningDelta
 } from "@/vercel/sse.ts";
+import type { $Enums } from "@slipstream/db/node/generated/client";
+import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type {
   EventTypeMap,
   MessageSingleton,
   VercelModelIdUnion
 } from "@slipstream/types";
-import { $Enums } from "@slipstream/db/node/generated/client";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 interface V0FunctionTool {
   type: "function";
@@ -51,10 +51,37 @@ type V0FunctionToolCall = {
   };
 };
 
-type V0BaseMessage = {
-  role: "system" | "user" | "assistant";
+type V0TextContentPart = {
+  type: "text";
+  text: string;
+};
+
+type V0ImageContentPart = {
+  type: "image_url";
+  image_url: {
+    url: string;
+    detail: "auto" | "low" | "high";
+  };
+};
+
+type V0UserContentPart = V0TextContentPart | V0ImageContentPart;
+
+type V0SystemMessage = {
+  role: "system";
   content: string;
 };
+
+type V0UserMessage = {
+  role: "user";
+  content: string | readonly V0UserContentPart[];
+};
+
+type V0AssistantMessage = {
+  role: "assistant";
+  content: string;
+};
+
+type V0BaseMessage = V0SystemMessage | V0UserMessage | V0AssistantMessage;
 
 type V0AssistantToolCallMessage = {
   role: "assistant";
@@ -94,9 +121,7 @@ interface V0FinalizedMessageBlock {
   type: $Enums.MessageBlockType;
 }
 
-type V0ForcedLoopStopReason =
-  | "MAX_ROUNDS"
-  | null;
+type V0ForcedLoopStopReason = "MAX_ROUNDS" | null;
 
 export class v0Service {
   private readonly baseUrl = "https://ai-gateway.vercel.sh/v1/chat/completions";
@@ -167,102 +192,158 @@ export class v0Service {
     }
   }
 
-  private buildSystemPrompt(
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
-    _fileSearchEnabled = false
-  ) {
-    // const basePrompt = fileSearchEnabled
-    //   ? "You are a knowledgeable full-stack expert. If document lookup would help, use the provided file_search tool."
-    //   : "You are a knowledgeable full-stack expert; without using any tools provide assistance by outputting formatted code blocks into chat. Tools such as QuickEdit are not to be used and are unnecessary for this.";
-
-    const historyNote =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
-
-    return systemPrompt
-      ? `${systemPrompt}\n\n${historyNote}`
-      : `${historyNote}`;
-  }
-
-  private messageText(
-    msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
-  ) {
-    const textBlocks = Array.of<string>();
-
-    if (msg.messageBlocks && msg.messageBlocks.length > 0) {
-      for (const block of msg.messageBlocks) {
-        if (block.type === "TEXT") {
-          textBlocks.push(block.content);
-        }
-      }
-    }
-
-    if (textBlocks.length > 0) {
-      return textBlocks.join("\n");
-    }
-
-    return msg.content;
-  }
-
-  private prependProviderModelTag(
-    msgs: Pick<
-      MessageSingleton<true>,
-      "senderType" | "provider" | "model" | "content" | "messageBlocks"
-    >[]
-  ) {
-    return msgs.map(msg => {
-      const text = this.messageText(msg);
-
-      if (msg.senderType === "USER") {
-        return { role: "user", content: text } as const;
-      }
-
-      const provider = msg.provider.toLowerCase();
-      const model = msg.model ?? "";
-      const modelIdentifier = `[${provider}/${model}]`;
-      return {
-        role: "assistant",
-        content: `${modelIdentifier} \n${text}`
-      } as const;
-    }) satisfies V0BaseMessage[];
-  }
-
-  private formatMsgs(
-    msgs: readonly V0BaseMessage[],
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
-    fileSearchEnabled = false
-  ) {
-    return [
-      {
-        role: "system",
-        content: this.buildSystemPrompt(systemPrompt, fileSearchEnabled)
-      },
-      ...msgs
-    ] satisfies V0RequestMessage[];
-  }
-
-  private v0Format(
+  private formatSystemInstruction(
     isNewChat: boolean,
-    msgs: ProviderChatRequestEntity["msgs"],
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
-    fileSearchEnabled = false
+    systemPrompt?: ProviderChatRequestEntity["systemPrompt"]
   ) {
     if (isNewChat) {
-      const first = msgs[0];
-      const userContent = first ? this.messageText(first) : "";
-      return [
-        {
-          role: "system",
-          content: this.buildSystemPrompt(systemPrompt, fileSearchEnabled)
-        },
-        { role: "user", content: userContent }
-      ] satisfies V0RequestMessage[];
+      return systemPrompt;
     }
 
-    return this.formatMsgs(
-      this.prependProviderModelTag(msgs),
-      systemPrompt,
-      fileSearchEnabled
+    const note =
+      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+
+    return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
+  }
+
+  private formatHistory(msgs: MessageSingleton<true>[]) {
+    const formatted = Array.of<V0BaseMessage>();
+    const lastIndex = msgs.findLastIndex(
+      m => m.provider === "VERCEL" && m.senderType === "AI"
     );
+
+    const isFirstV0Msg = lastIndex === -1;
+
+    for (const [msgIndex, msg] of msgs.entries()) {
+      const isFreshContext = isFirstV0Msg || msgIndex > lastIndex;
+      const isCurrentUserMsg = msgIndex === msgs.length - 1;
+
+      if (msg.senderType === "USER") {
+        const content = Array.of<V0UserContentPart>();
+        const textParts = Array.of<string>();
+
+        try {
+          if (msg.attachments && msg.attachments.length > 0) {
+            for (const att of msg.attachments) {
+              const {
+                cdnUrl,
+                mime: ogMime,
+                compatStatus,
+                compatCdnUrl,
+                compatMime
+              } = att;
+              const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
+              const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
+
+              if (url && mime) {
+                const [filename, ext] = this.prisma.filenameToHexExtTuple(
+                  url,
+                  att.compatStatus,
+                  false
+                );
+                const name = `${filename}.${ext}`;
+
+                if (att.assetType === "IMAGE") {
+                  if (isFreshContext && isCurrentUserMsg) {
+                    content.push({
+                      type: "image_url",
+                      image_url: { url, detail: "auto" }
+                    } satisfies V0ImageContentPart);
+                  } else {
+                    textParts.push(`![${name}](${url})`);
+                  }
+                } else {
+                  textParts.push(`[${name}](${url})`);
+                }
+              }
+            }
+          }
+        } catch (err) {
+          throw new Error(this.prisma.safeErrMsg(err));
+        } finally {
+          if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+            const textBlocks = Array.of<string>();
+            for (const x of msg.messageBlocks) {
+              if (x.type === "TEXT") {
+                textBlocks.push(x.content);
+              }
+            }
+            textParts.push(textBlocks.join(`\n`));
+          } else {
+            textParts.push(msg.content);
+          }
+        }
+
+        content.push({
+          type: "text",
+          text: textParts.join(`\n\n`)
+        } satisfies V0TextContentPart);
+
+        formatted.push({
+          role: "user",
+          content:
+            content.length === 1 && content[0]?.type === "text"
+              ? content[0].text
+              : content
+        } satisfies V0UserMessage);
+      } else {
+        const textParts = Array.of<string>();
+        const modelIdentifier = `[${msg.provider.toLowerCase()}/${msg.model ?? "model"}]`;
+
+        try {
+          if (msg.attachments && msg.attachments.length > 0) {
+            for (const att of msg.attachments) {
+              const {
+                cdnUrl,
+                mime: ogMime,
+                compatStatus,
+                assetType,
+                compatCdnUrl,
+                compatMime
+              } = att;
+              const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
+              const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
+
+              if (url && mime) {
+                const [filename, ext] = this.prisma.filenameToHexExtTuple(
+                  url,
+                  att.compatStatus,
+                  false
+                );
+                const name = `${filename}.${ext}`;
+
+                if (assetType === "IMAGE") {
+                  textParts.push(`${modelIdentifier}\n![${name}](${url})`);
+                } else {
+                  textParts.push(`${modelIdentifier}\n[${name}](${url})`);
+                }
+              }
+            }
+          }
+        } catch (err) {
+          this.logger.info(this.prisma.safeErrMsg(err));
+        } finally {
+          if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+            const textBlocks = Array.of<string>();
+            for (const x of msg.messageBlocks) {
+              if (x.type === "TEXT") {
+                textBlocks.push(x.content);
+              }
+            }
+            textParts.push(`${modelIdentifier}\n\n${textBlocks.join(`\n\n`)}`);
+          } else {
+            textParts.push(`${modelIdentifier}\n\n${msg.content}`);
+          }
+        }
+
+        formatted.push({
+          role: "assistant",
+          content: textParts.join(`\n\n`)
+        } satisfies V0AssistantMessage);
+      }
+    }
+
+    return formatted;
   }
 
   private fileSearchFunctionTool() {
@@ -508,7 +589,13 @@ export class v0Service {
 
     const results =
       "query" in input
-        ? await this.searchStore(userId, input.query, maxResults, 0, input.filename)
+        ? await this.searchStore(
+            userId,
+            input.query,
+            maxResults,
+            0,
+            input.filename
+          )
         : (
             await Promise.all(
               input.queries.map(query =>
@@ -762,9 +849,21 @@ export class v0Service {
     const tools = hasUserStoreDocs
       ? [this.fileSearchFunctionTool()]
       : undefined;
+    const systemInstruction = this.formatSystemInstruction(
+      isNewChat,
+      systemPrompt
+    );
 
     let roundMessages = Array.of<V0RequestMessage>(
-      ...this.v0Format(isNewChat, msgs, systemPrompt, hasUserStoreDocs)
+      ...(systemInstruction
+        ? [
+            {
+              role: "system",
+              content: systemInstruction
+            } satisfies V0BaseMessage
+          ]
+        : []),
+      ...this.formatHistory(msgs)
     );
 
     const MAX_TOOL_ROUNDS = 10;
@@ -813,9 +912,10 @@ export class v0Service {
                   thinkingText: emittedThinkingText,
                   messageBlocks: currentChunkMessageBlock(),
                   isThinking: true,
-                  thinkingDuration: currentThinkingDuration() > 0
-                    ? currentThinkingDuration()
-                    : undefined,
+                  thinkingDuration:
+                    currentThinkingDuration() > 0
+                      ? currentThinkingDuration()
+                      : undefined,
                   topP,
                   model,
                   done: false
@@ -834,9 +934,10 @@ export class v0Service {
                   imgGenEnabled: false,
                   title,
                   isThinking: true,
-                  thinkingDuration: currentThinkingDuration() > 0
-                    ? currentThinkingDuration()
-                    : undefined,
+                  thinkingDuration:
+                    currentThinkingDuration() > 0
+                      ? currentThinkingDuration()
+                      : undefined,
                   thinkingText: emittedThinkingText,
                   messageBlocks: currentChunkMessageBlock(),
                   systemPrompt,

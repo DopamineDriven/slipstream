@@ -7,13 +7,16 @@ import type {
 import {
   AnthropicMixin,
   CohereMixin,
+  DeepSeekMixin,
   GeminiMixin,
   GrokMixin,
+  KimiMixin,
   MetaMixin,
   MistralMixin,
   OpenAIMixin,
   ProviderBaseMixin,
-  VercelMixin
+  VercelMixin,
+  ZaiMixin
 } from "@/mixins/index.ts";
 import type { Provider } from "@slipstream/types";
 
@@ -78,19 +81,30 @@ class ProviderServiceBase {
     "grok",
     "meta",
     "openai",
-    "vercel"
+    "vercel",
+    "deepseek",
+    "moonshotai",
+    "zai"
   ] as const satisfies Provider[];
 
   constructor(protected opts?: ProviderOpts) {}
 }
 
-export class ProviderService extends MistralMixin(
-  CohereMixin(
-    VercelMixin(
-      MetaMixin(
-        OpenAIMixin(
-          GeminiMixin(
-            GrokMixin(AnthropicMixin(ProviderBaseMixin(ProviderServiceBase)))
+export class ProviderService extends KimiMixin(
+  ZaiMixin(
+    DeepSeekMixin(
+      MistralMixin(
+        CohereMixin(
+          VercelMixin(
+            MetaMixin(
+              OpenAIMixin(
+                GeminiMixin(
+                  GrokMixin(
+                    AnthropicMixin(ProviderBaseMixin(ProviderServiceBase))
+                  )
+                )
+              )
+            )
           )
         )
       )
@@ -224,6 +238,81 @@ export class ProviderService extends MistralMixin(
           hasProviderApiKeySet: false,
           initialized: true,
           provider: "mistral",
+          initTime: performance.now(),
+          lastAccessed: performance.now()
+        }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return direct;
+      }
+      case "moonshotai": {
+        const storeCheck = this.#store.get("moonshotai") as
+          | ProviderEntry<"moonshotai">
+          | undefined;
+        if (
+          typeof storeCheck?.instance !== "undefined" &&
+          storeCheck.available
+        ) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          return storeCheck.instance;
+        }
+        const direct = this.moonshotai;
+        this.#store.set("moonshotai", {
+          instance: direct,
+          available: true,
+          hasProviderApiKeySet: false,
+          initialized: true,
+          provider: "moonshotai",
+          initTime: performance.now(),
+          lastAccessed: performance.now()
+        }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return direct;
+      }
+      case "deepseek": {
+        const storeCheck = this.#store.get("deepseek") as
+          | ProviderEntry<"deepseek">
+          | undefined;
+        if (
+          typeof storeCheck?.instance !== "undefined" &&
+          storeCheck.available
+        ) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          return storeCheck.instance;
+        }
+        const direct = this.deepseek;
+        this.#store.set("deepseek", {
+          instance: direct,
+          available: true,
+          hasProviderApiKeySet: false,
+          initialized: true,
+          provider: "deepseek",
+          initTime: performance.now(),
+          lastAccessed: performance.now()
+        }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return direct;
+      }
+      case "zai": {
+        const storeCheck = this.#store.get("zai") as
+          | ProviderEntry<"zai">
+          | undefined;
+        if (
+          typeof storeCheck?.instance !== "undefined" &&
+          storeCheck.available
+        ) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          return storeCheck.instance;
+        }
+        const direct = this.zai;
+        this.#store.set("zai", {
+          instance: direct,
+          available: true,
+          hasProviderApiKeySet: false,
+          initialized: true,
+          provider: "zai",
           initTime: performance.now(),
           lastAccessed: performance.now()
         }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment

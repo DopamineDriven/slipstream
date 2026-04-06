@@ -1,7 +1,7 @@
+import type { Config } from "typescript-eslint";
 import baseConfig from "@slipstream/eslint-config/base";
 import reactConfig from "@slipstream/eslint-config/react";
 
-/** @type {import('typescript-eslint').Config} */
 export default [
   ...baseConfig,
   ...reactConfig,
@@ -16,4 +16,4 @@ export default [
       "@typescript-eslint/no-empty-object-type": "off"
     }
   }
-];
+] satisfies Config;

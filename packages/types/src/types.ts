@@ -13,9 +13,6 @@ import type {
   ImageGenJob,
   ImageGenOutput,
   ImageMetadata,
-  LocalVectorStore,
-  LocalVectorStoreDoc,
-  LocalVectorStoreDocChunk,
   Message,
   MessageBlock,
   Profile,
@@ -41,7 +38,6 @@ export interface UserSingleton<T extends boolean = false> extends User {
   sessions?: SessionSingleton<T>[];
   profile?: ProfileSingleton<T>;
   providerStores?: ProviderStoreSingleton<T>[];
-  localVectorStores?: LocalVectorStoreSingleton<T>[];
   settings?: SettingsSingleton<T>;
   conversationMemoryStore?: ConversationMemoryStoreSingleton<T>;
   userStores?: UserStoreSingleton<T>[];
@@ -49,7 +45,6 @@ export interface UserSingleton<T extends boolean = false> extends User {
 
 export interface SessionSingleton<T extends boolean = false> extends Session {
   user?: UserSingleton<T>;
-  docs?: UserStoreDoc[];
 }
 
 export interface AccountSingleton<T extends boolean = false> extends Account {
@@ -99,27 +94,6 @@ export interface UserStoreDocChunkSingleton<
   T extends boolean = false
 > extends UserStoreDocChunk {
   doc?: UserStoreDocSingleton<T>;
-}
-
-export interface LocalVectorStoreSingleton<
-  T extends boolean = false
-> extends SerializeBigInt<LocalVectorStore, T> {
-  user?: UserSingleton<T>;
-  docs?: LocalVectorStoreDocSingleton<T>[];
-}
-
-export interface LocalVectorStoreDocSingleton<
-  T extends boolean = false
-> extends SerializeBigInt<LocalVectorStoreDoc, T> {
-  store?: LocalVectorStoreSingleton<T>;
-  attachment?: AttachmentSingleton<T>;
-  chunks?: LocalVectorStoreDocChunkSingleton<T>[];
-}
-
-export interface LocalVectorStoreDocChunkSingleton<
-  T extends boolean = false
-> extends SerializeBigInt<LocalVectorStoreDocChunk, T> {
-  doc?: LocalVectorStoreDocSingleton<T>;
 }
 
 export interface ImageSingleton extends ImageMetadata {}
@@ -195,7 +169,6 @@ export interface ImageGenOutputSingleton<
 export interface AttachmentSingleton<
   T extends boolean = false
 > extends SerializeBigInt<Attachment, T> {
-  localVectorStoreDocs?: LocalVectorStoreDocSingleton<T>[];
   providerLinks?: AttachmentProviderSingleton<T>[];
   providerStoreDocs?: ProviderStoreDocumentSingleton<T>[];
   image: ImageSingleton | null;

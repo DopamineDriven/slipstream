@@ -100,5 +100,8 @@ export const displayNameModelsByProvider = {
   ],
   vercel: ["v0 medium", "v0 medium (legacy)"],
   mistral: ["Mistral Small 4", "Mistral Medium Latest", "Mistral Large Latest"],
-  cohere: ["Command A Reasoning", "Command A"]
+  cohere: ["Command A Reasoning", "Command A"],
+  moonshotai: ["Kimi K2.5", "Kimi K2 Thinking"],
+  deepseek: ["DeepSeek R1"],
+  zai: ["GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"]
 } as const;

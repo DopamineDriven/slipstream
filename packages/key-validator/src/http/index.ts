@@ -15,6 +15,9 @@ export class KeyValidator {
     "https://generativelanguage.googleapis.com/v1beta/models";
   private llama_url = "https://api.llama.com/v1/models";
   private v0_url = "https://ai-gateway.vercel.sh/v1/models";
+  private kimi_url = "https://ai-gateway.vercel.sh/v1/models";
+  private deepseek_url = "https://ai-gateway.vercel.sh/v1/models";
+  private zai_url = "https://ai-gateway.vercel.sh/v1/models";
   private mistral_url = "https://api.mistral.ai/v1/models";
   private cohere_url = "https://api.cohere.com/v1/models";
   constructor(
@@ -45,6 +48,12 @@ export class KeyValidator {
       case "MISTRAL":
       case "mistral":
       case "meta":
+      case "moonshotai":
+      case "MOONSHOTAI":
+      case "DEEPSEEK":
+      case "deepseek":
+      case "ZAI":
+      case "zai":
       case "OPENAI":
       case "openai":
       case "VERCEL":
@@ -88,6 +97,69 @@ export class KeyValidator {
       return {
         isValid: false,
         message: `invalid_api_key__vercel__${res.status}`
+      };
+    }
+  }
+
+  private async zai() {
+    const res = await this.callRest(this.apiKey, this.zai_url);
+    const provider = "zai";
+    if (res.ok) {
+      return {
+        isValid: true,
+        message: `valid_api_key__${provider}__${res.status}`
+      };
+    } else if (res.status === 429) {
+      return {
+        isValid: true,
+        message: `valid_api_key__${provider}__${res.status}`
+      };
+    } else {
+      return {
+        isValid: false,
+        message: `invalid_api_key__${provider}__${res.status}`
+      };
+    }
+  }
+
+  private async deepseek() {
+    const res = await this.callRest(this.apiKey, this.deepseek_url);
+    const provider = "deepseek";
+    if (res.ok) {
+      return {
+        isValid: true,
+        message: `valid_api_key__${provider}__${res.status}`
+      };
+    } else if (res.status === 429) {
+      return {
+        isValid: true,
+        message: `valid_api_key__${provider}__${res.status}`
+      };
+    } else {
+      return {
+        isValid: false,
+        message: `invalid_api_key__${provider}__${res.status}`
+      };
+    }
+  }
+
+  private async moonshotai() {
+    const res = await this.callRest(this.apiKey, this.kimi_url);
+    const provider = "moonshotai";
+    if (res.ok) {
+      return {
+        isValid: true,
+        message: `valid_api_key__${provider}__${res.status}`
+      };
+    } else if (res.status === 429) {
+      return {
+        isValid: true,
+        message: `valid_api_key__${provider}__${res.status}`
+      };
+    } else {
+      return {
+        isValid: false,
+        message: `invalid_api_key__${provider}__${res.status}`
       };
     }
   }
@@ -265,6 +337,18 @@ export class KeyValidator {
       case "COHERE":
       case "cohere": {
         return await this.cohere();
+      }
+      case "DEEPSEEK":
+      case "deepseek": {
+        return await this.deepseek();
+      }
+      case "MOONSHOTAI":
+      case "moonshotai": {
+        return await this.moonshotai();
+      }
+      case "ZAI":
+      case "zai": {
+        return await this.zai();
       }
       case "GROK":
       case "grok":

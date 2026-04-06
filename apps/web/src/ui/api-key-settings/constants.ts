@@ -2,12 +2,15 @@ import type { ApiKeyData } from "@/ui/api-key-settings/types";
 import {
   AnthropicIcon,
   CohereIconCurrentColor,
+  DeepSeek,
   GeminiIcon,
+  Kimi,
   MetaIcon,
   MistralIcon,
   OpenAiIcon,
   VercelIcon as v0Icon,
-  XAiIcon
+  XAiIcon,
+  Zai
 } from "@slipstream/ui";
 
 export const providerObj = [
@@ -71,7 +74,33 @@ export const providerObj = [
     provider: "cohere",
     text: "Cohere",
     icon: CohereIconCurrentColor,
-    value: "QlQ*************************************"
+    value: "QlQ*************************************",
+    isSet: false,
+    isDefault: false
+  },
+  {
+    provider: "deepseek",
+    text: "DeepSeek",
+    icon: DeepSeek,
+    value: "vck_********************************",
+    isSet: false,
+    isDefault: false
+  },
+  {
+    provider: "moonshotai",
+    text: "Moonshot AI",
+    icon: Kimi,
+    value: "vck_********************************",
+    isSet: false,
+    isDefault: false
+  },
+  {
+    provider: "zai",
+    text: "Z.ai",
+    icon: Zai,
+    value: "vck_********************************",
+    isSet: false,
+    isDefault: false
   }
 ] as ApiKeyData[];
 
