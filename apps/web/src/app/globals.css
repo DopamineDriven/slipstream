@@ -823,3 +823,49 @@ select {
     animation: pulse-glow 2s ease-in-out infinite;
   }
 }
+.embla {
+  overflow: hidden;
+  width: 100%;
+}
+
+.embla__viewport {
+  overflow: hidden;
+}
+
+.embla__container {
+  display: flex;
+  gap: 0;
+}
+
+.embla__container__posts {
+  display: flex;
+  flex-wrap: nowrap;
+  min-width: 100%;
+}
+
+.embla__viewport__posts {
+  overflow: hidden;
+  width: 100%;
+}
+
+@media (width >= 640px) {
+  .embla__slide__posts {
+    flex: 0 0 20%;
+  }
+}
+.embla__slide__posts {
+  flex: 0 0 50%;
+  min-width: max-content;
+  margin-right: 0.5rem;
+}
+
+.embla__slide {
+  flex: 0 0 16.6667%;
+  min-width: 0;
+}
+
+@media (width >= 640px) {
+  .embla__slide {
+    flex: 0 0 16.6667%;
+  }
+}
