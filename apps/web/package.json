@@ -48,6 +48,7 @@
     "clsx": "catalog:clsx",
     "csstype": "catalog:csstype",
     "decimal.js": "catalog:decimal",
+    "embla-carousel-react": "catalog:embla",
     "fflate": "catalog:fflate",
     "js-cookie": "catalog:cookies",
     "katex": "catalog:katex",
