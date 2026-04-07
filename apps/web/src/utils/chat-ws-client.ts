@@ -53,7 +53,8 @@ class EventHandlerRegistry {
     "user_tts_request",
     "user_tts_chunk",
     "user_tts_error",
-    "user_tts_response"
+    "user_tts_response",
+    "user_tts_response_preexisting"
   ] as const satisfies AnyEventTypeUnion[];
 
   public register<const K extends keyof HandlerMap>(
@@ -361,6 +362,12 @@ class EventHandlerRegistry {
       user_tts_response: () => {
         const handler = this.handlers.user_tts_response;
         if (handler && event.type === "user_tts_response") {
+          handler(event, socket);
+        }
+      },
+      user_tts_response_preexisting: () => {
+        const handler = this.handlers.user_tts_response_preexisting;
+        if (handler && event.type === "user_tts_response_preexisting") {
           handler(event, socket);
         }
       }

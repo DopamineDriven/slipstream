@@ -33,4 +33,26 @@ export namespace TTSTypes {
 
   export type IORecord = UnionToRecord<Inbound | Outbound>;
   export type IOUnion = Inbound | Outbound;
+
+  export type CreateTTSJob = {
+    conversationId: string;
+    sourceMessageId: string;
+    userId: string;
+    provider: string;
+    voice: string;
+    language: string;
+    codec: string;
+    sampleRate: number;
+    bitrate: number;
+    charCount: number;
+  };
+
+  export type UpdateTTSJob = {
+    durationMs?: number;
+    generationMs?: number;
+    sizeBytes?: bigint;
+    error?: string;
+    cdnUrl?: string;
+    attachmentId?: string;
+  };
 }

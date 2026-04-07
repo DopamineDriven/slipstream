@@ -131,7 +131,8 @@ export class ResolverDispatchService extends ResolverChatService {
     "user_tts_chunk",
     "user_tts_error",
     "user_tts_request",
-    "user_tts_response"
+    "user_tts_response",
+    "user_tts_response_preexisting"
   ] as const satisfies readonly AnyEventTypeUnion[];
 
   /** Parses a raw WebSocket message into an event */

@@ -1,10 +1,11 @@
 import type { ExtractService } from "@/extract/index.ts";
+import type { TTSTypes } from "@/tts/types.ts";
 import { PrismaProviderStoreService } from "@/prisma/provider-store.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import { TTSJobSingleton } from "@slipstream/types";
+import type { Rm, TTSJobSingleton } from "@slipstream/types";
 
-export interface CreateTTSJobParams {
+export type CreateTTSJobParams = {
   conversationId: string;
   sourceMessageId: string;
   userId: string;
@@ -15,16 +16,16 @@ export interface CreateTTSJobParams {
   sampleRate: number;
   bitrate: number;
   charCount: number;
-}
+};
 
-export interface UpdateTTSJobFields {
+export type UpdateTTSJobFields = {
   durationMs?: number;
   generationMs?: number;
   sizeBytes?: bigint;
   error?: string;
   cdnUrl?: string;
   attachmentId?: string;
-}
+};
 
 export class PrismaTTSService extends PrismaProviderStoreService {
   constructor(
@@ -35,11 +36,12 @@ export class PrismaTTSService extends PrismaProviderStoreService {
     super(prisma, extractor, isProd);
   }
 
-  private ttsJobBigIntToNum<const T extends { sizeBytes: bigint | null }>(
-    job: T
-  ) {
+  private ttsJobBigIntToNum(job: TTSJobSingleton<true | false>) {
     const { sizeBytes, ...rest } = job;
-    return { ...rest, sizeBytes: sizeBytes ? Number(sizeBytes) : 0 };
+    return {
+      ...rest,
+      sizeBytes: sizeBytes ? Number(sizeBytes) : 0
+    } satisfies TTSJobSingleton<true>;
   }
 
   public async getMsgContentForTTS(msgId: string) {
@@ -56,19 +58,10 @@ export class PrismaTTSService extends PrismaProviderStoreService {
     });
   }
 
-  public async createTTSJob(params: CreateTTSJobParams) {
+  public async createTTSJob(params: TTSTypes.CreateTTSJob) {
     const job = await this.prismaClient.tTSJob.create({
       data: {
-        conversationId: params.conversationId,
-        sourceMessageId: params.sourceMessageId,
-        userId: params.userId,
-        provider: params.provider,
-        voice: params.voice,
-        language: params.language,
-        codec: params.codec,
-        sampleRate: params.sampleRate,
-        bitrate: params.bitrate,
-        charCount: params.charCount,
+        ...params,
         status: "QUEUED"
       }
     });
@@ -78,7 +71,7 @@ export class PrismaTTSService extends PrismaProviderStoreService {
   public async updateTTSJobStatus(
     jobId: string,
     status: $Enums.TTSStatus,
-    fields?: UpdateTTSJobFields
+    fields?: TTSTypes.UpdateTTSJob
   ) {
     const job = await this.prismaClient.tTSJob.update({
       where: { id: jobId },
@@ -132,12 +125,18 @@ export class PrismaTTSService extends PrismaProviderStoreService {
         charCount: true
       }
     });
-    return ttsJobFindMany.map(v => {
-      const { sizeBytes, ...rest } = v;
+    return this.findManyBigIntHelper(ttsJobFindMany, userId);
+  }
+
+  private findManyBigIntHelper(
+    props: Rm<TTSJobSingleton<true | false>, "userId">[],
+    userId: string
+  ) {
+    return props.map(t => {
       return {
-        ...rest,
+        ...t,
         userId,
-        sizeBytes: sizeBytes ? Number(sizeBytes) : null
+        sizeBytes: t.sizeBytes ? Number(t.sizeBytes) : null
       } satisfies TTSJobSingleton<true>;
     });
   }

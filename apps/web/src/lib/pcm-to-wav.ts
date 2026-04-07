@@ -7,7 +7,7 @@
 export function pcmChunksToWavBlob(
   chunks: Uint8Array[],
   sampleRate = 24000
-): Blob {
+) {
   let totalLength = 0;
   for (const chunk of chunks) {
     totalLength += chunk.byteLength;
@@ -38,7 +38,7 @@ export function pcmChunksToWavBlob(
 
   // data sub-chunk
   writeString(view, 36, "data");
-  view.setUint32(40, totalLength, true); // Subchunk2Size
+  view.setUint32(40, totalLength, true);
 
   // Merge all PCM chunks into a single ArrayBuffer for BlobPart compat
   const pcmBuffer = new Uint8Array(totalLength);
@@ -48,7 +48,10 @@ export function pcmChunksToWavBlob(
     offset += chunk.byteLength;
   }
 
-  return new Blob([header, pcmBuffer.buffer satisfies ArrayBufferLike as ArrayBuffer], { type: "audio/wav" });
+  return new Blob(
+    [header, pcmBuffer.buffer satisfies ArrayBufferLike as ArrayBuffer],
+    { type: "audio/wav" }
+  );
 }
 
 function writeString(view: DataView, offset: number, str: string) {

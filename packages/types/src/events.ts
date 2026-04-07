@@ -769,7 +769,18 @@ export type UserTTSResponse = {
   cdnUrl: string;
   codec: TTSCodec;
 };
-
+export type UserTTSResponsePreexisting = {
+  type: "user_tts_response_preexisting";
+  ttsJobId: string;
+  attachmentId: string;
+  conversationId: string;
+  messageId: string;
+  durationMs: number;
+  generationMs: number;
+  size: number;
+  cdnUrl: string;
+  codec: TTSCodec;
+};
 /**
  * Batch upload notification
  */
@@ -822,7 +833,8 @@ export type AnyEvent =
   | UserTTSChunk
   | UserTTSRequest
   | UserTTSError
-  | UserTTSResponse;
+  | UserTTSResponse
+  | UserTTSResponsePreexisting;
 
 export type AnyEventTypeUnion = AnyEvent["type"];
 
@@ -876,6 +888,7 @@ export type EventTypeMap = {
   user_tts_error: UserTTSError;
   user_tts_request: UserTTSRequest;
   user_tts_response: UserTTSResponse;
+  user_tts_response_preexisting: UserTTSResponsePreexisting;
 };
 
 export type EventMap<T extends keyof EventTypeMap> = {

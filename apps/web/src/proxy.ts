@@ -6,10 +6,6 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|opengraph-image|twitter-image).*)"
   ]
 };
-// type CookieCacheProps = {
-//   session: Session & Record<string, any>;
-//   user: User & Record<string, any>;
-// } | null;
 
 function detectDeviceAndSetCookies(
   request: NextRequest,
@@ -24,6 +20,7 @@ function detectDeviceAndSetCookies(
     sameSite: "lax",
     httpOnly: false
   } as const;
+
   const country = request.headers.get("x-vercel-ip-country") ?? "US";
   const region =
     request.headers.get("x-vercel-ip-country-region") ?? "Illinois";
@@ -46,67 +43,10 @@ function detectDeviceAndSetCookies(
     /^\s*([A-Za-z]{1,8}(?:-[A-Za-z]{1,8})*)(?:;q=[0-9.]+)?/
   );
 
-  if (request.cookies.has("hostname")) {
-    response.cookies.delete("hostname");
-  }
-
-  if (request.cookies.has("locale")) {
-    response.cookies.delete("locale");
-  }
-
-  if (request.cookies.has("viewport")) {
-    response.cookies.delete("viewport");
-  }
-
-  if (request.cookies.has("ios")) {
-    response.cookies.delete("ios");
-  }
-
-  if (request.cookies.has("latlng")) {
-    response.cookies.delete("latlng");
-  }
-
-  if (request.cookies.has("country")) {
-    response.cookies.delete("country");
-  }
-
-  if (request.cookies.has("region")) {
-    response.cookies.delete("region");
-  }
-  if (request.cookies.has("postalCode")) {
-    response.cookies.delete("postalCode");
-  }
-
-  if (request.cookies.has("city")) {
-    response.cookies.delete("city");
-  }
-
-  if (request.cookies.has("tz")) {
-    response.cookies.delete("tz");
-  }
-  if (request.cookies.has("ip")) {
-    response.cookies.delete("ip");
-  }
-  if (request.cookies.has("ua")) {
-    response.cookies.delete("ua");
-  }
-  if (request.cookies.has("isMac")) {
-    response.cookies.delete("isMac");
-  }
-  if (request.cookies.has("userId")) {
-    response.cookies.delete("userId");
-  }
-  if (request.cookies.has("browserName")) {
-    response.cookies.delete("browserName");
-  }
-  if (request.cookies.has("browserVersion")) {
-    response.cookies.delete("browserVersion");
-  }
   const isIOS = /(ios|iphone|ipad|iwatch)/i.test(ua);
 
   const ios = `${isIOS}` as const;
 
-  // Set viewport type
   const viewport = device?.type === "mobile" ? "mobile" : "desktop";
 
   let locale = m?.[1] ?? "en-US";
@@ -115,22 +55,34 @@ function detectDeviceAndSetCookies(
     locale = `${locale.toLowerCase()}-${country}`;
   }
 
-  // Set cookies
-  response.cookies.set("browserName", browserName, config);
-  response.cookies.set("browserVersion", browserVersion, config);
-  response.cookies.set("hostname", hostname, config);
-  response.cookies.set("locale", locale, config);
-  response.cookies.set("viewport", viewport, config);
-  response.cookies.set("ios", ios, config);
-  response.cookies.set("latlng", latlng, config);
-  response.cookies.set("tz", tz, config);
-  response.cookies.set("ua", encodeURIComponent(ua), config);
-  response.cookies.set("ip", ip, config);
-  response.cookies.set("country", country, config);
-  response.cookies.set("city", city, config);
-  response.cookies.set("isMac", `${isMac}`, config);
-  response.cookies.set("region", region, config);
-  response.cookies.set("postalCode", postalCode, config);
+  const obj = {
+    hostname,
+    locale,
+    viewport,
+    browserName,
+    browserVersion,
+    ios,
+    latlng,
+    tz,
+    ua: encodeURIComponent(ua),
+    ip,
+    country,
+    city,
+    isMac: `${isMac}`,
+    region,
+    postalCode
+  } as const;
+
+  for (const key of Object.keys(obj)) {
+    if (request.cookies.has(key)) {
+      response.cookies.delete(key);
+    }
+  }
+
+  for (const [k, v] of Object.entries(obj)) {
+    response.cookies.set(k, v, config);
+  }
+
   response.headers.set("Access-Control-Allow-Origin", "*");
   return response;
 }

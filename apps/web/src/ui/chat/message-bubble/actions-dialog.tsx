@@ -111,9 +111,7 @@ export function MessageActionsDialog({
         <DialogHeader>
           <DialogTitle className="text-center">Message Actions</DialogTitle>
         </DialogHeader>
-
         <div className="flex items-center justify-center gap-8 py-6">
-          {/* Copy Action */}
           <div className="flex w-full flex-col items-center gap-2">
             <AnimatedCopyButtonWithText
               textToCopy={messageContent}
@@ -124,8 +122,6 @@ export function MessageActionsDialog({
               Copy
             </AnimatedCopyButtonWithText>
           </div>
-
-          {/* Read Aloud Action (AI messages only) */}
           {senderType === "AI" && (
             <div className="flex flex-col items-center gap-2">
               <Button
@@ -134,8 +130,11 @@ export function MessageActionsDialog({
                 disabled={isReadAloudDisabled}
                 className={cn(
                   "h-12 w-12 rounded-full bg-transparent",
-                  isTTSActive && "text-foreground drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]",
-                  tts.isGenerating && tts.activeMessageId === messageId && "animate-pulse"
+                  isTTSActive &&
+                    "text-foreground drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]",
+                  tts.isGenerating && tts.activeMessageId === messageId
+                    ? "animate-pulse"
+                    : ""
                 )}
                 onClick={handleReadAloud}>
                 <ReadAloudIcon className="h-9 w-9" />
@@ -143,8 +142,6 @@ export function MessageActionsDialog({
               <span className="sr-only">Read Aloud</span>
             </div>
           )}
-
-          {/* More Options Action */}
           <div className="flex flex-col items-center gap-2">
             <Button
               variant="ghost"
