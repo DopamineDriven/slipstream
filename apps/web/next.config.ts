@@ -9,6 +9,7 @@ export default {
       { pathname: "/dd/**" },
       { pathname: "/highlights/**" },
       { pathname: "/icon/**" },
+      {pathname: "/photos/heritage/**"},
       { pathname: "/ideation/**" },
       { pathname: "/misc/**" },
       { pathname: "/providers/**" },

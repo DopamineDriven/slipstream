@@ -1,336 +1,580 @@
-before
+# Implementation Plan: Detached In-Flight Work Completion
+
+## Context
+
+When a client disconnects mid-stream (mobile sleep, network drop, page reload, hardware mute → backgrounded tab), in-flight server work should run to completion server-side rather than being aborted. The user's principle: "rather let the agent continue until completion if it's already in flight than deal with resumability — at least that way when they navigate back or reconnect to the internet the full response is already there."
+
+**Concrete bugs this fixes:**
+
+1. **TTS COUPLED→FAILED overwrite** (`apps/ws-server/src/tts/index.ts:329-490`). `finalize()` wraps persist + notify in one try/catch. When the client socket dies before the trailing `ws.send(user_tts_response)`, the throw cascades into `handleStreamError`, which calls `updateTTSJobStatus(..., "FAILED")` — overwriting the COUPLED status that was just written one block earlier. S3 file and `Attachment` row persist successfully but the `TTSJob` row says FAILED. Next request deletes the FAILED job and re-generates → orphaned S3 object + double charge.
+
+2. **TTS chunk send unguarded** (`apps/ws-server/src/tts/index.ts:616`). `handleMessage` calls `ws.send(user_tts_chunk)` per PCM frame with no try/catch. After client disconnect, every subsequent chunk throws and propagates up through `xaiWs.emit('message', ...)`, killing the streaming loop before `audio.done`.
+
+3. **Server graceful shutdown drops in-flight work** (`apps/ws-server/src/ws-server/index.ts:266-274, 449-454`). `ws.on("close")` carries a TODO about awaiting in-flight processes; `WSServer.stop()` calls `wss.close()` immediately with no drain. `kill -SIGTERM` mid-TTS-finalize cuts the job off.
+
+4. **Generalization to AI chat / image gen.** Every provider service (`anthropic`, `openai`, `gemini`, `meta`, `mistral`, `cohere`, `xai`, `vercel`, `kimi`, `deepseek`, `zai`) and image-gen service has the same `ws.send`-throws-on-dead-socket pattern. **Important finding from codex's plan, verified during exploration:** AI chat has *partial* detach infrastructure — it dual-writes (`ws.send` + `redis.publishTypedEvent(streamChannel, ...)` at anthropic/index.ts lines 731, 796, 915) and has an existing replay mechanism (`anthropic/index.ts:118` "replay check"). The Redis path is already the authoritative delivery mechanism for chat. **However, this is partial infrastructure, not full detach safety** — many providers still mix direct socket sends into the hot path with no `ws.readyState` guard, so a dead socket throw still aborts the streaming loop before persist. Phase 2 for chat/img-gen is an *audit + best-effort wrap*, not a persistence rebuild — but the audit must be thorough because the existing dual-write doesn't immunize against the throws.
+
+5. **Resolver-layer sends.** `ws.send` is not confined to provider services. It exists in 8 resolver files (`resolver/tts.ts`, `resolver/chat.ts`, `resolver/connection.ts`, `resolver/dispatch.ts`, `resolver/asset-complete.ts`, `resolver/asset-fetch.ts`, `resolver/asset-attach-or-paste.ts`, `resolver/chat-utils.ts`), including replay paths and error responders. The `trySend` rollout in Phase 2 must cover the resolver layer, not just providers.
+
+6. **Asset-upload boundary clarification.** Server-side post-upload processing (PDF conversion, image compat, vector embedding) is detach-safe and belongs in the Phase 2 generalization. The *client-to-server byte stream itself* cannot survive disconnect — if a mobile user is uploading a 50MB PDF and their network drops mid-stream, those bytes are lost. There is no "let it complete" semantics for in-flight uploads from the client side. The detach pattern only applies once the bytes are server-side and processing has begun.
+
+**Intended outcome:** socket delivery becomes best-effort across the entire ws-server. Server-side work completion is authoritative for every workload type. Reconnecting clients re-fetch durable state (DB row for chat, `user_tts_response_preexisting` for TTS, `Attachment` row for image gen) — no resumability protocol, no chunk numbering, no offset tracking.
+
+---
+
+## Phase 1: TTS detach + drain (the immediate bug)
+
+Scope: TTS only. Fixes the COUPLED→FAILED overwrite, makes TTS streaming dead-socket safe, adds drain for graceful shutdown.
+
+### Step 1.1 — `trySend` helper + split `finalize` (the bug fix)
+
+Edit `apps/ws-server/src/tts/index.ts`:
+
+- Add `protected trySend<T extends keyof EventTypeMap>(ws, type, data): boolean` on `TTSService`. Checks `ws.readyState !== ws.OPEN`, wraps `ws.send(JSON.stringify({ ...data, type }))` in try/catch, logs `debug` on failure, returns boolean.
+- Split `finalize()` into two failure domains:
+  1. **Persist phase** (try): `s3.uploadGenerated`, `prisma.createAttachment`, `prisma.updateTTSJobStatus → COUPLED`, `ttsJobCache.set`. Failure → `handleStreamError` (marks FAILED).
+  2. **Notify phase** (separate, best-effort): `this.trySend(ws, "user_tts_response", {...})`. Failure must NOT mutate the COUPLED job — log and move on.
+- Replace direct `ws.send` in `handleMessage`'s chunk path (line 616) with `this.trySend(ws, "user_tts_chunk", {...})`. Same in `handleStreamError`'s `user_tts_error` send.
+- Add a single `clearInflight(messageId)` cleanup helper that replaces all scattered `this.inflight.delete(messageId)` calls (currently lines 484, 486, 499). One call site, no drift.
+
+**Files:** `apps/ws-server/src/tts/index.ts`
+
+### Step 1.2 — TTS in-flight registry (drain primitive)
+
+Edit `apps/ws-server/src/tts/index.ts`:
+
+- Keep existing `inflight: Set<string>` for duplicate-request prevention (used in `resolver/tts.ts:88`).
+- Add a purpose-specific TTS registry:
+  ```ts
+  private inflightByUser = new Map<string, Map<string, () => void>>();
+  private inflightPromises = new Map<string, Promise<void>>();
+  ```
+- In `streamToClient` (line 528) immediately after `this.inflight.add(messageId)`, create a `Promise.withResolvers<void>()`, store the resolver in `inflightByUser`/`inflightPromises`.
+- Extend `clearInflight` from Step 1.1 to also resolve the per-job promise and prune both maps.
+- Public APIs:
+  ```ts
+  public async awaitUserInflight(userId: string, timeoutMs?: number): Promise<void>
+  public async awaitAllInflight(timeoutMs?: number): Promise<void>
+  ```
+  Both resolve immediately when no jobs are active. Both must NOT throw on timeout — they return after either completion or timeout.
+
+**Drain implementation: `Promise.withResolvers` + while loop with re-snapshot.** A one-shot `Promise.race([Promise.all(snapshot), timeout])` has a snapshot-freshness bug — between calling `awaitAllInflight()` and the snapshot resolving, existing connected clients can fire new `user_tts_request` events (the drain runs *before* `wss.close()`, so message listeners are still attached). New jobs registered after the snapshot are invisible to the await, the drain returns prematurely, and `wss.close()` cuts off the brand-new in-flight job. The while loop re-snapshots on each iteration so new arrivals are caught.
 
 ```ts
- try {
-      const rawPcmBuffer = Buffer.concat(
-        audioChunks.map(c => Buffer.from(c, "base64"))
-      );
-      const generationMs = Math.round(performance.now() - t0);
+public async awaitAllInflight(
+  timeoutMs = Number(process.env.INFLIGHT_DRAIN_TIMEOUT_MS) || 90_000
+): Promise<void> {
+  if (this.inflightPromises.size === 0) return;
 
-      // When codec is PCM, wrap in WAV so the CDN asset is browser-playable.
-      // Duration is estimated from the raw PCM size (before WAV header).
-      const isPcm = codec === "pcm";
-      const uploadBuffer = isPcm
-        ? this.pcmToWav(rawPcmBuffer, sampleRate)
-        : rawPcmBuffer;
-      const uploadCodec = isPcm ? "wav" : codec;
-      const contentType = this.codecToContentType(uploadCodec);
-      const filename = `${ttsJob.id}.${uploadCodec === "mulaw" ? "ul" : uploadCodec}`;
-      const uploadDurInitial = performance.now();
-      const s3Result = await this.s3.uploadGenerated(
-        uploadBuffer,
-        this.prisma.isProd,
-        {
-          messageId,
-          contentType,
-          filename,
-          userId,
-          size: uploadBuffer.byteLength,
-          conversationId,
-          origin: "GENERATED"
-        }
-      );
-      const uploadDurFinal = performance.now();
+  const { promise: drainComplete, resolve: resolveDrain } =
+    Promise.withResolvers<void>();
+  const deadline = Date.now() + timeoutMs;
+  const POLL_INTERVAL_MS = 5_000;
 
-      const durationMs = this.estimateDurationMs(
-        rawPcmBuffer.byteLength,
-        codec,
-        bitRate,
-        sampleRate
-      );
-
-      const mime =
-        uploadCodec === "mp3"
-          ? "audio/mpeg"
-          : uploadCodec === "wav" || uploadCodec === "pcm"
-            ? "audio/wav"
-            : uploadCodec === "mulaw" || uploadCodec === "alaw"
-              ? "audio/basic"
-              : `audio/${uploadCodec}`;
-
-      const attachment = await this.prisma.createAttachment({
-        userId,
-        bucket: s3Result.bucket,
-        key: s3Result.key,
-        versionId: s3Result.versionId ?? undefined,
-        s3ObjectId: s3Result.s3ObjectId,
-        compatKey: s3Result.key,
-        compatReadyAt: new Date(uploadDurFinal),
-        compatS3ObjectId: s3Result.s3ObjectId,
-        compatVersionId: s3Result.versionId,
-        etag: s3Result.etag,
-        region: "us-east-1",
-        storageClass: s3Result.storageClass,
-        s3LastModified: new Date(s3Result.lastModified ?? uploadDurFinal),
-        cdnUrl: s3Result.cdnUrl,
-        publicUrl: s3Result.publicUrl,
-        mime,
-        ext: uploadCodec,
-        filename,
-        size: BigInt(s3Result.size ?? uploadBuffer.byteLength),
-        conversationId,
-        messageId,
-        compatStatus: "ALIASED",
-        origin: "GENERATED",
-        status: "READY",
-        assetType: "AUDIO",
-        uploadMethod: "GENERATED",
-        cacheControl: s3Result.cacheControl,
-        checksumAlgo: s3Result.checksum?.algo,
-        checksumSha256: s3Result.checksum?.value,
-        uploadDuration: uploadDurFinal - uploadDurInitial,
-        compatCdnUrl: s3Result.cdnUrl,
-        compatExt: uploadCodec,
-        compatMime: mime,
-        contentDisposition: s3Result.contentDisposition,
-        audio: {
-          format: contentType,
-          title: `${conversationId}-${messageId}-${ttsJob.id}`,
-          album: conversationId,
-          artist: `${provider.slice(0, 1).concat(provider.slice(1).toLowerCase())}, ${model}`,
-          duration: durationMs,
-          bitrate: bitRate,
-          sampleRate,
-          channels: 1,
-          createdAt: new Date(Date.now()),
-          year: new Date(Date.now()).getFullYear(),
-          codec: uploadCodec
-        }
-      });
-
-      await this.prisma.updateTTSJobStatus(ttsJob.id, "COUPLED", {
-        durationMs,
-        generationMs,
-        sizeBytes: BigInt(uploadBuffer.byteLength),
-        cdnUrl: s3Result.cdnUrl,
-        attachmentId: attachment.id
-      });
-
-      this.ttsJobCache.set(`${conversationId}:${messageId}`, {
-        ...ttsJob,
-        status: "COUPLED",
-        durationMs,
-        generationMs,
-        sizeBytes: uploadBuffer.byteLength,
-        cdnUrl: s3Result.cdnUrl,
-        attachmentId: attachment.id
-      });
-
-      ws.send(
-        JSON.stringify({
-          type: "user_tts_response",
-          ttsJobId: ttsJob.id,
-          attachmentId: attachment.id,
-          conversationId,
-          messageId,
-          durationMs,
-          generationMs,
-          size: uploadBuffer.byteLength,
-          cdnUrl: s3Result.cdnUrl,
-          codec: this.isValidCodec(uploadCodec) ? uploadCodec : "mp3"
-        } satisfies EventTypeMap["user_tts_response"])
-      );
-
-      this.logger.info(
-        {
-          ttsJobId: ttsJob.id,
-          traceId,
-          durationMs,
-          generationMs,
-          size: uploadBuffer.byteLength
-        },
-        "TTS finalized"
-      );
-      this.inflight.delete(messageId);
-    } catch (err) {
-      this.inflight.delete(messageId);
-      const msg = err instanceof Error ? err.message : "finalize failed";
-      void this.handleStreamError(ws, ttsJob, conversationId, messageId, msg);
+  const tick = async () => {
+    if (this.inflightPromises.size === 0) {
+      this.logger.info("Drain complete: all in-flight TTS work finished");
+      resolveDrain();
+      return;
     }
-  }
 
-  protected async handleStreamError(
-    ws: WebSocket,
-    ttsJob: TTSJobSingleton<true>,
-    conversationId: string,
-    messageId: string,
-    errorMsg: string
-  ) {
-    this.inflight.delete(messageId);
-    this.logger.error(
-      { ttsJobId: ttsJob.id, error: errorMsg },
-      "TTS stream error"
-    );
-    try {
-      await this.prisma.updateTTSJobStatus(ttsJob.id, "FAILED", {
-        error: errorMsg
-      });
-    } catch (dbErr) {
-      this.logger.error(
-        {
-          ttsJobId: ttsJob.id,
-          error: dbErr instanceof Error ? dbErr.message : "db update failed"
-        },
-        "Failed to update TTSJob status"
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 0) {
+      this.logger.warn(
+        { remaining: this.inflightPromises.size },
+        "Drain deadline exceeded, abandoning in-flight work"
       );
+      resolveDrain();
+      return;
     }
-    ws.send(
-      JSON.stringify({
-        type: "user_tts_error",
-        status: 500,
-        statusText: errorMsg,
-        conversationId,
-        messageId
-      } satisfies EventTypeMap["user_tts_error"])
-    );
-  }
 
-  public streamToClient(
-    ws: WebSocket,
-    conversationId: string,
-    messageId: string,
-    userId: string,
-    text: string,
-    provider: $Enums.Provider,
-    model: string | null,
-    ttsJob: TTSJobSingleton<true>,
-    voice = "eve",
-    language = "auto",
-    codec = "mp3",
-    sampleRate = 24000,
-    bitRate = 128000
-  ) {
-    const t0 = performance.now();
-    this.inflight.add(messageId);
-    const xaiWs = new TTSWebSocket(
-      this.buildWssUrl(voice, language, {
-        codec,
-        sample_rate: sampleRate,
-        bit_rate: bitRate
-      }),
-      { headers: { Authorization: `Bearer ${this.apiKey}` } }
-    );
-
-    let audioChunk: string | undefined;
-    const audioChunks = Array.of<string>();
-
-    const handleOpen = () => {
-      this.logger.info(
-        { ttsJobId: ttsJob.id, voice, language, codec },
-        "xAI TTS connected"
-      );
-      this.sendTextChunks(xaiWs, text);
-    };
-
-    const handleMessage = (raw: RawData) => {
-      let event: TTSTypes.Inbound;
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-base-to-string
-        event = JSON.parse<TTSTypes.Inbound>(raw.toString());
-      } catch {
-        this.logger.warn(
-          {
-            ttsJobId: ttsJob.id,
-            rawLength: Buffer.isBuffer(raw) ? raw.byteLength : 0
-          },
-          "Non-JSON frame from xAI TTS, skipping"
-        );
-        return;
-      }
-
-      if (event.type === "audio.delta") {
-        audioChunk = event.delta;
-      } else if (event.type === "audio.done") {
-        cleanup();
-        void this.finalize(
-          ws,
-          audioChunks,
-          ttsJob,
-          conversationId,
-          messageId,
-          userId,
-          codec,
-          bitRate,
-          sampleRate,
-          t0,
-          event.trace_id,
-          provider,
-          model
-        );
-        return;
-      } else if (event.type === "error") {
-        cleanup();
-        void this.handleStreamError(
-          ws,
-          ttsJob,
-          conversationId,
-          messageId,
-          event.message
-        );
-        return;
-      }
-
-      if (audioChunk) {
-        audioChunks.push(audioChunk);
-
-        ws.send(
-          JSON.stringify({
-            type: "user_tts_chunk",
-            conversationId,
-            ttsJobId: ttsJob.id,
-            generationMs: performance.now() - t0,
-            messageId,
-            audioChunk
-          } satisfies EventTypeMap["user_tts_chunk"])
-        );
-
-        audioChunk = undefined;
-      }
-    };
-
-    const handleError = (err: Error) => {
-      cleanup();
-      void this.handleStreamError(
-        ws,
-        ttsJob,
-        conversationId,
-        messageId,
-        err.message
-      );
-    };
-
-    const handleClose = () => {
-      cleanup();
-    };
-
-    const cleanup = () => {
-      xaiWs.off("open", handleOpen);
-      xaiWs.off("message", handleMessage);
-      xaiWs.off("error", handleError);
-      xaiWs.off("close", handleClose);
-      if (xaiWs.readyState === TTSWebSocket.OPEN) xaiWs.close();
-    };
-
-    xaiWs.once("open", handleOpen);
-    xaiWs.on("message", handleMessage);
-    xaiWs.on("error", handleError);
-    xaiWs.on("close", handleClose);
-  }
-
-  public async syncTTSCache(userId: string) {
-    this.ttsJobCache.clear();
-    const hasTTSJobs = await this.prisma.hasTTSJobsOnFile(userId);
-    if (!hasTTSJobs) return;
-    const allTTSJobs = await this.prisma.findAllTTSJobs(userId);
-    if (allTTSJobs.length < 1) return;
-    for (const m of allTTSJobs) {
-      const composite = `${m.conversationId}:${m.sourceMessageId}`;
-      this.ttsJobCache.set(composite, m);
-    }
     this.logger.info(
-      { userId, jobCount: allTTSJobs.length },
-      "TTS cache synced"
+      { remaining: this.inflightPromises.size, msUntilDeadline: remainingMs },
+      "Draining in-flight TTS work"
     );
+
+    // Re-snapshot on each iteration so newly registered jobs are awaited.
+    // Promise.race with a poll interval gives us event-driven completion in the
+    // common case (snapshot resolves) and a polling fallback for re-snapshotting
+    // (max 5s latency between new job arrival and being awaited).
+    const snapshot = Array.from(this.inflightPromises.values());
+    await Promise.race([
+      Promise.all(snapshot),
+      new Promise<void>(r =>
+        setTimeout(r, Math.min(remainingMs, POLL_INTERVAL_MS))
+      )
+    ]);
+
+    void tick();
+  };
+
+  void tick();
+  return drainComplete;
+}
+```
+
+`awaitUserInflight` follows the same shape but iterates `inflightByUser.get(userId)` instead of the global map.
+
+**Default timeout: 90 seconds (env-overridable via `INFLIGHT_DRAIN_TIMEOUT_MS`).**
+
+Rationale: this codebase deploys to **ECS Fargate** (`infra/deploy-ws-server-full.sh:63` → `--launch-type FARGATE`), which has a hard-capped `stopTimeout` of **120 seconds**. There is no escape hatch — Fargate sends SIGKILL at SIGTERM + 120s regardless of application configuration. The 90s drain default leaves ~30s of headroom for `redis.quit()` + `wss.close()` + container teardown, all fitting inside Fargate's 120s ceiling.
+
+- TTS jobs: ~5-30s typical → safely fits.
+- AI chat streams (Phase 2): typically 10-60s → fits.
+- Image generation (Phase 2): typically 10-60s → fits.
+- Worst case (long Anthropic stream finishing + TTS finalize ≈ 60-90s) → fits at the edge.
+
+The env var (`INFLIGHT_DRAIN_TIMEOUT_MS`) lets you raise this without a code change if you ever migrate off Fargate (k8s on EKS, EC2-launched ECS, or bare metal — none of which have Fargate's 120s cap).
+
+**Files:** `apps/ws-server/src/tts/index.ts`
+
+### Step 1.3 — WSServer integration with shutdown admission control
+
+Edit `apps/ws-server/src/ws-server/index.ts`:
+
+- Add `private isDraining = false;` instance field. This is the **shutdown admission gate** — once `stop()` flips it true, no new long-running work can be admitted. Re-snapshot loops alone are insufficient because they only catch *late registrations*; the admission gate prevents new clients (or existing clients) from creating fresh in-flight jobs during the drain window.
+
+- Add a setter for TTSService (matches existing `setResolver` pattern at line 293):
+  ```ts
+  public setTTSService(ttsService: TTSService) {
+    this.ttsService = ttsService;
+  }
+  ```
+  Setter injection is a **deliberate workaround for construction order**, not a stylistic preference. `WSServer` is currently instantiated at `apps/ws-server/src/index.ts:147` but `TTSService` not until line 267. Constructor injection would force a broader reordering of the entire service-construction sequence in `index.ts`. The `setResolver` precedent at line 293 already establishes setter-injection as the codebase pattern for "service constructed after WSServer." We follow it.
+
+- `ws.on("close", (code, reasonBuf) => { ... })` (currently lines 275-285):
+  - Decode `reasonBuf.toString("utf-8")` once.
+  - `this.logger.debug({ userId, code, reason: reason || undefined }, "ws close — in-flight server work continues")`.
+  - Delete `userMap`/`userDataMap` immediately (safe — userId is closure-captured into all in-flight TTS frames per `streamToClient` parameter passing).
+  - **Remove the TODO comment.** The drain responsibility moves to `stop()`, not the per-socket handler.
+  - Do NOT cancel in-flight TTS jobs.
+
+- **Message admission gate** in `ws.on("message", raw => ...)` (currently lines 267-274). Pseudocode:
+  ```ts
+  ws.on("message", raw => {
+    if (this.isDraining) {
+      // Reject new long-running work during shutdown drain.
+      // Use a typed shutdown/draining event matching an EXISTING contract in
+      // EventTypeMap — do NOT invent a new event shape inline. Inspect
+      // @slipstream/types EventTypeMap before implementing; the closest
+      // existing match is likely one of the per-feature error events
+      // (e.g. user_tts_error / ai_chat_error) — confirm the actual fields
+      // (status / statusText / message / code / etc.) before wiring this up.
+      this.trySend(ws, /* existing event type */, /* matching payload */);
+      return;
+    }
+    if (this.resolver) {
+      const uid = this.userMap.get(ws) ?? "";
+      this.resolver.handleRawMessage(ws, uid, raw, userData);
+    } else {
+      ws.send(JSON.stringify({ error: "No resolver configured" }));
+    }
+  });
+  ```
+  Rejecting *all* new messages during drain is the simplest correct behavior for Phase 1 since TTS is the only registered drain consumer. Phase 2 may refine this to only reject *long-running* work types (TTS request, AI chat request, image gen request) while still accepting cheap events like `ping` / `provider_context_pong` so connected clients don't see false-positive errors. For now, simplicity wins.
+
+- `stop()` (line 449) — full shutdown sequence in order:
+  ```ts
+  public async stop(): Promise<void> {
+    this.logger.info("Shutdown initiated, entering drain mode");
+    this.isDraining = true;  // 1. Stop admitting new long-running work
+    await this.teardownPubSub();
+    if (this.ttsService) {
+      await this.ttsService.awaitAllInflight();  // 2. Drain in-flight work
+    }
+    await this.redis.quit();  // 3. Tear down Redis
+    this.wss.close();  // 4. Close listening socket + existing client sockets
+    this.logger.info("Server shut down");
+  }
+  ```
+  **Critical ordering:**
+  1. Set `isDraining = true` *first* — message admission gate now blocks new work.
+  2. `teardownPubSub()` — stop receiving cross-instance Redis events.
+  3. `await ttsService.awaitAllInflight()` — wait for currently-running jobs to finish (re-snapshot loop catches anything that slipped in between flag flip and message-handler check; `Promise.race` against the env-configurable 90s ceiling caps the wait).
+  4. `await redis.quit()` — Redis goes away only after all consumers are done with it.
+  5. `this.wss.close()` — close the listening socket *and* all existing client sockets. **This must be last.** Closing the WSS earlier would force-close client sockets while in-flight finalizations were still trying to `trySend` to them (harmless because of `trySend`, but log-noisy). Letting clients see the natural close at the end is cleaner.
+
+  Phase 1 blocks for up to 90s on TTS drain. Fargate's `stopTimeout: 120` (see Deployment-Side Changes section) gives the remaining 30s for Redis quit + wss.close + container teardown.
+
+Edit `apps/ws-server/src/index.ts`:
+
+- After `wsServer.setResolver(resolver)` at line 293, add `wsServer.setTTSService(ttsService)`. The existing construction order (`WSServer` at 147, `TTSService` at 267) is preserved — no reordering needed.
+
+**Files:** `apps/ws-server/src/ws-server/index.ts`, `apps/ws-server/src/index.ts`
+
+### Step 1.4 — Type check + manual verification
+
+- `pnpm typecheck` from repo root.
+- Manual: start a TTS request, kill the client tab mid-stream, verify in DB that the TTSJob ends in COUPLED (not FAILED), the Attachment row exists, the S3 object is reachable, and a subsequent request from a fresh session emits `user_tts_response_preexisting` from the cache.
+- Manual: send `kill -SIGTERM` to the ws-server process while a TTS job is in flight. Verify the process waits for `audio.done` + persist + cache write before exiting.
+
+---
+
+## Phase 1.5: Dispatch exhaustiveness sentinel bug (post-Phase-1 hotfix)
+
+### Context
+
+After Phase 1 shipped, browser clients started seeing this warning during *idle* periods:
+
+```
+[browser] Invalid message structure received {
+  event: 'never',
+  timestamp: 1775577607365,
+  userId: 'nrr6h4r4480f6kviycyo1zhf'
+} (src/utils/chat-ws-client.ts:100:17)
+```
+
+The shape is malformed (no `type` field), so `chat-ws-client.ts:91-102`'s `parseEvent` validator rejects it and emits the warning. The shape literal `{event: "never", userId, timestamp}` originates at exactly one site:
+
+`apps/ws-server/src/resolver/dispatch.ts:88-91`:
+```ts
+default:
+  await this.wsServer.redis.publish(
+    this.wsServer.channel,
+    JSON.stringify({ event: "never", userId, timestamp: Date.now() })
+  );
+```
+
+This is the `default` branch of the `event.type` switch in `handleRawMessage`. Two stacked design failures:
+
+1. **The switch is not actually exhaustive.** `EVENT_TYPES` (the `parseEvent` allowlist at `dispatch.ts:95-136`) contains 40 entries; the switch handles only 11 (`typing`, `ping`, `ai_chat_request`, `asset_paste`, `asset_fetch_request`, `asset_upload_complete`, `asset_upload_progress`, `asset_attached`, `provider_context_ping`, `provider_context_update`, `user_tts_request`). Anything else in the allowlist — including `user_tts_response_preexisting` (added in commit `b7b8c91`), `provider_context_pong`, `connection_established`, etc. — flows past the validator, fails to match any case, and lands in the default branch. The literal name `"never"` was a coder hint marking "this branch should be unreachable when the union is fully discriminated" — but the switch never had a compile-time `const _: never = event` exhaustiveness assertion to enforce that hint, so silent fall-through went unnoticed.
+
+2. **The sentinel is shape-malformed AND fans out to every connected client.** The publish payload uses `{event: "never", ...}` instead of `{type: "<something>", ...}`, so the client validator rejects it. Worse, this gets fanned out via the broadcast path: `WSServer` subscribes to its own channel at `ws-server/index.ts:166-169` and pipes received messages through `broadcastRaw` (`ws-server/index.ts:515-521`), which iterates `wss.clients` and `client.send`s the raw bytes to **every connected client**. So one user triggering the default branch warns every connected browser tab on every server instance — which matches the "happens during idle, on multiple clients" symptom (it's not the idling client's own activity that's triggering it; it's somebody else's mishandled event being broadcast).
+
+**Why this surfaced after Phase 1 and not before:** the dormant bug existed in `dispatch.ts` long before Phase 1. Phase 1 didn't introduce it. What likely triggered exposure is one of:
+- A recent client-side addition that emits an event whose `type` is in `EVENT_TYPES` but isn't switched (the prime suspects are events ending in `_pong`, `_ack`, `_response`, `_preexisting`, `_request` for image/asset flows that the client now sends but the server's switch never grew a case for).
+- The dev-mode server restart cadence during Phase 1 work caused clients to reconnect more often, increasing the frequency of whatever inbound event hits the default branch.
+
+The exact trigger doesn't matter for the fix — the dispatch design is wrong and should be hardened so this can never silently regress again.
+
+### Step 1.5.1 — Make the dispatch switch exhaustive at compile time
+
+Edit `apps/ws-server/src/resolver/dispatch.ts:53-92`:
+
+```ts
+switch (event.type) {
+  case "typing":
+    await this.handleTyping(event, ws, userId);
+    break;
+  // ... all existing cases ...
+  case "user_tts_request":
+    await this.handleUserTTSRequest(event, ws, userId, userData);
+    break;
+  default: {
+    // Compile-time exhaustiveness assertion. If a new event type is added
+    // to AnyEventTypeUnion that isn't handled above, this assignment will
+    // fail typecheck and force the new case to be added at the source.
+    // The runtime branch only executes if the EVENT_TYPES allowlist drifts
+    // ahead of the switch — in which case we log server-side and drop the
+    // message. We do NOT publish a sentinel onto the broadcast channel.
+    const _exhaustive: never = event;
+    void _exhaustive;
+    this.logger.warn(
+      {
+        eventType: (event as { type?: string }).type,
+        userId
+      },
+      "Unhandled inbound event type — dispatch switch is not exhaustive"
+    );
+    return;
   }
 }
 ```
+
+The `const _exhaustive: never = event` line is the key — it weaponizes TypeScript's union narrowing to fail typecheck the moment any client-emittable event type is added to `EVENT_TYPES` without a corresponding switch arm. Today this assignment will likely fail immediately, which is *good* — it surfaces the existing missing cases as compile errors so they can be fixed individually rather than discovered at runtime.
+
+**Note on `EVENT_TYPES` vs `AnyEventTypeUnion` width:** `AnyEventTypeUnion` includes server→client events (e.g. `user_tts_response`, `ai_chat_chunk`, `asset_uploaded`) that the *client* never sends. If the exhaustiveness assertion forces cases for those, the right move is to **shrink `EVENT_TYPES` to a client-emittable subset** rather than add no-op cases. Server→client event types should not pass `parseEvent` in the first place — receiving one from a client is itself a signal of a bug or echo loop.
+
+### Step 1.5.2 — Remove the malformed sentinel publish
+
+Same edit as Step 1.5.1 — the `redis.publish({event: "never", ...})` is gone, replaced with a structured `this.logger.warn` server-side. No client-visible side effect from the default branch ever again.
+
+This is the immediate fix for the browser warning spam. Even if the exhaustiveness assertion takes follow-up work to fully satisfy (because of the EVENT_TYPES width issue above), removing the publish stops the client-visible symptom on its own.
+
+### Step 1.5.3 — Audit `EVENT_TYPES` for direction
+
+Read `EVENT_TYPES` at `dispatch.ts:95-136` and split into two groups:
+
+- **Client→server (inbound):** events the client legitimately sends. These need switch cases.
+- **Server→client (outbound):** events that should never appear in `parseEvent`. These should be removed from the allowlist.
+
+Likely outbound-only entries currently in `EVENT_TYPES` (verify against `EventTypeMap` in `@slipstream/types`):
+- `ai_chat_chunk`, `ai_chat_error`, `ai_chat_inline_data`, `ai_chat_response`
+- `asset_attached` (verify — this might be inbound), `asset_batch_upload`, `asset_deleted`, `asset_fetch_error`, `asset_fetch_response`, `asset_ready`, `asset_upload_aborted`, `asset_upload_complete_error`, `asset_upload_error`, `asset_upload_instructions`, `asset_upload_response`, `asset_uploaded`
+- `connection_established`
+- `image_gen_error`, `image_gen_progress`, `image_gen_response`
+- `provider_context_pong`, `provider_context_update_ack`
+- `user_tts_chunk`, `user_tts_error`, `user_tts_response`, `user_tts_response_preexisting`
+
+Removing these from the allowlist makes `parseEvent` reject them at the gate, which hardens the dispatch boundary against malicious or buggy clients echoing server events back.
+
+### Step 1.5.4 — Type check + verification
+
+- `pnpm --filter=@slipstream/ws-server typecheck` — must pass after the exhaustiveness assertion. Any `never` assignment failure at this point is a real bug surfacing as a compile error; fix each by either adding a switch case (if the event is client→server) or removing it from `EVENT_TYPES` (if it's server→client).
+- `pnpm --filter=@slipstream/web typecheck` — should be unaffected.
+- Manual: open the web client, leave it idle for 5+ minutes with the dev server running, confirm zero `Invalid message structure received` warnings in the browser console.
+- Manual: check ws-server logs for any new `Unhandled inbound event type` warnings — those identify the actual client→server event(s) currently hitting the default branch, so the missing case(s) can be added properly.
+
+### Files
+
+- `apps/ws-server/src/resolver/dispatch.ts` — switch exhaustiveness + sentinel removal + EVENT_TYPES audit
+
+### Why this is Phase 1.5 and not Phase 2
+
+The bug is client-visible (console spam, broken message handling on real events whose types collide with this fanout) and rooted in a one-file dispatch design flaw. It's small, targeted, and unblocks clean Phase 1 verification. Bundling it into Phase 2 would delay the fix behind the larger best-effort-sends rollout.
+
+---
+
+## Phase 2: best-effort sends everywhere + per-service drain
+
+Scope: generalize the Phase 1 pattern across all streaming workloads. Done as a follow-up after Phase 1 is in production and the bug is confirmed fixed.
+
+**Architectural decision (from convergent review with codex):** Per-service in-flight registries with `ProviderService.awaitAllInflight()` fan-in. NOT a shared cross-cutting registry. Reasoning: the codebase has strong service ownership; each service already encapsulates its own state, dependencies, and lifecycle; a premature shared registry risks becoming a weak abstraction that has to be designed around 11 different consumers. Per-service registries match the existing architecture style. If a unified view becomes valuable later (e.g., for metrics or admin tooling), it can be added as a thin aggregation layer over the per-service primitives without disturbing the producers.
+
+**Sequencing within Phase 2:** safe send first, drain second. The disconnect-throws-kill-persistence bug is bigger than the graceful-shutdown bug for chat/img-gen, so `trySend` rollout (Step 2.2) ships before per-service drain (Step 2.4).
+
+### Step 2.1 — Shared `trySend` helper
+
+Promote `trySend` from `TTSService` to a shared location. Two viable locations:
+
+- **Static on `ResolverChatUtilsService`** (`apps/ws-server/src/resolver/chat-utils.ts`) — the base class that the resolver layer already extends. Makes `this.trySend(...)` available across all resolvers without an import.
+- **Freestanding util** (`apps/ws-server/src/util/try-send.ts`) — better if provider services don't share a base class with resolvers.
+
+Inspect the inheritance graph and pick whichever requires the fewest imports across the rollout sites. Signature unchanged from Step 1.1:
+```ts
+trySend<T extends keyof EventTypeMap>(
+  ws: WebSocket,
+  type: T,
+  data: EventTypeMap[T]
+): boolean
+```
+
+### Step 2.2 — Audit and replace `ws.send` across providers AND resolvers
+
+Two layers, both required:
+
+**Provider services (11 chat + 3 image-gen):**
+- `apps/ws-server/src/anthropic/index.ts` (lines 710, 774, 891 + paired Redis publishes 731, 796, 915)
+- `apps/ws-server/src/openai/responses-chat.ts`
+- `apps/ws-server/src/gemini/chat.ts`
+- `apps/ws-server/src/meta/index.ts`
+- `apps/ws-server/src/mistral/index.ts`
+- `apps/ws-server/src/cohere/index.ts`
+- `apps/ws-server/src/xai/responses-api.ts`
+- `apps/ws-server/src/vercel/index.ts`
+- `apps/ws-server/src/kimi/index.ts`
+- `apps/ws-server/src/deepseek/index.ts`
+- `apps/ws-server/src/zai/index.ts`
+- `apps/ws-server/src/xai/img-gen.ts`
+- `apps/ws-server/src/openai/gpt-image.ts`
+- `apps/ws-server/src/openai/responses-img-gen.ts`
+
+For each: replace direct `ws.send(JSON.stringify({type: "ai_chat_chunk", ...}))` with `this.trySend(ws, "ai_chat_chunk", {...})`. Verify the adjacent `redis.publishTypedEvent(streamChannel, "ai_chat_chunk", ...)` is preserved — Redis remains the authoritative delivery path. Split any try/catch geometry that conflates persist failures with notify failures (same surgery as TTS Step 1.1).
+
+**Resolver layer (8 files, codex's catch):**
+- `apps/ws-server/src/resolver/tts.ts` (already touched in Phase 1, verify)
+- `apps/ws-server/src/resolver/chat.ts` — replay/error sends
+- `apps/ws-server/src/resolver/connection.ts` — `connection_established` and connection-state sends
+- `apps/ws-server/src/resolver/dispatch.ts` — error responders
+- `apps/ws-server/src/resolver/asset-complete.ts`
+- `apps/ws-server/src/resolver/asset-fetch.ts`
+- `apps/ws-server/src/resolver/asset-attach-or-paste.ts`
+- `apps/ws-server/src/resolver/chat-utils.ts`
+
+Same substitution. The replay path in `resolver/chat.ts` is the most sensitive — it's the existing reconnect-and-receive-accumulated-stream-state mechanism. Verify Phase 2 doesn't regress it: clients reconnecting mid-generation should continue to receive accumulated stream state via the Redis replay path.
+
+### Step 2.3 — Per-service in-flight registries
+
+Each provider service gets the same registry shape as TTS in Step 1.2:
+- `inflightByUser: Map<userId, Map<jobId, () => void>>`
+- `inflightPromises: Map<jobId, Promise<void>>`
+- `clearInflight(jobId)` cleanup helper
+- `awaitAllInflight(timeoutMs?)` and `awaitUserInflight(userId, timeoutMs?)` public APIs
+
+The drain implementation (`Promise.withResolvers` + while loop with re-snapshot + Fargate-safe default of 90s via `INFLIGHT_DRAIN_TIMEOUT_MS`) is identical to TTS — extract to a small **shared helper for the drain mechanics only** (not a registry, just the loop primitive) so the 11+ producer services don't each copy-paste the while loop. Each service still owns its own `inflightByUser`/`inflightPromises` Maps; the helper just takes a `() => Map<string, Promise<void>>` accessor and runs the drain loop against it.
+
+For image-gen services, the "job" is a single image generation request, identified by `requestId` or `messageId` depending on the path.
+
+### Step 2.4 — `ProviderService.awaitAllInflight()` fan-in
+
+`ProviderService` (`apps/ws-server/src/providers/index.ts`) already holds references to all 11 chat providers. Add:
+
+```ts
+public async awaitAllInflight(timeoutMs?: number): Promise<void> {
+  await Promise.all([
+    this.anthropic.awaitAllInflight(timeoutMs),
+    this.openai.awaitAllInflight(timeoutMs),
+    this.gemini.awaitAllInflight(timeoutMs),
+    this.meta.awaitAllInflight(timeoutMs),
+    this.mistral.awaitAllInflight(timeoutMs),
+    this.cohere.awaitAllInflight(timeoutMs),
+    this.grok.awaitAllInflight(timeoutMs),
+    this.vercel.awaitAllInflight(timeoutMs),
+    this.kimi.awaitAllInflight(timeoutMs),
+    this.deepseek.awaitAllInflight(timeoutMs),
+    this.zai.awaitAllInflight(timeoutMs)
+  ]);
+}
+```
+
+One method, one fan-in point, one place to add new providers. `WSServer` doesn't need to know about individual providers.
+
+### Step 2.5 — Wire per-service drains into `WSServer.stop()`
+
+Replace the TTS-only `stop()` body from Step 1.3 with parallel drain across all sources:
+
+```ts
+public async stop(): Promise<void> {
+  this.logger.info("Shutdown initiated, entering drain mode");
+  this.isDraining = true;  // Phase 1 admission gate — PRESERVED, not removed
+  await this.teardownPubSub();
+  this.logger.info("Draining all in-flight server work before shutdown...");
+  await Promise.all([
+    this.ttsService.awaitAllInflight(),
+    this.providers.awaitAllInflight(),
+    this.imgCompatService.awaitAllInflight()  // post-upload processing only
+  ]);
+  await this.redis.quit();
+  this.wss.close();
+  this.logger.info("Server shut down.");
+}
+```
+
+**Phase 2 extends — does not replace — the Phase 1 admission gate.** `isDraining = true` must still be the first thing `stop()` does, so the message handler keeps rejecting new long-running work for the entire drain window. Phase 2 only widens the set of services being drained; the gating behavior is unchanged.
+
+`Promise.all` because all three drains share the same Fargate-safe 90s deadline (configurable via `INFLIGHT_DRAIN_TIMEOUT_MS`). If any one trips, the others continue until their own deadline. The whole `stop()` will return when the slowest one finishes (or trips). Log per-service entry/exit for shutdown observability.
+
+**Out of scope for the in-flight drain:** in-flight client-to-server byte streams (asset uploads). The detach pattern only applies once bytes are server-side and processing has begun. If a 50MB PDF upload is mid-flight from a mobile client when the server starts shutting down, those bytes are lost — there's no "let it complete" semantics because the data source itself is the dying connection. Document this explicitly so nobody overgeneralizes the pattern.
+
+### Step 2.6 — Type check + verification
+
+- `pnpm typecheck`.
+- Manual: start an AI chat stream, drop the client mid-generation, verify the full `Message` row persists with the complete response and that a fresh session loading the conversation sees the completed message.
+- Manual: reconnect mid-generation and verify the existing replay-from-Redis path still delivers accumulated state.
+- Manual: same but for image generation.
+- Manual: SIGTERM with TTS + AI chat + image gen all in flight — all three complete before exit, drain log shows per-service progress.
+
+---
+
+## Critical Files
+
+**Phase 1:**
+- `apps/ws-server/src/tts/index.ts` — `trySend`, split `finalize`, registry, drain APIs (lines 329-490, 528-658)
+- `apps/ws-server/src/ws-server/index.ts` — close handler simplification, `stop()` drain, `setTTSService` setter (lines 266-285, 449-454)
+- `apps/ws-server/src/index.ts` — wire `setTTSService` after construction (line 293 region)
+
+**Phase 2:**
+- `apps/ws-server/src/util/drain-loop.ts` — shared drain helper (new file). Takes a `() => Iterable<Promise<void>>` accessor and runs the `Promise.withResolvers` + while-loop + re-snapshot mechanics. Each producer service owns its own registry Maps and exposes `awaitAllInflight`/`awaitUserInflight` that delegate to this helper. **No shared registry — only shared loop mechanics.**
+- `apps/ws-server/src/util/try-send.ts` — promoted shared helper (new file, optional — could also live as a static on `ResolverChatUtilsService`)
+- `apps/ws-server/src/anthropic/index.ts` — audit (lines 710, 774, 891 + paired Redis publishes 731, 796, 915)
+- `apps/ws-server/src/openai/responses-chat.ts` — audit
+- `apps/ws-server/src/gemini/chat.ts` — audit
+- `apps/ws-server/src/meta/index.ts` — audit
+- `apps/ws-server/src/mistral/index.ts` — audit
+- `apps/ws-server/src/cohere/index.ts` — audit
+- `apps/ws-server/src/xai/responses-api.ts` — audit
+- `apps/ws-server/src/vercel/index.ts` — audit
+- `apps/ws-server/src/kimi/index.ts` — audit
+- `apps/ws-server/src/deepseek/index.ts` — audit
+- `apps/ws-server/src/zai/index.ts` — audit
+- `apps/ws-server/src/xai/img-gen.ts`, `apps/ws-server/src/openai/gpt-image.ts`, `apps/ws-server/src/openai/responses-img-gen.ts` — image-gen audit
+- `apps/ws-server/src/resolver/chat.ts` — verify replay-on-reconnect path is preserved
+
+## Deployment-Side Changes (Required for Phase 1)
+
+The application changes alone are not sufficient on Fargate — the task definition must set an explicit `stopTimeout`, and the existing ALB target group can be tuned for free to dramatically extend in-flight work runway. Both changes are zero-downtime and require no infra rebuild.
+
+**Existing infrastructure (verified during planning):**
+- ALB: `ws-alb` (`arn:aws:elasticloadbalancing:us-east-1:782904577755:loadbalancer/app/ws-alb/239013fc4272cac9`), internet-facing, HTTPS via ACM cert.
+- Target group: `ws-tg-ip` (`arn:aws:elasticloadbalancing:us-east-1:782904577755:targetgroup/ws-tg-ip/fa5ac314b9a9d424`), HTTP:4000, target type `ip`, health check `/health`. **Currently `deregistration_delay.timeout_seconds = 300` (AWS default).**
+- Task definition: `ws-server:14` (current revision), `requiresCompatibilities: ["FARGATE"]`. **No `stopTimeout` set → defaults to Fargate's 30 seconds.**
+- ECS service: standard rolling deploy.
+
+### Step A — Bump ALB target group deregistration delay to 600s
+
+Single AWS CLI call, instant effect, no service restart needed:
+
+```bash
+aws elbv2 modify-target-group-attributes \
+  --target-group-arn arn:aws:elasticloadbalancing:us-east-1:782904577755:targetgroup/ws-tg-ip/fa5ac314b9a9d424 \
+  --attributes Key=deregistration_delay.timeout_seconds,Value=600 \
+  --region us-east-1
+```
+
+Effect: on any future ECS service update / task replacement, ALB stops routing **new** connections to the old task immediately upon deregistration, but existing in-flight work continues for up to 600 seconds before SIGTERM is sent. This is steady-state runway for jobs that started before deregistration — the application doesn't observe the deregistration window directly; it just sees fewer new requests arriving until eventually SIGTERM hits. Pure "give clients more breathing room" lever, no code coupling.
+
+### Step B — Add `stopTimeout: 120` to `infra/ws-server-taskdef.json` ✅ DONE
+
+The user has already added the field to `infra/ws-server-taskdef.json`'s `ws-server` container definition:
+
+```json
+{
+  "essential": true,
+  "name": "ws-server",
+  "stopTimeout": 120,
+  "image": "...",
+  ...
+}
+```
+
+Re-register and update the service:
+
+```bash
+aws ecs register-task-definition --cli-input-json file://infra/ws-server-taskdef.json --region us-east-1
+aws ecs update-service \
+  --cluster <cluster-arn> \
+  --service ws-server \
+  --task-definition ws-server \
+  --region us-east-1
+```
+
+(Current revision is `ws-server:14`; AWS auto-bumps to `ws-server:15` on next register.) The service update triggers a rolling deployment, which is the natural moment for the new `stopTimeout` to take effect. **Until the new revision is registered AND the service is updated, the running task is still on rev 14 with Fargate's default 30s ceiling — so the application drain code should NOT be relied on in production until this re-register has happened.**
+
+### Step C — Optional: explicit env var documentation
+
+Set `INFLIGHT_DRAIN_TIMEOUT_MS=90000` in the task definition's `environment` block. The application default is the same value, so this is documentation rather than functional — but it makes the deployment-topology coupling visible at the infra layer.
+
+### Total in-flight work runway after Steps A + B
+
+- **Steady-state** (between target deregistration and SIGTERM): **600 seconds** (10 min)
+- **Explicit drain window** (after SIGTERM, in `WSServer.stop()`): **90 seconds**
+- **Cleanup buffer** (Redis quit + wss.close + container teardown): **~30 seconds**
+- **Hard ceiling** (Fargate SIGKILL): **120 seconds after SIGTERM**
+
+**Effective worst-case runway: ~11.5 minutes per container shutdown.** This is dramatically more than the application drain alone could provide on Fargate, achieved with two config changes instead of code, platform migration, or architectural decoupling.
+
+### Future scaling escape hatches
+
+If 11.5 minutes ever proves insufficient (signal: drain timeout warnings appearing in production logs), four options in order of operational cost:
+
+1. **Bump ALB deregistration delay further** — max is 3600s (1 hour). Free, no code change.
+2. **Decouple finalize via SQS + Lambda** — push the persist phase (S3 upload + Prisma write + Redis publish) to a separate worker that doesn't share the WSS shutdown signal. WSS becomes "stream + accumulate + push to SQS + done." Best architectural answer at scale; more moving parts.
+3. **Move off Fargate** — EC2-launched ECS (`ECS_CONTAINER_STOP_TIMEOUT` configurable) or EKS (`terminationGracePeriodSeconds` configurable). Operationally heavier — you manage the underlying compute.
+4. **Bound worst-case generation client-side** — enforce 90s max on AI chat streams, 60s max on TTS. TTS already finalizes in 5-10s typical; chat streams >90s are extreme outliers.
+
+For current scale, Steps A + B alone are sufficient. Don't pre-build options 2 or 3 until metrics actually show pressure.
+
+## Existing Patterns to Reuse
+
+- `redis.publishTypedEvent(streamChannel, eventType, payload)` — already authoritative for AI chat. Phase 2 keeps this; do not replace.
+- `Promise.withResolvers<void>()` — used elsewhere in the codebase, matches the registry pattern.
+- `setResolver(resolver)` (`ws-server/index.ts:293`) — model for the new `setTTSService` setter.
+- `EventTypeMap` from `@slipstream/types` — `trySend` generic parameter source.
+- `ws.readyState === ws.OPEN` guard — already used in `chat-ws-client.ts:495` on the client side, mirror it on the server.
+- `user_tts_response_preexisting` event (already wired) — the cache-hit replay path that makes "let it complete + reconnect re-fetches" work for TTS. The same pattern conceptually applies to AI chat via Redis replay.
+
+## Verification
+
+**Phase 1:**
+1. `pnpm typecheck` passes.
+2. Start TTS, kill client tab mid-stream → DB shows `TTSJob.status = COUPLED`, `Attachment` row exists, S3 file reachable.
+3. Reload page → tap Read Aloud on the same message → server emits `user_tts_response_preexisting` → client plays from CDN.
+4. `kill -SIGTERM` mid-TTS-finalize → process exits cleanly after the job persists, not before.
+5. Duplicate TTS request while same `messageId` is in flight → second request is silently ignored (existing `inflight.has` guard at `resolver/tts.ts:88` still works).
+6. Provider error from xAI mid-stream → job marked FAILED, registry promise resolves, no leaked entries.
+
+**Phase 2:**
+7. Start AI chat, kill client mid-generation → full `Message` row persists with complete response → fresh session loads the conversation and sees the completed message.
+8. Same for image generation → `Attachment` row persists with the generated PNG.
+9. SIGTERM with TTS + AI chat + image gen all in flight → all three complete before exit.
+10. `pnpm typecheck` passes.

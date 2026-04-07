@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import React from "react";
 import { Inter } from "next/font/google";
-import { cn } from "@/lib/utils";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import "@slipstream/ui/globals.css";
@@ -13,6 +12,9 @@ import { getAnalyticsMode, getSiteUrl } from "@/lib/site-url";
 import { PathnameSync } from "@/ui/pathname-sync";
 import * as ga from "@/utils/google-analytics";
 import { Analytics } from "@vercel/analytics/next";
+import { GeistMono } from "geist/font/mono";
+import { GeistPixelSquare } from "geist/font/pixel";
+import { GeistSans } from "geist/font/sans";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -110,7 +112,11 @@ export default async function RootLayout({
 }>) {
   const mode = getAnalyticsMode(process.env.VERCEL_ENV);
   return (
-    <html suppressHydrationWarning lang="en" data-scroll-behavior="smooth">
+    <html
+      suppressHydrationWarning
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${GeistSans.variable} ${GeistPixelSquare.variable} ${GeistMono.variable} ${inter.variable}`}>
       <head>
         <script
           async={true}
@@ -130,10 +136,9 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={cn(
-          "bg-background font-basis m-0 h-dvh w-screen overflow-hidden p-0 antialiased",
-          inter.variable
-        )}>
+        className={
+          "bg-background font-basis m-0 h-dvh w-screen overflow-hidden p-0 antialiased"
+        }>
         <CookieProvider>
           <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
             <PathnameProvider>
