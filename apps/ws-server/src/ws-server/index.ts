@@ -1,7 +1,9 @@
-import http from "node:http";
-import { TLSSocket } from "tls";
+import { createServer } from "node:http";
+import { TLSSocket } from "node:tls";
+import type { LoggerService } from "@/logger/index.ts";
 import type { PdfService } from "@/pdf/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
+import type { TTSService } from "@/tts/index.ts";
 import type {
   BufferLike,
   HandlerMap,
@@ -9,8 +11,9 @@ import type {
   UserData,
   WSServerOptions
 } from "@/types/index.ts";
-import type { IncomingMessage } from "http";
-import type { RawData,  } from "ws";
+import type { IncomingMessage, Server } from "node:http";
+import type { Logger as PinoLogger } from "pino";
+import type { RawData } from "ws";
 import { WebSocket, WebSocketServer } from "ws";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { ClientContextWorkupProps, EventTypeMap } from "@slipstream/types";
@@ -21,7 +24,8 @@ export class WSServer {
   private unsubscribePubSub?: () => Promise<void>;
   private userMap = new Map<WebSocket, string>();
   public userDataMap = new Map<string, UserData>();
-  private httpServer: http.Server;
+  private httpServer: Server;
+  private logger: PinoLogger;
 
   public readonly handlers: HandlerMap = {};
   private resolver?: {
@@ -37,15 +41,42 @@ export class WSServer {
       userData?: UserData
     ): Promise<void>;
   };
+  /**
+   * In-flight TTS service reference (set via `setTTSService` after
+   * construction). Used by `stop()` to drain in-flight server-side work
+   * before tearing down Redis and the WS listener.
+   *
+   * Setter injection rather than constructor injection is a deliberate
+   * workaround for service construction order — `WSServer` is instantiated
+   * before `TTSService` in `apps/ws-server/src/index.ts`. The `setResolver`
+   * pattern below already establishes setter-injection as the codebase
+   * convention for "service constructed after WSServer."
+   */
+  private ttsService?: TTSService;
+  /**
+   * Shutdown admission gate. Once `stop()` flips this to `true`, the
+   * message handler rejects new long-running work so connected clients
+   * cannot create fresh in-flight jobs during the drain window. The
+   * re-snapshot drain loop alone is insufficient — it only catches *late*
+   * registrations; the gate prevents the inputs in the first place.
+   */
+  private isDraining = false;
 
   constructor(
     private opts: WSServerOptions,
     public redis: EnhancedRedisPubSub,
     public prisma: PrismaService,
-    public pdfService: PdfService
+    public pdfService: PdfService,
+    logger: LoggerService
   ) {
+    this.logger = logger
+      .getPinoInstance()
+      .child(
+        { pid: process.pid, v: process.version },
+        { msgPrefix: "[ws-server] " }
+      );
     this.channel = opts.channel ?? "chat-global";
-    this.httpServer = http.createServer(async (req, res) => {
+    this.httpServer = createServer(async (req, res) => {
       const startTime = performance.now();
       if (req.url === "/webhooks/adobe/pdf-created" && req.method === "POST") {
         await this.pdfService.handleWebhook(req, res);
@@ -85,11 +116,44 @@ export class WSServer {
     this.resolver = resolver;
   }
 
+  public setTTSService(ttsService: TTSService) {
+    this.ttsService = ttsService;
+  }
+
+  /**
+   * Best-effort socket send. Mirrors `TTSService.trySend`. Used by the
+   * shutdown admission gate to inform clients that new requests are being
+   * rejected during drain. Phase 2 will promote this to a shared utility
+   * once provider services adopt the pattern.
+   */
+  private trySend<T extends keyof EventTypeMap>(
+    ws: WebSocket,
+    type: T,
+    data: EventTypeMap[T]
+  ) {
+    if (ws.readyState !== WebSocket.OPEN) return false;
+    try {
+      ws.send(JSON.stringify({ ...data, type }));
+      return true;
+    } catch (err) {
+      this.logger.debug(
+        {
+          type,
+          err: err instanceof Error ? err.message : "unknown send error"
+        },
+        "trySend failed — client likely disconnected"
+      );
+      return false;
+    }
+  }
+
   public async start(): Promise<void> {
     await this.redis.connect();
     // now we listen on our HTTP server (which also speaks WS)
     this.httpServer.listen(this.opts.port, () => {
-      console.info(`HTTP+WebSocket server listening on port ${this.opts.port}`);
+      this.logger.info(
+        `HTTP+WebSocket server listening on port ${this.opts.port}`
+      );
     });
 
     // handle _all_ WS connections
@@ -112,16 +176,31 @@ export class WSServer {
     email?: string
   ) {
     if (!cookieObj) return;
-    const { city, country, latlng, tz, region, postalCode, ip, locale, ua } =
-      cookieObj;
+    const {
+      browserName,
+      browserVersion,
+      city,
+      country,
+      latlng,
+      viewport,
+      tz,
+      region,
+      postalCode,
+      ip,
+      locale,
+      ua
+    } = cookieObj;
     void this.prisma.updateProfile({
       email: email ?? "",
       region,
       postalCode,
+      browserName,
+      viewport,
+      browserVersion,
       city,
       ip,
       locale,
-      ua: decodeURIComponent(ua),
+      ua,
       country,
       latlng,
       tz,
@@ -131,9 +210,12 @@ export class WSServer {
     return this.userDataMap.set(userId, {
       email,
       region,
+      browserName,
+      browserVersion,
       ip,
       locale,
-      ua: decodeURIComponent(ua),
+      viewport,
+      ua,
       postalCode,
       city,
       country,
@@ -147,13 +229,13 @@ export class WSServer {
     const userId = this.userMap.get(ws);
     if (!userId) throw new Error("no user session currently active");
     const userData = this.userDataMap.get(userId);
-    console.log(userId);
+    this.logger.info(userId);
     if (!userData) {
       throw new Error(
         `Cannot refresh provider config: user ${userId} not in map`
       );
     }
-    console.info(userData);
+    this.logger.info(userData);
 
     const providerContext = await this.prisma.injectClientApiKeyProps(userId);
 
@@ -162,7 +244,7 @@ export class WSServer {
     // Update in-memory data
     this.userDataMap.set(userId, userData);
 
-    console.info(`Refreshed provider config for user ${userId}`);
+    this.logger.info(`Refreshed provider config for user ${userId}`);
     return providerContext;
   }
 
@@ -187,7 +269,10 @@ export class WSServer {
       country,
       ip,
       locale,
+      viewport,
       ua,
+      browserName,
+      browserVersion,
       providerContext = providers,
       latlng,
       tz,
@@ -195,15 +280,18 @@ export class WSServer {
       region,
       email: userEmail = email
     } = this.userDataMap.get(userId) ?? {
-      email: "unknown email",
-      city: "Chicago",
+      email: "anonymous@wow.com",
+      browserName: "Chrome",
+      browserVersion: "147.0.7727.49",
+      city: "Barrington",
+      viewport: "desktop",
       country: "US",
-      latlng: "unknown latlng",
+      latlng: "41.8338486,-87.8966849",
       tz: "America/Chicago",
       ip: "0.0.0.0",
       ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0",
       locale: "en-US",
-      postalCode: "unknown postal code",
+      postalCode: "60010",
       region: "Illinois",
       providerContext: {
         isDefault: providers.isDefault,
@@ -218,17 +306,35 @@ export class WSServer {
       providerContext,
       locale,
       ua,
+      viewport,
       country,
       latlng,
       postalCode,
+      browserName,
+      browserVersion,
       region,
       tz
-    };
+    } satisfies UserData;
 
     this.userMap.set(ws, userId);
-    const message = `User ${userId} connected from ${city}, ${country} (${region} region) having postal code ${postalCode} in the ${tz} timezone with a locale of ${locale}, an approx location of ${latlng}, an ip of ${ip}, and a ua of ${ua}`;
-    console.info(message);
+    const message = `User ${userId} (${email}) connected on a ${viewport} via ${browserName} version ${browserVersion} from ${city}, ${country} (${region} region) having postal code ${postalCode} in the ${tz} timezone with a locale of ${locale}, an approx location of ${latlng}, an ip of ${ip}, and a ua of ${ua}`;
+    this.logger.info(message);
     ws.on("message", raw => {
+      // Shutdown admission gate — once `stop()` flips `isDraining`, reject
+      // new long-running work so connected clients cannot create fresh
+      // in-flight jobs during the drain window. The drain primitive's
+      // re-snapshot loop alone is insufficient — it only catches *late*
+      // registrations, not new arrivals from already-connected clients.
+      if (this.isDraining) {
+        this.trySend(ws, "user_tts_error", {
+          type: "user_tts_error",
+          status: 503,
+          statusText: "Server is draining, please retry shortly",
+          conversationId: "",
+          messageId: ""
+        } satisfies EventTypeMap["user_tts_error"]);
+        return;
+      }
       if (this.resolver) {
         const uid = this.userMap.get(ws) ?? "";
         this.resolver.handleRawMessage(ws, uid, raw, userData);
@@ -236,10 +342,25 @@ export class WSServer {
         ws.send(JSON.stringify({ error: "No resolver configured" }));
       }
     });
-    ws.on("close", () => {
+    ws.on("close", (s, f) => {
+      // In-flight server-side work continues after socket close — drain
+      // responsibility lives in `stop()`, not the per-socket handler.
+      // userId is closure-captured into all in-flight TTS frames via the
+      // `streamToClient(... , userId, ...)` parameter, so deleting userMap
+      // here does not break anything.
+      const reason = f.toString("utf-8");
+      const obj =
+        reason.length > 1
+          ? { reason, code: s, userId, email }
+          : { code: s, userId, email };
+
+      this.logger.debug(
+        obj,
+        `ws close event with code ${s} — in-flight server work continues`
+      );
       this.userMap.delete(ws);
       this.userDataMap.delete(userId);
-      console.info(`User ${userId} disconnected`);
+      this.logger.info(`User ${userId} disconnected`);
     });
 
     if (this.resolver?.handleConnectionEstablished) {
@@ -247,10 +368,7 @@ export class WSServer {
     }
   }
 
-  private async authenticateConnection(
-    ws: WebSocket,
-    req: IncomingMessage
-  ): Promise<{ userId: string; email: string } | null> {
+  private async authenticateConnection(ws: WebSocket, req: IncomingMessage) {
     const id = this.extractUserIdFromUrl(req);
 
     if (!id) {
@@ -294,6 +412,22 @@ export class WSServer {
     try {
       if (cookieHeader) {
         cookieHeader.split(";").forEach(function (cookie) {
+          function isUserDataKey(s: string) {
+            return (
+              s === "city" ||
+              s === "locale" ||
+              s === "ua" ||
+              s === "ip" ||
+              s === "country" ||
+              s === "latlng" ||
+              s === "tz" ||
+              s === "region" ||
+              s === "postalCode" ||
+              s === "browserName" ||
+              s === "browserVersion" ||
+              s === "viewport"
+            );
+          }
           const cookieKeys = [
             "city",
             "locale",
@@ -303,14 +437,18 @@ export class WSServer {
             "latlng",
             "tz",
             "region",
-            "postalCode"
-          ];
+            "postalCode",
+            "browserName",
+            "browserVersion",
+            "viewport"
+          ] satisfies Exclude<keyof UserData, "providerContext">[];
           const parts = cookie.match(/(.*?)=(.*)/);
           if (parts) {
             const k = (parts?.[1]?.trim() ?? "").trimStart();
             const v = parts?.[2]?.trim() ?? "";
-            if (cookieKeys.includes(k)) {
-              arr.push([k as keyof UserData, decodeURIComponent(v)] as const);
+
+            if (isUserDataKey(k) && cookieKeys.includes(k)) {
+              arr.push([k, decodeURIComponent(v)] as const);
             }
           }
         });
@@ -331,7 +469,7 @@ export class WSServer {
     }
   }
 
-  private extractUserIdFromUrl(req: IncomingMessage): string | null {
+  private extractUserIdFromUrl(req: IncomingMessage) {
     const rawPath = req?.url ?? "";
     const host = req?.headers?.host;
     if (!host) return null;
@@ -398,10 +536,26 @@ export class WSServer {
     }
   }
 
-  public async stop(): Promise<void> {
+  public async stop() {
+    // Critical ordering — see plan
+    // /home/dopaminedriven/.claude/plans/fancy-nibbling-bentley.md Step 1.3.
+    //   1. Flip admission gate FIRST so message handler stops admitting new
+    //      long-running work for the entire drain window.
+    //   2. Tear down Redis pub/sub so cross-instance broadcasts stop arriving.
+    //   3. Drain in-flight TTS work — bounded by INFLIGHT_DRAIN_TIMEOUT_MS
+    //      (default 90s, Fargate-safe under the 120s stopTimeout ceiling).
+    //   4. Quit Redis only after all consumers are done with it.
+    //   5. Close the WSS listener + existing client sockets LAST so any
+    //      trailing trySend in finalize() lands on a still-open socket
+    //      where possible.
+    this.logger.info("Shutdown initiated, entering drain mode");
+    this.isDraining = true;
     await this.teardownPubSub();
+    if (this.ttsService) {
+      await this.ttsService.awaitAllInflight();
+    }
     await this.redis.quit();
     this.wss.close();
-    console.info("Server shut down.");
+    this.logger.info("Server shut down");
   }
 }

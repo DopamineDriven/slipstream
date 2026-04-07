@@ -946,6 +946,8 @@ export class GrokCollectionsService extends GrokWorkupService {
                   } else {
                     textParts.push(`![${name}](${url})`);
                   }
+                } else {
+                  textParts.push(`[${name}](${url})`);
                 }
               }
             }
@@ -1009,6 +1011,8 @@ export class GrokCollectionsService extends GrokWorkupService {
                   // can have image attachments from image gen models in multi-provider/multi-model convos
                 } else if (assetType === "IMAGE") {
                   textParts.push(`${modelIdentifier}\n![${name}](${url})`);
+                } else {
+                  textParts.push(`${modelIdentifier}\n[${name}](${url})`);
                 }
               }
             }

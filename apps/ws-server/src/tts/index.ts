@@ -24,6 +24,16 @@ export class TTSService {
   public ttsJobCache = new Map<string, TTSJobSingleton<true>>();
   /** Message IDs with in-flight TTS generation — prevents duplicate jobs */
   public inflight = new Set<string>();
+  /**
+   * Drain registry — per-job promise that resolves when finalize() (success
+   * or failure) completes for a given messageId. Used by `awaitAllInflight`
+   * during graceful shutdown so server-side work survives client disconnect.
+   */
+  private inflightPromises = new Map<string, Promise<void>>();
+  /** userId -> messageId -> resolver. Lets us drain a single user's work. */
+  private inflightByUser = new Map<string, Map<string, () => void>>();
+  /** messageId -> resolver. Direct lookup for `clearInflight` cleanup. */
+  private inflightResolvers = new Map<string, () => void>();
   protected readonly baseTTSUrl = "wss://api.x.ai/v1/tts";
   protected logger: PinoLogger;
   constructor(
@@ -52,7 +62,7 @@ export class TTSService {
       .join("&");
   }
 
-  private isValidCodec(codec: string) {
+  public isValidCodec(codec: string) {
     return (
       codec === "mp3" ||
       codec === "wav" ||
@@ -62,7 +72,7 @@ export class TTSService {
     );
   }
 
-  private isValidVoice(v: string) {
+  public isValidVoice(v: string) {
     return (
       v === "eve" ||
       v === "ara" ||
@@ -73,7 +83,7 @@ export class TTSService {
     );
   }
 
-  private isValidSampleRate(s: number) {
+  public isValidSampleRate(s: number) {
     return (
       s === 8000 ||
       s === 16000 ||
@@ -84,13 +94,13 @@ export class TTSService {
     );
   }
 
-  private isValidBitRate(s: number) {
+  public isValidBitRate(s: number) {
     return (
       s === 32000 || s === 64000 || s === 96000 || s === 128000 || s === 192000
     );
   }
 
-  private isValidLanguage(l: string) {
+  public isValidLanguage(l: string) {
     return (
       l === "auto" ||
       l === "en" ||
@@ -317,12 +327,185 @@ export class TTSService {
     bitRate: number,
     sampleRate: number
   ) {
-    if (codec === "mp3") return Math.round((byteLength * 8 * 1000) / bitRate);
-    if (codec === "wav" || codec === "pcm")
+    if (codec === "mp3") {
+      return Math.round((byteLength * 8 * 1000) / bitRate);
+    } else if (codec === "wav" || codec === "pcm") {
       return Math.round((byteLength / (sampleRate * 2)) * 1000);
-    if (codec === "mulaw" || codec === "alaw")
+    } else if (codec === "mulaw" || codec === "alaw") {
       return Math.round((byteLength / sampleRate) * 1000);
-    return Math.round((byteLength * 8 * 1000) / bitRate);
+    } else return Math.round((byteLength * 8 * 1000) / bitRate);
+  }
+
+  /**
+   * Best-effort socket send. Checks readyState, swallows throws so a dead
+   * client socket cannot abort server-side work.
+   *
+   * Returns `true` only if the send was actually attempted AND did not throw
+   * synchronously. The async `(err) => ...` ws callback is not awaited — for
+   * the purposes of in-flight detach, that asynchronous failure is moot
+   * because the persist phase has already completed by the time we send.
+   */
+  protected trySend<T extends keyof EventTypeMap>(
+    ws: WebSocket,
+    type: T,
+    data: EventTypeMap[T]
+  ) {
+    if (ws.readyState !== TTSWebSocket.OPEN) {
+      this.logger.debug(
+        { type, readyState: ws.readyState },
+        "trySend skipped — socket not open"
+      );
+      return false;
+    }
+    try {
+      ws.send(JSON.stringify({ ...data, type }));
+      return true;
+    } catch (err) {
+      this.logger.debug(
+        {
+          type,
+          err: err instanceof Error ? err.message : "unknown send error"
+        },
+        "trySend failed — client likely disconnected"
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Register a new in-flight TTS job for drain tracking. Called from
+   * `streamToClient` immediately after `inflight.add(messageId)`. Idempotent
+   * for the same `messageId` (the existing `inflight.has` check upstream
+   * already prevents duplicate jobs).
+   */
+  private registerInflight(userId: string, messageId: string) {
+    const { promise, resolve } = Promise.withResolvers<void>();
+    this.inflightPromises.set(messageId, promise);
+    this.inflightResolvers.set(messageId, resolve);
+    let userMap = this.inflightByUser.get(userId);
+    if (!userMap) {
+      userMap = new Map<string, () => void>();
+      this.inflightByUser.set(userId, userMap);
+    }
+    userMap.set(messageId, resolve);
+  }
+
+  /**
+   * Single cleanup point for in-flight state. Resolves the drain promise,
+   * removes the messageId from all registries, prunes empty user buckets.
+   * Replaces the previously scattered `this.inflight.delete(messageId)`
+   * call sites so cleanup state cannot drift.
+   */
+  private clearInflight(userId: string, messageId: string) {
+    this.inflight.delete(messageId);
+    const resolve = this.inflightResolvers.get(messageId);
+    if (resolve) resolve();
+    this.inflightResolvers.delete(messageId);
+    this.inflightPromises.delete(messageId);
+    const userMap = this.inflightByUser.get(userId);
+    if (userMap) {
+      userMap.delete(messageId);
+      if (userMap.size === 0) this.inflightByUser.delete(userId);
+    }
+  }
+
+  /**
+   * Drain primitive — wait for all in-flight TTS jobs to complete or for
+   * the deadline to elapse. Used by `WSServer.stop()` graceful shutdown.
+   *
+   * Implementation notes:
+   * - Uses `Promise.withResolvers` + a polling tick rather than a one-shot
+   *   `Promise.race([Promise.all(snapshot), timeout])`. The naive shape has
+   *   a snapshot-freshness bug: between calling `awaitAllInflight()` and the
+   *   snapshot resolving, new TTS requests can be admitted from connected
+   *   clients (the drain runs *before* `wss.close()`). New jobs registered
+   *   after the snapshot would be invisible to the await. The tick re-snapshots
+   *   on each iteration so newly registered jobs are caught.
+   * - Default ceiling 90s, env-overridable via `INFLIGHT_DRAIN_TIMEOUT_MS`.
+   *   This codebase deploys to ECS Fargate which hard-caps the container
+   *   `stopTimeout` at 120s, so the application drain leaves ~30s of headroom
+   *   for `redis.quit()` + `wss.close()` + container teardown.
+   * - Never throws on timeout — returns after either completion or deadline.
+   */
+  public awaitAllInflight(
+    timeoutMs = Number(process.env.INFLIGHT_DRAIN_TIMEOUT_MS) || 90_000
+  ) {
+    return this.drainSnapshot(() => this.inflightPromises, timeoutMs);
+  }
+
+  /**
+   * Per-user variant of `awaitAllInflight`. Same drain semantics, scoped
+   * to a single userId. Returns immediately if the user has no in-flight
+   * jobs.
+   */
+  public awaitUserInflight(
+    userId: string,
+    timeoutMs = Number(process.env.INFLIGHT_DRAIN_TIMEOUT_MS) || 90_000
+  ) {
+    return this.drainSnapshot(() => {
+      // Adapt the per-user resolver map into a Promise map for the shared
+      // drain loop. The promises themselves live in `inflightPromises`.
+      const userMap = this.inflightByUser.get(userId);
+      const out = new Map<string, Promise<void>>();
+      if (!userMap) return out;
+      for (const messageId of userMap.keys()) {
+        const p = this.inflightPromises.get(messageId);
+        if (p) out.set(messageId, p);
+      }
+      return out;
+    }, timeoutMs);
+  }
+
+  private async drainSnapshot(
+    accessor: () => Map<string, Promise<void>>,
+    timeoutMs: number
+  ) {
+    if (accessor().size === 0) return;
+
+    const { promise: drainComplete, resolve: resolveDrain } =
+      Promise.withResolvers<void>();
+    const deadline = Date.now() + timeoutMs;
+    const POLL_INTERVAL_MS = 5_000;
+
+    const tick = async () => {
+      const snapshotMap = accessor();
+      if (snapshotMap.size === 0) {
+        this.logger.info("Drain complete: all in-flight TTS work finished");
+        resolveDrain();
+        return;
+      }
+
+      const remainingMs = deadline - Date.now();
+      if (remainingMs <= 0) {
+        this.logger.warn(
+          { remaining: snapshotMap.size },
+          "Drain deadline exceeded, abandoning in-flight TTS work"
+        );
+        resolveDrain();
+        return;
+      }
+
+      this.logger.info(
+        { remaining: snapshotMap.size, msUntilDeadline: remainingMs },
+        "Draining in-flight TTS work"
+      );
+
+      // Re-snapshot on each iteration so newly registered jobs are awaited.
+      // Promise.race against a poll timer gives event-driven completion in
+      // the common case + a polling fallback to re-snapshot for new arrivals.
+      const snapshot = Array.from(snapshotMap.values());
+      await Promise.race([
+        Promise.all(snapshot),
+        new Promise<void>(r =>
+          setTimeout(r, Math.min(remainingMs, POLL_INTERVAL_MS))
+        )
+      ]);
+
+      void tick();
+    };
+
+    void tick();
+    return drainComplete;
   }
 
   protected async finalize(
@@ -336,8 +519,24 @@ export class TTSService {
     bitRate: number,
     sampleRate: number,
     t0: number,
-    traceId: string
+    traceId: string,
+    provider: $Enums.Provider,
+    model: string | null
   ) {
+    // Persist phase: anything in here failing → handleStreamError → FAILED.
+    // Notify phase (after the try/catch) is best-effort and MUST NOT mutate
+    // the COUPLED job status. This split is the fix for the
+    // COUPLED→FAILED overwrite bug where a dead-socket throw on the trailing
+    // `ws.send(user_tts_response)` was cascading into handleStreamError and
+    // wiping the COUPLED status that had just been written one block earlier.
+    let persisted: {
+      attachmentId: string;
+      durationMs: number;
+      generationMs: number;
+      uploadByteLength: number;
+      cdnUrl: string;
+      uploadCodec: string;
+    };
     try {
       const rawPcmBuffer = Buffer.concat(
         audioChunks.map(c => Buffer.from(c, "base64"))
@@ -422,6 +621,9 @@ export class TTSService {
         contentDisposition: s3Result.contentDisposition,
         audio: {
           format: contentType,
+          title: `${conversationId}-${messageId}-${ttsJob.id}`,
+          album: conversationId,
+          artist: `${provider.slice(0, 1).concat(provider.slice(1).toLowerCase())}, ${model}`,
           duration: durationMs,
           bitrate: bitRate,
           sampleRate,
@@ -450,21 +652,6 @@ export class TTSService {
         attachmentId: attachment.id
       });
 
-      ws.send(
-        JSON.stringify({
-          type: "user_tts_response",
-          ttsJobId: ttsJob.id,
-          attachmentId: attachment.id,
-          conversationId,
-          messageId,
-          durationMs,
-          generationMs,
-          size: uploadBuffer.byteLength,
-          cdnUrl: s3Result.cdnUrl,
-          codec: this.isValidCodec(uploadCodec) ? uploadCodec : "mp3"
-        } satisfies EventTypeMap["user_tts_response"])
-      );
-
       this.logger.info(
         {
           ttsJobId: ttsJob.id,
@@ -475,12 +662,41 @@ export class TTSService {
         },
         "TTS finalized"
       );
-      this.inflight.delete(messageId);
+
+      persisted = {
+        attachmentId: attachment.id,
+        durationMs,
+        generationMs,
+        uploadByteLength: uploadBuffer.byteLength,
+        cdnUrl: s3Result.cdnUrl,
+        uploadCodec
+      };
     } catch (err) {
-      this.inflight.delete(messageId);
       const msg = err instanceof Error ? err.message : "finalize failed";
-      void this.handleStreamError(ws, ttsJob, conversationId, messageId, msg);
+      await this.handleStreamError(ws, ttsJob, conversationId, messageId, msg);
+      this.clearInflight(userId, messageId);
+      return;
     }
+
+    // Notify phase — best-effort. A failure here MUST NOT mutate the COUPLED
+    // job that the persist phase just wrote. The client will re-fetch via
+    // `user_tts_response_preexisting` on next request from the cache.
+    this.trySend(ws, "user_tts_response", {
+      type: "user_tts_response",
+      ttsJobId: ttsJob.id,
+      attachmentId: persisted.attachmentId,
+      conversationId,
+      messageId,
+      durationMs: persisted.durationMs,
+      generationMs: persisted.generationMs,
+      size: persisted.uploadByteLength,
+      cdnUrl: persisted.cdnUrl,
+      codec: this.isValidCodec(persisted.uploadCodec)
+        ? persisted.uploadCodec
+        : "mp3"
+    } satisfies EventTypeMap["user_tts_response"]);
+
+    this.clearInflight(userId, messageId);
   }
 
   protected async handleStreamError(
@@ -490,7 +706,10 @@ export class TTSService {
     messageId: string,
     errorMsg: string
   ) {
-    this.inflight.delete(messageId);
+    // Note: in-flight cleanup happens at the call site via `clearInflight`
+    // (it needs the userId, which this method doesn't carry). All callers
+    // wrap this in `try { await handleStreamError(...) } finally { clearInflight }`
+    // semantics.
     this.logger.error(
       { ttsJobId: ttsJob.id, error: errorMsg },
       "TTS stream error"
@@ -508,15 +727,13 @@ export class TTSService {
         "Failed to update TTSJob status"
       );
     }
-    ws.send(
-      JSON.stringify({
-        type: "user_tts_error",
-        status: 500,
-        statusText: errorMsg,
-        conversationId,
-        messageId
-      } satisfies EventTypeMap["user_tts_error"])
-    );
+    this.trySend(ws, "user_tts_error", {
+      type: "user_tts_error",
+      status: 500,
+      statusText: errorMsg,
+      conversationId,
+      messageId
+    } satisfies EventTypeMap["user_tts_error"]);
   }
 
   public streamToClient(
@@ -525,6 +742,8 @@ export class TTSService {
     messageId: string,
     userId: string,
     text: string,
+    provider: $Enums.Provider,
+    model: string | null,
     ttsJob: TTSJobSingleton<true>,
     voice = "eve",
     language = "auto",
@@ -534,6 +753,7 @@ export class TTSService {
   ) {
     const t0 = performance.now();
     this.inflight.add(messageId);
+    this.registerInflight(userId, messageId);
     const xaiWs = new TTSWebSocket(
       this.buildWssUrl(voice, language, {
         codec,
@@ -585,7 +805,9 @@ export class TTSService {
           bitRate,
           sampleRate,
           t0,
-          event.trace_id
+          event.trace_id,
+          provider,
+          model
         );
         return;
       } else if (event.type === "error") {
@@ -596,23 +818,25 @@ export class TTSService {
           conversationId,
           messageId,
           event.message
-        );
+        ).finally(() => this.clearInflight(userId, messageId));
         return;
       }
 
       if (audioChunk) {
         audioChunks.push(audioChunk);
 
-        ws.send(
-          JSON.stringify({
-            type: "user_tts_chunk",
-            conversationId,
-            ttsJobId: ttsJob.id,
-            generationMs: performance.now() - t0,
-            messageId,
-            audioChunk
-          } satisfies EventTypeMap["user_tts_chunk"])
-        );
+        // Best-effort: a dead client socket must NOT abort the streaming
+        // loop. Server-side persistence in finalize() is authoritative; the
+        // client will replay from the cached cdnUrl on next request via
+        // `user_tts_response_preexisting`.
+        this.trySend(ws, "user_tts_chunk", {
+          type: "user_tts_chunk",
+          conversationId,
+          ttsJobId: ttsJob.id,
+          generationMs: performance.now() - t0,
+          messageId,
+          audioChunk
+        } satisfies EventTypeMap["user_tts_chunk"]);
 
         audioChunk = undefined;
       }
@@ -626,7 +850,7 @@ export class TTSService {
         conversationId,
         messageId,
         err.message
-      );
+      ).finally(() => this.clearInflight(userId, messageId));
     };
 
     const handleClose = () => {
@@ -647,7 +871,7 @@ export class TTSService {
     xaiWs.on("close", handleClose);
   }
 
-  protected async syncCache(userId: string) {
+  public async syncTTSCache(userId: string) {
     this.ttsJobCache.clear();
     const hasTTSJobs = await this.prisma.hasTTSJobsOnFile(userId);
     if (!hasTTSJobs) return;
@@ -661,9 +885,5 @@ export class TTSService {
       { userId, jobCount: allTTSJobs.length },
       "TTS cache synced"
     );
-  }
-
-  public async syncTTSCache(userId: string) {
-    await this.syncCache(userId);
   }
 }

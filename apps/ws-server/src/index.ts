@@ -144,7 +144,13 @@ async function exe() {
 
     const { WSServer } = await import("@/ws-server/index.ts");
 
-    const wsServer = new WSServer({ port }, redisInstance, prisma, pdfService);
+    const wsServer = new WSServer(
+      { port },
+      redisInstance,
+      prisma,
+      pdfService,
+      logger
+    );
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
@@ -291,6 +297,7 @@ async function exe() {
     resolver.registerAll();
 
     wsServer.setResolver(resolver);
+    wsServer.setTTSService(ttsService);
 
     const redisPingHandle = setInterval(async () => {
       try {

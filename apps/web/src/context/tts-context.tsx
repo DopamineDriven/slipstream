@@ -66,7 +66,8 @@ export function TTSProvider({
   const { get } = useCookiesCtx();
 
   const safariAudioSession = useMemo(
-    () => isSafariAudioSessionSupported(get("browserName"), get("browserVersion")),
+    () =>
+      isSafariAudioSessionSupported(get("browserName"), get("browserVersion")),
     [get]
   );
   const [isGenerating, setIsGenerating] = useState(false);
@@ -98,15 +99,25 @@ export function TTSProvider({
     isGeneratingRef.current = isGenerating;
   }, [isGenerating]);
 
-  const playFromUrl = useCallback((url: string | null, messageId: string) => {
-    if (!url || !audioRef.current) return;
-    if (safariAudioSession) {
-      PCMStreamPlayer.enablePlaybackAudioSession();
-    }
-    audioRef.current.src = url;
-    void audioRef.current.play();
-    setCurrentPlaybackMessageId(messageId);
-  }, [safariAudioSession]);
+  const playFromUrl = useCallback(
+    async (url: string | null, messageId: string) => {
+      if (!url || !audioRef.current) return;
+      if (!URL.canParse(url)) return;
+      if (safariAudioSession) {
+        PCMStreamPlayer.enablePlaybackAudioSession();
+      }
+      audioRef.current.src = url;
+      try {
+        await audioRef.current.play();
+        setCurrentPlaybackMessageId(messageId);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Audio playback failed");
+        setCurrentPlaybackMessageId(null);
+        setIsPlaying(false);
+      }
+    },
+    [safariAudioSession]
+  );
 
   useEffect(() => {
     const handleChunk = (evt: EventTypeMap["user_tts_chunk"]) => {
@@ -130,6 +141,31 @@ export function TTSProvider({
 
       // Stream immediately via Web Audio
       playerRef.current?.pushChunk(evt.audioChunk);
+    };
+
+    const handlePreexistingResponse = (
+      evt: EventTypeMap["user_tts_response_preexisting"]
+    ) => {
+      if (evt.messageId !== activeMessageIdRef.current) return;
+
+      // No PCM player was needed for this path — tear down the one requestTTS created.
+      void playerRef.current?.close();
+      playerRef.current = null;
+      rawChunksRef.current = Array.of<Uint8Array>();
+      activeTtsJobIdRef.current = null;
+
+      cacheRef.current.set(evt.messageId, {
+        cdnUrl: evt.cdnUrl,
+        blobUrl: null,
+        durationMs: evt.durationMs,
+        codec: evt.codec
+      });
+
+      setIsGenerating(false);
+      setActiveMessageId(null);
+      setError(null);
+
+      void playFromUrl(evt.cdnUrl, evt.messageId);
     };
 
     const handleResponse = (evt: EventTypeMap["user_tts_response"]) => {
@@ -188,13 +224,14 @@ export function TTSProvider({
     client.on("user_tts_chunk", handleChunk);
     client.on("user_tts_response", handleResponse);
     client.on("user_tts_error", handleError);
-
+    client.on("user_tts_response_preexisting", handlePreexistingResponse);
     return () => {
       client.off("user_tts_chunk");
       client.off("user_tts_response");
       client.off("user_tts_error");
+      client.off("user_tts_response_preexisting");
     };
-  }, [client]);
+  }, [client, playFromUrl]);
 
   // Cleanup on unmount: revoke blob URLs, close player
   useEffect(() => {
@@ -234,7 +271,10 @@ export function TTSProvider({
       if (isGeneratingRef.current) return;
 
       // Create PCM stream player (must be in user gesture call stack)
-      playerRef.current = new PCMStreamPlayer(STREAM_SAMPLE_RATE, safariAudioSession);
+      playerRef.current = new PCMStreamPlayer(
+        STREAM_SAMPLE_RATE,
+        safariAudioSession
+      );
 
       setIsGenerating(true);
       setActiveMessageId(messageId);

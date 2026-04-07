@@ -1,4 +1,6 @@
 import { createReadStream } from "node:fs";
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import type {
   Collection,
   CollectionDocument,
@@ -16,8 +18,6 @@ import type {
   xAIDocDbRegistryProps
 } from "@/xai/types.ts";
 import type { Logger } from "pino";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
 import type { ProviderDocState } from "@slipstream/db/enums-node";
 import type { AttachmentSingleton, GrokModelIdUnion } from "@slipstream/types";
 
@@ -25,7 +25,7 @@ export class GrokWorkupService {
   protected logger: Logger;
   protected readonly baseUrl = "https://api.x.ai/v1/responses";
   protected readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
-  
+
   /**
    * use if image attachments detected -- for grok-imagine-image and grok-imagine-image-pro only
    */

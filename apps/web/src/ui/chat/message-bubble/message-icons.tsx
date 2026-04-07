@@ -1,5 +1,6 @@
 "use client";
 
+import type { User } from "@/utils/auth-client";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useTTSContext } from "@/context/tts-context";
@@ -9,7 +10,6 @@ import { formatTime, getFirstName } from "@/lib/helpers";
 import { getModelDisplayName } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AnimatedCopyButton } from "@/ui/atoms/animated-copy-button";
-import { User } from "@/utils/auth-client";
 import { useTheme } from "next-themes";
 import type {
   AllModelsUnion,
@@ -75,9 +75,6 @@ export function MessageIcons({
       tts.requestTTS(message.id, message.conversationId);
     }
   }, [isTTSActive, tts, message.id, message.conversationId]);
-
-
-
 
   const RxnIcons = useMemo(
     () =>

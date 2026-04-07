@@ -384,6 +384,9 @@ export interface UserData {
   postalCode?: string;
   tz?: string;
   locale?: string;
+  browserName?: string;
+  browserVersion?: string;
+  viewport?: string;
 }
 
 export type MessageHandler<T extends keyof EventTypeMap> = (

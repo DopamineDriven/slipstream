@@ -181,7 +181,8 @@ export type {
   UserTTSChunk,
   UserTTSError,
   UserTTSRequest,
-  UserTTSResponse
+  UserTTSResponse,
+  UserTTSResponsePreexisting
 } from "@/events.ts";
 
 /**
