@@ -52,8 +52,7 @@
     "prettier": "catalog:prettier",
     "tsx": "catalog:tsx",
     "turbo": "catalog:turbo",
-    "typescript": "catalog:ts",
-    "vercel": "catalog:vercel"
+    "typescript": "catalog:ts"
   },
   "prettier": "@slipstream/prettier-config",
   "engines": {

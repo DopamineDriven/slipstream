@@ -4,7 +4,23 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build", "@slipstream/db#build"],
-      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
+      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "src/**/*.tsx",
+        "src/**/*.ts",
+        "src/**/*.css",
+        "tsconfig.json",
+        "package.json",
+        "index.d.ts",
+        "global.d.ts",
+        "aicoalesce-og-img.png",
+        "aicoalesce-twitter-img.png",
+        "next-env.d.ts",
+        "eslint.config.mjs",
+        "postcss.config.mjs",
+        "next.config.ts"
+      ]
     },
     "dev": {
       "cache": false
