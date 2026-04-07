@@ -1,7 +1,7 @@
 # Slipstream — Turborepo
 
 
-![Simplified Overview](./misc/slipstream-simplified-overview.png)
+![Attachment Pipeline Overview](./misc/slipstream-overview-asset-pipeline-update-white.png)
 
 
 ## Typical Flows
