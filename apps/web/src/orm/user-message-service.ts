@@ -8,7 +8,8 @@ import type {
   AttachmentSingleton,
   ConversationSingleton,
   MessageSingleton,
-  Rm
+  Rm,
+  TTSJobSingleton
 } from "@slipstream/types";
 
 export class PrismaUserMessageService extends ErrorHelperService {
@@ -39,23 +40,47 @@ export class PrismaUserMessageService extends ErrorHelperService {
     return await this.prismaClient.conversation.findUnique({
       where: { id: conversationId },
       include: {
-        messages: { orderBy: { createdAt: "asc" },include: {messageBlocks: true} },
+        messages: {
+          orderBy: { createdAt: "asc" },
+          include: { messageBlocks: true }
+        },
         conversationSettings: true
       }
     });
   }
 
-  private bigintToInt({ messages, ...rest }: ConversationSingleton<false>) {
+  private bigintToInt({
+    messages,
+    ...rest
+  }: ConversationSingleton<false | true>) {
     const msgs = messages.map(msg => {
-      const { attachments, ...rest } = msg;
+      let t: TTSJobSingleton<true | false> | null;
+      const { attachments, ttsJob, ...rest } = msg;
+      if (ttsJob) {
+        t = ttsJob;
+      } else {
+        t = null;
+      }
       const atts = attachments.map(att => {
         const { size, ...attRest } = att;
         return {
+          ttsJob: t
+            ? ({
+                ...t,
+                sizeBytes: t?.sizeBytes ? Number(t.sizeBytes) : null
+              } as const)
+            : null,
           ...attRest,
           size: size ? Number(size) : null
         } as Rm<AttachmentSingleton<true>, "providerLinks">;
       });
       return {
+        ttsJob: t
+          ? ({
+              ...t,
+              sizeBytes: t?.sizeBytes ? Number(t.sizeBytes) : null
+            } as const)
+          : null,
         ...rest,
         attachments: atts
       } as Rm<MessageSingleton<true>, "userKey">;
@@ -141,11 +166,17 @@ export class PrismaUserMessageService extends ErrorHelperService {
         messages: {
           orderBy: { createdAt: "asc" },
           include: {
+            ttsJob: true,
             imageGenJob: true,
             messageBlocks: true,
             attachments: {
               orderBy: { createdAt: "asc" },
-              include: { image: true, document: true, imageGenOutput: true, audio: true }
+              include: {
+                image: true,
+                document: true,
+                imageGenOutput: true,
+                audio: true
+              }
             }
           }
         },
@@ -153,7 +184,9 @@ export class PrismaUserMessageService extends ErrorHelperService {
       }
     });
 
-    return this.bigintToInt(convo) satisfies ConversationSingleton<true>;
+    return this.bigintToInt(
+      convo as ConversationSingleton<false>
+    ) satisfies ConversationSingleton<true>;
   }
 
   public async getTitleByConversationId(conversationId: string) {
