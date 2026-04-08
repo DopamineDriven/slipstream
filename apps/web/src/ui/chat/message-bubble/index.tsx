@@ -468,7 +468,13 @@ export function MessageBubble({
     return () => {
       cancelled = true;
     };
-  }, [hasRenderableMessageBlocks, isStreaming, message.id, orderedMessageBlocks]);
+  }, [
+    hasRenderableMessageBlocks,
+    isStreaming,
+    message.id,
+    orderedMessageBlocks,
+    blockOrdinalKey
+  ]);
 
   const renderedMessageBlocks = useMemo(() => {
     if (!hasRenderableMessageBlocks) {
@@ -499,7 +505,7 @@ export function MessageBubble({
               isStreaming
                 ? processStreamingMarkdown(blockContent)
                 : (renderedBlockContent[blockOrdinalKey(block.ordinal)] ??
-                    blockContent)
+                  blockContent)
             }
             duration={block.durationMs}
             isStreaming={isActiveThinkingBlock}
@@ -519,7 +525,7 @@ export function MessageBubble({
           {isStreaming
             ? processStreamingMarkdown(blockContent)
             : (renderedBlockContent[blockOrdinalKey(block.ordinal)] ??
-                blockContent)}
+              blockContent)}
         </div>
       );
     }
@@ -595,7 +601,9 @@ export function MessageBubble({
                     message.thinkingText
                   }
                   duration={
-                    liveThinkingDuration ?? message?.thinkingDuration ?? undefined
+                    liveThinkingDuration ??
+                    message?.thinkingDuration ??
+                    undefined
                   }
                   isStreaming={isStreaming ?? liveIsThinking ?? false}
                 />
@@ -608,7 +616,9 @@ export function MessageBubble({
                     message.thinkingText
                   }
                   duration={
-                    liveThinkingDuration ?? message?.thinkingDuration ?? undefined
+                    liveThinkingDuration ??
+                    message?.thinkingDuration ??
+                    undefined
                   }
                   isStreaming={isStreaming ?? liveIsThinking ?? false}
                 />

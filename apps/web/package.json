@@ -107,6 +107,7 @@
     "dotenv-expand": "catalog:dotenv",
     "eslint": "catalog:eslint",
     "eslint-config-next": "catalog:next",
+    "jiti": "catalog:jiti",
     "motion-dom": "catalog:motion",
     "motion-utils": "catalog:motion",
     "postcss": "catalog:styles",
@@ -118,7 +119,6 @@
     "typescript": "catalog:ts",
     "typescript-eslint": "catalog:tseslint",
     "unist-util-remove": "catalog:unist",
-    "unist-util-visit": "catalog:unist",
-    "urlpattern-polyfill": "catalog:polyfill"
+    "unist-util-visit": "catalog:unist"
   }
 }

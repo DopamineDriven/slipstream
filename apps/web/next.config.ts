@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 export default {
   reactStrictMode: true,
-  reactCompiler: true,
+  reactCompiler: true,experimental: {},
   typescript: { ignoreBuildErrors: false, tsconfigPath: "./tsconfig.json" },
   images: {
     localPatterns: [
@@ -22,6 +22,7 @@ export default {
     dangerouslyAllowLocalIP: true,
     maximumRedirects: 5,
     contentDispositionType: "attachment",
+    minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     remotePatterns: [
       {

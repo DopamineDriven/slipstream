@@ -105,24 +105,24 @@ export const metadata: Metadata = {
   }
 };
 
+const mode = getAnalyticsMode(process.env.VERCEL_ENV);
+
 export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const mode = getAnalyticsMode(process.env.VERCEL_ENV);
   return (
     <html
       suppressHydrationWarning
       lang="en"
       data-scroll-behavior="smooth"
       className={`${GeistSans.variable} ${GeistPixelSquare.variable} ${GeistMono.variable} ${inter.variable}`}>
-      <head>
-        <script
-          async={true}
-          id="prevent-flash-of-wrong-theme"
-          dangerouslySetInnerHTML={{
-            __html: `
+      <Script
+        async={true}
+        id="prevent-flash-of-wrong-theme"
+        dangerouslySetInnerHTML={{
+          __html: `
               (function() {
                 try {
                   const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -132,9 +132,8 @@ export default async function RootLayout({
                 } catch (e) {}
               })();
             `
-          }}
-        />
-      </head>
+        }}
+      />
       <body
         className={
           "bg-background font-basis m-0 h-dvh w-screen overflow-hidden p-0 antialiased"

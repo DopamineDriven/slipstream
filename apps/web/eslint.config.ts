@@ -1,8 +1,8 @@
+import type { Config } from "typescript-eslint";
 import baseConfig from "@slipstream/eslint-config/base";
 import nextjsConfig from "@slipstream/eslint-config/next";
 import reactConfig from "@slipstream/eslint-config/react";
 
-/** @type {import('typescript-eslint').Config} */
 export default [
   ...baseConfig,
   ...reactConfig,
@@ -20,4 +20,4 @@ export default [
       "@typescript-eslint/triple-slash-reference": "off"
     }
   }
-];
+] satisfies Config;

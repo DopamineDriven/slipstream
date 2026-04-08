@@ -2,10 +2,11 @@ import type { MetadataRoute } from "next";
 
 export default function manifest() {
   return <MetadataRoute.Manifest>{
-    short_name: "aicoalesce chat medium",
-    description: "Chat with models offered by Gemini, OpenAI, Anthropic, Meta, v0, and xAI",
+    short_name: "AI Coalesce",
+    description:
+      "Advanced custom tooling enabling user-tailored multimodel interactions that enhance with usage.",
     background_color: "#FFFFFF",
-    name: "aicoalesce multi-LLM chat medium",
+    name: "AI Coalesce",
     theme_color: "#020817",
     start_url: "/",
     display: "fullscreen",
