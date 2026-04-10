@@ -1,21 +1,16 @@
 "use client";
 
 import type { User } from "@/utils/auth-client";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useTTSContext } from "@/context/tts-context";
-import { useIsMobile } from "@/hooks/use-is-mobile";
 import { useReaction } from "@/hooks/use-reaction";
-import { formatTime, getFirstName } from "@/lib/helpers";
+import { formatTime, fromPrismaFormat, getFirstName } from "@/lib/helpers";
 import { getModelDisplayName } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AnimatedCopyButton } from "@/ui/atoms/animated-copy-button";
 import { useTheme } from "next-themes";
-import type {
-  AllModelsUnion,
-  MessageSingleton,
-  Provider
-} from "@slipstream/types";
+import type { MessageSingleton } from "@slipstream/types";
 import {
   Button,
   EditIcon,
@@ -31,51 +26,44 @@ const primerAudio = "/cassette-shortened.mp3";
 export function MessageIcons({
   user,
   message,
-  isStreaming
+  isStreaming,
+  isMobile
 }: {
   isStreaming: boolean;
   message: MessageSingleton<true>;
   user?: User;
+  isMobile: boolean;
 }) {
-  const isMobile = useIsMobile();
   const { resolvedTheme } = useTheme();
   const { handleReaction, isPending, reactionState } = useReaction(message);
   const tts = useTTSContext();
+
+  useEffect(() => {
+    if (message.ttsJob) {
+      tts.hydrateFromTtsJob(message.id, message.ttsJob);
+    }
+  }, [message.id, message.ttsJob, tts]);
 
   const isTTSActive =
     tts.currentPlaybackMessageId === message.id ||
     (tts.isGenerating && tts.activeMessageId === message.id);
 
-  const primerRef = useRef<HTMLAudioElement | null>(null);
-  const hasPlayedPrimer = useRef(false);
-
-  useEffect(() => {
-  if (primerRef.current) return;
+  const playPrimer = useCallback((hasCachedAudio: boolean) => {
+    if (hasCachedAudio) return;
     const el = new Audio(primerAudio);
+    el.preload = "none";
     el.volume = 0.1;
-    el.preload = "auto";
-    el.onended = () => {
-      hasPlayedPrimer.current = true;
-    };
-    primerRef.current = el;
-
-    return () => {
-      el.onended = null;
-      el.pause();
-      primerRef.current = null;
-    };
+    void el.play().catch(() => {});
   }, []);
 
   const handleReadAloud = useCallback(() => {
     if (isTTSActive) {
       tts.stop();
     } else {
-      if (primerRef.current && !hasPlayedPrimer.current) {
-        void primerRef.current.play().catch(() => {});
-      }
+      playPrimer(tts.hasCachedAudio(message.id));
       tts.requestTTS(message.id, message.conversationId);
     }
-  }, [isTTSActive, tts, message.id, message.conversationId]);
+  }, [isTTSActive, tts, message.id, message.conversationId, playPrimer]);
 
   const RxnIcons = useMemo(
     () =>
@@ -138,19 +126,20 @@ export function MessageIcons({
     <div className={actionButtonVariants.parent}>
       {message.senderType === "AI" ? (
         <>
-          <div
-            className={cn(isMobile ? "hidden" : "flex", "items-center gap-2")}>
-            <AnimatedCopyButton
-              textToCopy={message.content}
-              className={cn(
-                actionButtonVariants.default,
-                actionButtonVariants.cpBtn
-              )}
-              iconClassName="text-xs"
-              disabled={isStreaming === true}
-              initialIconSize={12}
-              size="icon"
-            />
+          <div className="flex items-center gap-2">
+            {!isMobile && (
+              <AnimatedCopyButton
+                textToCopy={message.content}
+                className={cn(
+                  actionButtonVariants.default,
+                  actionButtonVariants.cpBtn
+                )}
+                iconClassName="text-xs"
+                disabled={isStreaming === true}
+                initialIconSize={12}
+                size="icon"
+              />
+            )}
             {RxnIcons.map(action => (
               <Button
                 key={action.id}
@@ -197,28 +186,32 @@ export function MessageIcons({
               onClick={handleReadAloud}>
               <ReadAloudIcon className="size-3" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              disabled={isStreaming === true || isPending}
-              className={cn(
-                actionButtonVariants.default,
-                actionButtonVariants.reaction
-              )}
-              onClick={() => console.log("share action")}>
-              <Share className="size-3" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              disabled={isStreaming === true || isPending}
-              className={cn(
-                actionButtonVariants.default,
-                actionButtonVariants.reaction
-              )}
-              onClick={() => console.log("try again")}>
-              <RetryIcon className="size-3" />
-            </Button>
+            {!isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                disabled={isStreaming === true || isPending}
+                className={cn(
+                  actionButtonVariants.default,
+                  actionButtonVariants.reaction
+                )}
+                onClick={() => console.log("share action")}>
+                <Share className="size-3" />
+              </Button>
+            )}
+            {!isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                disabled={isStreaming === true || isPending}
+                className={cn(
+                  actionButtonVariants.default,
+                  actionButtonVariants.reaction
+                )}
+                onClick={() => console.log("try again")}>
+                <RetryIcon className="size-3" />
+              </Button>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <span>{formatTime(message.createdAt, locale, tz)}</span>
@@ -227,11 +220,24 @@ export function MessageIcons({
                 <span>•</span>
                 <span className="font-medium">
                   {getModelDisplayName(
-                    message.provider.toLowerCase() as Provider,
-                    message.model as AllModelsUnion
+                    fromPrismaFormat(message.provider),
+                    message.model
                   )}
                 </span>
               </>
+            )}
+            {isMobile && (
+              <AnimatedCopyButton
+                textToCopy={message.content}
+                className={cn(
+                  actionButtonVariants.default,
+                  actionButtonVariants.cpBtn
+                )}
+                iconClassName="text-xs"
+                disabled={isStreaming === true}
+                initialIconSize={12}
+                size="icon"
+              />
             )}
           </div>
         </>
@@ -242,8 +248,7 @@ export function MessageIcons({
             <span>•</span>
             <span className="font-medium">{getFirstName(user?.name)}</span>
           </div>
-          <div
-            className={cn("items-center gap-2", isMobile ? "hidden" : "flex")}>
+          <div className="flex items-center gap-2">
             <AnimatedCopyButton
               textToCopy={message.content}
               className={actionButtonVariants.default}
@@ -251,13 +256,15 @@ export function MessageIcons({
               initialIconSize={12}
               size="icon"
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              className={actionButtonVariants.default}
-              onClick={() => console.log("Edit message")}>
-              <EditIcon className="size-3" />
-            </Button>
+            {!isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className={actionButtonVariants.default}
+                onClick={() => console.log("Edit message")}>
+                <EditIcon className="size-3" />
+              </Button>
+            )}
           </div>
         </>
       )}

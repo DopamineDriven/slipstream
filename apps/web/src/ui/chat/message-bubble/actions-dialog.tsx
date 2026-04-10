@@ -58,7 +58,7 @@ export function MessageActionsDialog({
 
   useEffect(() => {
       if (!open) return;
-  if (primerRef.current) return; 
+  if (primerRef.current) return;
     const el = new Audio("/cassette-shortened.mp3");
     el.volume = 0.1;
     el.preload = "auto";

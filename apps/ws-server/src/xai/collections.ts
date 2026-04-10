@@ -7,7 +7,6 @@ import type {
   ContentBlockUnion,
   CreateResponseStreamProps,
   FileContentBlock,
-  FileSearchTool,
   FunctionCallContext,
   FunctionCallOutput,
   HandleToolUsageParams,
@@ -543,7 +542,7 @@ export class GrokCollectionsService extends GrokWorkupService {
           search_terms: {
             type: "string",
             description:
-              "Optional exact-match search terms for fulltext search. " +
+              "HIGHLY ENCOURAGED--Optional exact-match search terms for fulltext search. " +
               "Supports quoted phrases and negation (-deprecated). " +
               "When provided, returns partitioned semantic + fulltext results instead of a flat array."
           }
@@ -823,9 +822,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     });
   }
 
-  protected messageText(
-    msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
-  ) {
+  protected messageText(msg: MessageSingleton<true>) {
     const textBlocks = Array.of<string>();
 
     if (msg.messageBlocks && msg.messageBlocks.length > 0) {
@@ -835,12 +832,9 @@ export class GrokCollectionsService extends GrokWorkupService {
         }
       }
     }
-
     if (textBlocks.length > 0) {
       return textBlocks.join("\n");
-    }
-
-    return msg.content;
+    } else return msg.content;
   }
 
   protected async formatxAIMsgHistory(
@@ -848,10 +842,10 @@ export class GrokCollectionsService extends GrokWorkupService {
     model: GrokModelIdUnion,
     userId: string,
     imgDetail?: ImageContentBlock["detail"],
-    _keyFingerprint = "server",
-    _keyId?: string,
-    _apiKey = this.xaiKey,
-    _mgmtKey = this.xaiManagementKey
+    keyFingerprint = "server",
+    keyId?: string,
+    apiKey = this.xaiKey,
+    mgmtKey = this.xaiManagementKey
   ) {
     const formatted = Array.of<ResponsesComprehensive>();
 
@@ -988,14 +982,16 @@ export class GrokCollectionsService extends GrokWorkupService {
 
                 if (assetType === "DOCUMENT") {
                   try {
-                    //   const { docUri } = await this.ensureXaiAssetUploaded(
-                    //     att,
-                    //     keyFingerprint,
-                    //     keyId,
-                    //     apiKey,
-                    //     mgmtKey
-                    //   );
-                    textParts.push(`${modelIdentifier}\n[${name}](${url})`);
+                    const { docUri } = await this.ensureXaiAssetUploaded(
+                      att,
+                      keyFingerprint,
+                      keyId,
+                      apiKey,
+                      mgmtKey
+                    );
+                    textParts.push(
+                      `${modelIdentifier}\n[${name}](${docUri})\nsource: [${name}](${url})`
+                    );
                   } catch (err) {
                     this.logger.warn(
                       { err: this.prisma.safeErrMsg(err) },
@@ -1093,7 +1089,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     }
 
     const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.\n instead of file_search you have slather_user_store, a tool for spelunking a self-hosted vector store";
 
     return (
       systemPrompt ? `${systemPrompt}\n\n${note}` : note
@@ -1101,27 +1097,27 @@ export class GrokCollectionsService extends GrokWorkupService {
   }
 
   protected resolveResponsesTools({
-    collectionId = undefined,
-    enableFileSearch = false,
-    enableWebSearch = false,
-    enableXSearch = false,
+    collectionId: _c = undefined,
+    enableFileSearch: _e = false,
+    enableWebSearch = true,
+    enableXSearch = true,
     enableCodeInterpreter = false,
-    fileSearchMaxResults = 5,
+    fileSearchMaxResults: _x = 5,
     web_enable_image_understanding = true,
     x_enable_image_understanding = true,
     x_enable_video_understanding = true
   }: ResponsesToolsParams) {
     const tools = Array.of<ToolUnion>();
 
-    if (enableFileSearch && collectionId) {
-      if (collectionId) {
-        tools.push({
-          type: "file_search",
-          vector_store_ids: [collectionId],
-          max_num_results: fileSearchMaxResults
-        } satisfies FileSearchTool);
-      }
-    }
+    // if (enableFileSearch && collectionId) {
+    //   if (collectionId) {
+    //     tools.push({
+    //       type: "file_search",
+    //       vector_store_ids: [collectionId],
+    //       max_num_results: fileSearchMaxResults
+    //     } satisfies FileSearchTool);
+    //   }
+    // }
 
     if (enableWebSearch) {
       tools.push({

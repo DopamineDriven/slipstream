@@ -4,7 +4,7 @@ import type { Provider } from "@/lib/models";
 import type { User } from "@/utils/auth-client";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useIsMobile } from "@/hooks/use-is-mobile";
+import { useCookiesCtx } from "@/context/cookie-context";
 import { getInitials } from "@/lib/helpers";
 import { normalizeImgGenFields } from "@/lib/img-gen-to-attachment";
 import { processStreamingMarkdown } from "@/lib/markdown-streaming";
@@ -12,7 +12,6 @@ import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentDisplay } from "@/ui/chat/attachment-display";
 import { ImageGenerationCanvasTest } from "@/ui/chat/image-gen/test";
-import { MessageActionsDialog } from "@/ui/chat/message-bubble/actions-dialog";
 import { MessageIcons } from "@/ui/chat/message-bubble/message-icons";
 import { ThinkingSection } from "@/ui/chat/thinking";
 import { useTheme } from "next-themes";
@@ -22,13 +21,7 @@ import type {
   AttachmentSingleton,
   MessageSingleton
 } from "@slipstream/types";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-  Button,
-  EllipsisHorizontal
-} from "@slipstream/ui";
+import { Avatar, AvatarFallback, AvatarImage } from "@slipstream/ui";
 
 // Note: processMarkdownToReact is dynamically imported in the useEffect to reduce bundle size
 
@@ -75,9 +68,8 @@ export function MessageBubble({
       )
     });
   }, [liveImgGenFields]);
-
-  const isMobile = useIsMobile();
-  const [showMobileActions, setShowMobileActions] = useState(false);
+  const { get } = useCookiesCtx();
+  const isMobile = get("viewport") === "mobile";
 
   const [renderedContent, setRenderedContent] = useState<ReactNode | null>(
     null
@@ -141,10 +133,6 @@ export function MessageBubble({
     }
     return null;
   }, [isStreaming, liveIsThinking, liveThinkingText, message.thinkingText]);
-
-  const handleMobileActionsClick = useCallback(() => {
-    setShowMobileActions(true);
-  }, []);
 
   const streamingRenderedContent = useMemo(
     () => (isStreaming ? processStreamingMarkdown(message.content) : null),
@@ -560,21 +548,6 @@ export function MessageBubble({
                 ? "bg-[#2252ba] text-[#fefefe]"
                 : "bg-[#0d2a6b] text-[#fafafa]"
           )}>
-          {isMobile && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleMobileActionsClick}
-              className={cn(
-                "absolute size-6 bg-transparent p-0 focus:bg-transparent",
-                message.senderType === "USER"
-                  ? "text-primary-foreground/70 hover:text-primary-foreground/90"
-                  : "text-muted-foreground hover:text-foreground"
-              )}>
-              <EllipsisHorizontal className="h-3 w-3" />
-              <span className="sr-only">Message options</span>
-            </Button>
-          )}
           {hasRenderableMessageBlocks ? (
             renderedMessageBlocks
           ) : (
@@ -687,6 +660,7 @@ export function MessageBubble({
             </div>
           )}
           <MessageIcons
+            isMobile={isMobile}
             isStreaming={isStreaming}
             message={message}
             user={user}
@@ -704,11 +678,6 @@ export function MessageBubble({
           </div>
         )}
       </div>
-      <MessageActionsDialog
-        open={showMobileActions}
-        onOpenChange={setShowMobileActions}
-        msg={message}
-      />
     </>
   );
 }

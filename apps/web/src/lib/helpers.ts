@@ -1,3 +1,5 @@
+import { $Enums } from "@slipstream/db/node/generated/client";
+
 export const getInitials = (name?: string | null) => {
   if (!name) return "U";
   return name
@@ -24,3 +26,7 @@ export const formatTime = (dateString: Date, locale: string, tz: string) => {
     timeZone: decodeURIComponent(tz)
   });
 };
+
+export const fromPrismaFormat = (provider: $Enums.Provider) =>{
+  return provider.toLowerCase() as Lowercase<$Enums.Provider>;
+}
