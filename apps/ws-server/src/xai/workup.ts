@@ -61,7 +61,7 @@ export class GrokWorkupService {
     DOCUMENT_STATUS_UNKNOWN: "PENDING"
   } as const satisfies Record<DocumentStatus, ProviderDocState>;
 
-  protected isMultiAgent(m: GrokModelIdUnion) {
+  protected isMultiAgent(m: string) {
     return m === "grok-4.20-multi-agent-0309";
   }
 
@@ -69,7 +69,7 @@ export class GrokWorkupService {
     return !this.isMultiAgent(m);
   }
 
-  protected is420BetaModel(m: GrokModelIdUnion) {
+  protected is420BetaModel(m: string) {
     return (
       m === "grok-4.20-0309-reasoning" ||
       m === "grok-4.20-0309-non-reasoning" ||
@@ -77,8 +77,9 @@ export class GrokWorkupService {
     );
   }
 
-  protected isGrok4Model(m: GrokModelIdUnion) {
+  protected isGrok4Model(m: string) {
     return (
+      this.is420BetaModel(m) ||
       m === "grok-4-1-fast-non-reasoning" ||
       m === "grok-4-1-fast-reasoning" ||
       m === "grok-4-fast-reasoning" ||
@@ -86,15 +87,15 @@ export class GrokWorkupService {
     );
   }
 
-  protected isNativeImgModel(m: GrokModelIdUnion) {
+  protected isNativeImgModel(m: string) {
     return m === "grok-imagine-image" || m === "grok-imagine-image-pro";
   }
 
-  protected isNativeVideoModel(m: GrokModelIdUnion) {
+  protected isNativeVideoModel(m: string) {
     return m === "grok-imagine-video";
   }
 
-  protected canViewImgs(model: GrokModelIdUnion) {
+  protected canViewImgs(model: string) {
     return (
       this.isNativeImgModel(model) ||
       this.isNativeVideoModel(model) ||
@@ -935,7 +936,7 @@ export class GrokWorkupService {
     att: AttachmentSingleton<true>,
     key = this.xaiKey
   ) {
-    const { absTmpPath, tmpUniquename, mime } =
+    const { absTmpPath, tmpUniquename } =
       await this.prisma.fetchRemoteToTmp("GROK", att);
     try {
       const formData = new FormData();
@@ -958,9 +959,7 @@ export class GrokWorkupService {
 
       const buf = Buffer.concat(arr);
 
-      const file = new File([buf], displayName, { type: mime });
-
-      formData.append("file", file);
+      formData.append("file", new Blob([buf]), displayName);
 
       formData.append("purpose", "assistants");
 

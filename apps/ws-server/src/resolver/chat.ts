@@ -3,7 +3,11 @@ import type { LoggerService } from "@/logger/index.ts";
 import type { ProviderService } from "@/providers/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { TTSService } from "@/tts/index.ts";
-import type { ProviderChatRequestEntity, UserData } from "@/types/index.ts";
+import type {
+  HandleAiChatRequestRT,
+  ProviderChatRequestEntity,
+  UserData
+} from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
 import { ResolverTTSService } from "@/resolver/tts.ts";
@@ -16,6 +20,7 @@ import type {
 } from "@slipstream/types";
 
 export class ResolverChatService extends ResolverTTSService {
+  public userStoreDocStatus = new Map<string, boolean>();
   constructor(
     wsServer: WSServer,
     providers: ProviderService,
@@ -79,7 +84,7 @@ export class ResolverChatService extends ResolverTTSService {
       );
     }
 
-    const res = await this.wsServer.prisma.handleAiChatRequest({
+    const reqObj = {
       userId,
       batchId,
       conversationId: conversationIdInitial,
@@ -95,16 +100,22 @@ export class ResolverChatService extends ResolverTTSService {
       topP,
       model,
       metadata: userData
-    });
+    };
+    let res: HandleAiChatRequestRT, hasUserStoreDocs: boolean;
+    const getStatus = this.userStoreDocStatus.get(userId);
+    if (typeof getStatus === "undefined" || getStatus === false) {
+      [res, hasUserStoreDocs] = await Promise.all([
+        this.wsServer.prisma.handleAiChatRequest(reqObj),
+        this.wsServer.prisma.hasUserStoreDocs(userId)
+      ]);
+      this.userStoreDocStatus.set(userId, hasUserStoreDocs);
+    } else {
+      hasUserStoreDocs = getStatus;
+      res = await this.wsServer.prisma.handleAiChatRequest(reqObj);
+    }
+
     const { docCounts, imgCounts } = this.getCurrentMsgAttCounts(res);
-    // res.attachments?.findLastIndex(t =>t.id === res.requestMessageId);
-    // if (res.attachments) {
-    // for (const att of res.attachments) {
-    // if (att.assetType==="IMAGE") imgAttachmentCount+=1;
-    // }
-    // } else {
-    //   imgAttachmentCount=0;
-    // }
+
     const user_location = {
       type: "approximate",
       city: userData?.city ?? "Barrington",
@@ -227,6 +238,7 @@ export class ResolverChatService extends ResolverTTSService {
     }
     console.log(`key looked up for ${provider}, ${keyId ?? "no key"}`);
     const commonProps = {
+      hasUserStoreDocs,
       chunks,
       conversationId,
       userMsgId,

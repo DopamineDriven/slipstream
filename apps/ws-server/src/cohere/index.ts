@@ -690,6 +690,7 @@ export class CohereService {
     ws,
     userMsgId,
     userId,
+    hasUserStoreDocs,
     isNewChat,
     model,
     systemPrompt,
@@ -949,7 +950,6 @@ export class CohereService {
       }
     };
 
-    const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
     const tools =
       hasUserStoreDocs && this.isToolCapable(resolvedModel)
         ? [this.fileSearchTool()]

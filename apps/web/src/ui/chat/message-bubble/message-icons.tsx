@@ -50,6 +50,7 @@ export function MessageIcons({
   const hasPlayedPrimer = useRef(false);
 
   useEffect(() => {
+  if (primerRef.current) return;
     const el = new Audio(primerAudio);
     el.volume = 0.1;
     el.preload = "auto";

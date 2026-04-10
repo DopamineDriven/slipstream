@@ -88,9 +88,13 @@ function KimiSSETransformer(
   }
 
   if (dataLines.length > 0) {
+    const rawData = dataLines.join("\n").trim();
+    if (rawData === "[DONE]") {
+      return null;
+    }
+
     try {
-      const jsonStr = dataLines.join("\n");
-      const parsedData = JSON.parse<KimiChatCompletionsRes>(jsonStr);
+      const parsedData = JSON.parse<KimiChatCompletionsRes>(rawData);
       return { event: eventType, data: parsedData };
     } catch (error) {
       console.error("Failed to parse Kimi SSE data:", error);

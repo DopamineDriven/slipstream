@@ -361,6 +361,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     topP: top_p,
     model: m,
     systemPrompt,
+    hasUserStoreDocs,
     management_api_key,
     payload: {
       collectionId,
@@ -385,7 +386,6 @@ export class GrokCollectionsService extends GrokWorkupService {
     const mgmtApiKey = management_api_key ?? this.xaiManagementKey;
     const collection_id = this.collectionRegistry.get(userId);
     const cId = collection_id ?? collectionId;
-    const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
     const {
       input,
       instructions,
@@ -435,6 +435,8 @@ export class GrokCollectionsService extends GrokWorkupService {
           tool_choice: tool_choice_input,
           detail: imgDetail,
           keyId: keyId ?? undefined,
+          hasUserStoreDocs,
+          reasoning: m && this.isMultiAgent(m) ? { effort: "low" } : undefined,
           apiKey: key,
           managementKey: mgmtApiKey,
           collectionId: cId,
@@ -846,10 +848,10 @@ export class GrokCollectionsService extends GrokWorkupService {
     model: GrokModelIdUnion,
     userId: string,
     imgDetail?: ImageContentBlock["detail"],
-    keyFingerprint = "server",
-    keyId?: string,
-    apiKey = this.xaiKey,
-    mgmtKey = this.xaiManagementKey
+    _keyFingerprint = "server",
+    _keyId?: string,
+    _apiKey = this.xaiKey,
+    _mgmtKey = this.xaiManagementKey
   ) {
     const formatted = Array.of<ResponsesComprehensive>();
 
@@ -892,18 +894,10 @@ export class GrokCollectionsService extends GrokWorkupService {
 
                 if (attachment.assetType === "DOCUMENT") {
                   try {
-                    const { fileId, docUri } =
-                      await this.ensureXaiAssetUploaded(
-                        attachment,
-                        keyFingerprint,
-                        keyId,
-                        apiKey,
-                        mgmtKey
-                      );
                     if (isFreshContext) {
                       try {
                         if (!isCurrentUserMsg) {
-                          textParts.push(`[${name}](${docUri})`);
+                          textParts.push(`[${name}](${url})`);
                         } else {
                           if (
                             currentUserFileCount === 0 &&
@@ -911,19 +905,19 @@ export class GrokCollectionsService extends GrokWorkupService {
                           ) {
                             const docBlock = {
                               type: "input_file",
-                              file_id: fileId
+                              file_url: url
                             } satisfies FileContentBlock;
                             content.push(docBlock);
                             currentUserFileCount += 1;
                           } else {
-                            textParts.push(`[${name}](${docUri})`);
+                            textParts.push(`[${name}](${url})`);
                           }
                         }
                       } catch {
-                        textParts.push(`[${name}](${docUri})`);
+                        textParts.push(`[${name}](${url})`);
                       }
                     } else {
-                      textParts.push(`[${name}](${docUri})`);
+                      textParts.push(`[${name}](${url})`);
                     }
                   } catch (err) {
                     this.logger.warn(
@@ -994,14 +988,14 @@ export class GrokCollectionsService extends GrokWorkupService {
 
                 if (assetType === "DOCUMENT") {
                   try {
-                    const { docUri } = await this.ensureXaiAssetUploaded(
-                      att,
-                      keyFingerprint,
-                      keyId,
-                      apiKey,
-                      mgmtKey
-                    );
-                    textParts.push(`${modelIdentifier}\n[${name}](${docUri})`);
+                    //   const { docUri } = await this.ensureXaiAssetUploaded(
+                    //     att,
+                    //     keyFingerprint,
+                    //     keyId,
+                    //     apiKey,
+                    //     mgmtKey
+                    //   );
+                    textParts.push(`${modelIdentifier}\n[${name}](${url})`);
                   } catch (err) {
                     this.logger.warn(
                       { err: this.prisma.safeErrMsg(err) },
@@ -1107,8 +1101,8 @@ export class GrokCollectionsService extends GrokWorkupService {
   }
 
   protected resolveResponsesTools({
-    collectionId,
-    enableFileSearch = true,
+    collectionId = undefined,
+    enableFileSearch = false,
     enableWebSearch = false,
     enableXSearch = false,
     enableCodeInterpreter = false,
@@ -1162,13 +1156,13 @@ export class GrokCollectionsService extends GrokWorkupService {
    */
   protected handleTooling({
     model,
-    collectionId,
-    enableFileSearch = true,
-    enableUserStoreSearch = false,
+    collectionId = undefined,
+    enableFileSearch = false,
+    enableUserStoreSearch = true,
     fileSearchMaxResults = 10,
     enableCodeInterpreter = true,
     enableWebSearch = true,
-    enableXSearch = false,
+    enableXSearch = true,
     web_enable_image_understanding = true,
     x_enable_image_understanding = true,
     x_enable_video_understanding = true
@@ -1210,8 +1204,9 @@ export class GrokCollectionsService extends GrokWorkupService {
     keyId,
     apiKey = this.xaiKey,
     managementKey = this.xaiManagementKey,
-    collectionId,
-    enableFileSearch = true,
+    collectionId = undefined,
+    hasUserStoreDocs,
+    enableFileSearch = false,
     enableUserStoreSearch,
     fileSearchMaxResults = 5,
     enableCodeInterpreter = true,
@@ -1224,14 +1219,12 @@ export class GrokCollectionsService extends GrokWorkupService {
     parallel_tool_calls = true,
     include = ["reasoning.encrypted_content"]
   }: ResponsesApiInputWorkupParams) {
-    const hasUserStoreDocs =
-      enableUserStoreSearch ?? (await this.prisma.hasUserStoreDocs(userId));
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
       systemPrompt
     );
     let toolHandler: ToolUnion[] | undefined;
-
+    const hasDocs = enableUserStoreSearch && hasUserStoreDocs;
     // "grok-4.20-multi-agent-0309" doesn't support calling functional tools yet (2026-03-24)
     // and will error if they are presen
     if (this.isMultiAgent(model)) {
@@ -1253,7 +1246,7 @@ export class GrokCollectionsService extends GrokWorkupService {
         model,
         collectionId,
         enableFileSearch,
-        enableUserStoreSearch: hasUserStoreDocs,
+        enableUserStoreSearch: hasDocs,
         fileSearchMaxResults,
         enableCodeInterpreter,
         enableWebSearch,

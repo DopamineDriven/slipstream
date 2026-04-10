@@ -28,7 +28,8 @@ import type { Logger as PinoLogger } from "pino";
 import {
   createDeepSeekSSEParser,
   hasToolCallDelta,
-  isContentDelta
+  isContentDelta,
+  isReasoningDelta
 } from "@/deepseek/sse.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
@@ -37,6 +38,22 @@ import type {
   EventTypeMap,
   MessageSingleton
 } from "@slipstream/types";
+
+const DEEPSEEK_TOOLING_LIMITS = {
+  fileSearch: {
+    defaultResults: 5,
+    minResults: 5,
+    maxResults: 15
+  },
+  maxToolRounds: 15
+} as const satisfies {
+  fileSearch: {
+    defaultResults: number;
+    minResults: number;
+    maxResults: number;
+  };
+  maxToolRounds: number;
+};
 
 export class DeepSeekService {
   private readonly baseUrl = "https://ai-gateway.vercel.sh/v1/chat/completions";
@@ -261,14 +278,17 @@ export class DeepSeekService {
       function: {
         name: "file_search",
         description:
-          "This tool utilizes a 'Partitioned Foraging' approach which recognizes that for the 200,000+ years that humans have existed " +
-          "95%+ of it has been as foragers. Agents are trained exclusively on data aggregated/curated by humans; " +
-          "think of it as agentic foraging complete with Jaccard similarity scores for cross-analyzing your bounties. " +
-          "Search the user's uploaded documents. Uses semantic similarity by default. " +
-          "When search_terms is provided, also performs fulltext keyword search and returns " +
-          "both result sets separately (semantic + fulltext) so you can reason about which signal is most relevant. " +
-          "Without search_terms: returns a flat JSON array. " +
-          "With search_terms: returns { semantic, fulltext, overlap, meta }.",
+        "This tool utilizes a 'Partitioned Foraging' approach which recognizes that for the 200,000+ years that humans have existed " +
+        "95%+ of it has been as foragers. Agents are trained exclusively on data aggregated/curated by humans; " +
+        "think of it as agentic foraging complete with Jaccard similarity scores for cross-analyzing your bounties. " +
+        "Search the user's uploaded documents. Uses semantic similarity by default. " +
+        "When search_terms is provided, execjtes fulltext keyword search and returns " +
+        "both result sets separately (semantic + fulltext) so you can reason about which signal " +
+        "is most relevant to the user's intent. " +
+        "STRONGLY recommend using semantic+fulltext for the richest results"+
+        "Without search_terms: returns a flat JSON array of chunks. " +
+        "With search_terms: returns { semantic: [...], fulltext: [...], overlap: { chunkIds, jaccardSimilarity }, meta }. " +
+        "Call directly for single retrieval tasks, or from code_execution for multi-step programmatic workflows.",
         parameters: {
           type: "object",
           properties: {
@@ -278,7 +298,8 @@ export class DeepSeekService {
             },
             max_results: {
               type: "number",
-              description: "Maximum results to return (1-10, default 5)"
+              description:
+                "Maximum results to return. Value must be no lower than 5 and no higher than 15. Default 5."
             },
             filename: {
               type: "string",
@@ -479,7 +500,14 @@ export class DeepSeekService {
   }
 
   private async executeFileSearch(userId: string, input: FileSearchInput) {
-    const maxResults = Math.max(1, Math.min(input.max_results ?? 5, 10));
+    const requestedMaxResults =
+      input.max_results ?? DEEPSEEK_TOOLING_LIMITS.fileSearch.defaultResults;
+    const maxResults =
+      requestedMaxResults < DEEPSEEK_TOOLING_LIMITS.fileSearch.minResults
+        ? DEEPSEEK_TOOLING_LIMITS.fileSearch.minResults
+        : requestedMaxResults > DEEPSEEK_TOOLING_LIMITS.fileSearch.maxResults
+          ? DEEPSEEK_TOOLING_LIMITS.fileSearch.maxResults
+          : requestedMaxResults;
 
     if (input.search_terms) {
       const query = "query" in input ? input.query : input.queries[0];
@@ -632,6 +660,7 @@ export class DeepSeekService {
     ws,
     userMsgId,
     userId,
+    hasUserStoreDocs,
     isNewChat,
     max_tokens,
     model,
@@ -663,10 +692,7 @@ export class DeepSeekService {
         return;
       }
 
-      const durationMs = Math.max(
-        0,
-        Math.round(performance.now() - activeBlock.startedAt)
-      );
+      const durationMs = performance.now() - activeBlock.startedAt;
 
       trackedBlocks.push({
         content: activeBlock.content,
@@ -688,8 +714,6 @@ export class DeepSeekService {
         finalizeActiveBlock();
         activeBlock = {
           content: "",
-          reasoningChunkCount: 0,
-          sawAggregateTail: false,
           startedAt: performance.now(),
           type
         };
@@ -701,7 +725,7 @@ export class DeepSeekService {
     const currentThinkingDuration = () => {
       const activeThinkingDuration =
         activeBlock?.type === "THINKING"
-          ? Math.round(performance.now() - activeBlock.startedAt)
+          ? performance.now() - activeBlock.startedAt
           : 0;
 
       return DeepSeekThinkingDuration + activeThinkingDuration;
@@ -717,48 +741,21 @@ export class DeepSeekService {
         content: activeBlock.content,
         ordinal: nextOrdinal,
         conversationId,
-        durationMs: Math.max(
-          0,
-          Math.round(performance.now() - activeBlock.startedAt)
-        )
+        durationMs: performance.now() - activeBlock.startedAt
       } as const;
     };
 
     const appendReasoningDelta = (reasoningText?: string) => {
       if (!reasoningText) return;
       const block = ensureActiveBlock("THINKING");
-      block.reasoningChunkCount += 1;
 
-      let emittedThinkingText = reasoningText;
-      if (
-        block.reasoningChunkCount > 3 &&
-        Math.abs(block.content.length - reasoningText.length) <=
-          4 * block.reasoningChunkCount
-      ) {
-        block.sawAggregateTail = true;
-        const prependNew = `\n${reasoningText}`;
-        emittedThinkingText =
-          block.content.length < prependNew.length
-            ? prependNew.substring(block.content.length)
-            : "";
-      }
+      block.content += reasoningText;
+      DeepSeekThinkingAgg += reasoningText;
+      thinkingChunks.push(reasoningText);
 
-      if (emittedThinkingText.length === 0) {
-        return undefined;
-      }
-
-      const appendedText = block.sawAggregateTail
-        ? emittedThinkingText
-        : reasoningText;
-
-      block.content += appendedText;
-      DeepSeekThinkingAgg += appendedText;
-      thinkingChunks.push(appendedText);
-
-      return emittedThinkingText;
+      return reasoningText;
     };
 
-    const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
     const tools = hasUserStoreDocs
       ? [this.fileSearchFunctionTool()]
       : undefined;
@@ -779,7 +776,7 @@ export class DeepSeekService {
       ...this.formatHistory(msgs)
     );
 
-    const MAX_TOOL_ROUNDS = 10;
+    const MAX_TOOL_ROUNDS = DEEPSEEK_TOOLING_LIMITS.maxToolRounds;
     let forcedLoopStopReason: DeepSeekForcedLoopStopReason = null;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
@@ -805,7 +802,7 @@ export class DeepSeekService {
             finalizeActiveBlock();
           }
 
-          if (choice.delta.reasoning) {
+          if (isReasoningDelta(choice.delta)) {
             const reasoningText =
               "reasoning" in choice.delta &&
               typeof choice.delta.reasoning === "string"

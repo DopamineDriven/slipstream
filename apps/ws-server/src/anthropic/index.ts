@@ -212,10 +212,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
         return;
       }
 
-      const durationMs = Math.max(
-        0,
-        Math.round(performance.now() - activeBlock.startedAt)
-      );
+      const durationMs = performance.now() - activeBlock.startedAt
 
       trackedBlocks.push({
         content: activeBlock.content,
@@ -236,10 +233,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       type: AnthropicActiveMessageBlock["type"],
       blockIndex: number
     ) => {
-      if (
-        activeBlock?.type !== type ||
-        activeBlock.blockIndex !== blockIndex
-      ) {
+      if (activeBlock?.type !== type || activeBlock.blockIndex !== blockIndex) {
         finalizeActiveBlock();
         activeBlock = {
           blockIndex,
@@ -255,7 +249,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
     const getThinkingDuration = () => {
       const activeThinkingDuration =
         activeBlock?.type === "THINKING"
-          ? Math.round(performance.now() - activeBlock.startedAt)
+          ? performance.now() - activeBlock.startedAt
           : 0;
 
       const totalThinkingDuration =
@@ -266,7 +260,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
 
     const currentChunkMessageBlock = () => {
       if (!activeBlock) {
-        return undefined;
+        return;
       }
 
       return {
@@ -274,10 +268,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
         content: activeBlock.content,
         ordinal: nextOrdinal,
         conversationId,
-        durationMs: Math.max(
-          0,
-          Math.round(performance.now() - activeBlock.startedAt)
-        )
+        durationMs: performance.now() - activeBlock.startedAt
       } as const;
     };
 
@@ -376,7 +367,6 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       let usage: number | undefined = undefined;
 
       for await (const chunk of stream) {
-
         console.info(
           {
             event:
@@ -1036,7 +1026,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               );
             }
 
-            const input: FileSearchToolInput = {
+            const input = {
               query: parsed.query,
               max_results:
                 typeof parsed.max_results === "number"
@@ -1050,16 +1040,8 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
                 typeof parsed.search_terms === "string"
                   ? parsed.search_terms.trim() || undefined
                   : undefined
-            };
+            } satisfies FileSearchToolInput;
 
-            this.logger.info(
-              {
-                query: input.query,
-                max_results: input.max_results,
-                filename: input.filename
-              },
-              "PTC file_search query"
-            );
             const json = await this.executeFileSearch(userId, input);
             this.logger.info(
               { resultLength: json.length },

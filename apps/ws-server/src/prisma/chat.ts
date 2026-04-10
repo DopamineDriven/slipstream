@@ -78,7 +78,7 @@ export class PrismaChatService extends PrismaAttachmentService {
       where: { batchId, userId, conversationId, messageId: null },
       take: 10,
       orderBy: [{ createdAt: "desc" }],
-      include: { image: true, document: true }
+      include: { image: true, document: true, audio: true }
     });
     const extended = attachments.map(t => {
       const { compatStatus, assetType, compatCdnUrl, compatMime, compatExt } =
@@ -901,6 +901,17 @@ export class PrismaChatService extends PrismaAttachmentService {
     mime?: string;
   }) {
     const { keyId } = await this.handleApiKeyLookup(provider, userId);
+    const persistedThinkingDuration =
+      typeof data.thinkingDuration === "number"
+        ? Math.round(data.thinkingDuration)
+        : undefined;
+    const persistedMessageBlocks = data.messageBlocks?.map(block => ({
+      content: block.content,
+      conversationId: data.conversationId,
+      durationMs: Math.round(block.durationMs),
+      ordinal: block.ordinal,
+      type: block.type
+    }));
 
     const mapImgs = data.imgGenFields?.images
       ?.concat(data.imgGenFields?.partialImages ?? [])
@@ -993,8 +1004,16 @@ export class PrismaChatService extends PrismaAttachmentService {
             orderBy: { createdAt: "desc" },
             take: 1,
             include: {
+              ttsJob: true,
               messageBlocks: true,
-              attachments: { include: { imageGenOutput: true, image: true } }
+              attachments: {
+                include: {
+                  imageGenOutput: true,
+                  image: true,
+                  document: true,
+                  audio: true
+                }
+              }
             }
           },
           conversationSettings: true
@@ -1006,22 +1025,16 @@ export class PrismaChatService extends PrismaAttachmentService {
               messageType: data?.imgGenEnabled === true ? "IMAGE_GEN" : "TEXT",
               attachments: mapImgs ? { create: mapImgs } : undefined,
               messageBlocks:
-                data.messageBlocks && data.messageBlocks.length > 0
+                persistedMessageBlocks && persistedMessageBlocks.length > 0
                   ? {
-                      create: data.messageBlocks.map(block => ({
-                        content: block.content,
-                        conversationId: data.conversationId,
-                        durationMs: block.durationMs,
-                        ordinal: block.ordinal,
-                        type: block.type
-                      }))
+                      create: persistedMessageBlocks
                     }
                   : undefined,
               senderType: "AI",
               responseOutput: data.responseOutput ?? undefined,
               provider: this.providerToPrismaFormat(provider),
               model: data.model,
-              thinkingDuration: data.thinkingDuration,
+              thinkingDuration: persistedThinkingDuration,
               thinkingText: data?.thinkingText,
               isImageGen: data.imgGenEnabled ?? false,
               userKeyId: keyId,
@@ -1047,9 +1060,12 @@ export class PrismaChatService extends PrismaAttachmentService {
         )?.id;
         if (!jobId || !data.imgGenFields?.images)
           throw new Error("no jobid to associate image gen with");
+
         const s = data.imgGenFields.images;
-        if (data.imgGenFields.partialImages)
-          s.concat(data.imgGenFields.partialImages);
+
+        if (data.imgGenFields.partialImages) {
+          s.push(...data.imgGenFields.partialImages);
+        }
 
         const outputs = {
           connect: msg.attachments
@@ -1080,8 +1096,36 @@ export class PrismaChatService extends PrismaAttachmentService {
             outputs
           }
         });
-        return { aiMsgId, persist, imgGenAttachmentId };
-      } else return { aiMsgId, persist, imgGenAttachmentId: undefined };
+
+        const { messages, ...e } = persist;
+        const msgs = messages.map(t => {
+          return {
+            ...t,
+            ttsJob: {
+              ...t.ttsJob,
+              sizeBytes: t.ttsJob?.sizeBytes ? Number(t.ttsJob.sizeBytes) : null
+            }
+          };
+        });
+
+        const cleaned = { messages: msgs, ...e };
+        return { aiMsgId, persist: cleaned, imgGenAttachmentId };
+      } else {
+        const { messages, ...e } = persist;
+        const msgs = messages.map(t => {
+          return {
+            ...t,
+            ttsJob: {
+              ...t.ttsJob,
+              sizeBytes: t.ttsJob?.sizeBytes ? Number(t.ttsJob.sizeBytes) : null
+            }
+          };
+        });
+
+        const cleaned = { messages: msgs, ...e };
+
+        return { aiMsgId, persist: cleaned, imgGenAttachmentId: undefined };
+      }
     });
 
     return transaction;

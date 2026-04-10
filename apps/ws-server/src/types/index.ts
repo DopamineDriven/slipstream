@@ -85,7 +85,7 @@ export type IncludeCreateConvoWithImgGenProps = {
     };
     include: {
       imageGenJob: true;
-      messageBlocks: true;
+      messageBlocks: { orderBy: { ordinal: "asc" } };
       attachments: {
         orderBy: {
           createdAt: "asc";
@@ -286,8 +286,6 @@ export type BigIntToCompatProps<
       };
     };
 
-
-
 export type UpdateAttachmentMetadata = {
   img?:
     | {
@@ -444,6 +442,7 @@ export interface ProviderChatRequestEntity {
   imgGenFields?: AIChatRequestImgGenFields;
   docCounts: number;
   imgCounts: number;
+  hasUserStoreDocs: boolean;
 }
 
 export interface ImageGenReqDbRes<

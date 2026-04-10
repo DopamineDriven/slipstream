@@ -131,19 +131,6 @@ export function MessageBubble({
   const latestMessageBlock = orderedMessageBlocks.at(-1);
   const blockOrdinalKey = useCallback((ordinal: number) => String(ordinal), []);
 
-  const contentToCopy = useMemo(() => {
-    if (!hasRenderableMessageBlocks) {
-      return message.content;
-    }
-
-    const textContent = orderedMessageBlocks
-      .filter(block => block.type === "TEXT")
-      .map(block => block.content)
-      .join("");
-
-    return textContent.length > 0 ? textContent : message.content;
-  }, [hasRenderableMessageBlocks, message.content, orderedMessageBlocks]);
-
   // Lightweight, derived thinking content during live streaming to avoid setState in effects
   const streamingThinkingRenderedContent = useMemo(() => {
     if (liveThinkingText && (isStreaming || liveIsThinking)) {
@@ -720,10 +707,7 @@ export function MessageBubble({
       <MessageActionsDialog
         open={showMobileActions}
         onOpenChange={setShowMobileActions}
-        messageContent={contentToCopy}
-        messageId={message.id}
-        conversationId={message.conversationId}
-        senderType={message.senderType}
+        msg={message}
       />
     </>
   );

@@ -704,6 +704,7 @@ export class LlamaService {
     thinkingChunks,
     streamChannel,
     userId,
+    hasUserStoreDocs,
     ws,
     apiKey,
     max_tokens,
@@ -774,7 +775,6 @@ export class LlamaService {
       } as const;
     };
 
-    const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
     const tools = hasUserStoreDocs
       ? [this.fileSearchFunctionTool()]
       : undefined;

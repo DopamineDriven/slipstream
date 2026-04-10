@@ -74,6 +74,7 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     streamChannel,
     thinkingChunks,
     userId,
+    hasUserStoreDocs,
     ws,
     userMsgId,
     apiKey,
@@ -190,8 +191,6 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     );
 
     const loc = this.normalizeLocation(user_location);
-    const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
-
     const tools = this.handleTooling(
       m,
       false,

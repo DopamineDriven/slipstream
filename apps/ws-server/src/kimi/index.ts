@@ -25,7 +25,8 @@ import type { Logger as PinoLogger } from "pino";
 import {
   createKimiSSEParser,
   hasToolCallDelta,
-  isContentDelta
+  isContentDelta,
+  isReasoningDelta
 } from "@/kimi/sse.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
@@ -627,6 +628,7 @@ export class KimiService {
     ws,
     userMsgId,
     userId,
+    hasUserStoreDocs,
     isNewChat,
     max_tokens,
     model,
@@ -658,10 +660,7 @@ export class KimiService {
         return;
       }
 
-      const durationMs = Math.max(
-        0,
-        Math.round(performance.now() - activeBlock.startedAt)
-      );
+      const durationMs = performance.now() - activeBlock.startedAt;
 
       trackedBlocks.push({
         content: activeBlock.content,
@@ -683,8 +682,6 @@ export class KimiService {
         finalizeActiveBlock();
         activeBlock = {
           content: "",
-          reasoningChunkCount: 0,
-          sawAggregateTail: false,
           startedAt: performance.now(),
           type
         };
@@ -696,7 +693,7 @@ export class KimiService {
     const currentThinkingDuration = () => {
       const activeThinkingDuration =
         activeBlock?.type === "THINKING"
-          ? Math.round(performance.now() - activeBlock.startedAt)
+          ? performance.now() - activeBlock.startedAt
           : 0;
 
       return KimiThinkingDuration + activeThinkingDuration;
@@ -712,48 +709,21 @@ export class KimiService {
         content: activeBlock.content,
         ordinal: nextOrdinal,
         conversationId,
-        durationMs: Math.max(
-          0,
-          Math.round(performance.now() - activeBlock.startedAt)
-        )
+        durationMs: performance.now() - activeBlock.startedAt
       } as const;
     };
 
     const appendReasoningDelta = (reasoningText?: string) => {
       if (!reasoningText) return;
       const block = ensureActiveBlock("THINKING");
-      block.reasoningChunkCount += 1;
 
-      let emittedThinkingText = reasoningText;
-      if (
-        block.reasoningChunkCount > 3 &&
-        Math.abs(block.content.length - reasoningText.length) <=
-          4 * block.reasoningChunkCount
-      ) {
-        block.sawAggregateTail = true;
-        const prependNew = `\n${reasoningText}`;
-        emittedThinkingText =
-          block.content.length < prependNew.length
-            ? prependNew.substring(block.content.length)
-            : "";
-      }
+      block.content += reasoningText;
+      KimiThinkingAgg += reasoningText;
+      thinkingChunks.push(reasoningText);
 
-      if (emittedThinkingText.length === 0) {
-        return;
-      }
-
-      const appendedText = block.sawAggregateTail
-        ? emittedThinkingText
-        : reasoningText;
-
-      block.content += appendedText;
-      KimiThinkingAgg += appendedText;
-      thinkingChunks.push(appendedText);
-
-      return emittedThinkingText;
+      return reasoningText;
     };
 
-    const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
     const tools = hasUserStoreDocs
       ? [this.fileSearchFunctionTool()]
       : undefined;
@@ -800,7 +770,7 @@ export class KimiService {
             finalizeActiveBlock();
           }
 
-          if (choice.delta.reasoning) {
+          if (isReasoningDelta(choice.delta)) {
             const reasoningText =
               "reasoning" in choice.delta &&
               typeof choice.delta.reasoning === "string"
