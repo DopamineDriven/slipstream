@@ -16,7 +16,7 @@ import {
   EditIcon,
   ReadAloud as ReadAloudIcon,
   RetryIcon,
-  ShareIcon as Share,
+  ShareIcon,
   ThumbsDown,
   ThumbsUp
 } from "@slipstream/ui";
@@ -196,7 +196,7 @@ export function MessageIcons({
                   actionButtonVariants.reaction
                 )}
                 onClick={() => console.log("share action")}>
-                <Share className="size-3" />
+                <ShareIcon className="size-3" />
               </Button>
             )}
             {!isMobile && (
@@ -268,6 +268,7 @@ export function MessageIcons({
           </div>
         </>
       )}
+      
     </div>
   );
 }
