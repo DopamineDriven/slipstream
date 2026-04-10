@@ -754,8 +754,8 @@ export class UserStoreVectorService extends UserStoreWorkupService {
     const fulltext = Array.of<HybridChunkHit>();
 
     // Filter rows with null id (can't happen at runtime — Prisma CTE nullability artifact)
-    const valid = rows.filter((r): r is HybridChunkHit & { id: string } =>
-      r.id != null
+    const valid = rows.filter(
+      (r): r is HybridChunkHit & { id: string } => r.id != null
     );
 
     // Sort by score descending within each signal so dedup keeps highest score
@@ -815,7 +815,10 @@ export class UserStoreVectorService extends UserStoreWorkupService {
     } satisfies PartitionedSearchResult;
   }
 
-  public formatPartitionedResults(result: PartitionedSearchResult, query: string) {
+  public formatPartitionedResults(
+    result: PartitionedSearchResult,
+    query: string
+  ) {
     const searchTerms = result.meta.searchTerms;
     const parsedTerms = searchTerms
       ? this.parseSearchTerms(searchTerms)
@@ -839,7 +842,10 @@ export class UserStoreVectorService extends UserStoreWorkupService {
       const { matchedTerms, spans } =
         r.content && parsedTerms.length > 0
           ? this.extractMatchedSpans(r.content, parsedTerms)
-          : { matchedTerms: Array.of<string>(), spans: Array.of<[number, number]>() };
+          : {
+              matchedTerms: Array.of<string>(),
+              spans: Array.of<[number, number]>()
+            };
 
       return {
         filename: r.filename,
@@ -865,7 +871,10 @@ export class UserStoreVectorService extends UserStoreWorkupService {
         const { matchedTerms, spans } =
           hit.content && parsedTerms.length > 0
             ? this.extractMatchedSpans(hit.content, parsedTerms)
-            : { matchedTerms: Array.of<string>(), spans: Array.of<[number, number]>() };
+            : {
+                matchedTerms: Array.of<string>(),
+                spans: Array.of<[number, number]>()
+              };
 
         return {
           filename: hit.filename,
@@ -892,9 +901,7 @@ export class UserStoreVectorService extends UserStoreWorkupService {
         semantic_count: result.meta.semanticCount,
         fulltext_count: result.meta.fulltextCount,
         overlap_count: result.overlap.chunkIds.length,
-        jaccard_similarity: Number(
-          result.overlap.jaccardSimilarity.toFixed(4)
-        ),
+        jaccard_similarity: Number(result.overlap.jaccardSimilarity.toFixed(4)),
         semantic_threshold: result.meta.semanticThreshold
       }
     });
@@ -924,10 +931,7 @@ export class UserStoreVectorService extends UserStoreWorkupService {
     return terms;
   }
 
-  private extractMatchedSpans(
-    content: string,
-    terms: readonly string[]
-  ) {
+  private extractMatchedSpans(content: string, terms: readonly string[]) {
     const matchedTerms = Array.of<string>();
     const spans = Array.of<[number, number]>();
     const lowerContent = content.toLowerCase();
@@ -1432,5 +1436,163 @@ export class UserStoreVectorService extends UserStoreWorkupService {
     for (const storeName of storeNameArr) {
       await this.prisma.syncUserStore(userId, storeName);
     }
+  }
+
+  public async searchStore(
+    userId: string,
+    query: string,
+    limit = 5,
+    threshold = 0,
+    filename?: string
+  ) {
+    return await this.searchUserStoreChunks({
+      userId,
+      query,
+      limit,
+      threshold,
+      filename
+    });
+  }
+
+  protected extractFirstJsonObject(raw: string) {
+    let start = -1;
+    let depth = 0;
+    let inString = false;
+    let isEscaped = false;
+
+    for (const [index, char] of Array.from(raw).entries()) {
+      if (start === -1) {
+        if (char === "{") {
+          start = index;
+          depth = 1;
+        }
+        continue;
+      }
+
+      if (inString) {
+        if (isEscaped) {
+          isEscaped = false;
+        } else if (char === "\\") {
+          isEscaped = true;
+        } else if (char === '"') {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (char === '"') {
+        inString = true;
+        continue;
+      }
+
+      if (char === "{") {
+        depth += 1;
+        continue;
+      }
+
+      if (char === "}") {
+        depth -= 1;
+        if (depth === 0) {
+          return raw.slice(start, index + 1);
+        }
+      }
+    }
+
+    return undefined;
+  }
+  public parseUserStoreArgs(rawArguments: string, toolName = "file_search") {
+    const trimmed = rawArguments.trim();
+    if (trimmed.length === 0) {
+      return {} satisfies Record<string, unknown>;
+    }
+
+    try {
+      return JSON.parse<Record<string, unknown>>(trimmed);
+    } catch (error) {
+      const recovered = this.extractFirstJsonObject(trimmed);
+      if (!recovered) {
+        throw error;
+      }
+
+      this.logger.warn(
+        {
+          rawArgumentsPreview: trimmed.slice(0, 300),
+          recoveredPreview: recovered.slice(0, 300),
+          error: this.prisma.safeErrMsg(error)
+        },
+        `Recovered malformed ${toolName} arguments`
+      );
+      return JSON.parse<Record<string, unknown>>(recovered);
+    }
+  }
+  public parseUserStoreInput(rawArguments: string, toolName = "file_search") {
+    const parsed = this.parseUserStoreArgs(rawArguments, toolName);
+
+    if ("query" in parsed && typeof parsed.query === "string") {
+      const normalized = parsed.query.trim();
+      if (normalized.length > 0) {
+        const maxResults =
+          "max_results" in parsed && typeof parsed.max_results === "number"
+            ? parsed.max_results
+            : undefined;
+
+        const filenameInput =
+          "filename" in parsed && typeof parsed.filename === "string"
+            ? parsed.filename.trim() || undefined
+            : undefined;
+
+        const searchTermsInput =
+          "search_terms" in parsed && typeof parsed.search_terms === "string"
+            ? parsed.search_terms.trim() || undefined
+            : undefined;
+
+        return {
+          query: normalized,
+          max_results: maxResults,
+          filename: filenameInput,
+          search_terms: searchTermsInput
+        } as const;
+      }
+    }
+
+    const queryList = Array.of<string>();
+    if ("queries" in parsed && Array.isArray(parsed.queries)) {
+      for (const query of parsed.queries) {
+        if (typeof query !== "string") continue;
+        const normalized = query.trim();
+        if (normalized.length === 0) continue;
+        queryList.push(normalized);
+      }
+    }
+
+    const uniqueQueries = Array.from(new Set(queryList)).slice(0, 5);
+    const firstQuery = uniqueQueries[0];
+    if (!firstQuery) {
+      throw new Error(
+        `${toolName} input missing required "query": ${rawArguments}`
+      );
+    }
+
+    const maxResults =
+      "max_results" in parsed && typeof parsed.max_results === "number"
+        ? parsed.max_results
+        : undefined;
+
+    const filenameInput =
+      "filename" in parsed && typeof parsed.filename === "string"
+        ? parsed.filename.trim() || undefined
+        : undefined;
+
+    const searchTermsInput =
+      "search_terms" in parsed && typeof parsed.search_terms === "string"
+        ? parsed.search_terms.trim() || undefined
+        : undefined;
+
+    return {
+      queries: [firstQuery, ...uniqueQueries.slice(1)] as const,
+      max_results: maxResults,
+      filename: filenameInput,
+      search_terms: searchTermsInput
+    } as const;
   }
 }

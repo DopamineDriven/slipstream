@@ -21,7 +21,8 @@ import type {
   GrokAudioCodecTTS,
   GrokLanguageTTS,
   GrokVoiceTTS,
-  TTSCodec
+  TTSCodec,
+  TTSJobSingleton
 } from "@slipstream/types";
 
 interface TTSCacheEntry {
@@ -51,6 +52,7 @@ interface TTSContextValue {
   setCodec: (c: string) => void;
 
   hasCachedAudio: (messageId: string) => boolean;
+  hydrateFromTtsJob: (messageId: string, ttsJob: TTSJobSingleton<true>) => void;
 }
 
 const TTSContext = createContext<TTSContextValue | undefined>(undefined);
@@ -338,6 +340,23 @@ export function TTSProvider({
     []
   );
 
+  const hydrateFromTtsJob = useCallback(
+    (messageId: string, ttsJob: TTSJobSingleton<true>) => {
+      if (ttsJob.status !== "COUPLED") return;
+      if (ttsJob.cdnUrl == null) return;
+      if (ttsJob.durationMs == null) return;
+      if (cacheRef.current.has(messageId)) return;
+
+      cacheRef.current.set(messageId, {
+        cdnUrl: ttsJob.cdnUrl,
+        blobUrl: null,
+        durationMs: ttsJob.durationMs,
+        codec: isValidCodec(ttsJob.codec) ? ttsJob.codec : "wav"
+      } satisfies TTSCacheEntry);
+    },
+    []
+  );
+
   const value = useMemo<TTSContextValue>(
     () => ({
       isGenerating,
@@ -355,7 +374,8 @@ export function TTSProvider({
       setVoice: updateVoice,
       setLanguage: updateLanguage,
       setCodec: updateCodec,
-      hasCachedAudio
+      hasCachedAudio,
+      hydrateFromTtsJob
     }),
     [
       isGenerating,
@@ -373,7 +393,8 @@ export function TTSProvider({
       updateVoice,
       updateLanguage,
       updateCodec,
-      hasCachedAudio
+      hasCachedAudio,
+      hydrateFromTtsJob
     ]
   );
 

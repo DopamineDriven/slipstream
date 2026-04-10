@@ -936,8 +936,10 @@ export class GrokWorkupService {
     att: AttachmentSingleton<true>,
     key = this.xaiKey
   ) {
-    const { absTmpPath, tmpUniquename } =
-      await this.prisma.fetchRemoteToTmp("GROK", att);
+    const { absTmpPath, tmpUniquename } = await this.prisma.fetchRemoteToTmp(
+      "GROK",
+      att
+    );
     try {
       const formData = new FormData();
 
@@ -1235,6 +1237,27 @@ export class GrokWorkupService {
     });
     this.storeDbDocRegistry.set(att.id, rec);
     return { docDb: rec, docXai: promoteDocBg.doc };
+  }
+
+  public async syncGrokWithGuard(userId: string, mgmtKey = this.xaiManagementKey) {
+    let o = true;
+    try {
+      for await (const x of this.getAllCollections(10, mgmtKey)) {
+        if (x.data.length > 0) o = true;
+        else {
+          this.logger.info(
+            "xAI syncWithGuard no collections returned, aborting..."
+          );
+          o = false;
+        }
+        break;
+      }
+    } catch (err) {
+      this.logger.error(err, "err in xAI syncWithGuard");
+    }
+    if (o === true) {
+      return await this.syncFileRegistry(userId, false, mgmtKey);
+    } else return;
   }
 
   public async syncFileRegistry(
