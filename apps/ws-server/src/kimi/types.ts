@@ -105,8 +105,6 @@ type KimiAccumulatedToolCall = {
 
 interface KimiActiveMessageBlock {
   content: string;
-  reasoningChunkCount: number;
-  sawAggregateTail: boolean;
   startedAt: number;
   type: "THINKING" | "TEXT";
 }

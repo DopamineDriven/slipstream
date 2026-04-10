@@ -1,12 +1,11 @@
 import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
 import { xAIResponses } from "@/xai/event-types.ts";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   GrokModelIdUnion,
   MessageSingleton,
   XOR
 } from "@slipstream/types";
-import type { $Enums } from "@slipstream/db/node/generated/client";
-
 
 export interface GrokActiveMessageBlock {
   content: string;
@@ -162,7 +161,10 @@ export type TextContentBlock = {
 /**
  * only text-based files supported
  */
-export type FileContentBlock = { type: "input_file"; file_id: string };
+export type FileContentBlock = XOR<
+  { type: "input_file"; file_id: string },
+  { type: "input_file"; file_url: string }
+>;
 
 export type ContentBlockUnion =
   | ImageContentBlock
@@ -432,6 +434,7 @@ export interface ResponsesApiInputWorkupParams {
   x_enable_video_understanding?: boolean;
   parallel_tool_calls?: boolean;
   reasoning?: MultiAgentReasoningEffort;
+    hasUserStoreDocs: boolean;
 }
 
 /**

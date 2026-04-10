@@ -692,6 +692,7 @@ export class MistralService {
     ws,
     userMsgId,
     userId,
+    hasUserStoreDocs,
     isNewChat,
     max_tokens,
     model,
@@ -997,7 +998,6 @@ export class MistralService {
       }
     };
 
-    const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
     const tools = hasUserStoreDocs
       ? [this.fileSearchFunctionTool()]
       : undefined;

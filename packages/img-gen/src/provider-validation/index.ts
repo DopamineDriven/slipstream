@@ -798,7 +798,7 @@ export class ProviderValidation {
           orderBy: { createdAt: "asc" },
           include: {
             imageGenJob: true,
-            messageBlocks: true,
+            messageBlocks: { orderBy: { ordinal: "asc" } },
             attachments: {
               where: {
                 OR: [
@@ -828,7 +828,7 @@ export class ProviderValidation {
           orderBy: { createdAt: "asc" },
           include: {
             imageGenJob: true,
-            messageBlocks: true,
+            messageBlocks: { orderBy: { ordinal: "asc" } },
             attachments: {
               where: {
                 OR: [

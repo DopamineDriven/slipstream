@@ -102,8 +102,6 @@ type ZaiAccumulatedToolCall = {
 
 interface ZaiActiveMessageBlock {
   content: string;
-  reasoningChunkCount: number;
-  sawAggregateTail: boolean;
   startedAt: number;
   type: "THINKING" | "TEXT";
 }

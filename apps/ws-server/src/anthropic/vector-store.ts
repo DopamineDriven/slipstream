@@ -174,7 +174,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     } as const satisfies Anthropic.Beta.BetaToolUnion;
   }
 
-  protected isAdvancedToolCapable(m: AnthropicModelIdUnion) {
+  protected isAdvancedToolCapable(m: string) {
     return (
       m === "claude-sonnet-4-6" ||
       m === "claude-opus-4-6" ||
@@ -183,7 +183,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     );
   }
 
-  protected isEffortCapable(model: AnthropicModelIdUnion) {
+  protected isEffortCapable(model: string) {
     return (
       model === "claude-opus-4-6" ||
       model === "claude-opus-4-5-20251101" ||
@@ -406,6 +406,20 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     };
   }
 
+  private is4dot6Model(m = "claude-opus-4-6") {
+    return m === "claude-sonnet-4-6" || m === "claude-opus-4-6";
+  }
+
+  private handleEffort(model: string | null) {
+    if (!model) return;
+    if (!this.is4dot6Model(model)) return;
+    if (model === "claude-opus-4-6") {
+      return { effort: "max" } as const;
+    } else {
+      return { effort: "high" } as const;
+    }
+  }
+
   // ─── Multi-turn tool use streaming loop ──────────────────────────────
 
   protected async createStreamWorkup({
@@ -448,53 +462,24 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     this.logger.info(betas, "beta headers");
     this.logger.info(tools, "tools returned");
     // only opus 4.5 (with effort beta header set), opus 4.6 & sonnet 4.6 (natively) support effort config
-    if (this.isEffortCapable(model)) {
-      return {
-        params: {
-          max_tokens: maxTokens,
-          stream: true,
-          thinking,
-          top_p: topP,
-          temperature,
-          system,
-          container,
-          model,
-          tools,
-          // only 4.6 supports max effort
-          output_config: {
-            effort:
-              model === "claude-opus-4-6"
-                ? "max"
-                : model === "claude-sonnet-4-6"
-                  ? "high"
-                  : "high"
-          },
-          tool_choice: { type: "auto" },
-          metadata: { user_id: userId },
-          messages,
-          service_tier: "auto",
-          betas
-        } satisfies Anthropic.Beta.Messages.MessageCreateParamsStreaming
-      };
-    } else {
-      return {
-        params: {
-          max_tokens: maxTokens,
-          stream: true,
-          thinking,
-          top_p: topP,
-          temperature,
-          system,
-          container,
-          model,
-          tools,
-          tool_choice: { type: "auto" },
-          metadata: { user_id: userId },
-          messages,
-          service_tier: "auto",
-          betas
-        } satisfies Anthropic.Beta.Messages.MessageCreateParamsStreaming
-      };
-    }
+    return {
+      params: {
+        max_tokens: maxTokens,
+        stream: true,
+        thinking,
+        top_p: topP,
+        temperature,
+        system,
+        container,
+        model,
+        tools,
+        output_config: this.handleEffort(model),
+        tool_choice: { type: "auto" },
+        metadata: { user_id: userId },
+        messages,
+        service_tier: "auto",
+        betas
+      } satisfies Anthropic.Beta.Messages.MessageCreateParamsStreaming
+    };
   }
 }

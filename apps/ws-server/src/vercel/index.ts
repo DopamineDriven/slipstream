@@ -720,6 +720,7 @@ export class v0Service {
     ws,
     userMsgId,
     userId,
+    hasUserStoreDocs,
     isNewChat,
     max_tokens,
     model,
@@ -845,7 +846,6 @@ export class v0Service {
       return emittedThinkingText;
     };
 
-    const hasUserStoreDocs = await this.prisma.hasUserStoreDocs(userId);
     const tools = hasUserStoreDocs
       ? [this.fileSearchFunctionTool()]
       : undefined;

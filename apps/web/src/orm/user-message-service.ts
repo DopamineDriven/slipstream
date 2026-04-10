@@ -42,7 +42,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
       include: {
         messages: {
           orderBy: { createdAt: "asc" },
-          include: { messageBlocks: true }
+          include: { messageBlocks: { orderBy: { ordinal: "asc" } } }
         },
         conversationSettings: true
       }
@@ -69,7 +69,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
                 ...t,
                 sizeBytes: t?.sizeBytes ? Number(t.sizeBytes) : null
               } as const)
-            : null,
+            : undefined,
           ...attRest,
           size: size ? Number(size) : null
         } as Rm<AttachmentSingleton<true>, "providerLinks">;
@@ -168,7 +168,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
           include: {
             ttsJob: true,
             imageGenJob: true,
-            messageBlocks: true,
+            messageBlocks: { orderBy: { ordinal: "asc" } },
             attachments: {
               orderBy: { createdAt: "asc" },
               include: {
@@ -183,10 +183,16 @@ export class PrismaUserMessageService extends ErrorHelperService {
         conversationSettings: true
       }
     });
+    const { messages } = convo;
+    const f = messages.map(t => {
+      return {
+        ...t,
+        ttsJob: t.ttsJob ?? undefined
+      };
+    });
 
-    return this.bigintToInt(
-      convo as ConversationSingleton<false>
-    ) satisfies ConversationSingleton<true>;
+    const c = { ...convo, messages: f };
+    return this.bigintToInt(c) satisfies ConversationSingleton<true>;
   }
 
   public async getTitleByConversationId(conversationId: string) {

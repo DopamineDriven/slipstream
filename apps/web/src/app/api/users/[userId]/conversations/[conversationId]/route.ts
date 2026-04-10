@@ -56,7 +56,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    const body = (await request.json()) as { title: string };
+    const body = (await request.json<{ title: string; }>())
     const { title } = body;
 
     if (!title || typeof title !== "string") {

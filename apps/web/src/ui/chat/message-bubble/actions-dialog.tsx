@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTTSContext } from "@/context/tts-context";
 import { cn } from "@/lib/utils";
 import { AnimatedCopyButtonWithText } from "@/ui/atoms/animated-copy-button-with-text";
-import type { $Enums } from "@slipstream/db/node/generated/client";
+import type { MessageSingleton } from "@slipstream/types";
 import {
   Button,
   Dialog,
@@ -18,26 +18,47 @@ import {
 interface MessageActionsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  messageContent: string;
-  messageId: string;
-  conversationId: string;
-  senderType: $Enums.SenderType;
+  msg: MessageSingleton<true>;
+}
+
+export function msgContentHelper(msg: MessageSingleton<true>) {
+  const textBlocks = Array.of<string>();
+
+  if (msg.messageBlocks) {
+    for (const v of msg.messageBlocks.toSorted(
+      (a, b) => a.ordinal - b.ordinal
+    )) {
+      if (v.type === "TEXT") {
+        textBlocks.push(v.content);
+      }
+    }
+  }
+
+  return textBlocks.length > 0 ? textBlocks.join(`\n`) : msg.content;
 }
 
 export function MessageActionsDialog({
   open,
   onOpenChange,
-  messageContent,
-  messageId,
-  conversationId,
-  senderType
+  msg
 }: MessageActionsDialogProps) {
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const tts = useTTSContext();
+
+  const {
+    currentPlaybackMessageId,
+    activeMessageId,
+    requestTTS,
+    isGenerating,
+    stop
+  } = useTTSContext();
+
   const primerRef = useRef<HTMLAudioElement | null>(null);
+
   const hasPlayedPrimer = useRef(false);
 
   useEffect(() => {
+      if (!open) return;
+  if (primerRef.current) return; 
     const el = new Audio("/cassette-shortened.mp3");
     el.volume = 0.1;
     el.preload = "auto";
@@ -51,23 +72,23 @@ export function MessageActionsDialog({
       el.pause();
       primerRef.current = null;
     };
-  }, []);
+  }, [open]);
 
   const isTTSActive =
-    tts.currentPlaybackMessageId === messageId ||
-    (tts.isGenerating && tts.activeMessageId === messageId);
+    currentPlaybackMessageId === msg.id ||
+    (isGenerating && activeMessageId === msg.id);
 
   const handleReadAloud = useCallback(() => {
     if (isTTSActive) {
-      tts.stop();
+      stop();
     } else {
       if (primerRef.current && !hasPlayedPrimer.current) {
         void primerRef.current.play().catch(() => {});
       }
-      tts.requestTTS(messageId, conversationId);
+      requestTTS(msg.id, msg.conversationId);
     }
     onOpenChange(false);
-  }, [isTTSActive, tts, messageId, conversationId, onOpenChange]);
+  }, [isTTSActive, stop, requestTTS, msg.id, msg.conversationId, onOpenChange]);
 
   const handleCopyComplete = () => {
     if (closeTimerRef.current) {
@@ -99,8 +120,8 @@ export function MessageActionsDialog({
   }, [open]);
 
   const isReadAloudDisabled = useMemo(
-    () => tts.isGenerating && !isTTSActive,
-    [tts.isGenerating, isTTSActive]
+    () => isGenerating && !isTTSActive,
+    [isGenerating, isTTSActive]
   );
 
   return (
@@ -109,12 +130,12 @@ export function MessageActionsDialog({
         className="mx-0.5 sm:max-w-md"
         aria-description="copy, read aloud, or more opts">
         <DialogHeader>
-          <DialogTitle className="text-center">Message Actions</DialogTitle>
+          <DialogTitle className="sr-only">Message Actions</DialogTitle>
         </DialogHeader>
         <div className="flex items-center justify-center gap-8 py-6">
           <div className="flex w-full flex-col items-center gap-2">
             <AnimatedCopyButtonWithText
-              textToCopy={messageContent}
+              textToCopy={msgContentHelper(msg)}
               variant="ghost"
               className="flex h-auto w-full items-center justify-start gap-3 rounded-none px-6 py-4 text-left text-base font-normal"
               copiedDuration={1500}
@@ -122,7 +143,7 @@ export function MessageActionsDialog({
               Copy
             </AnimatedCopyButtonWithText>
           </div>
-          {senderType === "AI" && (
+          {msg.senderType === "AI" && (
             <div className="flex flex-col items-center gap-2">
               <Button
                 variant="ghost"
@@ -132,7 +153,7 @@ export function MessageActionsDialog({
                   "h-12 w-12 rounded-full bg-transparent",
                   isTTSActive &&
                     "text-foreground drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]",
-                  tts.isGenerating && tts.activeMessageId === messageId
+                  isGenerating && activeMessageId === msg.id
                     ? "animate-pulse"
                     : ""
                 )}

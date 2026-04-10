@@ -11,6 +11,7 @@ import type { S3Storage } from "@slipstream/storage-s3";
 import type { ClientContextWorkupProps, EventTypeMap } from "@slipstream/types";
 
 export class ResolverConnectionService extends ResolverAssetCompleteService {
+  protected userStoreDocStatus = new Map<string, boolean>();
   constructor(
     wsServer: WSServer,
     providers: ProviderService,
@@ -34,17 +35,23 @@ export class ResolverConnectionService extends ResolverAssetCompleteService {
       ttsService
     );
   }
-
+  // xai's collections api is broken
   protected async postHandleConnectionEstablishedJob(userId: string) {
+    //  delete previous entry by userId on connect or reconnect
+    this.userStoreDocStatus.delete(userId);
+
     const gemini = this.providers.getInstance("gemini");
     const anthropic = this.providers.getInstance("anthropic");
-    const grok = this.providers.getInstance("grok");
+    // const grok = this.providers.getInstance("grok");
     return await Promise.all([
       this.userVectorStore.syncUserStoreByName(userId),
       anthropic.syncFileRegistry(userId, true),
       gemini.syncFileRegistry(userId, true),
-      grok.syncFileRegistry(userId, false, this.xaiManagementApikey),
-      this.ttsService.syncTTSCache(userId)
+      this.ttsService.syncTTSCache(userId),
+      this.wsServer.prisma.hasUserStoreDocs(userId).then(t => {
+        this.userStoreDocStatus.set(userId, t);
+        return t;
+      })
     ]);
   }
 

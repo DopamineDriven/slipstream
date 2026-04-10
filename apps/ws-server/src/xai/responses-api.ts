@@ -15,8 +15,6 @@ import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap, GrokModelIdUnion } from "@slipstream/types";
 
-const ENCRYPTED_THINKING_PLACEHOLDER = "*encrypted output...*";
-
 export class GrokResponsesApiService extends GrokImgGenService {
   constructor(
     redis: EnhancedRedisPubSub,
@@ -29,6 +27,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
   ) {
     super(redis, s3, logger, prisma, userStore, apiKey, managementKey);
   }
+  protected encryptedTag = "*encrypted output...*" as const;
 
   protected async handleXAIAiResponsesApiRequest({
     chunks,
@@ -48,6 +47,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
     imgGenEnabled,
     docCounts,
     imgCounts,
+    hasUserStoreDocs,
     imgGenFields,
     userMsgId,
     requestMessageId,
@@ -90,12 +90,10 @@ export class GrokResponsesApiService extends GrokImgGenService {
       displayedReasoningItemIds.add(itemId);
       grokThinkingDisplayAgg =
         grokThinkingDisplayAgg.length > 0
-          ? grokThinkingDisplayAgg
-              .concat("\n")
-              .concat(ENCRYPTED_THINKING_PLACEHOLDER)
-          : ENCRYPTED_THINKING_PLACEHOLDER;
-      thinkingChunks.push(ENCRYPTED_THINKING_PLACEHOLDER);
-      return ENCRYPTED_THINKING_PLACEHOLDER;
+          ? grokThinkingDisplayAgg.concat("\n").concat(this.encryptedTag)
+          : this.encryptedTag;
+      thinkingChunks.push(this.encryptedTag);
+      return this.encryptedTag;
     };
 
     const applyEncryptedReasoning = (
@@ -121,7 +119,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
         if (encryptedParts.length > 0) {
           block.type = "ENCRYPTED_THINKING";
           block.content = encryptedParts.join("\n");
-          block.previewContent = ENCRYPTED_THINKING_PLACEHOLDER;
+          block.previewContent = this.encryptedTag;
         }
       }
 
@@ -131,7 +129,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
           durationMs: 0,
           itemIds: [itemId],
           ordinal: nextOrdinal,
-          previewContent: ENCRYPTED_THINKING_PLACEHOLDER,
+          previewContent: this.encryptedTag,
           type: "ENCRYPTED_THINKING"
         });
         nextOrdinal += 1;
@@ -178,7 +176,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
         ordinal: nextOrdinal,
         previewContent:
           activeBlock.type === "ENCRYPTED_THINKING"
-            ? ENCRYPTED_THINKING_PLACEHOLDER
+            ? this.encryptedTag
             : previewContent,
         type: activeBlock.type
       } satisfies GrokFinalizedMessageBlock;
@@ -231,7 +229,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
         type: activeBlock.type,
         content:
           activeBlock.type === "ENCRYPTED_THINKING"
-            ? ENCRYPTED_THINKING_PLACEHOLDER
+            ? this.encryptedTag
             : activeBlock.content,
         ordinal: nextOrdinal,
         conversationId,
@@ -283,6 +281,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
         keyId: keyId ?? "",
         apiKey: xaiApiKey,
         managementKey: mgmtKey,
+        hasUserStoreDocs,
         collectionId,
         enableCodeInterpreter: true,
         enableFileSearch: true,
@@ -317,6 +316,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
           temperature,
           title,
           topP,
+          hasUserStoreDocs,
           systemPrompt,
           isNewChat,
           keyId: keyId ?? "",

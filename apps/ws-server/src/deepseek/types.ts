@@ -107,8 +107,6 @@ type DeepSeekAccumulatedToolCall = {
 
 interface DeepSeekActiveMessageBlock {
   content: string;
-  reasoningChunkCount: number;
-  sawAggregateTail: boolean;
   startedAt: number;
   type: "THINKING" | "TEXT";
 }
