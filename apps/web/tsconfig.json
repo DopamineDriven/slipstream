@@ -20,6 +20,7 @@
     "next.config.ts",
     "global.d.ts",
     "index.d.ts",
+    "audio-session.d.ts",
     "postcss.config.mjs",
     "src/**/*.tsx",
     "src/**/*.ts",
