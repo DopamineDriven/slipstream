@@ -1,7 +1,7 @@
 "use client";
 
 import type { User } from "@/utils/auth-client";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useTTSContext } from "@/context/tts-context";
 import { useReaction } from "@/hooks/use-reaction";
@@ -37,6 +37,10 @@ export function MessageIcons({
   const { resolvedTheme } = useTheme();
   const { handleReaction, isPending, reactionState } = useReaction(message);
   const tts = useTTSContext();
+  const primerRef = useRef<HTMLAudioElement | null>(null);
+  const { get } = useCookiesCtx();
+  const tz = get("tz") ?? "america/chicago";
+  const locale = get("locale") ?? "en-US";
 
   useEffect(() => {
     if (message.ttsJob) {
@@ -50,9 +54,12 @@ export function MessageIcons({
 
   const playPrimer = useCallback((hasCachedAudio: boolean) => {
     if (hasCachedAudio) return;
-    const el = new Audio(primerAudio);
-    el.preload = "none";
+    if (primerRef.current) return;
+    primerRef.current = new Audio(primerAudio);
+    const el = primerRef.current;
+    el.preload = "auto";
     el.volume = 0.1;
+
     void el.play().catch(() => {});
   }, []);
 
@@ -83,12 +90,6 @@ export function MessageIcons({
       ] as const,
     [reactionState.liked, reactionState.disliked, handleReaction]
   );
-
-  const { get } = useCookiesCtx();
-
-  const tz = get("tz") ?? "america/chicago";
-
-  const locale = get("locale") ?? "en-US";
 
   const actionButtonVariants = useMemo(
     () => ({
@@ -268,7 +269,6 @@ export function MessageIcons({
           </div>
         </>
       )}
-      
     </div>
   );
 }
