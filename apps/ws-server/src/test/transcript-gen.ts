@@ -1,6 +1,6 @@
-import { Fs, UnwrapPromise } from "@d0paminedriven/fs";
+import type { UnwrapPromise } from "@d0paminedriven/fs";
+import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
-import { Client } from "pg";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AllModelsUnion,
@@ -39,6 +39,41 @@ type MapItRT = {
   }[];
 };
 
+type RenderedTranscriptMessageRT = {
+  readonly lineCount: number;
+  readonly markdown: string;
+  readonly msgNumber: number;
+};
+
+type TranscriptPartRT = {
+  readonly lineCount: number;
+  readonly messages: readonly RenderedTranscriptMessageRT[];
+  readonly partNumber: number;
+};
+
+interface TranscriptAssetAccumulator {
+  cdnUrl: string;
+  msgId: string;
+  filename: string;
+  ext: string;
+  size: number;
+  assetType: $Enums.AssetType;
+  batchOrSeriesId: string;
+  msgType: $Enums.MessageType;
+  duration: number;
+}
+
+type TranscriptPartitionConfigRT = {
+  readonly maxLoc: number;
+  readonly minLoc: number;
+  readonly targetLoc: number;
+};
+
+type RomanNumeralTupleRT = {
+  readonly numeral: string;
+  readonly value: number;
+};
+
 class ScriptGen extends Fs {
   constructor() {
     super(process.cwd());
@@ -72,6 +107,7 @@ class ScriptGen extends Fs {
     env: "dev" | "prod",
     id: string
   ) {
+    const { Client } = await import("pg");
     const client = new Client({
       connectionString,
       connectionTimeoutMillis: 30000
@@ -187,8 +223,6 @@ class ScriptGen extends Fs {
           };
         }
       );
-      console.log(messages.map((t)=>t.ttsJob?.cdnUrl).filter((t)=>typeof t!=="undefined"));
-      console.log(messages.map((t)=>t.attachments.filter((t)=>t.assetType==="AUDIO").map((o)=>o.cdnUrl).filter((v)=>v!==null)));
       return {
         ...conversation,
         conversationSettings: null,
@@ -283,20 +317,20 @@ class ScriptGen extends Fs {
         timestamp = new Date(msg.createdAt),
         id = msg.id,
         thoughtFor = msg.senderType === "USER" ? null : thinkingDur,
-        provider = msg.provider.toLowerCase() as Lowercase<$Enums.Provider>,
+        provider = this.providerToLowercase(msg.provider),
         model = msg.model ?? "",
         sender = msg.senderType,
         thinking =
           thinkingContent.length > 0 ? thinkingContent.join(`\n`) : null;
       msg.attachments.length > 0
         ? msg.attachments.map(t => {
-            const attObj = {
+            const attObj: TranscriptAssetAccumulator = {
               cdnUrl: "",
               msgId: msg.id,
               filename: "",
               ext: "",
               size: 0,
-              assetType: "UNKNOWN" as $Enums.AssetType,
+              assetType: "UNKNOWN",
               batchOrSeriesId: "",
               msgType: msg.messageType,
               duration: 0
@@ -340,11 +374,12 @@ class ScriptGen extends Fs {
                 attObj.cdnUrl = t.cdnUrl;
               }
               if (t.filename) {
-                if (t.assetType==="DOCUMENT" && t.audio?.duration) {
-                  attObj.filename=`duration: ${t.audio.duration/1000/60} min`
+                if (t.assetType === "DOCUMENT" && t.audio?.duration) {
+                  attObj.filename = `duration: ${t.audio.duration / 1000 / 60} min`;
                 } else {
-                attObj.filename = t.filename;
-                }}
+                  attObj.filename = t.filename;
+                }
+              }
               if (t.ext) {
                 attObj.ext = t.ext;
               }
@@ -388,8 +423,8 @@ class ScriptGen extends Fs {
       .map(v => {
         if (v.assetType === "IMAGE") {
           return `![${v.filename}](${v.cdnUrl})`;
-        } else if (v.assetType==="AUDIO"){
-          return `[duration: ${(v.duration/1000/60).toPrecision(6)} min](${v.cdnUrl})`
+        } else if (v.assetType === "AUDIO") {
+          return `[duration: ${(v.duration / 1000 / 60).toPrecision(6)} min](${v.cdnUrl})`;
         } else {
           return `[${v.filename}](${v.cdnUrl})`;
         }
@@ -397,11 +432,260 @@ class ScriptGen extends Fs {
       .join("\n\n");
   }
 
+  private get condensedOutputDir() {
+    return "src/test/__out__/condensed" as const;
+  }
+
+  private get transcriptPartitionConfig() {
+    return {
+      maxLoc: 2000,
+      minLoc: 1500,
+      targetLoc: 1750
+    } as const satisfies TranscriptPartitionConfigRT;
+  }
+
+  private get providerLookup() {
+    return {
+      ANTHROPIC: "anthropic",
+      COHERE: "cohere",
+      DEEPSEEK: "deepseek",
+      GEMINI: "gemini",
+      GROK: "grok",
+      META: "meta",
+      MISTRAL: "mistral",
+      MOONSHOTAI: "moonshotai",
+      OPENAI: "openai",
+      VERCEL: "vercel",
+      ZAI: "zai"
+    } as const satisfies Record<$Enums.Provider, Lowercase<$Enums.Provider>>;
+  }
+
+  private countLines(content: string) {
+    if (content.length === 0) return 0;
+    const newlineCount = content.match(/\n/g)?.length ?? 0;
+    return content.endsWith("\n") ? newlineCount : newlineCount + 1;
+  }
+
+  private transcriptHeading(title: string) {
+    return `### ${title}\n\n`;
+  }
+
+  private buildTranscriptContent(
+    messages: readonly RenderedTranscriptMessageRT[],
+    title: string
+  ) {
+    return `${this.transcriptHeading(title)}${messages.map(t => t.markdown).join("\n")}`;
+  }
+
+  private escapeRegex(value: string) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  private removeStaleTranscriptParts(toSlug: string) {
+    if (!this.exists(this.condensedOutputDir)) return;
+    const matcher = new RegExp(
+      `^${this.escapeRegex(toSlug)}-Part-[IVXLCDM]+\\.md$`
+    );
+    for (const file of this.readDir(this.condensedOutputDir, {
+      recursive: false
+    })) {
+      if (!matcher.test(file)) continue;
+      this.rmFile(`${this.condensedOutputDir}/${file}`);
+    }
+  }
+
+  private toRoman(value: number) {
+    const numerals = [
+      { numeral: "M", value: 1000 },
+      { numeral: "CM", value: 900 },
+      { numeral: "D", value: 500 },
+      { numeral: "CD", value: 400 },
+      { numeral: "C", value: 100 },
+      { numeral: "XC", value: 90 },
+      { numeral: "L", value: 50 },
+      { numeral: "XL", value: 40 },
+      { numeral: "X", value: 10 },
+      { numeral: "IX", value: 9 },
+      { numeral: "V", value: 5 },
+      { numeral: "IV", value: 4 },
+      { numeral: "I", value: 1 }
+    ] as const satisfies readonly RomanNumeralTupleRT[];
+    let remaining = value;
+    let out = "";
+    for (const entry of numerals) {
+      while (remaining >= entry.value) {
+        out = out.concat(entry.numeral);
+        remaining -= entry.value;
+      }
+    }
+    return out;
+  }
+
+  private transcriptPartPath(toSlug: string, partNumber: number) {
+    return `${this.condensedOutputDir}/${toSlug}-Part-${this.toRoman(partNumber)}.md`;
+  }
+
+  private providerToLowercase(provider: $Enums.Provider) {
+    return this.providerLookup[provider];
+  }
+
+  private readArrayValue<T>(
+    values: readonly T[],
+    index: number,
+    arrayName: string
+  ) {
+    const value = values[index];
+    if (typeof value === "undefined") {
+      throw new Error(`${arrayName}[${index}] is undefined`);
+    }
+    return value;
+  }
+
+  private partitionPenalty(lineCount: number) {
+    const { maxLoc, minLoc, targetLoc } = this.transcriptPartitionConfig;
+    const distanceFromTarget = Math.abs(targetLoc - lineCount);
+    const bandPenalty =
+      lineCount < minLoc
+        ? minLoc - lineCount
+        : lineCount > maxLoc
+          ? lineCount - maxLoc
+          : 0;
+
+    return distanceFromTarget * 10 + bandPenalty;
+  }
+
+  private partLineCount(
+    prefixLineCounts: readonly number[],
+    headingLineCount: number,
+    startIdx: number,
+    endIdxExclusive: number
+  ) {
+    const messageCount = endIdxExclusive - startIdx;
+    const messageLines =
+      this.readArrayValue(
+        prefixLineCounts,
+        endIdxExclusive,
+        "prefixLineCounts"
+      ) - this.readArrayValue(prefixLineCounts, startIdx, "prefixLineCounts");
+    const separatorLines = messageCount > 0 ? messageCount - 1 : 0;
+
+    return headingLineCount + messageLines + separatorLines;
+  }
+
+  private partitionTranscriptMessages(
+    messages: readonly RenderedTranscriptMessageRT[],
+    title: string
+  ) {
+    if (messages.length === 0) return Array.of<TranscriptPartRT>();
+    const headingLineCount = this.countLines(this.transcriptHeading(title));
+    const prefixLineCounts = Array.of<number>(0);
+    for (const message of messages) {
+      const currentPrefixTotal = this.readArrayValue(
+        prefixLineCounts,
+        prefixLineCounts.length - 1,
+        "prefixLineCounts"
+      );
+      prefixLineCounts.push(currentPrefixTotal + message.lineCount);
+    }
+
+    const bestCosts = Array.from(
+      { length: messages.length + 1 },
+      () => Number.POSITIVE_INFINITY
+    );
+    const partCounts = Array.from(
+      { length: messages.length + 1 },
+      () => Number.POSITIVE_INFINITY
+    );
+    const previousSplitIdxs = Array.from(
+      { length: messages.length + 1 },
+      () => -1
+    );
+
+    bestCosts[0] = 0;
+    partCounts[0] = 0;
+
+    for (
+      let endIdxExclusive = 1;
+      endIdxExclusive <= messages.length;
+      ++endIdxExclusive
+    ) {
+      for (let startIdx = 0; startIdx < endIdxExclusive; ++startIdx) {
+        const priorCost = this.readArrayValue(bestCosts, startIdx, "bestCosts");
+        if (!Number.isFinite(priorCost)) continue;
+        const priorPartCount = this.readArrayValue(
+          partCounts,
+          startIdx,
+          "partCounts"
+        );
+        const lineCount = this.partLineCount(
+          prefixLineCounts,
+          headingLineCount,
+          startIdx,
+          endIdxExclusive
+        );
+        const candidateCost = priorCost + this.partitionPenalty(lineCount);
+        const candidatePartCount = priorPartCount + 1;
+        const currentBestCost = this.readArrayValue(
+          bestCosts,
+          endIdxExclusive,
+          "bestCosts"
+        );
+        const currentBestPartCount = this.readArrayValue(
+          partCounts,
+          endIdxExclusive,
+          "partCounts"
+        );
+        const shouldUseCandidate =
+          candidateCost < currentBestCost ||
+          (candidateCost === currentBestCost &&
+            candidatePartCount < currentBestPartCount);
+
+        if (!shouldUseCandidate) continue;
+        bestCosts[endIdxExclusive] = candidateCost;
+        partCounts[endIdxExclusive] = candidatePartCount;
+        previousSplitIdxs[endIdxExclusive] = startIdx;
+      }
+    }
+
+    const reversedParts = Array.of<TranscriptPartRT>();
+    let cursor = messages.length;
+
+    while (cursor > 0) {
+      const startIdx = this.readArrayValue(
+        previousSplitIdxs,
+        cursor,
+        "previousSplitIdxs"
+      );
+      if (startIdx < 0) {
+        throw new Error(
+          `unable to partition transcript ending at message index ${cursor}`
+        );
+      }
+
+      reversedParts.push({
+        lineCount: this.partLineCount(
+          prefixLineCounts,
+          headingLineCount,
+          startIdx,
+          cursor
+        ),
+        messages: messages.slice(startIdx, cursor),
+        partNumber: reversedParts.length + 1
+      });
+      cursor = startIdx;
+    }
+
+    return reversedParts.reverse().map((part, i) => ({
+      ...part,
+      partNumber: i + 1
+    }));
+  }
+
   private transcriptFormat(
     dataRaw: UnwrapPromise<ReturnType<typeof this.data>>,
     withThinking: boolean | `${boolean}` = `${false}`
   ) {
-    const arr = Array.of<string>();
+    const arr = Array.of<RenderedTranscriptMessageRT>();
     const data = this.mapIt(dataRaw) satisfies MapItRT[] | undefined;
     if (!data) return;
     for (const p of data) {
@@ -438,16 +722,35 @@ class ScriptGen extends Fs {
             ? `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${this.assetsToMdFormat(p.asset)}\n\n${d}\n`
             : `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${d}\n`;
 
-      arr.push(transcriptMsg);
+      arr.push({
+        lineCount: this.countLines(transcriptMsg),
+        markdown: transcriptMsg,
+        msgNumber: p.msgNumber
+      });
     }
     return arr;
   }
 
-  private toTranscript(data: string[], toSlug: string, title: string) {
-    const content = `### ${title}\n\n${data.join(`\n`)}`;
-    return new Promise(res =>
-      res(this.withWs(`src/test/__out__/condensed/${toSlug}.md`, content))
-    );
+  private toTranscript(
+    data: readonly RenderedTranscriptMessageRT[],
+    toSlug: string,
+    title: string
+  ) {
+    const content = this.buildTranscriptContent(data, title);
+    this.withWs(`${this.condensedOutputDir}/${toSlug}.md`, content);
+  }
+
+  private toTranscriptParts(
+    data: readonly RenderedTranscriptMessageRT[],
+    toSlug: string,
+    title: string
+  ) {
+    this.removeStaleTranscriptParts(toSlug);
+    const parts = this.partitionTranscriptMessages(data, title);
+    for (const part of parts) {
+      const content = this.buildTranscriptContent(part.messages, title);
+      this.withWs(this.transcriptPartPath(toSlug, part.partNumber), content);
+    }
   }
 
   public async gen(
@@ -462,7 +765,8 @@ class ScriptGen extends Fs {
     if (!dbData.title) return;
     const toSlug = this.toSlug(dbData.title);
     try {
-      await this.toTranscript(data, toSlug, dbData.title);
+      this.toTranscript(data, toSlug, dbData.title);
+      this.toTranscriptParts(data, toSlug, dbData.title);
     } catch (err) {
       throw new Error("error in script-gen: ".concat(this.safeErrMsg(err)));
     }

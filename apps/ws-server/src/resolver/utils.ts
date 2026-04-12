@@ -8,6 +8,7 @@ import type { Logger as PinoLogger } from "pino";
 import type { S3Storage } from "@slipstream/storage-s3";
 
 export class ResolverUtilsService {
+  protected nanoid: Promise<<Type extends string>(size?: number) => Type>;
   protected logger: PinoLogger;
   constructor(
     public wsServer: WSServer,
@@ -20,6 +21,8 @@ export class ResolverUtilsService {
     logger: LoggerService,
     protected ttsService: TTSService
   ) {
+    this.nanoid = import("nanoid").then(t => t.nanoid);
+
     this.logger = logger
       .getPinoInstance()
       .child({ node_version: process.version }, { msgPrefix: "[resolver] " });
@@ -57,7 +60,12 @@ export class ResolverUtilsService {
     conversation: (conversationId: string) => `conv:${conversationId}` as const,
     conversationStream: (conversationId: string) =>
       `stream:${conversationId}` as const,
-
+    parallelStream: (
+      conversationId: string,
+      runId: string,
+      provider: string,
+      model: string
+    ) => `parallel:${conversationId}:${runId}:${provider}:${model}` as const,
     // System-wide channels
     system: {
       broadcasts: "system:broadcasts",

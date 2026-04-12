@@ -1,3 +1,5 @@
+import type { Rm } from "@slipstream/types";
+
 export const COOKIES = {
   browserVersion: "browserVersion",
   browserName: "browserName",
@@ -17,14 +19,35 @@ export const COOKIES = {
   userId: "userId"
 } as const;
 
+export function isValidCookieKey(c: string) {
+  return (
+    c === "browserName" ||
+    c === "browserVersion" ||
+    c === "hostname" ||
+    c === "viewport" ||
+    c === "ios" ||
+    c === "latlng" ||
+    c === "tz" ||
+    c === "ip" ||
+    c === "ua" ||
+    c === "country" ||
+    c === "city" ||
+    c === "isMac" ||
+    c === "region" ||
+    c === "postalCode" ||
+    c === "locale" ||
+    c === "userId"
+  );
+}
+
 export type CookieValue = {
   hostname: string;
   browserName: string;
   browserVersion: string;
-  viewport: "mobile" | "desktop";
+  viewport: "mobile" | "desktop" | (string & {});
   ip: string;
   ua: string;
-  ios: "true" | "false";
+  ios: "true" | "false" | (string & {});
   /**
    ```ts
    `${number},${number}` = `lat,lng`
@@ -36,16 +59,21 @@ export type CookieValue = {
   postalCode: string;
   country: string;
   city: string;
-  isMac: "true" | "false";
+  isMac: "true" | "false" | (string & {});
   locale: string;
   userId: string;
 };
 
 export type CookieKey = keyof typeof COOKIES;
 
-export type GetCookie<T extends keyof CookieValue> = {
-  [P in T]: CookieValue[P];
-}[T];
+export type GetCookie<
+  T extends keyof CookieValue = keyof CookieValue,
+  ToOptional = false
+> = ToOptional extends true
+  ? { [P in T]?: CookieValue[P] }[T]
+  : {
+      [P in T]: CookieValue[P];
+    }[T];
 
 export interface CookieContextType {
   get: <const K extends CookieKey>(key: K) => GetCookie<K> | undefined;
@@ -56,4 +84,39 @@ export interface CookieContextType {
   ) => void;
   remove: (key: CookieKey) => void;
   getAll: () => Partial<CookieValue>;
+  getTargeted: <const V extends keyof CookieValue>(k: readonly V[]) => FilterResults<V>
 }
+export type FilterBySelect<Q extends keyof CookieValue> = Exclude<
+  Exclude<Q, CookieValue>,
+  CookieValue
+>;
+
+export type FilterResults<S extends keyof CookieValue> = Rm<
+  CookieValue,
+  Exclude<keyof CookieValue, FilterBySelect<S>>
+>;
+
+export interface FullRes<S extends keyof CookieValue = keyof CookieValue> {
+  cookies: FilterResults<S>[];
+}
+
+export type CookieOpts<T extends keyof CookieValue = keyof CookieValue> = {
+  select: readonly T[];
+};
+
+export function handleSelect<
+  const V extends keyof CookieValue = keyof CookieValue
+>(select: CookieOpts<V>['select']) {
+  const a = Array.of<readonly [string, string | number | boolean]>();
+
+  if (select && select.length > 0) {
+    const k = select.join(",");
+
+    const tuple = ["select", k] as const;
+    a.push(tuple);
+  }
+
+  return select
+}
+
+handleSelect(["browserVersion", "browserName"] )

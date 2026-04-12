@@ -12,7 +12,8 @@ src/test/xai/*.ts
 
 src/test/v0/*
 src/test/sanity/*
-src/test/c**/*
+src/test/consts/*
+src/test/csv/*
 *.pdf
 testing.sh
 

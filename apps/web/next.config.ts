@@ -2,14 +2,16 @@ import type { NextConfig } from "next";
 
 export default {
   reactStrictMode: true,
-  reactCompiler: true,experimental: {},
+  reactCompiler: true,
+  // defaults to to 1mb :|
+  experimental: { serverActions: { bodySizeLimit: `50mb` } },
   typescript: { ignoreBuildErrors: false, tsconfigPath: "./tsconfig.json" },
   images: {
     localPatterns: [
       { pathname: "/dd/**" },
       { pathname: "/highlights/**" },
       { pathname: "/icon/**" },
-      {pathname: "/photos/heritage/**"},
+      { pathname: "/photos/heritage/**" },
       { pathname: "/ideation/**" },
       { pathname: "/misc/**" },
       { pathname: "/providers/**" },
@@ -21,6 +23,8 @@ export default {
     formats: ["image/avif", "image/webp"],
     dangerouslyAllowLocalIP: true,
     maximumRedirects: 5,
+    unoptimized: true,
+    
     contentDispositionType: "attachment",
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,

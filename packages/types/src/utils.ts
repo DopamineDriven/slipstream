@@ -388,3 +388,17 @@ export type FlexiProvider = FlexiCase<$Enums.Provider>;
 export type BigIntOrNumber<T extends boolean = false> = T extends true
   ? number
   : bigint;
+
+
+// export type FilterBySelect<Q extends keyof ModelIdToModelDisplayName> = Exclude<
+//   Exclude<Q, ProductDataFull>,
+//   ProductDataFull
+// >;
+
+// export type FilterResults<S extends keyof ProductDataFull> = Rm<
+//   ProductDataFull,
+//   Exclude<keyof ProductDataFull, FilterBySelect<S>>
+// >;
+/**
+ * 
+ */

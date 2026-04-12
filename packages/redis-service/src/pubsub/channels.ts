@@ -7,6 +7,14 @@ export const RedisChannels = {
   conversation: (conversationId: string) => `conv:${conversationId}` as const,
   conversationStream: (conversationId: string) => `stream:${conversationId}` as const,
 
+  // Fan-out channels for parallelized mode
+  parallelStream: (
+    conversationId: string,
+    runId: string,
+    provider: string,
+    model: string
+  ) => `parallel:${conversationId}:${runId}:${provider}:${model}` as const,
+
   // System-wide channels
   system: {
     broadcasts: 'system:broadcasts',

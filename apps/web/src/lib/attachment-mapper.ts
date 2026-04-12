@@ -11,9 +11,7 @@ export type UploadLookup = {
   size?: number | null;
 };
 
-function toAssetType(
-  mime: string | null | undefined
-): "IMAGE" | "DOCUMENT" | "AUDIO" | "VIDEO" | "UNKNOWN" {
+function toAssetType(mime: string | null | undefined) {
   if (!mime) return "UNKNOWN";
   if (mime.startsWith("image/")) return "IMAGE";
   if (mime.startsWith("audio/")) return "AUDIO";
@@ -28,7 +26,7 @@ function toAssetType(
  * Example: 1761729297502-ig_0d3912d56a96ce82016901dab7fa2c81a1886deddf5b1edfd1-3.png
  * Returns: ig_0d3912d56a96ce82016901dab7fa2c81a1886deddf5b1edfd1
  */
-function extractSeriesIdFromGeneratedFilename(filename: string): string | null {
+function extractSeriesIdFromGeneratedFilename(filename: string) {
   try {
     // Remove file extension first
     const nameWithoutExt = filename.split(".")[0];
@@ -67,12 +65,7 @@ function extractSeriesIdFromGeneratedFilename(filename: string): string | null {
  * - https://assets.aicoalesce.com/generated/userId/filename.png -> py-gen-assets-prod, true
  * - https://assets-dev.aicoalesce.com/generated/userId/filename.png -> py-gen-assets-dev, true
  */
-function extractS3InfoFromCdnUrl(cdnUrl: string | null): {
-  bucket: string;
-  key: string;
-  isGenerated: boolean;
-  seriesId: string | null;
-} {
+function extractS3InfoFromCdnUrl(cdnUrl: string | null) {
   if (!cdnUrl) {
     return { bucket: "", key: "", isGenerated: false, seriesId: null };
   }
@@ -121,7 +114,7 @@ export function buildOptimisticAttachment(
   conversationId: string,
   lookup?: UploadLookup,
   fallbackUserId?: string
-): AttachmentSingleton<true> {
+) {
   const filename = (lookup?.filename ?? preview.filename) || "file";
   const mime = (lookup?.mime ?? preview.mime) || "application/octet-stream";
   const size =
@@ -230,5 +223,5 @@ export function buildOptimisticAttachment(
     image: null,
     document: null,
     imageGenOutput: null
-  };
+  } satisfies AttachmentSingleton<true>;
 }
