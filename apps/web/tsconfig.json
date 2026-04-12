@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@slipstream/tsconfig/next.json",
   "compilerOptions": {
     "paths": {
@@ -11,7 +10,7 @@
       }
     ],
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-            "ignoreDeprecations":"6.0",
+    "ignoreDeprecations": "6.0",
     "types": ["*"]
   },
   "include": [

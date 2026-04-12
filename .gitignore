@@ -54,5 +54,5 @@ infra/remote/*
 infra/*.json
 infra/*.txt
 infra/*.md
-.codex
+\.codex
 docs/*

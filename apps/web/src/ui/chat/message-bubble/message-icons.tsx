@@ -2,7 +2,6 @@
 
 import type { User } from "@/utils/auth-client";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useCookiesCtx } from "@/context/cookie-context";
 import { useTTSContext } from "@/context/tts-context";
 import { useReaction } from "@/hooks/use-reaction";
 import { formatTime, fromPrismaFormat, getFirstName } from "@/lib/helpers";
@@ -21,56 +20,86 @@ import {
   ThumbsUp
 } from "@slipstream/ui";
 
-const primerAudio = "/cassette-shortened.mp3";
-
 export function MessageIcons({
   user,
   message,
   isStreaming,
-  isMobile
+  isMobile,
+  locale,
+  tz
 }: {
   isStreaming: boolean;
   message: MessageSingleton<true>;
   user?: User;
   isMobile: boolean;
+  locale: string;
+  tz: string;
 }) {
   const { resolvedTheme } = useTheme();
+
   const { handleReaction, isPending, reactionState } = useReaction(message);
-  const tts = useTTSContext();
+
+  const {
+    hydrateFromTtsJob,
+    requestTTS,
+    currentPlaybackMessageId,
+    isGenerating,
+    activeMessageId,
+    stop
+  } = useTTSContext();
+
   const primerRef = useRef<HTMLAudioElement | null>(null);
-  const { get } = useCookiesCtx();
-  const tz = get("tz") ?? "america/chicago";
-  const locale = get("locale") ?? "en-US";
+
+  const hasPlayedPrimer = useRef(false);
+
+  useEffect(() => {
+    if (primerRef.current) return;
+    const el = new Audio("/cassette-shortened.mp3");
+    el.volume = 0.1;
+    el.preload = "auto";
+    el.onended = () => {
+      hasPlayedPrimer.current = true;
+    };
+    primerRef.current = el;
+
+    return () => {
+      el.onended = null;
+      el.pause();
+      primerRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     if (message.ttsJob) {
-      tts.hydrateFromTtsJob(message.id, message.ttsJob);
+      hydrateFromTtsJob(message.id, message.ttsJob);
     }
-  }, [message.id, message.ttsJob, tts]);
+  }, [message.id, message.ttsJob, hydrateFromTtsJob]);
 
   const isTTSActive =
-    tts.currentPlaybackMessageId === message.id ||
-    (tts.isGenerating && tts.activeMessageId === message.id);
+    currentPlaybackMessageId === message.id ||
+    (isGenerating && activeMessageId === message.id);
+  // const handleReadAloud = useCallback(() => {
+  //   if (isTTSActive) {
+  //     stop();
+  //   } else {
+  //     if (primerRef.current && !hasPlayedPrimer.current) {
+  //       void primerRef.current.play().catch(() => {});
+  //     }
+  //     requestTTS(message.id, message.conversationId);
+  //   }
 
-  const playPrimer = useCallback((hasCachedAudio: boolean) => {
-    if (hasCachedAudio) return;
-    if (primerRef.current) return;
-    primerRef.current = new Audio(primerAudio);
-    const el = primerRef.current;
-    el.preload = "auto";
-    el.volume = 0.1;
-
-    void el.play().catch(() => {});
-  }, []);
-
+  // }, [isTTSActive, stop, requestTTS, message.id, message.conversationId]);
   const handleReadAloud = useCallback(() => {
     if (isTTSActive) {
-      tts.stop();
+      stop();
     } else {
-      playPrimer(tts.hasCachedAudio(message.id));
-      tts.requestTTS(message.id, message.conversationId);
+      if (primerRef.current && !hasPlayedPrimer.current) {
+        void primerRef.current.play().catch(() => {});
+      }
+      // hasCachedAudio(message.id);
+      requestTTS(message.id, message.conversationId);
     }
-  }, [isTTSActive, tts, message.id, message.conversationId, playPrimer]);
+  }, [isTTSActive, stop, requestTTS, message.id, message.conversationId]);
 
   const RxnIcons = useMemo(
     () =>
@@ -161,7 +190,7 @@ export function MessageIcons({
                 onClick={action.onClick}>
                 <action.icon
                   className={cn(
-                    "size-3 transition-all duration-200",
+                    "size-4 transition-all duration-200 sm:size-3",
                     action.isActive && "fill-current"
                   )}
                 />
@@ -170,9 +199,7 @@ export function MessageIcons({
             <Button
               variant="ghost"
               size="icon"
-              disabled={
-                isStreaming === true || (tts.isGenerating && !isTTSActive)
-              }
+              disabled={isStreaming === true || (isGenerating && !isTTSActive)}
               className={cn(
                 actionButtonVariants.default,
                 isTTSActive
@@ -180,12 +207,12 @@ export function MessageIcons({
                     ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
                     : "text-foreground drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
                   : actionButtonVariants.reaction,
-                tts.isGenerating &&
-                  tts.activeMessageId === message.id &&
+                isGenerating &&
+                  activeMessageId === message.id &&
                   "animate-pulse"
               )}
               onClick={handleReadAloud}>
-              <ReadAloudIcon className="size-3" />
+              <ReadAloudIcon className="size-4 sm:size-3" />
             </Button>
             {!isMobile && (
               <Button
@@ -231,6 +258,7 @@ export function MessageIcons({
               <AnimatedCopyButton
                 textToCopy={message.content}
                 className={cn(
+                  "z-50",
                   actionButtonVariants.default,
                   actionButtonVariants.cpBtn
                 )}
@@ -252,7 +280,11 @@ export function MessageIcons({
           <div className="flex items-center gap-2">
             <AnimatedCopyButton
               textToCopy={message.content}
-              className={actionButtonVariants.default}
+              className={cn(
+                "z-50",
+                actionButtonVariants.default,
+                actionButtonVariants.cpBtn
+              )}
               iconClassName="text-xs"
               initialIconSize={12}
               size="icon"

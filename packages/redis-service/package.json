@@ -73,6 +73,7 @@
     "dev": "pnpm build",
     "lint": "eslint",
     "clean": "git clean -xdf .turbo dist node_modules",
+    "typecheck": "tsgo --noEmit",
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,css,html,md}\" --ignore-unknown --cache"
   },
   "dependencies": {

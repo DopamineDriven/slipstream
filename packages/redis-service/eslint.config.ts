@@ -1,7 +1,7 @@
 import type { Config } from "typescript-eslint";
 import baseConfig from "@slipstream/eslint-config/base";
 
-export default [
+export default <Config>[
   ...baseConfig,
   {
     rules: {
@@ -12,4 +12,4 @@ export default [
     },
     ignores: ["dist/**"]
   }
-] satisfies Config;
+];

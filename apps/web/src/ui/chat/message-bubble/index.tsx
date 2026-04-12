@@ -68,8 +68,11 @@ export function MessageBubble({
       )
     });
   }, [liveImgGenFields]);
-  const { get } = useCookiesCtx();
-  const isMobile = get("viewport") === "mobile";
+  const { getTargeted } = useCookiesCtx();
+
+  const { locale, tz, viewport } = getTargeted(["tz", "locale", "viewport"]);
+
+  const isMobile = viewport === "mobile";
 
   const [renderedContent, setRenderedContent] = useState<ReactNode | null>(
     null
@@ -661,6 +664,8 @@ export function MessageBubble({
           )}
           <MessageIcons
             isMobile={isMobile}
+            locale={locale}
+            tz={tz}
             isStreaming={isStreaming}
             message={message}
             user={user}

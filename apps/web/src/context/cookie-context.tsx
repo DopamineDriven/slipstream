@@ -4,19 +4,21 @@ import type {
   CookieContextType,
   CookieKey,
   CookieValue,
+  FilterResults,
   GetCookie
 } from "@/types/cookies";
-import React, { createContext, useCallback, useContext } from "react";
-import { COOKIES } from "@/types/cookies";
+import type { ReactNode } from "react";
+import { createContext, useCallback, useContext } from "react";
+import { COOKIES, isValidCookieKey } from "@/types/cookies";
 import Cookies from "js-cookie";
 
 const CookieContext = createContext<CookieContextType | undefined>(undefined);
 
 export function CookieProvider({
   children
-}: Readonly<{ children: React.ReactNode }>) {
+}: Readonly<{ children: ReactNode }>) {
   const get = useCallback(<const K extends CookieKey>(key: K) => {
-    return Cookies.get(key) as GetCookie<K> | undefined;
+    return Cookies.get(key) as GetCookie<K, true>;
   }, []);
 
   const set = useCallback(
@@ -30,30 +32,42 @@ export function CookieProvider({
     []
   );
 
+  const getTargeted = useCallback(
+    <const V extends keyof CookieValue>(k: readonly V[]) => {
+      const result = {} as Record<keyof CookieValue, string | undefined>;
+      for (const kk of k) {
+        result[kk] = Cookies.get(kk);
+      }
+      return result as FilterResults<V>;
+    },
+    []
+  );
+
   const remove = useCallback((key: CookieKey) => {
     Cookies.remove(COOKIES[key]);
   }, []);
 
-  const getAll = useCallback((): Partial<CookieValue> => {
-    const result: Record<string, string> = {};
+  const getAll = useCallback(() => {
+    const result = {} as Record<keyof CookieValue, string | undefined>;
 
     Array.from(Object.entries(COOKIES)).forEach(([key, _]) => {
-      const k = key as keyof typeof COOKIES;
-      const value = get(k);
-      if (typeof value !== "undefined") {
-        result[k] = value;
+      if (isValidCookieKey(key) && key in result) {
+        const value = get(key);
+        if (value) {
+          result[key] = value;
+        }
       }
     });
-
-    return result as CookieValue;
+    return result;
   }, [get]);
 
-  const contextValue: CookieContextType = {
+  const contextValue = {
     get,
     set,
     remove,
-    getAll
-  };
+    getAll,
+    getTargeted
+  } satisfies CookieContextType;
 
   return (
     <CookieContext.Provider value={contextValue}>
