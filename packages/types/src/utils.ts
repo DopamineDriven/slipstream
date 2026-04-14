@@ -16,18 +16,7 @@ export type SerializeBigInt<T, Serialized extends boolean = boolean> = {
     : T[K];
 };
 
-// precision (field-level) targeting
-export type PrecisionSerializeBigIntField<
-  T,
-  Field extends keyof T = BigIntKeys<T>,
-  Serialized extends boolean = false
-> = DX<{
-  [K in keyof T]: K extends Field
-    ? Serialized extends true
-      ? number | null
-      : bigint | null
-    : T[K];
-}>;
+
 export type NormalizeAndInject<V, Q = object, P extends boolean = boolean> = DX<
   SerializeBigInt<V, P> & Q
 >;
@@ -89,25 +78,6 @@ export type IsExact<T, U> = [T] extends [U]
 export type TCN<T, X extends keyof T = keyof T> = Rm<T, X> & {
   [Q in X]?: XOR<T[Q], never>;
 };
-
-/**
- * export type ArrFieldReplacer<
-  T extends unknown[] | readonly unknown[],
-  V extends keyof Unenumerate<T>,
-  Q extends boolean = false,
-  P = unknown
-> = T extends (infer U)[] | readonly (infer U)[]
-  ? V extends keyof U
-    ? Q extends true
-      ? P extends Record<infer Z, infer S>
-        ? [...[DX<{ [C in Z]: S } & Rm<U, V>>]][number][]
-        : (Rm<U, V> & P)[]
-      : Q extends false
-        ? Rm<U, V>[]
-        : U
-    : T
-  : T;
- */
 
 export type ArrFieldReplacer<
   T extends unknown[] | readonly unknown[],
@@ -261,61 +231,6 @@ export function instanceFunc<const Type>(c: new (...args: Type[]) => Type) {
   return new c();
 }
 
-// export type IsNever<T> = [T] extends [never] ? true : false;
-
-// /**
-//  * Check if a key's value type is never
-//  */
-// export type IsKeyNever<T, K extends keyof T> = IsNever<T[K]>;
-
-// /**
-//  * Extract keys whose values are NOT never
-//  */
-// export type NonNeverKeys<T> = {
-//   [K in keyof T]: IsNever<T[K]> extends true ? never : K;
-// }[keyof T];
-
-// /**
-//  * Extract keys whose values ARE never
-//  */
-// export type NeverKeys<T> = {
-//   [K in keyof T]: IsNever<T[K]> extends true ? K : never;
-// }[keyof T];
-
-// /**
-//  * Strip all `never`-valued keys from a type
-//  */
-// export type StripNever<T> = {
-//   [K in NonNeverKeys<T>]: T[K];
-// };
-
-// /**
-//  * Get the non-never type of a key, or `never` if the key doesn't exist or is never
-//  */
-// export type NonNeverValue<T, K extends PropertyKey> = K extends keyof T
-//   ? IsNever<T[K]> extends true
-//     ? never
-//     : T[K]
-//   : never;
-
-// // ============================================================================
-// // Type Predicates for Field Checking
-// // ============================================================================
-
-// /**
-//  * Check if object has a key with a non-never, non-undefined value
-//  * Returns a type predicate that narrows the object type
-//  */
-// export function has<const T extends object, const K extends string>(
-//   obj: T,
-//   key: K
-// ): obj is T & Record<K, Exclude<NonNeverValue<T, K>,null>> {
-//   return (
-//     key in obj &&
-//     typeof (obj as Record<string, unknown>)[key] !== "undefined" &&
-//     (obj as Record<string, unknown>)[key] !== null
-//   );
-// }
 export type CommonDiscriminants =
   | "type"
   | "kind"
@@ -400,5 +315,5 @@ export type BigIntOrNumber<T extends boolean = false> = T extends true
 //   Exclude<keyof ProductDataFull, FilterBySelect<S>>
 // >;
 /**
- * 
+ *
  */

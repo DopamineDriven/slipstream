@@ -31,7 +31,7 @@ import {
   getModelIdByDisplayName
 } from "@slipstream/types";
 import {
-  AnthropicIcon,
+  ClaudeIcon,
   CohereIconCurrentColor as CohereIcon,
   DeepSeek,
   GeminiIcon,
@@ -67,7 +67,7 @@ export const providerMetadata = {
   },
   anthropic: {
     name: "Anthropic Claude",
-    icon: AnthropicIcon,
+    icon: ClaudeIcon,
     color: "#d97706",
     description: "Anthropic's helpful, harmless, and honest AI"
   },
@@ -319,4 +319,33 @@ export function getModelDisplayName(
                             "openai",
                             model as OpenAiModelIdUnion
                           );
+}
+export function isGeminiDisplayName(n: string) {
+  return (
+    n === "Gemini 3.1 Flash Lite Preview" ||
+    n === "Gemini 3.1 Pro Preview" ||
+    n === "Gemini 3.1 Pro Preview Custom Tools" ||
+    n === "Gemini 3 Flash Preview" ||
+    n === "Gemini 2.5 Pro" ||
+    n === "Nano Banana Pro" ||
+    n === "Nano Banana" ||
+    n === "Nano Banana 2" ||
+    n === "Gemini 2.5 Flash" ||
+    n === "Gemini 2.5 Flash-Lite" ||
+    n === "Deep Research Pro Preview (Dec-12-2025)" ||
+    n === "Gemini 2.0 Flash" ||
+    n === "Gemini 2.0 Flash-Lite" ||
+    n === "Imagen 4" ||
+    n === "Imagen 4 Fast" ||
+    n === "Imagen 4 Ultra" ||
+    n === "Veo 3.1" ||
+    n === "Veo 3.1 fast" ||
+    n === "Veo 3" ||
+    n === "Veo 3 fast" ||
+    n === "Veo 2"
+  );
+}
+
+export function isCohereDisplayName(n: string) {
+  return n === "Command A" || n === "Command A Reasoning";
 }

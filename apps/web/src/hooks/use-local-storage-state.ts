@@ -1,11 +1,9 @@
 "use client";
 
+import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
-export function useLocalStorageState<T>(
-  key: string,
-  defaultValue: T
-): [T, (v: T) => void] {
+export function useLocalStorageState<T>(key: string, defaultValue: T) {
   const [state, setState] = useState<T>(defaultValue);
 
   useEffect(() => {
@@ -27,5 +25,5 @@ export function useLocalStorageState<T>(
     localStorage.setItem(key, JSON.stringify(state));
   }, [key, state]);
 
-  return [state, setState];
+  return [state, setState] satisfies [T, Dispatch<SetStateAction<T>>];
 }

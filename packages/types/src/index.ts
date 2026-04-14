@@ -354,7 +354,6 @@ export type {
   NormalizeAndInject,
   OnlyOptional,
   OnlyRequired,
-  PrecisionSerializeBigIntField,
   RTC,
   RequireNested,
   Rm,
