@@ -16,12 +16,12 @@ import { useCookiesCtx } from "@/context/cookie-context";
 import { useImageGen } from "@/context/image-gen-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { usePathnameContext } from "@/context/pathname-context";
-import { useSettingsDrawer } from "@/context/settings-drawer-context";
 import { useAssets } from "@/hooks/use-assets";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
+import { ChatInputImageGenControls } from "@/ui/chat/chat-input/image-gen-controls";
 import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
 import { motion } from "motion/react";
 import type { AIChatRequestImgGenFields } from "@slipstream/types";
@@ -30,7 +30,6 @@ import {
   Camera,
   Expand,
   FileText,
-  ImageGen,
   ImageIcon,
   Loader,
   Mic,
@@ -40,7 +39,6 @@ import {
   PopoverTrigger,
   SendMessage,
   Textarea,
-  Tools,
   UploadProgress
 } from "@slipstream/ui";
 
@@ -100,8 +98,6 @@ export function ChatInput({
   const [openAttach, setOpenAttach] = useState(false);
 
   const { selectedModel, openDrawer } = useModelSelection();
-
-  const { openToTab: openSettingsToTab } = useSettingsDrawer();
 
   const assetUpload = useAssetUpload();
 
@@ -334,21 +330,12 @@ export function ChatInput({
         const batchId =
           optimistic.length > 0 ? assetUpload.getBatchId() : undefined;
 
-        const imgGenOpenAI = imgGen.enabled
-          ? selectedModel.provider === "openai"
-            ? {
-                ...imgGen.fields,
-                output_partial_images: 3,
-                output_quality: "high"
-              }
-            : imgGen.fields
-          : undefined;
         onUserMessage?.({
           content: composed,
           attachments: optimistic,
           batchId,
           imgGenEnabled: imgGen.enabled || undefined,
-          imgGenFields: imgGen.enabled ? imgGenOpenAI : undefined
+          imgGenFields: imgGen.enabled ? imgGen.fields : undefined
         });
 
         setMessage("");
@@ -658,38 +645,7 @@ export function ChatInput({
                         </div>
                       </PopoverContent>
                     </Popover>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      title="Tools and settings"
-                      className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
-                      onClick={() => openSettingsToTab("apiKeys")}>
-                      <Tools className="size-4" />
-                      <span className="sr-only">Tools</span>
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={imgGen.enabled ? "default" : "ghost"}
-                      size="icon"
-                      title={
-                        imgGen.enabled
-                          ? "Disable image generation"
-                          : "Enable image generation"
-                      }
-                      className={cn(
-                        "hover:bg-accent h-8",
-                        imgGen.enabled
-                          ? "text-foreground"
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
-                      onClick={() => {
-                        imgGen.setEnabled(!imgGen.enabled);
-                        if (!imgGen.enabled) imgGen.updateFields({ n: 1 });
-                      }}>
-                      <ImageGen className="size-4" />
-                      <span className="sr-only">Toggle Image Generation</span>
-                    </Button>
+                    <ChatInputImageGenControls />
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button

@@ -5,8 +5,7 @@ import { imgCtx } from "@/lib/img-ctx";
 import type {
   GeminiImageQuality,
   GeminiImageSize,
-  GeminiImgGenModels,
-  RTC
+  GeminiImgGenModels
 } from "@slipstream/types";
 
 export type GeminiImgModelId = GeminiImgGenModels;
@@ -32,6 +31,11 @@ export type GoogleQuality = NanoBanana2Quality;
 export interface GoogleImageSettings {
   aspectRatio: GoogleAspectRatio;
   quality: GoogleQuality;
+}
+
+export interface GoogleImageSettingsUpdates {
+  aspectRatio?: string;
+  quality?: string;
 }
 
 export function isGoogleImgGenCapable(m: string) {
@@ -157,10 +161,18 @@ function getStorageKey(modelId: string) {
 
 export function useGoogleImageSettings(modelId: string) {
   const isCapable = isGoogleImgGenCapable(modelId);
-  const googleModelId = isCapable ? (modelId as GeminiImgModelId) : null;
+  const googleModelId = isCapable
+    ? Array.from(MODEL_DEFAULTS.keys()).find(model => model === modelId) ?? null
+    : null;
   const defaultSettings = googleModelId
     ? (MODEL_DEFAULTS.get(googleModelId) ?? IMAGEN_DEFAULTS)
     : IMAGEN_DEFAULTS;
+  const aspectRatioOptions = googleModelId
+    ? (MODEL_ASPECT_RATIOS.get(googleModelId) ?? Array.of<GoogleAspectRatio>())
+    : Array.of<GoogleAspectRatio>();
+  const qualityOptions = googleModelId
+    ? (MODEL_QUALITIES.get(googleModelId) ?? Array.of<GoogleQuality>())
+    : Array.of<GoogleQuality>();
 
   const [settings, setSettings] =
     useState<GoogleImageSettings>(defaultSettings);
@@ -176,28 +188,15 @@ export function useGoogleImageSettings(modelId: string) {
         );
         const ar = parsed.aspectRatio ?? defaultSettings.aspectRatio;
         const q = parsed.quality ?? defaultSettings.quality;
-
         const aspectRatio =
-          isNanoBanana2(googleModelId) && isValidNanoBanana2AR(ar)
-            ? ar
-            : isNanoBanana(googleModelId) && isValidNanoBananaAR(ar)
-              ? ar
-              : isValidImagenAR(ar)
-                ? ar
-                : defaultSettings.aspectRatio;
-
+          aspectRatioOptions.find(option => option === ar) ??
+          defaultSettings.aspectRatio;
         const quality =
-          isNanoBanana2(googleModelId) && isValidNanoBanana2Quality(q)
-            ? q
-            : isNanoBanana(googleModelId) && isValidNanoBananaQuality(q)
-              ? q
-              : isValidImagenQuality(q)
-                ? q
-                : defaultSettings.quality;
+          qualityOptions.find(option => option === q) ?? defaultSettings.quality;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setSettings({
-          aspectRatio: aspectRatio as GoogleAspectRatio,
-          quality: quality as GoogleQuality
+          aspectRatio,
+          quality
         });
       } else {
         setSettings(defaultSettings);
@@ -205,7 +204,7 @@ export function useGoogleImageSettings(modelId: string) {
     } catch {
       setSettings(defaultSettings);
     }
-  }, [modelId, googleModelId, defaultSettings]);
+  }, [aspectRatioOptions, defaultSettings, googleModelId, modelId, qualityOptions]);
 
   useEffect(() => {
     if (!googleModelId) return;
@@ -217,18 +216,27 @@ export function useGoogleImageSettings(modelId: string) {
     }
   }, [modelId, googleModelId, settings]);
 
-  const updateSettings = useCallback((updates: RTC<GoogleImageSettings>) => {
-    setSettings(prev => ({ ...prev, ...updates }));
-  }, []);
+  const updateSettings = useCallback((updates: GoogleImageSettingsUpdates) => {
+    setSettings(prev => {
+      const aspectRatio =
+        typeof updates.aspectRatio === "string"
+          ? aspectRatioOptions.find(option => option === updates.aspectRatio)
+          : undefined;
+      const quality =
+        typeof updates.quality === "string"
+          ? qualityOptions.find(option => option === updates.quality)
+          : undefined;
+
+      return {
+        aspectRatio: aspectRatio ?? prev.aspectRatio,
+        quality: quality ?? prev.quality
+      };
+    });
+  }, [aspectRatioOptions, qualityOptions]);
 
   const resetSettings = useCallback(() => {
     setSettings(defaultSettings);
   }, [defaultSettings]);
-
-  const aspectRatios = googleModelId
-    ? MODEL_ASPECT_RATIOS.get(googleModelId)
-    : [];
-  const qualities = googleModelId ? MODEL_QUALITIES.get(googleModelId) : [];
 
   return {
     settings,
@@ -236,8 +244,8 @@ export function useGoogleImageSettings(modelId: string) {
     resetSettings,
     isCapable,
     modelId: googleModelId,
-    aspectRatios,
-    qualities,
+    aspectRatios: aspectRatioOptions,
+    qualities: qualityOptions,
     supportsOutputFormat: isImagenModel(googleModelId),
     supportsBackground: false
   };

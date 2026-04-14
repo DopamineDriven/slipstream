@@ -160,11 +160,7 @@ export class ProviderValidation {
     return this.geminiNanoBananasModel(m) || this.geminiImageGenModel(m);
   }
 
-  public isImgGenCapableModel(model: AllImgGenCapableModelUnion): true;
-  public isImgGenCapableModel(
-    model: Exclude<AllModelsUnion, AllImgGenCapableModelUnion>
-  ): false;
-  public isImgGenCapableModel<const V extends AllModelsUnion = AllModelsUnion>(
+  public isImgGenCapableModel<const V extends string = string>(
     model = "gpt-5.4" as V
   ) {
     if (
@@ -195,6 +191,11 @@ export class ProviderValidation {
       if (model === "deep-research-pro-preview-12-2025") return false;
       else return true;
     }
+  }
+
+
+  public imgGenCapableModels(m: string) {
+    return this.grokImagineImgGenModel(m) || this.geminiImgGenCapable(m) || this.openAIImgGenCapable(m)
   }
 
   public handleGoogleSafetyFilter(
