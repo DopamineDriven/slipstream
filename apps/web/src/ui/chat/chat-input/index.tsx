@@ -21,7 +21,7 @@ import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
-import { ChatInputImageGenControls } from "@/ui/chat/chat-input/image-gen-controls";
+import { ChatInputImageGenSettingsDrawer } from "@/ui/chat/chat-input/image-gen-controls";
 import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
 import { motion } from "motion/react";
 import type { AIChatRequestImgGenFields } from "@slipstream/types";
@@ -30,6 +30,7 @@ import {
   Camera,
   Expand,
   FileText,
+  ImageGen,
   ImageIcon,
   Loader,
   Mic,
@@ -39,6 +40,7 @@ import {
   PopoverTrigger,
   SendMessage,
   Textarea,
+  Tools,
   UploadProgress
 } from "@slipstream/ui";
 
@@ -106,6 +108,7 @@ export function ChatInput({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [showExpandButton, setShowExpandButton] = useState(false);
+  const [isImageSettingsOpen, setIsImageSettingsOpen] = useState(false);
 
   const [message, setMessage] = useState("");
   const imgGen = useImageGen();
@@ -152,6 +155,12 @@ export function ChatInput({
     attachmentsRef.current = assets.attachments;
   }, [assets.attachments]);
 
+  useEffect(() => {
+    if (!imgGen.supported || !imgGen.enabled) {
+      setIsImageSettingsOpen(false);
+    }
+  }, [imgGen.enabled, imgGen.supported]);
+
   // Track upload status for previews using AssetProvider as source of truth
   const getStatusText = useCallback(
     (attachment: AttachmentPreview): string => {
@@ -191,6 +200,26 @@ export function ChatInput({
       }
     };
   }, []);
+
+  const handleImageSettingsClick = useCallback(() => {
+    if (!imgGen.supported) return;
+    if (!imgGen.enabled) {
+      imgGen.setEnabled(true);
+      setIsImageSettingsOpen(true);
+      return;
+    }
+    setIsImageSettingsOpen(prev => !prev);
+  }, [imgGen]);
+
+  const handleToggleImageMode = useCallback(() => {
+    if (!imgGen.supported) return;
+    if (imgGen.enabled) {
+      imgGen.setEnabled(false);
+      setIsImageSettingsOpen(false);
+      return;
+    }
+    imgGen.setEnabled(true);
+  }, [imgGen]);
 
   // Consume an initial prompt passed from parent (or recovered from sessionStorage)
   useEffect(() => {
@@ -362,7 +391,6 @@ export function ChatInput({
       quotes,
       isSubmitting,
       message,
-      selectedModel.provider,
       router,
       isHome,
       imgGen.enabled,
@@ -645,7 +673,41 @@ export function ChatInput({
                         </div>
                       </PopoverContent>
                     </Popover>
-                    <ChatInputImageGenControls />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      title={
+                        imgGen.supported
+                          ? "Image settings"
+                          : "Image settings unavailable for selected model"
+                      }
+                      className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
+                      onClick={handleImageSettingsClick}>
+                      <Tools className="size-4" />
+                      <span className="sr-only">Image settings</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={imgGen.enabled ? "default" : "ghost"}
+                      size="icon"
+                      title={
+                        imgGen.supported
+                          ? imgGen.enabled
+                            ? "Disable image generation"
+                            : "Enable image generation"
+                          : "Selected model does not support image generation"
+                      }
+                      disabled={!imgGen.supported}
+                      className={
+                        imgGen.enabled
+                          ? "hover:bg-accent text-foreground h-8"
+                          : "hover:bg-accent text-muted-foreground hover:text-foreground h-8"
+                      }
+                      onClick={handleToggleImageMode}>
+                      <ImageGen className="size-4" />
+                      <span className="sr-only">Toggle Image Generation</span>
+                    </Button>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
@@ -694,6 +756,11 @@ export function ChatInput({
         onOpenChange={setIsFullScreenInputOpen}
         initialValue={message}
         onSubmit={handleFullscreenSubmit}
+      />
+      <ChatInputImageGenSettingsDrawer
+        open={isImageSettingsOpen}
+        onOpenChange={setIsImageSettingsOpen}
+        isMobile={isMobile}
       />
       <MobileModelSelectorDrawer />
     </>

@@ -55,13 +55,19 @@ export function AnimatedSelect<T extends string = string>({
         )}
         asChild>
         <motion.button
+          type="button"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           style={{ willChange: "transform" }}>
           <Select.Value placeholder={placeholder}>
             {current
               ? renderItem
-                ? renderItem(current, true)
+                ? (
+                    <>
+                      <span className="sr-only">{current.label}</span>
+                      {renderItem(current, true)}
+                    </>
+                  )
                 : current.label
               : null}
           </Select.Value>
@@ -72,10 +78,10 @@ export function AnimatedSelect<T extends string = string>({
       </Select.Trigger>
 
       <Select.Portal>
-        <Select.Content asChild>
+        <Select.Content position="popper" sideOffset={4} asChild>
           <motion.div
             className={cn(
-              "overflow-hidden rounded-[0.3125rem] border-[1px_solid_#1d2628] bg-[hsl(190,21%,5%)] text-[hsl(0,0%,96%)]",
+              "z-[80] max-h-72 min-w-(--radix-select-trigger-width) overflow-hidden rounded-[0.3125rem] border-[1px_solid_#1d2628] bg-[hsl(190,21%,5%)] text-[hsl(0,0%,96%)] shadow-xl",
               contentClassName
             )}
             initial={{ opacity: 0, scale: 0.5 }}
@@ -89,13 +95,14 @@ export function AnimatedSelect<T extends string = string>({
               }
             }}
             style={{ willChange: "transform, opacity" }}>
-            <Select.Viewport className="p-1.25">
+            <Select.Viewport className="max-h-72 p-1.25">
               {items.map(item => {
                 const isSelected = value === item.value;
                 return (
                   <Select.Item
                     key={item.value}
                     value={item.value}
+                    textValue={item.label}
                     className="item relative flex h-6.25 cursor-pointer items-center rounded-[0.1875rem] pr-8.75 pl-6.25 text-base select-none data-disabled:pointer-events-none data-highlighted:bg-[hsl(220,17%,7%)] data-highlighted:text-[hsl(0,0%,96%)] data-highlighted:outline-0"
                     asChild>
                     <motion.div
@@ -112,6 +119,11 @@ export function AnimatedSelect<T extends string = string>({
                       style={{
                         willChange: "background-color"
                       }}>
+                      {renderItem ? (
+                        <Select.ItemText>
+                          <span className="sr-only">{item.label}</span>
+                        </Select.ItemText>
+                      ) : null}
                       {renderItem ? (
                         renderItem(item, isSelected)
                       ) : (
