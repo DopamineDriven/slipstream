@@ -9,7 +9,6 @@ export default [
   ...nextjsConfig,
   {
     ignores: [".next/**", "!.next/types/**/*"],
-    files: ["src/**/*", "next.config.ts"],
     rules: {
       "@typescript-eslint/consistent-type-assertions": "off",
       "@typescript-eslint/require-await": "off",

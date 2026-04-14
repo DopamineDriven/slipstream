@@ -13,6 +13,7 @@ import { ChevronRight } from "@/icons/chevron-right";
 import { ChevronUp } from "@/icons/chevron-up";
 import { Circle } from "@/icons/circle";
 import { CirclePlus } from "@/icons/circle-plus";
+import { ClaudeIcon } from "@/icons/claude";
 import { Code } from "@/icons/code";
 import { CohereIcon, CohereIconCurrentColor } from "@/icons/cohere";
 import { Compass } from "@/icons/compass";
@@ -105,6 +106,7 @@ const IconComponents = {
   ChevronUp,
   CirclePlus,
   Circle,
+  ClaudeIcon,
   Code,
   CohereIcon,
   CohereIconCurrentColor,
@@ -232,6 +234,7 @@ export {
   ChevronUp,
   CirclePlus,
   Circle,
+  ClaudeIcon,
   Code,
   CohereIcon,
   CohereIconCurrentColor,

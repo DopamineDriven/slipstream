@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useIsMobile } from "@/hooks/use-is-mobile";
+import { useCookiesCtx } from "@/context/cookie-context";
 import { cn } from "@/lib/utils";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, VariantProps } from "class-variance-authority";
@@ -63,7 +63,8 @@ function SidebarProvider({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
-  const isMobile = useIsMobile();
+  const { get } = useCookiesCtx();
+  const isMobile = get("viewport") === "mobile";
   const [openMobile, setOpenMobile] = React.useState(false);
 
   // This is the internal state of the sidebar.
@@ -250,7 +251,7 @@ function SidebarTrigger({
   onClick,
   ...props
 }: React.ComponentPropsWithRef<typeof Button>) {
-  const { toggleSidebar,open } = useSidebar();
+  const { toggleSidebar, open } = useSidebar();
 
   return (
     <Button

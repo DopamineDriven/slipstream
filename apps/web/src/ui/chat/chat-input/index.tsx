@@ -3,15 +3,21 @@
 import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
 import type { User } from "@/utils/auth-client";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import { useRouter } from "next/navigation";
 import { useAssetUpload } from "@/context/asset-context";
+import { useCookiesCtx } from "@/context/cookie-context";
 import { useImageGen } from "@/context/image-gen-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { usePathnameContext } from "@/context/pathname-context";
 import { useSettingsDrawer } from "@/context/settings-drawer-context";
 import { useAssets } from "@/hooks/use-assets";
-import { useIsMobile } from "@/hooks/use-is-mobile";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
@@ -85,7 +91,8 @@ export function ChatInput({
   placeholder,
   className,
   handlePromptConsumed,
-  initialPrompt,children,
+  initialPrompt,
+  children,
   autoSubmitInitialPrompt = true
 }: UnifiedChatInputProps) {
   const router = useRouter();
@@ -116,8 +123,8 @@ export function ChatInput({
   const formRef = useRef<HTMLFormElement>(null);
 
   const CurrentIcon = providerMetadata[selectedModel.provider].icon;
-
-  const isMobile = useIsMobile();
+  const { get } = useCookiesCtx();
+  const isMobile = get("viewport") === "mobile";
 
   const isLockedRef = useRef(false);
 
@@ -446,7 +453,8 @@ export function ChatInput({
     () =>
       selectedModel.provider === "openai" ||
       selectedModel.provider === "anthropic" ||
-      selectedModel.provider === "gemini"
+      selectedModel.provider === "gemini" ||
+      selectedModel.provider === "grok"
         ? ".md,.txt,.pdf,.docx,.xlsx,.pptx,application/text,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/pdf,text/markdown,application/*,text/*"
         : ".pdf,.docx,application/*,text/*",
     [selectedModel.provider]
