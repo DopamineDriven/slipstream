@@ -1,6 +1,9 @@
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
+import type { SharpService } from "@/sharp/index.ts";
 import type {
   AttScopedImg,
   ChunkBudgetAdjustReason,
@@ -14,12 +17,9 @@ import type {
   UserStoreSearchParams,
   UserStoreSearchResult
 } from "@/store/types.ts";
+import type { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { Voyage } from "@/voyage/types.ts";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
-import { SharpService } from "@/sharp/index.ts";
 import { UserStoreWorkupService } from "@/store/workup.ts";
-import { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { AttachmentSingleton, MessageSingleton } from "@slipstream/types";
 

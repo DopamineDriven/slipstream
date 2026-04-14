@@ -1,37 +1,27 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { modelIdToDisplayNameImgGen } from "@slipstream/types";
+import { imgCtx } from "@/lib/img-ctx";
+import type { GrokImagineImageGenOpts } from "@slipstream/types";
 
-export type GrokImgModelId = keyof typeof modelIdToDisplayNameImgGen.grok;
+export type GrokImgModelId = GrokImagineImageGenOpts["model"];
 
-export type GrokAspectRatio =
-  | "1:1"
-  | "2:3"
-  | "3:2"
-  | "3:4"
-  | "4:3"
-  | "16:9"
-  | "9:16"
-  | "19.5:9"
-  | "9:19.5"
-  | "9:20"
-  | "20:9"
-  | "1:2"
-  | "2:1"
-  | "auto";
+export type GrokAspectRatio = GrokImagineImageGenOpts["aspect_ratio"];
 
-export type GrokQuality = "1k" | "2k";
+export type GrokQuality = GrokImagineImageGenOpts["resolution"];
 
 export interface GrokImageSettings {
-  aspectRatio: GrokAspectRatio;
-  quality: GrokQuality;
+  aspectRatio: Exclude<GrokAspectRatio, undefined | null>;
+  quality: Exclude<GrokQuality, undefined | null>;
 }
 
-export function isGrokImgGenCapable(
-  modelId: string
-): modelId is GrokImgModelId {
-  return modelId in modelIdToDisplayNameImgGen.grok;
+export interface GrokImageSettingsUpdates {
+  aspectRatio?: string;
+  quality?: string;
+}
+
+export function isGrokImgGenCapable(modelId: string) {
+  return imgCtx.grokImagineImgGenModel(modelId);
 }
 
 export const GROK_ASPECT_RATIOS = [
@@ -59,26 +49,11 @@ const DEFAULT_SETTINGS = {
 } satisfies GrokImageSettings;
 
 export function isValidGrokAspectRatio(ar: string) {
-  return (
-    ar === "1:1" ||
-    ar === "1:2" ||
-    ar === "2:1" ||
-    ar === "2:3" ||
-    ar === "3:2" ||
-    ar === "3:4" ||
-    ar === "4:3" ||
-    ar === "9:16" ||
-    ar === "16:9" ||
-    ar === "19.5:9" ||
-    ar === "9:19.5" ||
-    ar === "20:9" ||
-    ar === "9:20" ||
-    ar === "auto"
-  );
+  return imgCtx.isValidGrokAR(ar);
 }
 
 export function isValidGrokQuality(q: string) {
-  return q === "1k" || q === "2k";
+  return imgCtx.isValidGrokQuality(q);
 }
 
 const STORAGE_KEY_PREFIX = "grok-image-settings";
@@ -89,7 +64,7 @@ function getStorageKey(modelId: string) {
 
 export function useGrokImageSettings(modelId: string) {
   const isCapable = isGrokImgGenCapable(modelId);
-  const grokModelId = isCapable ? (modelId as GrokImgModelId) : null;
+  const grokModelId = isCapable ? (modelId) : null;
 
   const [settings, setSettings] = useState<GrokImageSettings>(DEFAULT_SETTINGS);
   useEffect(() => {
@@ -98,7 +73,7 @@ export function useGrokImageSettings(modelId: string) {
     try {
       const stored = localStorage.getItem(getStorageKey(modelId));
       if (stored) {
-        const parsed = JSON.parse<{ aspectRatio?: string; quality?: string }>(
+        const parsed = JSON.parse<{ aspectRatio?: string; quality?: string; }>(
           stored
         );
         const ar = parsed.aspectRatio ?? DEFAULT_SETTINGS.aspectRatio;
@@ -129,8 +104,23 @@ export function useGrokImageSettings(modelId: string) {
     }
   }, [modelId, grokModelId, settings]);
 
-  const updateSettings = useCallback((updates: Partial<GrokImageSettings>) => {
-    setSettings(prev => ({ ...prev, ...updates }));
+  const updateSettings = useCallback((updates: GrokImageSettingsUpdates) => {
+    setSettings(prev => {
+      const aspectRatio =
+        typeof updates.aspectRatio === "string" &&
+        isValidGrokAspectRatio(updates.aspectRatio)
+          ? GROK_ASPECT_RATIOS.find(option => option === updates.aspectRatio)
+          : undefined;
+      const quality =
+        typeof updates.quality === "string" && isValidGrokQuality(updates.quality)
+          ? GROK_QUALITIES.find(option => option === updates.quality)
+          : undefined;
+
+      return {
+        aspectRatio: aspectRatio ?? prev.aspectRatio,
+        quality: quality ?? prev.quality
+      };
+    });
   }, []);
 
   const resetSettings = useCallback(() => {

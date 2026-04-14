@@ -1,3 +1,4 @@
+```tsx
 "use client";
 
 import {
@@ -11,44 +12,36 @@ import {
 
 import {
   useOpenAIImageSettings,
-  isOpenAIImgGenCapable,
   type OpenAIImageSettings,
   type OpenAIAspectRatioOption,
   type OpenAIQualityOption,
-} from "@/hooks/use-openai-img-gen";
+} from "@/hooks/use-openai-image-settings";
 
 import {
   useGoogleImageSettings,
-  isGoogleImgGenCapable,
   type GoogleImageSettings,
   type GoogleAspectRatio,
   type GoogleQuality,
-} from "@/hooks/use-gemini-img-gen";
+} from "@/hooks/use-google-image-settings";
 
 import {
   useGrokImageSettings,
-  isGrokImgGenCapable,
   type GrokImageSettings,
   type GrokAspectRatio,
   type GrokQuality,
-} from "@/hooks/use-grok-img-gen";
+} from "@/hooks/use-grok-image-settings";
+
+import { useModelSelection } from "@/context/model-selection-context";
 
 export type ImageGenProvider = "openai" | "gemini" | "grok";
 
-export function detectProvider(modelId: string): ImageGenProvider | null {
-  if (isOpenAIImgGenCapable(modelId)) return "openai";
-  if (isGoogleImgGenCapable(modelId)) return "gemini";
-  if (isGrokImgGenCapable(modelId)) return "grok";
-  return null;
-}
 
-export function isImgGenCapable(modelId: string) {
-  return detectProvider(modelId) !== null;
-}
+export type UnifiedAspectRatio = string;
+export type UnifiedQuality = string;
 
 export interface UnifiedImageSettings {
-  aspectRatio: string;
-  quality: string;
+  aspectRatio: UnifiedAspectRatio;
+  quality: UnifiedQuality;
   outputFormat?: string;
   background?: string;
 }
@@ -65,51 +58,43 @@ export interface UnifiedQualityOption {
 }
 
 interface ImageGenSettingsContextType {
-  modelId: string;
-  setModelId: (modelId: string) => void;
-  provider: ImageGenProvider | null;
-  isCapable: boolean;
   isOpen: boolean;
   open: () => void;
   close: () => void;
   toggle: () => void;
-  settings: UnifiedImageSettings | null;
+  settings: UnifiedImageSettings;
   updateSettings: (updates: Partial<UnifiedImageSettings>) => void;
   resetSettings: () => void;
   aspectRatios: UnifiedAspectRatioOption[];
   qualities: UnifiedQualityOption[];
+  outputFormats: UnifiedQualityOption[] | null;
+  backgrounds: UnifiedQualityOption[] | null;
   supportsOutputFormat: boolean;
   supportsBackground: boolean;
-  openai: ReturnType<typeof useOpenAIImageSettings>;
-  gemini: ReturnType<typeof useGoogleImageSettings>;
-  grok: ReturnType<typeof useGrokImageSettings>;
 }
 
 const ImageGenSettingsContext = createContext<ImageGenSettingsContextType | undefined>(undefined);
 
 interface ImageGenSettingsProviderProps {
   children: ReactNode;
-  initialModelId?: string;
 }
 
-export function ImageGenSettingsProvider({
-  children,
-  initialModelId = "",
-}: ImageGenSettingsProviderProps) {
-  const [modelId, setModelId] = useState(initialModelId);
+export function ImageGenSettingsProvider({ children }: ImageGenSettingsProviderProps) {
+  const { selectedModel } = useModelSelection();
+  const modelId = selectedModel.modelId;
+  const provider = selectedModel.provider as ImageGenProvider;
+
   const [isOpen, setIsOpen] = useState(false);
 
   const openai = useOpenAIImageSettings(modelId);
-  const gemini = useGoogleImageSettings(modelId);
+  const google = useGoogleImageSettings(modelId);
   const grok = useGrokImageSettings(modelId);
-
-  const provider = useMemo(() => detectProvider(modelId), [modelId]);
 
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
   const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
 
-  const settings = useMemo((): UnifiedImageSettings | null => {
+  const settings = useMemo((): UnifiedImageSettings => {
     switch (provider) {
       case "openai":
         return {
@@ -120,49 +105,41 @@ export function ImageGenSettingsProvider({
         };
       case "gemini":
         return {
-          aspectRatio: gemini.settings.aspectRatio,
-          quality: gemini.settings.quality,
+          aspectRatio: google.settings.aspectRatio,
+          quality: google.settings.quality,
         };
       case "grok":
         return {
           aspectRatio: grok.settings.aspectRatio,
           quality: grok.settings.quality,
         };
-      default:
-        return null;
     }
-  }, [provider, openai.settings, gemini.settings, grok.settings]);
+  }, [provider, openai.settings, google.settings, grok.settings]);
 
   const updateSettings = useCallback(
     (updates: Partial<UnifiedImageSettings>) => {
       switch (provider) {
         case "openai":
-          openai.updateSettings(updates as Partial<OpenAIImageSettings>);
-          break;
+          return openai.updateSettings(updates as Partial<OpenAIImageSettings>);
         case "gemini":
-          gemini.updateSettings(updates as Partial<GoogleImageSettings>);
-          break;
+          return google.updateSettings(updates as Partial<GoogleImageSettings>);
         case "grok":
-          grok.updateSettings(updates as Partial<GrokImageSettings>);
-          break;
+          return grok.updateSettings(updates as Partial<GrokImageSettings>);
       }
     },
-    [provider, openai, gemini, grok]
+    [provider, openai, google, grok]
   );
 
   const resetSettings = useCallback(() => {
     switch (provider) {
       case "openai":
-        openai.resetSettings();
-        break;
+        return openai.resetSettings();
       case "gemini":
-        gemini.resetSettings();
-        break;
+        return google.resetSettings();
       case "grok":
-        grok.resetSettings();
-        break;
+        return grok.resetSettings();
     }
-  }, [provider, openai, gemini, grok]);
+  }, [provider, openai, google, grok]);
 
   const aspectRatios = useMemo((): UnifiedAspectRatioOption[] => {
     switch (provider) {
@@ -173,7 +150,7 @@ export function ImageGenSettingsProvider({
           pixelSize: ar.pixelSize,
         }));
       case "gemini":
-        return (gemini.aspectRatios ?? []).map((ar: GoogleAspectRatio) => ({
+        return google.aspectRatios.map((ar: GoogleAspectRatio) => ({
           value: ar,
           label: ar,
         }));
@@ -182,10 +159,8 @@ export function ImageGenSettingsProvider({
           value: ar,
           label: ar,
         }));
-      default:
-        return [];
     }
-  }, [provider, openai.aspectRatios, gemini.aspectRatios, grok.aspectRatios]);
+  }, [provider, openai.aspectRatios, google.aspectRatios, grok.aspectRatios]);
 
   const qualities = useMemo((): UnifiedQualityOption[] => {
     switch (provider) {
@@ -195,7 +170,7 @@ export function ImageGenSettingsProvider({
           label: q.label,
         }));
       case "gemini":
-        return (gemini.qualities ?? []).map((q: GoogleQuality) => ({
+        return google.qualities.map((q: GoogleQuality) => ({
           value: q,
           label: q,
         }));
@@ -204,41 +179,46 @@ export function ImageGenSettingsProvider({
           value: q,
           label: q,
         }));
-      default:
-        return [];
     }
-  }, [provider, openai.qualities, gemini.qualities, grok.qualities]);
+  }, [provider, openai.qualities, google.qualities, grok.qualities]);
 
   const supportsOutputFormat = useMemo(() => {
     switch (provider) {
       case "openai":
         return openai.supportsOutputFormat;
       case "gemini":
-        return gemini.supportsOutputFormat;
+        return google.supportsOutputFormat;
       case "grok":
         return grok.supportsOutputFormat;
-      default:
-        return false;
     }
-  }, [provider, openai.supportsOutputFormat, gemini.supportsOutputFormat, grok.supportsOutputFormat]);
+  }, [provider, openai.supportsOutputFormat, google.supportsOutputFormat, grok.supportsOutputFormat]);
 
   const supportsBackground = useMemo(() => {
     switch (provider) {
       case "openai":
         return openai.supportsBackground;
-      default:
+      case "gemini":
+      case "grok":
         return false;
     }
   }, [provider, openai.supportsBackground]);
 
-  const isCapable = provider !== null;
+  const outputFormats = useMemo((): UnifiedQualityOption[] | null => {
+    if (provider === "openai" && openai.supportsOutputFormat) {
+      return openai.outputFormats.map((f) => ({ value: f, label: f }));
+    }
+    return null;
+  }, [provider, openai.supportsOutputFormat, openai.outputFormats]);
+
+  const backgrounds = useMemo((): UnifiedQualityOption[] | null => {
+    if (provider === "openai" && openai.supportsBackground) {
+      return openai.backgrounds.map((b) => ({ value: b, label: b }));
+    }
+    return null;
+  }, [provider, openai.supportsBackground, openai.backgrounds]);
 
   const value = useMemo(
     () => ({
-      modelId,
-      setModelId,
-      provider,
-      isCapable,
       isOpen,
       open,
       close,
@@ -248,16 +228,12 @@ export function ImageGenSettingsProvider({
       resetSettings,
       aspectRatios,
       qualities,
+      outputFormats,
+      backgrounds,
       supportsOutputFormat,
       supportsBackground,
-      openai,
-      gemini,
-      grok,
     }),
     [
-      modelId,
-      provider,
-      isCapable,
       isOpen,
       open,
       close,
@@ -267,11 +243,10 @@ export function ImageGenSettingsProvider({
       resetSettings,
       aspectRatios,
       qualities,
+      outputFormats,
+      backgrounds,
       supportsOutputFormat,
       supportsBackground,
-      openai,
-      gemini,
-      grok,
     ]
   );
 
@@ -290,3 +265,9 @@ export function useImageGenSettings() {
   return ctx;
 }
 
+export { isOpenAIImgGenCapable, isOpenAIPureImgModel } from "@/hooks/use-openai-image-settings";
+export { isGoogleImgGenCapable } from "@/hooks/use-google-image-settings";
+export { isGrokImgGenCapable } from "@/hooks/use-grok-image-settings";
+
+
+```

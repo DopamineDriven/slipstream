@@ -16,12 +16,12 @@ import { useCookiesCtx } from "@/context/cookie-context";
 import { useImageGen } from "@/context/image-gen-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { usePathnameContext } from "@/context/pathname-context";
-import { useSettingsDrawer } from "@/context/settings-drawer-context";
 import { useAssets } from "@/hooks/use-assets";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
+import { ChatInputImageGenSettingsDrawer } from "@/ui/chat/chat-input/image-gen-controls";
 import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
 import { motion } from "motion/react";
 import type { AIChatRequestImgGenFields } from "@slipstream/types";
@@ -101,8 +101,6 @@ export function ChatInput({
 
   const { selectedModel, openDrawer } = useModelSelection();
 
-  const { openToTab: openSettingsToTab } = useSettingsDrawer();
-
   const assetUpload = useAssetUpload();
 
   const [quotes, setQuotes] = useState<QuoteDraft[]>([]);
@@ -110,6 +108,7 @@ export function ChatInput({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [showExpandButton, setShowExpandButton] = useState(false);
+  const [isImageSettingsOpen, setIsImageSettingsOpen] = useState(false);
 
   const [message, setMessage] = useState("");
   const imgGen = useImageGen();
@@ -156,6 +155,12 @@ export function ChatInput({
     attachmentsRef.current = assets.attachments;
   }, [assets.attachments]);
 
+  useEffect(() => {
+    if (!imgGen.supported || !imgGen.enabled) {
+      setIsImageSettingsOpen(false);
+    }
+  }, [imgGen.enabled, imgGen.supported]);
+
   // Track upload status for previews using AssetProvider as source of truth
   const getStatusText = useCallback(
     (attachment: AttachmentPreview): string => {
@@ -195,6 +200,26 @@ export function ChatInput({
       }
     };
   }, []);
+
+  const handleImageSettingsClick = useCallback(() => {
+    if (!imgGen.supported) return;
+    if (!imgGen.enabled) {
+      imgGen.setEnabled(true);
+      setIsImageSettingsOpen(true);
+      return;
+    }
+    setIsImageSettingsOpen(prev => !prev);
+  }, [imgGen]);
+
+  const handleToggleImageMode = useCallback(() => {
+    if (!imgGen.supported) return;
+    if (imgGen.enabled) {
+      imgGen.setEnabled(false);
+      setIsImageSettingsOpen(false);
+      return;
+    }
+    imgGen.setEnabled(true);
+  }, [imgGen]);
 
   // Consume an initial prompt passed from parent (or recovered from sessionStorage)
   useEffect(() => {
@@ -334,21 +359,12 @@ export function ChatInput({
         const batchId =
           optimistic.length > 0 ? assetUpload.getBatchId() : undefined;
 
-        const imgGenOpenAI = imgGen.enabled
-          ? selectedModel.provider === "openai"
-            ? {
-                ...imgGen.fields,
-                output_partial_images: 3,
-                output_quality: "high"
-              }
-            : imgGen.fields
-          : undefined;
         onUserMessage?.({
           content: composed,
           attachments: optimistic,
           batchId,
           imgGenEnabled: imgGen.enabled || undefined,
-          imgGenFields: imgGen.enabled ? imgGenOpenAI : undefined
+          imgGenFields: imgGen.enabled ? imgGen.fields : undefined
         });
 
         setMessage("");
@@ -375,7 +391,6 @@ export function ChatInput({
       quotes,
       isSubmitting,
       message,
-      selectedModel.provider,
       router,
       isHome,
       imgGen.enabled,
@@ -662,31 +677,34 @@ export function ChatInput({
                       type="button"
                       variant="ghost"
                       size="icon"
-                      title="Tools and settings"
+                      title={
+                        imgGen.supported
+                          ? "Image settings"
+                          : "Image settings unavailable for selected model"
+                      }
                       className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
-                      onClick={() => openSettingsToTab("apiKeys")}>
+                      onClick={handleImageSettingsClick}>
                       <Tools className="size-4" />
-                      <span className="sr-only">Tools</span>
+                      <span className="sr-only">Image settings</span>
                     </Button>
                     <Button
                       type="button"
                       variant={imgGen.enabled ? "default" : "ghost"}
                       size="icon"
                       title={
-                        imgGen.enabled
-                          ? "Disable image generation"
-                          : "Enable image generation"
+                        imgGen.supported
+                          ? imgGen.enabled
+                            ? "Disable image generation"
+                            : "Enable image generation"
+                          : "Selected model does not support image generation"
                       }
-                      className={cn(
-                        "hover:bg-accent h-8",
+                      disabled={!imgGen.supported}
+                      className={
                         imgGen.enabled
-                          ? "text-foreground"
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
-                      onClick={() => {
-                        imgGen.setEnabled(!imgGen.enabled);
-                        if (!imgGen.enabled) imgGen.updateFields({ n: 1 });
-                      }}>
+                          ? "hover:bg-accent text-foreground h-8"
+                          : "hover:bg-accent text-muted-foreground hover:text-foreground h-8"
+                      }
+                      onClick={handleToggleImageMode}>
                       <ImageGen className="size-4" />
                       <span className="sr-only">Toggle Image Generation</span>
                     </Button>
@@ -738,6 +756,11 @@ export function ChatInput({
         onOpenChange={setIsFullScreenInputOpen}
         initialValue={message}
         onSubmit={handleFullscreenSubmit}
+      />
+      <ChatInputImageGenSettingsDrawer
+        open={isImageSettingsOpen}
+        onOpenChange={setIsImageSettingsOpen}
+        isMobile={isMobile}
       />
       <MobileModelSelectorDrawer />
     </>
