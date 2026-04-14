@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useCookiesCtx } from "@/context/cookie-context";
 import { useImageGen } from "@/context/image-gen-context";
-import { useIsMobile } from "@/hooks/use-is-mobile";
 import { AnimatedSelect } from "@/ui/atoms/animated-select";
 import { AspectRatioShape } from "@/ui/atoms/aspect-ratio-shape";
 import {
@@ -41,7 +41,11 @@ function ImageGenSettingsForm() {
           contentClassName="z-[70] w-(--radix-select-trigger-width)"
           renderItem={(item, isSelected) => (
             <div className="flex items-center gap-3">
-              <AspectRatioShape ratio={item} isSelected={isSelected} size="md" />
+              <AspectRatioShape
+                ratio={item}
+                isSelected={isSelected}
+                size="md"
+              />
               <div className="flex items-center gap-2">
                 <span>{item.label}</span>
                 {item.pixelSize ? (
@@ -73,12 +77,14 @@ function ImageGenSettingsForm() {
 }
 
 export function ChatInputImageGenControls() {
+  const { get } = useCookiesCtx();
   const imgGen = useImageGen();
-  const isMobile = useIsMobile();
+  const isMobile = get("viewport") === "mobile";
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (!imgGen.supported || !imgGen.enabled) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpen(false);
     }
   }, [imgGen.enabled, imgGen.supported]);
@@ -91,7 +97,7 @@ export function ChatInputImageGenControls() {
       return;
     }
     setOpen(prev => !prev);
-  }, [imgGen.enabled, imgGen.setEnabled, imgGen.supported]);
+  }, [imgGen]);
 
   const handleToggleImageMode = useCallback(() => {
     if (!imgGen.supported) return;
@@ -102,7 +108,7 @@ export function ChatInputImageGenControls() {
     }
     imgGen.setEnabled(true);
     setOpen(true);
-  }, [imgGen.enabled, imgGen.setEnabled, imgGen.supported]);
+  }, [imgGen]);
 
   const imageButtonTitle = imgGen.supported
     ? imgGen.enabled
@@ -142,7 +148,7 @@ export function ChatInputImageGenControls() {
               side="top"
               align="start"
               sideOffset={10}
-              className="w-[22rem] rounded-[1.75rem] p-5 shadow-xl">
+              className="w-88 rounded-[1.75rem] p-5 shadow-xl">
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1">
                   <h3 className="text-foreground text-[1.125rem] font-semibold">
@@ -167,8 +173,8 @@ export function ChatInputImageGenControls() {
         disabled={!imgGen.supported}
         className={
           imgGen.enabled
-            ? "hover:bg-accent h-8 text-foreground"
-            : "hover:bg-accent h-8 text-muted-foreground hover:text-foreground"
+            ? "hover:bg-accent text-foreground h-8"
+            : "hover:bg-accent text-muted-foreground hover:text-foreground h-8"
         }
         onClick={handleToggleImageMode}>
         <ImageGen className="size-4" />

@@ -75,25 +75,6 @@ const OPENAI_DEFAULT_SETTINGS = {
   background: "auto"
 } satisfies OpenAIImageSettings;
 
-export function isOpenAIImgGenCapable(m: string) {
-  return imgCtx.openAIGptImgModel(m) || imgCtx.openAIFacilitatingImgGenModel(m);
-}
-
-export function isValidOpenAIAspectRatio(ar: string) {
-  return imgCtx.isValidOpenAISize(ar);
-}
-
-export function isValidOpenAIQuality(q: string) {
-  return imgCtx.isValidOpenAIQuality(q);
-}
-
-export function isValidOpenAIOutputFormat(f: string) {
-  return imgCtx.isValidOpenAIOutputFormat(f);
-}
-
-export function isValidOpenAIBackground(b: string) {
-  return b === "auto" || b === "transparent" || b === "opaque";
-}
 
 const STORAGE_KEY_PREFIX = "openai-image-settings";
 
@@ -107,7 +88,7 @@ export function useOpenAIImageSettings(modelId: string) {
   );
 
   useEffect(() => {
-    if (!isOpenAIImgGenCapable(modelId)) return;
+    if (!imgCtx.openAIImgGenCapable(modelId)) return;
 
     try {
       const stored = localStorage.getItem(getStorageKey(modelId));
@@ -120,19 +101,19 @@ export function useOpenAIImageSettings(modelId: string) {
         }>(stored);
 
         const aspectRatio =
-          parsed.aspectRatio && isValidOpenAIAspectRatio(parsed.aspectRatio)
+          parsed.aspectRatio && imgCtx.isValidOpenAISize(parsed.aspectRatio)
             ? parsed.aspectRatio
             : OPENAI_DEFAULT_SETTINGS.aspectRatio;
         const quality =
-          parsed.quality && isValidOpenAIQuality(parsed.quality)
+          parsed.quality && imgCtx.isValidOpenAIQuality(parsed.quality)
             ? parsed.quality
             : OPENAI_DEFAULT_SETTINGS.quality;
         const outputFormat =
-          parsed.outputFormat && isValidOpenAIOutputFormat(parsed.outputFormat)
+          parsed.outputFormat && imgCtx.isValidOpenAIOutputFormat(parsed.outputFormat)
             ? parsed.outputFormat
             : OPENAI_DEFAULT_SETTINGS.outputFormat;
         const backgroundCandidate =
-          parsed.background && isValidOpenAIBackground(parsed.background)
+          parsed.background && imgCtx.isValidOpenAIBg(parsed.background)
             ? parsed.background
             : OPENAI_DEFAULT_SETTINGS.background;
         const background =
@@ -153,7 +134,7 @@ export function useOpenAIImageSettings(modelId: string) {
   }, [modelId]);
 
   useEffect(() => {
-    if (!isOpenAIImgGenCapable(modelId)) return;
+    if (!imgCtx.openAIImgGenCapable(modelId)) return;
 
     try {
       localStorage.setItem(getStorageKey(modelId), JSON.stringify(settings));
@@ -166,25 +147,25 @@ export function useOpenAIImageSettings(modelId: string) {
     setSettings(prev => {
       const aspectRatio =
         typeof updates.aspectRatio === "string" &&
-        isValidOpenAIAspectRatio(updates.aspectRatio)
+        imgCtx.isValidOpenAISize(updates.aspectRatio)
           ? OPENAI_ASPECT_RATIOS.find(
               option => option.value === updates.aspectRatio
             )?.value
           : undefined;
       const quality =
-        typeof updates.quality === "string" && isValidOpenAIQuality(updates.quality)
+        typeof updates.quality === "string" && imgCtx.isValidOpenAIQuality(updates.quality)
           ? OPENAI_QUALITIES.find(option => option.value === updates.quality)?.value
           : undefined;
       const outputFormat =
         typeof updates.outputFormat === "string" &&
-        isValidOpenAIOutputFormat(updates.outputFormat)
+        imgCtx.isValidOpenAIOutputFormat(updates.outputFormat)
           ? OPENAI_OUTPUT_FORMATS.find(option => option === updates.outputFormat)
           : undefined;
       const nextOutputFormat =
         outputFormat ?? prev.outputFormat ?? OPENAI_DEFAULT_SETTINGS.outputFormat;
       const backgroundCandidate =
         typeof updates.background === "string" &&
-        isValidOpenAIBackground(updates.background)
+        imgCtx.isValidOpenAIBg(updates.background)
           ? OPENAI_BACKGROUNDS.find(option => option === updates.background)
           : undefined;
       const background =
@@ -207,7 +188,7 @@ export function useOpenAIImageSettings(modelId: string) {
     setSettings(OPENAI_DEFAULT_SETTINGS);
   }, []);
 
-  const isCapable = useMemo(() => isOpenAIImgGenCapable(modelId), [modelId]);
+  const isCapable = useMemo(() => imgCtx.openAIImgGenCapable(modelId), [modelId]);
 
   return {
     settings,

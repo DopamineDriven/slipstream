@@ -263,7 +263,9 @@ export class ProviderValidation {
   public isValidOpenAIOutputFormat(f: string) {
     return f === "png" || f === "jpeg" || f === "webp";
   }
-
+  public isValidOpenAIBg(b: string) {
+return b === "auto" || b === "transparent" || b === "opaque";
+  }
   public handleImgGenOutputFormat(
     model: AllModelsUnion = "gpt-5.4",
     data?: { format?: ModelToOutputFormatOpts<typeof model> }
@@ -282,7 +284,7 @@ export class ProviderValidation {
   }
 
   public handleImgGenBg(
-    model?: AllModelsUnion,
+    model?: string,
     data?: {
       background?: "transparent" | "opaque" | "auto";
       format?: "png" | "jpeg" | "webp";
@@ -294,7 +296,7 @@ export class ProviderValidation {
     if (!(data?.format === "png" || data?.format === "webp")) return;
     if (
       data?.background &&
-      /^(transparent|opaque|auto)$/gm.test(data.background)
+      this.isValidOpenAIBg(data.background)
     )
       return data.background;
     else return "auto";

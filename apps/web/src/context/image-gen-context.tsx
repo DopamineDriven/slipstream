@@ -9,17 +9,20 @@ import {
   useMemo,
   useState
 } from "react";
+import { useModelSelection } from "@/context/model-selection-context";
 import { useGoogleImageSettings } from "@/hooks/use-gemini-img-gen";
 import { useGrokImageSettings } from "@/hooks/use-grok-img-gen";
 import {
-  isValidOpenAIBackground,
   OPENAI_BACKGROUNDS,
   OPENAI_OUTPUT_FORMATS,
   useOpenAIImageSettings
 } from "@/hooks/use-openai-img-gen";
 import { imgCtx } from "@/lib/img-ctx";
-import type { AIChatRequestImgGenFields, Provider, RTC } from "@slipstream/types";
-import { useModelSelection } from "./model-selection-context";
+import type {
+  AIChatRequestImgGenFields,
+  Provider,
+  RTC
+} from "@slipstream/types";
 
 export interface ImageGenOption {
   value: string;
@@ -73,7 +76,7 @@ function normalizeOpenAIBackground(
 ) {
   if (!imgCtx.openAIImgGenCapable(model)) return undefined;
   if (outputFormat === "jpeg") return undefined;
-  if (background && isValidOpenAIBackground(background)) {
+  if (background && imgCtx.isValidOpenAIBg(background)) {
     return background;
   }
   return OPENAI_BACKGROUNDS[0];
@@ -253,7 +256,7 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
   }, [currentProvider, openai.outputFormats, openai.supportsOutputFormat]);
 
   const backgrounds = useMemo(() => {
-    if (!(imgCtx.openAIImgGenCapable(currentModelId))) {
+    if (!imgCtx.openAIImgGenCapable(currentModelId)) {
       return [] satisfies ImageGenOption[];
     }
     return openai.backgrounds.map(option => ({
@@ -357,23 +360,26 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
       imgCtx.handleOutputSize(mod, {
         output_size: settings?.aspectRatio
       }) ?? DEFAULT_FIELDS.output_size;
+
     const output_partial_images = imgCtx.handlePartialImgGen(mod, {
       partialImagesRequested: extraFields.output_partial_images
+    });
+    const output_format = imgCtx.imgGenCapableModels(currentModelId)
+      ? imgCtx.handleImgGenOutputFormat(currentModelId, {
+          format: settings?.outputFormat
+        })
+      : undefined;
+    const output_background = imgCtx.handleImgGenBg(currentModelId, {
+      background: settings?.background
     });
 
     return {
       n: 1,
       output_quality,
       output_size,
-      ...(typeof settings?.outputFormat !== "undefined"
-        ? { output_format: settings.outputFormat }
-        : {}),
-      ...(typeof settings?.background !== "undefined"
-        ? { output_background: settings.background }
-        : {}),
-      ...(typeof output_partial_images !== "undefined"
-        ? { output_partial_images }
-        : {})
+      output_partial_images,
+      output_background,
+      output_format
     } satisfies AIChatRequestImgGenFields;
   }, [currentModelId, extraFields.output_partial_images, settings]);
 
