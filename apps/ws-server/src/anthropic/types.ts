@@ -29,7 +29,6 @@ export type RequestOptions<T extends "0" | "1" = "1"> = Exclude<
   undefined
 >;
 
-
 export type MessageInputParams = {
   isNewChat: boolean;
   messages: MessageSingleton<true>[];
@@ -89,8 +88,11 @@ export interface BlockBuilder {
   tool_use_id?: string;
   codeExecutionContent?: Anthropic.Beta.BetaCodeExecutionToolResultBlockParam["content"];
 }
-export type CodeExecutionContentRT = UnionToRecord<Anthropic.Beta.BetaCodeExecutionToolResultBlockParam["content"]>;
-export type ContentBlockParamObj = UnionToRecord<Anthropic.Beta.BetaContentBlockParam>;
+export type CodeExecutionContentRT = UnionToRecord<
+  Anthropic.Beta.BetaCodeExecutionToolResultBlockParam["content"]
+>;
+export type ContentBlockParamObj =
+  UnionToRecord<Anthropic.Beta.BetaContentBlockParam>;
 
 export interface RoundRecord {
   round: number;
@@ -101,11 +103,22 @@ export interface RoundRecord {
 }
 export type BetaRawMessageStreamRecord =
   UnionToRecord<Anthropic.Beta.Messages.BetaRawMessageStreamEvent>;
-
+export type UnionToRecords<
+  TUnion extends Record<TKey, string>,
+  TKey extends string = "kind",
+  TDiscriminant extends string = TUnion[TKey]
+> = {
+  [K in TDiscriminant]: Extract<TUnion, Record<TKey, K>>;
+};
 
 /** Record keyed by `type` for BetaContentBlockParam (request/continuation param blocks) */
 export type ContentBlockObj =
   UnionToRecord<Anthropic.Beta.BetaContentBlockParam>;
+
+export type TestingContentBlockObj = UnionToRecords<
+  Anthropic.Beta.BetaContentBlockParam,
+  "type"
+>;
 
 export type MapContentBlock<T extends keyof ContentBlockObj> = {
   [P in T]: ContentBlockObj[P];

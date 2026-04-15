@@ -34,7 +34,7 @@ export interface xAIImgGenFields {
 }
 
 export class GrokImgGenService extends GrokCollectionsService {
-  protected nanoid: Promise<(typeof import("nanoid"))["nanoid"]>;
+  protected nanoid: Promise<<Type extends string>(size?: number) => Type>;
   constructor(
     protected redis: EnhancedRedisPubSub,
     protected s3: S3Storage,
@@ -52,30 +52,69 @@ export class GrokImgGenService extends GrokCollectionsService {
     msgs: MessageSingleton<true>[],
     requestMessageId: string
   ) {
-    const getUserMsg = msgs.find(t => t.id === requestMessageId);
+    const msg = msgs.find(t => t.id === requestMessageId);
 
-    if (!getUserMsg) throw new Error("no message found for grok image gen");
-
+    if (!msg) throw new Error("no message found for grok image gen");
+    if (!msg.model || !this.prisma.grokImagineImgGenModel(msg.model))
+      throw new Error(
+        `grok imagine image gen model required for grok image gen, received ${msg.model}`
+      );
+      
     const images = Array.of<xAIImageEditsInput>();
-    for (const att of getUserMsg.attachments) {
-      const url = att.compatStatus === "ACTIVE" ? att.compatCdnUrl : att.cdnUrl;
-      const mime = att.compatStatus === "ACTIVE" ? att.compatMime : att.mime;
+    const textBlocks = Array.of<string>();
 
-      if (att.assetType === "IMAGE" && url && mime) {
-        images.push({ url });
+    if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+      for (const block of msg.messageBlocks) {
+        if (block.type === "TEXT") {
+          textBlocks.push(block.content);
+        }
+      }
+    } else {
+      textBlocks.push(msg.content);
+    }
+    for (const att of msg.attachments) {
+      try {
+        const url =
+          att.compatStatus === "ACTIVE" ? att.compatCdnUrl : att.cdnUrl;
+        const mime = att.compatStatus === "ACTIVE" ? att.compatMime : att.mime;
+
+        if (url && mime) {
+          const [filename, ext] = this.prisma.filenameToHexExtTuple(
+            url,
+            att.compatStatus,
+            false
+          );
+          if (att.assetType === "IMAGE") {
+            images.push({ url });
+          } else {
+            textBlocks.push(`[${filename}.${ext}](${url})`);
+          }
+        }
+      } catch (err) {
+        this.logger.info(this.prisma.safeErrMsg(err));
       }
     }
 
-    if (images.length > 3) {
-      throw new Error(
-        "xAI image edits supports a maximum of 3 input images per request."
-      );
-    }
+    const ceiling = msg.model === "grok-imagine-image" ? 3 : 1;
 
-    return {
-      prompt: this.messageText(getUserMsg),
-      images
-    } as const;
+    if (images.length > ceiling) {
+      const mapIt = images
+        .slice(ceiling)
+        .map((u, i) => `![extra-image-${i}](${u.url})`)
+        .join("\n");
+
+      textBlocks.push(mapIt);
+
+      return {
+        prompt: textBlocks.join(`\n`),
+        images: images.slice(0, ceiling)
+      };
+    } else {
+      return {
+        prompt: textBlocks.join(`\n`),
+        images: images
+      };
+    }
   }
 
   private resolveGrokImagineImgOpts(imgGenFields?: AIChatRequestImgGenFields) {
@@ -155,7 +194,7 @@ export class GrokImgGenService extends GrokCollectionsService {
         response_format: "b64_json",
         user: userId
       } as const satisfies {
-        model: "grok-imagine-image" | "grok-imagine-image-pro";
+        model: GrokImagineImgModelUnion;
         prompt: string;
         n: number;
         aspect_ratio: GrokImagineARUnion;
@@ -169,9 +208,9 @@ export class GrokImgGenService extends GrokCollectionsService {
           ...baseBody,
           images
         } satisfies typeof baseBody & { images: xAIImageEditsInput[] });
+      } else {
+        return await this.handleImgGenReq(key, this.baseImgGenUrl, baseBody);
       }
-
-      return await this.handleImgGenReq(key, this.baseImgGenUrl, baseBody);
     }
   }
 

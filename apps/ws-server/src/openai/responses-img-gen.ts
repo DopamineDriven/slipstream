@@ -18,7 +18,6 @@ import type {
 
 interface OpenAIImgGenActiveMessageBlock {
   content: string;
-  itemIds: string[];
   startedAt: number;
   type: "THINKING" | "TEXT";
 }
@@ -26,9 +25,7 @@ interface OpenAIImgGenActiveMessageBlock {
 interface OpenAIImgGenFinalizedMessageBlock {
   content: string;
   durationMs: number;
-  itemIds: string[];
   ordinal: number;
-  previewContent: string;
   type: $Enums.MessageBlockType;
 }
 
@@ -95,7 +92,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       uploadtDelta = 0,
       usage = 0;
     const trackedBlocks = Array.of<OpenAIImgGenFinalizedMessageBlock>();
-    const encryptedReasoningByItemId = new Map<string, string>();
+    const trackedEncryptedReasoningItemIds = new Set<string>();
     let activeBlock: OpenAIImgGenActiveMessageBlock | undefined = undefined;
     let nextOrdinal = 0;
 
@@ -107,68 +104,12 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       conversationId: string;
     }>();
 
-    const pushItemId = (itemIds: string[], itemId: string) => {
-      if (!itemIds.includes(itemId)) {
-        itemIds.push(itemId);
-      }
-    };
-
-    const applyEncryptedReasoning = (
-      itemId: string,
-      encryptedContent: string
-    ) => {
-      encryptedReasoningByItemId.set(itemId, encryptedContent);
-
-      let matchedBlock = false;
-      for (const block of trackedBlocks) {
-        if (!block.itemIds.includes(itemId)) {
-          continue;
-        }
-
-        matchedBlock = true;
-        const encryptedParts = block.itemIds
-          .map(id => encryptedReasoningByItemId.get(id))
-          .filter(
-            (content): content is string =>
-              typeof content === "string" && content.length > 0
-          );
-
-        if (encryptedParts.length > 0) {
-          block.type = "ENCRYPTED_THINKING";
-          block.content = encryptedParts.join("\n");
-        }
-      }
-
-      if (matchedBlock === false && !activeBlock?.itemIds?.includes(itemId)) {
-        trackedBlocks.push({
-          content: encryptedContent,
-          durationMs: 0,
-          itemIds: [itemId],
-          ordinal: nextOrdinal,
-          previewContent: "",
-          type: "ENCRYPTED_THINKING"
-        });
-        nextOrdinal += 1;
-      }
-    };
-
     const finalizeActiveBlock = () => {
       if (!activeBlock) {
         return;
       }
 
-      const previewContent = activeBlock.content;
-      const encryptedParts =
-        activeBlock.type === "THINKING"
-          ? activeBlock.itemIds
-              .map(itemId => encryptedReasoningByItemId.get(itemId))
-              .filter(
-                (content): content is string =>
-                  typeof content === "string" && content.length > 0
-              )
-          : Array.of<string>();
-
-      if (previewContent.length === 0 && encryptedParts.length === 0) {
+      if (activeBlock.content.length === 0) {
         activeBlock = undefined;
         return;
       }
@@ -179,16 +120,10 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       );
 
       trackedBlocks.push({
-        content:
-          encryptedParts.length > 0
-            ? encryptedParts.join("\n")
-            : previewContent,
+        content: activeBlock.content,
         durationMs,
-        itemIds: Array.from(activeBlock.itemIds),
         ordinal: nextOrdinal,
-        previewContent,
-        type:
-          encryptedParts.length > 0 ? "ENCRYPTED_THINKING" : activeBlock.type
+        type: activeBlock.type
       });
 
       if (activeBlock.type === "THINKING") {
@@ -199,22 +134,33 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       activeBlock = undefined;
     };
 
-    const ensureActiveBlock = (
-      type: OpenAIImgGenActiveMessageBlock["type"],
-      itemId: string
-    ) => {
+    const appendEncryptedReasoningBlock = (itemId: string) => {
+      if (trackedEncryptedReasoningItemIds.has(itemId)) {
+        return;
+      }
+
+      finalizeActiveBlock();
+      trackedBlocks.push({
+        content: "",
+        durationMs: 0,
+        ordinal: nextOrdinal,
+        type: "ENCRYPTED_THINKING"
+      });
+      trackedEncryptedReasoningItemIds.add(itemId);
+      nextOrdinal += 1;
+    };
+
+    const ensureActiveBlock = (type: OpenAIImgGenActiveMessageBlock["type"]) => {
       if (activeBlock?.type !== type) {
         finalizeActiveBlock();
         activeBlock = {
           content: "",
-          itemIds: [itemId],
           startedAt: performance.now(),
           type
         };
         return activeBlock;
       }
 
-      pushItemId(activeBlock.itemIds, itemId);
       return activeBlock;
     };
 
@@ -342,7 +288,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
 
       if (s.type === "response.output_item.added") {
         if (s.item.type === "reasoning") {
-          ensureActiveBlock("THINKING", s.item.id);
+          ensureActiveBlock("THINKING");
         } else {
           finalizeActiveBlock();
         }
@@ -352,7 +298,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
         s.type === "response.reasoning_text.delta" ||
         s.type === "response.reasoning_summary_text.delta"
       ) {
-        const block = ensureActiveBlock("THINKING", s.item_id);
+        const block = ensureActiveBlock("THINKING");
         block.content += s.delta;
         thinkingText = s.delta;
       }
@@ -378,7 +324,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       }
 
       if (s.type === "response.output_text.delta") {
-        const block = ensureActiveBlock("TEXT", s.item_id);
+        const block = ensureActiveBlock("TEXT");
         block.content += s.delta;
         text = s.delta;
       }
@@ -389,22 +335,21 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
         typeof s.item.encrypted_content === "string" &&
         s.item.encrypted_content.length > 0
       ) {
-        applyEncryptedReasoning(s.item.id, s.item.encrypted_content);
+        appendEncryptedReasoningBlock(s.item.id);
       }
 
       if (s.type === "response.completed") {
         openaiResId = s.response.id;
+        finalizeActiveBlock();
         for (const output of s.response.output) {
           if (
             output.type === "reasoning" &&
             typeof output.encrypted_content === "string" &&
             output.encrypted_content.length > 0
           ) {
-            applyEncryptedReasoning(output.id, output.encrypted_content);
+            appendEncryptedReasoningBlock(output.id);
           }
         }
-
-        finalizeActiveBlock();
         for (const r of s.response.output) {
           if (r.type === "image_generation_call" && r.result) {
             if (r.result !== null) {

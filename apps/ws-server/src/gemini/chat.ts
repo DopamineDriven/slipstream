@@ -198,7 +198,7 @@ export class GeminiChatService extends GeminiWorkupService {
       max_tokens,
       systemPrompt,
       temperature,
-      topP
+      topP,requestMessageId
     });
 
     const MAX_ROUNDS = 10;
