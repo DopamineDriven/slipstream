@@ -16,7 +16,6 @@ export type SerializeBigInt<T, Serialized extends boolean = boolean> = {
     : T[K];
 };
 
-
 export type NormalizeAndInject<V, Q = object, P extends boolean = boolean> = DX<
   SerializeBigInt<V, P> & Q
 >;
@@ -71,6 +70,15 @@ export type IsExact<T, U> = [T] extends [U]
     ? true
     : false
   : false;
+
+
+export type UTR<
+  TUnion extends Record<TKey, string>,
+  TKey extends string = "kind",
+  TDiscriminant extends string = TUnion[TKey]
+> = {
+  [K in TDiscriminant]: Extract<TUnion, Record<TKey, K>>;
+};
 
 /**
  * TCN (To Conditionally Never)
@@ -251,6 +259,7 @@ export type DiscriminatedUnionToRecord<
   ? { [K in TUnion[TKey] & string]: Extract<TUnion, Record<TKey, K>> }
   : never;
 
+
 export type UnionToRecord<
   TUnion extends Record<"type", string>,
   TDiscriminant extends string = TUnion["type"]
@@ -303,7 +312,6 @@ export type FlexiProvider = FlexiCase<$Enums.Provider>;
 export type BigIntOrNumber<T extends boolean = false> = T extends true
   ? number
   : bigint;
-
 
 // export type FilterBySelect<Q extends keyof ModelIdToModelDisplayName> = Exclude<
 //   Exclude<Q, ProductDataFull>,

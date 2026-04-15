@@ -203,7 +203,7 @@ export type GenerateContentResponseProps = {
   userId: string;
   isNewChat: boolean;
   msgs: MessageSingleton<true>[];
-  model: string;
+  model: string | null;
   keyId: string | null;
   apiKey?: string;
   latlng?: string;
@@ -212,6 +212,7 @@ export type GenerateContentResponseProps = {
   max_tokens?: number;
   systemPrompt?: string;
   imgGenFields?: AIChatRequestImgGenFields;
+  requestMessageId?: string;
 };
 
 export type ImageGenArr = [

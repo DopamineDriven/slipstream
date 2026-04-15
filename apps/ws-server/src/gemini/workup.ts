@@ -8,10 +8,12 @@ import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
   Content,
+  ContentListUnion,
   ContentUnion,
   FunctionDeclaration,
   GenerateContentConfig,
   GenerateContentParameters,
+  ImageConfig,
   Part,
   PartMediaResolution,
   ToolConfig
@@ -25,14 +27,16 @@ import {
   Type
 } from "@google/genai";
 import type {
+  AIChatRequestImgGenFields,
   AttachmentSingleton,
   CTR,
   GeminiModelIdUnion,
-  MessageSingleton
+  MessageSingleton,
+  NanoBanana2OutputAR
 } from "@slipstream/types";
 
 export class GeminiWorkupService extends FileSearchStoreService {
-  protected nanoid: Promise<(typeof import("nanoid"))["nanoid"]>;
+  protected nanoid: Promise<<Type extends string>(size?: number) => Type>;
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
@@ -199,6 +203,12 @@ export class GeminiWorkupService extends FileSearchStoreService {
 
   protected isNanoBanana1(m: string) {
     return m === "gemini-2.5-flash-image";
+  }
+
+  protected isNanoBananaFam(m: string) {
+    return (
+      this.isNanoBanana2(m) || this.isNanoBananaPro(m) || this.isNanoBanana1(m)
+    );
   }
 
   protected async formatHistoryForDeepResearch(
@@ -425,7 +435,6 @@ export class GeminiWorkupService extends FileSearchStoreService {
         partArr.push({ text: textParts.join(`\n\n`) });
         formatted.push({ role: "user", parts: partArr } as const);
       } else {
-        // AI message - may have AI-generated attachments
         const partArr = Array.of<Part>();
         const textParts = Array.of<string>();
         const model = msg.model ?? "unknown";
@@ -802,7 +811,6 @@ export class GeminiWorkupService extends FileSearchStoreService {
       } satisfies ToolConfig;
     } else {
       return {
-        // allows for mixing of google tools with custom tools
         retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
       } satisfies ToolConfig;
     }
@@ -959,7 +967,9 @@ export class GeminiWorkupService extends FileSearchStoreService {
     systemPrompt,
     imgGenFields
   }: GenerateContentResponseProps) {
-    const m = model as GeminiModelIdUnion;
+    if (!model || !this.prisma.isGeminiModel(model))
+      throw new Error(`non-gemini model passed to gemini ${model}`);
+    const m = model;
     const keyFingerprint = keyId ?? "server";
     const toolConfig = this.getToolConfig(latlng, m);
     const tools = this.getTools(m);
@@ -995,9 +1005,50 @@ export class GeminiWorkupService extends FileSearchStoreService {
       }
     } satisfies GenerateContentParameters;
   }
+  private handleImgGenFields(
+    model: string,
+    {
+      output_size: ar,
+      output_quality: q
+    }: AIChatRequestImgGenFields | undefined = {}
+  ) {
+    let a: NanoBanana2OutputAR | undefined = undefined;
+    let qual: "0.5K" | "1K" | "2K" | "4K" | undefined = undefined;
+    if (!this.isNanoBananaFam(model)) return;
+    if (model === "gemini-3.1-flash-image-preview") {
+      if (ar && this.prisma.isValidNanoBananaGenTwoAR(ar)) {
+        a = ar;
+      } else {
+        a = "16:9";
+      }
+      if (q && this.prisma.isValidNanoBananaTwoOutputQuality(q)) {
+        qual = q;
+      } else {
+        qual = "1K";
+      }
+    }
+    if (
+      model === "gemini-3-pro-image-preview" ||
+      model === "gemini-2.5-flash-image"
+    ) {
+      if (ar && this.prisma.isValidNanoBananaGenOneAR(ar)) {
+        a = ar;
+      } else {
+        a = "16:9";
+      }
+      if (q && this.prisma.isValidNanoBananaProAndTwoOutputQuality(q)) {
+        qual = q;
+      } else {
+        qual = "1K";
+      }
+    }
+    return { aspectRatio: a, imageSize: qual } satisfies ImageConfig;
+  }
 
   /**
-   * 🍌 :3 🍌
+   * 🍌 🍌 🍌 🍌 🍌
+   *
+   * Note: I intend to filter for previous nano bananas messages within a convo context else include up to the 5 most recent turns or a combo thereof (for nano banana messages, that includes the user and the agent response + attachments)
    */
   private async contentGenNanoBananas({
     isNewChat,
@@ -1010,59 +1061,56 @@ export class GeminiWorkupService extends FileSearchStoreService {
     temperature,
     max_tokens,
     systemPrompt,
+    requestMessageId,
     imgGenFields
   }: GenerateContentResponseProps) {
-    const m = model as
-      | "gemini-3-pro-image-preview"
-      | "gemini-3.1-flash-image-preview"
-      | "gemini-2.5-flash-image";
-
-    const keyFingerprint = keyId ?? "server";
-    const toolConfig = this.getToolConfig(latlng, m);
-    const tools = this.getTools(m);
-    const thinkingConfig = this.getThinkingConfig(m);
-    const maxOutputTokens = max_tokens;
-    const { history: contents, systemInstruction } =
-      await this.getHistoryAndInstruction(
-        isNewChat,
-        msgs,
-        keyFingerprint,
-        systemPrompt,
-        keyId ?? undefined,
-        apiKey,
-        m
+    if (!model || !this.isNanoBananaFam(model)) {
+      this.logger.info(
+        `Non-Nano Bananas model passed to contentGenNanoBananas ${model}`
       );
+      throw new Error(
+        `Non-Nano Bananas model passed to contentGenNanoBananas ${model}`
+      );
+    }
 
-    const out = imgGenFields?.output_size
-      ? m === "gemini-3.1-flash-image-preview"
-        ? this.prisma.geminiAspectRatio(m, {
-            output_size: this.prisma.isValidNanoBananaGenOneAR(
-              imgGenFields.output_size
-            )
-              ? imgGenFields.output_size
-              : "16:9"
-          })
-        : undefined
-      : undefined;
+    const msg = msgs.find(t => t.id === requestMessageId);
+    if (!msg) throw new Error("no message found for grok image gen");
+    const keyFingerprint = keyId ?? "server";
+    const toolConfig = this.getToolConfig(latlng, model);
+    const tools = this.getTools(model);
+    const thinkingConfig = this.getThinkingConfig(model);
+    const maxOutputTokens = max_tokens;
+    // const bananaMsgs=msgs.filter((t) =>t.provider==="GEMINI" && t.model && this.isNanoBananaFam(t.model))
+    let msgBananas: MessageSingleton<true>[];
+    const currentIdx = msgs.findIndex(m => m.id === requestMessageId);
+    if (currentIdx === -1)
+      throw new Error(`Request message ${requestMessageId} not in msgs`);
+    if (msgs.length > 5) {
+      msgBananas = msgs.slice(Math.max(0, currentIdx - 4), currentIdx + 1);
+    } else {
+      msgBananas = msgs;
+    }
+    const { history, systemInstruction } = await this.getHistoryAndInstruction(
+      isNewChat,
+      msgBananas,
+      keyFingerprint,
+      systemPrompt,
+      keyId ?? undefined,
+      apiKey,
+      model
+    );
+    // pulls user req and gem's res
+    let contents: ContentListUnion;
+    if (history.length > 10) {
+      contents =
+        history.slice(history.findLastIndex(o => o.role === "user")) ?? history;
+    } else {
+      contents = history;
+    }
 
-    const aspectRatio = this.prisma.handleOutputSize(m, {
-      output_size: out ?? "16:9"
-    });
-    const imageSize = this.prisma.handleImgGenOutputQuality(m, {
-      output_quality: imgGenFields?.output_quality
-        ? this.prisma.isValidNanoBananaProAndTwoOutputQuality(
-            imgGenFields.output_quality
-          )
-          ? imgGenFields.output_quality
-          : m === "gemini-3.1-flash-image-preview"
-            ? "2K"
-            : m === "gemini-3-pro-image-preview"
-              ? "2K"
-              : undefined
-        : undefined
-    });
-    const responseModalities = this.mediaModalities(m);
-    const candidateCount = this.candidateCount(m, imgGenFields?.n);
+    const imageConfig = this.handleImgGenFields(model, imgGenFields);
+    const responseModalities = this.mediaModalities(model);
+    const candidateCount = this.candidateCount(model, imgGenFields?.n);
     return {
       contents,
       model,
@@ -1074,7 +1122,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
         tools,
         topP,
         candidateCount,
-        imageConfig: { aspectRatio, imageSize },
+        imageConfig,
         temperature,
         systemInstruction
       }
@@ -1082,17 +1130,12 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }
 
   protected async contentGen({
-    model,
+    model = "gemini-3.1-pro-preview",
     imgGenFields,
     ...rest
   }: GenerateContentResponseProps) {
-    const m = model as GeminiModelIdUnion;
-    if (
-      (this.isNanoBanana1(m) ||
-        this.isNanoBanana2(m) ||
-        this.isNanoBananaPro(m)) &&
-      typeof imgGenFields !== "undefined"
-    ) {
+    const m = model ?? "gemini-3.1-pro-preview";
+    if (this.isNanoBananaFam(m) && typeof imgGenFields !== "undefined") {
       return this.contentGenNanoBananas({
         model: m,
         imgGenFields: imgGenFields,
