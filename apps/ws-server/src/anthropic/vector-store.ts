@@ -176,6 +176,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
   protected isAdvancedToolCapable(m: string) {
     return (
+      m === "claude-opus-4-7" ||
       m === "claude-sonnet-4-6" ||
       m === "claude-opus-4-6" ||
       m === "claude-opus-4-5-20251101" ||
@@ -185,6 +186,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
   protected isEffortCapable(model: string) {
     return (
+      model === "claude-opus-4-7" ||
       model === "claude-opus-4-6" ||
       model === "claude-opus-4-5-20251101" ||
       model === "claude-sonnet-4-6"
@@ -406,13 +408,20 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     };
   }
 
-  private is4dot6Model(m = "claude-opus-4-6") {
-    return m === "claude-sonnet-4-6" || m === "claude-opus-4-6";
+  private is4dot67Model(m = "claude-opus-4-6") {
+    return (
+      m === "claude-sonnet-4-6" ||
+      m === "claude-opus-4-6" ||
+      m === "claude-opus-4-7"
+    );
   }
 
   private handleEffort(model: string | null) {
     if (!model) return;
-    if (!this.is4dot6Model(model)) return;
+    if (!this.is4dot67Model(model)) return;
+    if (model === "claude-opus-4-7") {
+      return { effort: "xhigh" } as const;
+    }
     if (model === "claude-opus-4-6") {
       return { effort: "max" } as const;
     } else {

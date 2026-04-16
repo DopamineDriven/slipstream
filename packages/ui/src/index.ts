@@ -129,6 +129,8 @@ export { Badge, badgeVariants } from "@/ui/badge";
 export type { BadgeProps } from "@/ui/badge";
 export { Button, buttonVariants } from "@/ui/button";
 export type { ButtonProps } from "@/ui/button";
+export { ButtonDos, buttonDosVariants } from "@/ui/button-dos";
+export type { ButtonDosProps } from "@/ui/button-dos";
 export {
   Card,
   CardHeader,

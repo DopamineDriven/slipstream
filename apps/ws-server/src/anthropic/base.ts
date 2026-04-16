@@ -36,11 +36,33 @@ export class AnthropicBaseService {
     withLocalStore = false
   ) {
     switch (model) {
+      case "claude-opus-4-7": {
+        if (withLocalStore) {
+          return [
+            "advanced-tool-use-2025-11-20",
+            "context-1m-2025-08-07",
+            "files-api-2025-04-14",
+            //     "output-300k-2026-03-24",
+            "extended-cache-ttl-2025-04-11",
+            "web-fetch-2025-09-10",
+            "code-execution-2025-08-25"
+          ] satisfies Anthropic.Beta.AnthropicBeta[];
+        } else {
+          return [
+            "context-1m-2025-08-07",
+            //     "output-300k-2026-03-24",
+            "files-api-2025-04-14",
+            "extended-cache-ttl-2025-04-11",
+            "code-execution-2025-08-25"
+          ] satisfies Anthropic.Beta.AnthropicBeta[];
+        }
+      }
       case "claude-sonnet-4-6":
       case "claude-opus-4-6": {
         if (withLocalStore) {
           return [
             "advanced-tool-use-2025-11-20",
+            //     "output-300k-2026-03-24",
             "context-1m-2025-08-07",
             "files-api-2025-04-14",
             "extended-cache-ttl-2025-04-11",
@@ -51,6 +73,7 @@ export class AnthropicBaseService {
           return [
             "context-1m-2025-08-07",
             "files-api-2025-04-14",
+            //     "output-300k-2026-03-24",
             "extended-cache-ttl-2025-04-11",
             "code-execution-2025-08-25"
           ] satisfies Anthropic.Beta.AnthropicBeta[];
@@ -122,6 +145,7 @@ export class AnthropicBaseService {
   }
 
   protected outputTokenCeilingByModel = {
+    "claude-opus-4-7": 128000,
     "claude-sonnet-4-6": 64000,
     "claude-opus-4-6": 128000,
     "claude-3-haiku-20240307": 4096,
@@ -134,6 +158,7 @@ export class AnthropicBaseService {
   } as const;
 
   protected inputTokenCeilingByModel = {
+    "claude-opus-4-7": 1000000,
     "claude-sonnet-4-6": 1000000,
     "claude-opus-4-6": 1000000,
     "claude-3-haiku-20240307": 200000,
@@ -162,6 +187,7 @@ export class AnthropicBaseService {
 
   protected handleThinking(mod: AnthropicModelIdUnion, max_tokens?: number) {
     switch (mod) {
+      case "claude-opus-4-7":
       case "claude-sonnet-4-6":
       case "claude-opus-4-6":
       case "claude-opus-4-1-20250805":
@@ -171,7 +197,11 @@ export class AnthropicBaseService {
       case "claude-opus-4-5-20251101":
       case "claude-sonnet-4-5-20250929": {
         if (this.handleMaxTokens(mod, max_tokens) >= 1024) {
-          if (mod === "claude-opus-4-6" || mod === "claude-sonnet-4-6") {
+          if (
+            mod === "claude-opus-4-7" ||
+            mod === "claude-opus-4-6" ||
+            mod === "claude-sonnet-4-6"
+          ) {
             return {
               type: "adaptive"
             } as const satisfies Anthropic.Beta.BetaThinkingConfigAdaptive;
@@ -181,7 +211,11 @@ export class AnthropicBaseService {
             budget_tokens: this.getMaxTokens(mod) - 1024
           } as const satisfies Anthropic.Beta.BetaThinkingConfigEnabled;
         } else {
-          if (mod === "claude-opus-4-6" || mod === "claude-sonnet-4-6") {
+          if (
+            mod === "claude-opus-4-7" ||
+            mod === "claude-opus-4-6" ||
+            mod === "claude-sonnet-4-6"
+          ) {
             return {
               type: "adaptive"
             } as const satisfies Anthropic.Beta.BetaThinkingConfigAdaptive;

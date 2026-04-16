@@ -78,17 +78,7 @@ export function MessageIcons({
   const isTTSActive =
     currentPlaybackMessageId === message.id ||
     (isGenerating && activeMessageId === message.id);
-  // const handleReadAloud = useCallback(() => {
-  //   if (isTTSActive) {
-  //     stop();
-  //   } else {
-  //     if (primerRef.current && !hasPlayedPrimer.current) {
-  //       void primerRef.current.play().catch(() => {});
-  //     }
-  //     requestTTS(message.id, message.conversationId);
-  //   }
 
-  // }, [isTTSActive, stop, requestTTS, message.id, message.conversationId]);
   const handleReadAloud = useCallback(() => {
     if (isTTSActive) {
       stop();
@@ -96,7 +86,6 @@ export function MessageIcons({
       if (primerRef.current && !hasPlayedPrimer.current) {
         void primerRef.current.play().catch(() => {});
       }
-      // hasCachedAudio(message.id);
       requestTTS(message.id, message.conversationId);
     }
   }, [isTTSActive, stop, requestTTS, message.id, message.conversationId]);

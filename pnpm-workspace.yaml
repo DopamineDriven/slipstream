@@ -5,7 +5,7 @@ packages:
 
 catalogs:
   anthropic:
-    "@anthropic-ai/sdk": ^0.89.0
+    "@anthropic-ai/sdk": ^0.90.0
   auth:
     better-auth: ^1.6.3
   aws:

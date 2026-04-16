@@ -19,6 +19,7 @@ import type {
   MetadataUnion,
   S3ObjectId,
   UserMetadata,
+  UserRxnAction,
   WithExpiry
 } from "@/events-workup.ts";
 import type {
@@ -154,6 +155,19 @@ export type ProviderContextPong = {
   providerContext: ClientContextWorkupProps;
 };
 
+export type UserRxnUpdate = {
+  type: "user_rxn_update";
+  conversationId: string;
+  messageId: string;
+  action: UserRxnAction;
+};
+export type UserRxnUpdateAck = {
+  type: "user_rxn_update_ack";
+  conversationId: string;
+  messageId: string;
+  liked: boolean | null;
+  disliked: boolean | null;
+};
 /**
  * Server notifies client that an asset was uploaded server-side
  * (After successful upload via API route or server action)

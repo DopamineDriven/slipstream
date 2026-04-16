@@ -1,6 +1,6 @@
 "use client";
 
-import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
+import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { imgSrcMapper } from "@/lib/img-helper";
@@ -206,7 +206,7 @@ export function AttachmentDisplay({
                   fill
                   alt={attachment.filename ?? "Attachment"}
                   sizes="(max-width: 768px) 90dvw, 24rem"
-                  className="rounded-lg object-contain transition-opacity hover:opacity-90"
+                  className="rounded-xs object-contain transition-all hover:opacity-90"
                 />
                 <div className="absolute top-2 right-2 flex gap-1">
                   <Button
@@ -264,7 +264,7 @@ export function AttachmentDisplay({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8"
+                      className="size-8"
                       onClick={() =>
                         attachment.cdnUrl
                           ? handlePreview(
@@ -281,7 +281,7 @@ export function AttachmentDisplay({
                           : () => {}
                       }
                       disabled={!displayUrl}>
-                      <Eye className="h-4 w-4" />
+                      <Eye className="size-4" />
                     </Button>
                   )}
                   <Button
@@ -290,7 +290,7 @@ export function AttachmentDisplay({
                     className="h-8 w-8"
                     onClick={() => handleDownload(attachment)}
                     disabled={!displayUrl}>
-                    <Download className="h-4 w-4" />
+                    <Download className="size-4" />
                   </Button>
                 </div>
               </div>
@@ -332,7 +332,7 @@ export function AttachmentDisplay({
                   alt="Expanded attachment"
                   fill
                   sizes="96dvw"
-                  className="rounded-md object-contain"
+                  className="rounded-xs object-contain"
                   unoptimized={
                     !isNextImageCompat(
                       expanded.format as ExpandedImgSpecs["format"]

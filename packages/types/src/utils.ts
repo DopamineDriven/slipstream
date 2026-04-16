@@ -71,7 +71,6 @@ export type IsExact<T, U> = [T] extends [U]
     : false
   : false;
 
-
 export type UTR<
   TUnion extends Record<TKey, string>,
   TKey extends string = "kind",
@@ -258,7 +257,6 @@ export type DiscriminatedUnionToRecord<
 > = TKey extends keyof TUnion
   ? { [K in TUnion[TKey] & string]: Extract<TUnion, Record<TKey, K>> }
   : never;
-
 
 export type UnionToRecord<
   TUnion extends Record<"type", string>,
