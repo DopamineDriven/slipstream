@@ -4,7 +4,7 @@ import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
 import type {
   ExpandedDocSpecs,
   ExpandedImgSpecs
-} from "@d0paminedriven/metadata";
+} from "@d0paminedriven/fs";
 import { default as NextImage } from "next/image";
 import { useAssetMetadata } from "@/hooks/use-asset-metadata";
 import { imgSrcMapper } from "@/lib/img-helper";

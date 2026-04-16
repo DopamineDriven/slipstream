@@ -145,14 +145,6 @@ export function isValidNanoBanana2Quality(q: string) {
   );
 }
 
-function isNanoBanana2(m: string) {
-  return imgCtx.geminiNanoBananaTwo(m);
-}
-
-function isNanoBanana(m: string) {
-  return imgCtx.geminiNanoBananasModel(m);
-}
-
 const STORAGE_KEY_PREFIX = "gemini-image-settings";
 
 function getStorageKey(modelId: string) {

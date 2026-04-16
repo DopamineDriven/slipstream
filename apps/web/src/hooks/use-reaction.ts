@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { rxnAction } from "@/app/actions/message-actions";
 import { rxnObject } from "@/lib/rxn-object";
-import { MessageSingleton } from "@slipstream/types";
+import type { MessageSingleton } from "@slipstream/types";
 
 export function useReaction(message: MessageSingleton<true>) {
   const [reactionState, setReactionState] = useState({

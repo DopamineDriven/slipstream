@@ -1073,40 +1073,39 @@ export class GeminiWorkupService extends FileSearchStoreService {
       );
     }
 
-    const msg = msgs.find(t => t.id === requestMessageId);
-    if (!msg) throw new Error("no message found for grok image gen");
     const keyFingerprint = keyId ?? "server";
     const toolConfig = this.getToolConfig(latlng, model);
     const tools = this.getTools(model);
     const thinkingConfig = this.getThinkingConfig(model);
     const maxOutputTokens = max_tokens;
-    // const bananaMsgs=msgs.filter((t) =>t.provider==="GEMINI" && t.model && this.isNanoBananaFam(t.model))
+
     let msgBananas: MessageSingleton<true>[];
+
     const currentIdx = msgs.findIndex(m => m.id === requestMessageId);
-    if (currentIdx === -1)
+
+    if (currentIdx === -1) {
       throw new Error(`Request message ${requestMessageId} not in msgs`);
-    if (msgs.length > 5) {
-      msgBananas = msgs.slice(Math.max(0, currentIdx - 4), currentIdx + 1);
+    }
+
+    const ceiling = model === "gemini-3.1-flash-image-preview" ? 10 : 5;
+    if (msgs.length > ceiling) {
+      msgBananas = msgs.slice(
+        Math.max(0, currentIdx - ceiling),
+        currentIdx + 1
+      );
     } else {
       msgBananas = msgs;
     }
-    const { history, systemInstruction } = await this.getHistoryAndInstruction(
-      isNewChat,
-      msgBananas,
-      keyFingerprint,
-      systemPrompt,
-      keyId ?? undefined,
-      apiKey,
-      model
-    );
-    // pulls user req and gem's res
-    let contents: ContentListUnion;
-    if (history.length > 10) {
-      contents =
-        history.slice(history.findLastIndex(o => o.role === "user")) ?? history;
-    } else {
-      contents = history;
-    }
+    const { history: contents, systemInstruction } =
+      await this.getHistoryAndInstruction(
+        isNewChat,
+        msgBananas,
+        keyFingerprint,
+        systemPrompt,
+        keyId ?? undefined,
+        apiKey,
+        model
+      );
 
     const imageConfig = this.handleImgGenFields(model, imgGenFields);
     const responseModalities = this.mediaModalities(model);

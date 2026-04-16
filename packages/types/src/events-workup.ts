@@ -89,6 +89,8 @@ export type AssetUploadAbortReason =
   | "TIMEOUT"
   | "UNKNOWN";
 
+export type UserRxnAction = "like" | "dislike";
+
 export type ImgColorSpace = $Enums.ColorSpace;
 
 export type ImgColorModel = $Enums.ColorModel;
