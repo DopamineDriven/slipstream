@@ -4,7 +4,10 @@ export default {
   reactStrictMode: true,
   reactCompiler: true,
   // defaults to to 1mb :|
-  experimental: { serverActions: { bodySizeLimit: `50mb` } },
+  experimental: {
+    serverActions: { bodySizeLimit: `50mb` },
+    authInterrupts: true
+  },
   typescript: { ignoreBuildErrors: false, tsconfigPath: "./tsconfig.json" },
   images: {
     localPatterns: [
@@ -18,13 +21,12 @@ export default {
       { pathname: "/svgs/**" },
       { pathname: "/*" }
     ],
-    qualities: [75, 100],
+    qualities: [75, 80, 85, 90, 95, 100],
     loader: "default",
     formats: ["image/avif", "image/webp"],
     dangerouslyAllowLocalIP: true,
     maximumRedirects: 5,
     unoptimized: true,
-    
     contentDispositionType: "attachment",
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,

@@ -49,17 +49,16 @@ export class PrismaUserMessageService extends ErrorHelperService {
     });
   }
 
-  private bigintToInt({
-    messages,
-    ...rest
-  }: ConversationSingleton<false | true>) {
-    const msgs = messages.map(msg => {
-      let t: TTSJobSingleton<true | false> | null;
+  public bigIntToIntMsg(
+    messages: Rm<MessageSingleton<true | false>, "userKey">[]
+  ) {
+    return messages.map(msg => {
+      let t: TTSJobSingleton<true | false> | undefined;
       const { attachments, ttsJob, ...rest } = msg;
       if (ttsJob) {
         t = ttsJob;
       } else {
-        t = null;
+        t = undefined;
       }
       const atts = attachments.map(att => {
         const { size, ...attRest } = att;
@@ -80,13 +79,21 @@ export class PrismaUserMessageService extends ErrorHelperService {
               ...t,
               sizeBytes: t?.sizeBytes ? Number(t.sizeBytes) : null
             } as const)
-          : null,
+          : undefined,
         ...rest,
         attachments: atts
       } as Rm<MessageSingleton<true>, "userKey">;
     });
+  }
 
-    return { ...rest, messages: msgs } as ConversationSingleton<true>;
+  public bigintToInt({
+    messages,
+    ...rest
+  }: ConversationSingleton<false | true>) {
+    return {
+      ...rest,
+      messages: this.bigIntToIntMsg(messages)
+    } as ConversationSingleton<true>;
   }
 
   public isHomeOrNewChat(conversationId: string) {
@@ -136,6 +143,126 @@ export class PrismaUserMessageService extends ErrorHelperService {
     }
   }
 
+  public async getMsgsByCursorId(
+    conversationId: string,
+    take = 25,
+    id?: string
+  ) {
+    const cursor = id ? { id } : undefined;
+    const skip = id ? 1 : undefined;
+
+    const getMany = await this.prismaClient.message.findMany({
+      where: { conversationId },
+      cursor,
+      take,
+      skip,
+      orderBy: { createdAt: "desc" },
+      include: {
+        ttsJob: true,
+        imageGenJob: true,
+        messageBlocks: { orderBy: { ordinal: "asc" } },
+        attachments: {
+          orderBy: { createdAt: "asc" },
+          include: {
+            image: true,
+            document: true,
+            imageGenOutput: true,
+            audio: true
+          }
+        }
+      }
+    });
+    const msgs = getMany.map(t => {
+      return {
+        ...t,
+        ttsJob: t.ttsJob ?? undefined
+      };
+    });
+    return this.bigIntToIntMsg(msgs) satisfies MessageSingleton<true>[];
+  }
+
+  public async getMessagesByCursor(
+    conversationId: string,
+    take = 25,
+    id?: string
+  ) {
+    const cursor = id ? { id } : undefined;
+    const skip = id ? 1 : undefined;
+    const convo = await this.prismaClient.conversation.findUniqueOrThrow({
+      where: { id: conversationId },
+      include: {
+        messages: {
+          cursor,
+          take,
+          skip,
+          orderBy: { createdAt: "desc" },
+          include: {
+            ttsJob: true,
+            imageGenJob: true,
+            messageBlocks: { orderBy: { ordinal: "asc" } },
+            attachments: {
+              orderBy: { createdAt: "asc" },
+              include: {
+                image: true,
+                document: true,
+                imageGenOutput: true,
+                audio: true
+              }
+            }
+          }
+        },
+        conversationSettings: true
+      }
+    });
+    const { messages, ...rest } = convo;
+    const msgs = messages.map(t => {
+      return {
+        ...t,
+        ttsJob: t.ttsJob ?? undefined
+      };
+    });
+
+    const c = { ...rest, messages: msgs };
+    return this.bigintToInt(c) satisfies ConversationSingleton<true>;
+  }
+
+  public async getConvoInitial(conversationId: string, take = 25) {
+    const convo = await this.prismaClient.conversation.findUniqueOrThrow({
+      where: { id: conversationId },
+      include: {
+        messages: {
+          take,
+          orderBy: { createdAt: "desc" },
+          include: {
+            ttsJob: true,
+            imageGenJob: true,
+            messageBlocks: { orderBy: { ordinal: "asc" } },
+            attachments: {
+              orderBy: { createdAt: "asc" },
+              include: {
+                image: true,
+                document: true,
+                imageGenOutput: true,
+                audio: true
+              }
+            }
+          }
+        },
+        conversationSettings: true
+      }
+    });
+    const { messages, ...rest } = convo;
+    const msgs = messages.map(t => {
+      return {
+        ...t,
+        ttsJob: t.ttsJob ?? undefined
+      };
+    });
+
+    const c = { ...rest, messages: msgs };
+    return this.bigintToInt(c) satisfies ConversationSingleton<true>;
+  }
+
   public async handleMetadata({
     params
   }: {
@@ -183,15 +310,15 @@ export class PrismaUserMessageService extends ErrorHelperService {
         conversationSettings: true
       }
     });
-    const { messages } = convo;
-    const f = messages.map(t => {
+    const { messages, ...rest } = convo;
+    const msgs = messages.map(t => {
       return {
         ...t,
         ttsJob: t.ttsJob ?? undefined
       };
     });
 
-    const c = { ...convo, messages: f };
+    const c = { ...rest, messages: msgs };
     return this.bigintToInt(c) satisfies ConversationSingleton<true>;
   }
 
