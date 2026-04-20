@@ -1032,7 +1032,7 @@ export class KimiService {
         type: "ai_chat_response",
         conversationId,
         userId,
-        provider,
+        provider, convo: d.convo,
         userMsgId,
         aiMsgId: d.aiMsgId,
         imgGenEnabled: false,

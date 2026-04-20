@@ -198,7 +198,8 @@ export class GeminiChatService extends GeminiWorkupService {
       max_tokens,
       systemPrompt,
       temperature,
-      topP,requestMessageId
+      topP,
+      requestMessageId
     });
 
     const MAX_ROUNDS = 10;
@@ -994,6 +995,7 @@ export class GeminiChatService extends GeminiWorkupService {
         userMsgId,
         aiMsgId: d.aiMsgId,
         usage,
+        convo: d.convo,
         systemPrompt,
         data: geminiDataPart
           ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`

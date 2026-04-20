@@ -30,7 +30,7 @@ export async function GET(
       unauthorized();
     }
 
-    const conversations = await p.getConvoInitial(conversationId);
+    const conversations = await p.getConvoInitial(conversationId, 25);
 
     return NextResponse.json(conversations);
   } catch (error) {

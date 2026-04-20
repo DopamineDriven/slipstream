@@ -150,7 +150,9 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       nextOrdinal += 1;
     };
 
-    const ensureActiveBlock = (type: OpenAIImgGenActiveMessageBlock["type"]) => {
+    const ensureActiveBlock = (
+      type: OpenAIImgGenActiveMessageBlock["type"]
+    ) => {
       if (activeBlock?.type !== type) {
         finalizeActiveBlock();
         activeBlock = {
@@ -952,6 +954,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
             provider,
             model,
             userMsgId,
+            convo: d.convo,
             aiMsgId: d.aiMsgId,
             imgGenAttachmentId: d.imgGenAttachmentId,
             title,

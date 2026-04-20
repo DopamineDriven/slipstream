@@ -33,11 +33,7 @@ export async function GET(
       unauthorized();
     }
 
-    const msgs = await p.getMessagesByCursor(
-      conversationId,
-      25,
-      cursorId
-    );
+    const msgs = await p.getMessagesByCursor(conversationId, 25, cursorId);
 
     return NextResponse.json(msgs);
   } catch (error) {

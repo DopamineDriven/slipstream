@@ -254,7 +254,7 @@ export class CohereService {
   }
 
   private fileSearchTool() {
-    return { 
+    return {
       type: "function",
       function: {
         name: "file_search",
@@ -1139,6 +1139,7 @@ export class CohereService {
         conversationId,
         userId,
         provider,
+        convo: d.convo,
         userMsgId,
         aiMsgId: d.aiMsgId,
         imgGenEnabled: false,

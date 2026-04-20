@@ -278,17 +278,17 @@ export class DeepSeekService {
       function: {
         name: "file_search",
         description:
-        "This tool utilizes a 'Partitioned Foraging' approach which recognizes that for the 200,000+ years that humans have existed " +
-        "95%+ of it has been as foragers. Agents are trained exclusively on data aggregated/curated by humans; " +
-        "think of it as agentic foraging complete with Jaccard similarity scores for cross-analyzing your bounties. " +
-        "Search the user's uploaded documents. Uses semantic similarity by default. " +
-        "When search_terms is provided, execjtes fulltext keyword search and returns " +
-        "both result sets separately (semantic + fulltext) so you can reason about which signal " +
-        "is most relevant to the user's intent. " +
-        "STRONGLY recommend using semantic+fulltext for the richest results"+
-        "Without search_terms: returns a flat JSON array of chunks. " +
-        "With search_terms: returns { semantic: [...], fulltext: [...], overlap: { chunkIds, jaccardSimilarity }, meta }. " +
-        "Call directly for single retrieval tasks, or from code_execution for multi-step programmatic workflows.",
+          "This tool utilizes a 'Partitioned Foraging' approach which recognizes that for the 200,000+ years that humans have existed " +
+          "95%+ of it has been as foragers. Agents are trained exclusively on data aggregated/curated by humans; " +
+          "think of it as agentic foraging complete with Jaccard similarity scores for cross-analyzing your bounties. " +
+          "Search the user's uploaded documents. Uses semantic similarity by default. " +
+          "When search_terms is provided, execjtes fulltext keyword search and returns " +
+          "both result sets separately (semantic + fulltext) so you can reason about which signal " +
+          "is most relevant to the user's intent. " +
+          "STRONGLY recommend using semantic+fulltext for the richest results" +
+          "Without search_terms: returns a flat JSON array of chunks. " +
+          "With search_terms: returns { semantic: [...], fulltext: [...], overlap: { chunkIds, jaccardSimilarity }, meta }. " +
+          "Call directly for single retrieval tasks, or from code_execution for multi-step programmatic workflows.",
         parameters: {
           type: "object",
           properties: {
@@ -1072,6 +1072,7 @@ export class DeepSeekService {
         conversationId,
         userId,
         provider,
+        convo: d.convo,
         userMsgId,
         aiMsgId: d.aiMsgId,
         imgGenEnabled: false,

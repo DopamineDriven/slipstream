@@ -1054,6 +1054,7 @@ export class LlamaService {
         userId,
         userMsgId,
         aiMsgId: d.aiMsgId,
+        convo: d.convo,
         provider,
         systemPrompt,
         title,
