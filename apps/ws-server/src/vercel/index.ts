@@ -1153,6 +1153,7 @@ export class v0Service {
         provider,
         userMsgId,
         aiMsgId: d.aiMsgId,
+        convo: d.convo,
         imgGenEnabled: false,
         systemPrompt,
         thinkingDuration:

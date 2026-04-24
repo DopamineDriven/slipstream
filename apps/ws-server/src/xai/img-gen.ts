@@ -59,7 +59,7 @@ export class GrokImgGenService extends GrokCollectionsService {
       throw new Error(
         `grok imagine image gen model required for grok image gen, received ${msg.model}`
       );
-      
+
     const images = Array.of<xAIImageEditsInput>();
     const textBlocks = Array.of<string>();
 
@@ -678,6 +678,7 @@ export class GrokImgGenService extends GrokCollectionsService {
             imgGenAttachmentId: d.imgGenAttachmentId,
             userMsgId,
             topP,
+            convo: d.convo,
             model: m,
             chunk: grokAgg,
             done: true,

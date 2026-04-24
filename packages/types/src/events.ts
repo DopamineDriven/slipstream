@@ -29,7 +29,11 @@ import type {
   ImageGenProviders,
   Provider
 } from "@/models.ts";
-import type { DocumentSingleton, ImageSingleton } from "@/types.ts";
+import type {
+  ConversationSingleton,
+  DocumentSingleton,
+  ImageSingleton
+} from "@/types.ts";
 import type { CTR, DX, Rm } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 
@@ -59,6 +63,7 @@ export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   messageBlocks?: T extends "ai_chat_response"
     ? ChatChunkAndResMsgBlock[]
     : ChatChunkAndResMsgBlock;
+  convo?: ConversationSingleton<true>;
   imgGenAttachmentId?: string;
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatResponseImgGenFieldsFinal;

@@ -16,8 +16,12 @@ import type {
   AIChatRequest,
   AIChatResponseDb,
   AllModelsUnion,
+  AttachmentSingleton,
+  ConversationSingleton,
   CTR,
-  Rm
+  MessageSingleton,
+  Rm,
+  TTSJobSingleton
 } from "@slipstream/types";
 import { PrismaDbService } from "@slipstream/db/factory";
 
@@ -887,6 +891,52 @@ export class PrismaChatService extends PrismaAttachmentService {
       });
     }
   }
+ public bigIntToIntMsg(
+    messages: Rm<MessageSingleton<true | false>, "userKey">[]
+  ) {
+    return messages.map(msg => {
+      let t: TTSJobSingleton<true | false> | undefined;
+      const { attachments, ttsJob, ...rest } = msg;
+      if (ttsJob) {
+        t = ttsJob;
+      } else {
+        t = undefined;
+      }
+      const atts = attachments.map(att => {
+        const { size, ...attRest } = att;
+        return {
+          ttsJob: t
+            ? ({
+                ...t,
+                sizeBytes: t?.sizeBytes ? Number(t.sizeBytes) : null
+              } as const)
+            : undefined,
+          ...attRest,
+          size: size ? Number(size) : null
+        } as Rm<AttachmentSingleton<true>, "providerLinks">;
+      });
+      return {
+        ttsJob: t
+          ? ({
+              ...t,
+              sizeBytes: t?.sizeBytes ? Number(t.sizeBytes) : null
+            } as const)
+          : undefined,
+        ...rest,
+        attachments: atts
+      } as Rm<MessageSingleton<true>, "userKey">;
+    });
+  }
+
+  public bigintToInt({
+    messages,
+    ...rest
+  }: ConversationSingleton<false | true>) {
+    return {
+      ...rest,
+      messages: this.bigIntToIntMsg(messages)
+    } as ConversationSingleton<true>;
+  }
 
   public async handleAiChatResponse({
     userId,
@@ -1006,6 +1056,7 @@ export class PrismaChatService extends PrismaAttachmentService {
             include: {
               ttsJob: true,
               messageBlocks: true,
+              imageGenJob: true,
               attachments: {
                 include: {
                   imageGenOutput: true,
@@ -1046,7 +1097,15 @@ export class PrismaChatService extends PrismaAttachmentService {
           userKeyId: keyId
         }
       });
-
+      const {messages, ...c} =persist;
+      const ttv = messages.map((t) =>{
+        const {ttsJob, ...rest} = t;
+        return {
+          ttsJob: ttsJob ? { ...ttsJob, sizeBytes: ttsJob?.sizeBytes ? Number(ttsJob.sizeBytes) :  null} : undefined,
+          ...rest
+        }
+      });
+      const convo = this.bigintToInt({...c, messages: ttv})
       const msg = persist.messages[0];
       if (!msg) throw new Error("AIChatResponse Message was not created");
       const aiMsgId = msg?.id;
@@ -1124,7 +1183,7 @@ export class PrismaChatService extends PrismaAttachmentService {
 
         const cleaned = { messages: msgs, ...e };
 
-        return { aiMsgId, persist: cleaned, imgGenAttachmentId: undefined };
+        return { aiMsgId, persist: cleaned, imgGenAttachmentId: undefined, convo };
       }
     });
 

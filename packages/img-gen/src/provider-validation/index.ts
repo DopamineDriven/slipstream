@@ -24,7 +24,12 @@ import type {
 
 export type AllPureImgGenModelsUnion =
   | OpenAIImgGenModels
-  | Exclude<GeminiImgGenModels, "deep-research-pro-preview-12-2025">
+  | Exclude<
+      GeminiImgGenModels,
+      | "deep-research-pro-preview-12-2025"
+      | "deep-research-max-preview-04-2026"
+      | "deep-research-preview-04-2026"
+    >
   | GrokImgGenModels;
 
 export type AllImgGenCapableModelUnion =
@@ -40,7 +45,9 @@ export type ModelToAspectRatioOpts<T extends AllModelsUnion> =
       : T extends GrokImagineImgModelUnion
         ? GrokImagineARUnion
         : T extends OpenAIImgCapableModels
-          ? OpenAINativeImgModelAspectRatioWorkup["gpt-image-1.5"]
+          ? T extends "gpt-image-1-mini" | "gpt-image-1" | "gpt-image-1.5"
+            ? OpenAINativeImgModelAspectRatioWorkup["gpt-image-1.5"]
+            : OpenAINativeImgModelAspectRatioWorkup["gpt-image-2"]
           : undefined
     : undefined;
 
@@ -51,6 +58,8 @@ export type ModelToQualityOpts<T extends AllModelsUnion> =
           | "gemini-3-pro-image-preview"
           | "gemini-3.1-flash-image-preview"
           | "deep-research-pro-preview-12-2025"
+          | "deep-research-max-preview-04-2026"
+          | "deep-research-preview-04-2026"
         ? T extends "gemini-3.1-flash-image-preview"
           ? GeminiImageQuality["gemini-3.1-flash-image-preview"]
           : GeminiImageQuality[
@@ -103,10 +112,18 @@ export class ProviderValidation {
     return m === "grok-imagine-image" || m === "grok-imagine-image-pro";
   }
 
-  public openAIGptImgModel(m: string) {
+  public baseOpenAIGptImgModel(m: string) {
     return (
       m === "gpt-image-1" || m === "gpt-image-1-mini" || m === "gpt-image-1.5"
     );
+  }
+
+  public gptImg2Model(m: string) {
+    return m === "gpt-image-2";
+  }
+
+  public openAIGptImgModel(m: string) {
+    return this.baseOpenAIGptImgModel(m) || this.gptImg2Model(m);
   }
 
   public openAIFacilitatingImgGenModel(model: string) {
@@ -140,9 +157,17 @@ export class ProviderValidation {
   public geminiNanoBananaTwo(m: string) {
     return m === "gemini-3.1-flash-image-preview";
   }
-  public geminiNanoBananasModel(m: string) {
+  public geminiDeepResearchModel(m: string) {
     return (
       m === "deep-research-pro-preview-12-2025" ||
+      m === "deep-research-max-preview-04-2026" ||
+      m === "deep-research-preview-04-2026"
+    );
+  }
+
+  public geminiNanoBananasModel(m: string) {
+    return (
+      this.geminiDeepResearchModel(m) ||
       this.geminiNanoBananaTwo(m) ||
       m === "gemini-2.5-flash-image" ||
       m === "gemini-3-pro-image-preview"
@@ -188,14 +213,22 @@ export class ProviderValidation {
     ) {
       return false;
     } else {
-      if (model === "deep-research-pro-preview-12-2025") return false;
+      if (
+        model === "deep-research-pro-preview-12-2025" ||
+        model === "deep-research-max-preview-04-2026" ||
+        model === "deep-research-preview-04-2026"
+      )
+        return false;
       else return true;
     }
   }
 
-
   public imgGenCapableModels(m: string) {
-    return this.grokImagineImgGenModel(m) || this.geminiImgGenCapable(m) || this.openAIImgGenCapable(m)
+    return (
+      this.grokImagineImgGenModel(m) ||
+      this.geminiImgGenCapable(m) ||
+      this.openAIImgGenCapable(m)
+    );
   }
 
   public handleGoogleSafetyFilter(
@@ -264,7 +297,7 @@ export class ProviderValidation {
     return f === "png" || f === "jpeg" || f === "webp";
   }
   public isValidOpenAIBg(b: string) {
-return b === "auto" || b === "transparent" || b === "opaque";
+    return b === "auto" || b === "transparent" || b === "opaque";
   }
   public handleImgGenOutputFormat(
     model: AllModelsUnion = "gpt-5.4",
@@ -294,10 +327,7 @@ return b === "auto" || b === "transparent" || b === "opaque";
     if (!this.openAIImgGenCapable(model)) return;
     if (!data?.format) return;
     if (!(data?.format === "png" || data?.format === "webp")) return;
-    if (
-      data?.background &&
-      this.isValidOpenAIBg(data.background)
-    )
+    if (data?.background && this.isValidOpenAIBg(data.background))
       return data.background;
     else return "auto";
   }
@@ -473,7 +503,9 @@ return b === "auto" || b === "transparent" || b === "opaque";
     m:
       | "gemini-3-pro-image-preview"
       | "gemini-2.5-flash-image"
-      | "deep-research-pro-preview-12-2025",
+      | "deep-research-pro-preview-12-2025"
+      | "deep-research-preview-04-2026"
+      | "deep-research-max-preview-04-2026",
     data?: { output_size: BaseNanoBananaOutputAR }
   ): BaseNanoBananaOutputAR | undefined;
   public geminiAspectRatio(
@@ -596,6 +628,102 @@ return b === "auto" || b === "transparent" || b === "opaque";
     );
   }
 
+  public isValidGPTImage2Size(m: string) {
+    return (
+      this.isValidOpenAISize(m) ||
+      m === "1536x1536" ||
+      m === "2048x2048" ||
+      m === "2560x2560" ||
+      m === "2880x2880" ||
+      // 2:3
+      m === "1536x2304" ||
+      m === "2048x3072" ||
+      m === "2304x3456" ||
+      // 3:2
+      m === "2304x1536" ||
+      m === "3072x2048" ||
+      m === "3456x2304" ||
+      // 3:4
+      m === "1152x1536" ||
+      m === "1536x2048" ||
+      m === "1920x2560" ||
+      m === "2304x3072" ||
+      // 4:3
+      m === "1536x1152" ||
+      m === "2048x1536" ||
+      m === "2560x1920" ||
+      m === "3072x2304" ||
+      // 4:5
+      m === "1024x1280" ||
+      m === "1536x1920" ||
+      m === "2048x2560" ||
+      m === "2304x2880" ||
+      m === "2560x3200" ||
+      // 5:4
+      m === "1280x1024" ||
+      m === "1920x1536" ||
+      m === "2560x2048" ||
+      m === "2880x2304" ||
+      m === "3200x2560" ||
+      // 9:16
+      m === "1152x2048" ||
+      m === "1440x2560" ||
+      m === "1728x3072" ||
+      m === "2016x3584" ||
+      m === "2160x3840" ||
+      // 16:9
+      m === "2048x1152" ||
+      m === "2560x1440" ||
+      m === "3072x1728" ||
+      m === "3584x2016" ||
+      m === "3840x2160" ||
+      // 10:16
+      m === "960x1536" ||
+      m === "1280x2048" ||
+      m === "1600x2560" ||
+      m === "1920x3072" ||
+      m === "2240x3584" ||
+      // 16:10
+      m === "1536x960" ||
+      m === "2048x1280" ||
+      m === "2560x1600" ||
+      m === "3072x1920" ||
+      m === "3584x2240" ||
+      // 1:2
+      m === "1024x2048" ||
+      m === "1280x2560" ||
+      m === "1536x3072" ||
+      m === "1792x3584" ||
+      m === "1920x3840" ||
+      // 2:1
+      m === "2048x1024" ||
+      m === "2560x1280" ||
+      m === "3072x1536" ||
+      m === "3584x1792" ||
+      m === "3840x1920" ||
+      // 9:21
+      m === "864x2016" ||
+      m === "1152x2688" ||
+      m === "1440x3360" ||
+      m === "1632x3808" ||
+      // 21:9
+      m === "2016x864" ||
+      m === "2688x1152" ||
+      m === "3360x1440" ||
+      m === "3808x1632" ||
+      // 1:3
+      m === "512x1536" ||
+      m === "768x2304" ||
+      m === "1024x3072" ||
+      m === "1280x3840" ||
+      // 3:1
+      m === "1536x512" ||
+      m === "2304x768" ||
+      m === "3072x1024" ||
+      m === "3840x1280"
+    );
+  }
+
   public handlePartialImgGen(
     model: AllModelsUnion = "gpt-5.4",
     data?: { partialImagesRequested?: number }
@@ -660,10 +788,16 @@ return b === "auto" || b === "transparent" || b === "opaque";
         } else return "1:1";
       } else return "1:1" satisfies NanoBanana2OutputAR;
     }
-    if (this.openAIImgGenCapable(m)) {
+    if (this.baseOpenAIGptImgModel(m)) {
       const ar = data?.output_size;
       if (ar && this.isValidOpenAISize(ar)) {
-        return data.output_size;
+        return ar;
+      } else return "auto";
+    }
+    if (this.openAIImgGenCapable(m)) {
+      const ar = data?.output_size;
+      if (ar && this.isValidGPTImage2Size(ar)) {
+        return ar;
       } else return "auto" as const;
     }
   }
@@ -767,7 +901,7 @@ return b === "auto" || b === "transparent" || b === "opaque";
           model:
             model ??
             this.fallbackImgGenModelByProvider(provider) ??
-            "gpt-image-1.5",
+            "gpt-image-2",
           prompt,
           provider: this.providerToPrismaFormat(provider)
         }
@@ -787,7 +921,7 @@ return b === "auto" || b === "transparent" || b === "opaque";
         content: prompt,
         provider: this.providerToPrismaFormat(provider),
         senderType: "USER",
-        model: model ?? "gpt-image-1.5",
+        model: model ?? "gpt-image-2",
         messageType: "IMAGE_GEN",
         userId,
         userKeyId,

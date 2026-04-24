@@ -16,6 +16,7 @@ import type { $Enums } from "@slipstream/db/node/generated/client";
 export type ImageGenModels =
   | "gpt-image-1"
   | "gpt-image-1.5"
+  | "gpt-image-2"
   | "gpt-image-1-mini"
   | "grok-imagine-image"
   | "grok-imagine-image-pro"
@@ -27,12 +28,14 @@ export type ImageGenModels =
   | "gemini-3.1-flash-image-preview";
 
 export const providerModelImageGenApi = {
-  openai: ["gpt-image-1", "gpt-image-1.5", "gpt-image-1-mini"],
+  openai: ["gpt-image-2", "gpt-image-1", "gpt-image-1.5", "gpt-image-1-mini"],
   gemini: [
     "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
     "deep-research-pro-preview-12-2025",
+    "deep-research-max-preview-04-2026",
+    "deep-research-preview-04-2026",
     "imagen-4.0-fast-generate-001",
     "imagen-4.0-generate-001",
     "imagen-4.0-ultra-generate-001"
@@ -71,7 +74,9 @@ export const providerModelImageGenFacilitatingApi = {
     "gemini-3.1-flash-image-preview",
     "gemini-2.5-flash-image",
     "gemini-3-pro-image-preview",
-    "deep-research-pro-preview-12-2025"
+    "deep-research-pro-preview-12-2025",
+    "deep-research-max-preview-04-2026",
+    "deep-research-preview-04-2026"
   ]
 } as const;
 
@@ -482,7 +487,7 @@ export const defaultModelDisplayNameByProvider = {
   mistral: "Mistral Small 4",
   cohere: "Command A Reasoning",
   deepseek: "DeepSeek R1",
-  moonshotai: "Kimi K2.5",
+  moonshotai: "Kimi K2.6",
   zai: "GLM 5"
 } as const satisfies Record<
   Provider,
@@ -509,7 +514,7 @@ export const defaultModelIdByProvider = {
   mistral: "mistral-small-latest",
   cohere: "command-a-reasoning-08-2025",
   deepseek: "deepseek-r1",
-  moonshotai: "kimi-k2.5",
+  moonshotai: "kimi-k2.6",
   zai: "glm-5"
 } as const satisfies Record<
   Providers,

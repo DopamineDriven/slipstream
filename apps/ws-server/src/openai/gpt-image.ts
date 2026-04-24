@@ -218,7 +218,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
             n: 1,
             partial_images,
             quality: r.output_quality ?? "high",
-            size: r.output_size ?? "auto",
+            size: (r.output_size ?? "auto") as "auto",
             stream: true
           } satisfies OpenAI.Images.ImageEditParamsStreaming,
           { stream: true }
@@ -239,7 +239,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
             n: 1,
             partial_images,
             quality: r.output_quality ?? "high",
-            size: r.output_size ?? "auto",
+            size: (r.output_size ?? "auto") as "auto",
             stream: true
           },
           { stream: true }
@@ -775,6 +775,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
               imgGenEnabled: true,
               usage,
               systemPrompt,
+              convo: d.convo,
               temperature,
               imgGenFields: {
                 duration,
@@ -805,15 +806,15 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
                 partialImages: remapPartials,
                 images: [imgFinal],
                 activeImage: imgFinal
-            },
-            topP,
-            chunk: openaiAgg,
-            thinkingText: undefined,
-            thinkingDuration: undefined,
-            messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
-            done: true
-          } satisfies EventTypeMap["ai_chat_response"])
-        );
+              },
+              topP,
+              chunk: openaiAgg,
+              thinkingText: undefined,
+              thinkingDuration: undefined,
+              messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
+              done: true
+            } satisfies EventTypeMap["ai_chat_response"])
+          );
 
           void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
             type: "ai_chat_response",

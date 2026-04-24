@@ -522,6 +522,7 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
         provider,
         model,
         title,
+        convo: d.convo,
         usage,
         aiMsgId: d.aiMsgId,
         imgGenEnabled: false,

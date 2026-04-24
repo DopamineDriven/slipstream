@@ -212,7 +212,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
         return;
       }
 
-      const durationMs = performance.now() - activeBlock.startedAt
+      const durationMs = performance.now() - activeBlock.startedAt;
 
       trackedBlocks.push({
         content: activeBlock.content,
@@ -862,6 +862,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
             usage,
             userMsgId,
             userId,
+
             systemPrompt,
             model,
             responseOutput: JSON.stringify({
@@ -885,6 +886,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               userId,
               usage,
               provider,
+              convo: d?.convo,
               model,
               userMsgId,
               aiMsgId: d.aiMsgId,

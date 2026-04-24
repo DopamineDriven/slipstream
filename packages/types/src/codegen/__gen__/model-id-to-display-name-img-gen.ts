@@ -18,6 +18,7 @@ export const modelIdToDisplayNameImgGen = {
     "gpt-4o": "GPT-4o",
     "gpt-4o-mini": "GPT-4o mini",
     o3: "o3",
+    "gpt-image-2": "GPT Image 2",
     "gpt-image-1.5": "GPT Image 1.5",
     "gpt-image-1": "GPT Image 1",
     "gpt-image-1-mini": "GPT Image 1 mini"
@@ -25,6 +26,9 @@ export const modelIdToDisplayNameImgGen = {
   gemini: {
     "deep-research-pro-preview-12-2025":
       "Deep Research Pro Preview (Dec-12-2025)",
+    "deep-research-max-preview-04-2026":
+      "Deep Research Max Preview (Apr-21-2026)",
+    "deep-research-preview-04-2026": "Deep Research Preview (Apr-21-2026)",
     "gemini-3.1-flash-image-preview": "Nano Banana 2",
     "gemini-3-pro-image-preview": "Nano Banana Pro",
     "gemini-2.5-flash-image": "Nano Banana",

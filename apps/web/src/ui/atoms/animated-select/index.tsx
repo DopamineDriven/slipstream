@@ -16,18 +16,18 @@ export interface AnimatedSelectItem<T extends string = string> {
 export function AnimatedSelect<T extends string = string>({
   items,
   value,
-  onValueChange,
+  onValueChangeAction,
   placeholder = "...",
-  renderItem,
+  renderItemAction,
   triggerClassName,
   contentClassName,
   ariaLabel
 }: {
   items: readonly AnimatedSelectItem<T>[];
   value: T;
-  onValueChange: (value: T) => void;
+  onValueChangeAction: (value: T) => void;
   placeholder?: ReactNode;
-  renderItem?: (item: AnimatedSelectItem<T>, isSelected: boolean) => ReactNode;
+  renderItemAction?: (item: AnimatedSelectItem<T>, isSelected: boolean) => ReactNode;
   triggerClassName?: string;
   contentClassName?: string;
   ariaLabel?: string;
@@ -37,7 +37,7 @@ export function AnimatedSelect<T extends string = string>({
   const handleValueChange = (nextValue: string) => {
     const nextItem = items.find(item => item.value === nextValue);
     if (nextItem) {
-      onValueChange(nextItem.value);
+      onValueChangeAction(nextItem.value);
     }
   };
 
@@ -61,11 +61,11 @@ export function AnimatedSelect<T extends string = string>({
           style={{ willChange: "transform" }}>
           <Select.Value placeholder={placeholder}>
             {current
-              ? renderItem
+              ? renderItemAction
                 ? (
                     <>
                       <span className="sr-only">{current.label}</span>
-                      {renderItem(current, true)}
+                      {renderItemAction(current, true)}
                     </>
                   )
                 : current.label
@@ -81,7 +81,7 @@ export function AnimatedSelect<T extends string = string>({
         <Select.Content position="popper" sideOffset={4} asChild>
           <motion.div
             className={cn(
-              "z-[80] max-h-72 min-w-(--radix-select-trigger-width) overflow-hidden rounded-[0.3125rem] border-[1px_solid_#1d2628] bg-[hsl(190,21%,5%)] text-[hsl(0,0%,96%)] shadow-xl",
+              "z-80 max-h-72 min-w-(--radix-select-trigger-width) overflow-hidden rounded-[0.3125rem] border-[1px_solid_#1d2628] bg-[hsl(190,21%,5%)] text-[hsl(0,0%,96%)] shadow-xl",
               contentClassName
             )}
             initial={{ opacity: 0, scale: 0.5 }}
@@ -95,7 +95,7 @@ export function AnimatedSelect<T extends string = string>({
               }
             }}
             style={{ willChange: "transform, opacity" }}>
-            <Select.Viewport className="max-h-72 p-1.25">
+            <Select.Viewport className="max-h-72 overflow-y-auto overscroll-contain p-1.25">
               {items.map(item => {
                 const isSelected = value === item.value;
                 return (
@@ -119,13 +119,13 @@ export function AnimatedSelect<T extends string = string>({
                       style={{
                         willChange: "background-color"
                       }}>
-                      {renderItem ? (
+                      {renderItemAction ? (
                         <Select.ItemText>
                           <span className="sr-only">{item.label}</span>
                         </Select.ItemText>
                       ) : null}
-                      {renderItem ? (
-                        renderItem(item, isSelected)
+                      {renderItemAction ? (
+                        renderItemAction(item, isSelected)
                       ) : (
                         <Select.ItemText>{item.label}</Select.ItemText>
                       )}

@@ -35,12 +35,15 @@ const providerModelImagesApi = {
     "gpt-4o",
     "gpt-4o-mini",
     "o3",
+    "gpt-image-2",
     "gpt-image-1.5",
     "gpt-image-1",
     "gpt-image-1-mini"
   ],
   gemini: [
     "deep-research-pro-preview-12-2025",
+    "deep-research-max-preview-04-2026",
+    "deep-research-preview-04-2026",
     "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
@@ -90,6 +93,7 @@ const providerModelChatApi = {
     "gpt-4.1-nano",
     "gpt-4o",
     "gpt-4o-mini",
+    "gpt-image-2",
     "gpt-image-1.5",
     "gpt-image-1",
     "gpt-image-1-mini",
@@ -120,6 +124,8 @@ const providerModelChatApi = {
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
     "deep-research-pro-preview-12-2025",
+    "deep-research-max-preview-04-2026",
+    "deep-research-preview-04-2026",
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite",
     "imagen-4.0-generate-001",
@@ -156,8 +162,7 @@ const providerModelChatApi = {
     "claude-haiku-4-5-20251001",
     "claude-opus-4-1-20250805",
     "claude-sonnet-4-20250514",
-    "claude-opus-4-20250514",
-    "claude-3-haiku-20240307"
+    "claude-opus-4-20250514"
   ],
   meta: [
     "Llama-4-Maverick-17B-128E-Instruct-FP8",
@@ -175,7 +180,7 @@ const providerModelChatApi = {
     "mistral-large-latest"
   ],
   cohere: ["command-a-reasoning-08-2025", "command-a-03-2025"],
-  moonshotai: ["kimi-k2.5", "kimi-k2-thinking"],
+  moonshotai: ["kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
   deepseek: ["deepseek-r1"],
   zai: ["glm-5", "glm-4.7", "glm-4.6", "glm-4.5"]
 } as const;
@@ -264,7 +269,8 @@ const ZAI_NAME_OVERRIDES = {
 
 const KIMI_NAME_OVERRIDES = {
   "kimi-k2-thinking": "Kimi K2 Thinking",
-  "kimi-k2.5": "Kimi K2.5"
+  "kimi-k2.5": "Kimi K2.5",
+  "kimi-k2.6": "Kimi K2.6"
 } as const;
 
 const DEEPSEEK_NAME_OVERRIDES = {
@@ -272,7 +278,7 @@ const DEEPSEEK_NAME_OVERRIDES = {
 };
 
 function filterForKimi(id: string) {
-  return id === "kimi-k2-thinking" || id === "kimi-k2.5";
+  return id === "kimi-k2-thinking" || id === "kimi-k2.5" || id === "kimi-k2.6";
 }
 
 function filterForDeepseek(id: string) {
@@ -538,6 +544,7 @@ function formattedOpenAi(props: OpenAiResponse) {
     if (id === "gpt-5.1-codex-max")
       return { id, displayName: "GPT-5.1-Codex-Max" };
     if (id === "gpt-image-1.5") return { id, displayName: "GPT Image 1.5" };
+    if (id === "gpt-image-2") return { id, displayName: "GPT Image 2" };
     const displayName = prettyModelName(id);
     return { id, displayName, ...rest };
   });

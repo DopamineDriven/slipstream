@@ -758,6 +758,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
           userMsgId,
           imgGenEnabled: false,
           aiMsgId: d.aiMsgId,
+          convo: d.convo,
           systemPrompt,
           usage,
           thinkingDuration:

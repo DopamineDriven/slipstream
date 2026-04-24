@@ -65,6 +65,7 @@ export class ModelService extends ProviderValidation {
       m === "gpt-image-1" ||
       m === "gpt-image-1-mini" ||
       m === "gpt-image-1.5" ||
+      m === "gpt-image-2" ||
       m === "sora-2" ||
       m === "sora-2-pro" ||
       m === "gpt-5.3-codex" ||
@@ -92,6 +93,8 @@ export class ModelService extends ProviderValidation {
       m === "gemini-2.5-flash-lite" ||
       m === "gemini-2.5-flash" ||
       m === "deep-research-pro-preview-12-2025" ||
+      m === "deep-research-max-preview-04-2026" ||
+      m === "deep-research-preview-04-2026" ||
       m === "gemini-3-pro-image-preview" ||
       m === "gemini-3.1-flash-image-preview" ||
       m === "gemini-2.5-flash-image" ||

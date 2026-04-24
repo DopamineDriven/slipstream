@@ -1170,6 +1170,7 @@ export class MistralService {
         provider,
         userMsgId,
         aiMsgId: d.aiMsgId,
+        convo: d.convo,
         imgGenEnabled: false,
         systemPrompt,
         thinkingDuration:

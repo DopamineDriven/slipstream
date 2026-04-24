@@ -20,8 +20,8 @@ import { useAssets } from "@/hooks/use-assets";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
-import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
 import { ChatInputImageGenSettingsDrawer } from "@/ui/chat/chat-input/image-gen-controls";
+import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
 import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
 import { motion } from "motion/react";
 import type { AIChatRequestImgGenFields } from "@slipstream/types";
@@ -157,6 +157,7 @@ export function ChatInput({
 
   useEffect(() => {
     if (!imgGen.supported || !imgGen.enabled) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsImageSettingsOpen(false);
     }
   }, [imgGen.enabled, imgGen.supported]);
@@ -234,6 +235,7 @@ export function ChatInput({
       }
     }
     if (!prompt) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMessage(prompt);
     if (autoSubmitInitialPrompt) {
       if (isHome) router.replace("/chat/new-chat", { scroll: false });
@@ -759,7 +761,7 @@ export function ChatInput({
       />
       <ChatInputImageGenSettingsDrawer
         open={isImageSettingsOpen}
-        onOpenChange={setIsImageSettingsOpen}
+        onOpenChangeAction={setIsImageSettingsOpen}
         isMobile={isMobile}
       />
       <MobileModelSelectorDrawer />

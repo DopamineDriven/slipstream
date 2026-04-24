@@ -134,13 +134,6 @@ export class AnthropicBaseService {
           "code-execution-2025-08-25"
         ] satisfies Anthropic.Beta.AnthropicBeta[];
       }
-      case "claude-3-haiku-20240307":
-      default: {
-        return [
-          "files-api-2025-04-14",
-          "extended-cache-ttl-2025-04-11"
-        ] satisfies Anthropic.Beta.AnthropicBeta[];
-      }
     }
   }
 
@@ -148,7 +141,6 @@ export class AnthropicBaseService {
     "claude-opus-4-7": 128000,
     "claude-sonnet-4-6": 64000,
     "claude-opus-4-6": 128000,
-    "claude-3-haiku-20240307": 4096,
     "claude-opus-4-20250514": 32000,
     "claude-opus-4-1-20250805": 32000,
     "claude-opus-4-5-20251101": 64000,
@@ -161,7 +153,6 @@ export class AnthropicBaseService {
     "claude-opus-4-7": 1000000,
     "claude-sonnet-4-6": 1000000,
     "claude-opus-4-6": 1000000,
-    "claude-3-haiku-20240307": 200000,
     "claude-opus-4-20250514": 200000,
     "claude-opus-4-1-20250805": 200000,
     "claude-opus-4-5-20251101": 200000,
@@ -225,7 +216,6 @@ export class AnthropicBaseService {
           } as const satisfies Anthropic.Beta.BetaThinkingConfigDisabled;
         }
       }
-      case "claude-3-haiku-20240307":
       default: {
         return {
           type: "disabled"

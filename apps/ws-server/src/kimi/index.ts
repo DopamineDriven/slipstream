@@ -56,7 +56,7 @@ export class KimiService {
   }
 
   private async *stream(
-    model = "kimi-k2.5" satisfies KimiModelIdUnion,
+    model = "kimi-k2.6" satisfies KimiModelIdUnion,
     messages: readonly KimiRequestMessage[],
     apiKey?: string,
     options?: {
@@ -1032,7 +1032,7 @@ export class KimiService {
         type: "ai_chat_response",
         conversationId,
         userId,
-        provider,
+        provider, convo: d.convo,
         userMsgId,
         aiMsgId: d.aiMsgId,
         imgGenEnabled: false,
