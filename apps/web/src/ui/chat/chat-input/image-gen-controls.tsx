@@ -26,10 +26,10 @@ function ImageGenSettingsForm() {
           ariaLabel="Select image aspect ratio"
           items={imgGen.aspectRatios}
           value={imgGen.settings.aspectRatio}
-          onValueChange={value => imgGen.updateSettings({ aspectRatio: value })}
+          onValueChangeAction={value => imgGen.updateSettings({ aspectRatio: value })}
           triggerClassName="w-full"
           contentClassName="w-full"
-          renderItem={(item, isSelected) => (
+          renderItemAction={(item, isSelected) => (
             <div className="flex items-center gap-3">
               <AspectRatioShape
                 ratio={item}
@@ -57,7 +57,7 @@ function ImageGenSettingsForm() {
           ariaLabel="Select image quality"
           items={imgGen.qualities}
           value={imgGen.settings.quality}
-          onValueChange={value => imgGen.updateSettings({ quality: value })}
+          onValueChangeAction={value => imgGen.updateSettings({ quality: value })}
           triggerClassName="w-full"
           contentClassName="w-full"
         />
@@ -68,17 +68,17 @@ function ImageGenSettingsForm() {
 
 export function ChatInputImageGenSettingsDrawer({
   open,
-  onOpenChange,
+  onOpenChangeAction,
   isMobile
 }: {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChangeAction: (open: boolean) => void;
   isMobile: boolean;
 }) {
   return (
     <Drawer
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={onOpenChangeAction}
       direction={isMobile ? "bottom" : "right"}>
       <DrawerContent className="data-[vaul-drawer-direction=bottom]:max-h-[80vh] data-[vaul-drawer-direction=bottom]:rounded-t-[1.75rem] data-[vaul-drawer-direction=bottom]:px-4 data-[vaul-drawer-direction=bottom]:pb-6 data-[vaul-drawer-direction=right]:w-full data-[vaul-drawer-direction=right]:max-w-md data-[vaul-drawer-direction=right]:px-4 data-[vaul-drawer-direction=right]:pb-6">
         <DrawerHeader className="px-1 pt-5 text-left">

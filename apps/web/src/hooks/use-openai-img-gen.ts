@@ -17,13 +17,13 @@ export interface OpenAIImageSettings {
 }
 
 export interface OpenAIAspectRatioOption {
-  value: OpenAIImageGenOpts["size"];
+  value: Exclude<OpenAIImageGenOpts["size"], undefined>;
   label: string;
   pixelSize?: string;
 }
 
 export interface OpenAIQualityOption {
-  value: OpenAIImageGenOpts["quality"];
+  value: Exclude<OpenAIImageGenOpts["quality"], undefined>;
   label: string;
 }
 
@@ -40,7 +40,6 @@ export const OPENAI_ASPECT_RATIOS = [
   { value: "1024x1536", label: "2:3", pixelSize: "1024×1536" },
   { value: "1536x1024", label: "3:2", pixelSize: "1536×1024" }
 ] satisfies OpenAIAspectRatioOption[];
-
 
 export const OPENAI_GPT_IMAGE_2_ASPECT_RATIOS = [
   { value: "auto", label: "Auto" },
@@ -189,13 +188,31 @@ function getStorageKey(modelId: string) {
   return `${STORAGE_KEY_PREFIX}:${modelId}`;
 }
 
+function getOpenAIAspectRatioOptions(modelId: string) {
+  if (!imgCtx.openAIImgGenCapable(modelId)) {
+    return Array.of<OpenAIAspectRatioOption>();
+  }
+  if (imgCtx.baseOpenAIGptImgModel(modelId)) {
+    return OPENAI_ASPECT_RATIOS;
+  }
+  return OPENAI_GPT_IMAGE_2_ASPECT_RATIOS;
+}
+
 export function useOpenAIImageSettings(modelId: string) {
+  const isCapable = useMemo(
+    () => imgCtx.openAIImgGenCapable(modelId),
+    [modelId]
+  );
+  const aspectRatioOptions = useMemo(
+    () => getOpenAIAspectRatioOptions(modelId),
+    [modelId]
+  );
   const [settings, setSettings] = useState<OpenAIImageSettings>(
     OPENAI_DEFAULT_SETTINGS
   );
 
   useEffect(() => {
-    if (!imgCtx.openAIImgGenCapable(modelId)) return;
+    if (!isCapable) return;
 
     try {
       const stored = localStorage.getItem(getStorageKey(modelId));
@@ -208,9 +225,11 @@ export function useOpenAIImageSettings(modelId: string) {
         }>(stored);
 
         const aspectRatio =
-          parsed.aspectRatio && imgCtx.isValidOpenAISize(parsed.aspectRatio)
-            ? parsed.aspectRatio
-            : OPENAI_DEFAULT_SETTINGS.aspectRatio;
+          (parsed.aspectRatio
+            ? aspectRatioOptions.find(
+                option => option.value === parsed.aspectRatio
+              )?.value
+            : undefined) ?? OPENAI_DEFAULT_SETTINGS.aspectRatio;
         const quality =
           parsed.quality && imgCtx.isValidOpenAIQuality(parsed.quality)
             ? parsed.quality
@@ -239,24 +258,23 @@ export function useOpenAIImageSettings(modelId: string) {
     } catch {
       setSettings(OPENAI_DEFAULT_SETTINGS);
     }
-  }, [modelId]);
+  }, [aspectRatioOptions, isCapable, modelId]);
 
   useEffect(() => {
-    if (!imgCtx.openAIImgGenCapable(modelId)) return;
+    if (!isCapable) return;
 
     try {
       localStorage.setItem(getStorageKey(modelId), JSON.stringify(settings));
     } catch {
       /* */
     }
-  }, [modelId, settings]);
+  }, [isCapable, modelId, settings]);
 
   const updateSettings = useCallback((updates: OpenAIImageSettingsUpdates) => {
     setSettings(prev => {
       const aspectRatio =
-        typeof updates.aspectRatio === "string" &&
-        imgCtx.isValidOpenAISize(updates.aspectRatio)
-          ? OPENAI_ASPECT_RATIOS.find(
+        typeof updates.aspectRatio === "string"
+          ? aspectRatioOptions.find(
               option => option.value === updates.aspectRatio
             )?.value
           : undefined;
@@ -296,23 +314,18 @@ export function useOpenAIImageSettings(modelId: string) {
         background
       };
     });
-  }, []);
+  }, [aspectRatioOptions]);
 
   const resetSettings = useCallback(() => {
     setSettings(OPENAI_DEFAULT_SETTINGS);
   }, []);
-
-  const isCapable = useMemo(
-    () => imgCtx.openAIImgGenCapable(modelId),
-    [modelId]
-  );
 
   return {
     settings,
     updateSettings,
     resetSettings,
     isCapable,
-    aspectRatios: OPENAI_ASPECT_RATIOS,
+    aspectRatios: aspectRatioOptions,
     qualities: OPENAI_QUALITIES,
     outputFormats: OPENAI_OUTPUT_FORMATS,
     backgrounds: OPENAI_BACKGROUNDS,
