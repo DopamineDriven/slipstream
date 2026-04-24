@@ -47,6 +47,7 @@ export type {
   AIChatResponseImgGenSubFields,
   BaseImagenOutpiutAR,
   BaseNanoBananaOutputAR,
+  BaseOpenAISize,
   GeminiImageQuality,
   GeminiImageSize,
   GeminiModelAspectRatio,
@@ -59,6 +60,7 @@ export type {
   GoogleImgSizeQualityOpts,
   GooglePersonGeneration,
   GoogleSafetyFilterLevel,
+  GPTImage2Size,
   GptImageAndFacilitatorsImgGenWorkupRT,
   GptImage1Opts,
   GptImageOutputSize,
@@ -93,6 +95,8 @@ export type {
   S3StorageClass,
   SharedOpenAIImageOpts
 } from "@/events-images.ts";
+
+export { GPT_IMAGE_2_EXTENDED_OPTIONS } from "@/events-images.ts";
 
 export type {
   AIChatEventTypeUnion,

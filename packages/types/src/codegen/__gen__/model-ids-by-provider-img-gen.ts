@@ -18,12 +18,15 @@ export const modelIdsByProviderImgGen = {
     "gpt-4o",
     "gpt-4o-mini",
     "o3",
+    "gpt-image-2",
     "gpt-image-1.5",
     "gpt-image-1",
     "gpt-image-1-mini"
   ],
   gemini: [
     "deep-research-pro-preview-12-2025",
+    "deep-research-max-preview-04-2026",
+    "deep-research-preview-04-2026",
     "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",

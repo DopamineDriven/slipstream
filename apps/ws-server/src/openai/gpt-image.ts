@@ -218,7 +218,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
             n: 1,
             partial_images,
             quality: r.output_quality ?? "high",
-            size: r.output_size ?? "auto",
+            size: (r.output_size ?? "auto") as "auto",
             stream: true
           } satisfies OpenAI.Images.ImageEditParamsStreaming,
           { stream: true }
@@ -239,7 +239,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
             n: 1,
             partial_images,
             quality: r.output_quality ?? "high",
-            size: r.output_size ?? "auto",
+            size: (r.output_size ?? "auto") as "auto",
             stream: true
           },
           { stream: true }

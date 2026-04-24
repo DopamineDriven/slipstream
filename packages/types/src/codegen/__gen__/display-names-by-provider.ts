@@ -25,6 +25,7 @@ export const displayNameModelsByProvider = {
     "GPT-4.1 nano",
     "GPT-4o",
     "GPT-4o mini",
+    "GPT Image 2",
     "GPT Image 1.5",
     "GPT Image 1",
     "GPT Image 1 mini",
@@ -55,6 +56,8 @@ export const displayNameModelsByProvider = {
     "Gemini 2.5 Flash",
     "Gemini 2.5 Flash-Lite",
     "Deep Research Pro Preview (Dec-12-2025)",
+    "Deep Research Max Preview (Apr-21-2026)",
+    "Deep Research Preview (Apr-21-2026)",
     "Gemini 2.0 Flash",
     "Gemini 2.0 Flash-Lite",
     "Imagen 4",
@@ -87,8 +90,7 @@ export const displayNameModelsByProvider = {
     "Claude Haiku 4.5",
     "Claude Opus 4.1",
     "Claude Sonnet 4",
-    "Claude Opus 4",
-    "Claude Haiku 3"
+    "Claude Opus 4"
   ],
   meta: [
     "Llama 4 Maverick (17B/128E, Instruct, FP8)",
@@ -102,7 +104,7 @@ export const displayNameModelsByProvider = {
   vercel: ["v0 medium", "v0 medium (legacy)"],
   mistral: ["Mistral Small 4", "Mistral Medium Latest", "Mistral Large Latest"],
   cohere: ["Command A Reasoning", "Command A"],
-  moonshotai: ["Kimi K2.5", "Kimi K2 Thinking"],
+  moonshotai: ["Kimi K2.6", "Kimi K2.5", "Kimi K2 Thinking"],
   deepseek: ["DeepSeek R1"],
   zai: ["GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"]
 } as const;

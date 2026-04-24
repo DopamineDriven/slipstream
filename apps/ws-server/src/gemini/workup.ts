@@ -8,7 +8,6 @@ import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
   Content,
-  ContentListUnion,
   ContentUnion,
   FunctionDeclaration,
   GenerateContentConfig,
@@ -137,7 +136,8 @@ export class GeminiWorkupService extends FileSearchStoreService {
       m =>
         m.provider === "GEMINI" &&
         m.senderType === "AI" &&
-        m.model === "deep-research-pro-preview-12-2025" &&
+        m.model &&
+        this.prisma.geminiDeepResearchModel(m.model) &&
         m.responseOutput &&
         m.responseOutput.length > 0
     );
@@ -159,7 +159,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }
 
   protected isDeepResearch(m: string) {
-    return m === "deep-research-pro-preview-12-2025";
+    return this.prisma.geminiDeepResearchModel(m);
   }
 
   protected isGemini2dot5Model(m: string) {

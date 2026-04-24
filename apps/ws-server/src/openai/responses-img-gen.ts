@@ -243,13 +243,13 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
         type: "image_generation",
         background: r.output_background,
         input_fidelity: imgCounts > 0 ? "high" : r.input_fidelity,
-        model: "gpt-image-1.5",
+        model: "gpt-image-2",
         moderation: "low",
         output_compression: r.output_compression,
         output_format: r.output_format,
         partial_images: r.partialImagesRequested ?? 3,
         quality: "high",
-        size: r.output_size
+        size: (r.output_size ??"auto") as "auto"
       } satisfies OpenAI.Responses.Tool.ImageGeneration
     );
 

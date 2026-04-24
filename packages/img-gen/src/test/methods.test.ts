@@ -69,6 +69,18 @@ describe("handleOutputSize", () => {
       );
     }
   );
+  it(
+    "should return 2016x3584 for openai with gpt-image-2 selected and output_size set to 2016x3584",
+    {},
+    () => {
+      assert.equal(
+        p.handleOutputSize("gpt-image-2", {
+          output_size: "2016x3584"
+        }),
+        "2016x3584"
+      );
+    }
+  );
 });
 
 describe("handleImgGenOutputQuality", () => {

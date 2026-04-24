@@ -29,7 +29,11 @@ import type {
   ImageGenProviders,
   Provider
 } from "@/models.ts";
-import type { ConversationSingleton, DocumentSingleton, ImageSingleton } from "@/types.ts";
+import type {
+  ConversationSingleton,
+  DocumentSingleton,
+  ImageSingleton
+} from "@/types.ts";
 import type { CTR, DX, Rm } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 

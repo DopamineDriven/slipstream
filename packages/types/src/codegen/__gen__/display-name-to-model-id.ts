@@ -25,6 +25,7 @@ export const displayNameToModelId = {
     "GPT-4.1 nano": "gpt-4.1-nano",
     "GPT-4o": "gpt-4o",
     "GPT-4o mini": "gpt-4o-mini",
+    "GPT Image 2": "gpt-image-2",
     "GPT Image 1.5": "gpt-image-1.5",
     "GPT Image 1": "gpt-image-1",
     "GPT Image 1 mini": "gpt-image-1-mini",
@@ -56,6 +57,9 @@ export const displayNameToModelId = {
     "Gemini 2.5 Flash-Lite": "gemini-2.5-flash-lite",
     "Deep Research Pro Preview (Dec-12-2025)":
       "deep-research-pro-preview-12-2025",
+    "Deep Research Max Preview (Apr-21-2026)":
+      "deep-research-max-preview-04-2026",
+    "Deep Research Preview (Apr-21-2026)": "deep-research-preview-04-2026",
     "Gemini 2.0 Flash": "gemini-2.0-flash",
     "Gemini 2.0 Flash-Lite": "gemini-2.0-flash-lite",
     "Imagen 4": "imagen-4.0-generate-001",
@@ -88,8 +92,7 @@ export const displayNameToModelId = {
     "Claude Haiku 4.5": "claude-haiku-4-5-20251001",
     "Claude Opus 4.1": "claude-opus-4-1-20250805",
     "Claude Sonnet 4": "claude-sonnet-4-20250514",
-    "Claude Opus 4": "claude-opus-4-20250514",
-    "Claude Haiku 3": "claude-3-haiku-20240307"
+    "Claude Opus 4": "claude-opus-4-20250514"
   },
   meta: {
     "Llama 4 Maverick (17B/128E, Instruct, FP8)":
@@ -119,6 +122,7 @@ export const displayNameToModelId = {
     "Command A": "command-a-03-2025"
   },
   moonshotai: {
+    "Kimi K2.6": "kimi-k2.6",
     "Kimi K2.5": "kimi-k2.5",
     "Kimi K2 Thinking": "kimi-k2-thinking"
   },

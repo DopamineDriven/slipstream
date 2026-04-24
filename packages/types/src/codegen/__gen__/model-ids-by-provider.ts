@@ -25,6 +25,7 @@ export const modelIdsByProvider = {
     "gpt-4.1-nano",
     "gpt-4o",
     "gpt-4o-mini",
+    "gpt-image-2",
     "gpt-image-1.5",
     "gpt-image-1",
     "gpt-image-1-mini",
@@ -55,6 +56,8 @@ export const modelIdsByProvider = {
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
     "deep-research-pro-preview-12-2025",
+    "deep-research-max-preview-04-2026",
+    "deep-research-preview-04-2026",
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite",
     "imagen-4.0-generate-001",
@@ -87,8 +90,7 @@ export const modelIdsByProvider = {
     "claude-haiku-4-5-20251001",
     "claude-opus-4-1-20250805",
     "claude-sonnet-4-20250514",
-    "claude-opus-4-20250514",
-    "claude-3-haiku-20240307"
+    "claude-opus-4-20250514"
   ],
   meta: [
     "Llama-4-Maverick-17B-128E-Instruct-FP8",
@@ -106,7 +108,7 @@ export const modelIdsByProvider = {
     "mistral-large-latest"
   ],
   cohere: ["command-a-reasoning-08-2025", "command-a-03-2025"],
-  moonshotai: ["kimi-k2.5", "kimi-k2-thinking"],
+  moonshotai: ["kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
   deepseek: ["deepseek-r1"],
   zai: ["glm-5", "glm-4.7", "glm-4.6", "glm-4.5"]
 } as const;
