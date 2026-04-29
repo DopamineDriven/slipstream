@@ -56,7 +56,7 @@ export class ZaiService {
   }
 
   private async *stream(
-    model = "glm-5" satisfies ZaiModelIdUnion,
+    model = "glm-5.1" satisfies ZaiModelIdUnion,
     messages: readonly ZaiRequestMessage[],
     apiKey?: string,
     options?: {

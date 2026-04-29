@@ -63,15 +63,16 @@ export class MistralService {
     return this.defaultClient;
   }
 
-  private isMistralModel(model = "mistral-small-latest") {
+  private isMistralModel(model = "mistral-medium-3.5") {
     return (
       model === "mistral-small-latest" ||
-      model === "mistral-medium-latest" ||
+      model === "mistral-medium-3" ||
+      model === "mistral-medium-3.5" ||
       model === "mistral-large-latest"
     );
   }
 
-  private resolveModel(model = "mistral-small-latest") {
+  private resolveModel(model = "mistral-medium-3.5") {
     if (this.isMistralModel(model)) {
       return model;
     }
@@ -81,6 +82,8 @@ export class MistralService {
 
   private handleReasoning(m: MistralModelIdUnion) {
     if (m === "mistral-small-latest") return "high";
+    if (m === "mistral-medium-3") return "high";
+    if (m === "mistral-medium-3.5") return "high";
     else return;
   }
 

@@ -45,6 +45,33 @@ import {
   X
 } from "@slipstream/ui";
 
+const getPlaceholder = (provider: Provider) => {
+  switch (provider) {
+    case "anthropic":
+      return "sk-ant-*******************************************";
+    case "grok":
+      return "xai-*******************************************";
+    case "meta":
+      return "LLM|******************|*******************";
+    case "vercel":
+      return "vck_********************************";
+    case "gemini":
+      return "AIza********************";
+    case "mistral":
+      return `SwM*****************************`;
+    case "cohere":
+      return "QlQ*************************************";
+    case "deepseek":
+      return "vck_********************************";
+    case "moonshotai":
+      return "vck_********************************";
+    case "zai":
+      return "vck_********************************";
+    case "openai":
+    default:
+      return "sk-************************************************";
+  }
+};
 const toProviderContext = (providerObj: ApiKeyData[]) => {
   const r = {
     isDefault: {
@@ -207,6 +234,7 @@ export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
           arr.push(p);
         }
       }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setApiKeys(arr);
     }
   }, [
@@ -497,34 +525,6 @@ export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
     [editingKey, visibleKeys]
   );
 
-  const getPlaceholder = (provider: Provider) => {
-    switch (provider) {
-      case "anthropic":
-        return "sk-ant-*******************************************";
-      case "grok":
-        return "xai-*******************************************";
-      case "meta":
-        return "LLM|******************|*******************";
-      case "vercel":
-        return "vck_********************************";
-      case "gemini":
-        return "AIza********************";
-      case "mistral":
-        return `SwM*****************************`;
-      case "cohere":
-        return "QlQ*************************************";
-      case "deepseek":
-        return "vck_********************************";
-      case "moonshotai":
-        return "vck_********************************";
-      case "zai":
-        return "vck_********************************";
-      case "openai":
-      default:
-        return "sk-************************************************";
-    }
-  };
-
   const getCurrentDefault = useCallback(
     (provider: Provider) => {
       if (editingKey === provider) {
@@ -586,6 +586,7 @@ export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
                 <AnimatePresence mode="popLayout">
                   {apiKeys
                     .filter(key => key.isSet)
+                    // eslint-disable-next-line
                     .map(keyData => (
                       <motion.div
                         key={keyData.provider}
@@ -835,6 +836,7 @@ export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
                 <AnimatePresence mode="popLayout">
                   {apiKeys
                     .filter(key => !key.isSet)
+                    // eslint-disable-next-line
                     .map(keyData => (
                       <motion.div
                         key={keyData.provider}

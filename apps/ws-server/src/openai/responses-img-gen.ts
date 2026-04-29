@@ -55,7 +55,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     max_tokens,
     jobId,
     requestMessageId,
-    model = "gpt-5.4" satisfies OpenAiModelIdUnion,
+    model = "gpt-5.5" satisfies OpenAiModelIdUnion,
     systemPrompt,
     temperature,
     title,

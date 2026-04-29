@@ -75,7 +75,7 @@ export class DeepSeekService {
   }
 
   private async *stream(
-    model = "deepseek-r1" satisfies DeepSeekModelIdUnion,
+    model = "deepseek-v4-pro" satisfies DeepSeekModelIdUnion,
     messages: readonly DeepSeekRequestMessage[],
     apiKey?: string,
     options?: {

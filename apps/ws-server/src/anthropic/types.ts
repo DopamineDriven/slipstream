@@ -2,7 +2,10 @@ import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import Anthropic from "@anthropic-ai/sdk";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import type { searchUserStoreChunksByStore } from "@slipstream/db/sql-node";
-import type { MessageSingleton, UnionToRecord } from "@slipstream/types";
+import type {
+  DiscriminatedUnionToRecord,
+  MessageSingleton
+} from "@slipstream/types";
 
 export interface AnthropicFileRecord {
   id: string;
@@ -88,11 +91,14 @@ export interface BlockBuilder {
   tool_use_id?: string;
   codeExecutionContent?: Anthropic.Beta.BetaCodeExecutionToolResultBlockParam["content"];
 }
-export type CodeExecutionContentRT = UnionToRecord<
-  Anthropic.Beta.BetaCodeExecutionToolResultBlockParam["content"]
+export type CodeExecutionContentRT = DiscriminatedUnionToRecord<
+  Anthropic.Beta.BetaCodeExecutionToolResultBlockParam["content"],
+  "type"
 >;
-export type ContentBlockParamObj =
-  UnionToRecord<Anthropic.Beta.BetaContentBlockParam>;
+export type ContentBlockParamObj = DiscriminatedUnionToRecord<
+  Anthropic.Beta.BetaContentBlockParam,
+  "type"
+>;
 
 export interface RoundRecord {
   round: number;
@@ -101,21 +107,12 @@ export interface RoundRecord {
   assistantBlocks: Anthropic.Beta.BetaContentBlockParam[];
   toolResults: Anthropic.Beta.BetaToolResultBlockParam[];
 }
-export type BetaRawMessageStreamRecord =
-  UnionToRecord<Anthropic.Beta.Messages.BetaRawMessageStreamEvent>;
-export type UnionToRecords<
-  TUnion extends Record<TKey, string>,
-  TKey extends string = "kind",
-  TDiscriminant extends string = TUnion[TKey]
-> = {
-  [K in TDiscriminant]: Extract<TUnion, Record<TKey, K>>;
-};
+export type BetaRawMessageStreamRecord = DiscriminatedUnionToRecord<
+  Anthropic.Beta.Messages.BetaRawMessageStreamEvent,
+  "type"
+>;
 
-/** Record keyed by `type` for BetaContentBlockParam (request/continuation param blocks) */
-export type ContentBlockObj =
-  UnionToRecord<Anthropic.Beta.BetaContentBlockParam>;
-
-export type TestingContentBlockObj = UnionToRecords<
+export type ContentBlockObj = DiscriminatedUnionToRecord<
   Anthropic.Beta.BetaContentBlockParam,
   "type"
 >;

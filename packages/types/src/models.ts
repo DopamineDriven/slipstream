@@ -51,6 +51,7 @@ export const allImgSupportingProviderModels = {
 
 export const providerModelImageGenFacilitatingApi = {
   openai: [
+    "gpt-5.5",
     "gpt-5.4",
     "gpt-5.4-mini",
     "gpt-5.4-nano",
@@ -60,6 +61,7 @@ export const providerModelImageGenFacilitatingApi = {
     "gpt-5-mini",
     "gpt-5-nano",
     "gpt-5-chat-latest",
+    "gpt-5.5-pro",
     "gpt-5.4-pro",
     "gpt-5.2-pro",
     "gpt-5-pro",

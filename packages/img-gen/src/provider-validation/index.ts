@@ -128,6 +128,8 @@ export class ProviderValidation {
 
   public openAIFacilitatingImgGenModel(model: string) {
     return (
+      model === "gpt-5.5" ||
+      model === "gpt-5.5-pro" ||
       model === "gpt-5.4" ||
       model === "gpt-5.4-mini" ||
       model === "gpt-5.4-nano" ||
@@ -186,7 +188,7 @@ export class ProviderValidation {
   }
 
   public isImgGenCapableModel<const V extends string = string>(
-    model = "gpt-5.4" as V
+    model = "gpt-5.5" as V
   ) {
     if (
       this.grokImgGenCapable(model) ||
@@ -202,7 +204,7 @@ export class ProviderValidation {
     model: Exclude<AllModelsUnion, AllPureImgGenModelsUnion>
   ): false;
   public isPureImgGenModel<const V extends AllModelsUnion = AllModelsUnion>(
-    model = "gpt-5.4" as V
+    model = "gpt-5.5" as V
   ) {
     if (
       !(
@@ -255,7 +257,7 @@ export class ProviderValidation {
     data?: { n?: number }
   ): undefined;
   public handleImgGenCount(
-    model: AllModelsUnion = "gpt-5.4",
+    model: AllModelsUnion = "gpt-5.5",
     data?: { n?: number }
   ) {
     if (this.grokImgGenCapable(model)) {
@@ -554,7 +556,7 @@ export class ProviderValidation {
   }
 
   public handleImgGenOutputQuality(
-    model: AllModelsUnion = "gpt-5.4",
+    model: AllModelsUnion = "gpt-5.5",
     data?: { output_quality: ModelToQualityOpts<typeof model> }
   ) {
     const q = data?.output_quality;
@@ -603,7 +605,7 @@ export class ProviderValidation {
         return "grok-imagine-image" satisfies AllModelsUnion;
       }
       case "openai": {
-        return "gpt-5.4" satisfies AllModelsUnion;
+        return "gpt-5.5" satisfies AllModelsUnion;
       }
       case "cohere":
       case "mistral":
@@ -747,7 +749,7 @@ export class ProviderValidation {
   }
 
   public handleOutputSize<const M extends AllModelsUnion = AllModelsUnion>(
-    model = "gpt-5.4" as M,
+    model = "gpt-5.5" as M,
     data?: { output_size?: ModelToAspectRatioOpts<typeof model> }
   ) {
     if (!model) return;
@@ -818,7 +820,7 @@ export class ProviderValidation {
     keyId: string | null;
   }) {
     const model =
-      data?.model ?? this.fallbackImgGenModelByProvider(provider) ?? "gpt-5.4";
+      data?.model ?? this.fallbackImgGenModelByProvider(provider) ?? "gpt-5.5";
 
     const outputCompression = this.handleImgGenCompression(model, {
         output_compression: data.imgGenFields?.output_compression,

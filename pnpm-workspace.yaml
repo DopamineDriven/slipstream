@@ -5,15 +5,15 @@ packages:
 
 catalogs:
   anthropic:
-    "@anthropic-ai/sdk": ^0.91.0
+    "@anthropic-ai/sdk": ^0.91.1
   auth:
-    better-auth: ^1.6.8
+    better-auth: ^1.6.9
   aws:
-    "@aws-sdk/client-s3": ^3.1036.0
-    "@aws-sdk/client-secrets-manager": ^3.1036.0
-    "@aws-sdk/credential-providers": ^3.1036.0
-    "@aws-sdk/lib-storage": ^3.1036.0
-    "@aws-sdk/s3-request-presigner": ^3.1036.0
+    "@aws-sdk/client-s3": ^3.1038.0
+    "@aws-sdk/client-secrets-manager": ^3.1038.0
+    "@aws-sdk/credential-providers": ^3.1038.0
+    "@aws-sdk/lib-storage": ^3.1038.0
+    "@aws-sdk/s3-request-presigner": ^3.1038.0
     "@aws-sdk/types": ^3.973.8
   babel:
     babel-plugin-react-compiler: ^1.0.0
@@ -77,7 +77,7 @@ catalogs:
   mdast:
     "@types/mdast": ^4.0.4
   mistral:
-    "@mistralai/mistralai": ^2.2.1
+    "@mistralai/mistralai": ^2.2.0
   motion:
     motion: ^12.38.0
     motion-dom: ^12.38.0
@@ -86,7 +86,7 @@ catalogs:
   nanoid:
     nanoid: ^5.1.9
   napi:
-    "@napi-rs/canvas": ^0.1.99
+    "@napi-rs/canvas": ^0.1.100
   next:
     "@next/eslint-plugin-next": ^16.2.4
     eslint-config-next: ^16.2.4
@@ -97,7 +97,7 @@ catalogs:
     node-html-parser: ^7.1.0
     nodemon: ^3.1.14
   openai:
-    openai: ^6.34.0
+    openai: ^6.35.0
   p-limit:
     p-limit: ^7.3.0
   pg:
@@ -112,7 +112,7 @@ catalogs:
   prettier:
     "@ianvs/prettier-plugin-sort-imports": ^4.7.1
     prettier: ^3.8.3
-    prettier-plugin-tailwindcss: ^0.7.2
+    prettier-plugin-tailwindcss: ^0.8.0
   prisma:
     "@prisma/adapter-pg": ^7.8.0
     "@prisma/client": ^7.8.0
@@ -167,7 +167,7 @@ catalogs:
     remark-parse: ^11.0.0
     remark-rehype: ^11.1.2
   rolldown:
-    rolldown: ^1.0.0-rc.17
+    rolldown: ^1.0.0-rc.18
     rolldown-plugin-dts: ^0.23.2
     rolldown-plugin-wasm: ^0.2.1
   safeql:
@@ -181,7 +181,7 @@ catalogs:
     "@smithy/node-http-handler": ^4.6.1
   styles:
     autoprefixer: ^10.5.0
-    postcss: ^8.5.10
+    postcss: ^8.5.12
   swr:
     swr: ^2.4.1
   tanstack:
@@ -195,9 +195,9 @@ catalogs:
   tsdown:
     tsdown: ^0.21.10
   tseslint:
-    typescript-eslint: ^8.59.0
+    typescript-eslint: ^8.59.1
   tsgo:
-    "@typescript/native-preview": ^7.0.0-dev.20260423.1
+    "@typescript/native-preview": ^7.0.0-dev.20260429.1
   tslib:
     tslib: ^2.8.1
   tsup:
@@ -227,7 +227,7 @@ catalogs:
   utils:
     "@changesets/cli": ^2.31.0
     husky: ^9.1.7
-    knip: ^6.6.2
+    knip: ^6.9.0
     wait-on: ^9.0.5
   vercel:
     "@vercel/analytics": ^2.0.1
@@ -258,4 +258,4 @@ onlyBuiltDependencies:
 patchedDependencies:
   "@google/genai": patches/@google__genai.patch
   llama-api-client@0.3.0: patches/llama-api-client@0.3.0.patch
-  openai@6.34.0: patches/openai@6.34.0.patch
+  openai@6.35.0: patches/openai@6.34.0.patch

@@ -1,5 +1,6 @@
 export const displayNameModelsByProvider = {
   openai: [
+    "GPT-5.5",
     "GPT-5.4",
     "GPT-5.4 mini",
     "GPT-5.4 nano",
@@ -16,6 +17,7 @@ export const displayNameModelsByProvider = {
     "GPT-5.1 Codex",
     "GPT-5.1 Codex mini",
     "GPT-5-Codex",
+    "GPT-5.5 pro",
     "GPT-5.4 pro",
     "GPT-5.2 pro",
     "GPT-5 pro",
@@ -102,9 +104,14 @@ export const displayNameModelsByProvider = {
     "Llama 4 Maverick (Groq, 17B/128E, Instruct)"
   ],
   vercel: ["v0 medium", "v0 medium (legacy)"],
-  mistral: ["Mistral Small 4", "Mistral Medium Latest", "Mistral Large Latest"],
+  mistral: [
+    "Mistral Small 4",
+    "Mistral Medium 3",
+    "Mistral Medium 3.5",
+    "Mistral Large Latest"
+  ],
   cohere: ["Command A Reasoning", "Command A"],
   moonshotai: ["Kimi K2.6", "Kimi K2.5", "Kimi K2 Thinking"],
-  deepseek: ["DeepSeek R1"],
-  zai: ["GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"]
+  deepseek: ["DeepSeek V4 Pro", "DeepSeek V4 Flash", "DeepSeek R1"],
+  zai: ["GLM 5.1", "GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"]
 } as const;

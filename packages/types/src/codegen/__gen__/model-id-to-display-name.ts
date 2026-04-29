@@ -1,5 +1,6 @@
 export const modelIdToDisplayName = {
   openai: {
+    "gpt-5.5": "GPT-5.5",
     "gpt-5.4": "GPT-5.4",
     "gpt-5.4-mini": "GPT-5.4 mini",
     "gpt-5.4-nano": "GPT-5.4 nano",
@@ -16,6 +17,7 @@ export const modelIdToDisplayName = {
     "gpt-5.1-codex": "GPT-5.1 Codex",
     "gpt-5.1-codex-mini": "GPT-5.1 Codex mini",
     "gpt-5-codex": "GPT-5-Codex",
+    "gpt-5.5-pro": "GPT-5.5 pro",
     "gpt-5.4-pro": "GPT-5.4 pro",
     "gpt-5.2-pro": "GPT-5.2 pro",
     "gpt-5-pro": "GPT-5 pro",
@@ -114,7 +116,8 @@ export const modelIdToDisplayName = {
   },
   mistral: {
     "mistral-small-latest": "Mistral Small 4",
-    "mistral-medium-latest": "Mistral Medium Latest",
+    "mistral-medium-3": "Mistral Medium 3",
+    "mistral-medium-3.5": "Mistral Medium 3.5",
     "mistral-large-latest": "Mistral Large Latest"
   },
   cohere: {
@@ -127,9 +130,12 @@ export const modelIdToDisplayName = {
     "kimi-k2-thinking": "Kimi K2 Thinking"
   },
   deepseek: {
+    "deepseek-v4-pro": "DeepSeek V4 Pro",
+    "deepseek-v4-flash": "DeepSeek V4 Flash",
     "deepseek-r1": "DeepSeek R1"
   },
   zai: {
+    "glm-5.1": "GLM 5.1",
     "glm-5": "GLM 5",
     "glm-4.7": "GLM 4.7",
     "glm-4.6": "GLM 4.6",

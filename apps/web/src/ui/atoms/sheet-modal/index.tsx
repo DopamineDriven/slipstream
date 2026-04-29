@@ -33,8 +33,6 @@ export default function SheetModal() {
       (sheetRef.current?.offsetHeight ?? 0) + 24,
       420
     );
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHiddenY(nextHiddenY);
 
     const onKeyDown = (e: KeyboardEvent) => {
