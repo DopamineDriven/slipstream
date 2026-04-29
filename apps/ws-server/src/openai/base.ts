@@ -98,6 +98,7 @@ export class OpenAIBaseService {
       m === "gpt-5-pro" ||
       m === "gpt-5.2-pro" ||
       m === "gpt-5.4-pro" ||
+      m === "gpt-5.5-pro" ||
       m === "o1-pro" ||
       m === "o3-pro" ||
       m === "o3-deep-research" ||
@@ -107,6 +108,8 @@ export class OpenAIBaseService {
 
   protected isOpenAIModel(m: string) {
     return (
+      m === "gpt-5.5" ||
+      m === "gpt-5.5-pro" ||
       m === "gpt-5.4-mini" ||
       m === "gpt-5.4-nano" ||
       m === "gpt-4.1" ||
@@ -155,6 +158,8 @@ export class OpenAIBaseService {
 
   protected isImgGenFacilitating(m: OpenAiModelIdUnion) {
     return (
+      m === "gpt-5.5" ||
+      m === "gpt-5.5-pro" ||
       m === "gpt-5.4-mini" ||
       m === "gpt-5.4-nano" ||
       m === "gpt-4.1" ||
@@ -418,6 +423,8 @@ export class OpenAIBaseService {
 
   protected isReasoningModel(m: OpenAiModelIdUnion) {
     return (
+      m === "gpt-5.5" ||
+      m === "gpt-5.5-pro" ||
       m === "gpt-5.4" ||
       m === "gpt-5.4-mini" ||
       m === "gpt-5.4-nano" ||
@@ -537,6 +544,7 @@ export class OpenAIBaseService {
       }
       case "gpt-5.2":
       case "gpt-5.4":
+      case "gpt-5.5":
       case "gpt-5.4-mini":
       case "gpt-5.4-nano": {
         if (imgGenEnabled === true) {
@@ -561,6 +569,7 @@ export class OpenAIBaseService {
           }
         }
       }
+      case "gpt-5.5-pro":
       case "gpt-5.4-pro":
       case "gpt-5.2-pro": {
         if (effort === "xhigh") {
@@ -595,6 +604,8 @@ export class OpenAIBaseService {
     imgGenEnabled = false
   ) {
     switch (model) {
+      case "gpt-5.5":
+      case "gpt-5.5-pro":
       case "gpt-5.4-mini":
       case "gpt-5.4-nano":
       case "gpt-5.2-codex":

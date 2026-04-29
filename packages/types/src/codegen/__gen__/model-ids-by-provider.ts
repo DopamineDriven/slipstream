@@ -1,5 +1,6 @@
 export const modelIdsByProvider = {
   openai: [
+    "gpt-5.5",
     "gpt-5.4",
     "gpt-5.4-mini",
     "gpt-5.4-nano",
@@ -16,6 +17,7 @@ export const modelIdsByProvider = {
     "gpt-5.1-codex",
     "gpt-5.1-codex-mini",
     "gpt-5-codex",
+    "gpt-5.5-pro",
     "gpt-5.4-pro",
     "gpt-5.2-pro",
     "gpt-5-pro",
@@ -104,11 +106,12 @@ export const modelIdsByProvider = {
   vercel: ["v0-1.5-md", "v0-1.0-md"],
   mistral: [
     "mistral-small-latest",
-    "mistral-medium-latest",
+    "mistral-medium-3",
+    "mistral-medium-3.5",
     "mistral-large-latest"
   ],
   cohere: ["command-a-reasoning-08-2025", "command-a-03-2025"],
   moonshotai: ["kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
-  deepseek: ["deepseek-r1"],
-  zai: ["glm-5", "glm-4.7", "glm-4.6", "glm-4.5"]
+  deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
+  zai: ["glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"]
 } as const;

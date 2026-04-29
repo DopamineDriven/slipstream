@@ -16,7 +16,6 @@ export function useFallingEdgeTimer(flag=false, ms = 3000) {
     // falling edge: true -> false
     if (prev && !flag) {
       // start/restart the grace window
-      // eslint-disable-next-line
       setActive(true);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => {
@@ -27,6 +26,7 @@ export function useFallingEdgeTimer(flag=false, ms = 3000) {
 
     // if streaming resumes during the window, cancel it
     if (flag && active) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActive(false);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);

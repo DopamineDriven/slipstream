@@ -37,6 +37,8 @@ export class ModelService extends ProviderValidation {
   }
   public isOpenAIModel(m: string) {
     return (
+      m === "gpt-5.5" ||
+      m === "gpt-5.5-pro" ||
       m === "gpt-5.4-mini" ||
       m === "gpt-5.4-nano" ||
       m === "gpt-4.1" ||

@@ -1358,6 +1358,8 @@ export type ImgGenWorkupRTObj = {
   "gpt-5.2-pro": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.1": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.4": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5.5": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5.5-pro": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.4-pro": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.4-mini": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.4-nano": GptImageAndFacilitatorsImgGenWorkupRT;

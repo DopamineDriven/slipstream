@@ -17,6 +17,8 @@ dotenv.config({ quiet: true });
 
 const providerModelImagesApi = {
   openai: [
+    "gpt-5.5",
+    "gpt-5.5-pro",
     "gpt-5.4",
     "gpt-5.4-mini",
     "gpt-5.4-nano",
@@ -68,6 +70,7 @@ const providerModelVideosApi = {
 
 const providerModelChatApi = {
   openai: [
+    "gpt-5.5",
     "gpt-5.4",
     "gpt-5.4-mini",
     "gpt-5.4-nano",
@@ -84,6 +87,7 @@ const providerModelChatApi = {
     "gpt-5.1-codex",
     "gpt-5.1-codex-mini",
     "gpt-5-codex",
+    "gpt-5.5-pro",
     "gpt-5.4-pro",
     "gpt-5.2-pro",
     "gpt-5-pro",
@@ -176,13 +180,14 @@ const providerModelChatApi = {
   vercel: ["v0-1.5-md", "v0-1.0-md"],
   mistral: [
     "mistral-small-latest",
-    "mistral-medium-latest",
+    "mistral-medium-3",
+    "mistral-medium-3.5",
     "mistral-large-latest"
   ],
   cohere: ["command-a-reasoning-08-2025", "command-a-03-2025"],
   moonshotai: ["kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
-  deepseek: ["deepseek-r1"],
-  zai: ["glm-5", "glm-4.7", "glm-4.6", "glm-4.5"]
+  deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
+  zai: ["glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"]
 } as const;
 
 async function anthropicFetcher() {
@@ -251,7 +256,8 @@ const GROK_NAME_OVERRIDES = {
 
 const MISTRAL_NAME_OVERRIDES = {
   "mistral-small-latest": "Mistral Small 4",
-  "mistral-medium-latest": "Mistral Medium Latest",
+  "mistral-medium-3": "Mistral Medium 3",
+  "mistral-medium-3.5": "Mistral Medium 3.5",
   "mistral-large-latest": "Mistral Large Latest"
 };
 
@@ -261,6 +267,7 @@ const COHERE_NAME_OVERRIDES = {
 };
 
 const ZAI_NAME_OVERRIDES = {
+  "glm-5.1": "GLM 5.1",
   "glm-5": "GLM 5",
   "glm-4.7": "GLM 4.7",
   "glm-4.6": "GLM 4.6",
@@ -274,7 +281,9 @@ const KIMI_NAME_OVERRIDES = {
 } as const;
 
 const DEEPSEEK_NAME_OVERRIDES = {
-  "deepseek-r1": "DeepSeek R1"
+  "deepseek-r1": "DeepSeek R1",
+  "deepseek-v4-pro": "DeepSeek V4 Pro",
+  "deepseek-v4-flash": "DeepSeek V4 Flash"
 };
 
 function filterForKimi(id: string) {
@@ -282,13 +291,34 @@ function filterForKimi(id: string) {
 }
 
 function filterForDeepseek(id: string) {
-  return id === "deepseek-r1";
+  return (
+    id === "deepseek-r1" ||
+    id === "deepseek-v4-pro" ||
+    id === "deepseek-v4-flash"
+  );
 }
 
 function filterForZai(id: string) {
   return (
-    id === "glm-5" || id === "glm-4.7" || id === "glm-4.6" || id === "glm-4.5"
+    id === "glm-5" ||
+    id === "glm-4.7" ||
+    id === "glm-4.6" ||
+    id === "glm-4.5" ||
+    id === "glm-5.1"
   );
+}
+
+function filterForMistral(id: string) {
+  return (
+    id === "mistral-small-latest" ||
+    id === "mistral-medium-3" ||
+    id === "mistral-medium-3.5" ||
+    id === "mistral-large-latest"
+  );
+}
+
+function filterForCohere(id: string) {
+  return id === "command-a-reasoning-08-2025" || id === "command-a-03-2025";
 }
 
 function kimiDisplayName(id: string) {
@@ -310,21 +340,15 @@ function zaiDisplayNames(id: string) {
 }
 
 function mistralDisplayName(id: string) {
-  return id === "mistral-small-latest"
-    ? MISTRAL_NAME_OVERRIDES[id]
-    : id === "mistral-medium-latest"
-      ? MISTRAL_NAME_OVERRIDES[id]
-      : id === "mistral-large-latest"
-        ? MISTRAL_NAME_OVERRIDES[id]
-        : id;
+  if (filterForMistral(id)) {
+    return MISTRAL_NAME_OVERRIDES[id];
+  } else return id;
 }
 
 function cohereDisplayName(id: string) {
-  return id === "command-a-reasoning-08-2025"
-    ? COHERE_NAME_OVERRIDES[id]
-    : id === "command-a-03-2025"
-      ? COHERE_NAME_OVERRIDES[id]
-      : id;
+  if (filterForCohere(id)) {
+    return COHERE_NAME_OVERRIDES[id];
+  } else return id;
 }
 
 function grokDisplayName(id: string) {
