@@ -64,7 +64,7 @@ function getStorageKey(modelId: string) {
 
 export function useGrokImageSettings(modelId: string) {
   const isCapable = isGrokImgGenCapable(modelId);
-  const grokModelId = isCapable ? (modelId) : null;
+  const grokModelId = isCapable ? modelId : null;
 
   const [settings, setSettings] = useState<GrokImageSettings>(DEFAULT_SETTINGS);
   useEffect(() => {
@@ -73,7 +73,7 @@ export function useGrokImageSettings(modelId: string) {
     try {
       const stored = localStorage.getItem(getStorageKey(modelId));
       if (stored) {
-        const parsed = JSON.parse<{ aspectRatio?: string; quality?: string; }>(
+        const parsed = JSON.parse<{ aspectRatio?: string; quality?: string }>(
           stored
         );
         const ar = parsed.aspectRatio ?? DEFAULT_SETTINGS.aspectRatio;
@@ -112,7 +112,8 @@ export function useGrokImageSettings(modelId: string) {
           ? GROK_ASPECT_RATIOS.find(option => option === updates.aspectRatio)
           : undefined;
       const quality =
-        typeof updates.quality === "string" && isValidGrokQuality(updates.quality)
+        typeof updates.quality === "string" &&
+        isValidGrokQuality(updates.quality)
           ? GROK_QUALITIES.find(option => option === updates.quality)
           : undefined;
 

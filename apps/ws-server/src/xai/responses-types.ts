@@ -2,6 +2,7 @@ import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
 import { xAIResponses } from "@/xai/event-types.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
+  DiscriminatedUnionToRecord,
   GrokModelIdUnion,
   MessageSingleton,
   XOR
@@ -336,14 +337,7 @@ export type SSEEvent<TUnion extends { type: string }> = TUnion extends {
 
 export type XAIResponsesSSEEvent = SSEEvent<XAIResponsesEvent>;
 
-export type UnionToRecord<
-  TUnion extends { type: string },
-  TDiscriminant extends string = TUnion["type"]
-> = {
-  [K in TDiscriminant]: Extract<TUnion, { type: K }>;
-};
-
-export type xAIRecord = UnionToRecord<XAIResponsesEvent>;
+export type xAIRecord = DiscriminatedUnionToRecord<XAIResponsesEvent, "type">;
 
 export type XAIResponsesEventType = keyof xAIRecord;
 
