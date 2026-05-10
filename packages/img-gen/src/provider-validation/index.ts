@@ -109,7 +109,7 @@ export class ProviderValidation {
   }
 
   public grokImagineImgGenModel(m: string) {
-    return m === "grok-imagine-image" || m === "grok-imagine-image-pro";
+    return m === "grok-imagine-image" || m === "grok-imagine-image-quality";
   }
 
   public baseOpenAIGptImgModel(m: string) {
@@ -584,7 +584,7 @@ export class ProviderValidation {
       if (q && this.isValidGrokQuality(q)) {
         return q;
       } else {
-        if (m === "grok-imagine-image-pro") {
+        if (m === "grok-imagine-image-quality") {
           return "2k";
         } else return "1k";
       }

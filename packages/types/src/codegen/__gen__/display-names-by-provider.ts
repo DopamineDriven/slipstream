@@ -72,15 +72,12 @@ export const displayNameModelsByProvider = {
     "Veo 2"
   ],
   grok: [
+    "Grok 4.3",
     "Grok 4.20 Multi-Agent",
     "Grok 4.20 Reasoning",
     "Grok 4.20 Non-Reasoning",
-    "Grok 4.1 Fast Reasoning",
-    "Grok 4.1 Fast Non-Reasoning",
-    "Grok 4 Fast Reasoning",
-    "Grok 4 Fast Non-Reasoning",
     "Grok Imagine Image",
-    "Grok Imagine Image Pro",
+    "Grok Imagine Image Quality",
     "Grok Imagine Video"
   ],
   anthropic: [

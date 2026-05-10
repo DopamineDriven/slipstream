@@ -1148,7 +1148,7 @@ export class GrokCollectionsService extends GrokWorkupService {
 
   /**
    * Model Compatibility
-   * Supported Models: grok-4-0709, grok-4-fast-reasoning, grok-4-fast-non-reasoning, grok-4-1-fast-reasoning, grok-4-1-fast-non-reasoning, grok-4.20-experimental-beta-0304-non-reasoning, grok-4.20-experimental-beta-0304-reasoning, grok-4.20-multi-agent-experimental-beta-0304
+   * Supported Models: grok-4.20-0309-reasoning, grok-4.20-multi-agent-0309, grok-4.20-0309-non-reasoning, grok-4.3
    */
   protected handleTooling({
     model,
@@ -1269,6 +1269,21 @@ export class GrokCollectionsService extends GrokWorkupService {
         input: history,
         model,
         reasoning: reasoning ?? { effort: "low" },
+        instructions: systemInstruction,
+        tools: toolHandler,
+        tool_choice: tool_choice ?? "auto",
+        store: false,
+        include,
+        stream: true,
+        parallel_tool_calls,
+        max_output_tokens,
+        user: userId
+      } as const;
+    } else if (this.isGrok4Point3(model)) {
+      return {
+        input: history,
+        model,
+        reasoning: reasoning ?? { effort: "high" },
         instructions: systemInstruction,
         tools: toolHandler,
         tool_choice: tool_choice ?? "auto",

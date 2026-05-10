@@ -28,6 +28,17 @@ export class GrokResponsesApiService extends GrokImgGenService {
     super(redis, s3, logger, prisma, userStore, apiKey, managementKey);
   }
   protected encryptedTag = "*encrypted output...*" as const;
+  private pushItemId = (itemIds: string[], itemId: string) => {
+    if (!itemIds.includes(itemId)) {
+      itemIds.push(itemId);
+    }
+  };
+
+  private reasoningPhaseKey = (
+    itemId: string,
+    outputIndex: number,
+    summaryIndex: number
+  ) => `${itemId}:${outputIndex}:${summaryIndex}` as const;
 
   protected async handleXAIAiResponsesApiRequest({
     chunks,
@@ -65,7 +76,11 @@ export class GrokResponsesApiService extends GrokImgGenService {
     const trackedBlocks = Array.of<GrokFinalizedMessageBlock>();
     const encryptedReasoningByItemId = new Map<string, string>();
     const displayedReasoningItemIds = new Set<string>();
+    const reasoningItemsWithSummaryText = new Set<string>();
+    const reasoningPhaseStartedAtByKey = new Map<string, number>();
+    const reasoningPhaseDurationByKey = new Map<string, number>();
     let activeBlock: GrokActiveMessageBlock | undefined = undefined;
+    let activeReasoningPhaseKey: string | undefined = undefined;
     let nextOrdinal = 0;
 
     const roundTrack = Array.of<{
@@ -76,54 +91,18 @@ export class GrokResponsesApiService extends GrokImgGenService {
       conversationId: string;
     }>();
 
-    const pushItemId = (itemIds: string[], itemId: string) => {
-      if (!itemIds.includes(itemId)) {
-        itemIds.push(itemId);
-      }
-    };
-
     const appendEncryptedThinkingPlaceholder = (itemId: string) => {
-      if (displayedReasoningItemIds.has(itemId)) {
+      if (
+        reasoningItemsWithSummaryText.has(itemId) ||
+        displayedReasoningItemIds.has(itemId)
+      ) {
         return undefined;
       }
 
       displayedReasoningItemIds.add(itemId);
-      grokThinkingDisplayAgg =
-        grokThinkingDisplayAgg.length > 0
-          ? grokThinkingDisplayAgg.concat("\n").concat(this.encryptedTag)
-          : this.encryptedTag;
-      thinkingChunks.push(this.encryptedTag);
-      return this.encryptedTag;
-    };
+      const encryptedContent = encryptedReasoningByItemId.get(itemId);
 
-    const applyEncryptedReasoning = (
-      itemId: string,
-      encryptedContent: string
-    ) => {
-      encryptedReasoningByItemId.set(itemId, encryptedContent);
-
-      let matchedBlock = false;
-      for (const block of trackedBlocks) {
-        if (!block.itemIds.includes(itemId)) {
-          continue;
-        }
-
-        matchedBlock = true;
-        const encryptedParts = block.itemIds
-          .map(id => encryptedReasoningByItemId.get(id))
-          .filter(
-            (content): content is string =>
-              typeof content === "string" && content.length > 0
-          );
-
-        if (encryptedParts.length > 0) {
-          block.type = "ENCRYPTED_THINKING";
-          block.content = encryptedParts.join("\n");
-          block.previewContent = this.encryptedTag;
-        }
-      }
-
-      if (matchedBlock === false && !activeBlock?.itemIds.includes(itemId)) {
+      if (typeof encryptedContent === "string" && encryptedContent.length > 0) {
         trackedBlocks.push({
           content: encryptedContent,
           durationMs: 0,
@@ -134,6 +113,37 @@ export class GrokResponsesApiService extends GrokImgGenService {
         });
         nextOrdinal += 1;
       }
+
+      grokThinkingDisplayAgg =
+        grokThinkingDisplayAgg.length > 0
+          ? grokThinkingDisplayAgg.concat("\n").concat(this.encryptedTag)
+          : this.encryptedTag;
+      thinkingChunks.push(this.encryptedTag);
+      return this.encryptedTag;
+    };
+
+    const currentActiveBlockDuration = () => {
+      if (!activeBlock) {
+        return 0;
+      }
+
+      if (activeBlock.type === "THINKING" && activeReasoningPhaseKey) {
+        const finalizedDuration = reasoningPhaseDurationByKey.get(
+          activeReasoningPhaseKey
+        );
+
+        if (typeof finalizedDuration === "number") {
+          return Math.max(0, finalizedDuration);
+        }
+
+        const startedAt =
+          reasoningPhaseStartedAtByKey.get(activeReasoningPhaseKey) ??
+          activeBlock.startedAt;
+
+        return Math.max(0, performance.now() - startedAt);
+      }
+
+      return Math.max(0, performance.now() - activeBlock.startedAt);
     };
 
     const finalizeActiveBlock = () => {
@@ -142,8 +152,9 @@ export class GrokResponsesApiService extends GrokImgGenService {
       }
 
       const previewContent = activeBlock.content;
+      const activeType = activeBlock.type;
       const encryptedParts =
-        activeBlock.type === "ENCRYPTED_THINKING"
+        activeType === "ENCRYPTED_THINKING"
           ? activeBlock.itemIds
               .map(itemId => encryptedReasoningByItemId.get(itemId))
               .filter(
@@ -153,18 +164,18 @@ export class GrokResponsesApiService extends GrokImgGenService {
           : Array.of<string>();
 
       if (
-        activeBlock.type === "TEXT" &&
+        (activeType === "TEXT" || activeType === "THINKING") &&
         previewContent.length === 0 &&
         encryptedParts.length === 0
       ) {
+        if (activeType === "THINKING") {
+          activeReasoningPhaseKey = undefined;
+        }
         activeBlock = undefined;
         return undefined;
       }
 
-      const durationMs = Math.max(
-        0,
-        Math.round(performance.now() - activeBlock.startedAt)
-      );
+      const durationMs = currentActiveBlockDuration();
 
       const finalizedBlock = {
         content:
@@ -175,19 +186,22 @@ export class GrokResponsesApiService extends GrokImgGenService {
         itemIds: Array.from(activeBlock.itemIds),
         ordinal: nextOrdinal,
         previewContent:
-          activeBlock.type === "ENCRYPTED_THINKING"
+          activeType === "ENCRYPTED_THINKING"
             ? this.encryptedTag
             : previewContent,
-        type: activeBlock.type
+        type: activeType
       } satisfies GrokFinalizedMessageBlock;
 
       trackedBlocks.push(finalizedBlock);
 
-      if (activeBlock.type === "ENCRYPTED_THINKING") {
+      if (activeType === "ENCRYPTED_THINKING" || activeType === "THINKING") {
         grokThinkingDuration += durationMs;
       }
 
       nextOrdinal += 1;
+      if (activeType === "THINKING") {
+        activeReasoningPhaseKey = undefined;
+      }
       activeBlock = undefined;
       return finalizedBlock;
     };
@@ -207,14 +221,15 @@ export class GrokResponsesApiService extends GrokImgGenService {
         return activeBlock;
       }
 
-      pushItemId(activeBlock.itemIds, itemId);
+      this.pushItemId(activeBlock.itemIds, itemId);
       return activeBlock;
     };
 
     const currentThinkingDuration = () => {
       const activeThinkingDuration =
-        activeBlock?.type === "ENCRYPTED_THINKING"
-          ? Math.round(performance.now() - activeBlock.startedAt)
+        activeBlock?.type === "ENCRYPTED_THINKING" ||
+        activeBlock?.type === "THINKING"
+          ? currentActiveBlockDuration()
           : 0;
 
       return grokThinkingDuration + activeThinkingDuration;
@@ -233,10 +248,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
             : activeBlock.content,
         ordinal: nextOrdinal,
         conversationId,
-        durationMs: Math.max(
-          0,
-          Math.round(performance.now() - activeBlock.startedAt)
-        )
+        durationMs: currentActiveBlockDuration()
       } as const;
     };
 
@@ -246,11 +258,8 @@ export class GrokResponsesApiService extends GrokImgGenService {
         "type" | "previewContent" | "ordinal" | "durationMs"
       >
     ) => {
-      const type =
-        block.type === "ENCRYPTED_THINKING" ? "ENCRYPTED_THINKING" : "TEXT";
-
       return {
-        type,
+        type: block.type,
         content: block.previewContent,
         ordinal: block.ordinal,
         conversationId,
@@ -281,6 +290,12 @@ export class GrokResponsesApiService extends GrokImgGenService {
         keyId: keyId ?? "",
         apiKey: xaiApiKey,
         managementKey: mgmtKey,
+        reasoning:
+          m === "grok-4.3"
+            ? { effort: "high" }
+            : m === "grok-4.20-multi-agent-0309"
+              ? { effort: "medium" }
+              : undefined,
         hasUserStoreDocs,
         collectionId,
         enableCodeInterpreter: true,
@@ -374,9 +389,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
           }
 
           if (chunk.event === "response.output_item.added") {
-            if (chunk.data.item.type === "reasoning") {
-              ensureActiveBlock("ENCRYPTED_THINKING", chunk.data.item.id);
-            } else {
+            if (chunk.data.item.type !== "reasoning") {
               finalizeActiveBlock();
             }
 
@@ -427,17 +440,32 @@ export class GrokResponsesApiService extends GrokImgGenService {
 
           if (chunk.event === "response.output_item.done") {
             if (chunk.data.item.type === "reasoning") {
-              applyEncryptedReasoning(
-                chunk.data.item.id,
-                chunk.data.item.encrypted_content
-              );
-              thinkingText = appendEncryptedThinkingPlaceholder(
-                chunk.data.item.id
-              );
+              if ("encrypted_content" in chunk.data.item) {
+                encryptedReasoningByItemId.set(
+                  chunk.data.item.id,
+                  chunk.data.item.encrypted_content
+                );
+              }
+
               const finalizedBlock = finalizeActiveBlock();
               if (finalizedBlock) {
                 thinkingMessageBlock =
                   finalizedChunkMessageBlock(finalizedBlock);
+              }
+
+              if (
+                "encrypted_content" in chunk.data.item &&
+                chunk.data.item.encrypted_content.length > 0
+              ) {
+                thinkingText = appendEncryptedThinkingPlaceholder(
+                  chunk.data.item.id
+                );
+
+                const encryptedBlock = trackedBlocks.at(-1);
+                if (thinkingText && encryptedBlock) {
+                  thinkingMessageBlock =
+                    finalizedChunkMessageBlock(encryptedBlock);
+                }
               }
             }
 
@@ -473,11 +501,92 @@ export class GrokResponsesApiService extends GrokImgGenService {
             }
           }
 
-          if (chunk.event === "response.reasoning_summary_text.delta") {
-            thinkingText = appendEncryptedThinkingPlaceholder(
-              chunk.data.item_id
+          if (chunk.event === "response.reasoning_summary_part.added") {
+            const phaseKey = this.reasoningPhaseKey(
+              chunk.data.item_id,
+              chunk.data.output_index,
+              chunk.data.summary_index
             );
+
+            if (
+              activeReasoningPhaseKey &&
+              activeReasoningPhaseKey !== phaseKey
+            ) {
+              finalizeActiveBlock();
+            }
+
+            reasoningPhaseStartedAtByKey.set(phaseKey, performance.now());
+            activeReasoningPhaseKey = phaseKey;
+            ensureActiveBlock("THINKING", chunk.data.item_id);
+          }
+
+          if (chunk.event === "response.reasoning_summary_text.delta") {
+            const phaseKey = this.reasoningPhaseKey(
+              chunk.data.item_id,
+              chunk.data.output_index,
+              chunk.data.summary_index
+            );
+
+            if (
+              activeReasoningPhaseKey &&
+              activeReasoningPhaseKey !== phaseKey
+            ) {
+              finalizeActiveBlock();
+            }
+
+            if (!reasoningPhaseStartedAtByKey.has(phaseKey)) {
+              reasoningPhaseStartedAtByKey.set(phaseKey, performance.now());
+            }
+
+            activeReasoningPhaseKey = phaseKey;
+            const block = ensureActiveBlock("THINKING", chunk.data.item_id);
+            block.content += chunk.data.delta;
+            grokThinkingDisplayAgg += chunk.data.delta;
+            thinkingChunks.push(chunk.data.delta);
+            reasoningItemsWithSummaryText.add(chunk.data.item_id);
+            displayedReasoningItemIds.add(chunk.data.item_id);
+            thinkingText = chunk.data.delta;
             thinkingMessageBlock = currentChunkMessageBlock();
+          }
+
+          if (chunk.event === "response.reasoning_summary_text.done") {
+            const phaseKey = this.reasoningPhaseKey(
+              chunk.data.item_id,
+              chunk.data.output_index,
+              chunk.data.summary_index
+            );
+            const startedAt = reasoningPhaseStartedAtByKey.get(phaseKey);
+
+            if (typeof startedAt === "number") {
+              reasoningPhaseDurationByKey.set(
+                phaseKey,
+                performance.now() - startedAt
+              );
+            }
+
+            activeReasoningPhaseKey = phaseKey;
+            finalizeActiveBlock();
+          }
+
+          if (chunk.event === "response.reasoning_summary_part.done") {
+            const phaseKey = this.reasoningPhaseKey(
+              chunk.data.item_id,
+              chunk.data.output_index,
+              chunk.data.summary_index
+            );
+
+            if (activeReasoningPhaseKey === phaseKey) {
+              const startedAt = reasoningPhaseStartedAtByKey.get(phaseKey);
+
+              if (typeof startedAt === "number") {
+                reasoningPhaseDurationByKey.set(
+                  phaseKey,
+                  performance.now() - startedAt
+                );
+              }
+
+              finalizeActiveBlock();
+            }
           }
 
           if (chunk.event === "response.output_text.delta") {
@@ -505,9 +614,13 @@ export class GrokResponsesApiService extends GrokImgGenService {
             for (const output of chunk.data.response.output) {
               if (
                 output.type === "reasoning" &&
+                "encrypted_content" in output &&
                 output.encrypted_content.length > 0
               ) {
-                applyEncryptedReasoning(output.id, output.encrypted_content);
+                encryptedReasoningByItemId.set(
+                  output.id,
+                  output.encrypted_content
+                );
                 appendEncryptedThinkingPlaceholder(output.id);
               }
             }

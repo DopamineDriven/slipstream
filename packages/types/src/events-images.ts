@@ -998,7 +998,7 @@ export type AIChatRequestImgGenFields = {
    * "1K" (default); "1K" | "2K"
    *
    *
-   * grok-imagine-image and grok-imagine-image-pro
+   * grok-imagine-image and grok-imagine-image-quality
    *
    * "1k" | "2k" | null
    *
@@ -1017,7 +1017,7 @@ export type AIChatRequestImgGenFields = {
    *
    * "1:1"="1024x1024" (default) | "2:3"="832x1248" | "3:2"="1248x832" | "3:4"="864x1184" | "4:3"="1184x864" | "4:5"="896x1152" | "5:4"="1152x896" | "9:16"="768x1344" | "16:9"="1344x768" | "21:9"="1536x672"
    *
-   * grok-imagine-image, grok-imagine-image-pro:
+   * grok-imagine-image, grok-imagine-image-quality:
    *
    * 1:1 | "3:4" | "4:3" | "9:16" | "16:9" | "2:3" | "3:2" | "9:19.5" | "19.5:9" | "9:20" | "20:9" | "1:2" | "2:1" | "auto"
    *
@@ -1036,7 +1036,7 @@ export type AIChatRequestImgGenFields = {
    */
   style?: string;
   /**
-   * **grok-imagine-image and grok-imagine-image-pro only**
+   * **grok-imagine-image and grok-imagine-image-quality only**
    *
    * "url" (default) | "b64_json"
    */

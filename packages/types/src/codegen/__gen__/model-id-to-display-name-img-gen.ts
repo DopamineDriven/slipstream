@@ -40,6 +40,6 @@ export const modelIdToDisplayNameImgGen = {
   },
   grok: {
     "grok-imagine-image": "Grok Imagine Image",
-    "grok-imagine-image-pro": "Grok Imagine Image Pro"
+    "grok-imagine-image-quality": "Grok Imagine Image Quality"
   }
 } as const;

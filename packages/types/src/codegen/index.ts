@@ -53,7 +53,7 @@ const providerModelImagesApi = {
     "imagen-4.0-fast-generate-001",
     "imagen-4.0-ultra-generate-001"
   ],
-  grok: ["grok-imagine-image", "grok-imagine-image-pro"]
+  grok: ["grok-imagine-image", "grok-imagine-image-quality"]
 } as const;
 
 const providerModelVideosApi = {
@@ -142,15 +142,12 @@ const providerModelChatApi = {
     "veo-2.0-generate-001"
   ],
   grok: [
+    "grok-4.3",
     "grok-4.20-multi-agent-0309",
     "grok-4.20-0309-reasoning",
     "grok-4.20-0309-non-reasoning",
-    "grok-4-1-fast-reasoning",
-    "grok-4-1-fast-non-reasoning",
-    "grok-4-fast-reasoning",
-    "grok-4-fast-non-reasoning",
     "grok-imagine-image",
-    "grok-imagine-image-pro",
+    "grok-imagine-image-quality",
     "grok-imagine-video"
   ],
   /**
@@ -242,29 +239,26 @@ async function geminiFetcher() {
  * one-offs here for when xAI ships odd labels
  */
 const GROK_NAME_OVERRIDES = {
-  "grok-4-fast-reasoning": "Grok 4 Fast Reasoning",
-  "grok-4-fast-non-reasoning": "Grok 4 Fast Non-Reasoning",
-  "grok-4-1-fast-non-reasoning": "Grok 4.1 Fast Non-Reasoning",
-  "grok-4-1-fast-reasoning": "Grok 4.1 Fast Reasoning",
   "grok-imagine-image": "Grok Imagine Image",
-  "grok-imagine-image-pro": "Grok Imagine Image Pro",
+  "grok-imagine-image-quality": "Grok Imagine Image Quality",
   "grok-imagine-video": "Grok Imagine Video",
   "grok-4.20-multi-agent-0309": "Grok 4.20 Multi-Agent",
   "grok-4.20-0309-reasoning": "Grok 4.20 Reasoning",
-  "grok-4.20-0309-non-reasoning": "Grok 4.20 Non-Reasoning"
-} satisfies Record<string, string>;
+  "grok-4.20-0309-non-reasoning": "Grok 4.20 Non-Reasoning",
+  "grok-4.3": "Grok 4.3"
+} as const;
 
 const MISTRAL_NAME_OVERRIDES = {
   "mistral-small-latest": "Mistral Small 4",
   "mistral-medium-3": "Mistral Medium 3",
   "mistral-medium-3.5": "Mistral Medium 3.5",
   "mistral-large-latest": "Mistral Large Latest"
-};
+} as const;
 
 const COHERE_NAME_OVERRIDES = {
   "command-a-reasoning-08-2025": "Command A Reasoning",
   "command-a-03-2025": "Command A"
-};
+} as const;
 
 const ZAI_NAME_OVERRIDES = {
   "glm-5.1": "GLM 5.1",
@@ -272,7 +266,7 @@ const ZAI_NAME_OVERRIDES = {
   "glm-4.7": "GLM 4.7",
   "glm-4.6": "GLM 4.6",
   "glm-4.5": "GLM 4.5"
-};
+} as const;
 
 const KIMI_NAME_OVERRIDES = {
   "kimi-k2-thinking": "Kimi K2 Thinking",
@@ -284,7 +278,19 @@ const DEEPSEEK_NAME_OVERRIDES = {
   "deepseek-r1": "DeepSeek R1",
   "deepseek-v4-pro": "DeepSeek V4 Pro",
   "deepseek-v4-flash": "DeepSeek V4 Flash"
-};
+} as const;
+
+function filterForGrok(id: string) {
+  return (
+    id === "grok-4.3" ||
+    id === "grok-4.20-multi-agent-0309" ||
+    id === "grok-4.20-0309-reasoning" ||
+    id === "grok-4.20-0309-non-reasoning" ||
+    id === "grok-imagine-image-quality" ||
+    id === "grok-imagine-image" ||
+    id === "grok-imagine-video"
+  );
+}
 
 function filterForKimi(id: string) {
   return id === "kimi-k2-thinking" || id === "kimi-k2.5" || id === "kimi-k2.6";
@@ -327,6 +333,12 @@ function kimiDisplayName(id: string) {
   } else return id;
 }
 
+function grokDisplayName(id: string) {
+  if (filterForGrok(id)) {
+    return GROK_NAME_OVERRIDES[id];
+  } else return id;
+}
+
 function deepseekDisplayName(id: string) {
   if (filterForDeepseek(id)) {
     return DEEPSEEK_NAME_OVERRIDES[id];
@@ -349,38 +361,6 @@ function cohereDisplayName(id: string) {
   if (filterForCohere(id)) {
     return COHERE_NAME_OVERRIDES[id];
   } else return id;
-}
-
-function grokDisplayName(id: string) {
-  // Start from your generic formatter (already fixes 4-digit suffix dates etc.)
-  let s = prettyModelName(id, "grok");
-
-  // Opinionated cleanup: "Non Reasoning" -> "Non-Reasoning"
-  s = s.replace(/\bNon Reasoning\b/i, "Non-Reasoning");
-
-  // Explicit model-specific overrides take ultimate precedence
-
-  return id === "grok-4-fast-reasoning"
-    ? GROK_NAME_OVERRIDES[id]
-    : id === "grok-4-fast-non-reasoning"
-      ? GROK_NAME_OVERRIDES[id]
-      : id === "grok-4-1-fast-non-reasoning"
-        ? GROK_NAME_OVERRIDES[id]
-        : id === "grok-4-1-fast-reasoning"
-          ? GROK_NAME_OVERRIDES[id]
-          : id === "grok-imagine-image"
-            ? GROK_NAME_OVERRIDES[id]
-            : id === "grok-imagine-image-pro"
-              ? GROK_NAME_OVERRIDES[id]
-              : id === "grok-imagine-video"
-                ? GROK_NAME_OVERRIDES[id]
-                : id === "grok-4.20-multi-agent-0309"
-                  ? GROK_NAME_OVERRIDES[id]
-                  : id === "grok-4.20-0309-reasoning"
-                    ? GROK_NAME_OVERRIDES[id]
-                    : id === "grok-4.20-0309-non-reasoning"
-                      ? GROK_NAME_OVERRIDES[id]
-                      : s;
 }
 
 function displayNameV0(id: string) {

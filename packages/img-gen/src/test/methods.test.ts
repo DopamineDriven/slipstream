@@ -123,10 +123,13 @@ describe("handleImgGenOutputQuality", () => {
     assert.equal(p.handleImgGenOutputQuality("grok-imagine-image"), "1k");
   });
   it(
-    "should return 2k for grok-imagine-image-pro and no args passed in",
+    "should return 2k for grok-imagine-image-quality and no args passed in",
     {},
     () => {
-      assert.equal(p.handleImgGenOutputQuality("grok-imagine-image-pro"), "2k");
+      assert.equal(
+        p.handleImgGenOutputQuality("grok-imagine-image-quality"),
+        "2k"
+      );
     }
   );
 });
@@ -263,7 +266,7 @@ describe("handleImgGenCompression", () => {
 describe("handlePartialImgGen", () => {
   it("should return undefined for grok provider", {}, () => {
     assert.equal(
-      p.handlePartialImgGen("grok-imagine-image-pro", {
+      p.handlePartialImgGen("grok-imagine-image-quality", {
         partialImagesRequested: 2
       }),
       undefined

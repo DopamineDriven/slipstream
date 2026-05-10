@@ -36,5 +36,5 @@ export const displayNameModelsByProviderImgGen = {
     "Imagen 4 Fast",
     "Imagen 4 Ultra"
   ],
-  grok: ["Grok Imagine Image", "Grok Imagine Image Pro"]
+  grok: ["Grok Imagine Image", "Grok Imagine Image Quality"]
 } as const;

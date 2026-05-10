@@ -74,15 +74,12 @@ export const modelIdToDisplayName = {
     "veo-2.0-generate-001": "Veo 2"
   },
   grok: {
+    "grok-4.3": "Grok 4.3",
     "grok-4.20-multi-agent-0309": "Grok 4.20 Multi-Agent",
     "grok-4.20-0309-reasoning": "Grok 4.20 Reasoning",
     "grok-4.20-0309-non-reasoning": "Grok 4.20 Non-Reasoning",
-    "grok-4-1-fast-reasoning": "Grok 4.1 Fast Reasoning",
-    "grok-4-1-fast-non-reasoning": "Grok 4.1 Fast Non-Reasoning",
-    "grok-4-fast-reasoning": "Grok 4 Fast Reasoning",
-    "grok-4-fast-non-reasoning": "Grok 4 Fast Non-Reasoning",
     "grok-imagine-image": "Grok Imagine Image",
-    "grok-imagine-image-pro": "Grok Imagine Image Pro",
+    "grok-imagine-image-quality": "Grok Imagine Image Quality",
     "grok-imagine-video": "Grok Imagine Video"
   },
   anthropic: {
