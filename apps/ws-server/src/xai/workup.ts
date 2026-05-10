@@ -27,7 +27,7 @@ export class GrokWorkupService {
   protected readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
 
   /**
-   * use if image attachments detected -- for grok-imagine-image and grok-imagine-image-pro only
+   * use if image attachments detected -- for grok-imagine-image and grok-imagine-image-quality only
    */
   protected readonly baseImgEditsUrl = "https://api.x.ai/v1/images/edits";
   protected storeDbDocRegistry = new Map<string, xAIDocDbRegistryProps>();
@@ -69,26 +69,27 @@ export class GrokWorkupService {
     return !this.isMultiAgent(m);
   }
 
+  protected isGrok4Point3(m: string){
+    return m === "grok-4.3";
+  }
+
   protected is420BetaModel(m: string) {
     return (
       m === "grok-4.20-0309-reasoning" ||
       m === "grok-4.20-0309-non-reasoning" ||
+      this.isGrok4Point3(m)||
       this.isMultiAgent(m)
     );
   }
 
   protected isGrok4Model(m: string) {
     return (
-      this.is420BetaModel(m) ||
-      m === "grok-4-1-fast-non-reasoning" ||
-      m === "grok-4-1-fast-reasoning" ||
-      m === "grok-4-fast-reasoning" ||
-      m === "grok-4-fast-non-reasoning"
+      this.is420BetaModel(m)
     );
   }
 
   protected isNativeImgModel(m: string) {
-    return m === "grok-imagine-image" || m === "grok-imagine-image-pro";
+    return m === "grok-imagine-image" || m === "grok-imagine-image-quality";
   }
 
   protected isNativeVideoModel(m: string) {

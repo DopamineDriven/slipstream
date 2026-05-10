@@ -19,7 +19,7 @@ export type ImageGenModels =
   | "gpt-image-2"
   | "gpt-image-1-mini"
   | "grok-imagine-image"
-  | "grok-imagine-image-pro"
+  | "grok-imagine-image-quality"
   | "imagen-4.0-fast-generate-001"
   | "imagen-4.0-ultra-generate-001"
   | "imagen-4.0-generate-001"
@@ -40,7 +40,7 @@ export const providerModelImageGenApi = {
     "imagen-4.0-generate-001",
     "imagen-4.0-ultra-generate-001"
   ],
-  grok: ["grok-imagine-image-pro", "grok-imagine-image"]
+  grok: ["grok-imagine-image-quality", "grok-imagine-image"]
 } as const;
 
 export const allImgSupportingProviderModels = {

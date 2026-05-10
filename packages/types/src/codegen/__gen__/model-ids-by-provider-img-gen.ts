@@ -36,5 +36,5 @@ export const modelIdsByProviderImgGen = {
     "imagen-4.0-fast-generate-001",
     "imagen-4.0-ultra-generate-001"
   ],
-  grok: ["grok-imagine-image", "grok-imagine-image-pro"]
+  grok: ["grok-imagine-image", "grok-imagine-image-quality"]
 } as const;

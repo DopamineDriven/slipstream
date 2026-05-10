@@ -23,3 +23,6 @@ src/test/google/**/*
 logs/
 shell-scripts/*
 
+claude-*
+codex-*
+no-over-abstractions.md

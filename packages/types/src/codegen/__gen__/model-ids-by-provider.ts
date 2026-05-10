@@ -72,15 +72,12 @@ export const modelIdsByProvider = {
     "veo-2.0-generate-001"
   ],
   grok: [
+    "grok-4.3",
     "grok-4.20-multi-agent-0309",
     "grok-4.20-0309-reasoning",
     "grok-4.20-0309-non-reasoning",
-    "grok-4-1-fast-reasoning",
-    "grok-4-1-fast-non-reasoning",
-    "grok-4-fast-reasoning",
-    "grok-4-fast-non-reasoning",
     "grok-imagine-image",
-    "grok-imagine-image-pro",
+    "grok-imagine-image-quality",
     "grok-imagine-video"
   ],
   anthropic: [

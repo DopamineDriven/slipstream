@@ -11,7 +11,7 @@ export interface GrokActiveMessageBlock {
   content: string;
   itemIds: string[];
   startedAt: number;
-  type: "ENCRYPTED_THINKING" | "TEXT";
+  type: "ENCRYPTED_THINKING" | "TEXT" | "THINKING";
 }
 
 export interface GrokFinalizedMessageBlock {
@@ -33,6 +33,8 @@ export type ResponsesRole = "user" | "assistant" | "developer" | "system";
  */
 
 export type ReasoningEffort = "low" | "medium" | "high" | "xhigh";
+
+export type ReasoningEffortGrok4_3 = "none" | Exclude<ReasoningEffort, "xhigh">;
 
 /**
  * `from_date` and `to_date` *must* be in ISO8601 format, e.g., "YYYY-MM-DD" if included
@@ -173,11 +175,13 @@ export type ContentBlockUnion =
   | FunctionCallOutput
   | FunctionCallContext;
 
-/**
- * only grok-3-mini supports the effort field...so it's essentially pointless to even worry about.
- */
 export type InputReasoningProps = {
-  effort: "high" | "medium" | "low" | null;
+  /**
+   * `grok-4.3` accepts `"none" | "low" | "medium" | "high"`
+   *
+   * `grok-4.20-multiagent` accepts `"low" | "medium" | "high" | "xhigh"`
+   */
+  effort: ReasoningEffort | ReasoningEffortGrok4_3 | null;
   /**
    * A summary of the model's reasoning process. Possible values are auto, concise and detailed. Only included for compatibility. The model shall always return detailed.
    */
@@ -434,7 +438,7 @@ export interface ResponsesApiInputWorkupParams {
   x_enable_video_understanding?: boolean;
   parallel_tool_calls?: boolean;
   reasoning?: MultiAgentReasoningEffort;
-    hasUserStoreDocs: boolean;
+  hasUserStoreDocs: boolean;
 }
 
 /**

@@ -281,6 +281,10 @@ export class GrokResponsesApiService extends GrokImgGenService {
         keyId: keyId ?? "",
         apiKey: xaiApiKey,
         managementKey: mgmtKey,
+        reasoning:
+          m === "grok-4.3" || m === "grok-4.20-multi-agent-0309"
+            ? { effort: "high" }
+            : undefined,
         hasUserStoreDocs,
         collectionId,
         enableCodeInterpreter: true,
