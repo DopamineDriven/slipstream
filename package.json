@@ -11,7 +11,7 @@
     "build:key-validator": "turbo build --filter=@slipstream/key-validator",
     "build:redis-service": "turbo build --filter=@slipstream/redis-service",
     "build:storage-s3": "turbo build --filter=@slipstream/storage-s3",
-    "build:targeted": "pnpm install && pnpm build:ui && pnpm build:redis-service && pnpm build:credentials && pnpm build:img-gen && pnpm build:encryption && pnpm build:key-validator && pnpm build:types && pnpm build:storage-s3 && pnpm build:ws-server",
+    "build:targeted": "pnpm install && pnpm build:ui && pnpm build:redis-service && pnpm build:credentials && pnpm build:img-gen && pnpm build:encryption && pnpm build:key-validator && pnpm build:types && pnpm build:storage-s3 && pnpm build:ws-server && pnpm build:web",
     "build:types": "turbo build --filter=@slipstream/types",
     "build:ui": "turbo build --filter=@slipstream/ui",
     "build:web": "turbo build --filter=@slipstream/web",
@@ -48,11 +48,13 @@
     "dotenv": "catalog:dotenv",
     "eslint": "catalog:eslint",
     "husky": "catalog:utils",
+    "jiti": "catalog:jiti",
     "knip": "catalog:utils",
     "prettier": "catalog:prettier",
     "tsx": "catalog:tsx",
     "turbo": "catalog:turbo",
-    "typescript": "catalog:ts"
+    "typescript": "catalog:ts",
+    "typescript-eslint": "catalog:tseslint"
   },
   "prettier": "@slipstream/prettier-config",
   "engines": {

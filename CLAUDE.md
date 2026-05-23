@@ -443,7 +443,7 @@ private get createUserCollectionFieldDefs() {
 
 ## When Given Reference Code
 
-When the human points to existing code as a conceptual reference, **understand the intent, don't mimic the structure.** Reference code explains "how this domain works" — it does not mean "copy this and add a parameter."
+When the smooth brained great ape (human) points to existing code as a conceptual reference, **understand the intent, don't mimic the structure.** Reference code explains "how this domain works" — it does not mean "copy this and add a parameter."
 
 Specifically:
 

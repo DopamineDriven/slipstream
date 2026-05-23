@@ -14,13 +14,13 @@ curl https://ai-gateway.vercel.sh/v1/responses \
   -H "Content-Type: application/json" \
   --no-buffer \
   -d '{
-    "model": "deepseek/deepseek-r1",
+    "model": "moonshotai/kimi-k2.6",
     "stream": true,
     "input": [
         {
         "type": "message",
         "role": "user",
-        "content": "hey deepseek, please write me a poem about JSDoc bros hiding in comment blocks from the wave of bliss that was advanced typescript flooding mainstream development circa 2020 while simultaneously infusing it with Catullan (Catullus, the ancient Roman poet) irreverence"
+        "content": "hey kimi, please write me a poem about JSDoc bros hiding in comment blocks from the wave of bliss that was advanced typescript flooding mainstream development circa 2020 while simultaneously infusing it with Catullan (Catullus, the ancient Roman poet) irreverence"
       }
     ],
     "providerOptions": {
@@ -29,4 +29,4 @@ curl https://ai-gateway.vercel.sh/v1/responses \
       }
     }
   }' \
-  > notes/sse-deepseek-responses.txt
+  > notes/sse-kimi-2-6-responses.txt

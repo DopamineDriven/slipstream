@@ -1,7 +1,7 @@
+import type { Config } from "typescript-eslint";
 import baseConfig from "@slipstream/eslint-config/base";
 
-/** @type {import('typescript-eslint').Config} */
-export default [
+export default <Config>[
   {
     rules: {
       "@typescript-eslint/consistent-type-definitions": "off"

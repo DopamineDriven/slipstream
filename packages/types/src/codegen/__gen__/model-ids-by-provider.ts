@@ -47,6 +47,7 @@ export const modelIdsByProvider = {
     "sora-2-pro"
   ],
   gemini: [
+    "gemini-3.5-flash",
     "gemini-3.1-pro-preview",
     "gemini-3.1-pro-preview-customtools",
     "gemini-3.1-flash-lite-preview",
@@ -76,6 +77,7 @@ export const modelIdsByProvider = {
     "grok-4.20-multi-agent-0309",
     "grok-4.20-0309-reasoning",
     "grok-4.20-0309-non-reasoning",
+    "grok-build-0.1",
     "grok-imagine-image",
     "grok-imagine-image-quality",
     "grok-imagine-video"

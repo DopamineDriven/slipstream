@@ -7,6 +7,8 @@ import type {
   FssRecordProps,
   StoreDocDbRegistryProps
 } from "@/gemini/types.ts";
+import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import type {
   DocumentState,
   File,
@@ -14,11 +16,9 @@ import type {
   UploadToFileSearchStoreParameters
 } from "@google/genai";
 import type { Logger } from "pino";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
 import { GoogleGenAI } from "@google/genai";
 import type { AttachmentSingleton } from "@slipstream/types";
-import * as $Enums from "@slipstream/db/node/generated/client";
+import * as $Enums from "@slipstream/db/enums-node";
 
 export class FileSearchStoreService {
   private defaultClient: GoogleGenAI;
@@ -473,7 +473,7 @@ export class FileSearchStoreService {
       return {
         ...rest,
         ...metaObj
-      } satisfies FssDocSurfacedMeta as FssDocSurfacedMeta;
+      } satisfies FssDocSurfacedMeta;
     } else {
       if (customMetadata && customMetadata.length > 0) {
         for (const { key, stringValue } of customMetadata) {
@@ -489,7 +489,7 @@ export class FileSearchStoreService {
       return {
         ...rest,
         ...metaObj
-      } satisfies FssDocSurfacedMeta as FssDocSurfacedMeta;
+      } satisfies FssDocSurfacedMeta;
     }
   }
 
@@ -576,6 +576,8 @@ export class FileSearchStoreService {
     try {
       for await (const s of this.getIndexedDocsFSS(fssRef, apiKey, 20)) {
         if (s.page.length > 0) {
+          const arrOfEpimerizedOutput = this.fssDocEpimerize(s.page);
+          const backToOriginal = this.fssDocEpimerize(arrOfEpimerizedOutput);
           for (const doc of s.page) {
             if (doc.displayName && doc.name) {
               const { attachmentId } = this.fssDocEpimerize(doc);
@@ -662,14 +664,19 @@ export class FileSearchStoreService {
         const fssDocsToSync = Array.of<FssDoc>();
         for (const [fileKey, fssDoc] of Array.from(fssDocRegistry.entries())) {
           if (!storeDocDbRegistry.has(fileKey)) {
-            const tos = this.fssDocEpimerize(fssDoc);
+            const { attachmentId } = this.fssDocEpimerize(fssDoc);
             const hasDocVerified = await this.prisma.hasProviderStoreDocument(
-              tos.attachmentId,
+              attachmentId,
               fssRef,
               storeId,
               "GEMINI"
             );
-            if (!hasDocVerified && fssDoc.name !== "fileSearchStores/devnrr6h4r4480f6kviycyo1zhf-ms61ejujh04k/documents/iuwtduxwu10r4xyrzfxl5hq1l2e-y41oga3z1sht") fssDocsToSync.push(fssDoc);
+            if (
+              !hasDocVerified &&
+              fssDoc.name !==
+                "fileSearchStores/devnrr6h4r4480f6kviycyo1zhf-ms61ejujh04k/documents/iuwtduxwu10r4xyrzfxl5hq1l2e-y41oga3z1sht"
+            )
+              fssDocsToSync.push(fssDoc);
           }
         }
         this.logger.debug(fssDocsToSync, "docs to sync");
@@ -682,7 +689,7 @@ export class FileSearchStoreService {
           const { attachment: _att, store: _store, ...rest } = doc;
           storeDocDbRegistry.set(`files/${doc.attachmentId}`, rest);
         }
-      } 
+      }
       if (storeDocDbRegistry.size > fssDocRegistry.size) {
         const fssDocsToIndex = Array.of<string>();
         for (const storeDoc of Array.from(storeDocDbRegistry.values())) {

@@ -127,5 +127,6 @@
   "prisma.pinToPrisma6": false,
   "[sql]": {
     "editor.defaultFormatter": "ReneSaarsoo.sql-formatter-vsc"
-  }
+  },
+  "typescript.native-preview.tsdk": "/home/dopaminedriven/cloneathon/t3-chat-clone/node_modules/@typescript/native-preview"
 }

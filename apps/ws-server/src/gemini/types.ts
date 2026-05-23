@@ -4,12 +4,11 @@ import type {
   UserData
 } from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
-import type { File as GeminiFile, Interactions } from "@google/genai";
+import type { File as GeminiFile } from "@google/genai";
 import type { CompatStatus } from "@slipstream/db/enums-node";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AIChatRequestImgGenFields,
-  CTR,
   Equal,
   ImgMetadataEntity,
   MessageSingleton,
@@ -24,12 +23,12 @@ export type UnionToRecord<
   [K in TDiscriminant]: Extract<TUnion, { type: K }>;
 };
 
-export type InteractionDeltas = CTR<
-  Interactions.ContentDelta,
-  "event_id"
->["delta"];
+// export type InteractionDeltas = CTR<
+//   Interactions.Content,
+//   "event_id"
+// >["delta"];
 
-export type GeminiEventMap = UnionToRecord<InteractionDeltas>;
+// export type GeminiEventMap = UnionToRecord<InteractionDeltas>;
 
 export interface ProviderGeminiChatRequestEntity extends ProviderChatRequestEntity {
   userData?: UserData;

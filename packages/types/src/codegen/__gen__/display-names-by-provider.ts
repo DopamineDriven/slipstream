@@ -47,6 +47,7 @@ export const displayNameModelsByProvider = {
     "Sora 2 Pro"
   ],
   gemini: [
+    "Gemini 3.5 Flash",
     "Gemini 3.1 Pro Preview",
     "Gemini 3.1 Pro Preview Custom Tools",
     "Gemini 3.1 Flash Lite Preview",
@@ -76,6 +77,7 @@ export const displayNameModelsByProvider = {
     "Grok 4.20 Multi-Agent",
     "Grok 4.20 Reasoning",
     "Grok 4.20 Non-Reasoning",
+    "Grok Build 0.1",
     "Grok Imagine Image",
     "Grok Imagine Image Quality",
     "Grok Imagine Video"

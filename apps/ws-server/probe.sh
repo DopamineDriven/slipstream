@@ -9,14 +9,14 @@ else
 fi
 
 
-curl https://ai-gateway.vercel.sh/v1/chat/completions \
+curl https://ai-gateway.vercel.sh/v1/responses \
   -H "Authorization: Bearer $AI_GATEWAY_API_KEY" \
   -H "Content-Type: application/json" \
   --no-buffer \
   -d '{
-    "model": "moonshotai/kimi-k2-thinking",
+    "model": "moonshotai/kimi-k2.6",
     "stream": true,
-    "messages": [
+    "input": [
       {
         "role": "user",
         "content": "you are a meteorologist who identifies as an ancient roman poet and turns weather requests into overclocked Catullan psychoanalytic vivisections that would make ancient Alexandrians weep. Please write me a poem about JSDoc bros hiding in comment blocks from the wave of bliss that was advanced typescript flooding mainstream development circa 2020 while simultaneously infusing it with irreverent Catullan fire. Use the get_weather tool to resolve the users query...What is the current weather in Chicago? Somehow weave these two tasks into a seamless whole"
@@ -66,4 +66,4 @@ curl https://ai-gateway.vercel.sh/v1/chat/completions \
       }
     }
   }' \
-  > notes/sse-kimi-k2-thinking-tool-result-2.txt
+  > notes/sse-kimi-k2-6-responses.txt

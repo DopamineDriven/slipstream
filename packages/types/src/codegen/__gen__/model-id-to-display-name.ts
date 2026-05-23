@@ -47,6 +47,7 @@ export const modelIdToDisplayName = {
     "sora-2-pro": "Sora 2 Pro"
   },
   gemini: {
+    "gemini-3.5-flash": "Gemini 3.5 Flash",
     "gemini-3.1-pro-preview": "Gemini 3.1 Pro Preview",
     "gemini-3.1-pro-preview-customtools": "Gemini 3.1 Pro Preview Custom Tools",
     "gemini-3.1-flash-lite-preview": "Gemini 3.1 Flash Lite Preview",
@@ -78,6 +79,7 @@ export const modelIdToDisplayName = {
     "grok-4.20-multi-agent-0309": "Grok 4.20 Multi-Agent",
     "grok-4.20-0309-reasoning": "Grok 4.20 Reasoning",
     "grok-4.20-0309-non-reasoning": "Grok 4.20 Non-Reasoning",
+    "grok-build-0.1": "Grok Build 0.1",
     "grok-imagine-image": "Grok Imagine Image",
     "grok-imagine-image-quality": "Grok Imagine Image Quality",
     "grok-imagine-video": "Grok Imagine Video"

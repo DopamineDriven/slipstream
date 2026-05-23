@@ -1,7 +1,4 @@
-import type {
-  GeminiEventMap,
-  GenerateContentResponseProps
-} from "@/gemini/types.ts";
+import type { GenerateContentResponseProps } from "@/gemini/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchToolInput } from "@/store/types.ts";
@@ -103,7 +100,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
         for await (const event of stream) {
           yield event;
           if (event.event_id) lastEventId = event.event_id;
-          if (event.event_type === "interaction.start") {
+          if (event.event_type === "interaction.created") {
             interactionId = event.interaction?.id;
           }
         }
@@ -123,12 +120,12 @@ export class GeminiWorkupService extends FileSearchStoreService {
     );
   }
 
-  protected interactionsHandler = <
-    const K extends keyof GeminiEventMap = keyof GeminiEventMap
-  >(
-    event: K,
-    handler: (data: GeminiEventMap[K]) => void
-  ) => ({ event, handler });
+  // protected interactionsHandler = <
+  //   const K extends keyof GeminiEventMap = keyof GeminiEventMap
+  // >(
+  //   event: K,
+  //   handler: (data: GeminiEventMap[K]) => void
+  // ) => ({ event, handler });
 
   protected getPreviousInteractionId(msgs: MessageSingleton<true>[]) {
     // Find the last message from the AI that used the Deep Research model
@@ -151,6 +148,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }
   protected isGemini3ChatModel(m: string) {
     return (
+      m === "gemini-3.5-flash" ||
       m === "gemini-3.1-pro-preview" ||
       m === "gemini-3.1-pro-preview-customtools" ||
       m === "gemini-3.1-flash-lite-preview" ||
@@ -211,113 +209,113 @@ export class GeminiWorkupService extends FileSearchStoreService {
     );
   }
 
-  protected async formatHistoryForDeepResearch(
-    msgs: MessageSingleton<true>[],
-    keyFingerprint: string,
-    keyId?: string,
-    apiKey?: string
-  ): Promise<Interactions.Turn[]> {
-    const formattedTurns = Array.of<Interactions.Turn>();
+  // protected async formatHistoryForDeepResearch(
+  //   msgs: MessageSingleton<true>[],
+  //   keyFingerprint: string,
+  //   keyId?: string,
+  //   apiKey?: string
+  // ): Promise<Interactions.Turn[]> {
+  //   const formattedTurns = Array.of<Interactions.Turn>();
 
-    for (const msg of msgs) {
-      const role = msg.senderType === "USER" ? "user" : "model";
-      const contentItems =
-        Array.of<
-          Exclude<CTR<Interactions.Turn, "content">["content"], string>[number]
-        >();
-      if (msg.attachments && msg.attachments.length > 0) {
-        for (const attachment of msg.attachments) {
-          try {
-            if (
-              attachment?.compatCdnUrl &&
-              attachment?.cdnUrl &&
-              attachment?.mime &&
-              attachment?.compatMime &&
-              attachment?.compatStatus
-            ) {
-              const { fileUri, mimeType } = await this.ensureAssetUploaded(
-                attachment,
-                keyFingerprint,
-                keyId ?? undefined,
-                apiKey
-              );
+  //   for (const msg of msgs) {
+  //     const role = msg.senderType === "USER" ? "user" : "model";
+  //     const contentItems =
+  //       Array.of<
+  //         Exclude<CTR<Interactions.Turn, "content">["content"], string>[number]
+  //       >();
+  //     if (msg.attachments && msg.attachments.length > 0) {
+  //       for (const attachment of msg.attachments) {
+  //         try {
+  //           if (
+  //             attachment?.compatCdnUrl &&
+  //             attachment?.cdnUrl &&
+  //             attachment?.mime &&
+  //             attachment?.compatMime &&
+  //             attachment?.compatStatus
+  //           ) {
+  //             const { fileUri, mimeType } = await this.ensureAssetUploaded(
+  //               attachment,
+  //               keyFingerprint,
+  //               keyId ?? undefined,
+  //               apiKey
+  //             );
 
-              // Switch on your Enum for strict typing
-              switch (attachment.assetType) {
-                case "IMAGE":
-                  contentItems.push({
-                    type: "image",
-                    uri: fileUri,
-                    mime_type: mimeType as
-                      | "image/png"
-                      | "image/jpeg"
-                      | "image/webp"
-                      | "image/heic"
-                      | "image/heif"
-                  });
-                  break;
+  //             // Switch on your Enum for strict typing
+  //             switch (attachment.assetType) {
+  //               case "IMAGE":
+  //                 contentItems.push({
+  //                   type: "image",
+  //                   uri: fileUri,
+  //                   mime_type: mimeType as
+  //                     | "image/png"
+  //                     | "image/jpeg"
+  //                     | "image/webp"
+  //                     | "image/heic"
+  //                     | "image/heif"
+  //                 });
+  //                 break;
 
-                case "DOCUMENT":
-                  contentItems.push({
-                    type: "document",
-                    uri: fileUri,
-                    mime_type: mimeType as "application/pdf"
-                  });
-                  break;
+  //               case "DOCUMENT":
+  //                 contentItems.push({
+  //                   type: "document",
+  //                   uri: fileUri,
+  //                   mime_type: mimeType as "application/pdf"
+  //                 });
+  //                 break;
 
-                case "VIDEO":
-                  // Note: Deep Research docs didn't explicitly forbid video, only audio.
-                  // If the underlying model (Gemini 3) supports it, this is how you pass it.
-                  contentItems.push({
-                    type: "video",
-                    uri: fileUri,
-                    mime_type: mimeType as
-                      | "video/mp4"
-                      | "video/mpeg"
-                      | "video/mpg"
-                      | "video/mov"
-                      | "video/avi"
-                      | "video/x-flv"
-                      | "video/webm"
-                      | "video/wmv"
-                      | "video/3gpp"
-                  });
-                  break;
+  //               case "VIDEO":
+  //                 // Note: Deep Research docs didn't explicitly forbid video, only audio.
+  //                 // If the underlying model (Gemini 3) supports it, this is how you pass it.
+  //                 contentItems.push({
+  //                   type: "video",
+  //                   uri: fileUri,
+  //                   mime_type: mimeType as
+  //                     | "video/mp4"
+  //                     | "video/mpeg"
+  //                     | "video/mpg"
+  //                     | "video/mov"
+  //                     | "video/avi"
+  //                     | "video/x-flv"
+  //                     | "video/webm"
+  //                     | "video/wmv"
+  //                     | "video/3gpp"
+  //                 });
+  //                 break;
 
-                case "AUDIO":
-                case "UNKNOWN":
-                default:
-                  // Deep Research currently docs state: "Audio inputs are not supported."
-                  this.logger.warn(
-                    `Skipping unsupported asset type for Deep Research: ${attachment.assetType}`
-                  );
-                  break;
-              }
-            }
-          } catch (err) {
-            this.logger.warn(
-              `Error preparing attachment ${attachment.id}: ${this.prisma.safeErrMsg(err)}`
-            );
-          }
-        }
-      }
+  //               case "AUDIO":
+  //               case "UNKNOWN":
+  //               default:
+  //                 // Deep Research currently docs state: "Audio inputs are not supported."
+  //                 this.logger.warn(
+  //                   `Skipping unsupported asset type for Deep Research: ${attachment.assetType}`
+  //                 );
+  //                 break;
+  //             }
+  //           }
+  //         } catch (err) {
+  //           this.logger.warn(
+  //             `Error preparing attachment ${attachment.id}: ${this.prisma.safeErrMsg(err)}`
+  //           );
+  //         }
+  //       }
+  //     }
 
-      let textContent = msg.content;
-      if (msg.senderType === "AI") {
-        const modelIdentifier = `[${msg.provider.toLowerCase()}/${msg.model ?? "unknown"}]`;
-        textContent = `${modelIdentifier}\n${msg.content}`;
-      }
+  //     let textContent = msg.content;
+  //     if (msg.senderType === "AI") {
+  //       const modelIdentifier = `[${msg.provider.toLowerCase()}/${msg.model ?? "unknown"}]`;
+  //       textContent = `${modelIdentifier}\n${msg.content}`;
+  //     }
 
-      contentItems.push({
-        type: "text",
-        text: textContent
-      });
+  //     contentItems.push({
+  //       type: "text",
+  //       text: textContent
+  //     });
 
-      formattedTurns.push({ content: contentItems, role });
-    }
+  //     formattedTurns.push({ content: contentItems, role });
+  //   }
 
-    return formattedTurns;
-  }
+  //   return formattedTurns;
+  // }
 
   protected async formatHistoryForSession(
     msgs: MessageSingleton<true>[],
@@ -1135,6 +1133,9 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }: GenerateContentResponseProps) {
     const m = model ?? "gemini-3.1-pro-preview";
     if (this.isNanoBananaFam(m) && typeof imgGenFields !== "undefined") {
+      /**
+       * 🍌 🍌 🍌 🍌 🍌
+       */
       return this.contentGenNanoBananas({
         model: m,
         imgGenFields: imgGenFields,
