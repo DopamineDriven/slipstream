@@ -69,7 +69,11 @@ export class GrokWorkupService {
     return !this.isMultiAgent(m);
   }
 
-  protected isGrok4Point3(m: string){
+  protected isGrokBuild(m: string) {
+    return m === "grok-build-0.1";
+  }
+
+  protected isGrok4Point3(m: string) {
     return m === "grok-4.3";
   }
 
@@ -77,15 +81,14 @@ export class GrokWorkupService {
     return (
       m === "grok-4.20-0309-reasoning" ||
       m === "grok-4.20-0309-non-reasoning" ||
-      this.isGrok4Point3(m)||
-      this.isMultiAgent(m)
+      this.isGrok4Point3(m) ||
+      this.isMultiAgent(m) ||
+      this.isGrokBuild(m)
     );
   }
 
   protected isGrok4Model(m: string) {
-    return (
-      this.is420BetaModel(m)
-    );
+    return this.is420BetaModel(m);
   }
 
   protected isNativeImgModel(m: string) {
@@ -101,12 +104,17 @@ export class GrokWorkupService {
       this.isNativeImgModel(model) ||
       this.isNativeVideoModel(model) ||
       this.isGrok4Model(model) ||
+      this.isGrokBuild(model) ||
       this.is420BetaModel(model)
     );
   }
 
   protected canViewDocs(model: GrokModelIdUnion) {
-    return this.isGrok4Model(model) || this.is420BetaModel(model);
+    return (
+      this.isGrok4Model(model) ||
+      this.is420BetaModel(model) ||
+      this.isGrokBuild(model)
+    );
   }
 
   protected async syncFilesRegistry(apiKey = this.xaiKey) {
@@ -1240,7 +1248,10 @@ export class GrokWorkupService {
     return { docDb: rec, docXai: promoteDocBg.doc };
   }
 
-  public async syncGrokWithGuard(userId: string, mgmtKey = this.xaiManagementKey) {
+  public async syncGrokWithGuard(
+    userId: string,
+    mgmtKey = this.xaiManagementKey
+  ) {
     let o = true;
     try {
       for await (const x of this.getAllCollections(10, mgmtKey)) {

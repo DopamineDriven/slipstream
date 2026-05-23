@@ -87,6 +87,7 @@ export class ModelService extends ProviderValidation {
 
   public isGeminiModel(m: string) {
     return (
+      m === "gemini-3.5-flash" ||
       m === "gemini-3.1-pro-preview" ||
       m === "gemini-3.1-pro-preview-customtools" ||
       m === "gemini-3.1-flash-lite-preview" ||

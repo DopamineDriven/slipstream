@@ -117,6 +117,7 @@ const providerModelChatApi = {
     "sora-2-pro"
   ],
   gemini: [
+    "gemini-3.5-flash",
     "gemini-3.1-pro-preview",
     "gemini-3.1-pro-preview-customtools",
     "gemini-3.1-flash-lite-preview",
@@ -146,6 +147,7 @@ const providerModelChatApi = {
     "grok-4.20-multi-agent-0309",
     "grok-4.20-0309-reasoning",
     "grok-4.20-0309-non-reasoning",
+    "grok-build-0.1",
     "grok-imagine-image",
     "grok-imagine-image-quality",
     "grok-imagine-video"
@@ -245,7 +247,8 @@ const GROK_NAME_OVERRIDES = {
   "grok-4.20-multi-agent-0309": "Grok 4.20 Multi-Agent",
   "grok-4.20-0309-reasoning": "Grok 4.20 Reasoning",
   "grok-4.20-0309-non-reasoning": "Grok 4.20 Non-Reasoning",
-  "grok-4.3": "Grok 4.3"
+  "grok-4.3": "Grok 4.3",
+  "grok-build-0.1": "Grok Build 0.1"
 } as const;
 
 const MISTRAL_NAME_OVERRIDES = {
@@ -288,7 +291,8 @@ function filterForGrok(id: string) {
     id === "grok-4.20-0309-non-reasoning" ||
     id === "grok-imagine-image-quality" ||
     id === "grok-imagine-image" ||
-    id === "grok-imagine-video"
+    id === "grok-imagine-video" ||
+    id === "grok-build-0.1"
   );
 }
 
@@ -516,41 +520,58 @@ function formattedGrok(props: GrokModelsResponse) {
   });
 }
 
+const gptNameMap = {
+  "gpt-image-1": "GPT Image 1",
+  "gpt-image-1-mini": "GPT Image 1 mini",
+  "gpt-image-1.5": "GPT Image 1.5",
+  "gpt-image-2": "GPT Image 2",
+  "gpt-5-codex": "GPT-5-Codex",
+  "gpt-5.1-codex": "GPT-5.1 Codex",
+  "gpt-5.1-codex-mini": "GPT-5.1 Codex mini",
+  "sora-2": "Sora 2",
+  "sora-2-pro": "Sora 2 Pro",
+  "o4-mini-deep-research": "o4-mini-deep-research",
+  "o3-deep-research": "o3-deep-research",
+  "chatgpt-4o-latest": "ChatGPT-4o",
+  "gpt-5-chat-latest": "GPT-5 Chat",
+  "gpt-5.1-chat-latest": "GPT-5.1 Chat",
+  "gpt-5.2-chat-latest": "GPT-5.2 Chat",
+  "gpt-5.2-pro": "GPT-5.2 pro",
+  "gpt-5.1-codex-max": "GPT-5.1-Codex-Max"
+} as const;
+
+function filterForGPT(s: string) {
+  return (
+    s === "gpt-image-1" ||
+    s === "gpt-image-1.5" ||
+    s === "gpt-image-2" ||
+    s === "gpt-image-1-mini" ||
+    s === "gpt-5-codex" ||
+    s === "gpt-5.1-codex" ||
+    s === "gpt-5.1-codex-mini" ||
+    s === "sora-2" ||
+    s === "sora-2-pro" ||
+    s === "o4-mini-deep-research" ||
+    s === "o3-deep-research" ||
+    s === "chatgpt-4o-latest" ||
+    s === "gpt-5-chat-latest" ||
+    s === "gpt-5.1-chat-latest" ||
+    s === "gpt-5.2-chat-latest" ||
+    s === "gpt-5.2-pro" ||
+    s === "gpt-5.1-codex-max"
+  );
+}
+
 function formattedOpenAi(props: OpenAiResponse) {
   if (!props.data) throw new Error(props.error.message);
   return props?.data?.map(t => {
     const { id, ...rest } = t;
-    if (id === "gpt-image-1")
-      return { id, displayName: "GPT Image 1", ...rest };
-    if (id === "gpt-5-codex")
-      return { id, displayName: "GPT-5-Codex", ...rest };
-    if (id === "gpt-5.1-codex")
-      return { id, displayName: "GPT-5.1 Codex", ...rest };
-    if (id === "gpt-5.1-codex-mini")
-      return { id, displayName: "GPT-5.1 Codex mini", ...rest };
-    if (id === "gpt-image-1-mini")
-      return { id, displayName: "GPT Image 1 mini", ...rest };
-    if (id === "dall-e-3") return { id, displayName: "DALL·E 3", ...rest };
-    if (id === "dall-e-2") return { id, displayName: "DALL·E 2", ...rest };
-    if (id === "sora-2") return { id, displayName: "Sora 2", ...rest };
-    if (id === "sora-2-pro") return { id, displayName: "Sora 2 Pro", ...rest };
-    if (id === "o4-mini-deep-research") return { id, displayName: id, ...rest };
-    if (id === "o3-deep-research") return { id, displayName: id, ...rest };
-    if (id === "chatgpt-4o-latest")
-      return { id, displayName: "ChatGPT-4o", ...rest };
-    if (id === "gpt-5-chat-latest")
-      return { id, displayName: "GPT-5 Chat", ...rest };
-    if (id === "gpt-5.1-chat-latest")
-      return { id, displayName: "GPT-5.1 Chat", ...rest };
-    if (id === "gpt-5.2-chat-latest")
-      return { id, displayName: "GPT-5.2 Chat" };
-    if (id === "gpt-5.2-pro") return { id, displayName: "GPT-5.2 pro" };
-    if (id === "gpt-5.1-codex-max")
-      return { id, displayName: "GPT-5.1-Codex-Max" };
-    if (id === "gpt-image-1.5") return { id, displayName: "GPT Image 1.5" };
-    if (id === "gpt-image-2") return { id, displayName: "GPT Image 2" };
-    const displayName = prettyModelName(id);
-    return { id, displayName, ...rest };
+    if (filterForGPT(id)) {
+      return { id, displayName: gptNameMap[id], ...rest };
+    } else {
+      const displayName = prettyModelName(id);
+      return { id, displayName, ...rest };
+    }
   });
 }
 
