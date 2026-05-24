@@ -17,10 +17,10 @@ import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type {
   ContentChunk,
   SystemMessage,
-  ThinkChunk,
   Tool,
   ToolCall
 } from "@mistralai/mistralai/models/components";
+import { MistralStreamContentService } from "@/mistral/stream-content.ts";
 import type { Logger as PinoLogger } from "pino";
 import { Mistral } from "@mistralai/mistralai";
 import type { $Enums } from "@slipstream/db/node/generated/client";
@@ -31,7 +31,7 @@ import type {
   MistralModelIdUnion
 } from "@slipstream/types";
 
-export class MistralService {
+export class MistralService extends MistralStreamContentService{
   protected defaultClient: Mistral;
   protected logger: PinoLogger;
 
@@ -40,8 +40,9 @@ export class MistralService {
     protected prisma: PrismaService,
     protected redis: EnhancedRedisPubSub,
     protected userStoreVector: UserStoreVectorService,
-    protected apiKey: string
+    protected apiKey: string,
   ) {
+    super();
     this.logger = logger
       .getPinoInstance()
       .child(
@@ -665,26 +666,6 @@ export class MistralService {
     return materialized;
   }
 
-  private isTextChunk(chunk: ContentChunk) {
-    return chunk.type === "text";
-  }
-
-  private isThinkingChunk(chunk: ContentChunk) {
-    return chunk.type === "thinking";
-  }
-
-  private thinkingChunkText(chunk: ThinkChunk) {
-    const textAgg = Array.of<string>();
-
-    for (const item of chunk.thinking) {
-      if (item.type === "text" && "text" in item) {
-        textAgg.push(item.text);
-      }
-    }
-
-    return textAgg.join("");
-  }
-
   public async handleMistralAiChatRequest({
     chunks,
     conversationId,
@@ -969,36 +950,10 @@ export class MistralService {
     const processDeltaContent = (
       content: string | readonly ContentChunk[] | null | undefined
     ) => {
-      if (typeof content === "string") {
-        emitTextChunk(content);
-        return;
-      }
-
-      if (!content || content.length === 0) {
-        return;
-      }
-
-      for (const chunk of content) {
-        if (this.isTextChunk(chunk)) {
-          emitTextChunk(chunk.text);
-          continue;
-        }
-
-        if (this.isThinkingChunk(chunk)) {
-          const thinkingText = this.thinkingChunkText(chunk);
-          if (thinkingText.length > 0) {
-            emitThinkingChunk(thinkingText);
-          }
-
-          if (chunk.closed === true) {
-            finalizeActiveBlock();
-          }
-
-          continue;
-        }
-
-        finalizeActiveBlock();
-      }
+      this.processDeltaContent(content, {
+        emitTextChunk,
+        emitThinkingChunk
+      });
     };
 
     const tools = hasUserStoreDocs

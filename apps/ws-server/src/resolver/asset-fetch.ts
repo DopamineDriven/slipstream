@@ -9,6 +9,7 @@ import type { UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
 import { ResolverAssetAttachOrPasteService } from "@/resolver/asset-attach-or-paste.ts";
+import type { ChecksumAlgo } from "@slipstream/db/enums-node";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap } from "@slipstream/types";
 
@@ -176,7 +177,7 @@ export class ResolverAssetFetchService extends ResolverAssetAttachOrPasteService
         s3ObjectId: s3Result.s3ObjectId,
         versionId: s3Result.versionId,
         sourceUrl,
-        checksumAlgo: s3Result.checksum?.algo,
+        checksumAlgo: s3Result.checksum?.algo as ChecksumAlgo | undefined,
         checksumSha256: s3Result.checksum?.value,
         key: s3Result.key,
         size: BigInt(uploadedBytes), // Use actual uploaded size

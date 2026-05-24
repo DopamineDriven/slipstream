@@ -201,27 +201,21 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       | undefined,
     hasLocalStore = false
   ) {
-    if (m === "claude-3-haiku-20240307") {
+    // advanced tool usage header is a prerequisite for file search (programmatic)
+    // only sonnet-4.5, opus-4.5, and opus-4.6 support advanced tool usage currently (2026-02-13)
+    if (hasLocalStore && this.isAdvancedToolCapable(m)) {
       return [
-        this.webSearchTool(user_location)
-      ] satisfies Anthropic.Beta.BetaToolUnion[];
-    } else {
-      // advanced tool usage header is a prerequisite for file search (programmatic)
-      // only sonnet-4.5, opus-4.5, and opus-4.6 support advanced tool usage currently (2026-02-13)
-      if (hasLocalStore && this.isAdvancedToolCapable(m)) {
-        return [
-          this.codeExecutionTool(),
-          this.fileSearchTool(),
-          this.webSearchTool(user_location),
-          this.webFetchTool()
-        ] satisfies Anthropic.Beta.BetaToolUnion[];
-      }
-      return [
+        this.codeExecutionTool(),
+        this.fileSearchTool(),
         this.webSearchTool(user_location),
-        this.webFetchTool(),
-        this.codeExecutionTool()
+        this.webFetchTool()
       ] satisfies Anthropic.Beta.BetaToolUnion[];
     }
+    return [
+      this.webSearchTool(user_location),
+      this.webFetchTool(),
+      this.codeExecutionTool()
+    ] satisfies Anthropic.Beta.BetaToolUnion[];
   }
 
   protected async formatAnthropicHistoryWithFiles(
