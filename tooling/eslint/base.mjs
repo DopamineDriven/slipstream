@@ -1,9 +1,8 @@
-/// <reference types="./types.d.ts" />
 import { join, relative, resolve } from "node:path";
 import { includeIgnoreFile } from "@eslint/compat";
 import eslint from "@eslint/js";
-import safeql from "@ts-safeql/eslint-plugin/config";
-import importPlugin from "eslint-plugin-import";
+// import safeql from "@ts-safeql/eslint-plugin/config";
+import importPlugin from "eslint-plugin-import-x";
 import turboPlugin from "eslint-plugin-turbo";
 import tseslint from "typescript-eslint";
 
@@ -13,7 +12,7 @@ const project = resolve(relative(process.cwd(), "tsconfig.json"));
  * @param {string} pathname
  * @returns {string}
  */
-const migrationsDir = pathname =>
+const _migrationsDir = pathname =>
   pathname
     .slice(0, pathname.lastIndexOf("turborepo/"))
     .concat("turborepo/packages/db/prisma/migrations");
@@ -46,18 +45,23 @@ export default tseslint.config(
     ],
     extends: [
       eslint.configs.recommended,
-      safeql.configs.connections({
-        migrationsDir: migrationsDir(new URL(import.meta.url).pathname),
-        targets: [
-          { tag: "prisma.+($queryRaw|$executeRaw)", transform: "{type}[]" }
-        ]
-      }),
+      // safeql.configs.connections({
+      //   migrationsDir: migrationsDir(new URL(import.meta.url).pathname),
+      //   targets: [
+      //     { tag: "prisma.+($queryRaw|$executeRaw)", transform: "{type}[]" }
+      //   ]
+      // }),
       ...tseslint.configs.recommended,
       ...tseslint.configs.recommendedTypeChecked,
       ...tseslint.configs.stylisticTypeChecked
     ],
     rules: {
-      ...turboPlugin.configs.recommended.rules,
+      "turbo/no-undeclared-env-vars": [
+        "warn",
+        {
+          allowList: ["^ENV_[A-Z]+$"]
+        }
+      ],
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }

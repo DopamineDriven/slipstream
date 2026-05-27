@@ -12,7 +12,7 @@
         "tsconfig.json",
         "package.json",
         "postcss.config.mjs",
-        "eslint.config.ts",
+        "eslint.config.mjs",
         "tsup.config.ts"
       ]
     }

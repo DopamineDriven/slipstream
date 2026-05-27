@@ -12,10 +12,9 @@
         "ignoreDeprecations":"6.0",
     "types": ["*"],
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "rootDir": "./src",
     "outDir": "dist"
   },
 
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/globals.d.ts", "next-env.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/globals.d.ts", "next-env.d.ts", "**/*.ts", "**/*.mjs"],
   "exclude": ["dist"]
 }

@@ -4,7 +4,7 @@ import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { ImageGenPartialArr, xAIImgGenResponse } from "@/xai/types.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
-import { GrokCollectionsService } from "@/xai/collections.ts";
+import { GrokStreamWorkupService } from "@/xai/stream-workup.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
@@ -12,7 +12,6 @@ import type {
   AIChatResponseImgGenSubFields,
   EventTypeMap,
   GrokImagineARUnion,
-  GrokImagineImageGenOpts,
   GrokImagineImgModelUnion,
   GrokImgGenModels,
   GrokModelIdUnion,
@@ -23,17 +22,7 @@ type xAIImageEditsInput = {
   url: string;
 };
 
-export interface xAIImgGenFields {
-  readonly model: GrokImagineImgModelUnion;
-  readonly prompt: string;
-  readonly n: number;
-  readonly aspect_ratio: GrokImagineARUnion;
-  readonly resolution: GrokImagineImageGenOpts["resolution"];
-  readonly response_format: "b64_json";
-  readonly user: string;
-}
-
-export class GrokImgGenService extends GrokCollectionsService {
+export class GrokImgGenService extends GrokStreamWorkupService {
   protected nanoid: Promise<<Type extends string>(size?: number) => Type>;
   constructor(
     protected redis: EnhancedRedisPubSub,
@@ -353,6 +342,7 @@ export class GrokImgGenService extends GrokCollectionsService {
           mime: t[5],
           revisedPrompt: null,
           seriesId: t[2],
+          // eslint-disable-next-line no-useless-assignment
           seriesIndex: seriesIndex ? Number.parseInt(seriesIndex, 10) : o++
         },
         uploadDuration: t[21] ?? null,
@@ -390,8 +380,11 @@ export class GrokImgGenService extends GrokCollectionsService {
     if (!imgGenFields || !imgGenEnabled || !this.isNativeImgModel(m)) return;
 
     let partialImgArr = Array.of<ImageGenPartialArr>(),
+      // eslint-disable-next-line no-useless-assignment
       tInitial = 0,
+      // eslint-disable-next-line no-useless-assignment
       tDelta = 0,
+      // eslint-disable-next-line no-useless-assignment
       totalDur = 0,
       grokAgg = "",
       grokChunks = Array.of<string>();

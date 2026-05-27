@@ -14,7 +14,8 @@ export default [
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/prefer-regexp-exec": "off",
       "@typescript-eslint/no-empty-object-type": "off",
-      "@typescript-eslint/no-namespace": "off"
+      "@typescript-eslint/no-namespace": "off",
+      "preserve-caught-error": "off"
     },
     ignores: ["dist/**"]
   }

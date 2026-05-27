@@ -12,15 +12,15 @@
   "scripts": {
     "clean": "git clean -xdf .cache .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
     "@eslint/compat": "catalog:eslint",
     "@eslint/js": "catalog:eslint",
     "@next/eslint-plugin-next": "catalog:next",
     "@ts-safeql/eslint-plugin": "catalog:safeql",
-    "eslint-config-turbo": "catalog:turbo",
     "eslint-plugin-import": "catalog:eslint",
+    "eslint-plugin-import-x": "catalog:eslint",
     "eslint-plugin-jsx-a11y": "catalog:eslint",
     "eslint-plugin-react": "catalog:eslint",
     "eslint-plugin-react-compiler": "catalog:eslint",
