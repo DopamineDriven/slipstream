@@ -28,7 +28,7 @@ export class GrokApiMethodsService extends GrokApiWorkupService {
       file_id,
       managementKey
     );
-    // set cache immediately, update after polling (regardless of stash'n'dash or nice'n'slow)
+    // set cache immediately, update after polling (regardless of stash'n'dash or soft'n'slow)
     this.docCache.set(doc.fields.attachmentId, doc);
     while (!this.isTerminalDocStatus(doc.status) && attempts < maxAttempts) {
       await new Promise(resolve =>

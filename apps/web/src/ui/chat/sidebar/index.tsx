@@ -153,6 +153,7 @@ export function EnhancedSidebar({
   };
 
   // Setup virtualizer
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: filteredConversations?.length ?? 0,
     getScrollElement: () => scrollContainerRef.current,

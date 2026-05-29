@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import { ProviderValidation } from "@/provider-validation/index.ts";
 
 const p = new ProviderValidation();
+
 describe("handleOutputSize", () => {
   it("should return auto for gpt-5.4 with no args set", {}, () => {
     assert.equal(p.handleOutputSize("gpt-5.4"), "auto");

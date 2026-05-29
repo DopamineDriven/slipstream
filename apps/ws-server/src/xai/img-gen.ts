@@ -342,7 +342,6 @@ export class GrokImgGenService extends GrokStreamWorkupService {
           mime: t[5],
           revisedPrompt: null,
           seriesId: t[2],
-          // eslint-disable-next-line no-useless-assignment
           seriesIndex: seriesIndex ? Number.parseInt(seriesIndex, 10) : o++
         },
         uploadDuration: t[21] ?? null,
@@ -380,11 +379,8 @@ export class GrokImgGenService extends GrokStreamWorkupService {
     if (!imgGenFields || !imgGenEnabled || !this.isNativeImgModel(m)) return;
 
     let partialImgArr = Array.of<ImageGenPartialArr>(),
-      // eslint-disable-next-line no-useless-assignment
       tInitial = 0,
-      // eslint-disable-next-line no-useless-assignment
       tDelta = 0,
-      // eslint-disable-next-line no-useless-assignment
       totalDur = 0,
       grokAgg = "",
       grokChunks = Array.of<string>();

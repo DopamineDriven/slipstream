@@ -157,6 +157,7 @@ const providerModelChatApi = {
    * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-aliases
    */
   anthropic: [
+    "claude-opus-4-8",
     "claude-opus-4-7",
     "claude-sonnet-4-6",
     "claude-opus-4-6",
@@ -183,7 +184,11 @@ const providerModelChatApi = {
     "mistral-medium-3.5",
     "mistral-large-latest"
   ],
-  cohere: ["command-a-reasoning-08-2025", "command-a-03-2025"],
+  cohere: [
+    "command-a-plus-05-2026",
+    "command-a-reasoning-08-2025",
+    "command-a-03-2025"
+  ],
   moonshotai: ["kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
   deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
   zai: ["glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"]
@@ -216,13 +221,7 @@ async function _llamaFetcher() {
   console.log(res.headers);
   return res;
 }
-async function _v0Fetcher() {
-  return await fetch("https://api.v0.dev/v1/models", {
-    headers: {
-      Authorization: `Bearer ` + (process.env.V0_API_KEY ?? "")
-    }
-  });
-}
+
 async function grokFetcher() {
   return await fetch("https://api.x.ai/v1/models", {
     headers: {
@@ -259,6 +258,7 @@ const MISTRAL_NAME_OVERRIDES = {
 } as const;
 
 const COHERE_NAME_OVERRIDES = {
+  "command-a-plus-05-2026": "Command A Plus",
   "command-a-reasoning-08-2025": "Command A Reasoning",
   "command-a-03-2025": "Command A"
 } as const;
@@ -328,7 +328,11 @@ function filterForMistral(id: string) {
 }
 
 function filterForCohere(id: string) {
-  return id === "command-a-reasoning-08-2025" || id === "command-a-03-2025";
+  return (
+    id === "command-a-reasoning-08-2025" ||
+    id === "command-a-03-2025" ||
+    id === "command-a-plus-05-2026"
+  );
 }
 
 function kimiDisplayName(id: string) {
@@ -370,7 +374,6 @@ function cohereDisplayName(id: string) {
 function displayNameV0(id: string) {
   const raw = id?.trim();
   if (!raw) return "";
-  // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
   const m = raw.toLowerCase().match(/^v0-(\d+(?:\.\d+)?)-([a-z]+)$/);
   if (!m) return prettyModelName(raw); // fallback to your generic formatter
 
@@ -408,7 +411,7 @@ function formatMeta(id: string) {
 
   // Host label (prefix before "llama-"): keep only well-known vendors
   let host: string | null = null;
-  // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec, no-useless-escape
+  // eslint-disable-next-line no-useless-escape
   const hostMatch = s.match(/^([a-z0-9.]+)[-\/](?=llama[-_]\d)/i);
   if (hostMatch) {
     const candidate = hostMatch?.[1]?.toLowerCase();

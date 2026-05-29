@@ -39,6 +39,17 @@ interface ChatMessageProps {
   liveImgGenAttachmentId?: string;
 }
 
+type ImageDataCache = {
+    images: string[];
+    currentImageIndex: number;
+    width: number;
+    height: number;
+    isGenerating: boolean;
+    attachmentId?: string;
+    prompt?: string;
+    kind?: $Enums.ImageGenOutputKind;
+};
+
 // Global cache for processed markdown
 const markdownCache = new Map<string, ReactNode>();
 const ENCRYPTED_THINKING_PLACEHOLDER = "*encrypted output...*";
@@ -90,16 +101,13 @@ export function MessageBubble({
 
   const { resolvedTheme } = useTheme();
 
-  const imageDataCacheRef = useRef<{
-    images: string[];
-    currentImageIndex: number;
-    width: number;
-    height: number;
-    isGenerating: boolean;
-    attachmentId?: string;
-    prompt?: string;
-    kind?: $Enums.ImageGenOutputKind;
-  } | null>(null);
+  const imageDataCacheRef = useRef<ImageDataCache | null>(null);
+
+  // const [imageDataCache, _setImageDataCache] = useState<ImageDataCache | null>(null);
+
+  // useEffect(()=>{
+  //   imageDataCacheRef.current === imageDataCache;
+  // },[imageDataCache]);
 
   const providerInfo = useMemo(
     () => providerMetadata[message.provider.toLowerCase() as Provider],
@@ -258,15 +266,18 @@ export function MessageBubble({
         kind,
         prompt
       };
+      // eslint-disable-next-line react-hooks/refs
       imageDataCacheRef.current = newData;
       return newData;
     }
 
     // If no data but we have cached data, check if it's still relevant
     // This handles the router transition moment
+    // eslint-disable-next-line react-hooks/refs
     if (imageDataCacheRef.current) {
       // Check if the cached data is for the same message
       // by comparing the final image URL with message attachments
+        // eslint-disable-next-line react-hooks/refs
       const cachedFinalUrl = imageDataCacheRef.current.images.at(-1);
 
       if (cachedFinalUrl) {
@@ -275,6 +286,7 @@ export function MessageBubble({
         );
         if (messageHasThisImage) {
           // The cache is still valid for this message
+          // eslint-disable-next-line react-hooks/refs
           return imageDataCacheRef.current;
         }
       }
@@ -282,6 +294,12 @@ export function MessageBubble({
 
     return null;
   }, [liveImgGenFields, message.attachments, message.senderType, isStreaming]);
+
+  // if (imageGenerationData?.currentImageIndex) {
+  //   if (!imageDataCache?.currentImageIndex) setImageDataCache(imageGenerationData);
+  //   if (imageDataCache?.currentImageIndex !==imageGenerationData.currentImageIndex) setImageDataCache(imageGenerationData);
+
+  // }
 
   useEffect(() => {
     // Clear cache if we're looking at a different message
@@ -313,6 +331,7 @@ export function MessageBubble({
     const cached = markdownCache.get(cacheKey);
 
     if (cached) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRenderedContent(cached);
       return;
     }
@@ -351,6 +370,7 @@ export function MessageBubble({
     const thinkingTextToProcess = message.thinkingText;
 
     if (!thinkingTextToProcess) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRenderedThinkingContent(null);
       return;
     }
@@ -392,6 +412,7 @@ export function MessageBubble({
 
   useEffect(() => {
     if (!hasRenderableMessageBlocks) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRenderedBlockContent({});
       return;
     }

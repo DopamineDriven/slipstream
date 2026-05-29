@@ -83,6 +83,7 @@ export const displayNameModelsByProvider = {
     "Grok Imagine Video"
   ],
   anthropic: [
+    "Claude Opus 4.8",
     "Claude Opus 4.7",
     "Claude Sonnet 4.6",
     "Claude Opus 4.6",
@@ -109,7 +110,7 @@ export const displayNameModelsByProvider = {
     "Mistral Medium 3.5",
     "Mistral Large Latest"
   ],
-  cohere: ["Command A Reasoning", "Command A"],
+  cohere: ["Command A Plus", "Command A Reasoning", "Command A"],
   moonshotai: ["Kimi K2.6", "Kimi K2.5", "Kimi K2 Thinking"],
   deepseek: ["DeepSeek V4 Pro", "DeepSeek V4 Flash", "DeepSeek R1"],
   zai: ["GLM 5.1", "GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"]

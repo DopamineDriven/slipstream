@@ -1,8 +1,7 @@
-import { Config } from "typescript-eslint";
-import baseConfig from "@slipstream/eslint-config/base";
+import { defineConfig } from "eslint/config";
+import { baseConfig } from "@slipstream/eslint-config/base";
 
-export default [
-  ...baseConfig,
+export default defineConfig(
   {
     rules: {
       "@typescript-eslint/no-floating-promises": "off",
@@ -18,5 +17,6 @@ export default [
       "preserve-caught-error": "off"
     },
     ignores: ["dist/**"]
-  }
-] satisfies Config;
+  },
+  baseConfig
+);

@@ -576,8 +576,8 @@ export class FileSearchStoreService {
     try {
       for await (const s of this.getIndexedDocsFSS(fssRef, apiKey, 20)) {
         if (s.page.length > 0) {
-          const arrOfEpimerizedOutput = this.fssDocEpimerize(s.page);
-          const backToOriginal = this.fssDocEpimerize(arrOfEpimerizedOutput);
+          const opeThereGoesGravity = this.fssDocEpimerize(s.page);
+          const _snapBackToReality = this.fssDocEpimerize(opeThereGoesGravity);
           for (const doc of s.page) {
             if (doc.displayName && doc.name) {
               const { attachmentId } = this.fssDocEpimerize(doc);

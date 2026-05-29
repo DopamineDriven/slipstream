@@ -30,12 +30,20 @@ export class AnthropicBaseService {
     }
     return client;
   }
-
+  protected supportsAdaptive(mod: string) {
+    return (
+      mod === "claude-opus-4-8" ||
+      mod === "claude-opus-4-7" ||
+      mod === "claude-opus-4-6" ||
+      mod === "claude-sonnet-4-6"
+    );
+  }
   protected handleBetaHeaders(
     model: AnthropicModelIdUnion,
     withLocalStore = false
   ) {
     switch (model) {
+      case "claude-opus-4-8":
       case "claude-opus-4-7": {
         if (withLocalStore) {
           return [
@@ -138,6 +146,7 @@ export class AnthropicBaseService {
   }
 
   protected outputTokenCeilingByModel = {
+    "claude-opus-4-8": 128000,
     "claude-opus-4-7": 128000,
     "claude-sonnet-4-6": 64000,
     "claude-opus-4-6": 128000,
@@ -150,6 +159,7 @@ export class AnthropicBaseService {
   } as const;
 
   protected inputTokenCeilingByModel = {
+    "claude-opus-4-8": 1000000,
     "claude-opus-4-7": 1000000,
     "claude-sonnet-4-6": 1000000,
     "claude-opus-4-6": 1000000,
@@ -177,50 +187,25 @@ export class AnthropicBaseService {
   }
 
   protected handleThinking(mod: AnthropicModelIdUnion, max_tokens?: number) {
-    switch (mod) {
-      case "claude-opus-4-7":
-      case "claude-sonnet-4-6":
-      case "claude-opus-4-6":
-      case "claude-opus-4-1-20250805":
-      case "claude-opus-4-20250514":
-      case "claude-sonnet-4-20250514":
-      case "claude-haiku-4-5-20251001":
-      case "claude-opus-4-5-20251101":
-      case "claude-sonnet-4-5-20250929": {
-        if (this.handleMaxTokens(mod, max_tokens) >= 1024) {
-          if (
-            mod === "claude-opus-4-7" ||
-            mod === "claude-opus-4-6" ||
-            mod === "claude-sonnet-4-6"
-          ) {
-            return {
-              type: "adaptive"
-            } as const satisfies Anthropic.Beta.BetaThinkingConfigAdaptive;
-          }
-          return {
-            type: "enabled",
-            budget_tokens: this.getMaxTokens(mod) - 1024
-          } as const satisfies Anthropic.Beta.BetaThinkingConfigEnabled;
-        } else {
-          if (
-            mod === "claude-opus-4-7" ||
-            mod === "claude-opus-4-6" ||
-            mod === "claude-sonnet-4-6"
-          ) {
-            return {
-              type: "adaptive"
-            } as const satisfies Anthropic.Beta.BetaThinkingConfigAdaptive;
-          }
-          return {
-            type: "disabled"
-          } as const satisfies Anthropic.Beta.BetaThinkingConfigDisabled;
-        }
-      }
-      default: {
+    if (this.handleMaxTokens(mod, max_tokens) >= 1024) {
+      if (this.supportsAdaptive(mod)) {
         return {
-          type: "disabled"
-        } as const satisfies Anthropic.Beta.BetaThinkingConfigDisabled;
+          type: "adaptive"
+        } as const satisfies Anthropic.Beta.BetaThinkingConfigAdaptive;
       }
+      return {
+        type: "enabled",
+        budget_tokens: this.getMaxTokens(mod) - 1024
+      } as const satisfies Anthropic.Beta.BetaThinkingConfigEnabled;
+    } else {
+      if (this.supportsAdaptive(mod)) {
+        return {
+          type: "adaptive"
+        } as const satisfies Anthropic.Beta.BetaThinkingConfigAdaptive;
+      }
+      return {
+        type: "disabled"
+      } as const satisfies Anthropic.Beta.BetaThinkingConfigDisabled;
     }
   }
 

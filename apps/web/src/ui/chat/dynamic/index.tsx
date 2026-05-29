@@ -110,7 +110,8 @@ export function ChatInterface({
     try {
       const raw = sessionStorage.getItem("chat.initialAttachments");
       const bid = sessionStorage.getItem("chat.initialAttachmentsBatchId");
-      if (raw)
+      if (raw) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setInitialPersistedAttachments(
           JSON.parse(raw) as
             | {
@@ -126,6 +127,7 @@ export function ChatInterface({
               }[]
             | null
         );
+      }
       if (bid) initialBatchIdRef.current = bid;
     } catch (err) {
       console.log(err);
@@ -290,7 +292,7 @@ export function ChatInterface({
     if (!activeConversationId) return;
 
     if (!streamedText && !thinkingText && !isThinking && !imgGenFields) return;
-
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsAwaitingFirstChunk(false);
 
     setMessages(prev => {
@@ -368,8 +370,7 @@ export function ChatInterface({
     user,
     isThinking,
     thinkingText,
-    thinkingDuration
-    ,
+    thinkingDuration,
     streamingMessageBlocks
   ]);
 
@@ -377,6 +378,7 @@ export function ChatInterface({
   useEffect(() => {
     if (isComplete && streamedText) {
       // Convert streaming message to final message and update message IDs
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMessages(prev => {
         let updated = [...prev];
 
@@ -421,8 +423,7 @@ export function ChatInterface({
                 imgGenAttachmentId: currentImgGenAttachmentId ?? undefined,
                 imgGenFields: imgGenFields ?? undefined,
                 messageBlocks: toMessageBlocks(
-                  currentAiMsgId ??
-                    streamingMsg.id.replace("streaming-", ""),
+                  currentAiMsgId ?? streamingMsg.id.replace("streaming-", ""),
                   streamingMessageBlocks
                 )
               }

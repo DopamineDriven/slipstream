@@ -117,7 +117,6 @@ function Plane({
       onHoverStart={onHoverStart}
       onHoverEnd={onHoverEnd}>
       <div className="absolute inset-0">
-       {/** eslint-disable-next-line */}
         <img
           src={images[index % images.length]}
           alt={`Plane ${index}`}

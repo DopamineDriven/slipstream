@@ -3,7 +3,6 @@
 import type { User as UserProps } from "@/utils/auth-client";
 import type { ValueKeyframesDefinition } from "motion-dom";
 import type { MotionStyle } from "motion/react";
-import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -84,11 +83,7 @@ const SECTION_TITLES = {
 
 type SectionId = keyof typeof SECTION_TITLES;
 
-export default function SettingsScaffold({
-  user
-}: {
-  user?: UserProps;
-}) {
+export default function SettingsScaffold({ user }: { user?: UserProps }) {
   const { resolvedTheme } = useTheme();
 
   useEffect(() => {
@@ -374,7 +369,10 @@ export default function SettingsScaffold({
               )}>
               <Avatar className="size-10">
                 <AvatarImage
-                  src={user?.image ?? "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"}
+                  src={
+                    user?.image ??
+                    "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"
+                  }
                   alt={user?.name ?? "username"}
                 />
                 <AvatarFallback>
@@ -451,7 +449,10 @@ export default function SettingsScaffold({
           <div className="mb-6">
             <Avatar className="size-10">
               <AvatarImage
-                src={user?.image ?? "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"}
+                src={
+                  user?.image ??
+                  "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"
+                }
                 width={24}
                 height={24}
                 alt={user?.name ?? "username"}
