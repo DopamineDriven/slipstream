@@ -176,21 +176,14 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
   protected isAdvancedToolCapable(m: string) {
     return (
-      m === "claude-opus-4-7" ||
-      m === "claude-sonnet-4-6" ||
-      m === "claude-opus-4-6" ||
+      this.supportsAdaptive(m) ||
       m === "claude-opus-4-5-20251101" ||
       m === "claude-sonnet-4-5-20250929"
     );
   }
 
   protected isEffortCapable(model: string) {
-    return (
-      model === "claude-opus-4-7" ||
-      model === "claude-opus-4-6" ||
-      model === "claude-opus-4-5-20251101" ||
-      model === "claude-sonnet-4-6"
-    );
+    return this.supportsAdaptive(model) || model === "claude-opus-4-5-20251101";
   }
 
   protected tooling(
@@ -403,16 +396,15 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   }
 
   private is4dot67Model(m = "claude-opus-4-6") {
-    return (
-      m === "claude-sonnet-4-6" ||
-      m === "claude-opus-4-6" ||
-      m === "claude-opus-4-7"
-    );
+    return this.supportsAdaptive(m);
   }
 
   private handleEffort(model: string | null) {
     if (!model) return;
     if (!this.is4dot67Model(model)) return;
+    if (model === "claude-opus-4-8") {
+      return { effort: "max" } as const;
+    }
     if (model === "claude-opus-4-7") {
       return { effort: "xhigh" } as const;
     }
@@ -464,7 +456,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     const betas = this.handleBetaHeaders(model, true);
     this.logger.info(betas, "beta headers");
     this.logger.info(tools, "tools returned");
-    // only opus 4.5 (with effort beta header set), opus 4.6 & sonnet 4.6 (natively) support effort config
     return {
       params: {
         max_tokens: maxTokens,

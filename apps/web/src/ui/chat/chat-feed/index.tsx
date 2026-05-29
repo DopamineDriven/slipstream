@@ -109,7 +109,6 @@ export function ChatFeed({
     const initialScroll = () => {
       if (isNewChat) return;
       if (scrollRef.current) {
-        // eslint-disable-next-line
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
     };

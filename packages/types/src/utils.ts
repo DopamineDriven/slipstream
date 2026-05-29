@@ -245,9 +245,7 @@ export type CommonDiscriminants =
   | "tag"
   | "_tag"
   | "__typename";
-// type CommonDiscriminantObj<T extends CommonDiscriminants = CommonDiscriminants> = readonly [Include<CommonDiscriminants,T>,string];
 
-// const O =(props: CommonDiscriminantObj<"type">)=>({[props[0]]: props[1]})
 export type LiteralUnion<TKnown extends string> = TKnown | string;
 
 export type DiscriminatedUnionToRecord<

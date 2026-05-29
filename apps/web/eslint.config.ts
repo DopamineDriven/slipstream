@@ -1,12 +1,9 @@
-import type { Config } from "typescript-eslint";
-import baseConfig from "@slipstream/eslint-config/base";
-import nextjsConfig from "@slipstream/eslint-config/next";
-import reactConfig from "@slipstream/eslint-config/react";
+import { defineConfig } from "eslint/config";
+import { baseConfig } from "@slipstream/eslint-config/base";
+import { nextjsConfig } from "@slipstream/eslint-config/next";
+import { reactConfig } from "@slipstream/eslint-config/react";
 
-export default [
-  ...baseConfig,
-  ...reactConfig,
-  ...nextjsConfig,
+export default defineConfig(
   {
     ignores: [".next/**", "!.next/types/**/*"],
     rules: {
@@ -19,5 +16,8 @@ export default [
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/triple-slash-reference": "off"
     }
-  }
-] satisfies Config;
+  },
+  baseConfig,
+  reactConfig,
+  nextjsConfig
+);

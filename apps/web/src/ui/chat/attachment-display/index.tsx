@@ -98,6 +98,7 @@ export function AttachmentDisplay({
     const cacheKey = `attachment-md:${expanded?.url}`;
     const cached = markdownCache.get(cacheKey);
     if (cached) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRendered(cached);
       return;
     }

@@ -59,6 +59,7 @@
       ],
       "mistral": [
         "dist/mistral/index.d.ts",
+        "dist/mistral/stream-content.d.ts",
         "dist/mistral/types.d.ts"
       ],
       "mixins": [
@@ -133,6 +134,9 @@
         "dist/ws-server/index.d.ts"
       ],
       "xai": [
+        "dist/xai/api-base.d.ts",
+        "dist/xai/api-methods.d.ts",
+        "dist/xai/base.d.ts",
         "dist/xai/collections.d.ts",
         "dist/xai/event-types.ts",
         "dist/xai/img-gen.ts",
@@ -140,8 +144,10 @@
         "dist/xai/response-sse.d.ts",
         "dist/xai/responses-api.d.ts",
         "dist/xai/responses-types.d.ts",
+        "dist/xai/stream-workup.d.ts",
+        "dist/xai/sync.d.ts",
         "dist/xai/types.d.ts",
-        "dist/xai/workup.d.ts"
+        "dist/xai/user-store.d.ts"
       ],
       "zai": [
         "dist/zai/index.d.ts",

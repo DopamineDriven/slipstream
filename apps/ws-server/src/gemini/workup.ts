@@ -25,7 +25,6 @@ import {
 import type {
   AIChatRequestImgGenFields,
   AttachmentSingleton,
-  CTR,
   GeminiModelIdUnion,
   MessageSingleton,
   NanoBanana2OutputAR

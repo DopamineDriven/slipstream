@@ -4,26 +4,24 @@
   "version": "0.1.0",
   "type": "module",
   "exports": {
-    "./base": "./base.mjs",
-    "./next": "./next.mjs",
-    "./react": "./react.mjs"
+    "./base": "./base.ts",
+    "./next": "./next.ts",
+    "./react": "./react.ts"
   },
   "license": "BUSL-1.1",
   "scripts": {
     "clean": "git clean -xdf .cache .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
     "@eslint/compat": "catalog:eslint",
     "@eslint/js": "catalog:eslint",
     "@next/eslint-plugin-next": "catalog:next",
     "@ts-safeql/eslint-plugin": "catalog:safeql",
-    "eslint-config-turbo": "catalog:turbo",
     "eslint-plugin-import": "catalog:eslint",
     "eslint-plugin-jsx-a11y": "catalog:eslint",
     "eslint-plugin-react": "catalog:eslint",
-    "eslint-plugin-react-compiler": "catalog:eslint",
     "eslint-plugin-react-hooks": "catalog:eslint",
     "eslint-plugin-turbo": "catalog:turbo",
     "jiti": "catalog:jiti",
@@ -36,6 +34,8 @@
     "@types/node": "catalog:node",
     "eslint": "catalog:eslint",
     "prettier": "catalog:prettier",
+    "tslib": "catalog:tslib",
+    "tsdown": "catalog:tsdown",
     "typescript": "catalog:ts"
   },
   "prettier": "@slipstream/prettier-config"

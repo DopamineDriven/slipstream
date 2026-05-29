@@ -62,7 +62,11 @@ export class CohereService {
   }
 
   protected isCohereModel(m = "command-a-reasoning-08-2025") {
-    return m === "command-a-03-2025" || m === "command-a-reasoning-08-2025";
+    return (
+      m === "command-a-plus-05-2026" ||
+      m === "command-a-03-2025" ||
+      m === "command-a-reasoning-08-2025"
+    );
   }
 
   protected resolveModel(m = "command-a-reasoning-08-2025") {
@@ -74,11 +78,21 @@ export class CohereService {
   }
 
   protected isReasoningCapable(m = "command-a-reasoning-08-2025") {
-    return m === "command-a-reasoning-08-2025";
+    return (
+      m === "command-a-reasoning-08-2025" || m === "command-a-plus-05-2026"
+    );
   }
 
   protected isToolCapable(m = "command-a-reasoning-08-2025") {
-    return m === "command-a-03-2025" || m === "command-a-reasoning-08-2025";
+    return (
+      m === "command-a-03-2025" ||
+      m === "command-a-reasoning-08-2025" ||
+      m === "command-a-plus-05-2026"
+    );
+  }
+
+  protected isVisionCapable(m = "command-a-plus-05-2026") {
+    return m === "command-a-plus-05-2026";
   }
 
   protected formatSystemInstruction(
@@ -169,6 +183,16 @@ export class CohereService {
                     textParts.push(`[${name}](${url})`);
                   }
                 } else if (att.assetType === "IMAGE") {
+                  if (
+                    isFreshContext &&
+                    msg.model &&
+                    this.isVisionCapable(msg.model)
+                  ) {
+                    content.push({
+                      imageUrl: { url, detail: "high" },
+                      type: "image_url"
+                    });
+                  }
                   textParts.push(`![${name}](${url})`);
                 } else {
                   textParts.push(`[${name}](${url})`);

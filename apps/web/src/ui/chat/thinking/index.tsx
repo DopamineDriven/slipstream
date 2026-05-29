@@ -55,7 +55,6 @@ export function ThinkingSection({
     if (!startTimeRef.current) {
       startTimeRef.current = performance.now();
       lastUpdateRef.current = 0;
-      // eslint-disable-next-line
       setDisplayDuration(0);
     }
 

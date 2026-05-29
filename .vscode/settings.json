@@ -45,9 +45,8 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.suggest.showStatusBar": true,
   "eslint.enable": true,
-  "eslint.useFlatConfig": true,
-  "eslint.nodePath": "node_modules",
   "terminal.integrated.suggest.enabled": false,
+  "eslint.debug": true,
   "eslint.rules.customizations": [
     {
       "rule": "*",

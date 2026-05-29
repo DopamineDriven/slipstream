@@ -83,6 +83,7 @@ export const modelIdsByProvider = {
     "grok-imagine-video"
   ],
   anthropic: [
+    "claude-opus-4-8",
     "claude-opus-4-7",
     "claude-sonnet-4-6",
     "claude-opus-4-6",
@@ -109,7 +110,11 @@ export const modelIdsByProvider = {
     "mistral-medium-3.5",
     "mistral-large-latest"
   ],
-  cohere: ["command-a-reasoning-08-2025", "command-a-03-2025"],
+  cohere: [
+    "command-a-plus-05-2026",
+    "command-a-reasoning-08-2025",
+    "command-a-03-2025"
+  ],
   moonshotai: ["kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
   deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
   zai: ["glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"]

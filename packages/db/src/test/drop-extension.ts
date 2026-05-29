@@ -12,7 +12,6 @@ async function dropExtension() {
   try {
     // Use the NON-Accelerate client to be safest (bypasses any caching layer)
 
-    // eslint-disable-next-line @ts-safeql/check-sql
     await prisma.$executeRaw`DROP EXTENSION IF EXISTS pg_stat_statements CASCADE;`;
 
     console.log("✅ pg_stat_statements dropped successfully on preview DB");
