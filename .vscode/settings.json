@@ -91,6 +91,7 @@
   "js/ts.experimental.useTsgo": false,
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "js/ts.suggest.autoImports": true,
+  "js/ts.suggest.enabled": true,
   "yaml.hover": true,
   "markdown-pdf.margin.top": "0.5in",
   "markdown-pdf.margin.bottom": "0.5in",
