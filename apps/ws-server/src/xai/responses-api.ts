@@ -895,7 +895,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
         conversationId,
         userId,
         systemPrompt,
-        temperature,
+        temperature,      convo: d.convo,
         title,
         userMsgId,
         usage,

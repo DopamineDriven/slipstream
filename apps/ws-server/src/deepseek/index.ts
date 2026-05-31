@@ -1097,6 +1097,7 @@ export class DeepSeekService {
       conversationId,
       userId,
       systemPrompt,
+      convo: d.convo,
       userMsgId,
       aiMsgId: d.aiMsgId,
       imgGenEnabled: false,

@@ -717,6 +717,7 @@ export class GrokImgGenService extends GrokStreamWorkupService {
           topP,
           provider,
           model: m,
+          convo: d.convo,
           chunk: grokAgg,
           done: true,
           imgGenEnabled: true,

@@ -14,6 +14,7 @@ import { PrismaAttachmentService } from "@/prisma/attachment.ts";
 import type { ImageGenOutputCreateNestedOneWithoutAttachmentInput } from "@slipstream/db/node/generated/models";
 import type {
   AIChatRequest,
+  AIChatResponse,
   AIChatResponseDb,
   AllModelsUnion,
   AttachmentSingleton,
@@ -1159,6 +1160,7 @@ export class PrismaChatService extends PrismaAttachmentService {
         const { messages, ...e } = persist;
         const msgs = messages.map(t => {
           return {
+
             ...t,
             ttsJob: {
               ...t.ttsJob,
@@ -1168,7 +1170,7 @@ export class PrismaChatService extends PrismaAttachmentService {
         });
 
         const cleaned = { messages: msgs, ...e };
-        return { aiMsgId, persist: cleaned, imgGenAttachmentId };
+        return { aiMsgId, persist: cleaned, imgGenAttachmentId, convo: convo satisfies AIChatResponse["convo"]};
       } else {
         const { messages, ...e } = persist;
         const msgs = messages.map(t => {
@@ -1183,7 +1185,7 @@ export class PrismaChatService extends PrismaAttachmentService {
 
         const cleaned = { messages: msgs, ...e };
 
-        return { aiMsgId, persist: cleaned, imgGenAttachmentId: undefined, convo };
+        return { aiMsgId, persist: cleaned, imgGenAttachmentId: undefined, convo: convo satisfies AIChatResponse['convo'] };
       }
     });
 

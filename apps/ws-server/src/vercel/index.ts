@@ -1177,6 +1177,7 @@ export class v0Service {
       systemPrompt,
       userMsgId,
       aiMsgId: d.aiMsgId,
+      convo: d.convo,
       imgGenEnabled: false,
       temperature,
       title,

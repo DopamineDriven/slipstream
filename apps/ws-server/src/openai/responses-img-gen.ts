@@ -1019,7 +1019,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
           userMsgId,
           aiMsgId: d.aiMsgId,
           imgGenAttachmentId: d.imgGenAttachmentId,
-          temperature,
+          temperature,      convo: d.convo,
           usage,
           imgGenEnabled: true,
           imgGenFields: {

@@ -871,6 +871,7 @@ export class GeminiChatService extends GeminiWorkupService {
           conversationId,
           done: true,
           aiMsgId: d.aiMsgId,
+          convo: d.convo,
           imgGenAttachmentId: d.imgGenAttachmentId,
           usage,
           imgGenFields: {
@@ -917,6 +918,7 @@ export class GeminiChatService extends GeminiWorkupService {
         type: "ai_chat_response",
         chunk: geminiAgg,
         conversationId,
+        convo: d.convo,
         done: true,
         aiMsgId: d.aiMsgId,
         imgGenAttachmentId: d.imgGenAttachmentId,
@@ -1023,6 +1025,7 @@ export class GeminiChatService extends GeminiWorkupService {
       userMsgId,
       aiMsgId: d.aiMsgId,
       usage,
+      convo: d.convo,
       data: geminiDataPart
         ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`
         : undefined,

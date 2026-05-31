@@ -1190,6 +1190,7 @@ export class CohereService {
       systemPrompt,
       userMsgId,
       aiMsgId: d.aiMsgId,
+      convo: d.convo,
       imgGenEnabled: false,
       temperature,
       title,

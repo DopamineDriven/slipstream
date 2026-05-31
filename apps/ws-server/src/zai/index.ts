@@ -1056,6 +1056,7 @@ export class ZaiService {
       systemPrompt,
       userMsgId,
       aiMsgId: d.aiMsgId,
+      convo: d.convo,
       imgGenEnabled: false,
       temperature,
       title,

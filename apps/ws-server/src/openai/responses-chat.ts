@@ -547,7 +547,7 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       type: "ai_chat_response",
       conversationId,
       userId,
-      systemPrompt,
+      systemPrompt,      convo: d.convo,
       temperature,
       userMsgId,
       title,
