@@ -26,7 +26,7 @@ import {
 } from "@slipstream/ui";
 
 const ThemeToggle = dynamic(
-  () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
+  () => import("@/ui/layout/theme-toggle").then(d => d.ThemeToggle),
   { ssr: false }
 );
 

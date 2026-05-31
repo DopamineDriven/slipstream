@@ -29,11 +29,12 @@ import {
   PanelRightClose,
   useElementDimensions,
   useMediaQuery,
-  User
+  User,
+  useResolvedTheme
 } from "@slipstream/ui";
 
 const ThemeToggle = dynamic(
-  () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
+  () => import("@/ui/layout/theme-toggle").then(d => d.ThemeToggle),
   { ssr: false }
 );
 const settingsSectionsConfig = [
@@ -86,26 +87,7 @@ type SectionId = keyof typeof SECTION_TITLES;
 export default function SettingsScaffold({ user }: { user?: UserProps }) {
   const { resolvedTheme } = useTheme();
 
-  useEffect(() => {
-    const prefersDark =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    if (!resolvedTheme) {
-      if (prefersDark) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    } else {
-      // Apply theme based on resolvedTheme once it's available
-      if (resolvedTheme === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    }
-  }, [resolvedTheme]);
+  useResolvedTheme(resolvedTheme);
 
   const [activeSection, setActiveSection] = useState<SectionId>("account");
 

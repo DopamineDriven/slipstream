@@ -19,11 +19,12 @@ import {
   Menu,
   Settings,
   TooltipProvider,
-  X
+  X,
+  useResolvedTheme
 } from "@slipstream/ui";
 
 const ThemeToggle = dynamic(
-  () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
+  () => import("@/ui/layout/theme-toggle").then(d => d.ThemeToggle),
   { ssr: false }
 );
 
@@ -70,27 +71,7 @@ export function MobileSettingsFAB({
 }: MobileSettingsFABProps) {
   const { resolvedTheme } = useTheme();
 
-  useEffect(() => {
-    const prefersDark =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    // Apply theme based on system preference during initial load
-    if (!resolvedTheme) {
-      if (prefersDark) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    } else {
-      // Apply theme based on resolvedTheme once it's available
-      if (resolvedTheme === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    }
-  }, [resolvedTheme]);
+  useResolvedTheme(resolvedTheme);
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -184,7 +165,7 @@ export function MobileSettingsFAB({
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0, opacity: 0, y: 20 }}
                     transition={{ duration: 0.2 }}
-                    className="bg-brand-component/95 border-brand-border absolute right-0 bottom-16 min-w-[200px] rounded-2xl border p-3 shadow-xl backdrop-blur-md">
+                    className="bg-brand-component/95 border-brand-border absolute right-0 bottom-16 min-w-50 rounded-2xl border p-3 shadow-xl backdrop-blur-md">
                     {/* User Profile */}
                     <div className="border-brand-border mb-3 flex items-center gap-3 border-b p-2">
                       <Avatar className="h-8 w-8">
