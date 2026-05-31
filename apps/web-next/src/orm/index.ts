@@ -6,30 +6,7 @@ interface OrmServiceEntity {
   prismaApiKeyService: PrismaUserKeyService;
   prismaConversationService: PrismaUserMessageService;
 }
-/**
-  async deleteAttachment(id: string, userId: string): Promise<Attachment> {
-    // Verify ownership
-    const attachment = await this.prismaClient.attachment.findUnique({
-      where: { id }
-    });
 
-    if (!attachment) {
-      throw new Error("Attachment not found");
-    }
-
-    if (attachment.userId !== userId) {
-      throw new Error("Unauthorized to delete this attachment");
-    }
-
-    return this.prismaClient.attachment.update({
-      where: { id },
-      data: {
-        status: "DELETED",
-        deletedAt: new Date()
-      }
-    });
-  }
- */
 export function ormHandler(prisma: PrismaClientBase) {
   return {
     prismaApiKeyService: new PrismaUserKeyService(prisma),

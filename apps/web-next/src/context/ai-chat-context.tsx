@@ -15,7 +15,7 @@ import { useAssetUpload } from "@/context/asset-context";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
-import { getModel } from "@/lib/get-model";
+import { getModel } from "@/lib/models";
 import { pathParser } from "@/lib/path-parser";
 import type {
   AIChatRequest,

@@ -1,30 +1,28 @@
 "use client";
 
+import type { SidebarProps } from "@/types/ui";
 import type { User } from "@/utils/auth-client";
 import type React from "react";
-import { Suspense, useCallback, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useCookiesCtx } from "@/context/cookie-context";
-import { useSettingsDrawer } from "@/context/settings-drawer-context";
-import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
-import { useResolvedTheme } from "@/hooks/use-resolved-theme";
-import { SidebarProps } from "@/types/ui";
 import {
   Sidebar,
   SidebarInset,
   SidebarProvider,
   SidebarTrigger
 } from "@/ui/atoms/sidebar";
+import { HeaderActions } from "@/ui/chat/chat-page-layout-shell/header-actions";
 import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
 import { ProviderModelSelector } from "@/ui/chat/provider-model-selector";
 import { SettingsDrawer } from "@/ui/chat/settings-drawer";
 import { EnhancedSidebar } from "@/ui/chat/sidebar";
+import { useTheme } from "next-themes";
 import {
-  Button,
-  PanelLeftClose as PanelLeft,
+  PanelLeftClose,
   Separator,
-  Settings,
-  ShareIcon as Share2
+  useKeyboardShortcuts,
+  useResolvedTheme
 } from "@slipstream/ui";
 
 const ThemeToggle = dynamic(
@@ -32,48 +30,19 @@ const ThemeToggle = dynamic(
   { ssr: false }
 );
 
-interface ChatLayoutShellProps {
-  children: React.ReactNode;
-  fallbackData?: SidebarProps[];
-  user?: User;
-}
-
-function HeaderActions() {
-  useResolvedTheme();
-  const { openToTab } = useSettingsDrawer();
-  const handleShareChat = useCallback(() => {
-    console.log("Share chat clicked. Implement sharing logic.");
-    alert("Share functionality to be implemented!");
-  }, []);
-
-  return (
-    <div className="flex items-center space-x-1 sm:space-x-2">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={handleShareChat}
-        className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
-        <Share2 className="size-5" />
-        <span className="sr-only">Share chat</span>
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => openToTab("apiKeys")}
-        className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
-        <Settings className="size-5" />
-        <span className="sr-only">Settings</span>
-      </Button>
-      <ThemeToggle className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component" />
-    </div>
-  );
-}
-
 export function ChatLayoutShell({
   children,
   fallbackData,
   user
-}: ChatLayoutShellProps) {
+}: {
+  children: React.ReactNode;
+  fallbackData?: SidebarProps[];
+  user?: User;
+}) {
+  const { resolvedTheme } = useTheme();
+
+  useResolvedTheme(resolvedTheme);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { get } = useCookiesCtx();
@@ -107,13 +76,15 @@ export function ChatLayoutShell({
               <header className="border-border bg-background relative flex h-14 shrink-0 items-center justify-between border-b px-4">
                 <div className="flex min-w-0 items-center">
                   <SidebarTrigger className="z-100">
-                    <PanelLeft className="size-5" />
+                    <PanelLeftClose className="size-5" />
                     <span className="sr-only">Toggle Sidebar</span>
                   </SidebarTrigger>
                   <Separator orientation="vertical" className="mx-2 h-6" />
                   <ProviderModelSelector />
                 </div>
-                <HeaderActions />
+                <HeaderActions>
+                  <ThemeToggle className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component" />
+                </HeaderActions>
               </header>
               <div className="flex-1 overflow-y-auto">{children}</div>
             </div>

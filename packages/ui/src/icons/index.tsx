@@ -1,4 +1,5 @@
 import type { ComponentPropsWithRef } from "react";
+import { AICoalesce } from "@/icons/aicoalesce";
 import { AnonymousIcon } from "@/icons/anonymous";
 import { AnthropicIcon } from "@/icons/anthropic";
 import { ArrowDownCircle } from "@/icons/arrow-down-circle";
@@ -29,6 +30,7 @@ import { Eye } from "@/icons/eye";
 import { EyeClosed } from "@/icons/eye-closed";
 import { EyeOff } from "@/icons/eye-off";
 import { FileText } from "@/icons/file-text";
+import { Folder } from "@/icons/folder";
 import { GeminiIcon } from "@/icons/gemini";
 import { Github } from "@/icons/github";
 import { GoogleIcon } from "@/icons/google";
@@ -92,6 +94,7 @@ import { Zai } from "@/icons/zai";
 import { Zap } from "@/icons/zap";
 
 const IconComponents = {
+  AICoalesce,
   AnonymousIcon,
   AnthropicIcon,
   ArrowDownCircle,
@@ -123,6 +126,7 @@ const IconComponents = {
   EyeClosed,
   EyeOff,
   FileText,
+  Folder,
   GeminiIcon,
   Github,
   GoogleIcon,
@@ -220,6 +224,7 @@ export const Icon = Object.assign(
 );
 
 export {
+  AICoalesce,
   AnonymousIcon,
   AnthropicIcon,
   ArrowDownCircle,
@@ -251,6 +256,7 @@ export {
   EyeClosed,
   EyeOff,
   FileText,
+  Folder,
   GeminiIcon,
   Github,
   GoogleIcon,

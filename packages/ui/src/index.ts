@@ -1,9 +1,24 @@
-// styles
 import "./globals.css";
 
-// icons
+export { useAspectCh } from "@/hooks/use-aspect-ch";
+export { useElementDimensions } from "@/hooks/use-element-dimensions";
+export { useFallingEdgeTimer } from "@/hooks/use-falling-edge-timer";
+export type { KeyboardShortcut } from "@/hooks/use-keyboard-shortcuts";
+export {
+  formatShortcut,
+  useKeyboardShortcuts
+} from "@/hooks/use-keyboard-shortcuts";
+export { useLocalStorageState } from "@/hooks/use-local-storage-state";
+export { useMediaQuery } from "@/hooks/use-media-query";
+export { useResizeObserver } from "@/hooks/use-resize-observer";
+export { useResolvedTheme } from "@/hooks/use-resolved-theme";
+export { useScrollObserver } from "@/hooks/use-scroll-observer";
+export { useStateDeferred } from "@/hooks/use-state-deferred";
+export { useViewportDimensions } from "@/hooks/use-viewport-dimensions";
+
 export { Icon } from "@/icons/index";
 export type { BaseSVGProps, IconName } from "@/icons/index";
+export { AICoalesce } from "@/icons/aicoalesce";
 export { AnonymousIcon } from "@/icons/anonymous";
 export { AnthropicIcon } from "@/icons/anthropic";
 export { ArrowDownCircle } from "@/icons/arrow-down-circle";
@@ -34,6 +49,7 @@ export { EyeClosed } from "@/icons/eye-closed";
 export { EyeOff } from "@/icons/eye-off";
 export { Eye } from "@/icons/eye";
 export { FileText } from "@/icons/file-text";
+export { Folder } from "@/icons/folder";
 export { GeminiIcon } from "@/icons/gemini";
 export { Github } from "@/icons/github";
 export { GoogleIcon } from "@/icons/google";
@@ -95,12 +111,26 @@ export { X } from "@/icons/x";
 export { XAiIcon } from "@/icons/xai";
 export { Zai } from "@/icons/zai";
 export { Zap } from "@/icons/zap";
-// lib
-export { cn } from "@/lib/utils";
-// ui - base components
-export { UploadProgress } from "@/base/progress";
 
-// ui - radix components
+export { mathmlTags } from "@/lib/mathml-tags";
+export type {
+  InferStrip,
+  StripCommas,
+  StripSeparators,
+  StripUnderscore
+} from "@/lib/safe-number";
+export { isDecimal, n, stripSeparators, toN } from "@/lib/safe-number";
+export type { ScaledRatio } from "@/lib/scale-ratio";
+export {
+  gcd,
+  parseAndScaleRatio,
+  parseRatio,
+  scaleRatio
+} from "@/lib/scale-ratio";
+export type { SafeNumber } from "@/lib/shimmer";
+export { fromBase64, shimmer, shimmerScaffold, toBase64 } from "@/lib/shimmer";
+export { cn } from "@/lib/utils";
+
 export {
   Accordion,
   AccordionContent,
@@ -127,6 +157,8 @@ export { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 export type { AvatarProps } from "@/ui/avatar";
 export { Badge, badgeVariants } from "@/ui/badge";
 export type { BadgeProps } from "@/ui/badge";
+export { BaseScrollArea, BaseScrollBar } from "@/base/scroll";
+export { BreakoutWrapper } from "@/ui/breakout-wrapper";
 export { Button, buttonVariants } from "@/ui/button";
 export type { ButtonProps } from "@/ui/button";
 export { ButtonDos, buttonDosVariants } from "@/ui/button-dos";
@@ -141,6 +173,10 @@ export {
   CardContent
 } from "@/ui/card";
 export { Checkbox } from "@/ui/checkbox";
+export type { CodeBlockProps } from "@/ui/code-block";
+export { CodeBlock } from "@/ui/code-block";
+export type { CopyButtonProps } from "@/ui/copy-button";
+export { CopyButton } from "@/ui/copy-button";
 export {
   Dialog,
   DialogPortal,
@@ -175,6 +211,7 @@ export type { DropdownMenuProps } from "@/ui/dropdown-menu";
 export { Input } from "@/ui/input";
 export type { InputProps } from "@/ui/input";
 export { Label } from "@/ui/label";
+export { NativeTruncatedText } from "@/ui/native-truncated-text";
 export {
   Popover,
   PopoverTrigger,
@@ -227,3 +264,16 @@ export {
   TooltipProvider,
   TooltipTrigger
 } from "@/ui/tooltip";
+export { UploadProgress } from "@/base/progress";
+
+declare global {
+  interface JSON {
+    parse<T = unknown>(
+      text: string,
+      reviver?: (this: any, key: string, value: any) => any
+    ): T;
+  }
+  interface Body {
+    json<T = unknown>(): Promise<T>;
+  }
+}

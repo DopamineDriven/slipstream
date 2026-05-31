@@ -2,7 +2,7 @@
 
 import type { TargetAndTransition } from "motion/react";
 import { useCallback, useState } from "react";
-import { ImageGenCostSlider } from "@/ui/atoms/animated-slider";
+import { ImageGenCostSlider } from "@/ui/chat/img-gen-controls/cost-slider";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "motion/react";
 import type {

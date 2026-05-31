@@ -203,7 +203,7 @@ const CloseIcon = () => (
   </svg>
 );
 
-const ICON_PROPS: React.SVGProps<SVGSVGElement> = {
+const ICON_PROPS = {
   width: 18,
   height: 18,
   viewBox: "0 0 24 24",
@@ -212,7 +212,7 @@ const ICON_PROPS: React.SVGProps<SVGSVGElement> = {
   strokeWidth: 2,
   strokeLinecap: "round",
   strokeLinejoin: "round"
-};
+} satisfies React.SVGProps<SVGSVGElement>;
 
 const LinkIcon = () => (
   <svg {...ICON_PROPS}>

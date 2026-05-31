@@ -1,47 +1,15 @@
-export const errHelper = <
-  const L extends
-    | "debug"
-    | "group"
-    | "error"
-    | "info"
-    | "log"
-    | "table"
-    | "warn"
->(
-  err: unknown,
-  target?: L
-) => {
-  if (!target) {
-    return console.info(
-      err instanceof Error ? err.message : JSON.stringify(err, null, 2)
-    );
-  } else
-    return console[target](
-      err instanceof Error ? err.message : JSON.stringify(err, null, 2)
-    );
-};
-
 export class ErrorHelperService {
-  public errHelper = <
-    const L extends
-      | "debug"
-      | "group"
-      | "error"
-      | "info"
-      | "log"
-      | "table"
-      | "warn"
-  >(
-    err: unknown,
-    target?: L
-  ) => {
-    if (!target) {
-      return console.info(
-        err instanceof Error ? err.message : JSON.stringify(err, null, 2)
-      );
-    } else
-      return console[target](
-        err instanceof Error ? err.message : JSON.stringify(err, null, 2)
-      );
-  };
+  public safeErrMsg(err: unknown) {
+    if (err instanceof Error) {
+      return err.message;
+    } else if (typeof err === "object" && err != null) {
+      return JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
+    } else if (typeof err === "string") {
+      return err;
+    } else if (typeof err === "number") {
+      return err.toPrecision(5);
+    } else if (typeof err === "boolean") {
+      return `${err}`;
+    } else return String(err);
+  }
 }

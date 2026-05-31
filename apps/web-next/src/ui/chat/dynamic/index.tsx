@@ -564,7 +564,6 @@ export function ChatInterface({
             user={user}
             selectedModel={selectedModel}
             tz={tz}
-            onPromptClickAction={handlePromptClick}
           />
         </ChatFeed>
         <Suspense>

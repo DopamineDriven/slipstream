@@ -1,13 +1,16 @@
 "use client";
 
-import type { ButtonProps } from "@slipstream/ui";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Button, Copy } from "@slipstream/ui";
 import { motion } from "motion/react";
+import type { ButtonProps } from "@slipstream/ui";
+import { Rm } from "@slipstream/types";
+import { Button, Copy } from "@slipstream/ui";
 
-export interface AnimatedCopyButtonProps
-  extends Omit<ButtonProps, "onClick" | "children"> {
+export interface AnimatedCopyButtonProps extends Rm<
+  ButtonProps,
+  "onClick" | "children"
+> {
   textToCopy: string;
   initialIconSize?: number;
   className?: string;

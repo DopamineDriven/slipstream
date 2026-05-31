@@ -1,8 +1,10 @@
 import type { JSX, ReactNode } from "react";
-import { preprocessAIMarkdown } from "@/lib/preprocess";
-import { preprocessMathDelimiters } from "@/lib/processor";
+import {
+  preprocessAIMarkdown,
+  preprocessMathDelimiters
+} from "@/lib/preprocess";
 import { cn } from "@/lib/utils";
-import { CodeBlock } from "@/ui/atoms/code-block";
+import { CodeBlock } from "@slipstream/ui";
 
 /**
  * Lightweight markdown processor for streaming messages

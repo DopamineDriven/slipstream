@@ -7,6 +7,7 @@ const tsupConfig = (options: Options) =>
     ...options,
     entry: [
       "src/base/*.tsx",
+      "src/hooks/*.ts",
       "src/globals.css",
       "src/index.ts",
       "src/icons/*.tsx",

@@ -1,9 +1,36 @@
 "use server";
 
 import { refresh } from "next/cache";
-import { handleBigintToNumber } from "@/lib/bigint-to-number";
 import { prismaClient } from "@/lib/prisma";
 import { rxnObject } from "@/lib/rxn-object";
+import type {
+  AttachmentProviderSingleton,
+  MessageSingleton
+} from "@slipstream/types";
+
+function handleBigintToNumber(message: MessageSingleton<false | true>) {
+  const { attachments, ...rest } = message;
+  const mapIt = attachments.map(t => {
+    const { size, ...p } = t;
+    const mapProviderSingleton = p?.providerLinks?.map(v => {
+      const { size, attachment: _att, ...s } = v;
+
+      return {
+        size: size ? Number(size) : null,
+        ...s
+      } satisfies AttachmentProviderSingleton<true>;
+    });
+    return {
+      ...p,
+      size: size ? Number(size) : null,
+      providerLinks: mapProviderSingleton
+    };
+  });
+  return {
+    attachments: mapIt,
+    ...rest
+  } satisfies MessageSingleton<true> as MessageSingleton<true>;
+}
 
 function extractId(dataMsgId: string) {
   if (/^(?:msg-)+(?:\w+)$/gim.test(dataMsgId)) {

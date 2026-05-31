@@ -1,7 +1,3 @@
-export type Unenumerate<T> = T extends readonly (infer U)[] | (infer U)[]
-  ? U
-  : T;
-
 type CollapseSpaces<S extends string> =
   S extends `${infer T}  ${infer U}` ? CollapseSpaces<`${T} ${U}`> : S;
 
@@ -78,44 +74,3 @@ export function slugify<const T extends string>(title: T) {
     .replace(/^-+/, "")
     .replace(/-+$/, "") as ToSlug<T>;
 }
-
-/**
- *
- * miscellaneous
- * ===============
- */
-export type Split<S extends string> = S extends `${infer First}${infer Rest}`
-  ? [First, ...Split<Rest>]
-  : [];
-
-export type SplitR<S extends string> = S extends `${infer First}${infer Rest}`
-  ? readonly [First, ...Split<Rest>]
-  : [];
-
-export type AtoZ = `abcdefghijklmnopqrstuvwxyz`;
-
-export type LowerAlphabet = Unenumerate<Split<AtoZ>>;
-
-export type AllowedSlugChars =
-  | LowerAlphabet
-  | "-"
-  | " "
-  | "0"
-  | "1"
-  | "2"
-  | "3"
-  | "4"
-  | "5"
-  | "6"
-  | "7"
-  | "8"
-  | "9";
-
-export type FilterAllowed<S extends string> =
-  S extends `${infer Head}${infer Tail}`
-    ? Lowercase<Head> extends AllowedSlugChars
-      ? `${Lowercase<Head>}${FilterAllowed<Tail>}`
-      : FilterAllowed<Tail>
-    : S extends ":"
-      ? ""
-      : S;

@@ -6,8 +6,6 @@ import type { MotionStyle } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useElementDimensions } from "@/hooks/use-element-dimensions";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { ApiKeysTab } from "@/ui/api-key-settings";
 import { MobileSettingsFAB } from "@/ui/settings/mobile-settings-fab";
@@ -29,6 +27,8 @@ import {
   Palette,
   PanelLeftClose,
   PanelRightClose,
+  useElementDimensions,
+  useMediaQuery,
   User
 } from "@slipstream/ui";
 

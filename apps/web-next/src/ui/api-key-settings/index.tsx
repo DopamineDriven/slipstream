@@ -11,12 +11,11 @@ import {
   API_KEY_SETTINGS_TEXT_CONSTS,
   providerObj
 } from "@/ui/api-key-settings/constants";
-import { BreakoutWrapper } from "@/ui/atoms/breakout-wrapper";
 import { MultiStateApiKeySubmissionBadge } from "@/ui/atoms/multi-state-submission-badge";
 import { AnimatePresence, motion } from "motion/react";
 import type {
   ClientContextWorkupProps,
-  Providers as Provider
+  Provider
 } from "@slipstream/types";
 import {
   AlertDialog,
@@ -28,6 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
+  BreakoutWrapper,
   Button,
   Card,
   CardContent,
