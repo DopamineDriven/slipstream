@@ -5,6 +5,7 @@ declare module "gtag.js";
 declare global {
   interface Window {
     dataLayer?: object[];
+    __chatStoreSnapshot?: <T = unknown>(conversationId?: string) => T;
   }
   interface JSON {
     parse<T = unknown>(
