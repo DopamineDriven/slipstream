@@ -47,10 +47,10 @@ export class ChatStore extends ChatMessageWorkup {
 
   private byId = new Map<string, MessageSingleton<true>>();
   private committedSnapshot: CommittedSnapshot = EMPTY_MESSAGES;
-  private draftSnapshot: DraftSnapshot = null;
-  private conversationSnapshot: ConversationSnapshot = null;
+  private draftSnapshot: DraftSnapshot = undefined;
+  private conversationSnapshot: ConversationSnapshot = undefined;
 
-  private errorSnapshot: ErrorSnapshot = null;
+  private errorSnapshot: ErrorSnapshot = undefined;
 
   private statusSnapshot: StatusSnapshot;
   private title: string | null = null;
@@ -59,7 +59,7 @@ export class ChatStore extends ChatMessageWorkup {
   private isNewChat = false;
   private urlTransitionInFlight = false;
   private phase: ChatStreamPhase = "idle";
-  private pendingOptimisticUserId: string | null = null;
+  private pendingOptimisticUserId: string | undefined = undefined;
   private readonly committedListeners = new Set<Listener>();
   private readonly draftListeners = new Set<Listener>();
   private readonly statusListeners = new Set<Listener>();
@@ -84,7 +84,7 @@ export class ChatStore extends ChatMessageWorkup {
     return () => void this.draftListeners.delete(listener);
   };
   public readonly getDraftSnapshot = () => this.draftSnapshot;
-  public readonly getDraftServerSnapshot = (): DraftSnapshot => null;
+  public readonly getDraftServerSnapshot = (): DraftSnapshot => undefined;
 
   public readonly subscribeStatus = (listener: Listener) => {
     this.statusListeners.add(listener);
@@ -99,14 +99,14 @@ export class ChatStore extends ChatMessageWorkup {
   };
   public readonly getConversationSnapshot = () => this.conversationSnapshot;
   public readonly getConversationServerSnapshot = (): ConversationSnapshot =>
-    null;
+    undefined;
 
   public readonly subscribeError = (listener: Listener) => {
     this.errorListeners.add(listener);
     return () => void this.errorListeners.delete(listener);
   };
   public readonly getErrorSnapshot = () => this.errorSnapshot;
-  public readonly getErrorServerSnapshot = (): ErrorSnapshot => null;
+  public readonly getErrorServerSnapshot = (): ErrorSnapshot => undefined;
 
   private notify(listeners: Set<Listener>) {
     for (const listener of listeners) listener();
@@ -200,12 +200,12 @@ export class ChatStore extends ChatMessageWorkup {
     });
     this.rebuildCommitted();
 
-    if (this.draftSnapshot !== null) {
-      this.draftSnapshot = null;
+    if (this.draftSnapshot !== undefined) {
+      this.draftSnapshot = undefined;
       this.notify(this.draftListeners);
     }
-    if (this.errorSnapshot !== null) {
-      this.errorSnapshot = null;
+    if (this.errorSnapshot !== undefined) {
+      this.errorSnapshot = undefined;
       this.notify(this.errorListeners);
     }
     this.commitStatus();
@@ -218,7 +218,7 @@ export class ChatStore extends ChatMessageWorkup {
    */
   public applyChunk(evt: AIChatChunk) {
     this.draftSnapshot =
-      this.draftSnapshot !== null ? [...this.draftSnapshot, evt] : [evt];
+      this.draftSnapshot !== undefined ? [...this.draftSnapshot, evt] : [evt];
     this.notify(this.draftListeners);
 
     if (this.phase === "awaiting-id") this.phase = "streaming";
@@ -237,15 +237,15 @@ export class ChatStore extends ChatMessageWorkup {
    */
   public applyResponse(evt: AIChatResponse) {
     const { user } = this.extractResponseMessages(evt);
-    if (user && this.pendingOptimisticUserId !== null) {
+    if (user && this.pendingOptimisticUserId !== undefined) {
       this.byId.delete(this.pendingOptimisticUserId);
-      this.pendingOptimisticUserId = null;
+      this.pendingOptimisticUserId = undefined;
     }
 
     this.ingestConversation(evt.convo);
 
-    if (this.draftSnapshot !== null) {
-      this.draftSnapshot = null;
+    if (this.draftSnapshot !== undefined) {
+      this.draftSnapshot = undefined;
       this.notify(this.draftListeners);
     }
     this.phase = evt.done ? "complete" : "streaming";
@@ -257,8 +257,8 @@ export class ChatStore extends ChatMessageWorkup {
 
   /** Stop the stream on a server error — preserve committed history + the optimistic user message. */
   public applyError(evt: AIChatError) {
-    if (this.draftSnapshot !== null) {
-      this.draftSnapshot = null;
+    if (this.draftSnapshot !== undefined) {
+      this.draftSnapshot = undefined;
       this.notify(this.draftListeners);
     }
     this.phase = "error";
@@ -289,8 +289,8 @@ export class ChatStore extends ChatMessageWorkup {
   }
 
   public clearError() {
-    if (this.errorSnapshot === null) return;
-    this.errorSnapshot = null;
+    if (this.errorSnapshot === undefined) return;
+    this.errorSnapshot = undefined;
     this.notify(this.errorListeners);
     if (this.phase === "error") {
       this.phase = "idle";
@@ -300,8 +300,8 @@ export class ChatStore extends ChatMessageWorkup {
 
   /** Reset transient stream state (draft + flags); committed history is preserved. */
   public resetStreamingState() {
-    if (this.draftSnapshot !== null) {
-      this.draftSnapshot = null;
+    if (this.draftSnapshot !== undefined) {
+      this.draftSnapshot = undefined;
       this.notify(this.draftListeners);
     }
     this.phase = "idle";
@@ -332,7 +332,7 @@ export class ChatStore extends ChatMessageWorkup {
 
   /**
    * Whether the registry's LRU may reclaim this store under memory pressure. False if anything would notice the
-   * loss: a live React subscriber on any surface, a non-null draft (mid-stream content the UI is showing), or an
+   * loss: a live React subscriber on any surface, a present draft (mid-stream content the UI is showing), or an
    * in-flight phase (`streaming` / `awaiting-id` / `interrupted`). Committed history alone is re-hydratable from
    * the API, so a quiescent, unsubscribed store is safe to drop — see `ChatStoreRegistry.evictIfNeeded`.
    */
@@ -344,7 +344,7 @@ export class ChatStore extends ChatMessageWorkup {
       this.conversationListeners.size > 0 ||
       this.errorListeners.size > 0;
     if (hasSubscribers) return false;
-    if (this.draftSnapshot !== null) return false;
+    if (this.draftSnapshot !== undefined) return false;
     return (
       this.phase !== "streaming" &&
       this.phase !== "awaiting-id" &&

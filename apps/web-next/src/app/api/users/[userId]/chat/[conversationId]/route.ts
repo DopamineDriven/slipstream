@@ -30,9 +30,9 @@ export async function GET(
       unauthorized();
     }
 
-    const conversations = await p.getConvoInitial(conversationId, 25);
+    const page = await p.getConversationMessagesPage(conversationId, 25);
 
-    return NextResponse.json(conversations);
+    return NextResponse.json(page);
   } catch (error) {
     console.error(`Error fetching conversation ${conversationId}:`, error);
     return NextResponse.json(

@@ -181,21 +181,32 @@ export class PrismaUserMessageService extends ErrorHelperService {
     return this.bigIntToIntMsg(msgs) satisfies MessageSingleton<true>[];
   }
 
-  public async getMessagesByCursor(
+  /**
+   * One ordinal-cursored page of a conversation, returned as the `{ convo, nextCursor, hasMore }` envelope the SWR
+   * loader expects. `convo` is a `ConversationSingleton<true>` (same shape `ai_chat_response.convo` returns), so
+   * the client tree ingests it without translation. Page 0 passes no cursor; older pages pass the previous page's
+   * `nextCursor`.
+   *
+   * Ordinals are gapless `0..n-1` per conversation (`@@unique([conversationId, ordinal])`), so pagination is
+   * probe-free: order `ordinal: "desc"`, take `take`, and the OLDEST row in the page (`.at(-1)`, smallest ordinal)
+   * tells us exactly how many older rows remain — `hasMore = oldestOrdinal > 0`, next cursor = that ordinal. No
+   * `take + 1` probe, no count query, no `createdAt` tie-break.
+   */
+  public async getConversationMessagesPage(
     conversationId: string,
     take = 25,
-    id?: string
+    cursorOrdinal?: number
   ) {
-    const cursor = id ? { id } : undefined;
-    const skip = id ? 1 : undefined;
     const convo = await this.prismaClient.conversation.findUniqueOrThrow({
       where: { id: conversationId },
       include: {
         messages: {
-          cursor,
+          where:
+            cursorOrdinal !== undefined
+              ? { ordinal: { lt: cursorOrdinal } }
+              : undefined,
           take,
-          skip,
-          orderBy: { createdAt: "desc" },
+          orderBy: { ordinal: "desc" },
           include: {
             ttsJob: true,
             imageGenJob: true,
@@ -222,45 +233,17 @@ export class PrismaUserMessageService extends ErrorHelperService {
       };
     });
 
-    const c = { ...rest, messages: msgs };
-    return this.bigintToInt(c) satisfies ConversationSingleton<true>;
-  }
-
-  public async getConvoInitial(conversationId: string, take = 25) {
-    const convo = await this.prismaClient.conversation.findUniqueOrThrow({
-      where: { id: conversationId },
-      include: {
-        messages: {
-          take,
-          orderBy: { createdAt: "desc" },
-          include: {
-            ttsJob: true,
-            imageGenJob: true,
-            messageBlocks: { orderBy: { ordinal: "asc" } },
-            attachments: {
-              orderBy: { createdAt: "asc" },
-              include: {
-                image: true,
-                document: true,
-                imageGenOutput: true,
-                audio: true
-              }
-            }
-          }
-        },
-        conversationSettings: true
-      }
-    });
-    const { messages, ...rest } = convo;
-    const msgs = messages.map(t => {
-      return {
-        ...t,
-        ttsJob: t.ttsJob ?? undefined
-      };
-    });
-
-    const c = { ...rest, messages: msgs };
-    return this.bigintToInt(c) satisfies ConversationSingleton<true>;
+    // Ordered desc, so the last element is the smallest (oldest) ordinal in this page.
+    const oldestOrdinal = msgs.at(-1)?.ordinal ?? 0;
+    const hasMore = oldestOrdinal > 0;
+    return {
+      convo: this.bigintToInt({
+        ...rest,
+        messages: msgs
+      }) satisfies ConversationSingleton<true>,
+      nextCursor: hasMore ? oldestOrdinal : null,
+      hasMore
+    };
   }
 
   public async handleMetadata({

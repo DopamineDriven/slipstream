@@ -87,7 +87,7 @@ export interface ChatStatus {
  * Store discipline (not a type wall): the store never populates `messages` on the envelope — the normalized
  * `committed` / `feed` surfaces own the timeline — so `splitConversation` destructures `messages` out and this
  * surface stays referentially stable across message mutations. Populated by `ingestConversation` (SWR page or
- * `ai_chat_response.convo`); `null` until the first ingest (e.g. a brand-new chat before its first response).
+ * `ai_chat_response.convo`); `undefined` until the first ingest (e.g. a brand-new chat before its first response).
  */
 export type ChatConversation = DX<
   RTC<ConversationSingleton<true>, "messages" | "conversationSettings">
@@ -96,10 +96,10 @@ export type ChatConversation = DX<
 /** Per-surface snapshot shapes (referentially stable when their slice is unchanged). */
 export type CommittedSnapshot = readonly MessageSingleton<true>[];
 export type FeedSnapshot = readonly MessageSingleton<true>[];
-export type DraftSnapshot = ChatDraft | null;
+export type DraftSnapshot = ChatDraft | undefined;
 export type StatusSnapshot = ChatStatus;
-export type ConversationSnapshot = ChatConversation | null;
-export type ErrorSnapshot = string | null;
+export type ConversationSnapshot = ChatConversation | undefined;
+export type ErrorSnapshot = string | undefined;
 
 /**
  * SWR cold-history page. `convo` is the SAME `ConversationSingleton<true>` the API and `ai_chat_response.convo`

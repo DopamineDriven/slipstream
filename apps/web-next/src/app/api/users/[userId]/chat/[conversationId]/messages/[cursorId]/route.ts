@@ -33,9 +33,21 @@ export async function GET(
       unauthorized();
     }
 
-    const msgs = await p.getMessagesByCursor(conversationId, 25, cursorId);
+    const cursorOrdinal = Number(cursorId);
+    if (!Number.isInteger(cursorOrdinal) || cursorOrdinal < 0) {
+      return NextResponse.json(
+        { error: `Invalid cursor "${cursorId}"` },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json(msgs);
+    const page = await p.getConversationMessagesPage(
+      conversationId,
+      25,
+      cursorOrdinal
+    );
+
+    return NextResponse.json(page);
   } catch (error) {
     console.error(
       `Error fetching more messages in conversation ${conversationId} after cursor ${cursorId}:`,
