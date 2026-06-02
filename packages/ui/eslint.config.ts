@@ -1,6 +1,5 @@
 import { defineConfig } from "eslint/config";
-import { baseConfig } from "@slipstream/eslint-config/base";
-import { reactConfig } from "@slipstream/eslint-config/react";
+import { baseConfig, reactConfig } from "@slipstream/eslint-config";
 
 export default defineConfig(
   {
@@ -14,6 +13,6 @@ export default defineConfig(
       "@typescript-eslint/no-empty-object-type": "off"
     }
   },
-  baseConfig,
+  baseConfig(process.cwd()),
   reactConfig
 );

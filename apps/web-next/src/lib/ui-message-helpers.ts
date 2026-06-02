@@ -48,6 +48,7 @@ export function createUserMessage(
 ): MessageSingleton<true> {
   return {
     id: params.id,
+    ordinal: params.ordinal,
     userId: params.userId,
     responseOutput: null,
     provider: params.provider,
@@ -86,6 +87,7 @@ export function createAIMessage(
 ): MessageSingleton<true> {
   return {
     id: params.id,
+    ordinal: params.ordinal,
     userId: params.userId,
     provider: params.provider,
     createdAt:

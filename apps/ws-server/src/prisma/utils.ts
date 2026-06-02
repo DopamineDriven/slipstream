@@ -1,7 +1,7 @@
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
+import type { ExtractService } from "@/extract/index.ts";
 import type { BigIntToCompatProps } from "@/types/index.ts";
-import { ExtractService } from "@/extract/index.ts";
 import { ModelService } from "@/models/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { AttachmentSingleton } from "@slipstream/types";
@@ -38,6 +38,13 @@ export class PrismaUtilsService extends ModelService {
   public defaultUserStoreName(userId: string) {
     const env = this.getEnv();
     return `${env}-${userId}`;
+  }
+  public async convoCount(convoId: string) {
+    const counts = await this.prismaClient.conversation.findUnique({
+      where: { id: convoId },
+      select: { _count: { select: { messages: true } } }
+    });
+    return counts?._count.messages ?? 0;
   }
 
   public localVectorStoreDisplayName(
@@ -131,25 +138,25 @@ export class PrismaUtilsService extends ModelService {
       : null;
   }
 
-  private urlLogWorkup(att: AttachmentSingleton<true>, provider?: $Enums.Provider){
+  private urlLogWorkup(
+    att: AttachmentSingleton<true>,
+    provider?: $Enums.Provider
+  ) {
     if (provider) {
-     return `no compat status provided in attachment record ${att.id} for provider ${provider.toLowerCase()} having cdnUrl ${att.cdnUrl}`
+      return `no compat status provided in attachment record ${att.id} for provider ${provider.toLowerCase()} having cdnUrl ${att.cdnUrl}`;
     } else {
-      return `no compat status provided in attachment record ${att.id} for user ${att.userId} having cdnUrl ${att.cdnUrl}`
+      return `no compat status provided in attachment record ${att.id} for user ${att.userId} having cdnUrl ${att.cdnUrl}`;
     }
   }
   private urlExtWorkup(
     attachment: AttachmentSingleton<true>,
-    provider: $Enums.Provider = "ANTHROPIC",
+    provider: $Enums.Provider = "ANTHROPIC"
   ) {
     const urlExtRecord = { url: "", ext: "", mime: "" };
 
-
     try {
       if (!attachment.compatStatus)
-        throw new Error(
-          this.urlLogWorkup(attachment, provider)
-        );
+        throw new Error(this.urlLogWorkup(attachment, provider));
       if (
         attachment.compatStatus === "ACTIVE" &&
         attachment.compatExt &&
@@ -177,18 +184,15 @@ export class PrismaUtilsService extends ModelService {
     }
   }
 
-
-  private async userStoreToTmpWorkup(
-    {
-      assetType,
-      compatStatus,
-      conversationId,
-      messageId,
-      id,
-      userId,
-      ...rest
-    }: AttachmentSingleton<true>
-  ) {
+  private async userStoreToTmpWorkup({
+    assetType,
+    compatStatus,
+    conversationId,
+    messageId,
+    id,
+    userId,
+    ...rest
+  }: AttachmentSingleton<true>) {
     const displayName = this.toVectorStoreFilename({
       assetType,
       compatStatus,
@@ -267,15 +271,18 @@ export class PrismaUtilsService extends ModelService {
       userId,
       ...rest
     });
-    const { ext, mime, url } = this.urlExtWorkup({
-      ...rest,
-      assetType,
-      compatStatus,
-      conversationId,
-      messageId,
-      id,
-      userId
-    }, provider);
+    const { ext, mime, url } = this.urlExtWorkup(
+      {
+        ...rest,
+        assetType,
+        compatStatus,
+        conversationId,
+        messageId,
+        id,
+        userId
+      },
+      provider
+    );
     const tmpPrefix = `${provider.toLowerCase()}-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
     const tmpName = this.extractor.uniqueTmpName(tmpPrefix, ext);
     const urlObj = new URL(url);
@@ -301,14 +308,10 @@ export class PrismaUtilsService extends ModelService {
     };
   }
 
-  public async userStoreAssetToTmp(
-    att: AttachmentSingleton<true>
-  ) {
+  public async userStoreAssetToTmp(att: AttachmentSingleton<true>) {
     const workup = await this.userStoreToTmpWorkup(att);
     if (!workup)
-      throw new Error(
-        `user ${att.userId} workup for ${att.id} not defined`
-      );
+      throw new Error(`user ${att.userId} workup for ${att.id} not defined`);
     const {
       absTmpPath,
       ext,
@@ -398,8 +401,6 @@ export class PrismaUtilsService extends ModelService {
       );
     }
   }
-
-  
 
   public urlExtWorkupEmbeddings(attachment: AttachmentSingleton<true>) {
     const urlExtRecord = { url: "", ext: "", mime: "", embeddedFilename: "" };
@@ -528,7 +529,8 @@ export class PrismaUtilsService extends ModelService {
   }
 
   public toUserStoreProvenanceId(att: AttachmentSingleton<true>) {
-    if (!att.cdnUrl) throw new Error("attachment should not exist if cdnUrl is null.");
+    if (!att.cdnUrl)
+      throw new Error("attachment should not exist if cdnUrl is null.");
     let url: string;
     if (att.compatStatus === "ACTIVE" && att.compatCdnUrl) {
       url = att.compatCdnUrl;
@@ -543,7 +545,8 @@ export class PrismaUtilsService extends ModelService {
     }
   }
   public toVectorStoreFilename(att: AttachmentSingleton<true>) {
-    if (!att.cdnUrl) throw new Error("attachment should not exist if cdnUrl is null.");
+    if (!att.cdnUrl)
+      throw new Error("attachment should not exist if cdnUrl is null.");
     let url: string;
     if (att.compatStatus === "ACTIVE" && att.compatCdnUrl) {
       url = att.compatCdnUrl;

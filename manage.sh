@@ -130,6 +130,8 @@ clean_house() {
 # Function to build specific packages
 build_targeted() {
     local build_order=(
+        "@slipstream/eslint-config"
+        "@slipstream/prettier-config"
         "@slipstream/ui"
         "@slipstream/db"
         "@slipstream/redis-service"

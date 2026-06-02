@@ -12,7 +12,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsgo --noEmit",
-    "typegen": "next typegen"
+    "typegen": "next typegen",
+    "test": "node --test --import tsx --test-reporter spec \"src/**/*.test.ts\""
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "catalog:aws",

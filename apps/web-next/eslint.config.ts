@@ -17,7 +17,7 @@ export default defineConfig(
       "@typescript-eslint/triple-slash-reference": "off"
     }
   },
-  baseConfig,
+  baseConfig(process.cwd()),
   reactConfig,
   nextjsConfig
 );

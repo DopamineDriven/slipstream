@@ -1,11 +1,12 @@
+import type { ExtractService } from "@/extract/index.ts";
 import type {
   UpdateAttachment,
   UpdateAttachmentCompatProps,
   UpdateAttachmentMetadata
 } from "@/types/index.ts";
 import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
-import { ExtractService } from "@/extract/index.ts";
 import { PrismaUserStoreService } from "@/prisma/user-store.ts";
+import type { PrismaDbService } from "@slipstream/db/factory";
 import type {
   $Enums,
   Attachment,
@@ -15,7 +16,6 @@ import type {
   VideoMetadata
 } from "@slipstream/db/node/generated/client";
 import type { CTR, Rm, RTC, XOR } from "@slipstream/types";
-import { PrismaDbService } from "@slipstream/db/factory";
 
 export class PrismaAttachmentService extends PrismaUserStoreService {
   constructor(

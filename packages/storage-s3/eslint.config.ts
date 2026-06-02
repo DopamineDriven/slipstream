@@ -11,5 +11,5 @@ export default defineConfig(
     },
     ignores: ["dist/**"]
   },
-  baseConfig
+  baseConfig(process.cwd())
 );

@@ -19,7 +19,8 @@
     "db:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio --browser none --port 7777",
     "precp:binaries": "tsx src/test/scan-output.ts --scan output",
-    "cp:binaries": "cp -r ./src/generated/prisma/*.x.so.node ./dist/generated/prisma"
+    "cp:binaries": "cp -r ./src/generated/prisma/*.x.so.node ./dist/generated/prisma",
+    "backfill:prod:msg:ordinals": "tsx src/test/backfill-message-ordinals.ts --env prod --target exe"
   },
   "files": [
     "dist/**",

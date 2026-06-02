@@ -1,6 +1,6 @@
 import reactPlugin from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
-import { defineConfig } from "eslint/config";
+import { defineConfig } from "@eslint/config-helpers";
 
 export const reactConfig = defineConfig(
   {

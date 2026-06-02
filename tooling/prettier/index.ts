@@ -1,13 +1,14 @@
-/** @typedef {import("prettier").Config} PrettierConfig */
-/** @typedef {import("prettier-plugin-tailwindcss").PluginOptions} TailwindConfig */
-/** @typedef {import("@ianvs/prettier-plugin-sort-imports").PluginConfig} SortImportsConfig */
-
-/** @type { PrettierConfig | SortImportsConfig | TailwindConfig } */
+import type { PluginConfig } from "@ianvs/prettier-plugin-sort-imports";
+import type { Config } from "prettier";
+import type { PluginOptions } from "prettier-plugin-tailwindcss";
+export type WorkspacePrettierConfig =
+  Config & PluginConfig & PluginOptions;
 const config = {
   plugins: [
     "@ianvs/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss"
   ],
+  experimentalTernaries: true,
   importOrder: [
     "<TYPES>",
     "^(openai(.*)$)|^(openai$)",
@@ -28,7 +29,7 @@ const config = {
     "decorators-legacy",
     "importAttributes"
   ],
-  importOrderTypeScriptVersion: "5.9.3",
+  importOrderTypeScriptVersion: "6.0.3",
   semi: true,
   singleQuote: false,
   trailingComma: "none",
@@ -40,6 +41,6 @@ const config = {
   bracketSpacing: true,
   quoteProps: "as-needed",
   printWidth: 80
-};
+} satisfies WorkspacePrettierConfig;
 
 export default config;

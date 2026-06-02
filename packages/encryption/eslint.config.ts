@@ -11,5 +11,5 @@ export default defineConfig(
       "prefer-const": "off"
     }
   },
-  baseConfig
+  baseConfig(process.cwd())
 );

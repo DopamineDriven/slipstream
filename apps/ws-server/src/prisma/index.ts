@@ -1,6 +1,6 @@
-import { ExtractService } from "@/extract/index.ts";
-import { PrismaChatService } from "@/prisma/chat.ts";
-import { PrismaDbService } from "@slipstream/db/factory";
+import type { ExtractService } from "@/extract/index.ts";
+import { PrismaChatResponseService } from "@/prisma/chat-response.ts";
+import type { PrismaDbService } from "@slipstream/db/factory";
 
 /**
  * **Inheritance chain**
@@ -11,7 +11,11 @@ import { PrismaDbService } from "@slipstream/db/factory";
  *
  *  ⬆
  *
- * `@/prisma/chat.ts`
+ * `@/prisma/chat-response.ts`
+ *
+ *  ⬆
+ *
+ * `@/prisma/chat-request.ts`
  *
  *  ⬆
  *
@@ -44,7 +48,7 @@ import { PrismaDbService } from "@slipstream/db/factory";
  * [*child*]
  */
 
-export class PrismaService extends PrismaChatService {
+export class PrismaService extends PrismaChatResponseService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
@@ -53,42 +57,3 @@ export class PrismaService extends PrismaChatService {
     super(prisma, extractor, isProd);
   }
 }
-
-/**
- * If needed (future)
- *
-   // Base mixin with Prisma client
-  export function PrismaBaseMixin<TBase extends Constructor>(Base: TBase) {
-    return class extends Base {
-      protected prismaClient: PrismaClient;
-      // ... base utilities
-    };
-  }
-
-  // Feature-specific mixins
-  export function AttachmentMixin<TBase extends Constructor<any[], HasPrisma>>(Base: TBase) {
-    return class extends Base {
-      async createAttachment(...) {  }
-      async updateAttachment(...) {  }
-    };
-  }
-
-  export function UserMetaMixin<TBase extends Constructor<any[], HasPrisma>>(Base: TBase) {
-    return class extends Base {
-      async handleApiKeyLookup(...) {  }
-      // ... user meta methods
-    };
-  }
-
-  // Compose as needed
-  export class PrismaService extends ChatMixin(
-    UserMetaMixin(
-      AttachmentMixin(
-        AttachmentProviderMixin(
-          UtilsMixin(PrismaBaseMixin(ServiceBase))
-        )
-      )
-    )
-  ) {}
-
- */

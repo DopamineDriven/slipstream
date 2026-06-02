@@ -45,6 +45,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.suggest.showStatusBar": true,
   "eslint.enable": true,
+  "eslint.useFlatConfig": true,
   "terminal.integrated.suggest.enabled": false,
   "eslint.rules.customizations": [
     {

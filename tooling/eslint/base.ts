@@ -3,14 +3,12 @@ import { includeIgnoreFile } from "@eslint/config-helpers";
 import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
 import turboPlugin from "eslint-plugin-turbo";
-import { defineConfig, type Config } from "eslint/config";
+import { defineConfig } from "@eslint/config-helpers";
 import tseslint from "typescript-eslint";
 
-type LocalRules = Config['rules']
-
-export const baseConfig = defineConfig(
-  includeIgnoreFile(join(import.meta.dirname, "../../.gitignore")),
-  { ignores: ["**/*.config.*", "**/__out__/**"] },
+export const baseConfig = (cwd=process.cwd()) => defineConfig(
+  includeIgnoreFile(join(cwd, "../../.gitignore")),
+  { ignores: ["**/*.config.*", "**/__out__/**", "**/*.json"] },
   {
     files: ["**/*.js", "**/*.mjs", "**/*.ts", "**/*.tsx"],
     plugins: {

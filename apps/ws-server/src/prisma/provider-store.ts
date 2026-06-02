@@ -1,7 +1,9 @@
+import type { ExtractService } from "@/extract/index.ts";
 import type { FssDoc, StoreDocDbRegistryProps } from "@/gemini/types.ts";
 import type {
   CreateGeminiDocParams,
   CreateManyGeminiDocsAgg,
+  FindManyProviderStoreDocsAgg,
   VectorStoreInfoByProviderProps
 } from "@/prisma/types.ts";
 import type {
@@ -9,15 +11,13 @@ import type {
   CreateManyGrokProviderStoreDocsProps,
   xAIDocDbRegistryProps
 } from "@/xai/types.ts";
-import { ExtractService } from "@/extract/index.ts";
 import { PrismaAttachmentProviderService } from "@/prisma/attachment-provider.ts";
-import { FindManyProviderStoreDocsAgg } from "@/prisma/types.ts";
+import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   ProviderStoreDocumentSingleton,
   ProviderStoreSingleton
 } from "@slipstream/types";
-import { PrismaDbService } from "@slipstream/db/factory";
 
 export class PrismaProviderStoreService extends PrismaAttachmentProviderService {
   constructor(

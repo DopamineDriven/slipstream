@@ -177,6 +177,7 @@ export function ChatInterface({
       // Add optimistic user message
       const userMsg = createUserMessage({
         id: optimisticMsgId,
+        ordinal: 0,
         content: queuedPrompt,
         userId: user.id,
         isImageGen: imgGenEnabled,
@@ -321,6 +322,7 @@ export function ChatInterface({
 
       const streamingMsg = createAIMessage({
         id: `streaming-${activeConversationId}`,
+        ordinal: 0,
         content: streamedText,
         userId: user.id,
         messageType: imgGenEnabled ? "IMAGE_GEN" : "TEXT",
@@ -493,6 +495,7 @@ export function ChatInterface({
       // Add optimistic user message with optional attachments
       const userMsg = createUserMessage({
         id: optimisticMsgId,
+        ordinal: 0,
         content: content.trim(),
         isImageGen: imgGenEnabled,
         userId: user.id,

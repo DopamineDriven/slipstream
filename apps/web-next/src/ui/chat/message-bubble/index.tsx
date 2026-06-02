@@ -1,6 +1,5 @@
 "use client";
 
-import type { Provider } from "@/lib/models";
 import type { User } from "@/utils/auth-client";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -19,7 +18,8 @@ import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AIChatResponseImgGenFieldsFinal,
   AttachmentSingleton,
-  MessageSingleton
+  MessageSingleton,
+  Provider
 } from "@slipstream/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@slipstream/ui";
 

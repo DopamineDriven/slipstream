@@ -2968,6 +2968,7 @@ export type ConversationMemoryChunkScalarFieldEnum = (typeof ConversationMemoryC
 
 export const MessageScalarFieldEnum = {
   id: 'id',
+  ordinal: 'ordinal',
   conversationId: 'conversationId',
   userId: 'userId',
   senderType: 'senderType',
