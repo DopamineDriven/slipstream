@@ -10,3 +10,6 @@ src/utils/anonymous-name-gen.ts
 
 claude-read
 inspect.pdf
+
+# real conversation dumps used as test fixtures — local only, never committed
+src/tests/__fixtures__/
