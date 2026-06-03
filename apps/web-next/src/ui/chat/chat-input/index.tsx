@@ -2,14 +2,14 @@
 
 import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
 import type { User } from "@/utils/auth-client";
-import type { KeyboardEvent as ReactKeyboardEvent } from "react";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
+import type {
+  ClipboardEvent as ReactClipboardEvent,
+  KeyboardEvent as ReactKeyboardEvent,
+  ReactNode,
+  SubmitEvent as ReactSubmitEvent,
+  RefObject
 } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAssetUpload } from "@/context/asset-context";
 import { useCookiesCtx } from "@/context/cookie-context";
@@ -72,7 +72,7 @@ interface UnifiedChatInputProps {
   handlePromptConsumed: () => void;
   initialPrompt?: string | null;
   autoSubmitInitialPrompt?: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 const ATTACHMENT_OPTIONS = [
@@ -194,6 +194,16 @@ export function ChatInput({
     [assetUpload]
   );
 
+  const attachmentsReadyForSend = useMemo(() => {
+    if (assets.attachments.length === 0) return true;
+    return assets.attachments.every(attachment => {
+      const task = assetUpload.getByPreviewId(attachment.id);
+      if (!task) return false;
+      const hasResolvedUrl = task.cdnUrl != null || task.publicUrl != null;
+      return task.status === "READY" && hasResolvedUrl;
+    });
+  }, [assetUpload, assets.attachments]);
+
   useEffect(() => {
     return () => {
       if (submitTimeoutRef.current) {
@@ -301,19 +311,27 @@ export function ChatInput({
   }, [message]);
 
   const handleSend = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
+    (e: ReactSubmitEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (isLockedRef.current === true) return;
 
       const trimmedMessage = message.trim();
 
-      if (!trimmedMessage || disabled || isSubmitting || !isConnected) return;
+      if (
+        !trimmedMessage ||
+        disabled ||
+        isSubmitting ||
+        !isConnected ||
+        !attachmentsReadyForSend
+      )
+        return;
 
       isLockedRef.current = true;
       setIsSubmitting(true);
       const quotedMarkdown = quotes.map(formatAsMarkdown).join("\n\n");
-      const composed = quotedMarkdown
-        ? `${quotedMarkdown}\n\n${trimmedMessage}`
+      const composed =
+        quotedMarkdown ?
+          `${quotedMarkdown}\n\n${trimmedMessage}`
         : trimmedMessage;
       if (isHome) {
         try {
@@ -401,6 +419,7 @@ export function ChatInput({
       onUserMessage,
       disabled,
       isConnected,
+      attachmentsReadyForSend,
       activeConversationId,
       conversationId,
       assets
@@ -413,7 +432,7 @@ export function ChatInput({
   }, []);
 
   const handleEnhancedPaste = useCallback(
-    async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    async (e: ReactClipboardEvent<HTMLTextAreaElement>) => {
       const created = await assets.handlePaste(e);
       if (created && created.length > 0) {
         const convId = activeConversationId ?? "new-chat";
@@ -460,7 +479,7 @@ export function ChatInput({
     [handleFilesFromPopover]
   );
 
-  const clickAndReset = (ref: React.RefObject<HTMLInputElement | null>) => {
+  const clickAndReset = (ref: RefObject<HTMLInputElement | null>) => {
     const el = ref.current;
     if (!el) return;
     el.value = "";
@@ -468,12 +487,14 @@ export function ChatInput({
   };
   const fileMemo = useMemo(
     () =>
-      selectedModel.provider === "openai" ||
-      selectedModel.provider === "anthropic" ||
-      selectedModel.provider === "gemini" ||
-      selectedModel.provider === "grok"
-        ? ".md,.txt,.pdf,.docx,.xlsx,.pptx,application/text,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/pdf,text/markdown,application/*,text/*"
-        : ".pdf,.docx,application/*,text/*",
+      (
+        selectedModel.provider === "openai" ||
+        selectedModel.provider === "anthropic" ||
+        selectedModel.provider === "gemini" ||
+        selectedModel.provider === "grok"
+      ) ?
+        ".md,.txt,.pdf,.docx,.xlsx,.pptx,application/text,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/pdf,text/markdown,application/*,text/*"
+      : ".pdf,.docx,application/*,text/*",
     [selectedModel.provider]
   );
 
@@ -483,6 +504,8 @@ export function ChatInput({
   );
 
   const isDisabled = !isConnected || isSubmitting || disabled;
+  const isSendDisabled =
+    !message.trim() || isDisabled || !attachmentsReadyForSend;
 
   const onKeydownCb = useCallback(
     (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
@@ -680,9 +703,9 @@ export function ChatInput({
                       variant="ghost"
                       size="icon"
                       title={
-                        imgGen.supported
-                          ? "Image settings"
-                          : "Image settings unavailable for selected model"
+                        imgGen.supported ? "Image settings" : (
+                          "Image settings unavailable for selected model"
+                        )
                       }
                       className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
                       onClick={handleImageSettingsClick}>
@@ -694,17 +717,17 @@ export function ChatInput({
                       variant={imgGen.enabled ? "default" : "ghost"}
                       size="icon"
                       title={
-                        imgGen.supported
-                          ? imgGen.enabled
-                            ? "Disable image generation"
-                            : "Enable image generation"
-                          : "Selected model does not support image generation"
+                        imgGen.supported ?
+                          imgGen.enabled ?
+                            "Disable image generation"
+                          : "Enable image generation"
+                        : "Selected model does not support image generation"
                       }
                       disabled={!imgGen.supported}
                       className={
-                        imgGen.enabled
-                          ? "hover:bg-accent text-foreground h-8"
-                          : "hover:bg-accent text-muted-foreground hover:text-foreground h-8"
+                        imgGen.enabled ?
+                          "hover:bg-accent text-foreground h-8"
+                        : "hover:bg-accent text-muted-foreground hover:text-foreground h-8"
                       }
                       onClick={handleToggleImageMode}>
                       <ImageGen className="size-4" />
@@ -736,14 +759,16 @@ export function ChatInput({
                       type="submit"
                       variant="ghost"
                       size="icon"
-                      title="Submit prompt"
+                      title={
+                        attachmentsReadyForSend ? "Submit prompt" : (
+                          "Waiting for attachments"
+                        )
+                      }
                       className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
-                      disabled={!message.trim() || isDisabled}>
-                      {isSubmitting ? (
+                      disabled={isSendDisabled}>
+                      {isSubmitting ?
                         <Loader className="h-5 w-5 animate-spin" />
-                      ) : (
-                        <SendMessage className="size-5" />
-                      )}
+                      : <SendMessage className="size-5" />}
                       <span className="sr-only">{`Submit Prompt`}</span>
                     </Button>
                   </div>
