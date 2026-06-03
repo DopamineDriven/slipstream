@@ -63,7 +63,6 @@
     "@eslint/config-helpers": "catalog:eslint",
     "@eslint/js": "catalog:eslint",
     "@next/eslint-plugin-next": "catalog:next",
-    "@ts-safeql/eslint-plugin": "catalog:safeql",
     "eslint-plugin-import": "catalog:eslint",
     "eslint-plugin-jsx-a11y": "catalog:eslint",
     "eslint-plugin-react": "catalog:eslint",
@@ -73,7 +72,6 @@
     "typescript-eslint": "catalog:tseslint"
   },
   "devDependencies": {
-    "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
     "@typescript/native-preview": "catalog:tsgo",
     "@types/node": "catalog:node",
@@ -83,6 +81,5 @@
     "tslib": "catalog:tslib",
     "tsx": "catalog:tsx",
     "typescript": "catalog:ts"
-  },
-  "prettier": "@slipstream/prettier-config"
+  }
 }
