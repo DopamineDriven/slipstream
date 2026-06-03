@@ -27,6 +27,9 @@ import type {
 } from "@/utils/chat-ws-client";
 import type { ChatWsEvent } from "@slipstream/types";
 
+/** The registry binds only the client's listener add/remove surface — not the full transport (keeps WS routing testable). */
+type WsListenerHost = Pick<ChatWebSocketClient, "addListener" | "removeListener">;
+
 /**
  * Discriminant for the rekey seam — names the resulting relationship between the browser `history` state (which
  * the registry drives directly via `replaceState`) and Next's React Router (which only learns the real id at the
@@ -64,7 +67,7 @@ export class ChatStoreRegistry {
   private readonly lastAccess = new Map<string, number>();
   private clock = 0;
 
-  private boundClient: ChatWebSocketClient | null = null;
+  private boundClient: WsListenerHost | null = null;
   private boundListener: ChatEventListener | null = null;
   private rekeyHandler: ChatRekeyHandler | null = null;
 
@@ -102,7 +105,7 @@ export class ChatStoreRegistry {
    * and `close()` clears all listeners) the prior binding is dropped first, so there is never a duplicate or
    * orphaned listener. The stores themselves are client-agnostic and survive reconnects untouched.
    */
-  public bindClient(client: ChatWebSocketClient) {
+  public bindClient(client: WsListenerHost) {
     if (this.boundClient === client && this.boundListener !== null) {
       return () => this.unbindClient(client);
     }
@@ -116,7 +119,7 @@ export class ChatStoreRegistry {
     return () => this.unbindClient(client);
   }
 
-  public unbindClient(client: ChatWebSocketClient) {
+  public unbindClient(client: WsListenerHost) {
     if (this.boundClient !== client || this.boundListener === null) return;
     client.removeListener(this.boundListener);
     this.boundClient = null;
@@ -244,10 +247,11 @@ export class ChatStoreRegistry {
 
   // ── dev-only introspection (backs `window.__chatStoreSnapshot`) ────────────
 
-  public debugSnapshot(conversationId?: string) {
-    if (typeof conversationId === "string") {
-      return this.stores.get(conversationId)?.debugSnapshot() ?? null;
-    }
+  public debugSnapshot(conversationId: string) {
+    return this.stores.get(conversationId)?.debugSnapshot() ?? null;
+  }
+
+  public debugSnapshotAll() {
     const all = Array.of<ReturnType<ChatStore["debugSnapshot"]>>();
     for (const store of this.stores.values()) all.push(store.debugSnapshot());
     return all;
