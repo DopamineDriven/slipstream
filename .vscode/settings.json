@@ -131,5 +131,7 @@
   },
   "typescript.native-preview.tsdk": "/home/dopaminedriven/cloneathon/t3-chat-clone/node_modules/@typescript/native-preview",
   "js/ts.implicitProjectConfig.target": "ESNext",
-  "js/ts.referencesCodeLens.enabled": true
+  "js/ts.referencesCodeLens.enabled": true,
+  "terminal.integrated.defaultLocation": "view",
+  "terminal.integrated.defaultProfile.linux": "bash"
 }

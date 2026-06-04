@@ -19,9 +19,7 @@
       "dependsOn": ["^build"],
       "persistent": true
     },
-    "typecheck": {
-      "dependsOn": ["^build"]
-    },
+    "typecheck": {},
     "clean": {
       "cache": false
     }
@@ -49,6 +47,7 @@
     "BETTER_AUTH_SECRET",
     "BETTER_AUTH_URL",
     "CLAUDE_CODE_OAUTH_TOKEN",
+    "CI",
     "COHERE_API_KEY",
     "COHERE_TRIAL_KEY",
     "COREPACK_ENABLE_STRICT",

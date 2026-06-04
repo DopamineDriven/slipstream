@@ -88,9 +88,11 @@
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
+    "@slipstream/vitest-config": "workspace:*",
     "@tailwindcss/forms": "catalog:tw",
     "@tailwindcss/postcss": "catalog:tw",
     "@tailwindcss/typography": "catalog:tw",
+    "@testing-library/react": "catalog:react",
     "@types/gtag.js": "catalog:gtag",
     "@types/js-cookie": "catalog:cookies",
     "@types/katex": "catalog:katex",
@@ -122,6 +124,7 @@
     "typescript": "catalog:ts",
     "typescript-eslint": "catalog:tseslint",
     "unist-util-remove": "catalog:unist",
-    "unist-util-visit": "catalog:unist"
+    "unist-util-visit": "catalog:unist",
+    "vitest": "catalog:vitest"
   }
 }

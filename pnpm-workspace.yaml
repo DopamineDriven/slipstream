@@ -1,13 +1,23 @@
 packages:
-  - apps/*
-  - packages/*
-  - tooling/*
+  - "apps/*"
+  - "packages/*"
+  - "tooling/*"
+
+enablePrePostScripts: true
+nodeLinker: hoisted
+autoInstallPeers: true
+minimumReleaseAge: 0
+trustPolicy: "off"
+trustLockfile: true
+blockExoticSubdeps: false
+ignorePatchFailures: true
+dangerouslyAllowAllBuilds: true
 
 catalogs:
   anthropic:
     "@anthropic-ai/sdk": ^0.100.1
   auth:
-    better-auth: ^1.6.14
+    better-auth: ^1.6.11
   aws:
     "@aws-sdk/client-s3": ^3.1060.0
     "@aws-sdk/client-secrets-manager": ^3.1060.0
@@ -60,12 +70,17 @@ catalogs:
     fflate: ^0.8.3
   geist:
     geist: ^1.7.2
+  glob:
+    glob: ^13.0.6
   google:
     "@google/genai": ^2.7.0
   gtag:
     "@types/gtag.js": ^0.0.20
   jiti:
     jiti: ^2.7.0
+  jsdom:
+    "@types/jsdom": ^28.0.3
+    jsdom: ^29.1.1
   katex:
     "@types/katex": ^0.16.8
     katex: ^0.17.0
@@ -97,6 +112,8 @@ catalogs:
     "@types/node": ^25.9.1
     node-html-parser: ^7.1.0
     nodemon: ^3.1.14
+  nyc:
+    nyc: ^18.0.0
   openai:
     openai: ^6.41.0
   p-limit:
@@ -147,6 +164,7 @@ catalogs:
     "@radix-ui/react-toggle-group": ^1.1.11
     "@radix-ui/react-tooltip": ^1.2.8
   react:
+    "@testing-library/react": ^16.3.2
     "@types/react": ^19.2.16
     "@types/react-dom": ^19.2.3
     react: ^19.2.7
@@ -168,7 +186,7 @@ catalogs:
     remark-parse: ^11.0.0
     remark-rehype: ^11.1.2
   rolldown:
-    rolldown: ^1.0.3
+    rolldown: ^1.1.0
     rolldown-plugin-dts: ^0.25.2
     rolldown-plugin-wasm: ^0.2.1
   sharp:
@@ -199,7 +217,7 @@ catalogs:
   tseslint:
     typescript-eslint: ^8.60.1
   tsgo:
-    "@typescript/native-preview": ^7.0.0-dev.20260602.1
+    "@typescript/native-preview": ^7.0.0-dev.20260603.1
   tslib:
     tslib: ^2.8.1
   tsup:
@@ -233,15 +251,22 @@ catalogs:
     wait-on: ^9.0.10
   vercel:
     "@vercel/analytics": ^2.0.1
-    "@vercel/functions": ^3.6.1
+    "@vercel/functions": ^3.6.2
   vfile:
     vfile: ^6.0.3
+  vite:
+    "@vitejs/plugin-react": ^6.0.2
+    vite: ^8.0.16
+  vitest:
+    "@vitest/coverage-istanbul": ^4.1.8
+    "@vitest/ui": ^4.1.8
+    vitest: ^4.1.8
   ws:
     "@types/ws": ^8.18.1
     ws: ^8.21.0
 
 onlyBuiltDependencies:
-  - '@google/genai'
+  - "@google/genai"
   - "@parcel/watcher"
   - "@prisma/client"
   - "@prisma/engines"
@@ -258,7 +283,12 @@ onlyBuiltDependencies:
   - sharp
   - unrs-resolver
 
-patchedDependencies:
-  "@google/genai": patches/@google__genai.patch
-  llama-api-client@0.3.0: patches/llama-api-client@0.3.0.patch
-  openai: patches/openai@6.34.0.patch
+allowBuilds:
+  '@google/genai': true
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
+
