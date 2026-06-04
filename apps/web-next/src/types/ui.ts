@@ -1,5 +1,4 @@
 import { User } from "@/utils/auth-client";
-import { MessageSingleton, Provider } from "@slipstream/types";
 
 export interface KeyboardShortcut {
   action: string;
@@ -11,11 +10,12 @@ export type SidebarProps = {
   title: string;
   updatedAt: Date;
 };
+
+/**
+ * The fully-client chat route hands the surface just its identity + the authed user; history hydrates client-side
+ * via SWR (`useHydrateChatStore`) and all live state comes from the store/context — no server-seeded props.
+ */
 export interface ChatInterfaceProps {
-  initialMessages?: MessageSingleton<true>[] | null;
-  conversationTitle?: string | null;
-  conversationId: string; // From the dynamic route param - not used, context drives everything
+  conversationId: string;
   user: User;
-  lastModel?: string | null;
-  lastProvider?: Provider | null;
 }

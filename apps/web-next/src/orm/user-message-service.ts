@@ -105,44 +105,6 @@ export class PrismaUserMessageService extends ErrorHelperService {
     return provider.toLowerCase() as Lowercase<$Enums.Provider>;
   }
 
-  public async getConversationRouteProps(conversationId: string) {
-    const session = await getSession();
-    console.log(session?.session);
-    if (!session?.user?.id || !session?.session.expiresAt)
-      redirect("/auth/login");
-
-    const expiryUnixEpoch = new Date(session.session.expiresAt).getTime();
-    if (new Date(Date.now()).getTime() > expiryUnixEpoch)
-      redirect("/auth/login");
-
-    if (this.isHomeOrNewChat(conversationId)) {
-      return {
-        conversationId,
-        user: session.user,
-        conversationTitle: null,
-        initialMessages: null,
-        lastModel: null,
-        lastProvider: null
-      } satisfies ChatInterfaceProps;
-    } else {
-      const convo =
-        await this.getMessagesByConversationIdWithAssets(conversationId);
-
-      const lastMsg = convo.messages.at(-1);
-      const lastModel = lastMsg?.model;
-      const lastProvider = this.fromPrismaFormat(lastMsg?.provider);
-
-      return {
-        user: session.user,
-        conversationId,
-        conversationTitle: convo.title,
-        initialMessages: convo.messages,
-        lastModel,
-        lastProvider
-      } satisfies ChatInterfaceProps;
-    }
-  }
-
   public async getMsgsByCursorId(
     conversationId: string,
     take = 25,

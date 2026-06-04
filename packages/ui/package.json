@@ -124,7 +124,7 @@
     "class-variance-authority": "catalog:cva",
     "clsx": "catalog:clsx",
     "motion": "catalog:motion",
-    "motion-plus": "https://api.motion.dev/registry.tgz?package=motion-plus&version=2.8.0",
+    "motion-plus": "https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3",
     "motion-plus-dom": "catalog:motion",
     "tailwind-merge": "catalog:tw",
     "vaul": "catalog:react"

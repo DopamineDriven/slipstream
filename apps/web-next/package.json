@@ -54,7 +54,7 @@
     "js-cookie": "catalog:cookies",
     "katex": "catalog:katex",
     "motion": "catalog:motion",
-    "motion-plus": "https://api.motion.dev/registry.tgz?package=motion-plus&version=2.8.0",
+    "motion-plus": "https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3",
     "motion-plus-dom": "catalog:motion",
     "nanoid": "catalog:nanoid",
     "next": "catalog:next",

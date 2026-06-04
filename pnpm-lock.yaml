@@ -739,8 +739,8 @@ importers:
         specifier: catalog:motion
         version: 12.40.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       motion-plus:
-        specifier: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.8.0
-        version: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.8.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3
+        version: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       motion-plus-dom:
         specifier: catalog:motion
         version: 2.11.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -1052,8 +1052,8 @@ importers:
         specifier: catalog:motion
         version: 12.40.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       motion-plus:
-        specifier: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.8.0
-        version: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.8.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3
+        version: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       motion-plus-dom:
         specifier: catalog:motion
         version: 2.11.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -2003,8 +2003,8 @@ importers:
         specifier: catalog:motion
         version: 12.40.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       motion-plus:
-        specifier: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.8.0
-        version: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.8.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3
+        version: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       motion-plus-dom:
         specifier: catalog:motion
         version: 2.11.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -7776,9 +7776,9 @@ packages:
   motion-plus-dom@2.11.2:
     resolution: {integrity: sha512-WNXCn7XRS7H5ZJiwceJMbNjXbhVwjhQquJn/3LuyPkwMcxtOtQmc+cCas46bNpYNfKCyJs94oN9XRcBWmT2LxQ==}
 
-  motion-plus@https://api.motion.dev/registry.tgz?package=motion-plus&version=2.8.0:
-    resolution: {integrity: sha512-1QG7TJhi9i/ZkjfqkdHEMNV539JoJvb7afKRmebbwg+Siup+eDd5u2sQZ6y0n3WW4SYqxOOtCHB6zvmiiNgRZg==, tarball: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.8.0}
-    version: 2.8.0
+  motion-plus@https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3:
+    resolution: {integrity: sha512-xRLIFMSCWMpRsdYdJ3qvLj5O1s7HogJk11Gt4h7r8DxAQmMA1exZXYTDPZpvEZyNdGudfP9CgiWS5DuTh7ybiA==, tarball: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3}
+    version: 2.11.3
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
@@ -15285,7 +15285,7 @@ snapshots:
       - react
       - react-dom
 
-  motion-plus@https://api.motion.dev/registry.tgz?package=motion-plus&version=2.8.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  motion-plus@https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       motion: 12.40.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       motion-dom: 12.40.0

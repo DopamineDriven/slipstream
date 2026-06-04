@@ -18,7 +18,9 @@ import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { usePathnameContext } from "@/context/pathname-context";
 import { useChatCommitted } from "@/hooks/use-chat-store-selector";
+import { useHydrateChatStore } from "@/hooks/use-hydrate-chat-store";
 import { cn } from "@/lib/utils";
+import { ChatAreaSkeleton } from "@/ui/chat/chat-area-skeleton";
 import { ChatFeed } from "@/ui/chat/chat-feed";
 import { ChatHero } from "@/ui/chat/chat-hero";
 import { ChatInput } from "@/ui/chat/chat-input";
@@ -38,8 +40,7 @@ interface PersistedAttachment {
 }
 
 export function ChatInterface({
-  initialMessages,
-  conversationId, // From route — not used for state; the store/context drive everything.
+  conversationId, // From the route params — used to scope SWR hydration; live state comes from the store/context.
   user
 }: ChatInterfaceProps) {
   const {
@@ -70,11 +71,21 @@ export function ChatInterface({
   // The committed timeline (referentially stable across tokens — the perf invariant).
   const committed = useChatCommitted(store);
 
-  // Seed the store ONCE from the existing server route's `initialMessages` (TEMPORARY cold-load bridge, removed in
-  // Phase 4 when SWR hydration replaces it). `hydrateMessages` no-ops on a warm/streaming store, so it can't clobber.
-  useEffect(() => {
-    store.hydrateMessages(initialMessages ?? []);
-  }, [store, initialMessages]);
+  // Hydrate cold history client-side via SWR (replaces the old server-route `initialMessages` seed). Home / new-chat
+  // carry no server history, so skip the fetch. The store stays the single read model; the bridge writes into it.
+  const historyConversationId =
+    conversationId === "new-chat" || conversationId === "home" ?
+      undefined
+    : conversationId;
+  const { error: historyError } = useHydrateChatStore(store, {
+    userId: user.id,
+    conversationId: historyConversationId
+  });
+  // Hold the skeleton until the store actually has rows — covers BOTH the SWR fetch and the hydration tick (no flash).
+  const showSkeleton =
+    historyConversationId !== undefined &&
+    committed.length === 0 &&
+    !historyError;
 
   // Feed = committed timeline + the live streaming bubble (or just committed when idle). The 599 committed bubbles
   // keep their object identity across tokens, so `React.memo(MessageBubble)` skips re-rendering them per token.
@@ -190,24 +201,27 @@ export function ChatInterface({
           "flex h-full flex-col",
           isHome ? "mx-auto items-center justify-center p-4" : "overflow-y-auto"
         )}>
-        <ChatFeed
-          messages={feed}
-          streamedText={isStreaming ? streamedText : ""}
-          isAwaitingFirstChunk={isAwaitingFirstChunk}
-          activeConversationId={activeConversationId ?? "new-chat"}
-          isStreaming={isStreaming}
-          isThinking={isThinking}
-          isNewChat={isNewChat}
-          isHome={isHome}
-          thinkingText={thinkingText}
-          thinkingDuration={thinkingDuration ?? undefined}
-          imgGenEnabled={imgGenEnabled}
-          imgGenFields={imgGenFields}
-          imgGenAttachmentId={currentImgGenAttachmentId ?? undefined}
-          currentAiMsgId={currentAiMsgId ?? undefined}
-          user={user}>
-          <ChatHero user={user} selectedModel={selectedModel} tz={tz} />
-        </ChatFeed>
+        {showSkeleton ?
+          <ChatAreaSkeleton />
+        : <ChatFeed
+            messages={feed}
+            streamedText={isStreaming ? streamedText : ""}
+            isAwaitingFirstChunk={isAwaitingFirstChunk}
+            activeConversationId={activeConversationId ?? "new-chat"}
+            isStreaming={isStreaming}
+            isThinking={isThinking}
+            isNewChat={isNewChat}
+            isHome={isHome}
+            thinkingText={thinkingText}
+            thinkingDuration={thinkingDuration ?? undefined}
+            imgGenEnabled={imgGenEnabled}
+            imgGenFields={imgGenFields}
+            imgGenAttachmentId={currentImgGenAttachmentId ?? undefined}
+            currentAiMsgId={currentAiMsgId ?? undefined}
+            user={user}>
+            <ChatHero user={user} selectedModel={selectedModel} tz={tz} />
+          </ChatFeed>
+        }
         <Suspense>
           <ChatInput
             handlePromptConsumed={handlePromptConsumed}
