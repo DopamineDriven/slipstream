@@ -102,7 +102,7 @@ export default defineConfig(
         "!public/**/*"
       ],
       cwd: process.cwd(),
-      target: ["node25"],
+      target: ["node26"],
       fixedExtension: false,
       dts: { tsgo: true },
       watch: process.env.NODE_ENV === "development",

@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM node:25-bullseye-slim AS base
+FROM node:26-bullseye-slim AS base
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -46,7 +46,7 @@ WORKDIR /app
 
 # --- Builder ---
 FROM base AS builder
-RUN npm install -g turbo@2.8.21 pnpm@10.33.0
+RUN npm install -g turbo@2.9.16 pnpm@11.51.1
 COPY turbo.json pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
 COPY . .
 ENV TURBO_TELEMETRY=0

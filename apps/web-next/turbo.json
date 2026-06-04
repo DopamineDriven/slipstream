@@ -18,7 +18,7 @@
         "aicoalesce-twitter-img.png",
         "next-env.d.ts",
         "eslint.config.ts",
-        "postcss.config.mjs",
+        "postcss.config.ts",
         "next.config.ts"
       ]
     },
