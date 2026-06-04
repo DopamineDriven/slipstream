@@ -16,7 +16,7 @@ import type {
 import { useScrollObserver } from "@slipstream/ui";
 
 interface ChatFeedProps {
-  messages: MessageSingleton<true>[];
+  messages: readonly MessageSingleton<true>[];
   isHome: boolean;
   user?: User;
   className?: string;
@@ -57,16 +57,6 @@ export function ChatFeed({
   children
 }: ChatFeedProps) {
   const { scrollRef, setScrollState } = useChatScroll();
-
-  useEffect(() => {
-    console.log({
-      ["chat-feed-has-image-gen-fields-data"]: JSON.stringify(
-        imgGenFields,
-        null,
-        2
-      )
-    });
-  }, [imgGenFields]);
 
   const { rect, quote, clear } = useSelectionQuote("[data-chat-feed]");
 

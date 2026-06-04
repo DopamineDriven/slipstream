@@ -1,53 +1,56 @@
 "use client";
 
+/**
+ * `AIChatProvider` — the thin, store-fed façade. It owns NO chat state: the per-conversation `ChatStore`
+ * (resolved from `chatStoreRegistry`) is the single source of truth, fed React-free by the registry's WS
+ * listener. The façade's whole job is the React seam:
+ *   - resolve the active store CLIENT-ONLY (the registry's module-global Map must never be mutated server-side),
+ *   - bind the registry's fan-out listener to the live client (`bindClient`),
+ *   - own the React-bound half of the new-chat → real-id router deception (`setRekeyHandler`: re-point the active
+ *     id on `decoupled`, the MANDATORY `router.replace` on `recoupled`),
+ *   - derive the live draft ONCE and assemble the legacy `AIChatContextValue` so existing consumers
+ *     (`dynamic`, `sidebar`) keep their `useAIChatContext()` ergonomics unchanged.
+ *
+ * Everything the old conductor did with ~20 `useState` + ~14 ref mirrors + a ~300-line WS handler now lives in
+ * `ChatStore`. `currentStreamingMessage` is now the real synthetic `streaming-<id>` `MessageSingleton<true>`
+ * (single-derived here, consumed by `dynamic`); the active `store` is exposed so `dynamic` reads the committed
+ * timeline via `useChatCommitted(store)`.
+ */
+
+import type { ReactNode } from "react";
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useApiKeys } from "@/context/api-keys-context";
-import { useAssetUpload } from "@/context/asset-context";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
-import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
-import { getModel } from "@/lib/models";
+import {
+  useChatDraft,
+  useChatError,
+  useChatStatus
+} from "@/hooks/use-chat-store-selector";
+import type { SendChatPayload } from "@/hooks/use-send-chat";
+import { useSendChat } from "@/hooks/use-send-chat";
+import {
+  deriveDraft,
+  streamingMessageFromDerived
+} from "@/lib/draft-to-message";
 import { pathParser } from "@/lib/path-parser";
+import { ChatStore } from "@/state/chat/store";
+import { chatStoreRegistry } from "@/state/chat/store-registry";
 import type {
-  AIChatRequest,
-  AIChatRequestImgGenFields,
-  UserMetadata as AIChatRequestUserMetadata,
   AIChatResponseImgGenFieldsFinal,
-  AllModelsUnion,
   ChatChunkAndResMsgBlock,
-  ClientContextWorkupProps,
-  EventTypeMap,
-  Provider
+  MessageSingleton
 } from "@slipstream/types";
 
-interface StreamingMessage {
-  id: string;
-  content: string;
-  messageBlocks?: ChatChunkAndResMsgBlock[];
-  provider: Provider;
-  model: string;
-  timestamp: Date;
-  isUser: boolean;
-  thinkingText?: string;
-  thinkingDuration?: number;
-  imgGenEnabled?: boolean;
-  imgGenFields?: AIChatResponseImgGenFieldsFinal | null;
-  userMsgId?: string;
-  aiMsgId?: string;
-  imgGenAttachmentId?: string;
-}
-
 interface AIChatContextValue {
-  // Core state - single source of truth
+  // Core state — sourced from the active store's surfaces (no local mirrors).
   activeConversationId: string | null;
   title: string | null;
   streamedText: string;
@@ -56,838 +59,181 @@ interface AIChatContextValue {
   isNewChat: boolean;
   error: string | null;
 
-  // Thinking state
+  // Thinking state (derived from the live draft).
   thinkingText: string;
   isThinking: boolean;
   thinkingDuration: number | null;
 
-  // Message tracking
-  currentStreamingMessage: StreamingMessage | null;
-  streamingMessageBlocks: ChatChunkAndResMsgBlock[];
+  // Live message tracking. `currentStreamingMessage` is the synthetic `streaming-<id>` bubble the feed renders.
+  currentStreamingMessage: MessageSingleton<true> | null;
+  streamingMessageBlocks: readonly ChatChunkAndResMsgBlock[];
   currentUserMsgId: string | null;
   currentAiMsgId: string | null;
   currentImgGenAttachmentId: string | null;
-  // Actions
-  // Optionally accept an explicit batchId to associate attachments deterministically
-  sendChat: (
-    prompt: string,
-    explicitBatchId?: string,
-    imgGenEnabled?: boolean,
-    imgGenFields?: AIChatRequestImgGenFields,
-    optimisticUserMsgId?: string
-  ) => void;
+
+  // Actions.
+  sendChat: (payload: SendChatPayload) => void;
   setActiveConversationId: (id: string | null) => void;
   clearError: () => void;
   resetStreamingState: () => void;
 
-  // Status flags
+  // Status flags.
   isWaitingForRealId: boolean;
   isConnected: boolean;
 
-  // Live image generation (progressive) state - complete server shape
+  // Live image generation (progressive) state.
   imgGenEnabled: boolean;
-  imgGenFields: AIChatResponseImgGenFieldsFinal | null;
+  imgGenFields: AIChatResponseImgGenFieldsFinal | undefined;
+
+  /** The active per-conversation store — `dynamic` reads the committed timeline via `useChatCommitted(store)`. */
+  store: ChatStore;
 }
 
 const AIChatContext = createContext<AIChatContextValue | undefined>(undefined);
 
-const orderMessageBlocks = (blocks: ChatChunkAndResMsgBlock[]) => {
-  return [...blocks].sort((left, right) => left.ordinal - right.ordinal);
-};
+/**
+ * SSR placeholder. The façade is a client component, so its body still runs during server pre-render; resolving
+ * from the registry there would mutate its module-global, cross-request `Map`. This single empty store satisfies
+ * the surface hooks server-side (every `getServerSnapshot` returns frozen empties regardless of instance) and is
+ * never bound or mutated, so sharing it across requests is safe. The real store resolves client-only.
+ */
+const ssrPlaceholderStore = new ChatStore("new-chat");
 
-const isThinkingBlock = (block: ChatChunkAndResMsgBlock) => {
-  return block.type === "THINKING" || block.type === "ENCRYPTED_THINKING";
-};
-
-const mergeStreamingMessageBlocks = (
-  currentBlocks: ChatChunkAndResMsgBlock[],
-  incomingBlock: ChatChunkAndResMsgBlock
-) => {
-  const nextBlocks = currentBlocks.filter(
-    block => block.ordinal !== incomingBlock.ordinal
-  );
-  nextBlocks.push(incomingBlock);
-  return orderMessageBlocks(nextBlocks);
-};
-
-const textFromMessageBlocks = (blocks: ChatChunkAndResMsgBlock[]) => {
-  return blocks
-    .filter(block => block.type === "TEXT")
-    .map(block => block.content)
-    .join("");
-};
-
-const thinkingTextFromMessageBlocks = (blocks: ChatChunkAndResMsgBlock[]) => {
-  return blocks
-    .filter(isThinkingBlock)
-    .map(block => block.content)
-    .join("\n\n");
-};
-
-const thinkingDurationFromMessageBlocks = (
-  blocks: ChatChunkAndResMsgBlock[]
-) => {
-  const totalDuration = blocks
-    .filter(isThinkingBlock)
-    .reduce((sum, block) => sum + block.durationMs, 0);
-
-  return totalDuration > 0 ? totalDuration : null;
-};
-
-// Note: Track active user streams within the provider to avoid module-scope writes
-const fallbackApiKeys = {
-  isDefault: {
-    anthropic: false,
-    cohere: false,
-    gemini: false,
-    grok: false,
-    mistral: false,
-    meta: false,
-    openai: false,
-    vercel: false,
-    deepseek: false,
-    moonshotai: false,
-    zai: false
-  },
-  isSet: {
-    anthropic: false,
-    cohere: false,
-    gemini: false,
-    grok: false,
-    mistral: false,
-    meta: false,
-    openai: false,
-    vercel: false,
-    deepseek: false,
-    moonshotai: false,
-    zai: false
-  }
-} satisfies ClientContextWorkupProps;
+const EMPTY_BLOCKS = Object.freeze(Array.of<ChatChunkAndResMsgBlock>());
 
 export function AIChatProvider({
   children,
   userId
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   userId?: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { client, isConnected, sendEvent } = useChatWebSocketContext();
+  const { client, isConnected } = useChatWebSocketContext();
   const { selectedModel } = useModelSelection();
-  const { providerContext } = useApiKeys();
-  const { startNewBatch, currentBatchId, getUploadsByBatchId } =
-    useAssetUpload();
 
-  // Parse conversation ID from pathname
-  const getConversationIdFromPath = useCallback((): string | null => {
-    const parsed = pathParser(pathname);
-    return parsed.conversationId ?? null;
-  }, [pathname]);
-
-  // Core state - initialize from path
+  // Active conversation id — seeded from the path, then driven by the rekey `decoupled` seam (new-chat → realId,
+  // where the path LAGS the deceived URL) and the passive path-sync effect (ordinary navigation).
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
-  >(getConversationIdFromPath());
-  const [title, setTitle] = useState<string | null>(null);
-  const [streamedText, setStreamedText] = useState<string>("");
-  const [isStreaming, setIsStreaming] = useState<boolean>(false);
-  const [isComplete, setIsComplete] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isWaitingForRealId, setIsWaitingForRealId] = useState<boolean>(false);
-  const [currentStreamingMessage, setCurrentStreamingMessage] =
-    useState<StreamingMessage | null>(null);
-  const [streamingMessageBlocks, setStreamingMessageBlocks] = useState<
-    ChatChunkAndResMsgBlock[]
-  >([]);
+  >(() => pathParser(pathname).conversationId ?? null);
 
-  // Thinking state
-  const [thinkingText, setThinkingText] = useState<string>("");
-  const [isThinking, setIsThinking] = useState<boolean>(false);
-  const [thinkingDuration, setThinkingDuration] = useState<number | null>(null);
+  const resolvedId = activeConversationId ?? "new-chat";
 
-  // Live image-gen progressive state
-  const [imgGenEnabled, setImgGenEnabled] = useState<boolean>(false);
-  const [imgGenFields, setImgGenFields] =
-    useState<AIChatResponseImgGenFieldsFinal | null>(null);
-
-  // Message ID tracking
-  const [currentUserMsgId, setCurrentUserMsgId] = useState<string | null>(null);
-  const [currentAiMsgId, setCurrentAiMsgId] = useState<string | null>(null);
-  const [currentImgGenAttachmentId, setCurrentImgGenAttachmentId] = useState<
-    string | null
-  >(null);
-  // Track if we've updated the URL for this stream
-  const urlUpdatedRef = useRef<boolean>(false);
-  const firstChunkReceivedRef = useRef<boolean>(false);
-  const originalConversationIdRef = useRef<string | null>(activeConversationId);
-  const [isNewChat, setIsNewChat] = useState(false);
-  const isNewChatRef = useRef<boolean | null>(false);
-  // Initialize and sync active conversation from pathname
-  // This is passive - only reads from the URL, never manipulates it
-  // Router manipulation only happens during new-chat → real ID transitions
+  // Client-only store resolution (see `ssrPlaceholderStore`). The lazy initializer runs once; the effect
+  // re-resolves when the active id changes — a no-op when the registry hands back the same (incl. migrated)
+  // instance, so subscribers never miss a chunk across the new-chat rekey.
+  const [store, setStore] = useState<ChatStore>(() =>
+    typeof window === "undefined" ?
+      ssrPlaceholderStore
+    : chatStoreRegistry.getOrCreate(resolvedId)
+  );
   useEffect(() => {
-    // Skip during streaming or URL transitions
-    if (isStreaming || urlUpdatedRef.current) {
-      return;
+    const next = chatStoreRegistry.getOrCreate(resolvedId);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setStore(prev => (prev === next ? prev : next));
+  }, [resolvedId]);
+
+  // Bind the registry's single fan-out listener to the live client; `bindClient` returns the unbind cleanup.
+  // Rebinds on client identity change (reconnect / user switch); idempotent under StrictMode.
+  useEffect(() => chatStoreRegistry.bindClient(client), [client]);
+
+  // The React-bound half of the router deception: re-point the active id on the shallow rekey (`decoupled`), and
+  // run the MANDATORY router reconcile at completion (`recoupled`). See memory `project_newchat_router_deception`.
+  useEffect(() => {
+    chatStoreRegistry.setRekeyHandler(event => {
+      if (event.phase === "decoupled") {
+        setActiveConversationId(event.conversationId);
+      } else {
+        router.replace(`/chat/${event.conversationId}`, { scroll: false });
+      }
+    });
+    return () => chatStoreRegistry.setRekeyHandler(null);
+  }, [router]);
+
+  const status = useChatStatus(store);
+  const draft = useChatDraft(store);
+  const error = useChatError(store) ?? null;
+
+  // Passive path-sync: adopt the URL's conversation id when idle — never while streaming or mid-deception (there
+  // the URL leads React, so reading the path would fight the rekey). Mirrors the legacy effect's bail condition.
+  useEffect(() => {
+    if (status.isStreaming || status.urlTransitionInFlight) return;
+    const pathId = pathParser(pathname).conversationId ?? null;
+    if (pathId && pathId !== activeConversationId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveConversationId(pathId);
     }
-
-    const pathConvId = getConversationIdFromPath();
-
-    // Only update if we have a valid path conversation ID and it's different
-    if (pathConvId && pathConvId !== activeConversationId) {
-      console.log(
-        `[AIChatContext] Updating conversation ID from path: ${pathConvId}`
-      );
-      // eslint-disable-next-line
-      setActiveConversationId(pathConvId);
-      originalConversationIdRef.current = pathConvId;
-
-      // Reset streaming state when navigating to a different conversation
-      setStreamedText("");
-      setThinkingText("");
-      setIsThinking(false);
-      setThinkingDuration(null);
-      setStreamingMessageBlocks([]);
-      setCurrentStreamingMessage(null);
-      setIsWaitingForRealId(false);
-      firstChunkReceivedRef.current = false;
-    }
-  }, [pathname, activeConversationId, getConversationIdFromPath, isStreaming]);
-
-  // Store refs for state values that need to be accessed in event handlers
-  const streamedTextRef = useRef(streamedText);
-  const thinkingTextRef = useRef(thinkingText);
-  const isThinkingRef = useRef(isThinking);
-  const thinkingDurationRef = useRef(thinkingDuration);
-  const isStreamingRef = useRef(isStreaming);
-  const titleRef = useRef<string | null>(null);
-  const activeUserStreamsRef = useRef<Set<string>>(new Set());
-  const imgGenEnabledRef = useRef(imgGenEnabled);
-  const imgGenFieldsRef = useRef(imgGenFields);
-  const currentUserMsgIdRef = useRef<string | null>(null);
-  const currentAiMsgIdRef = useRef<string | null>(null);
-  const currentImgGenAttachmentIdRef = useRef<string | null>(null);
-  const streamingMessageBlocksRef = useRef<ChatChunkAndResMsgBlock[]>([]);
-
-  // Update refs when state changes
-  useEffect(() => {
-    streamedTextRef.current = streamedText;
-  }, [streamedText]);
-
-  useEffect(() => {
-    thinkingTextRef.current = thinkingText;
-  }, [thinkingText]);
-
-  useEffect(() => {
-    isThinkingRef.current = isThinking;
-  }, [isThinking]);
-
-  useEffect(() => {
-    thinkingDurationRef.current = thinkingDuration;
-  }, [thinkingDuration]);
-
-  // Mirror isStreaming in a ref to avoid redundant setState in handlers
-  useEffect(() => {
-    isStreamingRef.current = isStreaming;
-  }, [isStreaming]);
-
-  // Keep a ref of the latest title to avoid redundant updates in handlers
-  useEffect(() => {
-    titleRef.current = title;
-  }, [title]);
-
-  // Keep refs for imgGen state
-  useEffect(() => {
-    imgGenEnabledRef.current = imgGenEnabled;
-  }, [imgGenEnabled]);
-
-  useEffect(() => {
-    imgGenFieldsRef.current = imgGenFields;
-  }, [imgGenFields]);
-
-  // Keep refs for message ID state
-  useEffect(() => {
-    currentUserMsgIdRef.current = currentUserMsgId;
-  }, [currentUserMsgId]);
-
-  useEffect(() => {
-    currentAiMsgIdRef.current = currentAiMsgId;
-  }, [currentAiMsgId]);
-
-  useEffect(() => {
-    currentImgGenAttachmentIdRef.current = currentImgGenAttachmentId;
-  }, [currentImgGenAttachmentId]);
-
-  useEffect(() => {
-    streamingMessageBlocksRef.current = streamingMessageBlocks;
-  }, [streamingMessageBlocks]);
-
-  useEffect(() => {
-    isNewChatRef.current = isNewChat;
-  }, [isNewChat]);
-
-  // Stable helper to update title state only when changed
-  const updateTitle = useCallback((nextTitle?: string | null) => {
-    if (!nextTitle) return;
-    if (titleRef.current === nextTitle) return;
-    setTitle(nextTitle);
-  }, []);
-
-  // Reflect title state into the DOM in an effect (React Compiler-friendly)
-  useEffect(() => {
-    if (!title) return;
-    if (typeof window !== "undefined") {
-      window.document.title = title;
-    }
-  }, [title]);
-
-  // WebSocket event handlers - only depend on stable references
-  useEffect(() => {
-    const syncStreamingStateFromBlocks = (
-      nextBlocks: ChatChunkAndResMsgBlock[],
-      evt: EventTypeMap["ai_chat_chunk"] | EventTypeMap["ai_chat_response"]
-    ) => {
-      const orderedBlocks = orderMessageBlocks(nextBlocks);
-      const nextStreamedText = textFromMessageBlocks(orderedBlocks);
-      const nextThinkingText = thinkingTextFromMessageBlocks(orderedBlocks);
-      const nextThinkingDuration =
-        thinkingDurationFromMessageBlocks(orderedBlocks);
-      const latestBlock = orderedBlocks.at(-1);
-      const nextIsThinking =
-        "isThinking" in evt && typeof evt.isThinking === "boolean"
-          ? evt.isThinking
-          : latestBlock
-            ? isThinkingBlock(latestBlock)
-            : false;
-
-      setStreamingMessageBlocks(orderedBlocks);
-      setStreamedText(nextStreamedText);
-      setThinkingText(nextThinkingText);
-      setThinkingDuration(nextThinkingDuration);
-      setIsThinking(nextIsThinking);
-
-      setCurrentStreamingMessage({
-        id: `streaming-${evt.conversationId}`,
-        content: nextStreamedText,
-        messageBlocks: orderedBlocks,
-        thinkingText: nextThinkingText || undefined,
-        thinkingDuration: nextThinkingDuration ?? undefined,
-        provider: evt.provider ?? selectedModel.provider,
-        model: evt.model ?? selectedModel.modelId,
-        timestamp: new Date(),
-        isUser: false,
-        imgGenEnabled: imgGenEnabledRef.current || evt.imgGenEnabled,
-        imgGenFields: imgGenFieldsRef.current ?? evt.imgGenFields,
-        userMsgId: evt.userMsgId ?? currentUserMsgIdRef.current ?? undefined,
-        imgGenAttachmentId: undefined,
-        aiMsgId: undefined
-      });
-    };
-
-    const handleChunk = (evt: EventTypeMap["ai_chat_chunk"]) => {
-      // Capture message IDs from the event, only update if different
-      if (evt.userMsgId && currentUserMsgIdRef.current !== evt.userMsgId) {
-        setCurrentUserMsgId(evt.userMsgId);
-      }
-      if (evt.aiMsgId && currentAiMsgIdRef.current !== evt.aiMsgId) {
-        setCurrentAiMsgId(evt.aiMsgId);
-      }
-      if (
-        evt.imgGenAttachmentId &&
-        currentImgGenAttachmentIdRef.current !== evt.imgGenAttachmentId
-      ) {
-        setCurrentImgGenAttachmentId(evt.imgGenAttachmentId);
-      }
-
-      // Handle first chunk with real conversation ID for new-chat transitions
-      if (
-        !firstChunkReceivedRef.current &&
-        evt.conversationId &&
-        evt.conversationId !== "new-chat" &&
-        originalConversationIdRef.current === "new-chat" &&
-        isWaitingForRealId
-      ) {
-        console.log(
-          `[AIChatContext] First chunk received with real ID: ${evt.conversationId}`
-        );
-        firstChunkReceivedRef.current = true;
-
-        // Update window.history immediately to show real URL
-        window.history.replaceState(null, "", `/chat/${evt.conversationId}`);
-        setIsNewChat(true);
-        urlUpdatedRef.current = true;
-
-        // Update active conversation ID to the real one from the event
-        setActiveConversationId(evt.conversationId);
-        setIsWaitingForRealId(false);
-      }
-
-      // Update title only if it actually changed
-      updateTitle(evt.title ?? null);
-
-      // Mark streaming only once per session to avoid redundant updates
-      if (evt.conversationId && evt.title && !isStreamingRef.current) {
-        setIsStreaming(true);
-      }
-
-      setIsComplete(false);
-
-      // Image generation progressive updates - accumulate the complete fields
-      if (evt.imgGenEnabled) {
-        setImgGenEnabled(evt.imgGenEnabled);
-      }
-      if (evt.imgGenFields) {
-        setImgGenEnabled(true);
-        console.log(evt.imgGenFields);
-        if (!firstChunkReceivedRef.current)
-          firstChunkReceivedRef.current = true;
-        // Merge new fields with existing, preserving all partial images
-        setImgGenFields(prev => ({
-          ...prev,
-          ...evt.imgGenFields,
-          // Accumulate partial images array if it exists
-          partialImages: evt.imgGenFields?.partialImages ?? prev?.partialImages
-        }));
-      }
-
-      if (evt.messageBlocks) {
-        const nextBlocks = mergeStreamingMessageBlocks(
-          streamingMessageBlocksRef.current,
-          evt.messageBlocks
-        );
-
-        syncStreamingStateFromBlocks(nextBlocks, evt);
-        return;
-      }
-
-      // Backwards compatibility for providers still emitting only legacy chunk fields
-      let nextThinkingText = thinkingTextRef.current;
-      let nextStreamedText = streamedTextRef.current;
-      let nextThinkingDuration = thinkingDurationRef.current;
-
-      if (evt.isThinking && evt.thinkingText) {
-        nextThinkingText += evt.thinkingText;
-        nextThinkingDuration = evt.thinkingDuration ?? null;
-        setThinkingText(nextThinkingText);
-        setIsThinking(true);
-        setThinkingDuration(nextThinkingDuration);
-      } else if (evt.chunk) {
-        if (isThinkingRef.current) {
-          setIsThinking(false);
-          if (evt.thinkingDuration) {
-            nextThinkingDuration = evt.thinkingDuration;
-            setThinkingDuration(evt.thinkingDuration);
-          }
-        }
-
-        nextStreamedText += evt.chunk;
-        setStreamedText(nextStreamedText);
-      }
-
-      if (evt.thinkingDuration) {
-        nextThinkingDuration = evt.thinkingDuration;
-        setThinkingDuration(evt.thinkingDuration);
-      }
-
-      setCurrentStreamingMessage({
-        id: `streaming-${evt.conversationId}`,
-        content: nextStreamedText,
-        messageBlocks: undefined,
-        thinkingText: nextThinkingText || undefined,
-        thinkingDuration: nextThinkingDuration ?? undefined,
-        provider: evt.provider ?? selectedModel.provider,
-        model: evt.model ?? selectedModel.modelId,
-        timestamp: new Date(),
-        isUser: false,
-        imgGenEnabled: imgGenEnabledRef.current || evt.imgGenEnabled,
-        imgGenFields: imgGenFieldsRef.current ?? evt.imgGenFields,
-        userMsgId: evt.userMsgId ?? currentUserMsgIdRef.current ?? undefined,
-        imgGenAttachmentId: undefined,
-        aiMsgId: undefined
-      });
-    };
-
-    const handleError = (evt: EventTypeMap["ai_chat_error"]) => {
-      // Capture message IDs from the event, only update if different
-      if (evt.userMsgId && currentUserMsgIdRef.current !== evt.userMsgId) {
-        setCurrentUserMsgId(evt.userMsgId);
-      }
-      if (evt.aiMsgId && currentAiMsgIdRef.current !== evt.aiMsgId) {
-        setCurrentAiMsgId(evt.aiMsgId);
-      }
-      if (
-        evt.imgGenAttachmentId &&
-        currentImgGenAttachmentIdRef.current !== evt.imgGenAttachmentId
-      ) {
-        setCurrentImgGenAttachmentId(evt.imgGenAttachmentId);
-      }
-
-      console.error(`[AIChatContext] Chat error: ${evt.message}`);
-      setError(evt.message);
-      setIsStreaming(false);
-      setIsComplete(true);
-      setIsWaitingForRealId(false);
-      setStreamingMessageBlocks([]);
-      setCurrentStreamingMessage(null);
-
-      // Update active conversation ID to match the event
-      if (evt.conversationId !== activeConversationId) {
-        setActiveConversationId(evt.conversationId);
-      }
-
-      // Clear active stream
-      if (userId) {
-        activeUserStreamsRef.current.delete(userId);
-      }
-
-      // Sync React Router only for new-chat transitions
-      // For existing chats, we never manipulate the router
-      if (
-        urlUpdatedRef.current ||
-        (originalConversationIdRef.current === "new-chat" &&
-          evt.conversationId !== "new-chat")
-      ) {
-        console.log(
-          `[AIChatContext] Error occurred, syncing router to: /chat/${evt.conversationId}`
-        );
-        router.replace(`/chat/${evt.conversationId}`, { scroll: false });
-        if (isNewChatRef.current === true) setIsNewChat(false);
-        urlUpdatedRef.current = false;
-      }
-
-      firstChunkReceivedRef.current = false;
-    };
-
-    const handleResponse = (evt: EventTypeMap["ai_chat_response"]) => {
-      // Capture message IDs from the event, only update if different
-      if (evt.userMsgId && currentUserMsgIdRef.current !== evt.userMsgId) {
-        setCurrentUserMsgId(evt.userMsgId);
-      }
-      // aiMsgId should always be defined in ai_chat_response
-      if (evt.aiMsgId && currentAiMsgIdRef.current !== evt.aiMsgId) {
-        setCurrentAiMsgId(evt.aiMsgId);
-      }
-      if (
-        evt.imgGenAttachmentId &&
-        currentImgGenAttachmentIdRef.current !== evt.imgGenAttachmentId
-      ) {
-        setCurrentImgGenAttachmentId(evt.imgGenAttachmentId);
-      }
-
-      // Image generation final response - complete fields with final images
-      if (
-        evt.imgGenFields &&
-        (imgGenFieldsRef.current?.activeImage?.cdnUrl == null ||
-          (evt.imgGenFields?.activeImage?.cdnUrl &&
-            evt.imgGenFields.activeImage.cdnUrl !==
-              imgGenFieldsRef.current.activeImage.cdnUrl))
-      ) {
-        setImgGenFields(evt.imgGenFields);
-      }
-
-      if (evt.messageBlocks && evt.messageBlocks.length > 0) {
-        syncStreamingStateFromBlocks(evt.messageBlocks, evt);
-      }
-
-      setTimeout(() => {
-        setIsComplete(evt.done);
-      }, 200);
-      if (evt.done) {
-        console.log("[AIChatContext] Stream completed");
-        setIsStreaming(false);
-        setIsThinking(false);
-        setIsWaitingForRealId(false);
-
-        // Capture final thinking duration if provided
-        if (evt.thinkingDuration) {
-          setThinkingDuration(evt.thinkingDuration);
-        }
-
-        if (
-          evt.thinkingText &&
-          (!evt.messageBlocks || evt.messageBlocks.length === 0)
-        ) {
-          setThinkingText(evt.thinkingText);
-        }
-
-        setCurrentStreamingMessage(null);
-
-        // Update active conversation ID to match the event
-        if (evt.conversationId !== activeConversationId) {
-          setActiveConversationId(evt.conversationId);
-        }
-
-        // Clear active stream
-        if (userId) {
-          activeUserStreamsRef.current.delete(userId);
-        }
-
-        // Sync React Router only for new-chat transitions
-        // For existing chats, we never manipulate the router
-        if (
-          urlUpdatedRef.current ||
-          (originalConversationIdRef.current === "new-chat" &&
-            evt.conversationId !== "new-chat")
-        ) {
-          console.log(
-            `[AIChatContext] Stream complete, syncing router to: /chat/${evt.conversationId}`
-          );
-          router.replace(`/chat/${evt.conversationId}`, { scroll: false });
-          if (isNewChatRef.current === true) setIsNewChat(false);
-          urlUpdatedRef.current = false;
-        }
-
-        firstChunkReceivedRef.current = false;
-      }
-    };
-
-    // Subscribe to events
-    client.on("ai_chat_chunk", handleChunk);
-    client.on("ai_chat_error", handleError);
-    client.on("ai_chat_response", handleResponse);
-
-    return () => {
-      client.off("ai_chat_chunk");
-      client.off("ai_chat_error");
-      client.off("ai_chat_response");
-    };
   }, [
-    client,
-    userId,
-    isWaitingForRealId,
-    selectedModel,
+    pathname,
     activeConversationId,
-    router,
-    updateTitle
+    status.isStreaming,
+    status.urlTransitionInFlight
   ]);
 
-  // Track recently sent messages to prevent duplicates
-  const recentMessagesRef = useRef<Map<string, number>>(new Map());
+  // Reflect the live title into the document (set mid-stream from `evt.title`, then `convo.title` on commit).
+  useEffect(() => {
+    if (!status.title) return;
+    if (typeof window !== "undefined") window.document.title = status.title;
+  }, [status.title]);
 
-  const { getAll } = useCookiesCtx();
-  const { city, country, latlng, postalCode, region, tz, locale, ip, ua } =
-    getAll(); // already wrapped in a useCallback
-
-  const metadata = useMemo(() => {
-    const useragent = ua ? decodeURIComponent(ua) : undefined;
-    const timezone = tz ? decodeURIComponent(tz) : undefined;
-    const ipAddress = ip ? decodeURIComponent(ip) : undefined;
-    const [lat, lng] = latlng
-      ? decodeURIComponent(latlng)
-          .split(",")
-          .map(p => {
-            return Number.parseFloat(p);
-          })
-      : [undefined, undefined];
-    return {
-      city,
-      country,
-      postalCode,
-      region,
-      tz: timezone,
-      ip: ipAddress,
-      ua: useragent,
-      lat,
-      lng,
-      locale
-    } satisfies AIChatRequestUserMetadata;
-  }, [city, ip, ua, country, latlng, postalCode, region, tz, locale]);
-
-  const sendChat = useCallback(
-    (
-      prompt: string,
-      explicitBatchId?: string,
-      imgGenEnabled?: boolean,
-      imgGenFields?: AIChatRequestImgGenFields,
-      optimisticUserMsgId?: string
-    ) => {
-      if (!userId) {
-        console.warn("[AIChatContext] Cannot send chat without userId");
-        return;
-      }
-
-      // Prevent duplicate sends
-      if (activeUserStreamsRef.current.has(userId)) {
-        console.warn(
-          `[AIChatContext] User ${userId} already has an active stream`
-        );
-        return;
-      }
-
-      // Check for duplicate messages sent within 500ms
-      const messageKey = `${userId}-${prompt}`;
-      const now = Date.now();
-      const lastSentTime = recentMessagesRef.current.get(messageKey);
-
-      if (lastSentTime && now - lastSentTime < 500) {
-        console.warn(
-          `[AIChatContext] Duplicate message detected, skipping: "${prompt.substring(0, 50)}..."`
-        );
-        return;
-      }
-
-      // Track this message
-      recentMessagesRef.current.set(messageKey, now);
-
-      // Clean up old entries after 2 seconds
-      setTimeout(() => {
-        recentMessagesRef.current.delete(messageKey);
-      }, 2000);
-
-      // Use the active conversation ID
-      const conversationId = activeConversationId ?? "new-chat";
-
-      // Generate or use provided optimistic userMsgId
-      const tempUserMsgId =
-        optimisticUserMsgId ?? `user-${Date.now()}-${Math.random()}`;
-      setCurrentUserMsgId(tempUserMsgId);
-      const p = providerContext ?? fallbackApiKeys;
-      // Get API key configuration
-      const hasProviderConfigured = p.isSet[selectedModel.provider];
-      const isDefaultProvider = p.isDefault[selectedModel.provider];
-
-      console.log(
-        `[AIChatContext] Sending chat with conversationId: ${conversationId}`
-      );
-      console.log(
-        `[AIChatContext] Using model: ${selectedModel.displayName} (${selectedModel.modelId})`
-      );
-      console.log(
-        `[AIChatContext] Message content: "${prompt.substring(0, 100)}${prompt.length > 100 ? "..." : ""}"`
-      );
-      console.log(
-        `[AIChatContext] Message length: ${prompt.length} characters`
-      );
-
-      // Mark user as having active stream
-      activeUserStreamsRef.current.add(userId);
-
-      // Reset state for new message
-      setStreamedText("");
-      setThinkingText("");
-      setIsThinking(false);
-      setThinkingDuration(null);
-      setError(null);
-      setImgGenEnabled(false);
-      setImgGenFields(null);
-      setStreamingMessageBlocks([]);
-      setIsComplete(false);
-      setIsStreaming(true);
-      setCurrentStreamingMessage(null);
-      urlUpdatedRef.current = false;
-      firstChunkReceivedRef.current = false;
-
-      if (conversationId === "new-chat") {
-        setIsWaitingForRealId(true);
-        originalConversationIdRef.current = "new-chat";
-      }
-
-      // Determine which batchId to send:
-      // - Prefer explicit (ChatInput provided because there were attachments)
-      // - Otherwise, only include the current batch if it actually has uploads
-      let batchIdUsed: string | undefined = explicitBatchId ?? undefined;
-      if (!batchIdUsed) {
-        const cur = currentBatchId ?? undefined;
-        const hasUploads = cur
-          ? (getUploadsByBatchId(cur)?.length ?? 0) > 0
-          : false;
-        batchIdUsed = hasUploads ? cur : undefined;
-      }
-      // intentionally not logging batchId in production
-
-      sendEvent("ai_chat_request", {
-        metadata,
-        type: "ai_chat_request",
-        conversationId,
-        prompt,
-        provider: selectedModel.provider,
-        model: getModel(
-          selectedModel.provider,
-          selectedModel.modelId as AllModelsUnion
-        ),
-        hasProviderConfigured,
-        isDefaultProvider,
-        maxTokens: undefined,
-        systemPrompt: undefined,
-        temperature: undefined,
-        topP: undefined,
-        // Use the explicit batchId from the input when provided so that
-        // the message uses the same batch as the registered attachments.
-        batchId: batchIdUsed,
-        imgGenEnabled,
-        imgGenFields: imgGenEnabled === true ? imgGenFields : undefined
-      } satisfies AIChatRequest);
-
-      // Immediately rotate to a fresh batch for the NEXT message.
-      // This covers all send paths (including initialPrompt/new-chat) so
-      // we never accidentally reuse the previous batch for subsequent uploads.
-      try {
-        startNewBatch();
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [
-      sendEvent,
-      metadata,
-      userId,
-      activeConversationId,
-      selectedModel,
-      providerContext,
-      startNewBatch,
-      currentBatchId,
-      getUploadsByBatchId
-    ]
+  // ONE draft fold per token — drives BOTH the legacy scalar fields and the synthetic streaming bubble.
+  const derived = useMemo(
+    () => (draft && draft.length > 0 ? deriveDraft(draft) : null),
+    [draft]
   );
 
-  const clearError = useCallback(() => setError(null), []);
+  const renderContext = useMemo(
+    () => ({
+      conversationId: resolvedId,
+      provider: selectedModel.provider,
+      model: selectedModel.modelId,
+      userId: userId ?? ""
+    }),
+    [resolvedId, selectedModel.provider, selectedModel.modelId, userId]
+  );
 
-  const resetStreamingState = useCallback(() => {
-    setThinkingText("");
-    setIsThinking(false);
-    setThinkingDuration(null);
-    setStreamingMessageBlocks([]);
-    setCurrentStreamingMessage(null);
-    setIsStreaming(false);
-    setIsComplete(false);
-    setError(null);
-    setStreamedText("");
-    // Reset image generation state
-    setImgGenEnabled(false);
-    setImgGenFields(null);
-    // Reset message IDs
-    setCurrentUserMsgId(null);
-    setCurrentAiMsgId(null);
-    setCurrentImgGenAttachmentId(null);
-  }, []);
+  const currentStreamingMessage = useMemo(
+    () =>
+      derived ? streamingMessageFromDerived(derived, renderContext) : null,
+    [derived, renderContext]
+  );
+
+  const sendChat = useSendChat(store, userId);
+  const clearError = useCallback(() => store.clearError(), [store]);
+  const resetStreamingState = useCallback(
+    () => store.resetStreamingState(),
+    [store]
+  );
 
   return (
     <AIChatContext.Provider
       value={{
         activeConversationId,
-        title,
-        streamedText,
-        isNewChat,
-        isStreaming,
-        isComplete,
+        title: status.title,
+        streamedText: derived?.text ?? "",
+        isStreaming: status.isStreaming,
+        isComplete: !status.isStreaming,
+        isNewChat: status.urlTransitionInFlight,
         error,
-        thinkingText,
-        isThinking,
-        thinkingDuration,
+        thinkingText: derived?.thinkingText ?? "",
+        isThinking: derived?.isThinking ?? false,
+        thinkingDuration: derived?.thinkingDuration ?? null,
         currentStreamingMessage,
-        streamingMessageBlocks,
-        currentUserMsgId,
-        currentImgGenAttachmentId,
-        currentAiMsgId,
+        streamingMessageBlocks: derived?.blocks ?? EMPTY_BLOCKS,
+        currentUserMsgId: derived?.userMsgId ?? null,
+        currentAiMsgId: derived?.aiMsgId ?? null,
+        currentImgGenAttachmentId: derived?.imgGenAttachmentId ?? null,
         sendChat,
         setActiveConversationId,
         clearError,
         resetStreamingState,
-        isWaitingForRealId,
+        isWaitingForRealId: store.isAwaitingRealId(),
         isConnected,
-        imgGenEnabled,
-        imgGenFields
+        imgGenEnabled: derived?.imgGenEnabled ?? false,
+        imgGenFields: derived?.imgGenFields,
+        store
       }}>
       {children}
     </AIChatContext.Provider>

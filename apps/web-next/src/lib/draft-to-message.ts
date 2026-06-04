@@ -179,15 +179,15 @@ function imgGenAttachments(
 }
 
 /**
- * The synthetic `streaming-<conversationId>` message the feed renders mid-stream. Display-only — the authoritative
- * message replaces it wholesale on `ai_chat_response`. `ChatFeed`/`MessageBubble` detect it by the `streaming-`
- * id prefix exactly as today, so their `live*` wiring is unchanged.
+ * Build the synthetic `streaming-<conversationId>` message from an ALREADY-derived draft. The façade derives the
+ * draft once per token (for the legacy scalar fields it exposes) and builds the bubble from that same derivation —
+ * so the chunk fold runs once, not twice. Display-only: the authoritative message replaces it wholesale on
+ * `ai_chat_response`. `ChatFeed`/`MessageBubble` detect it by the `streaming-` id prefix exactly as today.
  */
-export function draftToStreamingMessage(
-  draft: ChatDraft,
+export function streamingMessageFromDerived(
+  derived: DraftDerivation,
   ctx: DraftRenderContext
 ): MessageSingleton<true> {
-  const derived = deriveDraft(draft);
   const id = `streaming-${ctx.conversationId}`;
   const now = new Date();
   return createAIMessage({
@@ -218,6 +218,14 @@ export function draftToStreamingMessage(
     imageGenJob: null,
     messageBlocks: toMessageBlocks(id, [...derived.blocks])
   });
+}
+
+/** Derive a draft and build its streaming bubble in one shot (for callers holding the raw frames, not a derivation). */
+export function draftToStreamingMessage(
+  draft: ChatDraft,
+  ctx: DraftRenderContext
+): MessageSingleton<true> {
+  return streamingMessageFromDerived(deriveDraft(draft), ctx);
 }
 
 /** Compose the feed: committed timeline + the live streaming bubble (or just committed when no draft). */

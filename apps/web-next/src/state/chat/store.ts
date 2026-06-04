@@ -176,6 +176,22 @@ export class ChatStore extends ChatMessageWorkup {
   public hydratePage(page: { readonly convo: ConversationSingleton<true> }) {
     this.ingestConversation(page.convo);
   }
+
+  /**
+   * Seed committed history from a bare message list — the TEMPORARY cold-load bridge for the existing server
+   * route's `initialMessages` prop, removed once Phase 4 swaps the seed source to the SWR `hydratePage` loader.
+   * Seeds an EMPTY store only: a warm store (re-mount with the LRU instance, or one carrying live streamed /
+   * optimistic rows) is left untouched, so the seed can never clobber newer state or fire mid-stream. No envelope
+   * is carried by the route prop, so `conversation` / `title` stay as-is (matches the legacy null-title cold load).
+   */
+  public hydrateMessages(messages: readonly MessageSingleton<true>[]) {
+    if (messages.length === 0) return;
+    if (this.committedSnapshot.length > 0) return;
+    for (const message of messages) {
+      this.byId.set(message.id, message);
+    }
+    this.rebuildCommitted();
+  }
   /**
    * Begin a send: drop in the optimistic user bubble and enter streaming. `isNewChat` is derived from the
    * request. The optimistic message's temp id is remembered so `applyResponse` can swap it for the authoritative

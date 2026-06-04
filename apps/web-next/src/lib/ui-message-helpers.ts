@@ -1,12 +1,9 @@
 // src/lib/ui-message-helpers.ts
 import type {
-  AIChatResponseImgGenFieldsFinal,
-  AttachmentSingleton,
   ChatChunkAndResMsgBlock,
   MessageBlockSingleton,
   MessageSingleton
 } from "@slipstream/types";
-import { normalizeImgGenFields } from "./img-gen-to-attachment";
 
 export function toMessageBlocks(
   messageId: string,
@@ -115,61 +112,5 @@ export function createAIMessage(
     imageGenJob: params.imageGenJob ?? null,
     attachments: params.attachments ?? [],
     messageBlocks: params.messageBlocks
-  };
-}
-
-/**
- * Converts a streaming message to a final message
- */
-export function finalizeStreamingMessage(
-  streamingMessage: MessageSingleton<true>,
-  finalContent: string,
-  additionalData?: {
-    thinkingText?: string;
-    thinkingDuration?: number;
-    aiMsgId?: string;
-    imgGenAttachmentId?: string;
-    imgGenFields?: AIChatResponseImgGenFieldsFinal | null;
-    messageBlocks?: MessageBlockSingleton<true>[];
-  }
-): MessageSingleton<true> {
-  const arr = Array.of<AttachmentSingleton<true>>();
-
-  if (additionalData?.imgGenFields) {
-    const partials = normalizeImgGenFields(
-      additionalData.imgGenFields
-    )?.partialImages;
-
-    const finals = normalizeImgGenFields(additionalData.imgGenFields)?.images;
-
-    if (partials && partials.length > 0) {
-      const filter = partials.filter(t => typeof t !== "undefined");
-      if (filter.length > 0) arr.push(...filter);
-    }
-    if (finals && finals?.length > 0) {
-      const filter = finals.filter(t => typeof t !== "undefined");
-      const withCorrectId = filter.map(({ id: _id, ...rest }) => ({
-        ...rest,
-        id: additionalData.imgGenAttachmentId ?? _id
-      }));
-      if (withCorrectId.length > 0) arr.push(...withCorrectId);
-    }
-  }
-  return {
-    ...streamingMessage,
-    id:
-      additionalData?.aiMsgId ?? streamingMessage.id.replace("streaming-", ""),
-    content: finalContent,
-    thinkingText: additionalData?.thinkingText ?? streamingMessage.thinkingText,
-    thinkingDuration:
-      additionalData?.thinkingDuration ?? streamingMessage.thinkingDuration,
-    messageBlocks:
-      additionalData?.messageBlocks ??
-      toMessageBlocks(
-        additionalData?.aiMsgId ?? streamingMessage.id.replace("streaming-", ""),
-        streamingMessage.messageBlocks
-      ),
-    updatedAt: new Date(),
-    attachments: arr.length > 0 ? arr : streamingMessage.attachments
   };
 }
