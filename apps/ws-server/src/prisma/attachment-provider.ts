@@ -1,8 +1,8 @@
-import { ExtractService } from "@/extract/index.ts";
+import type { ExtractService } from "@/extract/index.ts";
 import { PrismaUserMetaService } from "@/prisma/user-meta.ts";
+import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { AttachmentProviderSingleton } from "@slipstream/types";
-import { PrismaDbService } from "@slipstream/db/factory";
 
 export class PrismaAttachmentProviderService extends PrismaUserMetaService {
   constructor(
@@ -466,7 +466,12 @@ export class PrismaAttachmentProviderService extends PrismaUserMetaService {
   public async getTargetedAtt(id: string) {
     const attachment = await this.prismaClient.attachment.findUniqueOrThrow({
       where: { id },
-      include: { image: true, document: true, imageGenOutput: true, audio: true }
+      include: {
+        image: true,
+        document: true,
+        imageGenOutput: true,
+        audio: true
+      }
     });
     const att = {
       ...attachment,
@@ -478,7 +483,12 @@ export class PrismaAttachmentProviderService extends PrismaUserMetaService {
   public async getManyAttachments(ids: string[]) {
     const attachments = await this.prismaClient.attachment.findMany({
       where: { id: { in: ids } },
-      include: { image: true, document: true, audio: true, imageGenOutput: true }
+      include: {
+        image: true,
+        document: true,
+        audio: true,
+        imageGenOutput: true
+      }
     });
 
     return attachments.map(v => {

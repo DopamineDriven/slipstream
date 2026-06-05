@@ -1,0 +1,29 @@
+{
+  "extends": "@slipstream/tsconfig/next.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "ignoreDeprecations": "6.0",
+    "types": ["*"]
+  },
+  "include": [
+    ".",
+    "next-env.d.ts",
+    "next.config.ts",
+    "global.d.ts",
+    "index.d.ts",
+    "audio-session.d.ts",
+    "postcss.config.mjs",
+    "src/**/*.tsx",
+    "src/**/*.ts",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules", "public/**/*.js"]
+}

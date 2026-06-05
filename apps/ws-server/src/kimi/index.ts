@@ -1055,7 +1055,7 @@ export class KimiService {
       type: "ai_chat_response",
       conversationId,
       userId,
-      systemPrompt,
+      systemPrompt,      convo: d.convo,
       userMsgId,
       aiMsgId: d.aiMsgId,
       imgGenEnabled: false,

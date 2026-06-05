@@ -1072,7 +1072,7 @@ export class LlamaService {
       userId,
       userMsgId,
       aiMsgId: d.aiMsgId,
-      systemPrompt,
+      systemPrompt,      convo: d.convo,
       temperature,
       title,
       topP,

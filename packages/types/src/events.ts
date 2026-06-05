@@ -63,7 +63,6 @@ export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   messageBlocks?: T extends "ai_chat_response"
     ? ChatChunkAndResMsgBlock[]
     : ChatChunkAndResMsgBlock;
-  convo?: ConversationSingleton<true>;
   imgGenAttachmentId?: string;
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatResponseImgGenFieldsFinal;
@@ -103,6 +102,10 @@ export type AIChatChunk = DX<
 
 export type AIChatResponse = DX<
   CTR<AIChatResEntity<"ai_chat_response">, "chunk"> & {
+    /**
+     * only contains a single message within, the most recent one (the ai model's response)
+     */
+    convo: ConversationSingleton<true>;
     usage?: number;
     thinkingDuration?: number;
     thinkingText?: string;

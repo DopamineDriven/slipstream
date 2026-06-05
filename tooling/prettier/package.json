@@ -3,10 +3,35 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist/**/*.{js,cjs,mjs,d.ts,d.cts,d.mts}"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "typesVersions": {
+      "*": {
+        "*": [
+          "dist/index.d.ts"
+        ]
+      }
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/index.d.ts"
+      ]
+    }
+  },
+  "source": "index.ts",
   "exports": {
-    ".": "./index.mjs"
+    ".": "./dist/index.js"
   },
   "scripts": {
+    "build": "tsdown",
     "clean": "git clean -xdf .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsc --noEmit"
@@ -18,8 +43,13 @@
   },
   "devDependencies": {
     "@slipstream/tsconfig": "workspace:*",
-    "@types/node": "catalog:node",
     "@typescript/native-preview": "catalog:tsgo",
+    "@types/node": "catalog:node",
+    "eslint": "catalog:eslint",
+    "jiti": "catalog:jiti",
+    "tsdown": "catalog:tsdown",
+    "tslib": "catalog:tslib",
+    "tsx": "catalog:tsx",
     "typescript": "catalog:ts"
   },
   "prettier": "@slipstream/prettier-config"

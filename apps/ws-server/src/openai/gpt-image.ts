@@ -819,7 +819,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
           void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
             type: "ai_chat_response",
             conversationId,
-            userId,
+            userId,      convo: d.convo,
             userMsgId,
             aiMsgId: d.aiMsgId,
             imgGenAttachmentId: d.imgGenAttachmentId,

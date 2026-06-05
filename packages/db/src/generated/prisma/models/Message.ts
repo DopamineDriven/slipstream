@@ -27,15 +27,18 @@ export type AggregateMessage = {
 }
 
 export type MessageAvgAggregateOutputType = {
+  ordinal: number | null
   thinkingDuration: number | null
 }
 
 export type MessageSumAggregateOutputType = {
+  ordinal: number | null
   thinkingDuration: number | null
 }
 
 export type MessageMinAggregateOutputType = {
   id: string | null
+  ordinal: number | null
   conversationId: string | null
   userId: string | null
   senderType: $Enums.SenderType | null
@@ -58,6 +61,7 @@ export type MessageMinAggregateOutputType = {
 
 export type MessageMaxAggregateOutputType = {
   id: string | null
+  ordinal: number | null
   conversationId: string | null
   userId: string | null
   senderType: $Enums.SenderType | null
@@ -80,6 +84,7 @@ export type MessageMaxAggregateOutputType = {
 
 export type MessageCountAggregateOutputType = {
   id: number
+  ordinal: number
   conversationId: number
   userId: number
   senderType: number
@@ -103,15 +108,18 @@ export type MessageCountAggregateOutputType = {
 
 
 export type MessageAvgAggregateInputType = {
+  ordinal?: true
   thinkingDuration?: true
 }
 
 export type MessageSumAggregateInputType = {
+  ordinal?: true
   thinkingDuration?: true
 }
 
 export type MessageMinAggregateInputType = {
   id?: true
+  ordinal?: true
   conversationId?: true
   userId?: true
   senderType?: true
@@ -134,6 +142,7 @@ export type MessageMinAggregateInputType = {
 
 export type MessageMaxAggregateInputType = {
   id?: true
+  ordinal?: true
   conversationId?: true
   userId?: true
   senderType?: true
@@ -156,6 +165,7 @@ export type MessageMaxAggregateInputType = {
 
 export type MessageCountAggregateInputType = {
   id?: true
+  ordinal?: true
   conversationId?: true
   userId?: true
   senderType?: true
@@ -265,6 +275,7 @@ export type MessageGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 
 export type MessageGroupByOutputType = {
   id: string
+  ordinal: number
   conversationId: string
   userId: string | null
   senderType: $Enums.SenderType
@@ -310,6 +321,7 @@ export type MessageWhereInput = {
   OR?: Prisma.MessageWhereInput[]
   NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
   id?: Prisma.StringFilter<"Message"> | string
+  ordinal?: Prisma.IntFilter<"Message"> | number
   conversationId?: Prisma.StringFilter<"Message"> | string
   userId?: Prisma.StringNullableFilter<"Message"> | string | null
   senderType?: Prisma.EnumSenderTypeFilter<"Message"> | $Enums.SenderType
@@ -339,6 +351,7 @@ export type MessageWhereInput = {
 
 export type MessageOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ordinal?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   senderType?: Prisma.SortOrder
@@ -368,9 +381,11 @@ export type MessageOrderByWithRelationInput = {
 
 export type MessageWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  conversationId_ordinal?: Prisma.MessageConversationIdOrdinalCompoundUniqueInput
   AND?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
   OR?: Prisma.MessageWhereInput[]
   NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
+  ordinal?: Prisma.IntFilter<"Message"> | number
   conversationId?: Prisma.StringFilter<"Message"> | string
   userId?: Prisma.StringNullableFilter<"Message"> | string | null
   senderType?: Prisma.EnumSenderTypeFilter<"Message"> | $Enums.SenderType
@@ -396,10 +411,11 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   imageGenJob?: Prisma.XOR<Prisma.ImageGenJobNullableScalarRelationFilter, Prisma.ImageGenJobWhereInput> | null
   conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
   conversationMemoryChunk?: Prisma.XOR<Prisma.ConversationMemoryChunkNullableScalarRelationFilter, Prisma.ConversationMemoryChunkWhereInput> | null
-}, "id">
+}, "id" | "conversationId_ordinal">
 
 export type MessageOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ordinal?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   senderType?: Prisma.SortOrder
@@ -430,6 +446,7 @@ export type MessageScalarWhereWithAggregatesInput = {
   OR?: Prisma.MessageScalarWhereWithAggregatesInput[]
   NOT?: Prisma.MessageScalarWhereWithAggregatesInput | Prisma.MessageScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Message"> | string
+  ordinal?: Prisma.IntWithAggregatesFilter<"Message"> | number
   conversationId?: Prisma.StringWithAggregatesFilter<"Message"> | string
   userId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
   senderType?: Prisma.EnumSenderTypeWithAggregatesFilter<"Message"> | $Enums.SenderType
@@ -452,6 +469,7 @@ export type MessageScalarWhereWithAggregatesInput = {
 
 export type MessageCreateInput = {
   id?: string
+  ordinal: number
   userId?: string | null
   senderType?: $Enums.SenderType
   provider: $Enums.Provider
@@ -478,6 +496,7 @@ export type MessageCreateInput = {
 
 export type MessageUncheckedCreateInput = {
   id?: string
+  ordinal: number
   conversationId: string
   userId?: string | null
   senderType?: $Enums.SenderType
@@ -504,6 +523,7 @@ export type MessageUncheckedCreateInput = {
 
 export type MessageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
@@ -530,6 +550,7 @@ export type MessageUpdateInput = {
 
 export type MessageUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
@@ -556,6 +577,7 @@ export type MessageUncheckedUpdateInput = {
 
 export type MessageCreateManyInput = {
   id?: string
+  ordinal: number
   conversationId: string
   userId?: string | null
   senderType?: $Enums.SenderType
@@ -578,6 +600,7 @@ export type MessageCreateManyInput = {
 
 export type MessageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
@@ -597,6 +620,7 @@ export type MessageUpdateManyMutationInput = {
 
 export type MessageUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
@@ -637,8 +661,14 @@ export type MessageScalarRelationFilter = {
   isNot?: Prisma.MessageWhereInput
 }
 
+export type MessageConversationIdOrdinalCompoundUniqueInput = {
+  conversationId: string
+  ordinal: number
+}
+
 export type MessageCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ordinal?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   senderType?: Prisma.SortOrder
@@ -660,11 +690,13 @@ export type MessageCountOrderByAggregateInput = {
 }
 
 export type MessageAvgOrderByAggregateInput = {
+  ordinal?: Prisma.SortOrder
   thinkingDuration?: Prisma.SortOrder
 }
 
 export type MessageMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ordinal?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   senderType?: Prisma.SortOrder
@@ -687,6 +719,7 @@ export type MessageMaxOrderByAggregateInput = {
 
 export type MessageMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ordinal?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   senderType?: Prisma.SortOrder
@@ -708,6 +741,7 @@ export type MessageMinOrderByAggregateInput = {
 }
 
 export type MessageSumOrderByAggregateInput = {
+  ordinal?: Prisma.SortOrder
   thinkingDuration?: Prisma.SortOrder
 }
 
@@ -891,6 +925,7 @@ export type MessageUncheckedUpdateManyWithoutUserKeyNestedInput = {
 
 export type MessageCreateWithoutAttachmentsInput = {
   id?: string
+  ordinal: number
   userId?: string | null
   senderType?: $Enums.SenderType
   provider: $Enums.Provider
@@ -916,6 +951,7 @@ export type MessageCreateWithoutAttachmentsInput = {
 
 export type MessageUncheckedCreateWithoutAttachmentsInput = {
   id?: string
+  ordinal: number
   conversationId: string
   userId?: string | null
   senderType?: $Enums.SenderType
@@ -957,6 +993,7 @@ export type MessageUpdateToOneWithWhereWithoutAttachmentsInput = {
 
 export type MessageUpdateWithoutAttachmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
@@ -982,6 +1019,7 @@ export type MessageUpdateWithoutAttachmentsInput = {
 
 export type MessageUncheckedUpdateWithoutAttachmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
@@ -1007,6 +1045,7 @@ export type MessageUncheckedUpdateWithoutAttachmentsInput = {
 
 export type MessageCreateWithoutConversationInput = {
   id?: string
+  ordinal: number
   userId?: string | null
   senderType?: $Enums.SenderType
   provider: $Enums.Provider
@@ -1032,6 +1071,7 @@ export type MessageCreateWithoutConversationInput = {
 
 export type MessageUncheckedCreateWithoutConversationInput = {
   id?: string
+  ordinal: number
   userId?: string | null
   senderType?: $Enums.SenderType
   provider: $Enums.Provider
@@ -1086,6 +1126,7 @@ export type MessageScalarWhereInput = {
   OR?: Prisma.MessageScalarWhereInput[]
   NOT?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
   id?: Prisma.StringFilter<"Message"> | string
+  ordinal?: Prisma.IntFilter<"Message"> | number
   conversationId?: Prisma.StringFilter<"Message"> | string
   userId?: Prisma.StringNullableFilter<"Message"> | string | null
   senderType?: Prisma.EnumSenderTypeFilter<"Message"> | $Enums.SenderType
@@ -1108,6 +1149,7 @@ export type MessageScalarWhereInput = {
 
 export type MessageCreateWithoutImageGenJobInput = {
   id?: string
+  ordinal: number
   userId?: string | null
   senderType?: $Enums.SenderType
   provider: $Enums.Provider
@@ -1133,6 +1175,7 @@ export type MessageCreateWithoutImageGenJobInput = {
 
 export type MessageUncheckedCreateWithoutImageGenJobInput = {
   id?: string
+  ordinal: number
   conversationId: string
   userId?: string | null
   senderType?: $Enums.SenderType
@@ -1174,6 +1217,7 @@ export type MessageUpdateToOneWithWhereWithoutImageGenJobInput = {
 
 export type MessageUpdateWithoutImageGenJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
@@ -1199,6 +1243,7 @@ export type MessageUpdateWithoutImageGenJobInput = {
 
 export type MessageUncheckedUpdateWithoutImageGenJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
@@ -1224,6 +1269,7 @@ export type MessageUncheckedUpdateWithoutImageGenJobInput = {
 
 export type MessageCreateWithoutConversationMemoryChunkInput = {
   id?: string
+  ordinal: number
   userId?: string | null
   senderType?: $Enums.SenderType
   provider: $Enums.Provider
@@ -1249,6 +1295,7 @@ export type MessageCreateWithoutConversationMemoryChunkInput = {
 
 export type MessageUncheckedCreateWithoutConversationMemoryChunkInput = {
   id?: string
+  ordinal: number
   conversationId: string
   userId?: string | null
   senderType?: $Enums.SenderType
@@ -1300,6 +1347,7 @@ export type MessageUpdateManyWithWhereWithoutConversationMemoryChunkInput = {
 
 export type MessageCreateWithoutMessageBlocksInput = {
   id?: string
+  ordinal: number
   userId?: string | null
   senderType?: $Enums.SenderType
   provider: $Enums.Provider
@@ -1325,6 +1373,7 @@ export type MessageCreateWithoutMessageBlocksInput = {
 
 export type MessageUncheckedCreateWithoutMessageBlocksInput = {
   id?: string
+  ordinal: number
   conversationId: string
   userId?: string | null
   senderType?: $Enums.SenderType
@@ -1366,6 +1415,7 @@ export type MessageUpdateToOneWithWhereWithoutMessageBlocksInput = {
 
 export type MessageUpdateWithoutMessageBlocksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
@@ -1391,6 +1441,7 @@ export type MessageUpdateWithoutMessageBlocksInput = {
 
 export type MessageUncheckedUpdateWithoutMessageBlocksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
@@ -1416,6 +1467,7 @@ export type MessageUncheckedUpdateWithoutMessageBlocksInput = {
 
 export type MessageCreateWithoutTtsJobInput = {
   id?: string
+  ordinal: number
   userId?: string | null
   senderType?: $Enums.SenderType
   provider: $Enums.Provider
@@ -1441,6 +1493,7 @@ export type MessageCreateWithoutTtsJobInput = {
 
 export type MessageUncheckedCreateWithoutTtsJobInput = {
   id?: string
+  ordinal: number
   conversationId: string
   userId?: string | null
   senderType?: $Enums.SenderType
@@ -1482,6 +1535,7 @@ export type MessageUpdateToOneWithWhereWithoutTtsJobInput = {
 
 export type MessageUpdateWithoutTtsJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
@@ -1507,6 +1561,7 @@ export type MessageUpdateWithoutTtsJobInput = {
 
 export type MessageUncheckedUpdateWithoutTtsJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
@@ -1532,6 +1587,7 @@ export type MessageUncheckedUpdateWithoutTtsJobInput = {
 
 export type MessageCreateWithoutUserKeyInput = {
   id?: string
+  ordinal: number
   userId?: string | null
   senderType?: $Enums.SenderType
   provider: $Enums.Provider
@@ -1557,6 +1613,7 @@ export type MessageCreateWithoutUserKeyInput = {
 
 export type MessageUncheckedCreateWithoutUserKeyInput = {
   id?: string
+  ordinal: number
   conversationId: string
   userId?: string | null
   senderType?: $Enums.SenderType
@@ -1608,6 +1665,7 @@ export type MessageUpdateManyWithWhereWithoutUserKeyInput = {
 
 export type MessageCreateManyConversationInput = {
   id?: string
+  ordinal: number
   userId?: string | null
   senderType?: $Enums.SenderType
   provider: $Enums.Provider
@@ -1629,6 +1687,7 @@ export type MessageCreateManyConversationInput = {
 
 export type MessageUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
@@ -1654,6 +1713,7 @@ export type MessageUpdateWithoutConversationInput = {
 
 export type MessageUncheckedUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
@@ -1679,6 +1739,7 @@ export type MessageUncheckedUpdateWithoutConversationInput = {
 
 export type MessageUncheckedUpdateManyWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
@@ -1700,6 +1761,7 @@ export type MessageUncheckedUpdateManyWithoutConversationInput = {
 
 export type MessageUpdateWithoutConversationMemoryChunkInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
@@ -1725,6 +1787,7 @@ export type MessageUpdateWithoutConversationMemoryChunkInput = {
 
 export type MessageUncheckedUpdateWithoutConversationMemoryChunkInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
@@ -1750,6 +1813,7 @@ export type MessageUncheckedUpdateWithoutConversationMemoryChunkInput = {
 
 export type MessageCreateManyConversationMemoryChunkInput = {
   id?: string
+  ordinal: number
   conversationId: string
   userId?: string | null
   senderType?: $Enums.SenderType
@@ -1771,6 +1835,7 @@ export type MessageCreateManyConversationMemoryChunkInput = {
 
 export type MessageUncheckedUpdateManyWithoutConversationMemoryChunkInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
@@ -1792,6 +1857,7 @@ export type MessageUncheckedUpdateManyWithoutConversationMemoryChunkInput = {
 
 export type MessageCreateManyUserKeyInput = {
   id?: string
+  ordinal: number
   conversationId: string
   userId?: string | null
   senderType?: $Enums.SenderType
@@ -1813,6 +1879,7 @@ export type MessageCreateManyUserKeyInput = {
 
 export type MessageUpdateWithoutUserKeyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
@@ -1838,6 +1905,7 @@ export type MessageUpdateWithoutUserKeyInput = {
 
 export type MessageUncheckedUpdateWithoutUserKeyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
@@ -1863,6 +1931,7 @@ export type MessageUncheckedUpdateWithoutUserKeyInput = {
 
 export type MessageUncheckedUpdateManyWithoutUserKeyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
@@ -1924,6 +1993,7 @@ export type MessageCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime.T
 
 export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ordinal?: boolean
   conversationId?: boolean
   userId?: boolean
   senderType?: boolean
@@ -1954,6 +2024,7 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 
 export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ordinal?: boolean
   conversationId?: boolean
   userId?: boolean
   senderType?: boolean
@@ -1979,6 +2050,7 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
 
 export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ordinal?: boolean
   conversationId?: boolean
   userId?: boolean
   senderType?: boolean
@@ -2004,6 +2076,7 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 
 export type MessageSelectScalar = {
   id?: boolean
+  ordinal?: boolean
   conversationId?: boolean
   userId?: boolean
   senderType?: boolean
@@ -2024,7 +2097,7 @@ export type MessageSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "senderType" | "provider" | "model" | "userKeyId" | "content" | "conversationMemoryChunkId" | "thinkingText" | "thinkingDuration" | "responseOutput" | "isImageGen" | "messageType" | "liked" | "disliked" | "tryAgain" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ordinal" | "conversationId" | "userId" | "senderType" | "provider" | "model" | "userKeyId" | "content" | "conversationMemoryChunkId" | "thinkingText" | "thinkingDuration" | "responseOutput" | "isImageGen" | "messageType" | "liked" | "disliked" | "tryAgain" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   messageBlocks?: boolean | Prisma.Message$messageBlocksArgs<ExtArgs>
   ttsJob?: boolean | Prisma.Message$ttsJobArgs<ExtArgs>
@@ -2059,6 +2132,7 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    ordinal: number
     conversationId: string
     userId: string | null
     senderType: $Enums.SenderType
@@ -2508,6 +2582,7 @@ export interface Prisma__MessageClient<T, Null = never, ExtArgs extends runtime.
  */
 export interface MessageFieldRefs {
   readonly id: Prisma.FieldRef<"Message", 'String'>
+  readonly ordinal: Prisma.FieldRef<"Message", 'Int'>
   readonly conversationId: Prisma.FieldRef<"Message", 'String'>
   readonly userId: Prisma.FieldRef<"Message", 'String'>
   readonly senderType: Prisma.FieldRef<"Message", 'SenderType'>

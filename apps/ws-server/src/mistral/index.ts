@@ -1151,6 +1151,7 @@ export class MistralService extends MistralStreamContentService{
       conversationId,
       userId,
       systemPrompt,
+      convo: d.convo,
       userMsgId,
       aiMsgId: d.aiMsgId,
       imgGenEnabled: false,

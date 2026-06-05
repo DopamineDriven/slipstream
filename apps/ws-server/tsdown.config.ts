@@ -46,7 +46,8 @@ export default defineConfig(
         "src/pdf/index.ts",
         "src/prisma/attachment-provider.ts",
         "src/prisma/attachment.ts",
-        "src/prisma/chat.ts",
+        "src/prisma/chat-request.ts",
+        "src/prisma/chat-response.ts",
         "src/prisma/index.ts",
         "src/prisma/provider-store.ts",
         "src/prisma/tts.ts",
@@ -101,7 +102,7 @@ export default defineConfig(
         "!public/**/*"
       ],
       cwd: process.cwd(),
-      target: ["node25"],
+      target: ["node26"],
       fixedExtension: false,
       dts: { tsgo: true },
       watch: process.env.NODE_ENV === "development",

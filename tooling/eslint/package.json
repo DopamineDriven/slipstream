@@ -3,22 +3,66 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist/**/*.{js,cjs,mjs,d.ts,d.cts,d.mts}"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "typesVersions": {
+      "*": {
+        "*": [
+          "dist/index.d.ts"
+        ],
+        "base": [
+          "dist/base.d.ts"
+        ],
+        "next": [
+          "dist/next.d.ts"
+        ],
+        "react": [
+          "dist/react.d.ts"
+        ]
+      }
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/index.d.ts"
+      ],
+      "base": [
+        "dist/base.d.ts"
+      ],
+      "next": [
+        "dist/next.d.ts"
+      ],
+      "react": [
+        "dist/react.d.ts"
+      ]
+    }
+  },
+  "source": "index.ts",
   "exports": {
-    "./base": "./base.ts",
-    "./next": "./next.ts",
-    "./react": "./react.ts"
+    ".": "./dist/index.js",
+    "./base": "./dist/base.js",
+    "./next": "./dist/next.js",
+    "./react": "./dist/react.js"
   },
   "license": "BUSL-1.1",
   "scripts": {
+    "build": "tsdown",
     "clean": "git clean -xdf .cache .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
     "@eslint/compat": "catalog:eslint",
+    "@eslint/config-helpers": "catalog:eslint",
     "@eslint/js": "catalog:eslint",
     "@next/eslint-plugin-next": "catalog:next",
-    "@ts-safeql/eslint-plugin": "catalog:safeql",
     "eslint-plugin-import": "catalog:eslint",
     "eslint-plugin-jsx-a11y": "catalog:eslint",
     "eslint-plugin-react": "catalog:eslint",
@@ -28,15 +72,14 @@
     "typescript-eslint": "catalog:tseslint"
   },
   "devDependencies": {
-    "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
     "@typescript/native-preview": "catalog:tsgo",
     "@types/node": "catalog:node",
     "eslint": "catalog:eslint",
     "prettier": "catalog:prettier",
-    "tslib": "catalog:tslib",
     "tsdown": "catalog:tsdown",
+    "tslib": "catalog:tslib",
+    "tsx": "catalog:tsx",
     "typescript": "catalog:ts"
-  },
-  "prettier": "@slipstream/prettier-config"
+  }
 }

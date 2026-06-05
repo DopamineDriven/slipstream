@@ -45,8 +45,8 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.suggest.showStatusBar": true,
   "eslint.enable": true,
+  "eslint.useFlatConfig": true,
   "terminal.integrated.suggest.enabled": false,
-  "eslint.debug": true,
   "eslint.rules.customizations": [
     {
       "rule": "*",
@@ -83,14 +83,16 @@
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,
   "tailwindCSS.colorDecorators": true,
   "js/ts.tsserver.web.typeAcquisition.enabled": true,
-  "js/ts.implementationsCodeLens.enabled": true,
-  "js/ts.implementationsCodeLens.showOnInterfaceMethods": true,
+  // "js/ts.implementationsCodeLens.enabled": true,
+  // "js/ts.implementationsCodeLens.showOnInterfaceMethods": true,
   "js/ts.locale": "en",
   "js/ts.referencesCodeLens.showOnAllFunctions": true,
-  "typescript.native-preview.trace.server": "messages",
-  "js/ts.experimental.useTsgo": false,
+  // "typescript.native-preview.trace.server": "messages",
+  "js/ts.experimental.useTsgo": true,
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "js/ts.suggest.autoImports": true,
+  "js/ts.suggest.enabled": true,
+
   "yaml.hover": true,
   "markdown-pdf.margin.top": "0.5in",
   "markdown-pdf.margin.bottom": "0.5in",
@@ -127,5 +129,9 @@
   "[sql]": {
     "editor.defaultFormatter": "ReneSaarsoo.sql-formatter-vsc"
   },
-  "typescript.native-preview.tsdk": "/home/dopaminedriven/cloneathon/t3-chat-clone/node_modules/@typescript/native-preview"
+  "typescript.native-preview.tsdk": "/home/dopaminedriven/cloneathon/t3-chat-clone/node_modules/@typescript/native-preview",
+  "js/ts.implicitProjectConfig.target": "ESNext",
+  "js/ts.referencesCodeLens.enabled": true,
+  "terminal.integrated.defaultLocation": "view",
+  "terminal.integrated.defaultProfile.linux": "bash"
 }

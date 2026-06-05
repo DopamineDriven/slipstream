@@ -8,6 +8,7 @@ export function Zai({ role = "img", ...svg }: BaseSVGProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       {...svg}>
+      <title>Zai</title>
       <path
         d="M12.6065 0.0129029L10.929 2.4C10.671 2.77419 10.2323 3.00645 9.76775 3.00645H0.606456V0C0.593552 0.0129032 12.6065 0.0129029 12.6065 0.0129029Z"
         fill="currentColor"

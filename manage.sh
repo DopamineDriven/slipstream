@@ -120,7 +120,7 @@ clean_house() {
 
     # Reinstall dependencies
     log "Reinstalling dependencies with pnpm"
-    pnpm install
+    pnpm install --no-frozen-lockfile
 
     # Run targeted build
     log "Running targeted build"
@@ -130,6 +130,9 @@ clean_house() {
 # Function to build specific packages
 build_targeted() {
     local build_order=(
+        "@slipstream/eslint-config"
+        "@slipstream/prettier-config"
+        "@slipstream/vitest-config"
         "@slipstream/ui"
         "@slipstream/db"
         "@slipstream/redis-service"
@@ -140,6 +143,7 @@ build_targeted() {
         "@slipstream/img-gen"
         "@slipstream/storage-s3"
         "@slipstream/ws-server"
+        "@slipstream/web-next"
     )
 
     for package in "${build_order[@]}"; do
