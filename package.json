@@ -40,7 +40,7 @@
     "generate:hex": "openssl rand -hex 64",
     "npm:registry": "npm set registry https://registry.npmjs.org",
     "run:web": "turbo dev --filter=@slipstream/web",
-    "run:web-next": "turbo dev --filter=@slipstream/web",
+    "run:web-next": "turbo dev --filter=@slipstream/web-next",
     "run:ws-server": "turbo dev --filter=@slipstream/ws-server",
     "wsl2:info": "lsb_release -a"
   },

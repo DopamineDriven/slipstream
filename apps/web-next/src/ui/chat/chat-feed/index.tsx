@@ -2,8 +2,9 @@
 
 import type { User } from "@/utils/auth-client";
 import type { ReactNode } from "react";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useChatScroll } from "@/context/chat-scroll-context";
+import { useLoadOlderHistory } from "@/hooks/use-load-older-history";
 import { useSelectionQuote } from "@/hooks/use-selection-quote";
 import { cn } from "@/lib/utils";
 import { SelectionToolbar } from "@/ui/chat/chat-selection";
@@ -34,6 +35,10 @@ interface ChatFeedProps {
   imgGenFields?: AIChatResponseImgGenFieldsFinal;
   imgGenAttachmentId?: string;
   currentAiMsgId?: string;
+  /** Upward pagination (UI-oriented names; the SWR `loadMore`/`hasMore`/`isLoadingMore` forwarded from the bridge). */
+  loadOlderMessages?: () => void | Promise<unknown>;
+  hasOlderMessages?: boolean;
+  isLoadingOlderMessages?: boolean;
 }
 
 export function ChatFeed({
@@ -54,9 +59,13 @@ export function ChatFeed({
   imgGenFields,
   imgGenAttachmentId,
   currentAiMsgId,
+  loadOlderMessages,
+  hasOlderMessages,
+  isLoadingOlderMessages,
   children
 }: ChatFeedProps) {
   const { scrollRef, setScrollState } = useChatScroll();
+  const [didInitialScroll, setDidInitialScroll] = useState(false);
 
   const { rect, quote, clear } = useSelectionQuote("[data-chat-feed]");
 
@@ -66,6 +75,15 @@ export function ChatFeed({
       scrollButtonThreshold: 100,
       debounceMs: 50
     });
+
+  // Velocity-adaptive upward pagination + scroll anchoring. Gated on `didInitialScroll` so it can't fetch an older
+  // page before the first scroll-to-bottom lands.
+  useLoadOlderHistory(scrollRef, messages, {
+    hasMore: hasOlderMessages ?? false,
+    isLoadingOlder: isLoadingOlderMessages ?? false,
+    onLoadOlder: loadOlderMessages ?? (() => {}),
+    enabled: didInitialScroll
+  });
 
   // Sync scroll state to context whenever it changes
   useEffect(() => {
@@ -95,36 +113,41 @@ export function ChatFeed({
     }
   }, [quote, clear]);
 
+  // Re-arm the one-time initial-scroll gate when the conversation changes.
   useEffect(() => {
-    const initialScroll = () => {
-      if (isNewChat) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDidInitialScroll(false);
+  }, [activeConversationId]);
+
+  // Jump to bottom on the first paint of a conversation (newest-first), then arm upward pagination.
+  useEffect(() => {
+    if (didInitialScroll || isNewChat || messages.length === 0) return;
+    const toBottom = () => {
       if (scrollRef.current) {
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
     };
-
-    // Use multiple attempts to ensure scroll happens after DOM is fully rendered
-    requestAnimationFrame(initialScroll);
-
-    const fallbackTimer = setTimeout(() => {
-      requestAnimationFrame(initialScroll);
-    }, 50);
-
+    requestAnimationFrame(() => {
+      toBottom();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDidInitialScroll(true);
+    });
+    const fallbackTimer = setTimeout(() => requestAnimationFrame(toBottom), 50);
     return () => clearTimeout(fallbackTimer);
-  }, [activeConversationId, scrollRef, isNewChat]);
+  }, [didInitialScroll, isNewChat, messages.length, scrollRef]);
 
-  // Auto-scroll when messages change or streaming updates occur (only if near bottom)
+  // Auto-scroll on a NEW message (tail id change) or streaming updates — keyed on the LAST id, not `messages.length`,
+  // so an older-page prepend (which only changes the head) never yanks the viewport to the bottom.
+  const lastMessageId = messages[messages.length - 1]?.id;
   useEffect(() => {
     if (!scrollRef.current || !isNearBottom) return;
-
-    // Use requestAnimationFrame for smooth scrolling
     requestAnimationFrame(() => {
       if (scrollRef.current) {
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
     });
   }, [
-    messages.length,
+    lastMessageId,
     streamedText,
     thinkingText,
     isAwaitingFirstChunk,
@@ -141,9 +164,22 @@ export function ChatFeed({
           ref={scrollRef}
           data-chat-feed
           className={cn(
-            `flex-1 space-y-6 overflow-y-auto px-4 py-6`,
+            `flex-1 space-y-6 overflow-y-auto px-4 py-6 [overflow-anchor:none]`,
             className
           )}>
+          {isLoadingOlderMessages && (
+            <div className="text-muted-foreground flex items-center justify-center gap-2 py-2 text-xs">
+              <div className="border-muted-foreground/30 border-t-muted-foreground/70 size-3.5 animate-spin rounded-full border-2" />
+              {`Loading older messages…`}
+            </div>
+          )}
+          {hasOlderMessages === false && messages.length > 0 && (
+            <div className="text-muted-foreground/70 flex items-center justify-center gap-3 py-2 text-[0.7rem] tracking-wide uppercase">
+              <span className="bg-border h-px w-8" />
+              {`Beginning of conversation`}
+              <span className="bg-border h-px w-8" />
+            </div>
+          )}
           {messages?.map(message => {
             // Check if this is a streaming message or matches the current aiMsgId
             const isStreamingMessage =

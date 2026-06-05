@@ -77,7 +77,12 @@ export function ChatInterface({
     conversationId === "new-chat" || conversationId === "home" ?
       undefined
     : conversationId;
-  const { error: historyError } = useHydrateChatStore(store, {
+  const {
+    error: historyError,
+    loadMore,
+    hasMore,
+    isLoadingMore
+  } = useHydrateChatStore(store, {
     userId: user.id,
     conversationId: historyConversationId
   });
@@ -218,6 +223,9 @@ export function ChatInterface({
             imgGenFields={imgGenFields}
             imgGenAttachmentId={currentImgGenAttachmentId ?? undefined}
             currentAiMsgId={currentAiMsgId ?? undefined}
+            loadOlderMessages={loadMore}
+            hasOlderMessages={hasMore}
+            isLoadingOlderMessages={isLoadingMore}
             user={user}>
             <ChatHero user={user} selectedModel={selectedModel} tz={tz} />
           </ChatFeed>
