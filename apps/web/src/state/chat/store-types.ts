@@ -107,7 +107,7 @@ export type ErrorSnapshot = string | undefined;
  */
 export interface ConversationMessagesPage {
   readonly convo: ConversationSingleton<true>;
-  readonly nextCursor: string | null;
+  readonly nextCursor: number | null;
   readonly hasMore: boolean;
 }
 

@@ -190,6 +190,8 @@ export function useConversationMessages({
     removeMessage,
     isLoading,
     isValidating,
+    isLoadingMore,
+    hasMore,
     data,
     error
   };
