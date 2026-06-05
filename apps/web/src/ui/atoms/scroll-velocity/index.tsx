@@ -120,7 +120,7 @@ function Plane({
         <img
           src={images[index % images.length]}
           alt={`Plane ${index}`}
-          className="w-120 h-180 object-cover"
+          className="h-180 w-120 object-cover"
           draggable={false}
         />
       </div>
@@ -144,12 +144,14 @@ function Plane({
               transition={{ duration: 0.3, ease: "easeOut" }}
             />
             <div className="font-geist-mono p-[4px_8px] text-[0.625rem] font-normal tracking-wider whitespace-nowrap text-[oklch(97.015%_0.00011_271.152)] uppercase">
-              <ScrambleText
-                active={isHovered}
-                duration={stagger(0.05)}
-                chars={scrambleChars}>
-                {labelText}
-              </ScrambleText>
+              {labelText && (
+                <ScrambleText
+                  active={isHovered}
+                  duration={stagger(0.05)}
+                  chars={scrambleChars}
+                  children={labelText}
+                />
+              )}
             </div>
           </motion.div>
         )}

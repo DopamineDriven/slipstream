@@ -8,6 +8,7 @@ export function AICoalesce({ role = "img", ...svg }: BaseSVGProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       {...svg}>
+      <title>AI Coalesce</title>
       <path
         d="M66.5617 12.0453C76.5028 11.0652 77.1007 26.3072 68.318 27.1934C58.3887 28.1953 57.6113 12.9278 66.5617 12.0453Z"
         fill="currentColor"

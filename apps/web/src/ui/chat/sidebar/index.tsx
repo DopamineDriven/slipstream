@@ -7,14 +7,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
 import { useConversations } from "@/hooks/use-conversations";
 import { cn } from "@/lib/utils";
-import { NativeTruncatedText } from "@/ui/atoms/native-truncated-text";
 import { useSidebar } from "@/ui/atoms/sidebar";
 import { SidebarDropdownMenu } from "@/ui/chat/sidebar/drop-menu";
-import { Logo } from "@/ui/logo";
 import { useSession } from "@/utils/auth-client";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion } from "motion/react";
 import {
+  AICoalesce,
   Button,
   Check,
   CirclePlus,
@@ -26,6 +25,7 @@ import {
   EmptyChatHistory,
   Input,
   EllipsisHorizontal as MoreHorizontal,
+  NativeTruncatedText,
   Search,
   Trash as Trash2,
   X
@@ -201,7 +201,7 @@ export function EnhancedSidebar({
               : "justify-between px-1"
           )}>
           <div className="flex items-center">
-            <Logo
+            <AICoalesce
               className={cn(
                 "stroke-current text-current [&_path]:stroke-current",
                 effectiveState === "collapsed" ? "size-8" : "size-10"

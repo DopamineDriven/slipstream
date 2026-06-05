@@ -15,20 +15,20 @@ catalogs:
       version: 1.6.14
   aws:
     '@aws-sdk/client-s3':
-      specifier: ^3.1060.0
-      version: 3.1061.0
+      specifier: ^3.1062.0
+      version: 3.1062.0
     '@aws-sdk/client-secrets-manager':
-      specifier: ^3.1060.0
-      version: 3.1061.0
+      specifier: ^3.1062.0
+      version: 3.1062.0
     '@aws-sdk/credential-providers':
-      specifier: ^3.1060.0
-      version: 3.1061.0
+      specifier: ^3.1062.0
+      version: 3.1062.0
     '@aws-sdk/lib-storage':
-      specifier: ^3.1060.0
-      version: 3.1061.0
+      specifier: ^3.1062.0
+      version: 3.1062.0
     '@aws-sdk/s3-request-presigner':
-      specifier: ^3.1060.0
-      version: 3.1061.0
+      specifier: ^3.1062.0
+      version: 3.1062.0
     '@aws-sdk/types':
       specifier: ^3.973.10
       version: 3.973.10
@@ -138,7 +138,7 @@ catalogs:
       version: 13.0.6
   google:
     '@google/genai':
-      specifier: ^2.7.0
+      specifier: ^2.8.0
       version: 2.8.0
   gtag:
     '@types/gtag.js':
@@ -225,7 +225,7 @@ catalogs:
       version: 18.0.0
   openai:
     openai:
-      specifier: ^6.41.0
+      specifier: ^6.42.0
       version: 6.42.0
   p-limit:
     p-limit:
@@ -426,8 +426,8 @@ catalogs:
       version: 4.2.0
   smithy:
     '@smithy/node-http-handler':
-      specifier: ^4.7.6
-      version: 4.7.6
+      specifier: ^4.7.7
+      version: 4.7.7
   store:
     '@types/use-sync-external-store':
       specifier: ^1.5.0
@@ -464,16 +464,16 @@ catalogs:
       version: 6.0.3
   tsdown:
     tsdown:
-      specifier: ^0.22.1
-      version: 0.22.1
+      specifier: ^0.22.2
+      version: 0.22.2
   tseslint:
     typescript-eslint:
       specifier: ^8.60.1
       version: 8.60.1
   tsgo:
     '@typescript/native-preview':
-      specifier: ^7.0.0-dev.20260603.1
-      version: 7.0.0-dev.20260603.1
+      specifier: ^7.0.0-dev.20260604.1
+      version: 7.0.0-dev.20260604.1
   tslib:
     tslib:
       specifier: ^2.8.1
@@ -599,7 +599,7 @@ importers:
         version: 25.9.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       dotenv:
         specifier: catalog:dotenv
         version: 17.4.2
@@ -626,320 +626,7 @@ importers:
     dependencies:
       '@aws-sdk/client-secrets-manager':
         specifier: catalog:aws
-        version: 3.1061.0
-      '@base-ui/react':
-        specifier: catalog:bui
-        version: 1.5.0(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@d0paminedriven/metadata':
-        specifier: catalog:dd
-        version: 6.0.1
-      '@radix-ui/react-avatar':
-        specifier: catalog:radix
-        version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-dialog':
-        specifier: catalog:radix
-        version: 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-dropdown-menu':
-        specifier: catalog:radix
-        version: 2.1.16(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-label':
-        specifier: catalog:radix
-        version: 2.1.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-popover':
-        specifier: catalog:radix
-        version: 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-primitive':
-        specifier: catalog:radix
-        version: 2.1.4(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-progress':
-        specifier: catalog:radix
-        version: 1.1.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-scroll-area':
-        specifier: catalog:radix
-        version: 1.2.10(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-select':
-        specifier: catalog:radix
-        version: 2.2.6(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-separator':
-        specifier: catalog:radix
-        version: 1.1.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-slider':
-        specifier: catalog:radix
-        version: 1.3.6(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-slot':
-        specifier: catalog:radix
-        version: 1.2.4(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-switch':
-        specifier: catalog:radix
-        version: 1.2.6(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-tabs':
-        specifier: catalog:radix
-        version: 1.1.13(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-tooltip':
-        specifier: catalog:radix
-        version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@shikijs/transformers':
-        specifier: catalog:shiki
-        version: 4.2.0
-      '@slipstream/db':
-        specifier: workspace:*
-        version: link:../../packages/db
-      '@slipstream/encryption':
-        specifier: workspace:*
-        version: link:../../packages/encryption
-      '@slipstream/img-gen':
-        specifier: workspace:*
-        version: link:../../packages/img-gen
-      '@slipstream/key-validator':
-        specifier: workspace:*
-        version: link:../../packages/key-validator
-      '@slipstream/storage-s3':
-        specifier: workspace:*
-        version: link:../../packages/storage-s3
-      '@slipstream/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@slipstream/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@tanstack/react-virtual':
-        specifier: catalog:tanstack
-        version: 3.14.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@vercel/analytics':
-        specifier: catalog:vercel
-        version: 2.0.1(next@16.2.7(@babel/core@7.29.7)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
-      better-auth:
-        specifier: catalog:auth
-        version: 1.6.14(@prisma/client@7.8.0(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3))(typescript@6.0.3))(mysql2@3.15.3)(next@16.2.7(@babel/core@7.29.7)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(pg@8.21.0)(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8)
-      class-variance-authority:
-        specifier: catalog:cva
-        version: 0.7.1
-      clsx:
-        specifier: catalog:clsx
-        version: 2.1.1
-      csstype:
-        specifier: catalog:csstype
-        version: 3.2.3
-      decimal.js:
-        specifier: catalog:decimal
-        version: 10.6.0
-      fflate:
-        specifier: catalog:fflate
-        version: 0.8.3
-      geist:
-        specifier: catalog:geist
-        version: 1.7.2(next@16.2.7(@babel/core@7.29.7)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))
-      js-cookie:
-        specifier: catalog:cookies
-        version: 3.0.8
-      katex:
-        specifier: catalog:katex
-        version: 0.17.0
-      motion:
-        specifier: catalog:motion
-        version: 12.40.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      motion-plus:
-        specifier: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3
-        version: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      motion-plus-dom:
-        specifier: catalog:motion
-        version: 2.11.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      nanoid:
-        specifier: catalog:nanoid
-        version: 5.1.11
-      next:
-        specifier: catalog:next
-        version: 16.2.7(@babel/core@7.29.7)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      next-themes:
-        specifier: catalog:next
-        version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react:
-        specifier: catalog:react
-        version: 19.2.7
-      react-dom:
-        specifier: catalog:react
-        version: 19.2.7(react@19.2.7)
-      react-resizable-panels:
-        specifier: catalog:react
-        version: 4.11.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      rehype-katex:
-        specifier: catalog:rehype
-        version: 7.0.1
-      rehype-pretty-code:
-        specifier: catalog:rehype
-        version: 0.14.3(shiki@4.2.0)
-      rehype-react:
-        specifier: catalog:rehype
-        version: 8.0.0
-      rehype-sanitize:
-        specifier: catalog:rehype
-        version: 6.0.0
-      rehype-stringify:
-        specifier: catalog:rehype
-        version: 10.0.1
-      remark-directive:
-        specifier: catalog:remark
-        version: 4.0.0
-      remark-gfm:
-        specifier: catalog:remark
-        version: 4.0.1
-      remark-math:
-        specifier: catalog:remark
-        version: 6.0.0
-      remark-parse:
-        specifier: catalog:remark
-        version: 11.0.0
-      remark-rehype:
-        specifier: catalog:remark
-        version: 11.1.2
-      swr:
-        specifier: catalog:swr
-        version: 2.4.1(react@19.2.7)
-      tailwind-merge:
-        specifier: catalog:tw
-        version: 3.6.0
-      tailwindcss:
-        specifier: catalog:tw
-        version: 4.3.0
-      tailwindcss-motion:
-        specifier: catalog:tw
-        version: 1.1.1(tailwindcss@4.3.0)
-      tw-animate-css:
-        specifier: catalog:tw
-        version: 1.4.0
-      unified:
-        specifier: catalog:unified
-        version: 11.0.5
-      vaul:
-        specifier: catalog:react
-        version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      vfile:
-        specifier: catalog:vfile
-        version: 6.0.3
-    devDependencies:
-      '@d0paminedriven/fs':
-        specifier: catalog:dd
-        version: 11.0.0
-      '@playwright/test':
-        specifier: catalog:test
-        version: 1.60.0
-      '@slipstream/eslint-config':
-        specifier: workspace:*
-        version: link:../../tooling/eslint
-      '@slipstream/prettier-config':
-        specifier: workspace:*
-        version: link:../../tooling/prettier
-      '@slipstream/tsconfig':
-        specifier: workspace:*
-        version: link:../../tooling/typescript
-      '@tailwindcss/forms':
-        specifier: catalog:tw
-        version: 0.5.11(tailwindcss@4.3.0)
-      '@tailwindcss/postcss':
-        specifier: catalog:tw
-        version: 4.3.0
-      '@tailwindcss/typography':
-        specifier: catalog:tw
-        version: 0.5.19(tailwindcss@4.3.0)
-      '@types/gtag.js':
-        specifier: catalog:gtag
-        version: 0.0.20
-      '@types/js-cookie':
-        specifier: catalog:cookies
-        version: 3.0.6
-      '@types/katex':
-        specifier: catalog:katex
-        version: 0.16.8
-      '@types/mdast':
-        specifier: catalog:mdast
-        version: 4.0.4
-      '@types/node':
-        specifier: catalog:node
-        version: 25.9.1
-      '@types/react':
-        specifier: catalog:react
-        version: 19.2.16
-      '@types/react-dom':
-        specifier: catalog:react
-        version: 19.2.3(@types/react@19.2.16)
-      '@types/unist':
-        specifier: catalog:unist
-        version: 3.0.3
-      '@typescript/native-preview':
-        specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
-      '@vercel/functions':
-        specifier: catalog:vercel
-        version: 3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47)
-      autoprefixer:
-        specifier: catalog:styles
-        version: 10.5.0(postcss@8.5.15)
-      babel-plugin-react-compiler:
-        specifier: catalog:babel
-        version: 1.0.0
-      colorjs.io:
-        specifier: catalog:colorjs
-        version: 0.6.1
-      dotenv:
-        specifier: catalog:dotenv
-        version: 17.4.2
-      dotenv-cli:
-        specifier: catalog:dotenv
-        version: 11.0.0
-      dotenv-expand:
-        specifier: catalog:dotenv
-        version: 13.0.0
-      eslint:
-        specifier: catalog:eslint
-        version: 10.4.1(jiti@2.7.0)
-      eslint-config-next:
-        specifier: catalog:next
-        version: 16.2.7(@typescript-eslint/parser@8.60.1(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3)
-      jiti:
-        specifier: catalog:jiti
-        version: 2.7.0
-      motion-dom:
-        specifier: catalog:motion
-        version: 12.40.0
-      motion-utils:
-        specifier: catalog:motion
-        version: 12.39.0
-      postcss:
-        specifier: catalog:styles
-        version: 8.5.15
-      prettier:
-        specifier: catalog:prettier
-        version: 3.8.3
-      sharp:
-        specifier: catalog:sharp
-        version: 0.34.5
-      shiki:
-        specifier: catalog:shiki
-        version: 4.2.0
-      tslib:
-        specifier: catalog:tslib
-        version: 2.8.1
-      tsx:
-        specifier: catalog:tsx
-        version: 4.22.4
-      typescript:
-        specifier: catalog:ts
-        version: 6.0.3
-      typescript-eslint:
-        specifier: catalog:tseslint
-        version: 8.60.1(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3)
-      unist-util-remove:
-        specifier: catalog:unist
-        version: 4.0.0
-      unist-util-visit:
-        specifier: catalog:unist
-        version: 5.1.0
-
-  apps/web-next:
-    dependencies:
-      '@aws-sdk/client-secrets-manager':
-        specifier: catalog:aws
-        version: 3.1061.0
+        version: 3.1062.0
       '@base-ui/react':
         specifier: catalog:bui
         version: 1.5.0(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -1192,10 +879,338 @@ importers:
         version: 1.5.0
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       '@vercel/functions':
         specifier: catalog:vercel
-        version: 3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47)
+        version: 3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48)
+      autoprefixer:
+        specifier: catalog:styles
+        version: 10.5.0(postcss@8.5.15)
+      babel-plugin-react-compiler:
+        specifier: catalog:babel
+        version: 1.0.0
+      colorjs.io:
+        specifier: catalog:colorjs
+        version: 0.6.1
+      dotenv:
+        specifier: catalog:dotenv
+        version: 17.4.2
+      dotenv-cli:
+        specifier: catalog:dotenv
+        version: 11.0.0
+      dotenv-expand:
+        specifier: catalog:dotenv
+        version: 13.0.0
+      eslint:
+        specifier: catalog:eslint
+        version: 10.4.1(jiti@2.7.0)
+      eslint-config-next:
+        specifier: catalog:next
+        version: 16.2.7(@typescript-eslint/parser@8.60.1(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3)
+      jiti:
+        specifier: catalog:jiti
+        version: 2.7.0
+      motion-dom:
+        specifier: catalog:motion
+        version: 12.40.0
+      motion-utils:
+        specifier: catalog:motion
+        version: 12.39.0
+      postcss:
+        specifier: catalog:styles
+        version: 8.5.15
+      prettier:
+        specifier: catalog:prettier
+        version: 3.8.3
+      sharp:
+        specifier: catalog:sharp
+        version: 0.34.5
+      shiki:
+        specifier: catalog:shiki
+        version: 4.2.0
+      tslib:
+        specifier: catalog:tslib
+        version: 2.8.1
+      tsx:
+        specifier: catalog:tsx
+        version: 4.22.4
+      typescript:
+        specifier: catalog:ts
+        version: 6.0.3
+      typescript-eslint:
+        specifier: catalog:tseslint
+        version: 8.60.1(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3)
+      unist-util-remove:
+        specifier: catalog:unist
+        version: 4.0.0
+      unist-util-visit:
+        specifier: catalog:unist
+        version: 5.1.0
+      vitest:
+        specifier: catalog:vitest
+        version: 4.1.8(@types/node@25.9.1)(@vitest/coverage-istanbul@4.1.8)(@vitest/ui@4.1.8)(vite@8.0.16(@types/node@25.9.1)(esbuild@0.28.0)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+
+  apps/web-next:
+    dependencies:
+      '@aws-sdk/client-secrets-manager':
+        specifier: catalog:aws
+        version: 3.1062.0
+      '@base-ui/react':
+        specifier: catalog:bui
+        version: 1.5.0(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@d0paminedriven/metadata':
+        specifier: catalog:dd
+        version: 6.0.1
+      '@radix-ui/react-avatar':
+        specifier: catalog:radix
+        version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-dialog':
+        specifier: catalog:radix
+        version: 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-dropdown-menu':
+        specifier: catalog:radix
+        version: 2.1.16(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-label':
+        specifier: catalog:radix
+        version: 2.1.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-popover':
+        specifier: catalog:radix
+        version: 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-primitive':
+        specifier: catalog:radix
+        version: 2.1.4(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-progress':
+        specifier: catalog:radix
+        version: 1.1.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-scroll-area':
+        specifier: catalog:radix
+        version: 1.2.10(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-select':
+        specifier: catalog:radix
+        version: 2.2.6(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-separator':
+        specifier: catalog:radix
+        version: 1.1.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-slider':
+        specifier: catalog:radix
+        version: 1.3.6(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-slot':
+        specifier: catalog:radix
+        version: 1.2.4(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-switch':
+        specifier: catalog:radix
+        version: 1.2.6(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-tabs':
+        specifier: catalog:radix
+        version: 1.1.13(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-tooltip':
+        specifier: catalog:radix
+        version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@shikijs/transformers':
+        specifier: catalog:shiki
+        version: 4.2.0
+      '@slipstream/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@slipstream/encryption':
+        specifier: workspace:*
+        version: link:../../packages/encryption
+      '@slipstream/img-gen':
+        specifier: workspace:*
+        version: link:../../packages/img-gen
+      '@slipstream/key-validator':
+        specifier: workspace:*
+        version: link:../../packages/key-validator
+      '@slipstream/storage-s3':
+        specifier: workspace:*
+        version: link:../../packages/storage-s3
+      '@slipstream/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@slipstream/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@tanstack/react-virtual':
+        specifier: catalog:tanstack
+        version: 3.14.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@vercel/analytics':
+        specifier: catalog:vercel
+        version: 2.0.1(next@16.2.7(@babel/core@7.29.7)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+      better-auth:
+        specifier: catalog:auth
+        version: 1.6.14(@prisma/client@7.8.0(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3))(typescript@6.0.3))(mysql2@3.15.3)(next@16.2.7(@babel/core@7.29.7)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(pg@8.21.0)(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(magicast@0.5.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8)
+      class-variance-authority:
+        specifier: catalog:cva
+        version: 0.7.1
+      clsx:
+        specifier: catalog:clsx
+        version: 2.1.1
+      csstype:
+        specifier: catalog:csstype
+        version: 3.2.3
+      decimal.js:
+        specifier: catalog:decimal
+        version: 10.6.0
+      fflate:
+        specifier: catalog:fflate
+        version: 0.8.3
+      geist:
+        specifier: catalog:geist
+        version: 1.7.2(next@16.2.7(@babel/core@7.29.7)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))
+      js-cookie:
+        specifier: catalog:cookies
+        version: 3.0.8
+      katex:
+        specifier: catalog:katex
+        version: 0.17.0
+      motion:
+        specifier: catalog:motion
+        version: 12.40.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      motion-plus:
+        specifier: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3
+        version: https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      motion-plus-dom:
+        specifier: catalog:motion
+        version: 2.11.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      nanoid:
+        specifier: catalog:nanoid
+        version: 5.1.11
+      next:
+        specifier: catalog:next
+        version: 16.2.7(@babel/core@7.29.7)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      next-themes:
+        specifier: catalog:next
+        version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react:
+        specifier: catalog:react
+        version: 19.2.7
+      react-dom:
+        specifier: catalog:react
+        version: 19.2.7(react@19.2.7)
+      react-resizable-panels:
+        specifier: catalog:react
+        version: 4.11.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      rehype-katex:
+        specifier: catalog:rehype
+        version: 7.0.1
+      rehype-pretty-code:
+        specifier: catalog:rehype
+        version: 0.14.3(shiki@4.2.0)
+      rehype-react:
+        specifier: catalog:rehype
+        version: 8.0.0
+      rehype-sanitize:
+        specifier: catalog:rehype
+        version: 6.0.0
+      rehype-stringify:
+        specifier: catalog:rehype
+        version: 10.0.1
+      remark-directive:
+        specifier: catalog:remark
+        version: 4.0.0
+      remark-gfm:
+        specifier: catalog:remark
+        version: 4.0.1
+      remark-math:
+        specifier: catalog:remark
+        version: 6.0.0
+      remark-parse:
+        specifier: catalog:remark
+        version: 11.0.0
+      remark-rehype:
+        specifier: catalog:remark
+        version: 11.1.2
+      swr:
+        specifier: catalog:swr
+        version: 2.4.1(react@19.2.7)
+      tailwind-merge:
+        specifier: catalog:tw
+        version: 3.6.0
+      tailwindcss:
+        specifier: catalog:tw
+        version: 4.3.0
+      tailwindcss-motion:
+        specifier: catalog:tw
+        version: 1.1.1(tailwindcss@4.3.0)
+      tw-animate-css:
+        specifier: catalog:tw
+        version: 1.4.0
+      unified:
+        specifier: catalog:unified
+        version: 11.0.5
+      use-sync-external-store:
+        specifier: catalog:store
+        version: 1.6.0(react@19.2.7)
+      vaul:
+        specifier: catalog:react
+        version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      vfile:
+        specifier: catalog:vfile
+        version: 6.0.3
+    devDependencies:
+      '@d0paminedriven/fs':
+        specifier: catalog:dd
+        version: 11.0.0
+      '@playwright/test':
+        specifier: catalog:test
+        version: 1.60.0
+      '@slipstream/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint
+      '@slipstream/prettier-config':
+        specifier: workspace:*
+        version: link:../../tooling/prettier
+      '@slipstream/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
+      '@slipstream/vitest-config':
+        specifier: workspace:*
+        version: link:../../tooling/vitest
+      '@tailwindcss/forms':
+        specifier: catalog:tw
+        version: 0.5.11(tailwindcss@4.3.0)
+      '@tailwindcss/postcss':
+        specifier: catalog:tw
+        version: 4.3.0
+      '@tailwindcss/typography':
+        specifier: catalog:tw
+        version: 0.5.19(tailwindcss@4.3.0)
+      '@testing-library/react':
+        specifier: catalog:react
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@types/gtag.js':
+        specifier: catalog:gtag
+        version: 0.0.20
+      '@types/js-cookie':
+        specifier: catalog:cookies
+        version: 3.0.6
+      '@types/katex':
+        specifier: catalog:katex
+        version: 0.16.8
+      '@types/mdast':
+        specifier: catalog:mdast
+        version: 4.0.4
+      '@types/node':
+        specifier: catalog:node
+        version: 25.9.1
+      '@types/react':
+        specifier: catalog:react
+        version: 19.2.16
+      '@types/react-dom':
+        specifier: catalog:react
+        version: 19.2.3(@types/react@19.2.16)
+      '@types/unist':
+        specifier: catalog:unist
+        version: 3.0.3
+      '@types/use-sync-external-store':
+        specifier: catalog:store
+        version: 1.5.0
+      '@typescript/native-preview':
+        specifier: catalog:tsgo
+        version: 7.0.0-dev.20260604.1
+      '@vercel/functions':
+        specifier: catalog:vercel
+        version: 3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48)
       autoprefixer:
         specifier: catalog:styles
         version: 10.5.0(postcss@8.5.15)
@@ -1270,16 +1285,16 @@ importers:
         version: 0.100.1(zod@4.4.3)
       '@aws-sdk/client-s3':
         specifier: catalog:aws
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/client-secrets-manager':
         specifier: catalog:aws
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/credential-providers':
         specifier: catalog:aws
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/s3-request-presigner':
         specifier: catalog:aws
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/types':
         specifier: catalog:aws
         version: 3.973.10
@@ -1342,10 +1357,10 @@ importers:
         version: 8.18.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       cohere-ai:
         specifier: catalog:cohere
-        version: 8.0.0(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/credential-providers@3.1061.0)(@smithy/signature-v4@5.4.6)
+        version: 8.0.0(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/credential-providers@3.1062.0)(@smithy/signature-v4@5.4.6)
       dotenv:
         specifier: catalog:dotenv
         version: 17.4.2
@@ -1430,7 +1445,7 @@ importers:
         version: 1.1.0
       tsdown:
         specifier: catalog:tsdown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
       tsx:
         specifier: catalog:tsx
         version: 4.22.4
@@ -1445,10 +1460,10 @@ importers:
     dependencies:
       '@aws-sdk/client-secrets-manager':
         specifier: catalog:aws
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/credential-providers':
         specifier: catalog:aws
-        version: 3.1061.0
+        version: 3.1062.0
       dotenv:
         specifier: catalog:dotenv
         version: 17.4.2
@@ -1473,7 +1488,7 @@ importers:
         version: 25.9.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       dotenv-cli:
         specifier: catalog:dotenv
         version: 11.0.0
@@ -1488,7 +1503,7 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:tsdown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1546,7 +1561,7 @@ importers:
         version: 8.20.0
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       eslint:
         specifier: catalog:eslint
         version: 10.4.1(jiti@2.7.0)
@@ -1582,10 +1597,10 @@ importers:
     dependencies:
       '@aws-sdk/client-secrets-manager':
         specifier: catalog:aws
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/credential-providers':
         specifier: catalog:aws
-        version: 3.1061.0
+        version: 3.1062.0
       '@slipstream/credentials':
         specifier: workspace:*
         version: link:../credentials-service
@@ -1613,7 +1628,7 @@ importers:
         version: 25.9.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       dotenv-cli:
         specifier: catalog:dotenv
         version: 11.0.0
@@ -1628,7 +1643,7 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:tsdown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1662,7 +1677,7 @@ importers:
         version: 25.9.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       dotenv:
         specifier: catalog:dotenv
         version: 17.4.2
@@ -1677,7 +1692,7 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:tsdown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1710,7 +1725,7 @@ importers:
         version: 25.9.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       dotenv:
         specifier: catalog:dotenv
         version: 17.4.2
@@ -1725,7 +1740,7 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:tsdown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1771,7 +1786,7 @@ importers:
         version: 25.9.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       dotenv-cli:
         specifier: catalog:dotenv
         version: 11.0.0
@@ -1786,7 +1801,7 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:tsdown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1804,16 +1819,16 @@ importers:
     dependencies:
       '@aws-sdk/client-s3':
         specifier: catalog:aws
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/credential-providers':
         specifier: catalog:aws
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/lib-storage':
         specifier: catalog:aws
-        version: 3.1061.0(@aws-sdk/client-s3@3.1061.0)
+        version: 3.1062.0(@aws-sdk/client-s3@3.1062.0)
       '@aws-sdk/s3-request-presigner':
         specifier: catalog:aws
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/types':
         specifier: catalog:aws
         version: 3.973.10
@@ -1822,7 +1837,7 @@ importers:
         version: link:../types
       '@smithy/node-http-handler':
         specifier: catalog:smithy
-        version: 4.7.6
+        version: 4.7.7
     devDependencies:
       '@slipstream/eslint-config':
         specifier: workspace:*
@@ -1838,7 +1853,7 @@ importers:
         version: 25.9.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       dotenv:
         specifier: catalog:dotenv
         version: 17.4.2
@@ -1853,7 +1868,7 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:tsdown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -1893,7 +1908,7 @@ importers:
         version: 25.9.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       dotenv-expand:
         specifier: catalog:dotenv
         version: 13.0.0
@@ -1908,7 +1923,7 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:tsdown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -2044,7 +2059,7 @@ importers:
         version: 19.2.3(@types/react@19.2.16)
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       autoprefixer:
         specifier: catalog:styles
         version: 10.5.0(postcss@8.5.15)
@@ -2074,7 +2089,7 @@ importers:
         version: 1.1.0
       rolldown-plugin-dts:
         specifier: catalog:rolldown
-        version: 0.25.2(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(rolldown@1.1.0)(typescript@6.0.3)
+        version: 0.25.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(rolldown@1.1.0)(typescript@6.0.3)
       tailwindcss:
         specifier: catalog:tw
         version: 4.3.0
@@ -2083,7 +2098,7 @@ importers:
         version: 5.48.0
       tsdown:
         specifier: catalog:tsdown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -2147,7 +2162,7 @@ importers:
         version: 25.9.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       eslint:
         specifier: catalog:eslint
         version: 10.4.1(jiti@2.7.0)
@@ -2156,7 +2171,7 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:tsdown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -2187,7 +2202,7 @@ importers:
         version: 25.9.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       eslint:
         specifier: catalog:eslint
         version: 10.4.1(jiti@2.7.0)
@@ -2196,7 +2211,7 @@ importers:
         version: 2.7.0
       tsdown:
         specifier: catalog:tsdown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -2241,7 +2256,7 @@ importers:
         version: 25.9.1
       '@typescript/native-preview':
         specifier: catalog:tsgo
-        version: 7.0.0-dev.20260603.1
+        version: 7.0.0-dev.20260604.1
       eslint:
         specifier: catalog:eslint
         version: 10.4.1(jiti@2.7.0)
@@ -2259,7 +2274,7 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:tsdown
-        version: 0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3)
       tslib:
         specifier: catalog:tslib
         version: 2.8.1
@@ -2315,24 +2330,24 @@ packages:
     resolution: {integrity: sha512-DFCtlisEuWzw7rESV65jHK7De1QsJZRZgUNJ8ovpmdVaayPrxvmlsAlW8hka9E7f9B31d1T7lHG9oozZf6Bp6w==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-cognito-identity@3.1061.0':
-    resolution: {integrity: sha512-U3ULArHdDdu6MOtgkg3ojVVAiT5mjKMv2hUdvu3PvLxNZXV6T3pHY4b4GCAcv9vHXqZ5ci+4IMvCwHkoY6kMzA==}
+  '@aws-sdk/client-cognito-identity@3.1062.0':
+    resolution: {integrity: sha512-QA5z/Pl3aTMR3+bmiHoC6MpKYa4FMk/9lNP7k104uKuUsjMqP4ysRa43IwdcbI9sH023T//kSJCLxrxa2CP/Tw==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-s3@3.1061.0':
-    resolution: {integrity: sha512-ygyRCIkktaDz4/kNzsxhbZqocLwCJV5absi/k7Xd3LThPOmVkid7Nghm/xTW2Yg+vSQIL0yq99oV7u3T+4ZbAQ==}
+  '@aws-sdk/client-s3@3.1062.0':
+    resolution: {integrity: sha512-fb+qr6Jql36rJwlOEgkzaC85PGZ1sQ1pTd5YlpwPbOoN54gpVBaSLsDp8GXMToymJzpDHd8GeSDalUak1W9gLw==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-secrets-manager@3.1061.0':
-    resolution: {integrity: sha512-HUMUazrwoD5bhvwJA1bmdX+n5Q/rAml2t8t32l9EsIxzplHP7w6r64g+L8WOna8jwiCOydxx+MDclGHpfAD8zA==}
+  '@aws-sdk/client-secrets-manager@3.1062.0':
+    resolution: {integrity: sha512-flDnjyGn2V7nIkMJ2wMcqo4V+YzzcOhoMWMVAXlPxO6BefpMRSLCf3IrbrUENwODc/b0FWSUdlrdt/GZY8kFoA==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/core@3.974.17':
     resolution: {integrity: sha512-r8o4h2K7j6P9ngno+8ei0aK0U/4JwDb7A2fMMxGVoSqDN8AFlIzSDeZHME9LcVLR2codyhtr1WAAg+/nmkeeMA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-cognito-identity@3.972.40':
-    resolution: {integrity: sha512-viZSv9qWrcfWvpnhy8FPQ5y0ee4TiCOX/xM8LSQXR+xJn0P4DV7B+XwXfOZ+Ik3+yQ/aO69qVnngEpXExAwizA==}
+  '@aws-sdk/credential-provider-cognito-identity@3.972.41':
+    resolution: {integrity: sha512-byGPybEQe9ejeyUzhWjtjfh0ctv25HsRx2djF/Tl2j9+DAuAmhjq0NqSRqYZEoSe8vJObXz5RYDtJYAmdupBig==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/credential-provider-env@3.972.43':
@@ -2343,78 +2358,62 @@ packages:
     resolution: {integrity: sha512-w9PuOoKCt6+xoESvY+zlV0u3PKQ0mVL259PcsVR6a3S/uYJJHnIi4r1NxdJHEcNldUVRIciltWnFMGBR4YEm3g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-ini@3.972.48':
-    resolution: {integrity: sha512-+6BQ6Lrnc+EyAGElLRW6j+Sa+RirPHnIJsobvYO6nnyK+oGKmz1ne/ieclbLWyjyDKEU3/JVJWcWY3VLFPvGtQ==}
+  '@aws-sdk/credential-provider-ini@3.972.49':
+    resolution: {integrity: sha512-83r5MK+PERv9irzky1o5aNbXiLuaLfeB7N8MrktB9USpoebdNtuG0Ek9ieIxpGH1aZ9a0nIaDaLjEr3EmOV3Ng==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-login@3.972.47':
-    resolution: {integrity: sha512-Iy2ebWVgrZBH05464uJiQYu6HSSiROnwVZptthEFXx2gWjo1ORCxEAFZB5Cr2MdfrSnZ+0QUPkZ1ZpCqpkUrLQ==}
+  '@aws-sdk/credential-provider-login@3.972.48':
+    resolution: {integrity: sha512-amPGeF6fcvLInK4Pu2k2Y2jHFR6MpaIKrZrbaf0QUnV3tjzjWh442eifZ2+KcmzFdsqyvyjBqAhq2JNLt1C5gA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-node@3.972.50':
-    resolution: {integrity: sha512-b05Aelq5cqAvCCDQjCYacl0XmR8QhBNSqLbsdISkQmlQBa5oPS66zYPteWcSp5LswbpoIe552EUGjluKiadBig==}
+  '@aws-sdk/credential-provider-node@3.972.51':
+    resolution: {integrity: sha512-mbhSY3ytXIGMuBoJsWCivk+63dtVlenT6wstUra07Lar4Ln2MVL8/j5zCTIOog+ig5/FlFJ8gcFU4nQZV+Jh4Q==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/credential-provider-process@3.972.43':
     resolution: {integrity: sha512-GPokLNyvTfCmuaHk+v3GKVs4ZT3cMu5kgS2a+NPkOMt96cq6fSIK0g+mZHpGS6Cd4QGrPKesANEaLUKgOskTzg==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-sso@3.972.47':
-    resolution: {integrity: sha512-0AzvLrzlvJs0DzbeWGvNj+bX3Uzd7VNS6vDqCOdZzBlCGKGd78uxctJSW9iK/Rt/nxiJqpTvrYQlVJ4guVM2Dw==}
+  '@aws-sdk/credential-provider-sso@3.972.48':
+    resolution: {integrity: sha512-tf0sD47SeTgCDfOWYssctzGgwAuk8/ECjb7bom4wZ7P1om0qE8i2yjniUdvysmANm5haARr35O8vZnTe/UEtpQ==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-web-identity@3.972.47':
-    resolution: {integrity: sha512-eksfbUErOejUAGWBAcNqaP7IX21oUOEo73d9R56k9Ua4d57qS90NEYkWJsuSGzTXMFulCu17qXJI/qGmM7hvoA==}
+  '@aws-sdk/credential-provider-web-identity@3.972.48':
+    resolution: {integrity: sha512-YYsumc2oe09gl4l+fjfmR64JDn6+0o4Ql5HMBkMuhFazO1tZlE5NjSnZM3oXHwenPjh2qow0TFgSIVjfWfsojg==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-providers@3.1061.0':
-    resolution: {integrity: sha512-Jf7N/lx74AV7BLvooCkqMqV4xBAyHJ+L/Hn7TbU2QSlQsVK8Ngm5R0Z9ljD4PwxCVfUUc8T8jGhY+ZaTyQjnRA==}
+  '@aws-sdk/credential-providers@3.1062.0':
+    resolution: {integrity: sha512-QS2UT3srjNppZv6mq7V0igqK/ThYKqRWwDscxDsMEmmEE5JqCPPSqFW71aEpkvXaMdgmG8xEpt4RtNHpZ30cTA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/lib-storage@3.1061.0':
-    resolution: {integrity: sha512-8jEu8CUhLyw05whk523nUZm3UEkmNy05NORU5pMsY6wOtjLgRH66CDBUXpSAeTJtyqOzLEDXsd2+ZC7GQF6kMA==}
+  '@aws-sdk/lib-storage@3.1062.0':
+    resolution: {integrity: sha512-yD4P7+19rd4JqLmQ+Z4zcnPiwVQlsbT2Bppam5R8mOLpBHnWExVVRdlQy90RitQfevTGWj5CM/6EzWaGvs1h/w==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      '@aws-sdk/client-s3': ^3.1061.0
-
-  '@aws-sdk/middleware-bucket-endpoint@3.972.20':
-    resolution: {integrity: sha512-D35MfedGvTTzK1oygFPjm7DViSJwj9cuPV26ElHKwZqEz2rWag1hzYeAQ7st0jlCIAAihQgOyQ0/JwmqLOOinw==}
-    engines: {node: '>=20.0.0'}
-
-  '@aws-sdk/middleware-expect-continue@3.972.16':
-    resolution: {integrity: sha512-S52iw+M9zJC+7uxRdvvKeiR0s2PDeYEmbNZQkWE6OJf8upIs+r4WQY0TER+6akVitEMeRdwS0DrBUhKkmpsyng==}
-    engines: {node: '>=20.0.0'}
+      '@aws-sdk/client-s3': ^3.1062.0
 
   '@aws-sdk/middleware-flexible-checksums@3.974.26':
     resolution: {integrity: sha512-WndRXQV8wAU/bW3GH8THumEOSV7FpS0AtoluT2M7lYaaDUyG0gOCD+DppB+IWQ4TPmzuTtFcCedh9xCzM4Zv4g==}
-    engines: {node: '>=20.0.0'}
-
-  '@aws-sdk/middleware-location-constraint@3.972.13':
-    resolution: {integrity: sha512-Yh0MmpADMsSR7ExRM/2w85D26i/U2aDC/pC7fMwhUpmOl6sebGpmBPoRL/uJRDhqRrwX/tvXWWZrsbsPM/O9FQ==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/middleware-sdk-s3@3.972.47':
     resolution: {integrity: sha512-fzVBvGib8P1G6RFV3qVTPlXy9bMFAy5nxhdhA7LwyhWjRkJufNfJIPiloZq2mt36YAXSlLsEa4s3Kgcw6cv3+g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/middleware-ssec@3.972.13':
-    resolution: {integrity: sha512-M+dDhWp2zv9u92I4/4rgUFdiF8jSIk5PIj5ktyBdhvR/dkmKSYMo07nuh+3g8/59HnizwkcRC3glcLMX5GhyaQ==}
+  '@aws-sdk/nested-clients@3.997.16':
+    resolution: {integrity: sha512-bGvfDgC2KQePjEmZdltScPPLKFoyjPElAXeZcLfvZ58J1AO283//WGtvp9GdnryLHTi7gis0UoCezqh0vl/nig==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/nested-clients@3.997.15':
-    resolution: {integrity: sha512-Fpri1/PXKMKveORZ7E00VLTlWS5DkfZkW70PUE+bOnpWpAeHAQLoiDHhkzN3kNWbbSsGg64+IZYiq/EZgME3Mg==}
-    engines: {node: '>=20.0.0'}
-
-  '@aws-sdk/s3-request-presigner@3.1061.0':
-    resolution: {integrity: sha512-unGsJZSKQWD4KjokNs5QATLPaNt3u0YoIch7KIomfNy1UB6YaRngsAeArDGAnbrrx2LMOb9l2+4sa+yRn8rkbw==}
+  '@aws-sdk/s3-request-presigner@3.1062.0':
+    resolution: {integrity: sha512-AE/LWvZWNBDbtx/29KdIAs3NKOvMi3xm22icENTwTDSlaRzsckTCb3xjaVB8ahKNylOhNbSLFSqgc0HtAax45A==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/signature-v4-multi-region@3.996.31':
     resolution: {integrity: sha512-Kn2up9SlG1KC6wRtwf0d7waTGF6rvp9DxYqB54x6UCKdQ6kyaXCqHL4WGb5vUJga5kS8FxnjhY0LqM28aMvnNQ==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/token-providers@3.1060.0':
-    resolution: {integrity: sha512-6NZaMKkFhpaNiwLpHi1sZaYjidL/lCJE6ME6NxwA8gv9vQna+Kr0j4OFwVoz6tANRWM3WbGz6jiPsGX/Vkjwow==}
+  '@aws-sdk/token-providers@3.1062.0':
+    resolution: {integrity: sha512-fvHh53zSm2FoQPgkw9thH5D7sd13bC0nPyuZb+mQJ85l5v7lQnsZ97u6e6YkJJN/LU1Mxm1/DLGrIIRR2L7tZw==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/types@3.973.10':
@@ -4996,6 +4995,10 @@ packages:
     resolution: {integrity: sha512-3fya8i7GrJilQouk4cZJKdy5k8MWQBpjfXrRNaXDedH8r779tr0jcxyH3+yoTmsluc2+vF4S343yFbnvu8ExDQ==}
     engines: {node: '>=18.0.0'}
 
+  '@smithy/node-http-handler@4.7.7':
+    resolution: {integrity: sha512-ZAFvHXrEk6K180EVhmZVg8GU5pUH5BSFqRs27JW3j1qEFx9YyYwWFx17x/MHcjALYimGAji7qEOlF1++be+G5A==}
+    engines: {node: '>=18.0.0'}
+
   '@smithy/signature-v4@5.4.6':
     resolution: {integrity: sha512-Ojg4B6oIDlIr1R86xCDJt1zJWnYa0VINmqdjfe9qxWjdRivHalZ3iSlQgVqYbW0MdpFOC5XfHEWsnbmdnpIILQ==}
     engines: {node: '>=18.0.0'}
@@ -5326,50 +5329,50 @@ packages:
     resolution: {integrity: sha512-EbGRQg4FhrmwLodl+t3JNAnXHWVr9Vp+Zl1QBZVPY4ByfkzIT8cX3K6QWODHtkIZqqJVEWvhHSx3v5PDHsaQag==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260603.1':
-    resolution: {integrity: sha512-BvaaQAHWaHA0nl26DsWTsXsKkCHqUTm7f5FMuNDyCU83Hvo7zHx0vpSTrzL+1KEWeWLUVVGA7U224dk+3yIosQ==}
+  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260604.1':
+    resolution: {integrity: sha512-zs616um9UuaODLsNlCu5Aw95rFcTV4u3hVt090r6k0lVvTxfaJOv8HKA6BpIotcEYlZlMQowrMSYCCdedo7iyA==}
     engines: {node: '>=16.20.0'}
     cpu: [arm64]
     os: [darwin]
 
-  '@typescript/native-preview-darwin-x64@7.0.0-dev.20260603.1':
-    resolution: {integrity: sha512-a2JJezvJAqWXgTAD1tKdWs7iA/4s3EakLcCYx4rg3ptEbBF6ADWv7A9ySHxT/+CQWYCD0DYIb9du1JUWL85fRw==}
+  '@typescript/native-preview-darwin-x64@7.0.0-dev.20260604.1':
+    resolution: {integrity: sha512-pOdNAf2pwc9JBjo8gUsvLs5uqg7d0AhYXfE8/3zvPKBlIZG+mTcvEWW1hPawlWxXzf/vxnP4dgYwUHAMDghhKA==}
     engines: {node: '>=16.20.0'}
     cpu: [x64]
     os: [darwin]
 
-  '@typescript/native-preview-linux-arm64@7.0.0-dev.20260603.1':
-    resolution: {integrity: sha512-MQ0JcRucLdcR6MT14wlrGNz9HaxJrFF8Axmo0IN6e5gSou2UrKKUvvAH1i8zU5Gm7jl8CWCLzzX/qGCi1TsinA==}
+  '@typescript/native-preview-linux-arm64@7.0.0-dev.20260604.1':
+    resolution: {integrity: sha512-GjIrt6YHP3bbOWBCCE08SlBSDf84Lnjn3Td822/lOX9nm6ODlA/HI7rtGh7KzS/fxehep2Vy4dXU4Il12X1s5A==}
     engines: {node: '>=16.20.0'}
     cpu: [arm64]
     os: [linux]
 
-  '@typescript/native-preview-linux-arm@7.0.0-dev.20260603.1':
-    resolution: {integrity: sha512-GLsTfJQiGfTN+r1ezlxMcTd5MNYRB/tADD6Y1j1jfLjZsFYSVkNfCnDQA/jwUG6GddBBF+0Um7tBUP16emej9w==}
+  '@typescript/native-preview-linux-arm@7.0.0-dev.20260604.1':
+    resolution: {integrity: sha512-IKaZL3i5HKmKqwb2IZEXW1j68fVg1HsvAaXkbrkOIG/J5Eyksu5tEnTzucrIY1oPdzgHT+y2HpDIYp2sGeHFvw==}
     engines: {node: '>=16.20.0'}
     cpu: [arm]
     os: [linux]
 
-  '@typescript/native-preview-linux-x64@7.0.0-dev.20260603.1':
-    resolution: {integrity: sha512-u6gvCiVGSDagdR2+GI5VJLPxJbGevATJgjZ2QFLKBLWI3re7liTGlPAuaINNDq/r0m9rUPj2rEn0zwqtcLK0nQ==}
+  '@typescript/native-preview-linux-x64@7.0.0-dev.20260604.1':
+    resolution: {integrity: sha512-twQ7XDjsmaHIevN1MjeRYIVLUPL0fBm8A0jg1FhGYPckhTxEBiHIpJf9E//eFidAdrEHjeTSBP1jJw3GNAensg==}
     engines: {node: '>=16.20.0'}
     cpu: [x64]
     os: [linux]
 
-  '@typescript/native-preview-win32-arm64@7.0.0-dev.20260603.1':
-    resolution: {integrity: sha512-slxm6HBYs+jk0GpIBC2o03uY5qHgW7wIH+OTjK8JHbd2sUCgYV7P7bfZHUVZYi/cJZcVrnDW6MxXx734TuFn+w==}
+  '@typescript/native-preview-win32-arm64@7.0.0-dev.20260604.1':
+    resolution: {integrity: sha512-QBRxaVT3SFiNfOhwYb/56ddpHWPMFdfiJ4zkFJIjaAXeZ/ssWNHM9lH7yR++GrE9VTsUZ4eVSZfOmQbzRERhgw==}
     engines: {node: '>=16.20.0'}
     cpu: [arm64]
     os: [win32]
 
-  '@typescript/native-preview-win32-x64@7.0.0-dev.20260603.1':
-    resolution: {integrity: sha512-G7SDZJn2Z9+c1qsAFzI/JL0OsRjJ18diQ39ycWKmJikilZZeL7iS7j933bemWY4ODaLTfxhMRKPMHf9292gpDA==}
+  '@typescript/native-preview-win32-x64@7.0.0-dev.20260604.1':
+    resolution: {integrity: sha512-hR7YHoRpm88Q86gK6/IMayWUA+ROdHGzOPKK8EBp1xD/Cg2Bh5AXbut8HcyUDx/bcGQvnuht/XsW47bT3to9mg==}
     engines: {node: '>=16.20.0'}
     cpu: [x64]
     os: [win32]
 
-  '@typescript/native-preview@7.0.0-dev.20260603.1':
-    resolution: {integrity: sha512-CO519Ccw5rji4JIG0DGVMR5owraCeQhm94jM53eRhMdlzz0nAJcAZ63Y6m1u3dUwqGssqlYxh4CcwTFPxTpMYw==}
+  '@typescript/native-preview@7.0.0-dev.20260604.1':
+    resolution: {integrity: sha512-A3/9yZTt2V5NlDURcVJ4mN2YjfeQTXCRyLuENKrNdGhO+y59mC/2UDr7UvpB3Li+83TRAuhDN8SBoM+7gkHdzQ==}
     engines: {node: '>=16.20.0'}
     hasBin: true
 
@@ -9066,14 +9069,14 @@ packages:
   tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
 
-  tsdown@0.22.1:
-    resolution: {integrity: sha512-Ldx1jLyDFEzsN/fMBi2TBVaZe4fuEJhIiHjQhX0pV7oa5uYz5Imdivs5mNzEXOrMEtFRR6C9BQ2YqLoroffB+Q==}
+  tsdown@0.22.2:
+    resolution: {integrity: sha512-VX9gsyKXsTnBZjnIM4jsHl9aRv+GfgkE/k1hQslilaBfZMlaw3JuGR+6yhiU0QxWBtOCDnTjwOSoXzgB7Rr50g==}
     engines: {node: ^22.18.0 || >=24.0.0}
     hasBin: true
     peerDependencies:
       '@arethetypeswrong/core': ^0.18.1
-      '@tsdown/css': 0.22.1
-      '@tsdown/exe': 0.22.1
+      '@tsdown/css': 0.22.2
+      '@tsdown/exe': 0.22.2
       '@vitejs/devtools': '*'
       publint: ^0.3.8
       tsx: '*'
@@ -9610,12 +9613,12 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-cognito-identity@3.1061.0':
+  '@aws-sdk/client-cognito-identity@3.1062.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.50
+      '@aws-sdk/credential-provider-node': 3.972.51
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/fetch-http-handler': 5.4.6
@@ -9623,19 +9626,15 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-s3@3.1061.0':
+  '@aws-sdk/client-s3@3.1062.0':
     dependencies:
       '@aws-crypto/sha1-browser': 5.2.0
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.50
-      '@aws-sdk/middleware-bucket-endpoint': 3.972.20
-      '@aws-sdk/middleware-expect-continue': 3.972.16
+      '@aws-sdk/credential-provider-node': 3.972.51
       '@aws-sdk/middleware-flexible-checksums': 3.974.26
-      '@aws-sdk/middleware-location-constraint': 3.972.13
       '@aws-sdk/middleware-sdk-s3': 3.972.47
-      '@aws-sdk/middleware-ssec': 3.972.13
       '@aws-sdk/signature-v4-multi-region': 3.996.31
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
@@ -9644,12 +9643,12 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-secrets-manager@3.1061.0':
+  '@aws-sdk/client-secrets-manager@3.1062.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.50
+      '@aws-sdk/credential-provider-node': 3.972.51
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/fetch-http-handler': 5.4.6
@@ -9668,9 +9667,9 @@ snapshots:
       bowser: 2.14.1
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-cognito-identity@3.972.40':
+  '@aws-sdk/credential-provider-cognito-identity@3.972.41':
     dependencies:
-      '@aws-sdk/nested-clients': 3.997.15
+      '@aws-sdk/nested-clients': 3.997.16
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
@@ -9694,39 +9693,39 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-ini@3.972.48':
+  '@aws-sdk/credential-provider-ini@3.972.49':
     dependencies:
       '@aws-sdk/core': 3.974.17
       '@aws-sdk/credential-provider-env': 3.972.43
       '@aws-sdk/credential-provider-http': 3.972.45
-      '@aws-sdk/credential-provider-login': 3.972.47
+      '@aws-sdk/credential-provider-login': 3.972.48
       '@aws-sdk/credential-provider-process': 3.972.43
-      '@aws-sdk/credential-provider-sso': 3.972.47
-      '@aws-sdk/credential-provider-web-identity': 3.972.47
-      '@aws-sdk/nested-clients': 3.997.15
+      '@aws-sdk/credential-provider-sso': 3.972.48
+      '@aws-sdk/credential-provider-web-identity': 3.972.48
+      '@aws-sdk/nested-clients': 3.997.16
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/credential-provider-imds': 4.3.7
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-login@3.972.47':
+  '@aws-sdk/credential-provider-login@3.972.48':
     dependencies:
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/nested-clients': 3.997.15
+      '@aws-sdk/nested-clients': 3.997.16
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-node@3.972.50':
+  '@aws-sdk/credential-provider-node@3.972.51':
     dependencies:
       '@aws-sdk/credential-provider-env': 3.972.43
       '@aws-sdk/credential-provider-http': 3.972.45
-      '@aws-sdk/credential-provider-ini': 3.972.48
+      '@aws-sdk/credential-provider-ini': 3.972.49
       '@aws-sdk/credential-provider-process': 3.972.43
-      '@aws-sdk/credential-provider-sso': 3.972.47
-      '@aws-sdk/credential-provider-web-identity': 3.972.47
+      '@aws-sdk/credential-provider-sso': 3.972.48
+      '@aws-sdk/credential-provider-web-identity': 3.972.48
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/credential-provider-imds': 4.3.7
@@ -9741,48 +9740,48 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-sso@3.972.47':
+  '@aws-sdk/credential-provider-sso@3.972.48':
     dependencies:
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/nested-clients': 3.997.15
-      '@aws-sdk/token-providers': 3.1060.0
+      '@aws-sdk/nested-clients': 3.997.16
+      '@aws-sdk/token-providers': 3.1062.0
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-web-identity@3.972.47':
+  '@aws-sdk/credential-provider-web-identity@3.972.48':
     dependencies:
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/nested-clients': 3.997.15
+      '@aws-sdk/nested-clients': 3.997.16
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-providers@3.1061.0':
+  '@aws-sdk/credential-providers@3.1062.0':
     dependencies:
-      '@aws-sdk/client-cognito-identity': 3.1061.0
+      '@aws-sdk/client-cognito-identity': 3.1062.0
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-cognito-identity': 3.972.40
+      '@aws-sdk/credential-provider-cognito-identity': 3.972.41
       '@aws-sdk/credential-provider-env': 3.972.43
       '@aws-sdk/credential-provider-http': 3.972.45
-      '@aws-sdk/credential-provider-ini': 3.972.48
-      '@aws-sdk/credential-provider-login': 3.972.47
-      '@aws-sdk/credential-provider-node': 3.972.50
+      '@aws-sdk/credential-provider-ini': 3.972.49
+      '@aws-sdk/credential-provider-login': 3.972.48
+      '@aws-sdk/credential-provider-node': 3.972.51
       '@aws-sdk/credential-provider-process': 3.972.43
-      '@aws-sdk/credential-provider-sso': 3.972.47
-      '@aws-sdk/credential-provider-web-identity': 3.972.47
-      '@aws-sdk/nested-clients': 3.997.15
+      '@aws-sdk/credential-provider-sso': 3.972.48
+      '@aws-sdk/credential-provider-web-identity': 3.972.48
+      '@aws-sdk/nested-clients': 3.997.16
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/credential-provider-imds': 4.3.7
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/lib-storage@3.1061.0(@aws-sdk/client-s3@3.1061.0)':
+  '@aws-sdk/lib-storage@3.1062.0(@aws-sdk/client-s3@3.1062.0)':
     dependencies:
-      '@aws-sdk/client-s3': 3.1061.0
+      '@aws-sdk/client-s3': 3.1062.0
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       buffer: 5.6.0
@@ -9790,24 +9789,9 @@ snapshots:
       stream-browserify: 3.0.0
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-bucket-endpoint@3.972.20':
-    dependencies:
-      '@aws-sdk/middleware-sdk-s3': 3.972.47
-      tslib: 2.8.1
-
-  '@aws-sdk/middleware-expect-continue@3.972.16':
-    dependencies:
-      '@aws-sdk/middleware-sdk-s3': 3.972.47
-      tslib: 2.8.1
-
   '@aws-sdk/middleware-flexible-checksums@3.974.26':
     dependencies:
       '@aws-sdk/checksums': 3.1000.1
-      tslib: 2.8.1
-
-  '@aws-sdk/middleware-location-constraint@3.972.13':
-    dependencies:
-      '@aws-sdk/middleware-sdk-s3': 3.972.47
       tslib: 2.8.1
 
   '@aws-sdk/middleware-sdk-s3@3.972.47':
@@ -9819,12 +9803,7 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-ssec@3.972.13':
-    dependencies:
-      '@aws-sdk/middleware-sdk-s3': 3.972.47
-      tslib: 2.8.1
-
-  '@aws-sdk/nested-clients@3.997.15':
+  '@aws-sdk/nested-clients@3.997.16':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
@@ -9837,7 +9816,7 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/s3-request-presigner@3.1061.0':
+  '@aws-sdk/s3-request-presigner@3.1062.0':
     dependencies:
       '@aws-sdk/core': 3.974.17
       '@aws-sdk/signature-v4-multi-region': 3.996.31
@@ -9853,10 +9832,10 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/token-providers@3.1060.0':
+  '@aws-sdk/token-providers@3.1062.0':
     dependencies:
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/nested-clients': 3.997.15
+      '@aws-sdk/nested-clients': 3.997.16
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
@@ -12104,6 +12083,12 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
+  '@smithy/node-http-handler@4.7.7':
+    dependencies:
+      '@smithy/core': 3.24.6
+      '@smithy/types': 4.14.3
+      tslib: 2.8.1
+
   '@smithy/signature-v4@5.4.6':
     dependencies:
       '@smithy/core': 3.24.6
@@ -12431,36 +12416,36 @@ snapshots:
       '@typescript-eslint/types': 8.60.1
       eslint-visitor-keys: 5.0.1
 
-  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260603.1':
+  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260604.1':
     optional: true
 
-  '@typescript/native-preview-darwin-x64@7.0.0-dev.20260603.1':
+  '@typescript/native-preview-darwin-x64@7.0.0-dev.20260604.1':
     optional: true
 
-  '@typescript/native-preview-linux-arm64@7.0.0-dev.20260603.1':
+  '@typescript/native-preview-linux-arm64@7.0.0-dev.20260604.1':
     optional: true
 
-  '@typescript/native-preview-linux-arm@7.0.0-dev.20260603.1':
+  '@typescript/native-preview-linux-arm@7.0.0-dev.20260604.1':
     optional: true
 
-  '@typescript/native-preview-linux-x64@7.0.0-dev.20260603.1':
+  '@typescript/native-preview-linux-x64@7.0.0-dev.20260604.1':
     optional: true
 
-  '@typescript/native-preview-win32-arm64@7.0.0-dev.20260603.1':
+  '@typescript/native-preview-win32-arm64@7.0.0-dev.20260604.1':
     optional: true
 
-  '@typescript/native-preview-win32-x64@7.0.0-dev.20260603.1':
+  '@typescript/native-preview-win32-x64@7.0.0-dev.20260604.1':
     optional: true
 
-  '@typescript/native-preview@7.0.0-dev.20260603.1':
+  '@typescript/native-preview@7.0.0-dev.20260604.1':
     optionalDependencies:
-      '@typescript/native-preview-darwin-arm64': 7.0.0-dev.20260603.1
-      '@typescript/native-preview-darwin-x64': 7.0.0-dev.20260603.1
-      '@typescript/native-preview-linux-arm': 7.0.0-dev.20260603.1
-      '@typescript/native-preview-linux-arm64': 7.0.0-dev.20260603.1
-      '@typescript/native-preview-linux-x64': 7.0.0-dev.20260603.1
-      '@typescript/native-preview-win32-arm64': 7.0.0-dev.20260603.1
-      '@typescript/native-preview-win32-x64': 7.0.0-dev.20260603.1
+      '@typescript/native-preview-darwin-arm64': 7.0.0-dev.20260604.1
+      '@typescript/native-preview-darwin-x64': 7.0.0-dev.20260604.1
+      '@typescript/native-preview-linux-arm': 7.0.0-dev.20260604.1
+      '@typescript/native-preview-linux-arm64': 7.0.0-dev.20260604.1
+      '@typescript/native-preview-linux-x64': 7.0.0-dev.20260604.1
+      '@typescript/native-preview-win32-arm64': 7.0.0-dev.20260604.1
+      '@typescript/native-preview-win32-x64': 7.0.0-dev.20260604.1
 
   '@ungap/structured-clone@1.3.1': {}
 
@@ -12548,11 +12533,11 @@ snapshots:
     dependencies:
       execa: 5.1.1
 
-  '@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47)':
+  '@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48)':
     dependencies:
       '@vercel/oidc': 3.6.0
     optionalDependencies:
-      '@aws-sdk/credential-provider-web-identity': 3.972.47
+      '@aws-sdk/credential-provider-web-identity': 3.972.48
 
   '@vercel/oidc@3.6.0':
     dependencies:
@@ -13089,7 +13074,7 @@ snapshots:
 
   cluster-key-slot@1.1.2: {}
 
-  cohere-ai@8.0.0(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/credential-providers@3.1061.0)(@smithy/signature-v4@5.4.6):
+  cohere-ai@8.0.0(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/credential-providers@3.1062.0)(@smithy/signature-v4@5.4.6):
     dependencies:
       convict: 6.2.5
       form-data: 4.0.5
@@ -13098,7 +13083,7 @@ snapshots:
       readable-stream: 4.7.0
     optionalDependencies:
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/credential-providers': 3.1061.0
+      '@aws-sdk/credential-providers': 3.1062.0
       '@smithy/signature-v4': 5.4.6
 
   color-convert@2.0.1:
@@ -16195,7 +16180,7 @@ snapshots:
       glob: 13.0.6
       package-json-from-dist: 1.0.1
 
-  rolldown-plugin-dts@0.25.2(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(rolldown@1.1.0)(typescript@6.0.3):
+  rolldown-plugin-dts@0.25.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(rolldown@1.1.0)(typescript@6.0.3):
     dependencies:
       '@babel/generator': 8.0.0-rc.6
       '@babel/helper-validator-identifier': 8.0.0-rc.6
@@ -16207,7 +16192,7 @@ snapshots:
       obug: 2.1.1
       rolldown: 1.1.0
     optionalDependencies:
-      '@typescript/native-preview': 7.0.0-dev.20260603.1
+      '@typescript/native-preview': 7.0.0-dev.20260604.1
       typescript: 6.0.3
     transitivePeerDependencies:
       - oxc-resolver
@@ -16761,7 +16746,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.22.1(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3):
+  tsdown@0.22.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(tsx@4.22.4)(typescript@6.0.3):
     dependencies:
       ansis: 4.3.1
       cac: 7.0.0
@@ -16772,7 +16757,7 @@ snapshots:
       obug: 2.1.1
       picomatch: 4.0.4
       rolldown: 1.1.0
-      rolldown-plugin-dts: 0.25.2(@typescript/native-preview@7.0.0-dev.20260603.1)(oxc-resolver@11.20.0)(rolldown@1.1.0)(typescript@6.0.3)
+      rolldown-plugin-dts: 0.25.2(@typescript/native-preview@7.0.0-dev.20260604.1)(oxc-resolver@11.20.0)(rolldown@1.1.0)(typescript@6.0.3)
       semver: 7.8.1
       tinyexec: 1.2.4
       tinyglobby: 0.2.17

@@ -95,7 +95,7 @@ function ToastList() {
   );
 }
 
-function prettyDate(date: Date): string {
+function prettyDate(date: Date) {
   return date.toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -105,7 +105,7 @@ function prettyDate(date: Date): string {
   });
 }
 
-function randomDate(): Date {
+function randomDate() {
   const now = new Date();
   const futureTime = now.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000;
   return new Date(futureTime);

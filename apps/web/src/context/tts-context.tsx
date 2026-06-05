@@ -12,10 +12,9 @@ import {
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { useCookiesCtx } from "@/context/cookie-context";
-import { isSafariAudioSessionSupported } from "@/lib/audio-session";
 import { PCMStreamPlayer } from "@/lib/pcm-stream-player";
 import { pcmChunksToWavBlob } from "@/lib/pcm-to-wav";
-import { isValidCodec, isValidLanguage, isValidVoice } from "@/lib/tts-helpers";
+import { isSafariAudioSessionSupported, isValidCodec, isValidLanguage, isValidVoice } from "@/lib/tts-helpers";
 import type {
   EventTypeMap,
   GrokAudioCodecTTS,

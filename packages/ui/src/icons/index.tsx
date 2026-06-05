@@ -53,6 +53,7 @@ import { MessageSquare } from "@/icons/message-square";
 import { MessageSquareText } from "@/icons/message-square-text";
 import { MetaIcon } from "@/icons/meta";
 import { Mic } from "@/icons/mic";
+import {MinimaxIcon} from "@/icons/minimax";
 import { MistralIcon } from "@/icons/mistral";
 import { Moon } from "@/icons/moon";
 import { OpenAiIcon } from "@/icons/openai";
@@ -149,6 +150,7 @@ const IconComponents = {
   MessageSquareText,
   MetaIcon,
   Mic,
+  MinimaxIcon,
   MistralIcon,
   Moon,
   OpenAiIcon,
@@ -279,6 +281,7 @@ export {
   MessageSquareText,
   MetaIcon,
   Mic,
+  MinimaxIcon,
   MistralIcon,
   Moon,
   OpenAiIcon,

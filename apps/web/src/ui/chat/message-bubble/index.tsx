@@ -1,9 +1,8 @@
 "use client";
 
-import type { Provider } from "@/lib/models";
 import type { User } from "@/utils/auth-client";
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { getInitials } from "@/lib/helpers";
 import { normalizeImgGenFields } from "@/lib/img-gen-to-attachment";
@@ -19,7 +18,8 @@ import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AIChatResponseImgGenFieldsFinal,
   AttachmentSingleton,
-  MessageSingleton
+  MessageSingleton,
+  Provider
 } from "@slipstream/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@slipstream/ui";
 
@@ -40,14 +40,14 @@ interface ChatMessageProps {
 }
 
 type ImageDataCache = {
-    images: string[];
-    currentImageIndex: number;
-    width: number;
-    height: number;
-    isGenerating: boolean;
-    attachmentId?: string;
-    prompt?: string;
-    kind?: $Enums.ImageGenOutputKind;
+  images: string[];
+  currentImageIndex: number;
+  width: number;
+  height: number;
+  isGenerating: boolean;
+  attachmentId?: string;
+  prompt?: string;
+  kind?: $Enums.ImageGenOutputKind;
 };
 
 // Global cache for processed markdown
@@ -59,7 +59,7 @@ function formatAttmntLabel(message: MessageSingleton<true>) {
   else return `${message.attachments.length} Attachments`;
 }
 
-export function MessageBubble({
+function MessageBubbleImpl({
   message,
   className,
   user,
@@ -277,7 +277,7 @@ export function MessageBubble({
     if (imageDataCacheRef.current) {
       // Check if the cached data is for the same message
       // by comparing the final image URL with message attachments
-        // eslint-disable-next-line react-hooks/refs
+      // eslint-disable-next-line react-hooks/refs
       const cachedFinalUrl = imageDataCacheRef.current.images.at(-1);
 
       if (cachedFinalUrl) {
@@ -707,3 +707,25 @@ export function MessageBubble({
     </>
   );
 }
+
+/**
+ * Memoized so the committed bubbles skip per-token re-renders during streaming: the store re-pins each committed
+ * message's object identity across snapshots, and the feed passes stable `live*`/`isStreaming` props (only the
+ * single `streaming-<id>` bubble gets live values), so a shallow prop compare short-circuits the other N bubbles.
+ */
+export const MessageBubble = memo(MessageBubbleImpl);
+
+/**
+   const bubblePropsEqual = (prev: ChatMessageProps, next: ChatMessageProps) =>
+    prev.message === next.message &&
+    prev.isStreaming === next.isStreaming &&
+    prev.user === next.user &&
+    prev.className === next.className &&
+    // live* drive only the streaming bubble; committed rows ignore them
+    (next.isStreaming !== true ||
+      (prev.liveThinkingText === next.liveThinkingText &&
+        prev.liveIsThinking === next.liveIsThinking &&
+        prev.liveThinkingDuration === next.liveThinkingDuration &&
+        prev.liveImgGenFields === next.liveImgGenFields &&
+        prev.liveImgGenAttachmentId === next.liveImgGenAttachmentId));
+ */

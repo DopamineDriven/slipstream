@@ -1,5 +1,5 @@
-import { parseAndScaleRatio } from "@/lib/scale-ratio";
 import { cn } from "@/lib/utils";
+import { parseAndScaleRatio } from "@slipstream/ui";
 
 const SHAPE_CONTAINER_SIZE = { sm: 16, md: 20, lg: 24 };
 export interface AspectRatioShapeProps {

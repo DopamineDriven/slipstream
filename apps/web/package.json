@@ -12,7 +12,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsgo --noEmit",
-    "typegen": "next typegen"
+    "typegen": "next typegen",
+    "test": "node --test --import tsx --test-reporter spec \"src/**/*.test.ts\"",
+    "test:vitest": "vitest"
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "catalog:aws",
@@ -77,6 +79,7 @@
     "tailwindcss-motion": "catalog:tw",
     "tw-animate-css": "catalog:tw",
     "unified": "catalog:unified",
+    "use-sync-external-store": "catalog:store",
     "vaul": "catalog:react",
     "vfile": "catalog:vfile"
   },
@@ -86,9 +89,11 @@
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
+    "@slipstream/vitest-config": "workspace:*",
     "@tailwindcss/forms": "catalog:tw",
     "@tailwindcss/postcss": "catalog:tw",
     "@tailwindcss/typography": "catalog:tw",
+    "@testing-library/react": "catalog:react",
     "@types/gtag.js": "catalog:gtag",
     "@types/js-cookie": "catalog:cookies",
     "@types/katex": "catalog:katex",
@@ -97,6 +102,7 @@
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@types/unist": "catalog:unist",
+    "@types/use-sync-external-store": "catalog:store",
     "@typescript/native-preview": "catalog:tsgo",
     "@vercel/functions": "catalog:vercel",
     "autoprefixer": "catalog:styles",
@@ -119,6 +125,7 @@
     "typescript": "catalog:ts",
     "typescript-eslint": "catalog:tseslint",
     "unist-util-remove": "catalog:unist",
-    "unist-util-visit": "catalog:unist"
+    "unist-util-visit": "catalog:unist",
+    "vitest": "catalog:vitest"
   }
 }

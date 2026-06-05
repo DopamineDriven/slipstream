@@ -1,13 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { shimmer } from "@/lib/shimmer";
-import { Logo } from "@/ui/logo";
+import { signinGithub, signinGoogle } from "@/utils/auth-sign-in";
 import {
-  signinGithub,
-  signinGoogle
-} from "@/utils/auth-sign-in";
-import { AnonymousIcon, Button, Github, GoogleIcon } from "@slipstream/ui";
+  AICoalesce,
+  AnonymousIcon,
+  Button,
+  Github,
+  GoogleIcon,
+  shimmer
+} from "@slipstream/ui";
 
 export function AuthUI({
   target = "sign_in"
@@ -19,7 +21,7 @@ export function AuthUI({
       <div className="via-background/95 flex flex-1 items-center justify-center bg-linear-to-b from-gray-900 to-gray-900 px-6 py-12 sm:px-10 lg:px-20">
         <div className="w-full max-w-md">
           <div className="select-none">
-            <Logo className="text-foreground stroke-foreground size-12" />
+            <AICoalesce className="text-foreground stroke-foreground size-12" />
             <h1 className="mt-8 text-2xl font-bold tracking-tight">
               {target === "sign_in" ? "Sign In" : "Sign Up"}
             </h1>

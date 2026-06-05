@@ -2,9 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { shimmer } from "@/lib/shimmer";
 import { cn } from "@/lib/utils";
-import { Button, Download, Eye } from "@slipstream/ui";
+import { Button, Download, Eye, shimmer } from "@slipstream/ui";
 
 interface ImageGenerationCanvasProps {
   isGenerating: boolean;
@@ -110,7 +109,7 @@ export function ImageGenerationCanvasTest({
             alt={"Image Gen"}
             width={w}
             height={h}
-            style={{ aspectRatio: w/h }}
+            style={{ aspectRatio: w / h }}
             className="h-full w-full object-cover"
             priority
             placeholder="blur"

@@ -4,7 +4,6 @@ import type { User } from "@/utils/auth-client";
 import type { ReactNode } from "react";
 import { useCallback, useEffect } from "react";
 import { useChatScroll } from "@/context/chat-scroll-context";
-import { useScrollObserver } from "@/hooks/use-scroll-observer";
 import { useSelectionQuote } from "@/hooks/use-selection-quote";
 import { cn } from "@/lib/utils";
 import { SelectionToolbar } from "@/ui/chat/chat-selection";
@@ -14,9 +13,10 @@ import type {
   AIChatResponseImgGenFieldsFinal,
   MessageSingleton
 } from "@slipstream/types";
+import { useScrollObserver } from "@slipstream/ui";
 
 interface ChatFeedProps {
-  messages: MessageSingleton<true>[];
+  messages: readonly MessageSingleton<true>[];
   isHome: boolean;
   user?: User;
   className?: string;
@@ -57,16 +57,6 @@ export function ChatFeed({
   children
 }: ChatFeedProps) {
   const { scrollRef, setScrollState } = useChatScroll();
-
-  useEffect(() => {
-    console.log({
-      ["chat-feed-has-image-gen-fields-data"]: JSON.stringify(
-        imgGenFields,
-        null,
-        2
-      )
-    });
-  }, [imgGenFields]);
 
   const { rect, quote, clear } = useSelectionQuote("[data-chat-feed]");
 

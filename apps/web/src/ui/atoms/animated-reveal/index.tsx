@@ -301,8 +301,8 @@ const CloseIcon = () => (
 const FolderIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="1.5rem"
-    height="1.5rem"
+    width="10.5rem"
+    height="10.5rem"
     viewBox="0 0 24 24">
     <path
       fill="currentColor"
@@ -399,7 +399,7 @@ const wrapper: React.CSSProperties = {
   lineHeight: "2rem"
 };
 
-const triggerButton: React.CSSProperties = {
+const triggerButton = {
   position: "relative",
   display: "flex",
   alignItems: "center",
@@ -421,7 +421,7 @@ const triggerButton: React.CSSProperties = {
   outline: "none",
   fontFamily: "inherit",
   fontSize: "inherit"
-};
+} satisfies React.CSSProperties ;
 
 const triggerCap: React.CSSProperties = {
   position: "absolute",

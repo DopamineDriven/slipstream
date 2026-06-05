@@ -1,36 +1,27 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
-import { prismaClient } from "@/lib/prisma";
-import { ormHandler } from "@/orm";
-import { ChatAreaSkeleton } from "@/ui/chat/chat-area-skeleton";
+"use client";
+
+/**
+ * Fully client chat route — no SSR data fetch, no `generateMetadata`. Authed by the `(chat)` layout; non-indexed,
+ * so SEO is irrelevant. History hydrates client-side via SWR into the store, and the tab title is owned by the
+ * façade's `document.title` effect (off `status.title` — first chunk for a new chat, SWR hydration for an existing
+ * one). `use(params)` suspends into the route's `loading.tsx` (the `AiCoalesceLoader`); `useSession()` provides the
+ * authed user (the same hook the sidebar uses).
+ */
+
+import { use } from "react";
 import { ChatInterface } from "@/ui/chat/dynamic";
-import type { InferGSPRT } from "@slipstream/types";
+import { useSession } from "@/utils/auth-client";
 
-const { prismaConversationService } = ormHandler(prismaClient);
-
-export const dynamicParams = true;
-export const dynamic = "force-dynamic";
-
-export async function generateStaticParams() {
-  return [{ conversationId: "new-chat" }, { conversationId: "home" }];
-}
-
-export async function generateMetadata({
+export default function ChatPage({
   params
-}: InferGSPRT<typeof generateStaticParams>): Promise<Metadata> {
-  return await prismaConversationService.handleMetadata({ params });
-}
+}: {
+  params: Promise<{ conversationId: string }>;
+}) {
+  const { conversationId } = use(params);
+  const { data: session } = useSession();
 
-export default async function ChatPage({
-  params
-}: InferGSPRT<typeof generateStaticParams>) {
-  const { conversationId } = await params;
-  const props =
-    await prismaConversationService.getConversationRouteProps(conversationId);
+  // No in-page fallback: `loading.tsx` covers route/param resolution; this brief null covers session hydration.
+  if (!session?.user) return null;
 
-  return (
-    <Suspense fallback={<ChatAreaSkeleton />}>
-      <ChatInterface {...props} />
-    </Suspense>
-  );
+  return <ChatInterface user={session.user} conversationId={conversationId} />;
 }

@@ -70,7 +70,7 @@ export function ContactUsSettingsSection({ user }: { user?: User }) {
             <Textarea
               id="contact-message"
               placeholder="Describe your issue or question in detail..."
-              className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text min-h-[120px] pr-3 pl-10"
+              className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text min-h-30 pr-3 pl-10"
             />
           </div>
           <Button
@@ -89,7 +89,8 @@ export function ContactUsSettingsSection({ user }: { user?: User }) {
                 href="#"
                 className="text-brand-primary flex items-center hover:underline"
                 onClick={e => e.preventDefault()}>
-                <Mail className="mr-2 h-4 w-4" /> Email us at coming@soon.com
+                <Mail className="mr-2 h-4 w-4" /> Email us at
+                contact@aicoalesce.com
               </a>
             </li>
             <li>

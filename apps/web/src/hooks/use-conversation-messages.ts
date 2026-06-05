@@ -10,7 +10,7 @@ import type {
 
 export interface Page {
   convo: ConversationSingleton<true>;
-  nextCursor: string | null;
+  nextCursor: number | null;
   hasMore: boolean;
 }
 
@@ -19,7 +19,7 @@ type CursorKey = readonly [
   "cursor",
   userId: string,
   conversationId: string,
-  cursorId: string
+  cursorOrdinal: number
 ];
 type PageKey = InitialKey | CursorKey;
 export interface UseConversationMessagesArgs {
@@ -100,11 +100,12 @@ export function useConversationMessages({
   const conversation = useMemo<ConversationSingleton<true> | undefined>(() => {
     const firstPage = data?.[0]?.convo;
     if (!firstPage) return undefined;
-    const messages: MessageSingleton<true>[] = [];
-    for (let i = data.length - 1; i >= 0; i--) {
-      const pageMessages = data[i]?.convo?.messages;
-      if (pageMessages) messages.push(...pageMessages);
-    }
+    // Each page is DB-ordered `ordinal: desc` and pages load newest-block-first, so the flattened result is
+    // already globally descending — a reverse (not a comparator sort) yields the ascending transcript. Gapless
+    // ordinals + the exclusive `ordinal < cursor` cursor guarantee contiguous, non-overlapping page blocks.
+    const messages = (data ?? [])
+      .flatMap(page => page.convo.messages)
+      .reverse();
     return { ...firstPage, messages };
   }, [data]);
 
