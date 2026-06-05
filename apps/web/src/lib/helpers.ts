@@ -18,7 +18,7 @@ export const smoothScrollToBottom = (distance: number) => {
 };
 
 export const formatTime = (dateString: Date, locale: string, tz: string) => {
-  const date = new Date(dateString.toISOString());
+  const date = new Date(dateString);
   return date.toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
