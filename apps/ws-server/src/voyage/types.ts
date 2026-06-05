@@ -50,6 +50,7 @@ export namespace Voyage {
     | "voyage-code-2"
     | "voyage-code-3"
     | "voyage-context-3"
+    | "voyage-context-4"
     | "voyage-finance-2"
     | "voyage-large-2"
     | "voyage-large-2-instruct"
