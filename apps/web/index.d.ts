@@ -5,6 +5,7 @@ declare module "gtag.js";
 declare global {
   interface Window {
     dataLayer?: object[];
+    __chatStoreSnapshot?: <T = unknown>(conversationId?: string) => T;
   }
   interface JSON {
     parse<T = unknown>(
@@ -15,7 +16,7 @@ declare global {
   interface Body {
     json<T = unknown>(): Promise<T>;
   }
-    interface ObjectConstructor {
+  interface ObjectConstructor {
     // PropertyKey -> string and number allowed, symbol disallowed (symbol can't be enumerable)
     keys<T = object>(
       o: T
