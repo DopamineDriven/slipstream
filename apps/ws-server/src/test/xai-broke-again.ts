@@ -24,7 +24,7 @@ async function* getAllCollections(limit = 10) {
       }
     });
 
-    const page = await response.json<ListCollectionsResponse>();
+    const page = await response.json() as ListCollectionsResponse;
 
     has_more = typeof page.pagination_token !== "undefined";
     pagination_token = page.pagination_token;

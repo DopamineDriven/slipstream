@@ -1,25 +1,28 @@
 "use client";
 
 /**
- * Upward pagination + scroll anchoring for the chat feed, with a VELOCITY-ADAPTIVE trigger.
+ * Upward pagination + scroll anchoring for the chat feed, with a velocity-adaptive on-demand trigger AND a
+ * background backfill.
  *
- * Trigger: rather than a fixed prefetch distance, the trigger margin is a function of upward scroll velocity —
- * a slow/casual scroll fires close to the top (`minMarginPx`, minimal premature prefetch), a fast fling fires with
- * full runway (`maxMarginPx`, so the next page is in cache before the reader arrives). Velocity comes from
- * `motion`'s `useScroll({ container }) → useVelocity` (px/s, negative when scrolling toward the top), read each
- * frame via `useMotionValueEvent`. One mechanism, no IntersectionObserver, no debounced scroll-state path.
+ * Backfill (the "snappy illusion"): once armed, it eagerly walks the rest of the conversation into the caches on
+ * IDLE (`requestIdleCallback`), so by the time a reader scrolls up the data is already preloaded — the on-demand
+ * load-older path then resolves from cache, instantly. The velocity trigger survives purely for the race where
+ * someone flings up before the backfill catches up.
  *
- * Anchor (the architecture-specific part — see codex's follow-up): the v0 prototype renders straight from SWR so it
- * can restore the instant `isLoadingMore` flips false. web-next can't — SWR resolves, THEN the bridge ingests into
- * the store, THEN `useChatCommitted` notifies, THEN the feed grows. Restoring on the flag alone would run with a
- * zero delta and clear the anchor too early. So we capture `scrollHeight` + message COUNT at trigger time and
- * restore only once the rendered list has grown past that count, bumping `scrollTop` by the height gained
- * (relative — a velocity-driven scroll-while-loading stays put), in a layout effect so it lands before paint. The
- * container disables native scroll-anchoring (`overflow-anchor: none`) so only this manual restore runs.
+ * Trigger: the on-demand margin is a function of upward scroll velocity (`useScroll` → `useVelocity`) — slow scroll
+ * fires near the top, a fast fling fires with full runway.
+ *
+ * Anchor (the SWR → store architecture adaptation, per codex): web-next renders from the store AFTER the bridge
+ * ingests SWR, so we restore only once the rendered list has grown past the count captured before `loadMore`,
+ * bumping `scrollTop` by the height gained (relative — a backfill prepend keeps a bottom-pinned reader pinned), in
+ * a layout effect so it lands before paint. The container disables native scroll-anchoring so only this restore runs.
+ *
+ * Both the velocity trigger and the backfill route through one `triggerLoad` (capture + load), so they anchor
+ * identically and dedupe via `pendingRef`.
  */
 
 import type { RefObject } from "react";
-import { useCallback, useLayoutEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { useMotionValueEvent, useScroll, useVelocity } from "motion/react";
 import type { MessageSingleton } from "@slipstream/types";
 
@@ -27,13 +30,11 @@ interface UseLoadOlderHistoryArgs {
   readonly hasMore: boolean;
   readonly isLoadingOlder: boolean;
   readonly onLoadOlder: () => void | Promise<unknown>;
-  /** Hold off until the conversation's initial scroll-to-bottom has run (no page-1 fetch on first paint). */
   readonly enabled: boolean;
-  /** Trigger distance from the top at (near-)zero upward velocity. */
+  /** Eagerly preload the rest of the convo in the background (on idle) so on-demand loads hit warm cache. */
+  readonly backfill?: boolean;
   readonly minMarginPx?: number;
-  /** Trigger distance from the top once upward speed saturates `maxVelocityPxPerSec` (full prefetch runway). */
   readonly maxMarginPx?: number;
-  /** Upward speed (px/s) at which the margin reaches `maxMarginPx`. */
   readonly maxVelocityPxPerSec?: number;
 }
 
@@ -45,6 +46,7 @@ export function useLoadOlderHistory(
     isLoadingOlder,
     onLoadOlder,
     enabled,
+    backfill = true,
     minMarginPx = 200,
     maxMarginPx = 1500,
     maxVelocityPxPerSec = 2500
@@ -56,34 +58,54 @@ export function useLoadOlderHistory(
   const pendingRef = useRef(false);
   const prevHeightRef = useRef(0);
   const prevCountRef = useRef(0);
-
-  // Latest control values for the per-frame motion event, so the listener never re-subscribes or goes stale.
   const stateRef = useRef({ hasMore, isLoadingOlder, onLoadOlder, enabled });
   stateRef.current = { hasMore, isLoadingOlder, onLoadOlder, enabled };
   const countRef = useRef(messages.length);
   countRef.current = messages.length;
 
-  // Memoized so `useMotionValueEvent` subscribes ONCE — not per streaming token (ChatFeed re-renders per token).
-  // It reads all changing control state through `stateRef`/`countRef`, so the deps stay stable.
+  // Capture scroll metrics + fire one older-page load — shared by the velocity trigger and the backfill so both
+  // anchor identically.
+  const triggerLoad = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    prevHeightRef.current = el.scrollHeight;
+    prevCountRef.current = countRef.current;
+    pendingRef.current = true;
+    void stateRef.current.onLoadOlder();
+  }, [scrollRef]);
+
   const onScrollChange = useCallback(
     (top: number) => {
-      const { hasMore, isLoadingOlder, onLoadOlder, enabled } = stateRef.current;
-      if (!enabled || pendingRef.current || isLoadingOlder || !hasMore) return;
+      const s = stateRef.current;
+      if (!s.enabled || pendingRef.current || s.isLoadingOlder || !s.hasMore) {
+        return;
+      }
       // Negative velocity = scrolling up. Faster up → bigger margin → fire earlier (more runway).
       const upwardSpeed = Math.max(0, -scrollVelocity.get());
       const ramp = Math.min(1, upwardSpeed / maxVelocityPxPerSec);
       const margin = minMarginPx + ramp * (maxMarginPx - minMarginPx);
       if (top > margin) return;
-      const el = scrollRef.current;
-      if (!el) return;
-      prevHeightRef.current = el.scrollHeight;
-      prevCountRef.current = countRef.current;
-      pendingRef.current = true;
-      void onLoadOlder();
+      triggerLoad();
     },
-    [scrollVelocity, scrollRef, minMarginPx, maxMarginPx, maxVelocityPxPerSec]
+    [scrollVelocity, minMarginPx, maxMarginPx, maxVelocityPxPerSec, triggerLoad]
   );
   useMotionValueEvent(scrollY, "change", onScrollChange);
+
+  // Background backfill: re-runs after each page (messages grows) to schedule the next idle load, until exhausted.
+  useEffect(() => {
+    if (!backfill || !enabled || !hasMore || pendingRef.current) return;
+    const run = () => {
+      const s = stateRef.current;
+      if (pendingRef.current || s.isLoadingOlder || !s.hasMore) return;
+      triggerLoad();
+    };
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(run, { timeout: 250 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(run, 60);
+    return () => window.clearTimeout(id);
+  }, [backfill, enabled, hasMore, isLoadingOlder, messages.length, triggerLoad]);
 
   useLayoutEffect(() => {
     if (!pendingRef.current) return;

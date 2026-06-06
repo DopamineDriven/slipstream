@@ -131,7 +131,7 @@ export class GrokApiWorkupService extends GrokBaseService {
         }
       });
 
-      const page = await response.json<ListCollectionsResponse>();
+      const page = (await response.json()) as ListCollectionsResponse;
 
       has_more = typeof page.pagination_token !== "undefined";
       pagination_token = page.pagination_token;
@@ -163,7 +163,7 @@ export class GrokApiWorkupService extends GrokBaseService {
         ? `https://management-api.x.ai/v1/collections/${collection_id}/documents?limit=${limit}&pagination_token=${pagination_token}`
         : `https://management-api.x.ai/v1/collections/${collection_id}/documents?limit=${limit}`;
 
-      const response = await fetch(url, {
+      const response = await fetch(url as string, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -171,7 +171,7 @@ export class GrokApiWorkupService extends GrokBaseService {
         }
       });
 
-      const page = await response.json<GetDocumentsByCollectionId>();
+      const page = (await response.json()) as GetDocumentsByCollectionId;
 
       has_more = typeof page.pagination_token !== "undefined";
       pagination_token = page.pagination_token;
@@ -548,5 +548,31 @@ export class GrokApiWorkupService extends GrokBaseService {
 
   protected pollingDelay(pollIntervalMs: number, attempts: number) {
     return Math.min(pollIntervalMs * Math.pow(1.5, attempts), 30000);
+  }
+}
+declare global {
+  interface JSON {
+    parse<T = unknown>(
+      text: string,
+      reviver?: (this: any, key: string, value: any) => any
+    ): T;
+  }
+  interface Body {
+    json<T = unknown>(): Promise<T>;
+  }
+  interface Response {
+    json<T = unknown>(): Promise<T>;
+  }
+  interface ObjectConstructor {
+    // PropertyKey -> string and number allowed, symbol disallowed (symbol can't be enumerable)
+    keys<T = object>(
+      o: T
+    ): (keyof T extends infer K
+      ? K extends string
+        ? K
+        : K extends number
+          ? `${K}`
+          : never
+      : never)[];
   }
 }

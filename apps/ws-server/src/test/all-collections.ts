@@ -22,7 +22,7 @@ async function* getAllCollections(limit = 10, mgmtKey = xaiManagementKey) {
       }
     });
 
-    const page = await response.json<ListCollectionsResponse>();
+    const page = (await response.json()) as ListCollectionsResponse;
 
     has_more = typeof page.pagination_token !== "undefined";
     pagination_token = page.pagination_token;
@@ -64,3 +64,4 @@ pullCollectionRecord().then(res => {
   console.log(toJSON);
   return toJSON;
 });
+

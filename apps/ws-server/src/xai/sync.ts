@@ -301,10 +301,11 @@ export class GrokSyncService extends GrokApiMethodsService {
     mgmtApiKey = this.xaiManagementKey
   ) {
     try {
-      const { collectionId } = await this.ensureUserCollection(
+      const d= await this.ensureUserCollection(
         userId,
         mgmtApiKey
       );
+      const collectionId = d.collectionId;
       return collectionId;
     } catch (err) {
       throw new Error(this.prisma.safeErrMsg(err));

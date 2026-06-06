@@ -269,13 +269,14 @@ export class GrokApiMethodsService extends GrokApiWorkupService {
         true,
         mgmtKey
       );
-      if (result.ok === true && collectionObj.storeRef) {
+      const storeRef = collectionObj.storeRef;
+      if (result.ok === true && storeRef) {
         this.docCache.set(att.id, result.doc);
         const dbDocData = await this.prisma.upsertGrokProviderDoc({
           attachmentId: att.id,
           docRef: result.doc.file_metadata.file_id,
           docUri: this.xaiURI(
-            collectionObj.storeRef,
+            storeRef,
             result.doc.file_metadata.file_id
           ),
           filename: result.doc.file_metadata.name,
@@ -285,7 +286,7 @@ export class GrokApiMethodsService extends GrokApiWorkupService {
           mimeType: result.doc.file_metadata.content_type,
           state: this.xaiToDbState[result.doc.status],
           storeId: collectionObj.dbId,
-          storeRef: collectionObj.storeRef,
+          storeRef,
           userId: att.userId,
           size: BigInt(Number.parseInt(result.doc.file_metadata.size_bytes))
         });
