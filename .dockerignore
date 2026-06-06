@@ -37,6 +37,7 @@ Thumbs.db
 .changeset
 .claude
 .husky
+.codex
 infra
 misc
 plans

@@ -46,7 +46,7 @@ WORKDIR /app
 
 # --- Builder ---
 FROM base AS builder
-RUN npm install -g turbo@2.9.16 pnpm@11.5.1
+RUN npm install -g turbo@2.9.16 pnpm@11.5.2
 COPY turbo.json pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
 COPY . .
 ENV TURBO_TELEMETRY=0

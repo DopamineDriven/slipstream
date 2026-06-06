@@ -13,8 +13,11 @@
     "lint": "eslint",
     "typecheck": "tsgo --noEmit",
     "typegen": "next typegen",
-    "test": "node --test --import tsx --test-reporter spec \"src/**/*.test.ts\"",
-    "test:vitest": "vitest"
+    "test:vitest": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
+    "test": "node --test --import tsx --test-reporter spec \"src/**/*.test.ts\""
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "catalog:aws",
@@ -96,6 +99,7 @@
     "@testing-library/react": "catalog:react",
     "@types/gtag.js": "catalog:gtag",
     "@types/js-cookie": "catalog:cookies",
+    "@types/jsdom": "catalog:jsdom",
     "@types/katex": "catalog:katex",
     "@types/mdast": "catalog:mdast",
     "@types/node": "catalog:node",
@@ -114,6 +118,7 @@
     "eslint": "catalog:eslint",
     "eslint-config-next": "catalog:next",
     "jiti": "catalog:jiti",
+    "jsdom": "catalog:jsdom",
     "motion-dom": "catalog:motion",
     "motion-utils": "catalog:motion",
     "postcss": "catalog:styles",
