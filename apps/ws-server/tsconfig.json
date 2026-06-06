@@ -5,12 +5,11 @@
       "@/*": ["./src/*"]
     },
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "rootDir": "./src",
     "outDir": "dist",
     "emitDeclarationOnly": true,
     "ignoreDeprecations":"6.0",
     "types": ["*"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "include": ["**/*.ts", "**/*.d.ts"],
   "exclude": ["dist", "public/inspect/**/*"]
 }

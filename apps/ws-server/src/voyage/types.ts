@@ -12,7 +12,7 @@ export namespace Voyage {
   /**
    * default to 1024
    */
-  export type EmbeddingDims = 256 | 512 | 1024 |2048;
+  export type EmbeddingDims = 256 | 512 | 1024 | 2048;
   export type PromiseConditional<T> = Promise<T> | PromiseLike<T>;
   export namespace PyBuiltIns {
     export type Exec = <const V = unknown>(
@@ -229,7 +229,7 @@ export namespace Voyage {
       | Output.Success<T>["response"]
       | Output.Error["response"];
 
-    export type Model = "voyage-context-3";
+    export type Model = "voyage-context-3" | "voyage-context-4";
 
     export interface Usage {
       total_tokens: number;
