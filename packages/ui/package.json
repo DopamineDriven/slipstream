@@ -85,6 +85,7 @@
   "scripts": {
     "lint": "eslint",
     "dev": "pnpm build",
+    "typecheck": "tsgo --noEmit",
     "prebuild": "rm -rf dist",
     "postbuild": "tsx src/services/postbuild.ts flag-check",
     "build": "tsup",

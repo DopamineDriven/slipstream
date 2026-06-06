@@ -3,21 +3,7 @@ import type { UserConfig as Options } from "tsdown";
 import { defineConfig } from "tsdown";
 
 export default defineConfig(
-  (
-    options: Omit<
-      Options,
-      | "entry"
-      | "target"
-      | "dts"
-      | "watch"
-      | "format"
-      | "cwd"
-      | "sourcemap"
-      | "clean"
-      | "outDir"
-      | "tsconfig"
-    >
-  ) =>
+  options =>
     ({
       ...options,
       entry: [
@@ -30,7 +16,7 @@ export default defineConfig(
         "src/pubsub/extended-events.ts",
         "!src/test/**"
       ],
-      target: ["node25"],
+      target: ["node26"],
       dts: { tsgo: true },
       unbundle: true,
       fixedExtension: false,

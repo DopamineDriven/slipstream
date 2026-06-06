@@ -51,7 +51,7 @@ async function* getAllGrokFiles(collection_id: string, limit = 10) {
       }
     });
 
-    const page = await response.json<RT>();
+    const page = await response.json() as RT;
 
     has_more = typeof page.pagination_token !== "undefined";
     pagination_token = page.pagination_token;

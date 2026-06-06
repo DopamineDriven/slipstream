@@ -6,7 +6,6 @@ const tsupConfig = (options: Options) =>
   ({
     ...options,
     entry: ["!prisma/**", "!src/test/**/*.ts", "src/**/*.ts"],
-    
     dts: true,
     watch: process.env.NODE_ENV === "development",
     keepNames: true,

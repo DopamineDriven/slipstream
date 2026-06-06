@@ -1,25 +1,9 @@
-// tsdown.config.ts
 import { relative } from "node:path";
 import type { UserConfig as Options } from "tsdown";
 import { defineConfig } from "tsdown";
 
 export default defineConfig(
-  (
-    options: Omit<
-      Options,
-      | "entry"
-      | "target"
-      | "dts"
-      | "watch"
-      | "format"
-      | "cwd"
-      | "sourcemap"
-      | "clean"
-      | "outDir"
-      | "tsconfig"
-      | "outputOptions"
-    >
-  ) =>
+  options =>
     ({
       ...options,
       entry: [

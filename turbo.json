@@ -8,12 +8,13 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "test": {
-      "outputs": ["coverage/**"],
-      "dependsOn": []
+
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/vitest.config.ts"],
+      "outputs": ["coverage.json"],
+      "dependsOn": ["transit", "@slipstream/vitest-config#build"]
     },
-    "lint": {
-      "dependsOn": ["^build"]
-    },
+    "transit": { "dependsOn": ["^transit"] },
+    "lint": {},
     "dev": {
       "cache": false,
       "dependsOn": ["^build"],
