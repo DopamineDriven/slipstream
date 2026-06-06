@@ -99,12 +99,9 @@ export function useLoadOlderHistory(
       if (pendingRef.current || s.isLoadingOlder || !s.hasMore) return;
       triggerLoad();
     };
-    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(run, { timeout: 250 });
-      return () => window.cancelIdleCallback(id);
-    }
-    const id = window.setTimeout(run, 60);
-    return () => window.clearTimeout(id);
+    if (typeof window === "undefined") return;
+    const id = window.requestIdleCallback(run, { timeout: 250 });
+    return () => window.cancelIdleCallback(id);
   }, [backfill, enabled, hasMore, isLoadingOlder, messages.length, triggerLoad]);
 
   useLayoutEffect(() => {
