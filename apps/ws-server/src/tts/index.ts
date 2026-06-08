@@ -125,7 +125,7 @@ export class TTSService {
       l === "vi"
     );
   }
-  private sanitizeBlockContent(
+  private sanitizeAnthropicForTTS(
     content: string,
     provider: $Enums.Provider | null,
     model = "claude-opus-4-6"
@@ -159,7 +159,7 @@ export class TTSService {
     if (textBlocks.length > 0) {
       const content = textBlocks.join("\n");
       return msg.senderType === "AI"
-        ? this.sanitizeBlockContent(
+        ? this.sanitizeAnthropicForTTS(
             content,
             msg.provider,
             msg.model ?? undefined
@@ -168,7 +168,7 @@ export class TTSService {
     }
 
     return msg.senderType === "AI"
-      ? this.sanitizeBlockContent(
+      ? this.sanitizeAnthropicForTTS(
           msg.content,
           msg.provider,
           msg.model ?? undefined

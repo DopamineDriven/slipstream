@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
     countryName: "US",
-    emails: ["andrew.simpson.ross@gmail.com"]
+    emails: ["andrew@aicoalesce.com"]
   },
   icons: [
     {

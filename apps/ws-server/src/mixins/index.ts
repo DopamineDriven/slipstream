@@ -1,11 +1,13 @@
 import type { LoggerService } from "@/logger/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import { AlibabaService } from "@/alibaba/index.ts";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { CohereService } from "@/cohere/index.ts";
 import { DeepSeekService } from "@/deepseek/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { KimiService } from "@/kimi/index.ts";
 import { LlamaService } from "@/meta/index.ts";
+import { MiniMaxService } from "@/minimax/index.ts";
 import { MistralService } from "@/mistral/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
@@ -38,7 +40,11 @@ export type ProviderNarrowing<P extends Provider> = P extends "openai"
                     ? DeepSeekService
                     : P extends "zai"
                       ? ZaiService
-                      : never;
+                      : P extends "alibaba"
+                        ? AlibabaService
+                        : P extends "minimax"
+                          ? MiniMaxService
+                          : never;
 
 export interface ProviderMap {
   anthropic: AnthropicService;
@@ -52,6 +58,8 @@ export interface ProviderMap {
   moonshotai: KimiService;
   deepseek: DeepSeekService;
   zai: ZaiService;
+  alibaba: AlibabaService;
+  minimax: MiniMaxService;
 }
 
 export type ProviderNarrowed<T extends keyof ProviderMap> = {
@@ -113,6 +121,8 @@ export interface ProviderOpts extends Partial<ProviderMap> {
     moonshotai?: string;
     deepseek?: string;
     zai?: string;
+    alibaba?: string;
+    minimax?: string;
   };
 }
 
@@ -602,6 +612,139 @@ export function KimiMixin<
       return !!(
         this.kimi ??
         (this.constructor as typeof KimiServiceMixin)?.sharedKimi ??
+        this.getDependencies()
+      );
+    }
+  };
+}
+
+export function AlibabaMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = AlibabaService;
+  return class AlibabaServiceMixin extends Base {
+    qwen?: S;
+    qwenApiKey?: string;
+    static sharedQwen?: S;
+    static qwenFactory?: ProviderFactory<S>;
+    constructor(...args: any[]) {
+      super(...(args as (ProviderOpts | undefined)[]));
+
+      const opts = this.opts;
+
+      if (opts?.alibaba) this.qwen = opts.alibaba;
+
+      this.qwenApiKey = opts?.apiKeys?.moonshotai;
+    }
+    public get alibaba() {
+      if (!this.qwen) {
+        const shared = (this.constructor as typeof AlibabaServiceMixin)
+          .sharedQwen;
+        if (shared) {
+          this.qwen = shared;
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "Alibaba deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
+          }
+
+          const factory = (this.constructor as typeof AlibabaServiceMixin)
+            .qwenFactory;
+
+          this.qwen =
+            factory?.(deps, this.qwenApiKey) ??
+            new AlibabaService(
+              deps.logger,
+              deps.prisma,
+              deps.redis,
+              deps.userStore,
+              this.qwenApiKey ?? ""
+            );
+        }
+      }
+      return this.qwen;
+    }
+
+    static setSharedAlibaba(instance: S) {
+      this.sharedQwen = instance;
+    }
+
+    static setAlibabaFactory(factory: ProviderFactory<S>) {
+      this.qwenFactory = factory;
+    }
+
+    public hasAlibaba() {
+      return !!(
+        this.qwen ??
+        (this.constructor as typeof AlibabaServiceMixin)?.sharedQwen ??
+        this.getDependencies()
+      );
+    }
+  };
+}
+
+export function MiniMaxMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = MiniMaxService;
+  return class MiniMaxServiceMixin extends Base {
+    m?: S;
+    mApiKey?: string;
+    static sharedM?: S;
+    static mFactory?: ProviderFactory<S>;
+    constructor(...args: any[]) {
+      super(...(args as (ProviderOpts | undefined)[]));
+
+      const opts = this.opts;
+
+      if (opts?.minimax) this.m = opts.minimax;
+
+      this.mApiKey = opts?.apiKeys?.moonshotai;
+    }
+    public get minimax() {
+      if (!this.m) {
+        const shared = (this.constructor as typeof MiniMaxServiceMixin).sharedM;
+        if (shared) {
+          this.m = shared;
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "MiniMax deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
+          }
+
+          const factory = (this.constructor as typeof MiniMaxServiceMixin)
+            .mFactory;
+
+          this.m =
+            factory?.(deps, this.mApiKey) ??
+            new MiniMaxService(
+              deps.logger,
+              deps.prisma,
+              deps.redis,
+              deps.userStore,
+              this.mApiKey ?? ""
+            );
+        }
+      }
+      return this.m;
+    }
+
+    static setSharedMiniMax(instance: S) {
+      this.sharedM = instance;
+    }
+
+    static setMiniMaxFactory(factory: ProviderFactory<S>) {
+      this.mFactory = factory;
+    }
+
+    public hasMiniMax() {
+      return !!(
+        this.m ??
+        (this.constructor as typeof MiniMaxServiceMixin)?.sharedM ??
         this.getDependencies()
       );
     }

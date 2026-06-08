@@ -5,12 +5,14 @@ import { useModelSelection } from "@/context/model-selection-context";
 import { defaultModelByProvider, providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import type {
+  AlibabaDisplayNameUnion,
   AnthropicDisplayNameUnion,
   CohereDisplayNameUnion,
   DeepSeekDisplayNameUnion,
   GeminiDisplayNameUnion,
   GrokDisplayNameUnion,
   KimiDisplayNameUnion,
+  MiniMaxDisplayNameUnion,
   MistralDisplayNameUnion,
   OpenAiDisplayNameUnion,
   Provider,
@@ -87,6 +89,24 @@ export function ProviderModelSelector({
         updateModel(
           displayName,
           getModelIdByDisplayName("cohere", displayName)
+        );
+        break;
+      }
+      case "alibaba": {
+        const displayName = defaultModelByProvider.alibaba;
+        updateProvider("alibaba");
+        updateModel(
+          displayName,
+          getModelIdByDisplayName("alibaba", displayName)
+        );
+        break;
+      }
+      case "minimax": {
+        const displayName = defaultModelByProvider.minimax;
+        updateProvider("minimax");
+        updateModel(
+          displayName,
+          getModelIdByDisplayName("minimax", displayName)
         );
         break;
       }
@@ -172,6 +192,16 @@ export function ProviderModelSelector({
       case "cohere": {
         const dn = name as CohereDisplayNameUnion;
         updateModel(dn, getModelIdByDisplayName("cohere", dn));
+        break;
+      }
+      case "alibaba": {
+        const dn = name as AlibabaDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("alibaba", dn));
+        break;
+      }
+      case "minimax": {
+        const dn = name as MiniMaxDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("minimax", dn));
         break;
       }
       case "moonshotai": {

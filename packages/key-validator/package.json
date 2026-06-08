@@ -53,7 +53,8 @@
     "dev": "pnpm build",
     "lint": "eslint",
     "clean": "git clean -xdf .turbo dist node_modules",
-    "fetch": "tsx src/test/index.ts",
+    "gen": "tsx src/test/index.ts",
+    "postgen": "tsx src/test/filter.ts",
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,css,html,md}\" --ignore-unknown --cache"
   },
   "devDependencies": {

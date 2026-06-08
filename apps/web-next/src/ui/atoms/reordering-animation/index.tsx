@@ -13,8 +13,10 @@ import {
   GeminiIcon,
   Kimi,
   MetaIcon,
+  MinimaxIcon,
   MistralIcon,
   OpenAiIcon,
+  QwenIcon,
   VercelIcon as v0Icon,
   XAiIcon,
   Zai
@@ -46,6 +48,18 @@ const PROVIDERS = [
     label: "Meta",
     colorVar: providerMetadata.meta.color,
     Icon: MetaIcon
+  },
+  {
+    id: "minimax",
+    label: "MiniMax",
+    colorVar: providerMetadata.minimax.color,
+    Icon: MinimaxIcon
+  },
+  {
+    id: "alibaba",
+    label: "Alibaba",
+    colorVar: providerMetadata.alibaba.color,
+    Icon: QwenIcon
   }
 ] as const;
 
@@ -60,7 +74,9 @@ const initialOrder = [
   "vercel",
   "deepseek",
   "moonshotai",
-  "zai"
+  "zai",
+  "alibaba",
+  "minimax"
 ] satisfies Provider[];
 
 export function Reordering() {
@@ -84,7 +100,9 @@ export function Reordering() {
       cohere: PROVIDERS[6],
       deepseek: PROVIDERS[7],
       moonshotai: PROVIDERS[8],
-      zai: PROVIDERS[9]
+      zai: PROVIDERS[9],
+      alibaba: PROVIDERS[10],
+      minimax: PROVIDERS[11]
     };
     return map;
   }, []);

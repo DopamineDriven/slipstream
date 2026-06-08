@@ -65,7 +65,7 @@ const providerModelVideosApi = {
     "veo-3.0-fast-generate-001",
     "veo-2.0-generate-001"
   ],
-  grok: ["grok-imagine-video"]
+  grok: ["grok-imagine-video-1.5-preview", "grok-imagine-video"]
 } as const;
 
 const providerModelChatApi = {
@@ -150,7 +150,8 @@ const providerModelChatApi = {
     "grok-build-0.1",
     "grok-imagine-image",
     "grok-imagine-image-quality",
-    "grok-imagine-video"
+    "grok-imagine-video",
+    "grok-imagine-video-1.5-preview"
   ],
   /**
    * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-names
@@ -191,7 +192,20 @@ const providerModelChatApi = {
   ],
   moonshotai: ["kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
   deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
-  zai: ["glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"]
+  zai: ["glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
+  alibaba: [
+    "qwen3.5-flash",
+    "qwen3.5-plus",
+    "qwen3.6-plus",
+    "qwen3.7-plus",
+    "qwen3.7-max"
+  ].reverse(),
+  minimax: [
+    "minimax-m2.1",
+    "minimax-m2.5",
+    "minimax-m2.7",
+    "minimax-m3"
+  ].reverse()
 } as const;
 
 async function anthropicFetcher() {
@@ -247,7 +261,23 @@ const GROK_NAME_OVERRIDES = {
   "grok-4.20-0309-reasoning": "Grok 4.20 Reasoning",
   "grok-4.20-0309-non-reasoning": "Grok 4.20 Non-Reasoning",
   "grok-4.3": "Grok 4.3",
-  "grok-build-0.1": "Grok Build 0.1"
+  "grok-build-0.1": "Grok Build 0.1",
+  "grok-imagine-video-1.5-preview": "Grok Imagine Video 1.5 Preview"
+} as const;
+
+const ALIBABA_NAME_OVERRIDES = {
+  "qwen3.5-flash": "Qwen3.5-Flash",
+  "qwen3.5-plus": "Qwen3.5-Plus",
+  "qwen3.6-plus": "Qwen3.6-Plus",
+  "qwen3.7-plus": "Qwen3.7-Plus",
+  "qwen3.7-max": "Qwen3.7-Max"
+} as const;
+
+const MINIMAX_NAME_OVERRIDES = {
+  "minimax-m2.1": "MiniMax-M2.1",
+  "minimax-m2.5": "MiniMax-M2.5",
+  "minimax-m2.7": "MiniMax-M2.7",
+  "minimax-m3": "MiniMax-M3"
 } as const;
 
 const MISTRAL_NAME_OVERRIDES = {
@@ -283,6 +313,25 @@ const DEEPSEEK_NAME_OVERRIDES = {
   "deepseek-v4-flash": "DeepSeek V4 Flash"
 } as const;
 
+function filterForMinimax(id: string) {
+  return (
+    id === "minimax-m2.1" ||
+    id === "minimax-m2.5" ||
+    id === "minimax-m2.7" ||
+    id === "minimax-m3"
+  );
+}
+
+function filterForAlibaba(id: string) {
+  return (
+    id === "qwen3.5-flash" ||
+    id === "qwen3.5-plus" ||
+    id === "qwen3.6-plus" ||
+    id === "qwen3.7-max" ||
+    id === "qwen3.7-plus"
+  );
+}
+
 function filterForGrok(id: string) {
   return (
     id === "grok-4.3" ||
@@ -292,7 +341,8 @@ function filterForGrok(id: string) {
     id === "grok-imagine-image-quality" ||
     id === "grok-imagine-image" ||
     id === "grok-imagine-video" ||
-    id === "grok-build-0.1"
+    id === "grok-build-0.1" ||
+    id === "grok-imagine-video-1.5-preview"
   );
 }
 
@@ -333,6 +383,18 @@ function filterForCohere(id: string) {
     id === "command-a-03-2025" ||
     id === "command-a-plus-05-2026"
   );
+}
+
+function toMinimaxDisplayName(id: string) {
+  if (filterForMinimax(id)) {
+    return MINIMAX_NAME_OVERRIDES[id];
+  } else return id;
+}
+
+function toAlibabaDisplayName(id: string) {
+  if (filterForAlibaba(id)) {
+    return ALIBABA_NAME_OVERRIDES[id];
+  } else return id;
 }
 
 function kimiDisplayName(id: string) {
@@ -714,6 +776,26 @@ const modelMapper = async (modelKeys = true) => {
           });
           return helper;
         }
+        case "alibaba": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            const name = toAlibabaDisplayName(model);
+            modelKeys === true
+              ? helper.push([model, name])
+              : helper.push([name, model]);
+          });
+          return helper;
+        }
+        case "minimax": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            const name = toMinimaxDisplayName(model);
+            modelKeys === true
+              ? helper.push([model, name])
+              : helper.push([name, model]);
+          });
+          return helper;
+        }
         case "openai":
         default: {
           let helper = Array.of<[string, string]>();
@@ -873,6 +955,8 @@ async function displayNameModelIdGen<
   const moonshotai = mapper[8];
   const deepseek = mapper[9];
   const zai = mapper[10];
+  const alibaba = mapper[11];
+  const minimax = mapper[12];
 
   if (
     !openai ||
@@ -885,7 +969,9 @@ async function displayNameModelIdGen<
     !cohere ||
     !moonshotai ||
     !deepseek ||
-    !zai
+    !zai ||
+    !alibaba ||
+    !minimax
   )
     throw new Error("empty data in displayNameModelIdGen");
 
@@ -903,7 +989,9 @@ async function displayNameModelIdGen<
           cohere: cohere.map(([keys, _v]) => keys),
           moonshotai: moonshotai.map(([keys, _v]) => keys),
           deepseek: deepseek.map(([keys, _v]) => keys),
-          zai: zai.map(([keys, _v]) => keys)
+          zai: zai.map(([keys, _v]) => keys),
+          alibaba: alibaba.map(([keys, _v]) => keys),
+          minimax: minimax.map(([keys, _v]) => keys)
         };
       } else {
         return {
@@ -917,7 +1005,9 @@ async function displayNameModelIdGen<
           cohere: cohere.map(([_, vals]) => vals),
           moonshotai: moonshotai.map(([_, vals]) => vals),
           deepseek: deepseek.map(([_, vals]) => vals),
-          zai: zai.map(([_, vals]) => vals)
+          zai: zai.map(([_, vals]) => vals),
+          alibaba: alibaba.map(([_, vals]) => vals),
+          minimax: minimax.map(([_, vals]) => vals)
         };
       }
     } else {
@@ -933,7 +1023,9 @@ async function displayNameModelIdGen<
           cohere: cohere.map(([_, vals]) => vals),
           moonshotai: moonshotai.map(([_, vals]) => vals),
           deepseek: deepseek.map(([_, vals]) => vals),
-          zai: zai.map(([_, vals]) => vals)
+          zai: zai.map(([_, vals]) => vals),
+          alibaba: alibaba.map(([_, vals]) => vals),
+          minimax: minimax.map(([_, vals]) => vals)
         };
       } else {
         return {
@@ -947,7 +1039,9 @@ async function displayNameModelIdGen<
           cohere: cohere.map(([keys, _v]) => keys),
           moonshotai: moonshotai.map(([keys, _v]) => keys),
           deepseek: deepseek.map(([keys, _v]) => keys),
-          zai: zai.map(([keys, _v]) => keys)
+          zai: zai.map(([keys, _v]) => keys),
+          alibaba: alibaba.map(([keys, _v]) => keys),
+          minimax: minimax.map(([keys, _v]) => keys)
         };
       }
     }
@@ -963,7 +1057,9 @@ async function displayNameModelIdGen<
     cohere: Object.fromEntries(cohere),
     moonshotai: Object.fromEntries(moonshotai),
     deepseek: Object.fromEntries(deepseek),
-    zai: Object.fromEntries(zai)
+    zai: Object.fromEntries(zai),
+    alibaba: Object.fromEntries(alibaba),
+    minimax: Object.fromEntries(minimax)
   };
 }
 

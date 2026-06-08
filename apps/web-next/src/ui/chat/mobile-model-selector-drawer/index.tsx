@@ -95,14 +95,14 @@ export function MobileModelSelectorDrawer() {
               value={activeDraftProvider}
               onValueChange={prov => setDraftProvider(prov as Provider)}
               className="flex h-full flex-col">
-              <TabsList className="bg-brand-sidebar border-brand-border mb-3 grid h-auto gap-y-0.5 w-full shrink-0 grid-cols-10 border">
+              <TabsList className="bg-brand-sidebar border-brand-border mb-3 grid h-auto w-full shrink-0 grid-cols-12 gap-y-0.5 border">
                 {visibleProviders.map(provider => {
                   const Icon = providerMetadata[provider].icon;
                   return (
                     <TabsTrigger
                       key={provider}
                       value={provider}
-                      className="data-[state=active]:bg-brand-primary data-[state=active]:text-brand-primary-foreground col-span-2 flex h-10 items-center justify-center gap-2 text-xs nth-6:col-start-2 sm:text-sm">
+                      className="data-[state=active]:bg-brand-primary data-[state=active]:text-brand-primary-foreground col-span-2 flex h-10 items-center justify-center gap-2 text-xs nth-7:col-start-2 sm:text-sm">
                       <Icon className="size-4 shrink-0" />
                       <span className="sr-only sm:not-sr-only sm:inline">
                         {providerMetadata[provider].name.split(" ")[0]}
@@ -163,6 +163,60 @@ export function MobileModelSelectorDrawer() {
                             );
                           })
                         ) : provider === "deepseek" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  cxStyles.default,
+                                  isSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
+                                )}
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
+                        ) : provider === "alibaba" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  cxStyles.default,
+                                  isSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
+                                )}
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
+                        ) : provider === "minimax" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =
                               activeSelectedProvider === provider &&

@@ -615,6 +615,8 @@ export class ProviderValidation {
       case "zai":
       case "meta":
       case "vercel":
+      case "alibaba":
+      case "minimax":
       default: {
         return undefined;
       }
@@ -727,7 +729,7 @@ export class ProviderValidation {
   }
 
   public handlePartialImgGen(
-    model: AllModelsUnion = "gpt-5.4",
+    model: AllModelsUnion = "gpt-5.5",
     data?: { partialImagesRequested?: number }
   ) {
     if (this.openAIImgGenCapable(model)) {

@@ -193,6 +193,9 @@ export type {
  * model/provider types
  */
 export type {
+  AlibabaChatModels,
+  AlibabaDisplayNameUnion,
+  AlibabaModelIdUnion,
   AllDisplayNamesUnion,
   AllImgGenFacilitatingModelsUnion,
   AllImgGenModelsUnion,
@@ -253,6 +256,9 @@ export type {
   MetaChatModels,
   MetaDisplayNameUnion,
   MetaModelIdUnion,
+  MiniMaxChatModels,
+  MiniMaxDisplayNameUnion,
+  MiniMaxModelIdUnion,
   MistralChatModels,
   MistralDisplayNameUnion,
   MistralModelIdUnion,

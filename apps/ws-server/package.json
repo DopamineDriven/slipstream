@@ -14,6 +14,11 @@
         "dist/*.d.ts",
         "dist/*/index.d.ts"
       ],
+      "alibaba": [
+        "dist/alibaba/index.d.ts",
+        "dist/alibaba/sse.d.ts",
+        "dist/alibaba/types.d.ts"
+      ],
       "anthropic": [
         "dist/anthropic/base.d.ts",
         "dist/anthropic/index.d.ts",
@@ -56,6 +61,11 @@
       ],
       "meta": [
         "dist/meta/index.d.ts"
+      ],
+      "minimax": [
+        "dist/minimax/index.d.ts",
+        "dist/minimax/sse.d.ts",
+        "dist/minimax/types.d.ts"
       ],
       "mistral": [
         "dist/mistral/index.d.ts",

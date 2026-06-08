@@ -53,7 +53,7 @@ import { MessageSquare } from "@/icons/message-square";
 import { MessageSquareText } from "@/icons/message-square-text";
 import { MetaIcon } from "@/icons/meta";
 import { Mic } from "@/icons/mic";
-import {MinimaxIcon} from "@/icons/minimax";
+import { MinimaxIcon } from "@/icons/minimax";
 import { MistralIcon } from "@/icons/mistral";
 import { Moon } from "@/icons/moon";
 import { OpenAiIcon } from "@/icons/openai";
@@ -69,6 +69,7 @@ import { Play } from "@/icons/play";
 import { Plus } from "@/icons/plus";
 import { QuestionMark } from "@/icons/question-mark";
 import { QuoteIcon } from "@/icons/quote";
+import { QwenIcon } from "@/icons/qwen";
 import { ReadAloud } from "@/icons/read-aloud";
 import { RetryIcon } from "@/icons/retry";
 import { Save } from "@/icons/save";
@@ -166,6 +167,7 @@ const IconComponents = {
   Plus,
   QuestionMark,
   QuoteIcon,
+  QwenIcon,
   ReadAloud,
   RetryIcon,
   Save,
@@ -297,6 +299,7 @@ export {
   Plus,
   QuestionMark,
   QuoteIcon,
+  QwenIcon,
   ReadAloud,
   RetryIcon,
   Save,

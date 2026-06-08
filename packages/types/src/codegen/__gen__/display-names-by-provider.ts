@@ -80,7 +80,8 @@ export const displayNameModelsByProvider = {
     "Grok Build 0.1",
     "Grok Imagine Image",
     "Grok Imagine Image Quality",
-    "Grok Imagine Video"
+    "Grok Imagine Video",
+    "Grok Imagine Video 1.5 Preview"
   ],
   anthropic: [
     "Claude Opus 4.8",
@@ -113,5 +114,13 @@ export const displayNameModelsByProvider = {
   cohere: ["Command A Plus", "Command A Reasoning", "Command A"],
   moonshotai: ["Kimi K2.6", "Kimi K2.5", "Kimi K2 Thinking"],
   deepseek: ["DeepSeek V4 Pro", "DeepSeek V4 Flash", "DeepSeek R1"],
-  zai: ["GLM 5.1", "GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"]
+  zai: ["GLM 5.1", "GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"],
+  alibaba: [
+    "Qwen3.7-Max",
+    "Qwen3.7-Plus",
+    "Qwen3.6-Plus",
+    "Qwen3.5-Plus",
+    "Qwen3.5-Flash"
+  ],
+  minimax: ["MiniMax-M3", "MiniMax-M2.7", "MiniMax-M2.5", "MiniMax-M2.1"]
 } as const;

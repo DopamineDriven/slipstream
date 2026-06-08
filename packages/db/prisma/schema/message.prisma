@@ -23,9 +23,12 @@ model Message {
   provider                  Provider
   model                     String?
   userKeyId                 String?
+  /// deprecated, use messageBlocks instead
   content                   String
   conversationMemoryChunkId String?
+  /// deprecated, use messageBlocks instead
   thinkingText              String?
+  /// deprecated, use messageBlocks instead
   thinkingDuration          Int?
   responseOutput            String? // JSON serialized response output
   isImageGen                Boolean                  @default(false)

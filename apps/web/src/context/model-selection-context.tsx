@@ -32,7 +32,9 @@ interface ModelSelectionContextType {
     "cohere",
     "deepseek",
     "moonshotai",
-    "zai"
+    "zai",
+    "alibaba",
+    "minimax"
   ];
   setSelectedModel: (m: ModelSelection) => void;
   updateProvider: (p: Provider) => void;

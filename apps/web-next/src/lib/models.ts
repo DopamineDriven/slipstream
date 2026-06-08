@@ -1,4 +1,6 @@
 import type {
+  AlibabaDisplayNameUnion,
+  AlibabaModelIdUnion,
   AllModelsUnion,
   AnthropicDisplayNameUnion,
   AnthropicModelIdUnion,
@@ -15,6 +17,8 @@ import type {
   KimiModelIdUnion,
   MetaDisplayNameUnion,
   MetaModelIdUnion,
+  MiniMaxDisplayNameUnion,
+  MiniMaxModelIdUnion,
   MistralDisplayNameUnion,
   MistralModelIdUnion,
   OpenAiDisplayNameUnion,
@@ -39,8 +43,10 @@ import {
   GeminiIcon,
   Kimi,
   MetaIcon,
+  MinimaxIcon,
   MistralIcon,
   OpenAiIcon,
+  QwenIcon,
   VercelIcon as v0Icon,
   XAiIcon,
   Zai
@@ -112,6 +118,18 @@ export const providerMetadata = {
     icon: Zai,
     color: "#3B5CFF",
     description: "Open-Source GLM Models for Coding and Agents"
+  },
+  alibaba: {
+    name: "Alibaba",
+    icon: QwenIcon,
+    color: "#615CED",
+    description: "Alibaba's Qwen foundation models"
+  },
+  minimax: {
+    name: "MiniMax",
+    icon: MinimaxIcon,
+    color: "#B4393C",
+    description: "MiniMax's multimodal and agentic AI models"
   }
 } as const;
 
@@ -147,7 +165,21 @@ export type DisplayNameWorkup<T extends Provider> = T extends "openai"
                       ? ReturnType<
                           typeof getDisplayNameByModelId<T, ZaiModelIdUnion>
                         >
-                      : never;
+                      : T extends "minimax"
+                        ? ReturnType<
+                            typeof getDisplayNameByModelId<
+                              T,
+                              MiniMaxModelIdUnion
+                            >
+                          >
+                        : T extends "alibaba"
+                          ? ReturnType<
+                              typeof getDisplayNameByModelId<
+                                T,
+                                AlibabaModelIdUnion
+                              >
+                            >
+                          : never;
 
 export type ModelIdWorkup<T extends Provider> = T extends "openai"
   ? ReturnType<typeof getModelIdByDisplayName<T, OpenAiDisplayNameUnion>>
@@ -186,7 +218,21 @@ export type ModelIdWorkup<T extends Provider> = T extends "openai"
                       ? ReturnType<
                           typeof getModelIdByDisplayName<T, ZaiDisplayNameUnion>
                         >
-                      : never;
+                      : T extends "minimax"
+                        ? ReturnType<
+                            typeof getModelIdByDisplayName<
+                              T,
+                              MiniMaxDisplayNameUnion
+                            >
+                          >
+                        : T extends "alibaba"
+                          ? ReturnType<
+                              typeof getModelIdByDisplayName<
+                                T,
+                                AlibabaDisplayNameUnion
+                              >
+                            >
+                          : never;
 /**
  * use this in client components where the select options are
  * the display names (the keys of the object) which, on select, outputs the
@@ -263,10 +309,20 @@ export const defaultModelSelection: ModelSelection = {
                             (defaultProvider = "zai"),
                             defaultModelByProvider[defaultProvider]
                           )
-                        : getModelIdByDisplayName(
-                            (defaultProvider = "openai"),
-                            defaultModelByProvider[defaultProvider]
-                          )
+                        : defaultProvider === "minimax"
+                          ? getModelIdByDisplayName(
+                              (defaultProvider = "minimax"),
+                              defaultModelByProvider[defaultProvider]
+                            )
+                          : defaultProvider === "alibaba"
+                            ? getModelIdByDisplayName(
+                                (defaultProvider = "alibaba"),
+                                defaultModelByProvider[defaultProvider]
+                              )
+                            : getModelIdByDisplayName(
+                                (defaultProvider = "openai"),
+                                defaultModelByProvider[defaultProvider]
+                              )
 };
 export function getModelDisplayName(
   toProvider: Provider,
@@ -310,15 +366,25 @@ export function getModelDisplayName(
                           toProvider,
                           model as KimiModelIdUnion
                         )
-                      : toProvider === "openai"
+                      : toProvider === "alibaba"
                         ? getDisplayNameByModelId(
                             toProvider,
-                            model as OpenAiModelIdUnion
+                            model as AlibabaModelIdUnion
                           )
-                        : getDisplayNameByModelId(
-                            "openai",
-                            model as OpenAiModelIdUnion
-                          );
+                        : toProvider === "minimax"
+                          ? getDisplayNameByModelId(
+                              toProvider,
+                              model as MiniMaxModelIdUnion
+                            )
+                          : toProvider === "openai"
+                            ? getDisplayNameByModelId(
+                                toProvider,
+                                model as OpenAiModelIdUnion
+                              )
+                            : getDisplayNameByModelId(
+                                "openai",
+                                model as OpenAiModelIdUnion
+                              );
 }
 export function isGeminiDisplayName(n: string) {
   return (
@@ -347,10 +413,6 @@ export function isGeminiDisplayName(n: string) {
   );
 }
 
-export function isCohereDisplayName(n: string) {
-  return n === "Command A" || n === "Command A Reasoning";
-}
-
 export const getModel = <
   const V extends Provider,
   const K extends GetModelUtilRT<V>
@@ -376,7 +438,7 @@ export const getModel = <
         providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"grok">)
       ) {
         return model;
-      } else return "grok-4.20-0309-reasoning" as const as NonNullable<K>;
+      } else return "grok-4.3" as const as NonNullable<K>;
     }
     case "anthropic": {
       if (
@@ -414,7 +476,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "mistral-small-latest" as const as NonNullable<K>;
+      } else return "mistral-medium-3.5" as const as NonNullable<K>;
     }
     case "cohere": {
       if (
@@ -424,7 +486,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "command-a-reasoning-08-2025" as const as NonNullable<K>;
+      } else return "command-a-plus-05-2026" as const as NonNullable<K>;
     }
     case "deepseek": {
       if (
@@ -434,7 +496,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "deepseek-r1" as const as NonNullable<K>;
+      } else return "deepseek-v4-pro" as const as NonNullable<K>;
     }
     case "moonshotai": {
       if (
@@ -444,7 +506,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "kimi-k2.5" as const as NonNullable<K>;
+      } else return "kimi-k2.6" as const as NonNullable<K>;
     }
     case "zai": {
       if (
@@ -452,7 +514,27 @@ export const getModel = <
         providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"zai">)
       ) {
         return model;
-      } else return "glm-5" as const as NonNullable<K>;
+      } else return "glm-5.1" as const as NonNullable<K>;
+    }
+    case "alibaba": {
+      if (
+        model &&
+        providerModelChatApi[xTarget].includes(
+          model as GetModelUtilRT<"alibaba">
+        )
+      ) {
+        return model;
+      } else return "qwen3.7-max" as const as NonNullable<K>;
+    }
+    case "minimax": {
+      if (
+        model &&
+        providerModelChatApi[xTarget].includes(
+          model as GetModelUtilRT<"minimax">
+        )
+      ) {
+        return model;
+      } else return "minimax-m3" as const as NonNullable<K>;
     }
     case "openai":
     default: {
@@ -463,7 +545,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "gpt-5.4" as const as NonNullable<K>;
+      } else return "gpt-5.5" as const as NonNullable<K>;
     }
   }
 };

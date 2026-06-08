@@ -271,6 +271,7 @@ export type ProviderDocState = (typeof ProviderDocState)[keyof typeof ProviderDo
 
 
 export const Provider = {
+  ALIBABA: 'ALIBABA',
   OPENAI: 'OPENAI',
   GROK: 'GROK',
   GEMINI: 'GEMINI',
@@ -279,6 +280,7 @@ export const Provider = {
   VERCEL: 'VERCEL',
   MISTRAL: 'MISTRAL',
   COHERE: 'COHERE',
+  MINIMAX: 'MINIMAX',
   MOONSHOTAI: 'MOONSHOTAI',
   DEEPSEEK: 'DEEPSEEK',
   ZAI: 'ZAI'

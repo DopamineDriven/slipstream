@@ -205,7 +205,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "grok-4.20-0309-reasoning" as const as NonNullable<K>;
+        } else return "grok-4.3" as const as NonNullable<K>;
       }
       case "anthropic": {
         if (
@@ -245,7 +245,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "mistral-small-latest" as const as NonNullable<K>;
+        } else return "mistral-medium-3.5" as const as NonNullable<K>;
       }
       case "cohere": {
         if (
@@ -255,7 +255,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "command-a-reasoning-08-2025" as const as NonNullable<K>;
+        } else return "command-a-plus-05-2026" as const as NonNullable<K>;
       }
       case "deepseek": {
         if (
@@ -265,7 +265,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "deepseek-r1" as const as NonNullable<K>;
+        } else return "deepseek-v4-pro" as const as NonNullable<K>;
       }
       case "moonshotai": {
         if (
@@ -275,7 +275,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "kimi-k2.5" as const as NonNullable<K>;
+        } else return "kimi-k2.6" as const as NonNullable<K>;
       }
       case "zai": {
         if (
@@ -283,7 +283,27 @@ export class ModelService extends ProviderValidation {
           providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"zai">)
         ) {
           return model;
-        } else return "glm-5" as const as NonNullable<K>;
+        } else return "glm-5.1" as const as NonNullable<K>;
+      }
+      case "alibaba": {
+        if (
+          model &&
+          providerModelChatApi[xTarget].includes(
+            model as GetModelUtilRT<"alibaba">
+          )
+        ) {
+          return model;
+        } else return "qwen3.7-max" as const as NonNullable<K>;
+      }
+      case "minimax": {
+        if (
+          model &&
+          providerModelChatApi[xTarget].includes(
+            model as GetModelUtilRT<"minimax">
+          )
+        ) {
+          return model;
+        } else return "minimax-m3" as const as NonNullable<K>;
       }
       case "openai":
       default: {
@@ -294,7 +314,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "gpt-5.4" as const as NonNullable<K>;
+        } else return "gpt-5.5" as const as NonNullable<K>;
       }
     }
   };

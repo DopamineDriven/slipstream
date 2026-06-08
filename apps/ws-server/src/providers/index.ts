@@ -5,6 +5,7 @@ import type {
   ServiceFromProvider
 } from "@/mixins/index.ts";
 import {
+  AlibabaMixin,
   AnthropicMixin,
   CohereMixin,
   DeepSeekMixin,
@@ -12,6 +13,7 @@ import {
   GrokMixin,
   KimiMixin,
   MetaMixin,
+  MiniMaxMixin,
   MistralMixin,
   OpenAIMixin,
   ProviderBaseMixin,
@@ -84,23 +86,29 @@ class ProviderServiceBase {
     "vercel",
     "deepseek",
     "moonshotai",
-    "zai"
+    "zai",
+    "alibaba",
+    "minimax"
   ] as const satisfies Provider[];
 
   constructor(protected opts?: ProviderOpts) {}
 }
 
 export class ProviderService extends KimiMixin(
-  ZaiMixin(
-    DeepSeekMixin(
-      MistralMixin(
-        CohereMixin(
-          VercelMixin(
-            MetaMixin(
-              OpenAIMixin(
-                GeminiMixin(
-                  GrokMixin(
-                    AnthropicMixin(ProviderBaseMixin(ProviderServiceBase))
+  MiniMaxMixin(
+    AlibabaMixin(
+      ZaiMixin(
+        DeepSeekMixin(
+          MistralMixin(
+            CohereMixin(
+              VercelMixin(
+                MetaMixin(
+                  OpenAIMixin(
+                    GeminiMixin(
+                      GrokMixin(
+                        AnthropicMixin(ProviderBaseMixin(ProviderServiceBase))
+                      )
+                    )
                   )
                 )
               )
@@ -263,6 +271,56 @@ export class ProviderService extends KimiMixin(
           hasProviderApiKeySet: false,
           initialized: true,
           provider: "moonshotai",
+          initTime: performance.now(),
+          lastAccessed: performance.now()
+        }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return direct;
+      }
+      case "alibaba": {
+        const storeCheck = this.#store.get("alibaba") as
+          | ProviderEntry<"alibaba">
+          | undefined;
+        if (
+          typeof storeCheck?.instance !== "undefined" &&
+          storeCheck.available
+        ) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          return storeCheck.instance;
+        }
+        const direct = this.alibaba;
+        this.#store.set("alibaba", {
+          instance: direct,
+          available: true,
+          hasProviderApiKeySet: false,
+          initialized: true,
+          provider: "alibaba",
+          initTime: performance.now(),
+          lastAccessed: performance.now()
+        }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return direct;
+      }
+      case "minimax": {
+        const storeCheck = this.#store.get("minimax") as
+          | ProviderEntry<"minimax">
+          | undefined;
+        if (
+          typeof storeCheck?.instance !== "undefined" &&
+          storeCheck.available
+        ) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          return storeCheck.instance;
+        }
+        const direct = this.minimax;
+        this.#store.set("minimax", {
+          instance: direct,
+          available: true,
+          hasProviderApiKeySet: false,
+          initialized: true,
+          provider: "minimax",
           initTime: performance.now(),
           lastAccessed: performance.now()
         }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment

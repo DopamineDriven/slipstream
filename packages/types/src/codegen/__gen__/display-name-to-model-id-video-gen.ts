@@ -11,6 +11,7 @@ export const displayNameToModelIdVideoGen = {
     "Veo 2": "veo-2.0-generate-001"
   },
   grok: {
+    "Grok Imagine Video 1.5 Preview": "grok-imagine-video-1.5-preview",
     "Grok Imagine Video": "grok-imagine-video"
   }
 } as const;

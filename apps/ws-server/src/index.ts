@@ -195,6 +195,7 @@ async function exe() {
     );
 
     const { CohereService } = await import("@/cohere/index.ts");
+
     const cohere = new CohereService(
       logger,
       prisma,
@@ -204,6 +205,7 @@ async function exe() {
     );
 
     const { KimiService } = await import("@/kimi/index.ts");
+
     const moonshotai = new KimiService(
       logger,
       prisma,
@@ -213,6 +215,7 @@ async function exe() {
     );
 
     const { DeepSeekService } = await import("@/deepseek/index.ts");
+
     const deepseek = new DeepSeekService(
       logger,
       prisma,
@@ -222,6 +225,7 @@ async function exe() {
     );
 
     const { ZaiService } = await import("@/zai/index.ts");
+
     const zai = new ZaiService(
       logger,
       prisma,
@@ -229,6 +233,27 @@ async function exe() {
       userStore,
       cfg.AI_GATEWAY_API_KEY
     );
+
+    const { AlibabaService } = await import("@/alibaba/index.ts");
+
+    const alibaba = new AlibabaService(
+      logger,
+      prisma,
+      redisInstance,
+      userStore,
+      cfg.AI_GATEWAY_API_KEY
+    );
+
+    const { MiniMaxService } = await import("@/minimax/index.ts");
+
+    const minimax = new MiniMaxService(
+      logger,
+      prisma,
+      redisInstance,
+      userStore,
+      cfg.AI_GATEWAY_API_KEY
+    );
+
     const { ProviderService } = await import("@/providers/index.ts");
 
     const providers = new ProviderService({
@@ -245,7 +270,9 @@ async function exe() {
         cohere: cfg.COHERE_API_KEY,
         deepseek: cfg.AI_GATEWAY_API_KEY,
         moonshotai: cfg.AI_GATEWAY_API_KEY,
-        zai: cfg.AI_GATEWAY_API_KEY
+        zai: cfg.AI_GATEWAY_API_KEY,
+        alibaba: cfg.AI_GATEWAY_API_KEY,
+        minimax: cfg.AI_GATEWAY_API_KEY
       },
       dependencies: {
         logger,
@@ -265,7 +292,9 @@ async function exe() {
       cohere,
       deepseek,
       moonshotai,
-      zai
+      zai,
+      alibaba,
+      minimax
     });
 
     const { TTSService } = await import("@/tts/index.ts");
