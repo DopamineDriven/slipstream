@@ -37,7 +37,9 @@ export class PrismaUserKeyService extends ErrorHelperService {
         meta: 0,
         deepseek: 0,
         moonshotai: 0,
-        zai: 0
+        zai: 0,
+        alibaba: 0,
+        minimax: 0
       },
       isDefault: {
         vercel: 0,
@@ -50,7 +52,9 @@ export class PrismaUserKeyService extends ErrorHelperService {
         anthropic: 0,
         deepseek: 0,
         moonshotai: 0,
-        zai: 0
+        zai: 0,
+        alibaba: 0,
+        minimax: 0
       }
     };
     props.forEach(function (res) {
