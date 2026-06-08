@@ -31,7 +31,7 @@
           "dist/codegen-types.d.ts"
         ],
         "codegen": [
-          "dist/codegen/*.d.ts"
+          "dist/codegen/__gen__/*.d.ts"
         ]
       }
     }
@@ -65,7 +65,7 @@
         "dist/codegen-types.d.ts"
       ],
       "codegen": [
-        "dist/codegen/*.d.ts"
+        "dist/codegen/__gen__/*.d.ts"
       ]
     }
   },
@@ -86,7 +86,7 @@
     "./events-workup": "./dist/events-workup.js",
     "./events": "./dist/events.js",
     "./codegen-types": "./dist/codegen-types.js",
-    "./codegen/*": "./dist/codegen/*.js"
+    "./codegen/*": "./dist/codegen/__gen__/*.js"
   },
   "scripts": {
     "build": "tsdown",
