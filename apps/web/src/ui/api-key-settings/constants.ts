@@ -6,8 +6,10 @@ import {
   GeminiIcon,
   Kimi,
   MetaIcon,
+  MinimaxIcon,
   MistralIcon,
   OpenAiIcon,
+  QwenIcon,
   VercelIcon as v0Icon,
   XAiIcon,
   Zai
@@ -98,6 +100,22 @@ export const providerObj = [
     provider: "zai",
     text: "Z.ai",
     icon: Zai,
+    value: "vck_********************************",
+    isSet: false,
+    isDefault: false
+  },
+  {
+    provider: "alibaba",
+    text: "Alibaba",
+    icon: QwenIcon,
+    value: "vck_********************************",
+    isSet: false,
+    isDefault: false
+  },
+  {
+    provider: "minimax",
+    text: "MiniMax",
+    icon: MinimaxIcon,
     value: "vck_********************************",
     isSet: false,
     isDefault: false

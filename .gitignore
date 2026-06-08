@@ -56,3 +56,4 @@ infra/*.txt
 infra/*.md
 \.codex
 docs/*
+infra/dkim.sh

@@ -2139,9 +2139,18 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     provider: $Enums.Provider
     model: string | null
     userKeyId: string | null
+    /**
+     * deprecated, use messageBlocks instead
+     */
     content: string
     conversationMemoryChunkId: string | null
+    /**
+     * deprecated, use messageBlocks instead
+     */
     thinkingText: string | null
+    /**
+     * deprecated, use messageBlocks instead
+     */
     thinkingDuration: number | null
     responseOutput: string | null
     isImageGen: boolean

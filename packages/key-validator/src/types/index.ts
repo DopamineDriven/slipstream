@@ -14,6 +14,8 @@ export type FlexiProvider =
   | "vercel"
   | "mistral"
   | "cohere"
+  | "minimax"
+  | "alibaba"
   | "OPENAI"
   | "ANTHROPIC"
   | "GEMINI"
@@ -24,7 +26,9 @@ export type FlexiProvider =
   | "COHERE"
   | "MOONSHOTAI"
   | "DEEPSEEK"
-  | "ZAI";
+  | "ZAI"
+  | "MINIMAX"
+  | "ALIBABA";
 
 /**
  * helper workup for use in XOR type below

@@ -240,6 +240,9 @@ export type MetaChatModels = ModelMap["meta"];
 
 export type MistralChatModels = ModelMap["mistral"];
 
+export type AlibabaChatModels = ModelMap["alibaba"];
+export type MiniMaxChatModels = ModelMap["minimax"];
+
 export type AllModelsUnion = ModelMap[Provider];
 
 export type AllDisplayNamesUnion = DisplayNameModelMap[Provider];
@@ -266,7 +269,11 @@ export type GetModelUtilRT<T = Provider> = T extends "openai"
                     ? KimiChatModels
                     : T extends "zai"
                       ? ZaiChatModels
-                      : never;
+                      : T extends "alibaba"
+                        ? AlibabaChatModels
+                        : T extends "minimax"
+                          ? MiniMaxChatModels
+                          : never;
 
 export function toPrismaFormat<const T extends Providers>(provider: T) {
   return provider.toUpperCase() as Uppercase<T> satisfies $Enums.Provider;
@@ -360,6 +367,22 @@ export const getModelIdByDisplayName = <
       if (model && model in displayNameToModelId[xTarget]) {
         return displayNameToModelId[xTarget][
           model as ModelDisplayNameToModelId<"zai">
+        ] as (typeof displayNameToModelId)[V][K];
+      } else
+        return defaultModelIdByProvider.zai as (typeof displayNameToModelId)[V][K];
+    }
+    case "alibaba": {
+      if (model && model in displayNameToModelId[xTarget]) {
+        return displayNameToModelId[xTarget][
+          model as ModelDisplayNameToModelId<"alibaba">
+        ] as (typeof displayNameToModelId)[V][K];
+      } else
+        return defaultModelIdByProvider.zai as (typeof displayNameToModelId)[V][K];
+    }
+    case "minimax": {
+      if (model && model in displayNameToModelId[xTarget]) {
+        return displayNameToModelId[xTarget][
+          model as ModelDisplayNameToModelId<"minimax">
         ] as (typeof displayNameToModelId)[V][K];
       } else
         return defaultModelIdByProvider.zai as (typeof displayNameToModelId)[V][K];
@@ -467,6 +490,22 @@ export const getDisplayNameByModelId = <
       } else
         return defaultModelDisplayNameByProvider.zai as (typeof modelIdToDisplayName)[V][K];
     }
+    case "alibaba": {
+      if (model && model in modelIdToDisplayName[xTarget]) {
+        return modelIdToDisplayName[xTarget][
+          model as ModelIdToModelDisplayName<"alibaba">
+        ] as (typeof modelIdToDisplayName)[V][K];
+      } else
+        return defaultModelDisplayNameByProvider.zai as (typeof modelIdToDisplayName)[V][K];
+    }
+    case "minimax": {
+      if (model && model in modelIdToDisplayName[xTarget]) {
+        return modelIdToDisplayName[xTarget][
+          model as ModelIdToModelDisplayName<"minimax">
+        ] as (typeof modelIdToDisplayName)[V][K];
+      } else
+        return defaultModelDisplayNameByProvider.zai as (typeof modelIdToDisplayName)[V][K];
+    }
     case "openai":
     default: {
       if (model && model in modelIdToDisplayName[xTarget]) {
@@ -480,17 +519,19 @@ export const getDisplayNameByModelId = <
 };
 
 export const defaultModelDisplayNameByProvider = {
-  openai: "GPT-5.4 nano",
-  gemini: "Gemini 3.1 Flash Lite Preview",
-  grok: "Grok 4.20 Reasoning",
-  anthropic: "Claude Sonnet 4.6",
+  openai: "GPT-5.5",
+  gemini: "Gemini 3.1 Pro Preview",
+  grok: "Grok 4.3",
+  anthropic: "Claude Opus 4.6",
   meta: "Llama 3.3 (70B, Instruct)",
   vercel: "v0 medium",
-  mistral: "Mistral Small 4",
-  cohere: "Command A Reasoning",
-  deepseek: "DeepSeek R1",
+  mistral: "Mistral Medium 3.5",
+  cohere: "Command A Plus",
+  deepseek: "DeepSeek V4 Pro",
   moonshotai: "Kimi K2.6",
-  zai: "GLM 5"
+  zai: "GLM 5.1",
+  alibaba: "Qwen3.7-Max",
+  minimax: "MiniMax-M3"
 } as const satisfies Record<
   Provider,
   | OpenAiDisplayNameUnion
@@ -504,35 +545,25 @@ export const defaultModelDisplayNameByProvider = {
   | DeepSeekDisplayNameUnion
   | KimiDisplayNameUnion
   | ZaiDisplayNameUnion
+  | AlibabaDisplayNameUnion
+  | MiniMaxDisplayNameUnion
 >;
 
 export const defaultModelIdByProvider = {
-  openai: "gpt-5.4-nano",
-  gemini: "gemini-3.1-flash-lite-preview",
-  grok: "grok-4.20-0309-reasoning",
-  anthropic: "claude-sonnet-4-6",
-  meta: "Llama-3.3-70B-Instruct",
-  vercel: "v0-1.5-md",
-  mistral: "mistral-small-latest",
-  cohere: "command-a-reasoning-08-2025",
-  deepseek: "deepseek-r1",
-  moonshotai: "kimi-k2.6",
-  zai: "glm-5"
-} as const satisfies Record<
-  Providers,
-  | OpenAiModelIdUnion
-  | GeminiModelIdUnion
-  | GrokModelIdUnion
-  | AnthropicModelIdUnion
-  | MetaModelIdUnion
-  | VercelModelIdUnion
-  | MistralModelIdUnion
-  | CohereModelIdUnion
-  | DeepSeekModelIdUnion
-  | KimiModelIdUnion
-  | ZaiModelIdUnion
->;
-
+  openai: "gpt-5.5" satisfies OpenAiModelIdUnion,
+  gemini: "gemini-3.1-pro-preview" satisfies GeminiModelIdUnion,
+  grok: "grok-4.3" satisfies GrokModelIdUnion,
+  anthropic: "claude-opus-4-6" satisfies AnthropicModelIdUnion,
+  meta: "Llama-3.3-70B-Instruct" satisfies MetaModelIdUnion,
+  vercel: "v0-1.5-md" satisfies VercelModelIdUnion,
+  mistral: "mistral-medium-3.5" satisfies MistralModelIdUnion,
+  cohere: "command-a-plus-05-2026" satisfies CohereModelIdUnion,
+  deepseek: "deepseek-v4-pro" satisfies DeepSeekModelIdUnion,
+  moonshotai: "kimi-k2.6" satisfies KimiModelIdUnion,
+  zai: "glm-5.1" satisfies ZaiModelIdUnion,
+  alibaba: "qwen3.7-max" satisfies AlibabaModelIdUnion,
+  minimax: "minimax-m3" satisfies MiniMaxModelIdUnion
+} as const;
 export type ModelDisplayNameToModelId<T extends Provider> =
   keyof (typeof displayNameToModelId)[T];
 
@@ -584,6 +615,15 @@ export type GeminiDisplayNameUnionImgGen =
  */
 export type GrokDisplayNameUnionImgGen =
   ModelDisplayNameToModelIdImgGen<"grok">;
+
+/**
+ * valid alibaba model display names
+ */
+export type AlibabaDisplayNameUnion = ModelDisplayNameToModelId<"alibaba">;
+/**
+ * valid minimax model display names
+ */
+export type MiniMaxDisplayNameUnion = ModelDisplayNameToModelId<"minimax">;
 /**
  * valid deepseek model display names
  */
@@ -659,6 +699,14 @@ export type GeminiModelIdUnionVideoGen =
  */
 export type GrokModelIdUnionVideoGen =
   ModelIdToModelDisplayNameVideoGen<"grok">;
+/**
+ * valid alibaba models to call
+ */
+export type AlibabaModelIdUnion = ModelIdToModelDisplayName<"alibaba">;
+/**
+ * valid minimax models to call
+ */
+export type MiniMaxModelIdUnion = ModelIdToModelDisplayName<"minimax">;
 /**
  * valid deepseek models to call
  */
@@ -743,7 +791,11 @@ export type GetModelsForProviderRTImgGen<T extends Provider> =
                       ? undefined
                       : T extends "zai"
                         ? undefined
-                        : never;
+                        : T extends "alibaba"
+                          ? undefined
+                          : T extends "minimax"
+                            ? undefined
+                            : never;
 
 export type GetModelsForProviderRTVideoGen<T extends Provider> =
   T extends "gemini"
@@ -768,7 +820,11 @@ export type GetModelsForProviderRTVideoGen<T extends Provider> =
                       ? undefined
                       : T extends "zai"
                         ? undefined
-                        : never;
+                        : T extends "alibaba"
+                          ? undefined
+                          : T extends "minimax"
+                            ? undefined
+                            : never;
 
 export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
   T extends "gemini"
@@ -793,7 +849,11 @@ export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
                       ? undefined
                       : T extends "zai"
                         ? undefined
-                        : never;
+                        : T extends "alibaba"
+                          ? undefined
+                          : T extends "minimax"
+                            ? undefined
+                            : never;
 
 export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
   ? AnthropicModelIdUnion
@@ -817,7 +877,11 @@ export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
                     ? KimiModelIdUnion
                     : T extends "zai"
                       ? ZaiModelIdUnion
-                      : never;
+                      : T extends "alibaba"
+                        ? AlibabaModelIdUnion
+                        : T extends "minimax"
+                          ? MiniMaxModelIdUnion
+                          : never;
 
 export type GetDisplayNamesForProviderRTVideoGen<T extends Provider> =
   T extends "gemini"
@@ -842,7 +906,11 @@ export type GetDisplayNamesForProviderRTVideoGen<T extends Provider> =
                       ? undefined
                       : T extends "zai"
                         ? undefined
-                        : never;
+                        : T extends "alibaba"
+                          ? undefined
+                          : T extends "minimax"
+                            ? undefined
+                            : never;
 
 export type GetDisplayNamesForProviderRT<T extends Provider> =
   T extends "anthropic"
@@ -867,7 +935,11 @@ export type GetDisplayNamesForProviderRT<T extends Provider> =
                       ? KimiDisplayNameUnion
                       : T extends "zai"
                         ? ZaiDisplayNameUnion
-                        : never;
+                        : T extends "alibaba"
+                          ? AlibabaDisplayNameUnion
+                          : T extends "minimax"
+                            ? MiniMaxDisplayNameUnion
+                            : never;
 
 export function getModelsForProvider<const T extends Provider>(provider: T) {
   return Object.entries(displayNameToModelId[provider])
@@ -951,7 +1023,9 @@ export function allProviders() {
     "cohere",
     "deepseek",
     "moonshotai",
-    "zai"
+    "zai",
+    "alibaba",
+    "minimax"
   ] as const satisfies readonly Providers[];
 }
 export function allImgGenProviders() {
@@ -987,7 +1061,9 @@ export const imgMimeSupportByProvider = {
   cohere: ["image/jpeg", "image/png", "image/webp"],
   moonshotai: ["image/jpeg", "image/png", "image/webp"],
   deepseek: ["image/jpeg", "image/png", "image/webp"],
-  zai: ["image/jpeg", "image/png", "image/webp"]
+  zai: ["image/jpeg", "image/png", "image/webp"],
+  alibaba: ["image/jpeg", "image/png", "image/webp"],
+  minimax: ["image/jpeg", "image/png", "image/webp"]
 } as const;
 
 // direct input -- I have a document conversion pipeline set up
@@ -1003,6 +1079,8 @@ export const docMimeSupportByProvider = {
   moonshotai: ["application/pdf"],
   deepseek: ["application/pdf"],
   zai: ["application/pdf"],
+  alibaba: ["application/pdf"],
+  minimax: ["application/pdf"],
   /**
    * https://ai.google.dev/gemini-api/docs/document-processing#technical-details
    */
@@ -1020,6 +1098,8 @@ export const audioMimeSupportByProvider = {
   moonshotai: [],
   deepseek: [],
   zai: [],
+  alibaba: [],
+  minimax: [],
   /**
    * https://ai.google.dev/gemini-api/docs/audio#supported-formats
    */
@@ -1058,5 +1138,7 @@ export const videoMimeSupportByProvider = {
   moonshotai: ["video/mpeg", "video/mp4"],
   deepseek: [],
   zai: [],
-  anthropic: []
+  anthropic: [],
+  alibaba: [],
+  minimax: []
 } as const;

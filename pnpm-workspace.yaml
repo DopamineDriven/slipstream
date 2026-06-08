@@ -15,7 +15,7 @@ dangerouslyAllowAllBuilds: true
 
 catalogs:
   anthropic:
-    "@anthropic-ai/sdk": ^0.101.0
+    "@anthropic-ai/sdk": ^0.102.0
   auth:
     better-auth: ^1.6.11
   aws:
@@ -217,7 +217,7 @@ catalogs:
   tseslint:
     typescript-eslint: ^8.60.1
   tsgo:
-    "@typescript/native-preview": ^7.0.0-dev.20260604.1
+    "@typescript/native-preview": ^7.0.0-dev.20260607.1
   tslib:
     tslib: ^2.8.1
   tsup:
@@ -292,4 +292,4 @@ allowBuilds:
   unrs-resolver: true
 
 patchedDependencies:
-  '@anthropic-ai/sdk@0.101.0': patches/@anthropic-ai__sdk@0.101.0.patch
+  '@anthropic-ai/sdk@0.102.0': patches/@anthropic-ai__sdk@0.101.0.patch

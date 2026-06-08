@@ -45,7 +45,9 @@ function equalityCheck(
     "grok",
     "deepseek",
     "moonshotai",
-    "zai"
+    "zai",
+    "alibaba",
+    "minimax"
   ] as const satisfies Lowercase<$Enums.Provider>[];
 
   for (const provider of p) {

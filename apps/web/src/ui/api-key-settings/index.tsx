@@ -13,10 +13,7 @@ import {
 } from "@/ui/api-key-settings/constants";
 import { MultiStateApiKeySubmissionBadge } from "@/ui/atoms/multi-state-submission-badge";
 import { AnimatePresence, motion } from "motion/react";
-import type {
-  ClientContextWorkupProps,
-  Provider
-} from "@slipstream/types";
+import type { ClientContextWorkupProps, Provider } from "@slipstream/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,6 +64,10 @@ const getPlaceholder = (provider: Provider) => {
       return "vck_********************************";
     case "zai":
       return "vck_********************************";
+    case "alibaba":
+      return "vck_********************************";
+    case "minimax":
+      return "vck_********************************";
     case "openai":
     default:
       return "sk-************************************************";
@@ -85,7 +86,9 @@ const toProviderContext = (providerObj: ApiKeyData[]) => {
       anthropic: false,
       deepseek: false,
       moonshotai: false,
-      zai: false
+      zai: false,
+      alibaba: false,
+      minimax: false
     },
     isSet: {
       gemini: false,
@@ -98,7 +101,9 @@ const toProviderContext = (providerObj: ApiKeyData[]) => {
       anthropic: false,
       deepseek: false,
       moonshotai: false,
-      zai: false
+      zai: false,
+      alibaba: false,
+      minimax: false
     }
   };
   providerObj.forEach(function (o) {
@@ -127,7 +132,9 @@ function equalityCheck(
     "grok",
     "deepseek",
     "moonshotai",
-    "zai"
+    "zai",
+    "alibaba",
+    "minimax"
   ] as const;
 
   for (const provider of p) {

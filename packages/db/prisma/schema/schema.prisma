@@ -14,6 +14,7 @@ generator client {
 }
 
 enum Provider {
+  ALIBABA
   OPENAI
   GROK
   GEMINI
@@ -22,6 +23,7 @@ enum Provider {
   VERCEL
   MISTRAL
   COHERE
+  MINIMAX
   MOONSHOTAI
   DEEPSEEK
   ZAI

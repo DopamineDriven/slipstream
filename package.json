@@ -33,7 +33,7 @@
     "gen:web": "pnpm --filter=@slipstream/web typegen",
     "gen:web-next": "pnpm --filter=@slipstream/web-next typegen",
     "postclean:house": "pnpm gen:web && pnpm gen:web-next",
-    "fetch:models": "pnpm --filter=@slipstream/key-validator fetch",
+    "get:models": "pnpm --filter=@slipstream/key-validator gen",
     "gen:models": "pnpm --filter=@slipstream/types gen",
     "list:packages": "bash ./manage.sh list",
     "generate:base64": "openssl rand -base64 64",

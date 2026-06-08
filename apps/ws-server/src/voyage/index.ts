@@ -68,7 +68,7 @@ export class VoyageEmbeddingService {
   public async embedChunksContextual<const T extends Voyage.InputType>({
     inputs,
     input_type,
-    model = "voyage-context-3",
+    model = "voyage-context-4",
     encoding_format = null,
     output_dimension = 1024,
     output_dtype = "float"
@@ -296,7 +296,7 @@ count_usage_result = main()
 
   private pyTokenizeScript(
     texts: readonly string[],
-    model: Voyage.ModelUnion = "voyage-context-3",
+    model: Voyage.ModelUnion = "voyage-context-4",
     apiKey = this.apiKey
   ) {
     // Escape texts for Python string literals

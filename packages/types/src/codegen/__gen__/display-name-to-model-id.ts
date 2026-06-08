@@ -82,7 +82,8 @@ export const displayNameToModelId = {
     "Grok Build 0.1": "grok-build-0.1",
     "Grok Imagine Image": "grok-imagine-image",
     "Grok Imagine Image Quality": "grok-imagine-image-quality",
-    "Grok Imagine Video": "grok-imagine-video"
+    "Grok Imagine Video": "grok-imagine-video",
+    "Grok Imagine Video 1.5 Preview": "grok-imagine-video-1.5-preview"
   },
   anthropic: {
     "Claude Opus 4.8": "claude-opus-4-8",
@@ -141,5 +142,18 @@ export const displayNameToModelId = {
     "GLM 4.7": "glm-4.7",
     "GLM 4.6": "glm-4.6",
     "GLM 4.5": "glm-4.5"
+  },
+  alibaba: {
+    "Qwen3.7-Max": "qwen3.7-max",
+    "Qwen3.7-Plus": "qwen3.7-plus",
+    "Qwen3.6-Plus": "qwen3.6-plus",
+    "Qwen3.5-Plus": "qwen3.5-plus",
+    "Qwen3.5-Flash": "qwen3.5-flash"
+  },
+  minimax: {
+    "MiniMax-M3": "minimax-m3",
+    "MiniMax-M2.7": "minimax-m2.7",
+    "MiniMax-M2.5": "minimax-m2.5",
+    "MiniMax-M2.1": "minimax-m2.1"
   }
 } as const;

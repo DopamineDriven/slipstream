@@ -18,6 +18,8 @@ export class KeyValidator {
   private kimi_url = "https://ai-gateway.vercel.sh/v1/models";
   private deepseek_url = "https://ai-gateway.vercel.sh/v1/models";
   private zai_url = "https://ai-gateway.vercel.sh/v1/models";
+  private alibaba_url = "https://ai-gateway.vercel.sh/v1/models";
+  private minimax_url = "https://ai-gateway.vercel.sh/v1/models";
   private mistral_url = "https://api.mistral.ai/v1/models";
   private cohere_url = "https://api.cohere.com/v1/models";
   constructor(
@@ -58,6 +60,10 @@ export class KeyValidator {
       case "openai":
       case "VERCEL":
       case "vercel":
+      case "ALIBABA":
+      case "alibaba":
+      case "MINIMAX":
+      case "minimax":
       default: {
         return (await fetch(url, {
           headers: { Authorization: `Bearer ${apiKey}` }
@@ -121,7 +127,47 @@ export class KeyValidator {
       };
     }
   }
+  private async alibaba() {
+    const res = await this.callRest(this.apiKey, this.alibaba_url);
+    const provider = "alibaba";
+    if (res.ok) {
+      return {
+        isValid: true,
+        message: `valid_api_key__${provider}__${res.status}`
+      };
+    } else if (res.status === 429) {
+      return {
+        isValid: true,
+        message: `valid_api_key__${provider}__${res.status}`
+      };
+    } else {
+      return {
+        isValid: false,
+        message: `invalid_api_key__${provider}__${res.status}`
+      };
+    }
+  }
 
+  private async minimax() {
+    const res = await this.callRest(this.apiKey, this.minimax_url);
+    const provider = "minimax";
+    if (res.ok) {
+      return {
+        isValid: true,
+        message: `valid_api_key__${provider}__${res.status}`
+      };
+    } else if (res.status === 429) {
+      return {
+        isValid: true,
+        message: `valid_api_key__${provider}__${res.status}`
+      };
+    } else {
+      return {
+        isValid: false,
+        message: `invalid_api_key__${provider}__${res.status}`
+      };
+    }
+  }
   private async deepseek() {
     const res = await this.callRest(this.apiKey, this.deepseek_url);
     const provider = "deepseek";
@@ -349,6 +395,14 @@ export class KeyValidator {
       case "ZAI":
       case "zai": {
         return await this.zai();
+      }
+      case "alibaba":
+      case "ALIBABA": {
+        return await this.alibaba();
+      }
+      case "MINIMAX":
+      case "minimax": {
+        return await this.minimax();
       }
       case "GROK":
       case "grok":

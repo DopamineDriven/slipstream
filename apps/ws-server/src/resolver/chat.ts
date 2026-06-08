@@ -318,6 +318,16 @@ export class ResolverChatService extends ResolverTTSService {
           await svc.routeXai(commonProps);
           break;
         }
+        case "alibaba": {
+          const svc = this.providers.getRequiredInstance("alibaba");
+          await svc.handleAlibabaAiChatRequest(commonProps);
+          break;
+        }
+        case "minimax": {
+          const svc = this.providers.getRequiredInstance("minimax");
+          await svc.handleMiniMaxAiChatRequest(commonProps);
+          break;
+        }
         case "openai":
         default: {
           const svc = this.providers.getRequiredInstance("openai");

@@ -88,6 +88,7 @@ export { Play } from "@/icons/play";
 export { Plus } from "@/icons/plus";
 export { QuestionMark } from "@/icons/question-mark";
 export { QuoteIcon } from "@/icons/quote";
+export { QwenIcon } from "@/icons/qwen";
 export { ReadAloud } from "@/icons/read-aloud";
 export { RetryIcon } from "@/icons/retry";
 export { Save } from "@/icons/save";
