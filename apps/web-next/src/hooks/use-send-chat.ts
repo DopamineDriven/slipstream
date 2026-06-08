@@ -50,7 +50,9 @@ const fallbackApiKeys = {
     vercel: false,
     deepseek: false,
     moonshotai: false,
-    zai: false
+    zai: false,
+    alibaba: false,
+    minimax: false
   },
   isSet: {
     anthropic: false,
@@ -63,7 +65,9 @@ const fallbackApiKeys = {
     vercel: false,
     deepseek: false,
     moonshotai: false,
-    zai: false
+    zai: false,
+    alibaba: false,
+    minimax: false
   }
 } satisfies ClientContextWorkupProps;
 
