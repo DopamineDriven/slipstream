@@ -159,6 +159,7 @@ export { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 export type { AvatarProps } from "@/ui/avatar";
 export { Badge, badgeVariants } from "@/ui/badge";
 export type { BadgeProps } from "@/ui/badge";
+export { BaseButton, baseButtonVariants } from "@/base/button";
 export { BaseScrollArea, BaseScrollBar } from "@/base/scroll";
 export { BreakoutWrapper } from "@/ui/breakout-wrapper";
 export { Button, buttonVariants } from "@/ui/button";

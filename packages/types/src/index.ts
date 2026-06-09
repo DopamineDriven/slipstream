@@ -423,4 +423,16 @@ declare global {
   interface Body {
     json<T = unknown>(): Promise<T>;
   }
+  interface ObjectConstructor {
+    // PropertyKey -> string and number allowed, symbol disallowed (symbol can't be enumerable)
+    keys<T = object>(
+      o: T
+    ): (keyof T extends infer K
+      ? K extends string
+        ? K
+        : K extends number
+          ? `${K}`
+          : never
+      : never)[];
+  }
 }

@@ -19,6 +19,10 @@ export type SerializeBigInt<T, Serialized extends boolean = boolean> = {
 export type NormalizeAndInject<V, Q = object, P extends boolean = boolean> = DX<
   SerializeBigInt<V, P> & Q
 >;
+
+/**
+ * Superior form of Omit
+ */
 export type Rm<T, P extends keyof T = keyof T> = {
   [S in keyof T as Exclude<S, P>]: T[S];
 };

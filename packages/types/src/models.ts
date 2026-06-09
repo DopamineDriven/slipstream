@@ -519,35 +519,20 @@ export const getDisplayNameByModelId = <
 };
 
 export const defaultModelDisplayNameByProvider = {
-  openai: "GPT-5.5",
-  gemini: "Gemini 3.1 Pro Preview",
-  grok: "Grok 4.3",
-  anthropic: "Claude Opus 4.6",
-  meta: "Llama 3.3 (70B, Instruct)",
-  vercel: "v0 medium",
-  mistral: "Mistral Medium 3.5",
-  cohere: "Command A Plus",
-  deepseek: "DeepSeek V4 Pro",
-  moonshotai: "Kimi K2.6",
-  zai: "GLM 5.1",
-  alibaba: "Qwen3.7-Max",
-  minimax: "MiniMax-M3"
-} as const satisfies Record<
-  Provider,
-  | OpenAiDisplayNameUnion
-  | GeminiDisplayNameUnion
-  | GrokDisplayNameUnion
-  | AnthropicDisplayNameUnion
-  | MetaDisplayNameUnion
-  | VercelDisplayNameUnion
-  | MistralDisplayNameUnion
-  | CohereDisplayNameUnion
-  | DeepSeekDisplayNameUnion
-  | KimiDisplayNameUnion
-  | ZaiDisplayNameUnion
-  | AlibabaDisplayNameUnion
-  | MiniMaxDisplayNameUnion
->;
+  openai: "GPT-5.5" satisfies OpenAiDisplayNameUnion,
+  gemini: "Gemini 3.1 Pro Preview" satisfies GeminiDisplayNameUnion,
+  grok: "Grok 4.3" satisfies GrokDisplayNameUnion,
+  anthropic: "Claude Opus 4.6" satisfies AnthropicDisplayNameUnion,
+  meta: "Llama 3.3 (70B, Instruct)" satisfies MetaDisplayNameUnion,
+  vercel: "v0 medium" satisfies VercelDisplayNameUnion,
+  mistral: "Mistral Medium 3.5" satisfies MistralDisplayNameUnion,
+  cohere: "Command A Plus" satisfies CohereDisplayNameUnion,
+  deepseek: "DeepSeek V4 Pro" satisfies DeepSeekDisplayNameUnion,
+  moonshotai: "Kimi K2.6" satisfies KimiDisplayNameUnion,
+  zai: "GLM 5.1" satisfies ZaiDisplayNameUnion,
+  alibaba: "Qwen3.6-Plus" satisfies AlibabaDisplayNameUnion,
+  minimax: "MiniMax-M3" satisfies MiniMaxDisplayNameUnion
+} as const;
 
 export const defaultModelIdByProvider = {
   openai: "gpt-5.5" satisfies OpenAiModelIdUnion,
@@ -561,9 +546,10 @@ export const defaultModelIdByProvider = {
   deepseek: "deepseek-v4-pro" satisfies DeepSeekModelIdUnion,
   moonshotai: "kimi-k2.6" satisfies KimiModelIdUnion,
   zai: "glm-5.1" satisfies ZaiModelIdUnion,
-  alibaba: "qwen3.7-max" satisfies AlibabaModelIdUnion,
+  alibaba: "qwen3.6-plus" satisfies AlibabaModelIdUnion,
   minimax: "minimax-m3" satisfies MiniMaxModelIdUnion
 } as const;
+
 export type ModelDisplayNameToModelId<T extends Provider> =
   keyof (typeof displayNameToModelId)[T];
 
@@ -1012,21 +998,9 @@ export function getDisplayNamesForProviderVideoGen<
 }
 
 export function allProviders() {
-  return [
-    "anthropic",
-    "gemini",
-    "grok",
-    "openai",
-    "meta",
-    "vercel",
-    "mistral",
-    "cohere",
-    "deepseek",
-    "moonshotai",
-    "zai",
-    "alibaba",
-    "minimax"
-  ] as const satisfies readonly Providers[];
+  return Object.keys(modelIdsByProvider).map(
+    t => t
+  ) satisfies readonly Lowercase<$Enums.Provider>[];
 }
 export function allImgGenProviders() {
   return ["gemini", "grok", "openai"] as const;

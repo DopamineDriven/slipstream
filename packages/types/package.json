@@ -94,10 +94,10 @@
     "lint": "eslint",
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml}\" --ignore-unknown --cache",
     "clean": "git clean -xdf .turbo dist node_modules",
-    "pregen:media": "pnpm tsx src/codegen/index.ts --target video",
-    "gen:media": "pnpm tsx src/codegen/index.ts --target img",
+    "pregen:media": "tsx src/codegen/index.ts --target video",
+    "gen:media": "tsx src/codegen/index.ts --target img",
     "pregen": "pnpm gen:media",
-    "gen": "pnpm tsx src/codegen/index.ts --target default",
+    "gen": "tsx src/codegen/index.ts --target default",
     "postgen": "pnpm format",
     "typecheck": "tsgo --noEmit"
   },

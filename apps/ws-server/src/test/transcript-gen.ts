@@ -456,7 +456,9 @@ class ScriptGen extends Fs {
       MOONSHOTAI: "moonshotai",
       OPENAI: "openai",
       VERCEL: "vercel",
-      ZAI: "zai"
+      ZAI: "zai",
+      ALIBABA: "alibaba",
+      MINIMAX: "minimax"
     } as const satisfies Record<$Enums.Provider, Lowercase<$Enums.Provider>>;
   }
 
