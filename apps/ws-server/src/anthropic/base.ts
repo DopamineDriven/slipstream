@@ -35,7 +35,8 @@ export class AnthropicBaseService {
       mod === "claude-opus-4-8" ||
       mod === "claude-opus-4-7" ||
       mod === "claude-opus-4-6" ||
-      mod === "claude-sonnet-4-6"
+      mod === "claude-sonnet-4-6" ||
+      mod ==="claude-fable-5"
     );
   }
   protected handleBetaHeaders(
@@ -43,6 +44,7 @@ export class AnthropicBaseService {
     withLocalStore = false
   ) {
     switch (model) {
+      case "claude-fable-5":
       case "claude-opus-4-8":
       case "claude-opus-4-7": {
         if (withLocalStore) {
@@ -146,6 +148,7 @@ export class AnthropicBaseService {
   }
 
   protected outputTokenCeilingByModel = {
+    "claude-fable-5": 128000,
     "claude-opus-4-8": 128000,
     "claude-opus-4-7": 128000,
     "claude-sonnet-4-6": 64000,
@@ -159,6 +162,7 @@ export class AnthropicBaseService {
   } as const;
 
   protected inputTokenCeilingByModel = {
+    "claude-fable-5":  1000000,
     "claude-opus-4-8": 1000000,
     "claude-opus-4-7": 1000000,
     "claude-sonnet-4-6": 1000000,

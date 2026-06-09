@@ -402,7 +402,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   private handleEffort(model: string | null) {
     if (!model) return;
     if (!this.is4dot67Model(model)) return;
-    if (model === "claude-opus-4-8") {
+    if (model === "claude-opus-4-8" || model === "claude-fable-5") {
       return { effort: "max" } as const;
     }
     if (model === "claude-opus-4-7") {
