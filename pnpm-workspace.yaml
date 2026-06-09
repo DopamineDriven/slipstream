@@ -15,16 +15,16 @@ dangerouslyAllowAllBuilds: true
 
 catalogs:
   anthropic:
-    "@anthropic-ai/sdk": ^0.102.0
+    "@anthropic-ai/sdk": ^0.103.0
   auth:
     better-auth: ^1.6.11
   aws:
-    "@aws-sdk/client-s3": ^3.1063.0
-    "@aws-sdk/client-secrets-manager": ^3.1063.0
-    "@aws-sdk/credential-providers": ^3.1063.0
-    "@aws-sdk/lib-storage": ^3.1063.0
-    "@aws-sdk/s3-request-presigner": ^3.1063.0
-    "@aws-sdk/types": ^3.973.11
+    "@aws-sdk/client-s3": ^3.1064.0
+    "@aws-sdk/client-secrets-manager": ^3.1064.0
+    "@aws-sdk/credential-providers": ^3.1064.0
+    "@aws-sdk/lib-storage": ^3.1064.0
+    "@aws-sdk/s3-request-presigner": ^3.1064.0
+    "@aws-sdk/types": ^3.973.12
   babel:
     babel-plugin-react-compiler: ^1.0.0
   biome:
@@ -97,7 +97,7 @@ catalogs:
   motion:
     motion: ^12.40.0
     motion-dom: ^12.40.0
-    motion-plus-dom: ^2.11.2
+    motion-plus-dom: ^2.12.0
     motion-utils: ^12.39.0
   nanoid:
     nanoid: ^5.1.11
@@ -129,7 +129,7 @@ catalogs:
     urlpattern-polyfill: ^10.1.0
   prettier:
     "@ianvs/prettier-plugin-sort-imports": ^4.7.1
-    prettier: ^3.8.3
+    prettier: ^3.8.4
     prettier-plugin-tailwindcss: ^0.8.0
   prisma:
     "@prisma/adapter-pg": ^7.8.0
@@ -215,25 +215,25 @@ catalogs:
   tsdown:
     tsdown: ^0.22.2
   tseslint:
-    typescript-eslint: ^8.60.1
+    typescript-eslint: ^8.61.0
   tsgo:
-    "@typescript/native-preview": ^7.0.0-dev.20260607.1
+    "@typescript/native-preview": ^7.0.0-dev.20260609.1
   tslib:
     tslib: ^2.8.1
   tsup:
-    "@microsoft/api-extractor": ^7.58.7
+    "@microsoft/api-extractor": ^7.58.8
     terser: ^5.48.0
     tsup: ^8.5.1
   tsx:
     tsx: ^4.22.4
   turbo:
-    eslint-config-turbo: ^2.9.16
-    eslint-plugin-turbo: ^2.9.16
-    turbo: ^2.9.16
+    eslint-config-turbo: ^2.9.17
+    eslint-plugin-turbo: ^2.9.17
+    turbo: ^2.9.17
   tw:
     "@tailwindcss/forms": ^0.5.11
     "@tailwindcss/postcss": ^4.3.0
-    "@tailwindcss/typography": ^0.5.19
+    "@tailwindcss/typography": ^0.5.20
     tailwind-merge: ^3.6.0
     tailwindcss: ^4.3.0
     tailwindcss-motion: ^1.1.1
@@ -250,7 +250,7 @@ catalogs:
     wait-on: ^9.0.10
   vercel:
     "@vercel/analytics": ^2.0.1
-    "@vercel/functions": ^3.6.2
+    "@vercel/functions": ^3.7.0
   vfile:
     vfile: ^6.0.3
   vite:
@@ -292,4 +292,4 @@ allowBuilds:
   unrs-resolver: true
 
 patchedDependencies:
-  '@anthropic-ai/sdk@0.102.0': patches/@anthropic-ai__sdk@0.101.0.patch
+  '@anthropic-ai/sdk@0.103.0': patches/@anthropic-ai__sdk@0.101.0.patch

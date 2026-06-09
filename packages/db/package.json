@@ -12,7 +12,7 @@
     "lint": "eslint",
     "format": "prisma format",
     "clean": "git clean -xdf .turbo dist node_modules",
-    "prebuild": "rm -rf dist/ && pnpm db:generate",
+    "prebuild": "pnpm db:generate",
     "predev": "pnpm db:generate",
     "db:generate": "prisma generate --sql",
     "db:migrate": "prisma migrate dev",

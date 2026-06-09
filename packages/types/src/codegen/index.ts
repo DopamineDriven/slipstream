@@ -158,6 +158,7 @@ const providerModelChatApi = {
    * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-aliases
    */
   anthropic: [
+    "claude-fable-5",
     "claude-opus-4-8",
     "claude-opus-4-7",
     "claude-sonnet-4-6",

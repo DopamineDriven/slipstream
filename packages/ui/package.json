@@ -136,6 +136,7 @@
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
+    "@slipstream/types": "workspace:*",
     "@tailwindcss/postcss": "catalog:tw",
     "@types/node": "catalog:node",
     "@types/react": "catalog:react",
