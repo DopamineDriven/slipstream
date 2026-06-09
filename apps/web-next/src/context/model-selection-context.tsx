@@ -21,21 +21,21 @@ import {
 interface ModelSelectionContextType {
   selectedModel: ModelSelection;
   isDrawerOpen: boolean;
-  providers: readonly [
-    "anthropic",
-    "gemini",
-    "grok",
-    "openai",
-    "meta",
-    "vercel",
-    "mistral",
-    "cohere",
-    "deepseek",
-    "moonshotai",
-    "zai",
-    "alibaba",
-    "minimax"
-  ];
+  providers: (
+    | "alibaba"
+    | "anthropic"
+    | "cohere"
+    | "deepseek"
+    | "gemini"
+    | "grok"
+    | "meta"
+    | "minimax"
+    | "mistral"
+    | "moonshotai"
+    | "openai"
+    | "vercel"
+    | "zai"
+  )[];
   setSelectedModel: (m: ModelSelection) => void;
   updateProvider: (p: Provider) => void;
   updateModel: (name: string, id: AllModelsUnion) => void;
