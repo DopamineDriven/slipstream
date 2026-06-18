@@ -584,12 +584,12 @@ export class ModelService extends ProviderValidation {
     }
   }
 
-  public arrToArrOfArrs = <const T>(
-    arr: T[],
+  public arrToArrOfArrs = <const T = unknown>(
+    arr: readonly T[],
     int = 10,
     agg = Array.of<T[]>()
   ) => {
-    for (let i = 0; i < arr.length; i++) {
+    for (let i = 0; i < arr.length; i += int) {
       agg.push(arr.slice(i, i + int));
     }
     return agg;

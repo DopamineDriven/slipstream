@@ -91,6 +91,9 @@ export function useConversationMessages({
       revalidateFirstPage: false, // critical: don't refetch page 0 when loading page 1+
       revalidateIfStale: false,
       refreshInterval: 0,
+      refreshWhenHidden: false,
+      refreshWhenOffline: false,
+      fetcher: pageFetcher,
       dedupingInterval: 60000,
       errorRetryCount: 2,
       errorRetryInterval: 5000,

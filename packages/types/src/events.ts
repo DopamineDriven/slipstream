@@ -29,12 +29,8 @@ import type {
   ImageGenProviders,
   Provider
 } from "@/models.ts";
-import type {
-  ConversationSingleton,
-  DocumentSingleton,
-  ImageSingleton
-} from "@/types.ts";
-import type { CTR, DX, Rm } from "@/utils.ts";
+import type { ConversationSingleton } from "@/types.ts";
+import type { CTR, DX, Rm, UTR } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 
 export type ChatChunkAndResMsgBlock = {
@@ -43,6 +39,42 @@ export type ChatChunkAndResMsgBlock = {
   ordinal: number;
   conversationId: string;
   durationMs: number;
+};
+
+export type HydrateConversation = {
+  type: "hydrate_conversation";
+  conversationId: string;
+  lowestLoadedOrdinal: number;
+  /** clamped server-side; defaults to CONVERSATION_PAGE_SIZE */
+  take?: number;
+};
+
+export type HydrateConversationPage = {
+  /**
+   * Exclusive upper bound / SWR page key cursor.
+   * This page was fetched with: ordinal < cursor.
+   */
+  cursor: number;
+  /**
+   * First ordinal in lookup order.
+   * Because messages are ordinal-desc, this is the newest/highest ordinal in the page.
+   */
+  firstOrdinal: number;
+  /**
+   * Last ordinal in lookup order.
+   * Because messages are ordinal-desc, this is the oldest/lowest ordinal in the page.
+   * The next older page uses cursor = lastOrdinal.
+   */
+  lastOrdinal: number;
+  convo: ConversationSingleton<true>;
+  hasMore: boolean;
+};
+
+export type HydrateConversationAck = {
+  type: "hydrate_conversation_ack";
+  userId: string;
+  pages: HydrateConversationPage[];
+  conversationId: string;
 };
 
 export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
@@ -841,6 +873,8 @@ export type AnyEvent =
   | AssetUploadRequest
   | AssetUploadResponse
   | ConnectionEstablished
+  | HydrateConversation
+  | HydrateConversationAck
   | ImageGenError
   | ImageGenProgress
   | ImageGenRequest
@@ -869,171 +903,8 @@ export type ChatWsEvent = AnyEvent;
  */
 export type ChatWsEventTypeUnion = ChatWsEvent["type"];
 
-export type EventTypeMap = {
-  ai_chat_chunk: AIChatChunk;
-  ai_chat_error: AIChatError;
-  ai_chat_inline_data: AIChatInlineData;
-  ai_chat_request: AIChatRequest;
-  ai_chat_response: AIChatResponse;
-  asset_attached: AssetAttachedToMessage;
-  asset_batch_upload: AssetBatchUpload;
-  asset_deleted: AssetDeleted;
-  asset_fetch_error: AssetFetchError;
-  asset_fetch_request: AssetFetchRequest;
-  asset_fetch_response: AssetFetchResponse;
-  asset_paste: AssetPasteEvent;
-  asset_ready: AssetReady;
-  asset_upload_abort: AssetUploadAbort;
-  asset_upload_aborted: AssetUploadAborted;
-  asset_upload_complete: AssetUploadComplete;
-  asset_upload_complete_error: AssetUploadCompleteError;
-  asset_upload_error: AssetUploadError;
-  asset_upload_instructions: AssetUploadInstructions;
-  asset_upload_prepare: AssetUploadPrepare;
-  asset_upload_progress: AssetUploadProgress;
-  asset_upload_request: AssetUploadRequest;
-  asset_upload_response: AssetUploadResponse;
-  asset_uploaded: AssetUploadedNotification;
-  connection_established: ConnectionEstablished;
-  image_gen_error: ImageGenError;
-  image_gen_progress: ImageGenProgress;
-  image_gen_request: ImageGenRequest;
-  image_gen_response: ImageGenResponse;
-  ping: PingMessage;
-  provider_context_ping: ProviderContextPing;
-  provider_context_pong: ProviderContextPong;
-  provider_context_update: ProviderContextUpdate;
-  provider_context_update_ack: ProviderContextUpdateAck;
-  typing: TypingIndicator;
-  user_tts_chunk: UserTTSChunk;
-  user_tts_error: UserTTSError;
-  user_tts_request: UserTTSRequest;
-  user_tts_response: UserTTSResponse;
-  user_tts_response_preexisting: UserTTSResponsePreexisting;
-};
+export type EventTypeMap = UTR<AnyEvent, "type">;
 
 export type EventMap<T extends keyof EventTypeMap> = {
   [P in T]: EventTypeMap[P];
 }[T];
-
-export type AIChatResRT = {
-  conversationSettings: {
-    createdAt: Date;
-    id: string;
-    updatedAt: Date;
-    conversationId: string;
-    systemPrompt: string | null;
-    temperature: number | null;
-    topP: number | null;
-    enableThinking: boolean | null;
-    trackUsage: boolean | null;
-    enableWebSearch: boolean | null;
-    enableAssetGen: boolean | null;
-    reasoningEffort: $Enums.ReasoningEffort | null;
-    outputVerbosity: $Enums.OutputVerbosity | null;
-    maxTokens: number | null;
-    usageAlerts: boolean | null;
-  } | null;
-  messages: ({
-    attachments: ({
-      imageGenOutput: {
-        createdAt: Date;
-        id: string;
-        updatedAt: Date;
-        jobId: string;
-        mime: string | null;
-        jobIndex: number;
-        kind: $Enums.ImageGenOutputKind;
-        seriesIndex: number;
-        seriesId: string;
-        isPartial: boolean;
-        width: number | null;
-        height: number | null;
-        ext: string | null;
-        revisedPrompt: string | null;
-        attachmentId: string;
-      } | null;
-      image: ImageSingleton | null;
-      document: DocumentSingleton | null;
-    } & {
-      createdAt: Date;
-      id: string;
-      userId: string;
-      updatedAt: Date;
-      conversationId: string | null;
-      uploadDuration: number | null;
-      mime: string | null;
-      seriesId: string | null;
-      ext: string | null;
-      draftId: string | null;
-      batchId: string | null;
-      generationGroupId: string | null;
-      s3ObjectId: string | null;
-      origin: $Enums.AssetOrigin;
-      status: $Enums.AssetStatus;
-      uploadMethod: $Enums.UploadMethod;
-      assetType: $Enums.AssetType;
-      cdnUrl: string | null;
-      publicUrl: string | null;
-      sourceUrl: string | null;
-      thumbnailKey: string | null;
-      compatMime: string | null;
-      compatExt: string | null;
-      compatVersionId: string | null;
-      compatKey: string | null;
-      compatS3ObjectId: string | null;
-      compatStatus: $Enums.CompatStatus | null;
-      compatReadyAt: Date | null;
-      compatCdnUrl: string | null;
-      bucket: string;
-      key: string;
-      versionId: string | null;
-      region: string;
-      cacheControl: string | null;
-      contentDisposition: string | null;
-      contentEncoding: string | null;
-      expiresAt: Date | null;
-      size: bigint | null;
-      filename: string | null;
-      etag: string | null;
-      checksumAlgo: $Enums.ChecksumAlgo;
-      checksumSha256: string | null;
-      storageClass: string | null;
-      sseAlgorithm: string | null;
-      sseKmsKeyId: string | null;
-      s3LastModified: Date | null;
-      deletedAt: Date | null;
-      messageId: string | null;
-    })[];
-  } & {
-    createdAt: Date;
-    id: string;
-    userId: string | null;
-    userKeyId: string | null;
-    updatedAt: Date;
-    conversationId: string;
-    provider: $Enums.Provider;
-    model: string | null;
-    responseOutput: string | null;
-    thinkingDuration: number | null;
-    thinkingText: string | null;
-    senderType: $Enums.SenderType;
-    content: string;
-    isImageGen: boolean;
-    messageType: $Enums.MessageType;
-    liked: boolean | null;
-    disliked: boolean | null;
-    tryAgain: boolean | null;
-  })[];
-} & {
-  createdAt: Date;
-  id: string;
-  shareToken: string | null;
-  userId: string;
-  userKeyId: string | null;
-  title: string | null;
-  updatedAt: Date;
-  branchId: string | null;
-  parentId: string | null;
-  isShared: boolean;
-};
