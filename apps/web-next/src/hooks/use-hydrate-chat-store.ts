@@ -10,7 +10,6 @@
  * the cold-load skeleton. Pass `conversationId: undefined` for home / new-chat so the loader's key is null and no
  * fetch happens (those have no server history).
  */
-
 import { useEffect } from "react";
 import { useConversationMessages } from "@/hooks/use-conversation-messages";
 import type { ChatStore } from "@/state/chat/store";

@@ -40,6 +40,8 @@ class EventHandlerRegistry {
     "asset_upload_response",
     "asset_uploaded",
     "connection_established",
+    "hydrate_conversation",
+    "hydrate_conversation_ack",
     "image_gen_error",
     "image_gen_progress",
     "image_gen_request",
@@ -278,6 +280,18 @@ class EventHandlerRegistry {
       connection_established: () => {
         const handler = this.handlers.connection_established;
         if (handler && event.type === "connection_established") {
+          handler(event, socket);
+        }
+      },
+      hydrate_conversation: () => {
+        const handler = this.handlers["hydrate_conversation"];
+        if (handler && event.type === "hydrate_conversation") {
+          handler(event, socket);
+        }
+      },
+      hydrate_conversation_ack: () => {
+        const handler = this.handlers["hydrate_conversation_ack"];
+        if (handler && event.type === "hydrate_conversation_ack") {
           handler(event, socket);
         }
       },
