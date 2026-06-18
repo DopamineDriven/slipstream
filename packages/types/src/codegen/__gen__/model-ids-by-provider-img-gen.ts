@@ -26,15 +26,11 @@ export const modelIdsByProviderImgGen = {
     "gpt-image-1-mini"
   ],
   gemini: [
-    "deep-research-pro-preview-12-2025",
     "deep-research-max-preview-04-2026",
     "deep-research-preview-04-2026",
     "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
-    "gemini-2.5-flash-image",
-    "imagen-4.0-generate-001",
-    "imagen-4.0-fast-generate-001",
-    "imagen-4.0-ultra-generate-001"
+    "gemini-2.5-flash-image"
   ],
   grok: ["grok-imagine-image", "grok-imagine-image-quality"]
 } as const;

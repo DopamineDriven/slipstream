@@ -244,12 +244,8 @@ export type OpenAIModelAspectRatio = {
 
 export type GeminiModelAspectRatioWorkup = DX<
   {
-    "imagen-4.0-fast-generate-001": BaseImagenOutpiutAR;
-    "imagen-4.0-generate-001": BaseImagenOutpiutAR;
-    "imagen-4.0-ultra-generate-001": BaseImagenOutpiutAR;
     "gemini-3-pro-image-preview": BaseNanoBananaOutputAR;
     "gemini-2.5-flash-image": BaseNanoBananaOutputAR;
-    "deep-research-pro-preview-12-2025": BaseNanoBananaOutputAR;
     "deep-research-max-preview-04-2026": BaseNanoBananaOutputAR;
     "deep-research-preview-04-2026": BaseNanoBananaOutputAR;
     "gemini-3.1-flash-image-preview": NanoBanana2OutputAR;
@@ -292,6 +288,12 @@ export type OutputSizeProps<P extends Provider = Provider> = {
     OpenAiModelIdUnion,
     OpenAIImgCapableModels
   >];
+  minimax: {
+    [M in GetModelUtilRT<"minimax">]: undefined;
+  }[GetModelUtilRT<"minimax">];
+  alibaba?: {
+    [M in GetModelUtilRT<"alibaba">]: undefined;
+  }[GetModelUtilRT<"alibaba">];
   mistral?: {
     [M in GetModelUtilRT<"mistral">]: undefined;
   }[GetModelUtilRT<"mistral">];
@@ -319,8 +321,6 @@ export type OutputSizeProps<P extends Provider = Provider> = {
     [P in GetModelUtilRT<"vercel">]: undefined;
   }[GetModelUtilRT<"vercel">];
 }[P];
-
-export type BaseImagenOutpiutAR = "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
 
 export type BaseNanoBananaOutputAR =
   | "1:1"
@@ -367,12 +367,8 @@ export type OpenAIImgCapableModels =
   | OpenAIImgGenModels;
 
 export type GeminiImageSize = {
-  "imagen-4.0-fast-generate-001": BaseImagenOutpiutAR;
-  "imagen-4.0-generate-001": BaseImagenOutpiutAR;
-  "imagen-4.0-ultra-generate-001": BaseImagenOutpiutAR;
   "gemini-3-pro-image-preview": BaseNanoBananaOutputAR;
   "gemini-2.5-flash-image": BaseNanoBananaOutputAR;
-  "deep-research-pro-preview-12-2025": BaseNanoBananaOutputAR;
   "gemini-3.1-flash-image-preview": NanoBanana2OutputAR;
   "deep-research-max-preview-04-2026": BaseNanoBananaOutputAR;
   "deep-research-preview-04-2026": BaseNanoBananaOutputAR;
@@ -380,12 +376,8 @@ export type GeminiImageSize = {
 
 export type GeminiImageQuality = {
   "gemini-3.1-flash-image-preview": "0.5K" | "1K" | "2K" | "4K";
-  "imagen-4.0-fast-generate-001": "1K" | "2K";
-  "imagen-4.0-generate-001": "1K" | "2K";
-  "imagen-4.0-ultra-generate-001": "1K" | "2K";
   "gemini-3-pro-image-preview": "1K" | "2K" | "4K";
   "gemini-2.5-flash-image": "1K";
-  "deep-research-pro-preview-12-2025": "1K" | "2K" | "4K";
   "deep-research-max-preview-04-2026": "1K" | "2K" | "4K";
   "deep-research-preview-04-2026": "1K" | "2K" | "4K";
 };
@@ -408,14 +400,6 @@ export type OpenAISizeQualityOpts = {
 export type GoogleImgSizeQualityOpts = {
   size: GeminiImageSize;
   quality: GeminiImageQuality;
-};
-
-export type GoogleImgOutputFormat = {
-  format: {
-    "imagen-4.0-fast-generate-001": "image/png" | "image/jpeg";
-    "imagen-4.0-generate-001": "image/png" | "image/jpeg";
-    "imagen-4.0-ultra-generate-001": "image/png" | "image/jpeg";
-  };
 };
 
 /** Required. The harm block threshold. */
@@ -703,85 +687,7 @@ export interface GptImage1Opts extends SharedOpenAIImageOpts<
 
 export type OpenAIImageGenOpts = GptImage1Opts;
 
-/**
- * Parameters for Google's Imagen 3 & 4 models
- * (e.g., imagen-4.0-generate-001,
- * imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001)
- */
-export type ImagenOptions = {
-  model: Exclude<
-    GeminiImgGenModels,
-    | "gemini-3.1-flash-image-preview"
-    | "gemini-2.5-flash-image"
-    | "gemini-3-pro-image-preview"
-    | "deep-research-pro-preview-12-2025"
-  >;
-  /**
-   * The text prompt describing the image.
-   */
-  prompt: string;
-  /**
-   *  The number of images to generate, from 1 to 4 (inclusive). The default is 4.
-   */
-  numberOfImages?: number;
-  /**
-   *
-   * "dont_allow": Disallow the inclusion of people or faces in images.
-   * "allow_adult": Allow generation of adults only.
-   * "allow_all": Allow generation of people of all ages.
-   *
-   * "allow_adult" (default)
-   */
-  personGeneration: "dont_allow" | "allow_adult" | "allow_all";
-  /**
-   * A negative prompt.
-   * What you *don't* want to see in the image.
-   */
-  negativePrompt?: string;
 
-  /**
-   * The aspect ratio of the generated image.
-   * Default: "1:1"
-   *
-   * Supported values:
-   * "1:1", "9:16", "16:9", "3:4", "4:3"
-   */
-  aspectRatio?: GeminiImageSize["imagen-4.0-generate-001"];
-
-  /**
-   * The output resolution. Only available for Imagen 4.
-   * Default: "1K"
-   */
-  sampleImageSize?: GeminiImageQuality["imagen-4.0-generate-001"];
-
-  /**
-   * A seed value for reproducible results.
-   * accepted integer values: 1 - 2147483647
-   */
-  seed?: number;
-
-  /**
-   * Whether to automatically enhance the prompt.
-   * (Available on Imagen 4 and 3.0-002)
-   * Default: true
-   */
-  enhancePrompt?: boolean;
-
-  /**
-   * Output format configuration.
-   */
-  outputOptions?: {
-    /**
-     * Default: "image/png"
-     */
-    mimeType?: "image/png" | "image/jpeg";
-    /**
-     * Only applies if mimeType is "image/jpeg".
-     * Range: 0-100. Default: 75
-     */
-    compressionQuality?: number;
-  };
-};
 /**
  * Parameters for Google's native image-generating model
  * (gemini-2.5-flash-image)
@@ -792,7 +698,6 @@ export type NanoBananaImageGenOpts<
   | "gemini-3-pro-image-preview"
   | "gemini-2.5-flash-image"
   | "gemini-3.1-flash-image-preview"
-  | "deep-research-pro-preview-12-2025"
   | "deep-research-max-preview-04-2026"
   | "deep-research-preview-04-2026"
   ? {
@@ -862,7 +767,7 @@ export type NanoBananaImageGenOpts<
 
 export type GoogleGenAIImageGenOpts<
   T extends GeminiModelIdUnion = GeminiModelIdUnion
-> = NanoBananaImageGenOpts<T> | ImagenOptions;
+> = NanoBananaImageGenOpts<T>;
 
 export type GrokImagineImageGenOpts = {
   model: GrokImagineImgModelUnion;

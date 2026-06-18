@@ -1,7 +1,6 @@
 import type {
   AnthropicResponse,
   GeminiResponse,
-  GrokModelsResponse,
   MultimodalRT,
   OpenAiResponse
 } from "@/codegen-types.ts";
@@ -43,15 +42,11 @@ const providerModelImagesApi = {
     "gpt-image-1-mini"
   ],
   gemini: [
-    "deep-research-pro-preview-12-2025",
     "deep-research-max-preview-04-2026",
     "deep-research-preview-04-2026",
     "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
-    "gemini-2.5-flash-image",
-    "imagen-4.0-generate-001",
-    "imagen-4.0-fast-generate-001",
-    "imagen-4.0-ultra-generate-001"
+    "gemini-2.5-flash-image"
   ],
   grok: ["grok-imagine-image", "grok-imagine-image-quality"]
 } as const;
@@ -128,14 +123,10 @@ const providerModelChatApi = {
     "gemini-2.5-flash-image",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
-    "deep-research-pro-preview-12-2025",
     "deep-research-max-preview-04-2026",
     "deep-research-preview-04-2026",
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite",
-    "imagen-4.0-generate-001",
-    "imagen-4.0-fast-generate-001",
-    "imagen-4.0-ultra-generate-001",
     "veo-3.1-generate-preview",
     "veo-3.1-fast-generate-preview",
     "veo-3.0-generate-001",
@@ -166,18 +157,13 @@ const providerModelChatApi = {
     "claude-sonnet-4-5-20250929",
     "claude-opus-4-5-20251101",
     "claude-haiku-4-5-20251001",
-    "claude-opus-4-1-20250805",
-    "claude-sonnet-4-20250514",
-    "claude-opus-4-20250514"
+    "claude-opus-4-1-20250805"
   ],
   meta: [
     "Llama-4-Maverick-17B-128E-Instruct-FP8",
     "Llama-4-Scout-17B-16E-Instruct-FP8",
     "Llama-3.3-70B-Instruct",
-    "Llama-3.3-8B-Instruct",
-    "Cerebras-Llama-4-Maverick-17B-128E-Instruct",
-    "Cerebras-Llama-4-Scout-17B-16E-Instruct",
-    "Groq-Llama-4-Maverick-17B-128E-Instruct"
+    "Llama-3.3-8B-Instruct"
   ],
   vercel: ["v0-1.5-md", "v0-1.0-md"],
   mistral: [
@@ -193,20 +179,15 @@ const providerModelChatApi = {
   ],
   moonshotai: ["kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
   deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
-  zai: ["glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
+  zai: ["glm-5.2", "glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
   alibaba: [
-    "qwen3.5-flash",
-    "qwen3.5-plus",
-    "qwen3.6-plus",
+    "qwen3.7-max",
     "qwen3.7-plus",
-    "qwen3.7-max"
-  ].reverse(),
-  minimax: [
-    "minimax-m2.1",
-    "minimax-m2.5",
-    "minimax-m2.7",
-    "minimax-m3"
-  ].reverse()
+    "qwen3.6-plus",
+    "qwen3.5-plus",
+    "qwen3.5-flash"
+  ],
+  minimax: ["minimax-m3", "minimax-m2.7", "minimax-m2.5", "minimax-m2.1"]
 } as const;
 
 async function anthropicFetcher() {
@@ -225,25 +206,6 @@ async function openAiFetcher() {
     }
   });
 }
-async function _llamaFetcher() {
-  const res = await fetch("https://api.llama.com/v1/models", {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ` + (process.env.LLAMA_API_KEY ?? ""),
-      "Content-Type": "application/json"
-    }
-  });
-  console.log(res.headers);
-  return res;
-}
-
-async function grokFetcher() {
-  return await fetch("https://api.x.ai/v1/models", {
-    headers: {
-      Authorization: `Bearer ` + (process.env.X_AI_KEY ?? "")
-    }
-  });
-}
 
 async function geminiFetcher() {
   return await fetch(
@@ -251,9 +213,15 @@ async function geminiFetcher() {
   );
 }
 
-/**
- * one-offs here for when xAI ships odd labels
- */
+const LLAMA_NAME_OVERRIDES = {
+  "Llama-4-Maverick-17B-128E-Instruct-FP8":
+    "Llama 4 Maverick (17B/128E, Instruct, FP8)",
+  "Llama-4-Scout-17B-16E-Instruct-FP8":
+    "Llama 4 Scout (17B/16E, Instruct, FP8)",
+  "Llama-3.3-70B-Instruct": "Llama 3.3 (70B, Instruct)",
+  "Llama-3.3-8B-Instruct": "Llama 3.3 (8B, Instruct)"
+} as const;
+
 const GROK_NAME_OVERRIDES = {
   "grok-imagine-image": "Grok Imagine Image",
   "grok-imagine-image-quality": "Grok Imagine Image Quality",
@@ -295,6 +263,7 @@ const COHERE_NAME_OVERRIDES = {
 } as const;
 
 const ZAI_NAME_OVERRIDES = {
+  "glm-5.2": "GLM 5.2",
   "glm-5.1": "GLM 5.1",
   "glm-5": "GLM 5",
   "glm-4.7": "GLM 4.7",
@@ -365,7 +334,17 @@ function filterForZai(id: string) {
     id === "glm-4.7" ||
     id === "glm-4.6" ||
     id === "glm-4.5" ||
-    id === "glm-5.1"
+    id === "glm-5.1" ||
+    id === "glm-5.2"
+  );
+}
+
+function filterForLlama(id: string) {
+  return (
+    id === "Llama-4-Maverick-17B-128E-Instruct-FP8" ||
+    id === "Llama-4-Scout-17B-16E-Instruct-FP8" ||
+    id === "Llama-3.3-70B-Instruct" ||
+    id === "Llama-3.3-8B-Instruct"
   );
 }
 
@@ -390,6 +369,14 @@ function toMinimaxDisplayName(id: string) {
   if (filterForMinimax(id)) {
     return MINIMAX_NAME_OVERRIDES[id];
   } else return id;
+}
+
+function toLlamaDisplayName(id: string) {
+  if (filterForLlama(id)) {
+    return LLAMA_NAME_OVERRIDES[id];
+  } else {
+    return id;
+  }
 }
 
 function toAlibabaDisplayName(id: string) {
@@ -458,82 +445,6 @@ function displayNameV0(id: string) {
   return name;
 }
 
-// Replace formatMeta with this stronger normalizer
-function formatMeta(id: string) {
-  const raw = id?.trim();
-  if (!raw) return "";
-
-  // Normalize: strip noise & standardize separators
-  let s = raw
-    .replace(/\s+/g, "")
-    .replace(/^models\//i, "")
-    .replace(/^hfs?:\/\//i, "")
-    // eslint-disable-next-line no-useless-escape
-    .replace(/^meta[._-]?llama[\/-]/i, "llama-") // meta-llama/llama-... -> llama-...
-    .replace(/_/g, "-");
-
-  // Host label (prefix before "llama-"): keep only well-known vendors
-  let host: string | null = null;
-  // eslint-disable-next-line no-useless-escape
-  const hostMatch = s.match(/^([a-z0-9.]+)[-\/](?=llama[-_]\d)/i);
-  if (hostMatch) {
-    const candidate = hostMatch?.[1]?.toLowerCase();
-    if (candidate === "cerebras" || candidate === "groq") {
-      host = candidate?.[0]?.toUpperCase() + candidate.slice(1);
-    }
-  }
-
-  // Trim everything before the first "llama-<version>"
-  const firstLlama = s.toLowerCase().indexOf("llama-");
-  if (firstLlama >= 0) s = s.slice(firstLlama);
-  const core = s.toLowerCase();
-
-  // Tokenize
-  const tokens = core.split(/[-/]/).filter(Boolean);
-  if (!tokens[0]?.startsWith("llama")) return prettyModelName(raw);
-
-  // Version (supports "4" or "3.3")
-  const version =
-    tokens.find((t, i) => i > 0 && /^\d+(?:\.\d+)?$/.test(t)) ?? "";
-
-  // Known codenames (expand here as Meta adds more)
-  const codename = tokens.find(t => t === "maverick" || t === "scout") ?? null;
-
-  // Params & experts (e.g., 17B, 70B, 128E)
-  const params = tokens.find(t => /^\d+(?:b|m)$/.test(t)) ?? null; // 8B, 70B, 17B (or M)
-  const experts = tokens.find(t => /^\d+e$/.test(t)) ?? null; // 128E, 16E
-
-  // Feature flags
-  const has = (x: string) => tokens.includes(x);
-  const isVision = has("vision");
-  const isInstruct = has("instruct");
-  const quant = tokens.find(t => /^(fp\d+|bf16|int\d+|q\d)/.test(t)) ?? null; // FP8, BF16, INT4, Q*
-  const isHF = has("hf"); // sometimes appears in registry IDs
-
-  // Compose
-  const title = ["Llama", version, codename ? cap(codename) : null]
-    .filter(Boolean)
-    .join(" ");
-  if (!title) return prettyModelName(raw);
-
-  const size = params
-    ? params.toUpperCase() + (experts ? `/${experts.toUpperCase()}` : "")
-    : null;
-
-  const metaParts = [
-    host,
-    size,
-    isVision ? "Vision" : null,
-    isInstruct ? "Instruct" : null,
-    quant ? quant.toUpperCase() : null,
-    isHF ? "HF" : null
-  ].filter(Boolean);
-
-  return metaParts.length ? `${title} (${metaParts.join(", ")})` : title;
-}
-
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-
 function normalizeGrokSegments(segments: string[]): string[] {
   if (segments[0] === "grok") {
     const last = segments[segments.length - 1] ?? "";
@@ -576,14 +487,6 @@ function prettyModelName(id: string, provider: Provider = "openai") {
         : s
     )
     .join(provider === "openai" ? "" : " ");
-}
-
-function formattedGrok(props: GrokModelsResponse) {
-  return props.data.map(t => {
-    const { id, ...rest } = t;
-    const displayName = prettyModelName(id, "grok");
-    return { id, ...rest, displayName };
-  });
 }
 
 const gptNameMap = {
@@ -653,14 +556,15 @@ function formattedAnthropic(props: AnthropicResponse) {
 const fs = new Fs(process.cwd());
 
 const modelMapper = async (modelKeys = true) => {
-  const data = await anthropicFetcher();
-  const openAiData = await openAiFetcher();
-  const geminiData = await geminiFetcher();
-  const grokData = await grokFetcher();
-  const parseGemini = formattedGemini(JSON.parse(await geminiData.text()));
-  const parseOpenAi = formattedOpenAi(JSON.parse(await openAiData.text()));
-  const _parseGrok = formattedGrok(JSON.parse(await grokData.text()));
-  const parseIt = formattedAnthropic(JSON.parse(await data.text()));
+  const [data, openAiData, geminiData] = await Promise.all([
+    anthropicFetcher().then(d => d.text()),
+    openAiFetcher().then(d => d.text()),
+    geminiFetcher().then(d => d.text())
+  ]);
+  const parseGemini = formattedGemini(JSON.parse(geminiData));
+  const parseOpenAi = formattedOpenAi(JSON.parse(openAiData));
+  const parseIt = formattedAnthropic(JSON.parse(data));
+
   return Array.from(Object.entries(providerModelChatApi)).map(
     ([provider, models]) => {
       const p = provider as keyof typeof providerModelChatApi;
@@ -701,9 +605,10 @@ const modelMapper = async (modelKeys = true) => {
           let Helper = Array.of<[string, string]>();
 
           models.forEach(function (model) {
+            const name = toLlamaDisplayName(model);
             modelKeys === true
-              ? Helper.push([model, formatMeta(model)])
-              : Helper.push([formatMeta(model), model]);
+              ? Helper.push([model, name])
+              : Helper.push([name, model]);
           });
           return Helper;
         }
@@ -821,10 +726,10 @@ const modelMapper = async (modelKeys = true) => {
 };
 
 const imageModelMapper = async (modelKeys = true) => {
-  const openAiData = await openAiFetcher();
-  const geminiData = await geminiFetcher();
-  const parseGemini = formattedGemini(JSON.parse(await geminiData.text()));
-  const parseOpenAi = formattedOpenAi(JSON.parse(await openAiData.text()));
+  const openAiData = await openAiFetcher().then(d => d.text());
+  const geminiData = await geminiFetcher().then(d => d.text());
+  const parseGemini = formattedGemini(JSON.parse(geminiData));
+  const parseOpenAi = formattedOpenAi(JSON.parse(openAiData));
   return Array.from(Object.entries(providerModelImagesApi)).map(
     ([provider, models]) => {
       const p = provider as keyof typeof providerModelImagesApi;
@@ -880,10 +785,10 @@ const imageModelMapper = async (modelKeys = true) => {
 };
 
 const videoModelMapper = async (modelKeys = true) => {
-  const openAiData = await openAiFetcher();
-  const geminiData = await geminiFetcher();
-  const parseGemini = formattedGemini(JSON.parse(await geminiData.text()));
-  const parseOpenAi = formattedOpenAi(JSON.parse(await openAiData.text()));
+  const openAiData = await openAiFetcher().then(d => d.text());
+  const geminiData = await geminiFetcher().then(d => d.text());
+  const parseGemini = formattedGemini(JSON.parse(geminiData));
+  const parseOpenAi = formattedOpenAi(JSON.parse(openAiData));
   return Array.from(Object.entries(providerModelVideosApi)).map(
     ([provider, models]) => {
       const p = provider as keyof typeof providerModelVideosApi;

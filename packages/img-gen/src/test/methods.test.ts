@@ -99,12 +99,14 @@ describe("handleImgGenOutputQuality", () => {
     }
   );
   it(
-    "should return 1K for gemini provdier with model set to imagen-4.0-ultra-generate-001",
+    "should return 0.5K for gemini provdier with model set to Nano Banana 2",
     {},
     () => {
       assert.equal(
-        p.handleImgGenOutputQuality("imagen-4.0-ultra-generate-001"),
-        "1K"
+        p.handleImgGenOutputQuality("gemini-3.1-flash-image-preview", {
+          output_quality: "0.5K"
+        }),
+        "0.5K"
       );
     }
   );
@@ -144,18 +146,6 @@ describe("handleImgGenOutputFormat", () => {
       undefined
     );
   });
-  it(
-    "should return image/jpeg for proivder gemini, model imagen-4.0-fast-generate-001, format set to image/png",
-    {},
-    () => {
-      assert.equal(
-        p.handleImgGenOutputFormat("imagen-4.0-fast-generate-001", {
-          format: "image/png"
-        }),
-        "image/png"
-      );
-    }
-  );
   it(
     "should return webp for proivder openai, model gpt-5.1, format set to webp",
     {},
@@ -220,19 +210,6 @@ describe("handleImgGenCompression", () => {
           output_format: "jpeg"
         }),
         100
-      );
-    }
-  );
-  it(
-    "should return 75 for gemini provider with model set to imagen-4.0-ultra-generate-001, output_format set to jpeg, and output_compression set to undefined",
-    {},
-    () => {
-      assert.equal(
-        p.handleImgGenCompression("imagen-4.0-ultra-generate-001", {
-          output_compression: undefined,
-          output_format: "jpeg"
-        }),
-        75
       );
     }
   );
@@ -325,13 +302,6 @@ describe("handlePartialImgGen", () => {
 
 describe("handleImgGenCount", () => {
   it(
-    "should return 1 for imagen-4.0-ultra-generate-001 model with n=undefined",
-    {},
-    () => {
-      assert.equal(p.handleImgGenCount("imagen-4.0-ultra-generate-001"), 1);
-    }
-  );
-  it(
     "should return 1 for gemini-2.5-flash-image model with n=-11 set as input",
     {},
     () => {
@@ -375,26 +345,17 @@ describe("handleImgGenCount", () => {
   it("should return 1 for gpt-5.4 with n=-7 set as input", {}, () => {
     assert.equal(p.handleImgGenCount("gpt-5.4", { n: -7 }), 1);
   });
-  it(
-    "should return 4 for imagen-4.0-ultra-generate-001 model with n=4000",
-    {},
-    () => {
-      assert.equal(
-        p.handleImgGenCount("imagen-4.0-ultra-generate-001", {
-          n: 4000
-        }),
-        4
-      );
-    }
-  );
   it("should return 10 for gpt-5.4 with n=2000 set", {}, () => {
     assert.equal(p.handleImgGenCount("gpt-5.4", { n: 2000 }), 10);
   });
 });
 
 describe("isImgGenCapableModel", () => {
-  it("should return true for imagen-4.0-ultra-generate-001", {}, () => {
-    assert.equal(p.isImgGenCapableModel("imagen-4.0-ultra-generate-001"), true);
+  it("should return true for deep-research-max-preview-04-2026", {}, () => {
+    assert.equal(
+      p.isImgGenCapableModel("deep-research-max-preview-04-2026"),
+      true
+    );
   });
   it("should return true for gemini-3.1-flash-image-preview", {}, () => {
     assert.equal(
@@ -436,9 +397,6 @@ describe("isImgGenCapableModel", () => {
 });
 
 describe("isPureImgGenModel", () => {
-  it("should return true for  imagen-4.0-ultra-generate-001", {}, () => {
-    assert.equal(p.isPureImgGenModel("imagen-4.0-ultra-generate-001"), true);
-  });
   it(
     "should return true for gemini-3.1-flash-image-preview (🍌 nano banana 2 🍌)",
     {},
@@ -455,9 +413,9 @@ describe("isPureImgGenModel", () => {
   it("should return true for grok-imagine-image", {}, () => {
     assert.equal(p.isPureImgGenModel("grok-imagine-image"), true);
   });
-  it("should return false for deep-research-pro-preview-12-2025", {}, () => {
+  it("should return false for deep-research-pro-preview-04-2026", {}, () => {
     assert.equal(
-      p.isPureImgGenModel("deep-research-pro-preview-12-2025"),
+      p.isPureImgGenModel("deep-research-max-preview-04-2026"),
       false
     );
   });
@@ -486,9 +444,6 @@ describe("isPureImgGenModel", () => {
 });
 
 describe("handleImgGenBg", () => {
-  it("should return undefined for imagen-4.0-ultra-generate-001", {}, () => {
-    assert.equal(p.handleImgGenBg("imagen-4.0-ultra-generate-001"), undefined);
-  });
   it(
     "should return undefined for gemini-3.1-flash-image-preview with background=auto and format=webp",
     {},

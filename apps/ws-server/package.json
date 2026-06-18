@@ -113,6 +113,7 @@
         "dist/resolver/chat-utils.d.ts",
         "dist/resolver/chat.d.ts",
         "dist/resolver/connection.d.ts",
+        "dist/resolver/convo-hydration.d.ts",
         "dist/resolver/dispatch.d.ts",
         "dist/resolver/index.d.ts",
         "dist/resolver/tts.d.ts",

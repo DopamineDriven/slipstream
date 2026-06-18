@@ -36,9 +36,20 @@ export class AnthropicBaseService {
       mod === "claude-opus-4-7" ||
       mod === "claude-opus-4-6" ||
       mod === "claude-sonnet-4-6" ||
-      mod ==="claude-fable-5"
+      mod === "claude-opus-4-5-20251101" ||
+      mod === "claude-fable-5"
     );
   }
+
+  protected isAnthropicModel(m: string) {
+    return (
+      this.supportsAdaptive(m) ||
+      m === "claude-sonnet-4-5-20250929" ||
+      m === "claude-haiku-4-5-20251001" ||
+      m === "claude-opus-4-1-20250805"
+    );
+  }
+
   protected handleBetaHeaders(
     model: AnthropicModelIdUnion,
     withLocalStore = false
@@ -112,8 +123,7 @@ export class AnthropicBaseService {
         }
       }
       // input context window 1m is only supported by claude sonnet 4 & 4.5 / Opus 4.6
-      case "claude-sonnet-4-5-20250929":
-      case "claude-sonnet-4-20250514": {
+      case "claude-sonnet-4-5-20250929":{
         // advanced-tool-use supported by claude sonnet|opus 4.5/4.6 only
         if (withLocalStore && model === "claude-sonnet-4-5-20250929") {
           return [
@@ -134,7 +144,6 @@ export class AnthropicBaseService {
           ] satisfies Anthropic.Beta.AnthropicBeta[];
         }
       }
-      case "claude-opus-4-20250514":
       case "claude-opus-4-1-20250805":
       case "claude-haiku-4-5-20251001": {
         return [
@@ -153,25 +162,21 @@ export class AnthropicBaseService {
     "claude-opus-4-7": 128000,
     "claude-sonnet-4-6": 64000,
     "claude-opus-4-6": 128000,
-    "claude-opus-4-20250514": 32000,
     "claude-opus-4-1-20250805": 32000,
     "claude-opus-4-5-20251101": 64000,
     "claude-haiku-4-5-20251001": 64000,
-    "claude-sonnet-4-20250514": 64000,
     "claude-sonnet-4-5-20250929": 64000
   } as const;
 
   protected inputTokenCeilingByModel = {
-    "claude-fable-5":  1000000,
+    "claude-fable-5": 1000000,
     "claude-opus-4-8": 1000000,
     "claude-opus-4-7": 1000000,
     "claude-sonnet-4-6": 1000000,
     "claude-opus-4-6": 1000000,
-    "claude-opus-4-20250514": 200000,
     "claude-opus-4-1-20250805": 200000,
     "claude-opus-4-5-20251101": 200000,
     "claude-haiku-4-5-20251001": 200000,
-    "claude-sonnet-4-20250514": 1000000,
     "claude-sonnet-4-5-20250929": 1000000
   } as const;
 

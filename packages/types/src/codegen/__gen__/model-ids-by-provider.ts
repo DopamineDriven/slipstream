@@ -58,14 +58,10 @@ export const modelIdsByProvider = {
     "gemini-2.5-flash-image",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
-    "deep-research-pro-preview-12-2025",
     "deep-research-max-preview-04-2026",
     "deep-research-preview-04-2026",
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite",
-    "imagen-4.0-generate-001",
-    "imagen-4.0-fast-generate-001",
-    "imagen-4.0-ultra-generate-001",
     "veo-3.1-generate-preview",
     "veo-3.1-fast-generate-preview",
     "veo-3.0-generate-001",
@@ -92,18 +88,13 @@ export const modelIdsByProvider = {
     "claude-sonnet-4-5-20250929",
     "claude-opus-4-5-20251101",
     "claude-haiku-4-5-20251001",
-    "claude-opus-4-1-20250805",
-    "claude-sonnet-4-20250514",
-    "claude-opus-4-20250514"
+    "claude-opus-4-1-20250805"
   ],
   meta: [
     "Llama-4-Maverick-17B-128E-Instruct-FP8",
     "Llama-4-Scout-17B-16E-Instruct-FP8",
     "Llama-3.3-70B-Instruct",
-    "Llama-3.3-8B-Instruct",
-    "Cerebras-Llama-4-Maverick-17B-128E-Instruct",
-    "Cerebras-Llama-4-Scout-17B-16E-Instruct",
-    "Groq-Llama-4-Maverick-17B-128E-Instruct"
+    "Llama-3.3-8B-Instruct"
   ],
   vercel: ["v0-1.5-md", "v0-1.0-md"],
   mistral: [
@@ -119,7 +110,7 @@ export const modelIdsByProvider = {
   ],
   moonshotai: ["kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
   deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
-  zai: ["glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
+  zai: ["glm-5.2", "glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
   alibaba: [
     "qwen3.7-max",
     "qwen3.7-plus",

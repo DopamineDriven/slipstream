@@ -26,17 +26,12 @@ export const displayNameToModelIdImgGen = {
     "GPT Image 1 mini": "gpt-image-1-mini"
   },
   gemini: {
-    "Deep Research Pro Preview (Dec-12-2025)":
-      "deep-research-pro-preview-12-2025",
     "Deep Research Max Preview (Apr-21-2026)":
       "deep-research-max-preview-04-2026",
     "Deep Research Preview (Apr-21-2026)": "deep-research-preview-04-2026",
     "Nano Banana 2": "gemini-3.1-flash-image-preview",
     "Nano Banana Pro": "gemini-3-pro-image-preview",
-    "Nano Banana": "gemini-2.5-flash-image",
-    "Imagen 4": "imagen-4.0-generate-001",
-    "Imagen 4 Fast": "imagen-4.0-fast-generate-001",
-    "Imagen 4 Ultra": "imagen-4.0-ultra-generate-001"
+    "Nano Banana": "gemini-2.5-flash-image"
   },
   grok: {
     "Grok Imagine Image": "grok-imagine-image",

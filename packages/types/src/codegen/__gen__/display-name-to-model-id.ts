@@ -58,16 +58,11 @@ export const displayNameToModelId = {
     "Nano Banana": "gemini-2.5-flash-image",
     "Gemini 2.5 Flash": "gemini-2.5-flash",
     "Gemini 2.5 Flash-Lite": "gemini-2.5-flash-lite",
-    "Deep Research Pro Preview (Dec-12-2025)":
-      "deep-research-pro-preview-12-2025",
     "Deep Research Max Preview (Apr-21-2026)":
       "deep-research-max-preview-04-2026",
     "Deep Research Preview (Apr-21-2026)": "deep-research-preview-04-2026",
     "Gemini 2.0 Flash": "gemini-2.0-flash",
     "Gemini 2.0 Flash-Lite": "gemini-2.0-flash-lite",
-    "Imagen 4": "imagen-4.0-generate-001",
-    "Imagen 4 Fast": "imagen-4.0-fast-generate-001",
-    "Imagen 4 Ultra": "imagen-4.0-ultra-generate-001",
     "Veo 3.1": "veo-3.1-generate-preview",
     "Veo 3.1 fast": "veo-3.1-fast-generate-preview",
     "Veo 3": "veo-3.0-generate-001",
@@ -94,9 +89,7 @@ export const displayNameToModelId = {
     "Claude Sonnet 4.5": "claude-sonnet-4-5-20250929",
     "Claude Opus 4.5": "claude-opus-4-5-20251101",
     "Claude Haiku 4.5": "claude-haiku-4-5-20251001",
-    "Claude Opus 4.1": "claude-opus-4-1-20250805",
-    "Claude Sonnet 4": "claude-sonnet-4-20250514",
-    "Claude Opus 4": "claude-opus-4-20250514"
+    "Claude Opus 4.1": "claude-opus-4-1-20250805"
   },
   meta: {
     "Llama 4 Maverick (17B/128E, Instruct, FP8)":
@@ -104,13 +97,7 @@ export const displayNameToModelId = {
     "Llama 4 Scout (17B/16E, Instruct, FP8)":
       "Llama-4-Scout-17B-16E-Instruct-FP8",
     "Llama 3.3 (70B, Instruct)": "Llama-3.3-70B-Instruct",
-    "Llama 3.3 (8B, Instruct)": "Llama-3.3-8B-Instruct",
-    "Llama 4 Maverick (Cerebras, 17B/128E, Instruct)":
-      "Cerebras-Llama-4-Maverick-17B-128E-Instruct",
-    "Llama 4 Scout (Cerebras, 17B/16E, Instruct)":
-      "Cerebras-Llama-4-Scout-17B-16E-Instruct",
-    "Llama 4 Maverick (Groq, 17B/128E, Instruct)":
-      "Groq-Llama-4-Maverick-17B-128E-Instruct"
+    "Llama 3.3 (8B, Instruct)": "Llama-3.3-8B-Instruct"
   },
   vercel: {
     "v0 medium": "v0-1.5-md",
@@ -138,6 +125,7 @@ export const displayNameToModelId = {
     "DeepSeek R1": "deepseek-r1"
   },
   zai: {
+    "GLM 5.2": "glm-5.2",
     "GLM 5.1": "glm-5.1",
     "GLM 5": "glm-5",
     "GLM 4.7": "glm-4.7",
