@@ -69,6 +69,7 @@ export default defineConfig(
         "src/resolver/chat-utils.ts",
         "src/resolver/chat.ts",
         "src/resolver/connection.ts",
+        "src/resolver/convo-hydration.ts",
         "src/resolver/dispatch.ts",
         "src/resolver/index.ts",
         "src/resolver/tts.ts",

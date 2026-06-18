@@ -58,14 +58,10 @@ export const displayNameModelsByProvider = {
     "Nano Banana",
     "Gemini 2.5 Flash",
     "Gemini 2.5 Flash-Lite",
-    "Deep Research Pro Preview (Dec-12-2025)",
     "Deep Research Max Preview (Apr-21-2026)",
     "Deep Research Preview (Apr-21-2026)",
     "Gemini 2.0 Flash",
     "Gemini 2.0 Flash-Lite",
-    "Imagen 4",
-    "Imagen 4 Fast",
-    "Imagen 4 Ultra",
     "Veo 3.1",
     "Veo 3.1 fast",
     "Veo 3",
@@ -92,18 +88,13 @@ export const displayNameModelsByProvider = {
     "Claude Sonnet 4.5",
     "Claude Opus 4.5",
     "Claude Haiku 4.5",
-    "Claude Opus 4.1",
-    "Claude Sonnet 4",
-    "Claude Opus 4"
+    "Claude Opus 4.1"
   ],
   meta: [
     "Llama 4 Maverick (17B/128E, Instruct, FP8)",
     "Llama 4 Scout (17B/16E, Instruct, FP8)",
     "Llama 3.3 (70B, Instruct)",
-    "Llama 3.3 (8B, Instruct)",
-    "Llama 4 Maverick (Cerebras, 17B/128E, Instruct)",
-    "Llama 4 Scout (Cerebras, 17B/16E, Instruct)",
-    "Llama 4 Maverick (Groq, 17B/128E, Instruct)"
+    "Llama 3.3 (8B, Instruct)"
   ],
   vercel: ["v0 medium", "v0 medium (legacy)"],
   mistral: [
@@ -115,7 +106,7 @@ export const displayNameModelsByProvider = {
   cohere: ["Command A Plus", "Command A Reasoning", "Command A"],
   moonshotai: ["Kimi K2.6", "Kimi K2.5", "Kimi K2 Thinking"],
   deepseek: ["DeepSeek V4 Pro", "DeepSeek V4 Flash", "DeepSeek R1"],
-  zai: ["GLM 5.1", "GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"],
+  zai: ["GLM 5.2", "GLM 5.1", "GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"],
   alibaba: [
     "Qwen3.7-Max",
     "Qwen3.7-Plus",

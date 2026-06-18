@@ -45,7 +45,6 @@ export type {
   AIChatResponseImgGenFields,
   AIChatResponseImgGenFieldsFinal,
   AIChatResponseImgGenSubFields,
-  BaseImagenOutpiutAR,
   BaseNanoBananaOutputAR,
   BaseOpenAISize,
   GeminiImageQuality,
@@ -56,7 +55,6 @@ export type {
   GoogleHarmCategory,
   GoogleImagePromptLanguage,
   GoogleImagenGenerateImagesConfig,
-  GoogleImgOutputFormat,
   GoogleImgSizeQualityOpts,
   GooglePersonGeneration,
   GoogleSafetyFilterLevel,
@@ -72,7 +70,6 @@ export type {
   GrokModelAspectRatioWorkup,
   ImageGenOptsByProvider,
   ImageGenPartialArr,
-  ImagenOptions,
   ImagenOutputSize,
   ImgGenStage,
   ImgGenWorkupRT,
@@ -130,6 +127,7 @@ export type {
   UnknownSpecs,
   UploadMethod,
   UserMetadata,
+  UserRxnAction,
   WithExpiry
 } from "@/events-workup.ts";
 

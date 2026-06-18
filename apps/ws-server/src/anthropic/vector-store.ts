@@ -395,13 +395,13 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     };
   }
 
-  private is4dot67Model(m = "claude-opus-4-6") {
+  private isAdaptiveCapable(m = "claude-opus-4-6") {
     return this.supportsAdaptive(m);
   }
 
   private handleEffort(model: string | null) {
     if (!model) return;
-    if (!this.is4dot67Model(model)) return;
+    if (!this.isAdaptiveCapable(model)) return;
     if (model === "claude-opus-4-8" || model === "claude-fable-5") {
       return { effort: "max" } as const;
     }
@@ -415,7 +415,12 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     }
   }
 
-  // ─── Multi-turn tool use streaming loop ──────────────────────────────
+  private interceptFableTemporary(model: string | undefined) {
+    if (!model) return "claude-opus-4-6" as const;
+    if (!this.isAnthropicModel(model)) return "claude-opus-4-6" as const;
+    if (model === "claude-fable-5") return "claude-opus-4-8" as const;
+    else return model;
+  }
 
   protected async createStreamWorkup({
     isNewChat,
@@ -431,7 +436,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     topP,
     user_location
   }: MessageInputParams) {
-    const model = m as AnthropicModelIdUnion;
+    const model = this.interceptFableTemporary(m);
 
     const keyFingerprint = keyId ?? "server";
 

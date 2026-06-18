@@ -95,7 +95,6 @@ export class ModelService extends ProviderValidation {
       m === "gemini-2.5-pro" ||
       m === "gemini-2.5-flash-lite" ||
       m === "gemini-2.5-flash" ||
-      m === "deep-research-pro-preview-12-2025" ||
       m === "deep-research-max-preview-04-2026" ||
       m === "deep-research-preview-04-2026" ||
       m === "gemini-3-pro-image-preview" ||
@@ -103,9 +102,6 @@ export class ModelService extends ProviderValidation {
       m === "gemini-2.5-flash-image" ||
       m === "gemini-2.0-flash" ||
       m === "gemini-2.0-flash-lite" ||
-      m === "imagen-4.0-fast-generate-001" ||
-      m === "imagen-4.0-ultra-generate-001" ||
-      m === "imagen-4.0-generate-001" ||
       m === "veo-3.0-fast-generate-001" ||
       m === "veo-3.0-generate-001" ||
       m === "veo-2.0-generate-001" ||
@@ -283,7 +279,7 @@ export class ModelService extends ProviderValidation {
           providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"zai">)
         ) {
           return model;
-        } else return "glm-5.1" as const as NonNullable<K>;
+        } else return "glm-5.2" as const as NonNullable<K>;
       }
       case "alibaba": {
         if (

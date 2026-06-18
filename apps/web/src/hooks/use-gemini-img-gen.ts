@@ -10,15 +10,11 @@ import type {
 
 export type GeminiImgModelId = GeminiImgGenModels;
 
-export type ImagenAR = GeminiImageSize["imagen-4.0-fast-generate-001"];
-
 export type NanoBananaAR = GeminiImageSize["gemini-3-pro-image-preview"];
 
 export type NanoBanana2AR = GeminiImageSize["gemini-3.1-flash-image-preview"];
 
 export type GoogleAspectRatio = NanoBanana2AR;
-
-export type ImagenQuality = GeminiImageQuality["imagen-4.0-fast-generate-001"];
 
 export type NanoBananaQuality =
   GeminiImageQuality["gemini-3-pro-image-preview"];
@@ -39,22 +35,15 @@ export interface GoogleImageSettingsUpdates {
 }
 
 export function isGoogleImgGenCapable(m: string) {
-  return imgCtx.geminiNanoBananasModel(m) || imgCtx.geminiImageGenModel(m);
+  return imgCtx.geminiNanoBananasModel(m);
 }
 
-function isImagenModel(m: string | null) {
-  return imgCtx.geminiImageGenModel(m ?? "imagen-4.0-ultra-generate-001");
-}
-
-const IMAGEN_ASPECT_RATIOS = [
+const NANO_BANANA_ASPECT_RATIOS = [
   "1:1",
   "3:4",
   "4:3",
   "9:16",
-  "16:9"
-] satisfies ImagenAR[];
-const NANO_BANANA_ASPECT_RATIOS = [
-  ...IMAGEN_ASPECT_RATIOS,
+  "16:9",
   "2:3",
   "3:2",
   "4:5",
@@ -73,13 +62,10 @@ const MODEL_ASPECT_RATIOS = new Map<GeminiImgModelId, GoogleAspectRatio[]>([
   ["gemini-3.1-flash-image-preview", NANO_BANANA_2_ASPECT_RATIOS],
   ["gemini-3-pro-image-preview", NANO_BANANA_ASPECT_RATIOS],
   ["gemini-2.5-flash-image", NANO_BANANA_ASPECT_RATIOS],
-  ["deep-research-pro-preview-12-2025", NANO_BANANA_ASPECT_RATIOS],
-  ["imagen-4.0-generate-001", IMAGEN_ASPECT_RATIOS],
-  ["imagen-4.0-fast-generate-001", IMAGEN_ASPECT_RATIOS],
-  ["imagen-4.0-ultra-generate-001", IMAGEN_ASPECT_RATIOS]
+  ["deep-research-max-preview-04-2026", NANO_BANANA_ASPECT_RATIOS],
+  ["deep-research-preview-04-2026", NANO_BANANA_ASPECT_RATIOS]
 ]);
 
-const IMAGEN_QUALITIES = ["1K", "2K"] satisfies ImagenQuality[];
 const NANO_BANANA_QUALITIES = ["1K", "2K", "4K"] satisfies NanoBananaQuality[];
 const NANO_BANANA_2_QUALITIES = [
   "0.5K",
@@ -92,10 +78,8 @@ const MODEL_QUALITIES = new Map<GeminiImgModelId, GoogleQuality[]>([
   ["gemini-3.1-flash-image-preview", NANO_BANANA_2_QUALITIES],
   ["gemini-3-pro-image-preview", NANO_BANANA_QUALITIES],
   ["gemini-2.5-flash-image", NANO_BANANA_QUALITIES],
-  ["deep-research-pro-preview-12-2025", NANO_BANANA_QUALITIES],
-  ["imagen-4.0-generate-001", IMAGEN_QUALITIES],
-  ["imagen-4.0-fast-generate-001", IMAGEN_QUALITIES],
-  ["imagen-4.0-ultra-generate-001", IMAGEN_QUALITIES]
+  ["deep-research-max-preview-04-2026", NANO_BANANA_QUALITIES],
+  ["deep-research-preview-04-2026", NANO_BANANA_QUALITIES]
 ]);
 
 const IMAGEN_DEFAULTS = {
@@ -111,18 +95,12 @@ const MODEL_DEFAULTS = new Map<GeminiImgModelId, GoogleImageSettings>([
   ["gemini-3.1-flash-image-preview", NANO_BANANA_DEFAULTS],
   ["gemini-3-pro-image-preview", NANO_BANANA_DEFAULTS],
   ["gemini-2.5-flash-image", NANO_BANANA_DEFAULTS],
-  ["deep-research-pro-preview-12-2025", NANO_BANANA_DEFAULTS],
-  ["imagen-4.0-generate-001", IMAGEN_DEFAULTS],
-  ["imagen-4.0-fast-generate-001", IMAGEN_DEFAULTS],
-  ["imagen-4.0-ultra-generate-001", IMAGEN_DEFAULTS]
+  ["deep-research-max-preview-04-2026", NANO_BANANA_DEFAULTS],
+  ["deep-research-preview-04-2026", NANO_BANANA_DEFAULTS]
 ]);
 
-export function isValidImagenAR(ar: string) {
-  return imgCtx.isValidImagenAR(ar);
-}
-
 export function isValidNanoBananaAR(ar: string) {
-  return isValidImagenAR(ar) || imgCtx.isValidNanoBananaGenOneAR(ar);
+  return imgCtx.isValidNanoBananaGenOneAR(ar);
 }
 
 export function isValidNanoBanana2AR(ar: string) {
@@ -154,7 +132,8 @@ function getStorageKey(modelId: string) {
 export function useGoogleImageSettings(modelId: string) {
   const isCapable = isGoogleImgGenCapable(modelId);
   const googleModelId = isCapable
-    ? Array.from(MODEL_DEFAULTS.keys()).find(model => model === modelId) ?? null
+    ? (Array.from(MODEL_DEFAULTS.keys()).find(model => model === modelId) ??
+      null)
     : null;
   const defaultSettings = googleModelId
     ? (MODEL_DEFAULTS.get(googleModelId) ?? IMAGEN_DEFAULTS)
@@ -184,7 +163,8 @@ export function useGoogleImageSettings(modelId: string) {
           aspectRatioOptions.find(option => option === ar) ??
           defaultSettings.aspectRatio;
         const quality =
-          qualityOptions.find(option => option === q) ?? defaultSettings.quality;
+          qualityOptions.find(option => option === q) ??
+          defaultSettings.quality;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setSettings({
           aspectRatio,
@@ -196,7 +176,13 @@ export function useGoogleImageSettings(modelId: string) {
     } catch {
       setSettings(defaultSettings);
     }
-  }, [aspectRatioOptions, defaultSettings, googleModelId, modelId, qualityOptions]);
+  }, [
+    aspectRatioOptions,
+    defaultSettings,
+    googleModelId,
+    modelId,
+    qualityOptions
+  ]);
 
   useEffect(() => {
     if (!googleModelId) return;
@@ -208,23 +194,26 @@ export function useGoogleImageSettings(modelId: string) {
     }
   }, [modelId, googleModelId, settings]);
 
-  const updateSettings = useCallback((updates: GoogleImageSettingsUpdates) => {
-    setSettings(prev => {
-      const aspectRatio =
-        typeof updates.aspectRatio === "string"
-          ? aspectRatioOptions.find(option => option === updates.aspectRatio)
-          : undefined;
-      const quality =
-        typeof updates.quality === "string"
-          ? qualityOptions.find(option => option === updates.quality)
-          : undefined;
+  const updateSettings = useCallback(
+    (updates: GoogleImageSettingsUpdates) => {
+      setSettings(prev => {
+        const aspectRatio =
+          typeof updates.aspectRatio === "string"
+            ? aspectRatioOptions.find(option => option === updates.aspectRatio)
+            : undefined;
+        const quality =
+          typeof updates.quality === "string"
+            ? qualityOptions.find(option => option === updates.quality)
+            : undefined;
 
-      return {
-        aspectRatio: aspectRatio ?? prev.aspectRatio,
-        quality: quality ?? prev.quality
-      };
-    });
-  }, [aspectRatioOptions, qualityOptions]);
+        return {
+          aspectRatio: aspectRatio ?? prev.aspectRatio,
+          quality: quality ?? prev.quality
+        };
+      });
+    },
+    [aspectRatioOptions, qualityOptions]
+  );
 
   const resetSettings = useCallback(() => {
     setSettings(defaultSettings);
@@ -238,7 +227,7 @@ export function useGoogleImageSettings(modelId: string) {
     modelId: googleModelId,
     aspectRatios: aspectRatioOptions,
     qualities: qualityOptions,
-    supportsOutputFormat: isImagenModel(googleModelId),
+    supportsOutputFormat: false,
     supportsBackground: false
   };
 }

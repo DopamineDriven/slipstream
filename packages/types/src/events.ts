@@ -536,19 +536,19 @@ export type ImageGenRequest = {
   batchId?: string;
   metadata?: UserMetadata;
   /**
-   * gpt-image-1.5 & gpt-image-1 only
+   * gpt-image-2, gpt-image-1.5 & gpt-image-1 only
    *
    * values include "high" | "low" | null
    */
   input_fidelity?: string;
   /**
-   * gpt-image-1.5, gpt-image-1, and gpt-image-1-mini only
+   * gpt-image-2, gpt-image-1.5, gpt-image-1, and gpt-image-1-mini only
    *
    * values include "low" | "auto"
    */
   moderation?: string;
   /**
-   * gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
+   * gpt-image-2, gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * n=1 (default),
    * n=10 (max)
@@ -558,12 +558,8 @@ export type ImageGenRequest = {
    * n=1 (default),
    * n=10 (max)
    *
-   *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
-   * n=1 (default),
-   * n=4 (max)
-   *
-   * grok-imagine-image (uncertain as to how xAI caps grok-imagine-image-pro)
+   * grok-imagine-image (uncertain as to how xAI caps grok-imagine-image-quality)
    *
    * n=1 (default),
    * n=10 (max)
@@ -593,21 +589,15 @@ export type ImageGenRequest = {
   output_format?: string;
   /**
    *
-   *  gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
+   * gpt-image-2, gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * output must be of type jpeg or webp
    *
    * Range: 0-100. Default: 100
-   *
-   *
-   *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
-   *
-   * Only applies if mimeType is "image/jpeg",
-   * Range: 0-100. Default: 75
    */
   output_compression?: number;
   /**
-   * gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
+   * gpt-image-2, gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * "auto" (default); "transparent" | "opaque" | "auto"
    *
@@ -615,7 +605,7 @@ export type ImageGenRequest = {
    */
   output_background?: "transparent" | "opaque" | "auto";
   /**
-   *  gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
+   *  gpt-image-2, gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * "auto" (default); "low" | "medium" | "high" | "auto"
    *
@@ -625,13 +615,9 @@ export type ImageGenRequest = {
    */
   output_quality: string;
   /**
-   *  gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
+   *  gpt-image-2, gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
    * "auto" (default); "1024x1024" | "1536x1024" | "1024x1536" | "auto"
-   *
-   *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
-   *
-   * "1:1" (default); "1:1" | "9:16" | "16:9" | "3:4" | "4:3"
    *
    * gemini-2.5-flash-image:
    *

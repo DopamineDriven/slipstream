@@ -26,9 +26,7 @@ export type AllPureImgGenModelsUnion =
   | OpenAIImgGenModels
   | Exclude<
       GeminiImgGenModels,
-      | "deep-research-pro-preview-12-2025"
-      | "deep-research-max-preview-04-2026"
-      | "deep-research-preview-04-2026"
+      "deep-research-max-preview-04-2026" | "deep-research-preview-04-2026"
     >
   | GrokImgGenModels;
 
@@ -57,20 +55,12 @@ export type ModelToQualityOpts<T extends AllModelsUnion> =
       ? T extends
           | "gemini-3-pro-image-preview"
           | "gemini-3.1-flash-image-preview"
-          | "deep-research-pro-preview-12-2025"
           | "deep-research-max-preview-04-2026"
           | "deep-research-preview-04-2026"
         ? T extends "gemini-3.1-flash-image-preview"
           ? GeminiImageQuality["gemini-3.1-flash-image-preview"]
-          : GeminiImageQuality[
-              | "gemini-3-pro-image-preview"
-              | "deep-research-pro-preview-12-2025"]
-        : T extends
-              | "imagen-4.0-generate-001"
-              | "imagen-4.0-fast-generate-001"
-              | "imagen-4.0-ultra-generate-001"
-          ? GeminiImageQuality["imagen-4.0-fast-generate-001"]
-          : undefined
+          : GeminiImageQuality[GeminiImgGenModels]
+        : undefined
       : T extends GrokImagineImgModelUnion
         ? "1k" | "2k" | "4k" | "auto"
         : T extends OpenAIImgCapableModels
@@ -81,12 +71,7 @@ export type ModelToQualityOpts<T extends AllModelsUnion> =
 export type ModelToOutputFormatOpts<Q extends AllModelsUnion> =
   Q extends OpenAIImgCapableModels
     ? "png" | "jpeg" | "webp" | undefined
-    : Q extends
-          | "imagen-4.0-generate-001"
-          | "imagen-4.0-fast-generate-001"
-          | "imagen-4.0-ultra-generate-001"
-      ? "image/png" | "image/jpeg" | undefined
-      : undefined;
+    : undefined;
 
 export type BackgroundFormattingOpts = {
   background?: "auto" | "transparent" | "opaque";
@@ -161,7 +146,6 @@ export class ProviderValidation {
   }
   public geminiDeepResearchModel(m: string) {
     return (
-      m === "deep-research-pro-preview-12-2025" ||
       m === "deep-research-max-preview-04-2026" ||
       m === "deep-research-preview-04-2026"
     );
@@ -175,16 +159,9 @@ export class ProviderValidation {
       m === "gemini-3-pro-image-preview"
     );
   }
-  public geminiImageGenModel(m: string) {
-    return (
-      m === "imagen-4.0-fast-generate-001" ||
-      m === "imagen-4.0-generate-001" ||
-      m === "imagen-4.0-ultra-generate-001"
-    );
-  }
 
   public geminiImgGenCapable(m: string) {
-    return this.geminiNanoBananasModel(m) || this.geminiImageGenModel(m);
+    return this.geminiNanoBananasModel(m);
   }
 
   public isImgGenCapableModel<const V extends string = string>(
@@ -216,7 +193,6 @@ export class ProviderValidation {
       return false;
     } else {
       if (
-        model === "deep-research-pro-preview-12-2025" ||
         model === "deep-research-max-preview-04-2026" ||
         model === "deep-research-preview-04-2026"
       )
@@ -268,19 +244,11 @@ export class ProviderValidation {
       } else return 1;
     }
     if (this.geminiImgGenCapable(model)) {
-      if (this.geminiImageGenModel(model)) {
-        if (data?.n) {
-          if (data.n < 1) return 1;
-          if (data.n > 4) return 4;
-          return data.n;
-        } else return 1;
-      } else {
-        if (data?.n) {
-          if (data.n < 1) return 1;
-          if (data.n > 10) return 10;
-          return data.n;
-        } else return 1;
-      }
+      if (data?.n) {
+        if (data.n < 1) return 1;
+        if (data.n > 10) return 10;
+        return data.n;
+      } else return 1;
     }
 
     if (this.openAIImgGenCapable(model)) {
@@ -309,7 +277,7 @@ export class ProviderValidation {
     const f = data?.format;
     if (!m) return undefined;
 
-    if (!(this.openAIImgGenCapable(m) || this.geminiImageGenModel(m))) return;
+    if (!this.openAIImgGenCapable(m)) return;
     if (f && this.isValidOpenAIOutputFormat(f)) {
       return f;
     }
@@ -335,7 +303,7 @@ export class ProviderValidation {
   }
 
   /**
-   * **gpt-image-1 and gpt-image-1.5 only**
+   * **gpt-image-1 and gpt-image-1.5 only and gpt-image-2 **
    */
   public handleInputFidelity(
     provider: Provider,
@@ -365,35 +333,20 @@ export class ProviderValidation {
 
     const m = model;
 
-    if (
-      !(
-        this.geminiImageGenModel(m) ||
-        this.openAIFacilitatingImgGenModel(m) ||
-        this.openAIGptImgModel(m)
-      )
-    ) {
+    if (!(this.openAIFacilitatingImgGenModel(m) || this.openAIGptImgModel(m))) {
       return;
     }
     const f = data?.output_format as "png" | "jpeg" | "webp" | undefined;
 
-    if (this.geminiImageGenModel(m)) {
-      if (typeof data?.output_compression === "undefined") return 75;
-      return data?.output_compression >= 0 && data?.output_compression <= 100
-        ? data.output_compression
-        : data.output_compression > 100
-          ? 100
-          : 75;
-    } else {
-      if (typeof f !== "undefined") {
-        if (typeof data?.output_compression !== "undefined") {
-          return f === "png"
-            ? undefined
-            : data.output_compression >= 0 && data.output_compression <= 100
-              ? data.output_compression
-              : 100;
-        } else return 100;
-      } else return;
-    }
+    if (typeof f !== "undefined") {
+      if (typeof data?.output_compression !== "undefined") {
+        return f === "png"
+          ? undefined
+          : data.output_compression >= 0 && data.output_compression <= 100
+            ? data.output_compression
+            : 100;
+      } else return 100;
+    } else return;
   }
 
   public handleModeration(
@@ -414,26 +367,6 @@ export class ProviderValidation {
     ) {
       return data.moderation;
     } else return "low";
-  }
-
-  public handlePersonGeneration(
-    model?: AllModelsUnion,
-    data?: {
-      personGeneration?:
-        | "DONT_ALLOW"
-        | "ALLOW_ADULT"
-        | "ALLOW_ALL"
-        | (string & {});
-    }
-  ) {
-    if (!model) return;
-    if (!this.geminiImageGenModel(model)) return;
-    const p = data?.personGeneration;
-    if (typeof p !== "undefined") {
-      if (/^(dont_allow|allow_(all|adult))$/gim.test(p)) {
-        return p;
-      } else return "ALLOW_ADULT";
-    } else return "ALLOW_ADULT";
   }
 
   /**1:1 | 2:3 | 3:2 | 3:4 | 4:3 | 16:9 | 9:16 | 19\.5:9 | 9:19\.5 | 9:20 | 20:9 | 1:2 | 2:1 | auto */
@@ -465,19 +398,13 @@ export class ProviderValidation {
     return q === "1k" || q === "2k";
   }
 
-  public isValidImagenAR(ar: string) {
+  public isValidNanoBananaGenOneAR(ar: string) {
     return (
+      ar === "16:9" ||
       ar === "1:1" ||
       ar === "3:4" ||
       ar === "4:3" ||
       ar === "9:16" ||
-      ar === "16:9"
-    );
-  }
-
-  public isValidNanoBananaGenOneAR(ar: string) {
-    return (
-      this.isValidImagenAR(ar) ||
       ar === "2:3" ||
       ar === "3:2" ||
       ar === "4:5" ||
@@ -505,18 +432,10 @@ export class ProviderValidation {
     m:
       | "gemini-3-pro-image-preview"
       | "gemini-2.5-flash-image"
-      | "deep-research-pro-preview-12-2025"
       | "deep-research-preview-04-2026"
       | "deep-research-max-preview-04-2026",
     data?: { output_size: BaseNanoBananaOutputAR }
   ): BaseNanoBananaOutputAR | undefined;
-  public geminiAspectRatio(
-    m:
-      | "imagen-4.0-generate-001"
-      | "imagen-4.0-fast-generate-001"
-      | "imagen-4.0-ultra-generate-001",
-    data?: { output_size: ImagenOutputSize }
-  ): ImagenOutputSize | undefined;
   public geminiAspectRatio(
     m: GeminiImgGenModels,
     data?: {
@@ -527,9 +446,6 @@ export class ProviderValidation {
     }
   ) {
     if (!data?.output_size) return;
-    if (this.geminiImageGenModel(m) && this.isValidImagenAR(data.output_size)) {
-      return data.output_size;
-    }
     if (this.geminiNanoBananasModel(m)) {
       if (
         m === "gemini-3.1-flash-image-preview" &&
@@ -564,6 +480,13 @@ export class ProviderValidation {
     const m = model;
 
     if (this.geminiNanoBananasModel(m) && m !== "gemini-2.5-flash-image") {
+      if (
+        m === "gemini-3.1-flash-image-preview" &&
+        q &&
+        this.isValidNanoBananaTwoOutputQuality(q)
+      ) {
+        return q;
+      }
       if (q && this.isValidNanoBananaProAndTwoOutputQuality(q)) {
         return q;
       } else return "2K";
@@ -574,11 +497,6 @@ export class ProviderValidation {
       } else {
         return "2K" as const satisfies GeminiImageQuality["gemini-3.1-flash-image-preview"];
       }
-    }
-    if (this.geminiImageGenModel(m)) {
-      if (q && this.isValidImagenOutputQuality(q)) {
-        return q;
-      } else return "1K";
     }
     if (this.grokImagineImgGenModel(model)) {
       if (q && this.isValidGrokQuality(q)) {
@@ -775,12 +693,6 @@ export class ProviderValidation {
 
     if (this.geminiImgGenCapable(m)) {
       const ar = data?.output_size;
-      if (this.geminiImageGenModel(m)) {
-        if (ar && this.isValidImagenAR(ar)) {
-          return ar;
-        } else return "1:1";
-      }
-
       if (m === "gemini-3.1-flash-image-preview") {
         if (ar && this.isValidNanoBananaGenTwoAR(ar)) {
           return ar;
@@ -848,9 +760,7 @@ export class ProviderValidation {
       inputFidelity = this.handleInputFidelity(provider, model, {
         input_fidelity: data.imgGenFields?.input_fidelity
       }),
-      personGeneration = this.handlePersonGeneration(model, {
-        personGeneration: data.imgGenFields?.personGeneration
-      }),
+      personGeneration = undefined,
       progress = 0,
       partialImagesRequested = this.handlePartialImgGen(model, {
         partialImagesRequested: data.imgGenFields?.output_partial_images

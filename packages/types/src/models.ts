@@ -20,9 +20,6 @@ export type ImageGenModels =
   | "gpt-image-1-mini"
   | "grok-imagine-image"
   | "grok-imagine-image-quality"
-  | "imagen-4.0-fast-generate-001"
-  | "imagen-4.0-ultra-generate-001"
-  | "imagen-4.0-generate-001"
   | "gemini-2.5-flash-image"
   | "gemini-3-pro-image-preview"
   | "gemini-3.1-flash-image-preview";
@@ -33,12 +30,8 @@ export const providerModelImageGenApi = {
     "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
-    "deep-research-pro-preview-12-2025",
     "deep-research-max-preview-04-2026",
-    "deep-research-preview-04-2026",
-    "imagen-4.0-fast-generate-001",
-    "imagen-4.0-generate-001",
-    "imagen-4.0-ultra-generate-001"
+    "deep-research-preview-04-2026"
   ],
   grok: ["grok-imagine-image-quality", "grok-imagine-image"]
 } as const;
@@ -76,7 +69,6 @@ export const providerModelImageGenFacilitatingApi = {
     "gemini-3.1-flash-image-preview",
     "gemini-2.5-flash-image",
     "gemini-3-pro-image-preview",
-    "deep-research-pro-preview-12-2025",
     "deep-research-max-preview-04-2026",
     "deep-research-preview-04-2026"
   ]
