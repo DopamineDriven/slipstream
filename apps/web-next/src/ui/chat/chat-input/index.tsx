@@ -22,7 +22,6 @@ import { cn } from "@/lib/utils";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { ChatInputImageGenSettingsDrawer } from "@/ui/chat/chat-input/image-gen-controls";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
-import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
 import { motion } from "motion/react";
 import type { AIChatRequestImgGenFields } from "@slipstream/types";
 import {
@@ -724,11 +723,11 @@ export function ChatInput({
                         : "Selected model does not support image generation"
                       }
                       disabled={!imgGen.supported}
-                      className={
+                      className={cn(
                         imgGen.enabled ?
                           "hover:bg-accent text-foreground h-8"
                         : "hover:bg-accent text-muted-foreground hover:text-foreground h-8"
-                      }
+                      )}
                       onClick={handleToggleImageMode}>
                       <ImageGen className="size-4" />
                       <span className="sr-only">Toggle Image Generation</span>
@@ -789,7 +788,6 @@ export function ChatInput({
         onOpenChangeAction={setIsImageSettingsOpen}
         isMobile={isMobile}
       />
-      <MobileModelSelectorDrawer />
     </>
   );
 }

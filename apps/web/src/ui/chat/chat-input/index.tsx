@@ -22,7 +22,6 @@ import { cn } from "@/lib/utils";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { ChatInputImageGenSettingsDrawer } from "@/ui/chat/chat-input/image-gen-controls";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
-import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
 import { motion } from "motion/react";
 import type { AIChatRequestImgGenFields } from "@slipstream/types";
 import {
@@ -329,9 +328,8 @@ export function ChatInput({
       isLockedRef.current = true;
       setIsSubmitting(true);
       const quotedMarkdown = quotes.map(formatAsMarkdown).join("\n\n");
-      const composed =
-        quotedMarkdown ?
-          `${quotedMarkdown}\n\n${trimmedMessage}`
+      const composed = quotedMarkdown
+        ? `${quotedMarkdown}\n\n${trimmedMessage}`
         : trimmedMessage;
       if (isHome) {
         try {
@@ -487,14 +485,12 @@ export function ChatInput({
   };
   const fileMemo = useMemo(
     () =>
-      (
-        selectedModel.provider === "openai" ||
-        selectedModel.provider === "anthropic" ||
-        selectedModel.provider === "gemini" ||
-        selectedModel.provider === "grok"
-      ) ?
-        ".md,.txt,.pdf,.docx,.xlsx,.pptx,application/text,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/pdf,text/markdown,application/*,text/*"
-      : ".pdf,.docx,application/*,text/*",
+      selectedModel.provider === "openai" ||
+      selectedModel.provider === "anthropic" ||
+      selectedModel.provider === "gemini" ||
+      selectedModel.provider === "grok"
+        ? ".md,.txt,.pdf,.docx,.xlsx,.pptx,application/text,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/pdf,text/markdown,application/*,text/*"
+        : ".pdf,.docx,application/*,text/*",
     [selectedModel.provider]
   );
 
@@ -703,9 +699,9 @@ export function ChatInput({
                       variant="ghost"
                       size="icon"
                       title={
-                        imgGen.supported ? "Image settings" : (
-                          "Image settings unavailable for selected model"
-                        )
+                        imgGen.supported
+                          ? "Image settings"
+                          : "Image settings unavailable for selected model"
                       }
                       className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
                       onClick={handleImageSettingsClick}>
@@ -717,18 +713,18 @@ export function ChatInput({
                       variant={imgGen.enabled ? "default" : "ghost"}
                       size="icon"
                       title={
-                        imgGen.supported ?
-                          imgGen.enabled ?
-                            "Disable image generation"
-                          : "Enable image generation"
-                        : "Selected model does not support image generation"
+                        imgGen.supported
+                          ? imgGen.enabled
+                            ? "Disable image generation"
+                            : "Enable image generation"
+                          : "Selected model does not support image generation"
                       }
                       disabled={!imgGen.supported}
-                      className={
-                        imgGen.enabled ?
-                          "hover:bg-accent text-foreground h-8"
-                        : "hover:bg-accent text-muted-foreground hover:text-foreground h-8"
-                      }
+                      className={cn(
+                        imgGen.enabled
+                          ? "hover:bg-accent text-foreground h-8"
+                          : "hover:bg-accent text-muted-foreground hover:text-foreground h-8"
+                      )}
                       onClick={handleToggleImageMode}>
                       <ImageGen className="size-4" />
                       <span className="sr-only">Toggle Image Generation</span>
@@ -760,15 +756,17 @@ export function ChatInput({
                       variant="ghost"
                       size="icon"
                       title={
-                        attachmentsReadyForSend ? "Submit prompt" : (
-                          "Waiting for attachments"
-                        )
+                        attachmentsReadyForSend
+                          ? "Submit prompt"
+                          : "Waiting for attachments"
                       }
                       className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
                       disabled={isSendDisabled}>
-                      {isSubmitting ?
+                      {isSubmitting ? (
                         <Loader className="h-5 w-5 animate-spin" />
-                      : <SendMessage className="size-5" />}
+                      ) : (
+                        <SendMessage className="size-5" />
+                      )}
                       <span className="sr-only">{`Submit Prompt`}</span>
                     </Button>
                   </div>
@@ -789,7 +787,6 @@ export function ChatInput({
         onOpenChangeAction={setIsImageSettingsOpen}
         isMobile={isMobile}
       />
-      <MobileModelSelectorDrawer />
     </>
   );
 }

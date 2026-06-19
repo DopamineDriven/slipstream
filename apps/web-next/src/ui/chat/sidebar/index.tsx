@@ -220,7 +220,7 @@ export function EnhancedSidebar({
 
       <Link href="/" className="w-full appearance-none">
         <Button
-          variant="outline"
+          variant="ghost"
           className={cn(
             "transition-all",
             effectiveState === "collapsed"
