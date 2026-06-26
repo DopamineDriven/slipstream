@@ -94,6 +94,7 @@
         "dist/prisma/attachment.d.ts",
         "dist/prisma/chat-request.d.ts",
         "dist/prisma/chat-response.d.ts",
+        "dist/prisma/convo-hydration.d.ts",
         "dist/prisma/index.d.ts",
         "dist/prisma/provider-store.d.ts",
         "dist/prisma/tts.d.ts",

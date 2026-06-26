@@ -54,6 +54,7 @@ export default defineConfig(
         "src/prisma/attachment.ts",
         "src/prisma/chat-request.ts",
         "src/prisma/chat-response.ts",
+        "src/prisma/convo-hydration.ts",
         "src/prisma/index.ts",
         "src/prisma/provider-store.ts",
         "src/prisma/tts.ts",
