@@ -1,27 +1,25 @@
 "use client";
 
+import type {
+  ConversationMessagesPage,
+  ConversationPageKey
+} from "@/lib/conversation-pages";
 import type { SWRInfiniteKeyLoader } from "swr/infinite";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
+import { useConversationHydration } from "@/context/convo-hydration-context";
+import {
+  CONVERSATION_PAGE_SIZE,
+  conversationCursorPageKey,
+  conversationInitialPageKey
+} from "@/lib/conversation-pages";
 import useSWRInfinite from "swr/infinite";
 import type {
   ConversationSingleton,
   MessageSingleton
 } from "@slipstream/types";
 
-export interface Page {
-  convo: ConversationSingleton<true>;
-  nextCursor: number | null;
-  hasMore: boolean;
-}
+export type Page = ConversationMessagesPage;
 
-type InitialKey = readonly ["initial", userId: string, conversationId: string];
-type CursorKey = readonly [
-  "cursor",
-  userId: string,
-  conversationId: string,
-  cursorOrdinal: number
-];
-type PageKey = InitialKey | CursorKey;
 export interface UseConversationMessagesArgs {
   userId?: string;
   conversationId?: string;
@@ -39,33 +37,35 @@ export function useConversationMessages({
   conversationId,
   fallback
 }: UseConversationMessagesArgs) {
-  const getKey: SWRInfiniteKeyLoader<Page, PageKey | null> = useCallback(
-    (pageIndex, previousPageData) => {
-      if (!userId || !conversationId) return null;
+  const { requestConversationHydration } = useConversationHydration();
 
-      if (pageIndex === 0) {
-        return ["initial", userId, conversationId] as const;
-      }
+  const getKey: SWRInfiniteKeyLoader<Page, ConversationPageKey | null> =
+    useCallback(
+      (pageIndex, previousPageData) => {
+        if (!userId || !conversationId) return null;
 
-      if (
-        !previousPageData ||
-        !previousPageData.hasMore ||
-        !previousPageData.nextCursor
-      ) {
-        return null;
-      }
+        if (pageIndex === 0) {
+          return conversationInitialPageKey(userId, conversationId);
+        }
 
-      return [
-        "cursor",
-        userId,
-        conversationId,
-        previousPageData.nextCursor
-      ] as const;
-    },
-    [userId, conversationId]
-  );
+        if (
+          !previousPageData ||
+          !previousPageData.hasMore ||
+          !previousPageData.nextCursor
+        ) {
+          return null;
+        }
 
-  const pageFetcher = async (key: PageKey) => {
+        return conversationCursorPageKey(
+          userId,
+          conversationId,
+          previousPageData.nextCursor
+        );
+      },
+      [userId, conversationId]
+    );
+
+  const pageFetcher = async (key: ConversationPageKey) => {
     if (key[0] === "initial") {
       const [_, userId, conversationId] = key;
       const url = `/api/users/${userId}/chat/${conversationId}`;
@@ -99,6 +99,32 @@ export function useConversationMessages({
       errorRetryInterval: 5000,
       fallbackData: fallback ? [{ ...fallback }] : undefined
     });
+
+  const lastPage = data?.at(-1);
+  const prewarmCursor = lastPage?.nextCursor;
+
+  useEffect(() => {
+    if (
+      !userId ||
+      !conversationId ||
+      lastPage?.hasMore !== true ||
+      prewarmCursor == null
+    ) {
+      return;
+    }
+
+    requestConversationHydration({
+      conversationId,
+      lowestLoadedOrdinal: prewarmCursor,
+      take: CONVERSATION_PAGE_SIZE
+    });
+  }, [
+    conversationId,
+    lastPage?.hasMore,
+    prewarmCursor,
+    requestConversationHydration,
+    userId
+  ]);
 
   const conversation = useMemo<ConversationSingleton<true> | undefined>(() => {
     const firstPage = data?.[0]?.convo;

@@ -1,5 +1,6 @@
 import { redirect, unauthorized } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
+import { CONVERSATION_PAGE_SIZE } from "@/lib/conversation-pages";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 import { getSession } from "@/utils/auth";
@@ -43,7 +44,7 @@ export async function GET(
 
     const page = await p.getConversationMessagesPage(
       conversationId,
-      25,
+      CONVERSATION_PAGE_SIZE,
       cursorOrdinal
     );
 

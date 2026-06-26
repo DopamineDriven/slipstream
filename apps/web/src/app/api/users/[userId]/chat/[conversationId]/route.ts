@@ -1,5 +1,6 @@
 import { redirect, unauthorized } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
+import { CONVERSATION_PAGE_SIZE } from "@/lib/conversation-pages";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 import { getSession } from "@/utils/auth";
@@ -30,7 +31,10 @@ export async function GET(
       unauthorized();
     }
 
-    const page = await p.getConversationMessagesPage(conversationId, 25);
+    const page = await p.getConversationMessagesPage(
+      conversationId,
+      CONVERSATION_PAGE_SIZE
+    );
 
     return NextResponse.json(page);
   } catch (error) {
