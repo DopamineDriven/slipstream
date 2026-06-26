@@ -58,7 +58,7 @@ export function ImageGenCostSlider({
               transition={{ duration: 0.2, ease: "easeOut" }}
               locales="en-US"
               className="bg-background text-foreground block size-5 rounded px-2 py-1 text-sm font-medium focus:[box-shadow:0_0_0_2px_#9911ff] focus:outline-none"
-              style={{ originX: 0.5, originY: 1.5, rotate }}>
+              style={{ originX: 0.5, originY: 1.5, rotate: rotate.get() }}>
               {value as any}
             </AnimateNumber>
           </div>

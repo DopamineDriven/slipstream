@@ -3,29 +3,31 @@ import type { ViteUserConfigExport } from "vitest/config";
 import reactPlugin from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
-export const sharedConfig = (cwd= process.cwd())=> defineConfig({
-  plugins: [reactPlugin()],
-  resolve: {
-    alias: {
-      "@": resolve(cwd, "./src")
+export const sharedConfig = (cwd = process.cwd()) =>
+  defineConfig({
+    plugins: [reactPlugin()],
+    root: cwd,
+    resolve: {
+      alias: {
+        "@": resolve(cwd, "./src")
+      }
+    },
+    test: {
+      environment: "jsdom",
+      coverage: {
+        provider: "istanbul",
+        reporter: [
+          [
+            "json",
+            {
+              file: `../coverage.json`
+            }
+          ]
+        ],
+        enabled: true
+      }
     }
-  },
-  test: {
-    environment: "jsdom",
-    coverage: {
-      provider: "istanbul",
-      reporter: [
-        [
-          "json",
-          {
-            file: `../coverage.json`
-          }
-        ]
-      ],
-      enabled: true
-    }
-  }
-} satisfies ViteUserConfigExport);
+  } satisfies ViteUserConfigExport);
 
 declare global {
   interface JSON {

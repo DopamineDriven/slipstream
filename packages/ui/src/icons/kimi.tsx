@@ -8,7 +8,7 @@ export function Kimi({ role = "img", ...svg }: BaseSVGProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       {...svg}>
-              <title>Kimi</title>
+      <title>Kimi</title>
       <path
         d="M21.7202 0.939941C22.9502 0.939941 23.9502 1.93994 23.9502 3.16994C23.9502 4.39994 22.9502 5.39994 21.7202 5.39994H19.7502C19.6002 5.39994 19.4902 5.27994 19.4902 5.13994V3.16994C19.4902 1.93994 20.4902 0.939941 21.7202 0.939941Z"
         fill="currentColor"
