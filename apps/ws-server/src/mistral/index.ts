@@ -1007,11 +1007,8 @@ export class MistralService extends MistralStreamContentService {
     };
 
     const tools = hasUserStoreDocs
-      ? ([
-          this.fileSearchFunctionTool(),
-          { type: "web_search" }
-        ] satisfies ToolTypes)
-      : ([{ type: "web_search" }] satisfies ToolTypes);
+      ? ([this.fileSearchFunctionTool()] satisfies ToolTypes)
+      : undefined;
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
       systemPrompt

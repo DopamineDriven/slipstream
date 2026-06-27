@@ -161,7 +161,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
       include: {
         messages: {
           where:
-            cursorOrdinal !== undefined
+           typeof cursorOrdinal !== "undefined"
               ? { ordinal: { lt: cursorOrdinal } }
               : undefined,
           take,

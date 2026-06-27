@@ -22,10 +22,7 @@ export async function GET(
         redirect("/auth/login");
       }
     }
-    const expiryUnixEpoch = new Date(session.session.expiresAt).getTime();
-    if (new Date(Date.now()).getTime() > expiryUnixEpoch) {
-      redirect("/auth/login");
-    }
+
     // Ensure user can only access their own conversations
     if (session.user.id !== userId) {
       unauthorized();

@@ -8,7 +8,7 @@ import { getSession } from "@/utils/auth";
 export const fetchCache = "force-no-store";
 export const revalidate = 0;
 
-const { prismaConversationService: p } = ormHandler(prismaClient);
+const { prismaConversationService } = ormHandler(prismaClient);
 
 export async function GET(
   _req: NextRequest,
@@ -22,16 +22,13 @@ export async function GET(
         redirect("/auth/login");
       }
     }
-    const expiryUnixEpoch = new Date(session.session.expiresAt).getTime();
-    if (new Date(Date.now()).getTime() > expiryUnixEpoch) {
-      redirect("/auth/login");
-    }
+
     // Ensure user can only access their own conversations
     if (session.user.id !== userId) {
       unauthorized();
     }
 
-    const page = await p.getConversationMessagesPage(
+    const page = await prismaConversationService.getConversationMessagesPage(
       conversationId,
       CONVERSATION_PAGE_SIZE
     );

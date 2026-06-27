@@ -99,10 +99,11 @@ export function MobileModelSelectorDrawer() {
                 {visibleProviders.map(provider => {
                   const Icon = providerMetadata[provider].icon;
                   return (
+                    // removed nth-7:col-start-2 from className for stagger effect; re-add when n=odd again
                     <TabsTrigger
                       key={provider}
                       value={provider}
-                      className="data-[state=active]:bg-brand-primary data-[state=active]:text-brand-primary-foreground col-span-2 flex h-10 items-center justify-center gap-2 text-xs nth-7:col-start-2 sm:text-sm">
+                      className="data-[state=active]:bg-brand-primary data-[state=active]:text-brand-primary-foreground col-span-2 flex h-10 items-center justify-center gap-2 text-xs sm:text-sm">
                       <Icon className="size-4 shrink-0" />
                       <span className="sr-only sm:not-sr-only sm:inline">
                         {providerMetadata[provider].name.split(" ")[0]}
@@ -163,6 +164,33 @@ export function MobileModelSelectorDrawer() {
                             );
                           })
                         ) : provider === "deepseek" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  cxStyles.default,
+                                  isSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
+                                )}
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
+                        ) : provider === "sakana" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =
                               activeSelectedProvider === provider &&
