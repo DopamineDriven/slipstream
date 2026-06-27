@@ -60,7 +60,7 @@ const providerModelVideosApi = {
     "veo-3.0-fast-generate-001",
     "veo-2.0-generate-001"
   ],
-  grok: ["grok-imagine-video-1.5-preview", "grok-imagine-video"]
+  grok: ["grok-imagine-video-1.5", "grok-imagine-video"]
 } as const;
 
 const providerModelChatApi = {
@@ -142,7 +142,7 @@ const providerModelChatApi = {
     "grok-imagine-image",
     "grok-imagine-image-quality",
     "grok-imagine-video",
-    "grok-imagine-video-1.5-preview"
+    "grok-imagine-video-1.5"
   ],
   /**
    * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-names
@@ -187,7 +187,8 @@ const providerModelChatApi = {
     "qwen3.5-plus",
     "qwen3.5-flash"
   ],
-  minimax: ["minimax-m3", "minimax-m2.7", "minimax-m2.5", "minimax-m2.1"]
+  minimax: ["minimax-m3", "minimax-m2.7", "minimax-m2.5", "minimax-m2.1"],
+  sakana: ["fugu-ultra", "fugu"]
 } as const;
 
 async function anthropicFetcher() {
@@ -231,7 +232,7 @@ const GROK_NAME_OVERRIDES = {
   "grok-4.20-0309-non-reasoning": "Grok 4.20 Non-Reasoning",
   "grok-4.3": "Grok 4.3",
   "grok-build-0.1": "Grok Build 0.1",
-  "grok-imagine-video-1.5-preview": "Grok Imagine Video 1.5 Preview"
+  "grok-imagine-video-1.5": "Grok Imagine Video 1.5"
 } as const;
 
 const ALIBABA_NAME_OVERRIDES = {
@@ -283,6 +284,15 @@ const DEEPSEEK_NAME_OVERRIDES = {
   "deepseek-v4-flash": "DeepSeek V4 Flash"
 } as const;
 
+const SAKANA_NAME_OVERRIDES = {
+  fugu: "Fugu",
+  "fugu-ultra": "Fugu Ultra"
+};
+
+function filterForSakana(id: string) {
+  return id === "fugu" || id === "fugu-ultra";
+}
+
 function filterForMinimax(id: string) {
   return (
     id === "minimax-m2.1" ||
@@ -312,7 +322,7 @@ function filterForGrok(id: string) {
     id === "grok-imagine-image" ||
     id === "grok-imagine-video" ||
     id === "grok-build-0.1" ||
-    id === "grok-imagine-video-1.5-preview"
+    id === "grok-imagine-video-1.5"
   );
 }
 
@@ -363,6 +373,12 @@ function filterForCohere(id: string) {
     id === "command-a-03-2025" ||
     id === "command-a-plus-05-2026"
   );
+}
+
+function toSakanaDisplayName(id: string) {
+  if (filterForSakana(id)) {
+    return SAKANA_NAME_OVERRIDES[id];
+  } else return id;
 }
 
 function toMinimaxDisplayName(id: string) {
@@ -642,6 +658,16 @@ const modelMapper = async (modelKeys = true) => {
           });
           return helper;
         }
+        case "sakana": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            const name = toSakanaDisplayName(model);
+            modelKeys === true
+              ? helper.push([model, name])
+              : helper.push([name, model]);
+          });
+          return helper;
+        }
         case "cohere": {
           let helper = Array.of<[string, string]>();
           models.forEach(function (model) {
@@ -863,6 +889,7 @@ async function displayNameModelIdGen<
   const zai = mapper[10];
   const alibaba = mapper[11];
   const minimax = mapper[12];
+  const sakana = mapper[13];
 
   if (
     !openai ||
@@ -877,7 +904,8 @@ async function displayNameModelIdGen<
     !deepseek ||
     !zai ||
     !alibaba ||
-    !minimax
+    !minimax ||
+    !sakana
   )
     throw new Error("empty data in displayNameModelIdGen");
 
@@ -897,7 +925,8 @@ async function displayNameModelIdGen<
           deepseek: deepseek.map(([keys, _v]) => keys),
           zai: zai.map(([keys, _v]) => keys),
           alibaba: alibaba.map(([keys, _v]) => keys),
-          minimax: minimax.map(([keys, _v]) => keys)
+          minimax: minimax.map(([keys, _v]) => keys),
+          sakana: sakana.map(([keys, _v]) => keys)
         };
       } else {
         return {
@@ -913,7 +942,8 @@ async function displayNameModelIdGen<
           deepseek: deepseek.map(([_, vals]) => vals),
           zai: zai.map(([_, vals]) => vals),
           alibaba: alibaba.map(([_, vals]) => vals),
-          minimax: minimax.map(([_, vals]) => vals)
+          minimax: minimax.map(([_, vals]) => vals),
+          sakana: sakana.map(([_, vals]) => vals)
         };
       }
     } else {
@@ -931,7 +961,8 @@ async function displayNameModelIdGen<
           deepseek: deepseek.map(([_, vals]) => vals),
           zai: zai.map(([_, vals]) => vals),
           alibaba: alibaba.map(([_, vals]) => vals),
-          minimax: minimax.map(([_, vals]) => vals)
+          minimax: minimax.map(([_, vals]) => vals),
+          sakana: sakana.map(([_, vals]) => vals)
         };
       } else {
         return {
@@ -947,7 +978,8 @@ async function displayNameModelIdGen<
           deepseek: deepseek.map(([keys, _v]) => keys),
           zai: zai.map(([keys, _v]) => keys),
           alibaba: alibaba.map(([keys, _v]) => keys),
-          minimax: minimax.map(([keys, _v]) => keys)
+          minimax: minimax.map(([keys, _v]) => keys),
+          sakana: sakana.map(([keys, _v]) => keys)
         };
       }
     }
@@ -965,7 +997,8 @@ async function displayNameModelIdGen<
     deepseek: Object.fromEntries(deepseek),
     zai: Object.fromEntries(zai),
     alibaba: Object.fromEntries(alibaba),
-    minimax: Object.fromEntries(minimax)
+    minimax: Object.fromEntries(minimax),
+    sakana: Object.fromEntries(sakana)
   };
 }
 

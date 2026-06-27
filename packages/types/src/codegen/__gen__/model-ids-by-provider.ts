@@ -77,7 +77,7 @@ export const modelIdsByProvider = {
     "grok-imagine-image",
     "grok-imagine-image-quality",
     "grok-imagine-video",
-    "grok-imagine-video-1.5-preview"
+    "grok-imagine-video-1.5"
   ],
   anthropic: [
     "claude-fable-5",
@@ -118,5 +118,6 @@ export const modelIdsByProvider = {
     "qwen3.5-plus",
     "qwen3.5-flash"
   ],
-  minimax: ["minimax-m3", "minimax-m2.7", "minimax-m2.5", "minimax-m2.1"]
+  minimax: ["minimax-m3", "minimax-m2.7", "minimax-m2.5", "minimax-m2.1"],
+  sakana: ["fugu-ultra", "fugu"]
 } as const;

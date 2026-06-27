@@ -79,6 +79,7 @@ export interface CredentialEntity {
   MISTRAL_API_KEY?: string;
   COHERE_API_KEY?: string;
   COHERE_TRIAL_KEY?: string;
+  SAKANA_API_KEY?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

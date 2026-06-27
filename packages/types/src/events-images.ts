@@ -320,6 +320,9 @@ export type OutputSizeProps<P extends Provider = Provider> = {
   vercel?: {
     [P in GetModelUtilRT<"vercel">]: undefined;
   }[GetModelUtilRT<"vercel">];
+  sakana?: {
+    [P in GetModelUtilRT<"sakana">]: undefined;
+  }[GetModelUtilRT<"sakana">];
 }[P];
 
 export type BaseNanoBananaOutputAR =
@@ -686,7 +689,6 @@ export interface GptImage1Opts extends SharedOpenAIImageOpts<
 }
 
 export type OpenAIImageGenOpts = GptImage1Opts;
-
 
 /**
  * Parameters for Google's native image-generating model

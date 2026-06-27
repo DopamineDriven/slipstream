@@ -16,6 +16,7 @@ export type FlexiProvider =
   | "cohere"
   | "minimax"
   | "alibaba"
+ | "sakana"
   | "OPENAI"
   | "ANTHROPIC"
   | "GEMINI"
@@ -28,7 +29,8 @@ export type FlexiProvider =
   | "DEEPSEEK"
   | "ZAI"
   | "MINIMAX"
-  | "ALIBABA";
+  | "ALIBABA"
+  | "SAKANA";
 
 /**
  * helper workup for use in XOR type below
