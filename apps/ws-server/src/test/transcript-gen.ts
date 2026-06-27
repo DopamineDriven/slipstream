@@ -458,7 +458,8 @@ class ScriptGen extends Fs {
       VERCEL: "vercel",
       ZAI: "zai",
       ALIBABA: "alibaba",
-      MINIMAX: "minimax"
+      MINIMAX: "minimax",
+      SAKANA: "sakana"
     } as const satisfies Record<$Enums.Provider, Lowercase<$Enums.Provider>>;
   }
 

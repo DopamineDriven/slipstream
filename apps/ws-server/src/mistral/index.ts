@@ -8,7 +8,8 @@ import type {
   MistralFunctionTool,
   MistralFunctionToolCall,
   MistralMessageReq,
-  MistralToolMessage
+  MistralToolMessage,
+  ToolTypes
 } from "@/mistral/types.ts";
 import type { OpenAIFileSearchToolInput } from "@/openai/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -17,11 +18,10 @@ import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type {
   ContentChunk,
   SystemMessage,
-  Tool,
   ToolCall
 } from "@mistralai/mistralai/models/components";
-import { MistralStreamContentService } from "@/mistral/stream-content.ts";
 import type { Logger as PinoLogger } from "pino";
+import { MistralStreamContentService } from "@/mistral/stream-content.ts";
 import { Mistral } from "@mistralai/mistralai";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
@@ -31,7 +31,7 @@ import type {
   MistralModelIdUnion
 } from "@slipstream/types";
 
-export class MistralService extends MistralStreamContentService{
+export class MistralService extends MistralStreamContentService {
   protected defaultClient: Mistral;
   protected logger: PinoLogger;
 
@@ -40,7 +40,7 @@ export class MistralService extends MistralStreamContentService{
     protected prisma: PrismaService,
     protected redis: EnhancedRedisPubSub,
     protected userStoreVector: UserStoreVectorService,
-    protected apiKey: string,
+    protected apiKey: string
   ) {
     super();
     this.logger = logger
@@ -96,7 +96,7 @@ export class MistralService extends MistralStreamContentService{
       temperature?: number;
       topP?: number;
       maxTokens?: number;
-      tools?: Tool[];
+      tools?: ToolTypes;
     }
   ) {
     const client = this.getClient(apiKey);
@@ -957,8 +957,11 @@ export class MistralService extends MistralStreamContentService{
     };
 
     const tools = hasUserStoreDocs
-      ? [this.fileSearchFunctionTool()]
-      : undefined;
+      ? ([
+          this.fileSearchFunctionTool(),
+          { type: "web_search" }
+        ] satisfies ToolTypes)
+      : ([{ type: "web_search" }] satisfies ToolTypes);
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
       systemPrompt
