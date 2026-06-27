@@ -72,6 +72,7 @@ import { QuoteIcon } from "@/icons/quote";
 import { QwenIcon } from "@/icons/qwen";
 import { ReadAloud } from "@/icons/read-aloud";
 import { RetryIcon } from "@/icons/retry";
+import { SakanaIcon } from "@/icons/sakana";
 import { Save } from "@/icons/save";
 import { Search } from "@/icons/search";
 import { Send } from "@/icons/send";
@@ -170,6 +171,7 @@ const IconComponents = {
   QwenIcon,
   ReadAloud,
   RetryIcon,
+  SakanaIcon,
   Save,
   Search,
   Send,
@@ -302,6 +304,7 @@ export {
   QwenIcon,
   ReadAloud,
   RetryIcon,
+  SakanaIcon,
   Save,
   Search,
   Send,

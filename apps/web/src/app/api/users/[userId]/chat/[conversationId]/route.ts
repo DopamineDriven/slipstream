@@ -1,5 +1,6 @@
 import { redirect, unauthorized } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
+import { CONVERSATION_PAGE_SIZE } from "@/lib/conversation-pages";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 import { getSession } from "@/utils/auth";
@@ -7,7 +8,7 @@ import { getSession } from "@/utils/auth";
 export const fetchCache = "force-no-store";
 export const revalidate = 0;
 
-const { prismaConversationService: p } = ormHandler(prismaClient);
+const { prismaConversationService } = ormHandler(prismaClient);
 
 export async function GET(
   _req: NextRequest,
@@ -21,16 +22,16 @@ export async function GET(
         redirect("/auth/login");
       }
     }
-    const expiryUnixEpoch = new Date(session.session.expiresAt).getTime();
-    if (new Date(Date.now()).getTime() > expiryUnixEpoch) {
-      redirect("/auth/login");
-    }
+
     // Ensure user can only access their own conversations
     if (session.user.id !== userId) {
       unauthorized();
     }
 
-    const page = await p.getConversationMessagesPage(conversationId, 25);
+    const page = await prismaConversationService.getConversationMessagesPage(
+      conversationId,
+      CONVERSATION_PAGE_SIZE
+    );
 
     return NextResponse.json(page);
   } catch (error) {

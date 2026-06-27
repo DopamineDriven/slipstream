@@ -10,6 +10,7 @@ import {
   MistralIcon,
   OpenAiIcon,
   QwenIcon,
+  SakanaIcon,
   VercelIcon as v0Icon,
   XAiIcon,
   Zai
@@ -117,6 +118,14 @@ export const providerObj = [
     text: "MiniMax",
     icon: MinimaxIcon,
     value: "vck_********************************",
+    isSet: false,
+    isDefault: false
+  },
+  {
+    provider: "sakana",
+    text: "Sakana",
+    icon: SakanaIcon,
+    value: "fish_********************************",
     isSet: false,
     isDefault: false
   }

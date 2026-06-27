@@ -99,7 +99,8 @@ export class PrismaUserMetaService extends PrismaUtilsService {
         deepseek: 0,
         zai: 0,
         alibaba: 0,
-        minimax: 0
+        minimax: 0,
+        sakana: 0
       },
       isDefault: {
         vercel: 0,
@@ -114,7 +115,8 @@ export class PrismaUserMetaService extends PrismaUtilsService {
         deepseek: 0,
         zai: 0,
         alibaba: 0,
-        minimax: 0
+        minimax: 0,
+        sakana: 0
       }
     };
     props.forEach(function (res) {

@@ -328,6 +328,11 @@ export class ResolverChatService extends ResolverTTSService {
           await svc.handleMiniMaxAiChatRequest(commonProps);
           break;
         }
+        case "sakana": {
+          const svc = this.providers.getRequiredInstance("sakana");
+          await svc.routeSakana({ ...commonProps, user_location });
+          break;
+        }
         case "openai":
         default: {
           const svc = this.providers.getRequiredInstance("openai");

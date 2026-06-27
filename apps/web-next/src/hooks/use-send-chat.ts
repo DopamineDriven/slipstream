@@ -52,7 +52,8 @@ const fallbackApiKeys = {
     moonshotai: false,
     zai: false,
     alibaba: false,
-    minimax: false
+    minimax: false,
+    sakana: false
   },
   isSet: {
     anthropic: false,
@@ -67,7 +68,8 @@ const fallbackApiKeys = {
     moonshotai: false,
     zai: false,
     alibaba: false,
-    minimax: false
+    minimax: false,
+    sakana: false
   }
 } satisfies ClientContextWorkupProps;
 

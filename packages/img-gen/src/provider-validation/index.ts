@@ -534,6 +534,7 @@ export class ProviderValidation {
       case "meta":
       case "vercel":
       case "alibaba":
+      case "sakana":
       case "minimax":
       default: {
         return undefined;

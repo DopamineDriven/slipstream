@@ -1,10 +1,10 @@
 import type {
   AssistantMessage,
+  ChatCompletionStreamRequest,
   GuardrailConfig,
   Prediction,
   ResponseFormat,
   SystemMessage,
-  Tool,
   ToolChoice,
   ToolMessage,
   UserMessage
@@ -20,7 +20,7 @@ export type ChatCompletionRequest = {
   stream: boolean;
   stop?: string | string[] | undefined;
   random_seed?: number | null | undefined;
-  metadata?: { [k: string]: any } | null | undefined;
+  metadata?: { [k: string]: unknown } | null | undefined;
   messages: (
     | CTR<AssistantMessage, "role">
     | SystemMessage
@@ -28,7 +28,7 @@ export type ChatCompletionRequest = {
     | UserMessage
   )[];
   response_format?: ResponseFormat | undefined;
-  tools?: Tool[] | null | undefined;
+  tools?: ToolTypes;
   tool_choice?: ToolChoice | string | undefined;
   presence_penalty?: number | undefined;
   frequency_penalty?: number | undefined;
@@ -41,12 +41,11 @@ export type ChatCompletionRequest = {
   safe_prompt?: boolean | undefined;
 };
 
-export type MistralMessageReq = (
+export type MistralMessageReq =
   | CTR<AssistantMessage, "role">
   | SystemMessage
   | ToolMessage
-  | UserMessage
-);
+  | UserMessage;
 
 export type MistralReqMessage = (
   | SystemMessage
@@ -59,6 +58,8 @@ export type MistralMessageContentChunk = Exclude<
   UserMessage["content"],
   string | null
 >[number];
+
+export type ToolTypes = ChatCompletionStreamRequest["tools"];
 
 export interface MistralFunctionTool {
   type: "function";

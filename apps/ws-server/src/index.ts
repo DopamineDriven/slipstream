@@ -254,6 +254,17 @@ async function exe() {
       cfg.AI_GATEWAY_API_KEY
     );
 
+    const { SakanaService } = await import("@/sakana/index.ts");
+
+    const sakana = new SakanaService(
+      logger,
+      prisma,
+      userStore,
+      s3,
+      redisInstance,
+      cfg.SAKANA_API_KEY
+    );
+
     const { ProviderService } = await import("@/providers/index.ts");
 
     const providers = new ProviderService({
@@ -272,7 +283,8 @@ async function exe() {
         moonshotai: cfg.AI_GATEWAY_API_KEY,
         zai: cfg.AI_GATEWAY_API_KEY,
         alibaba: cfg.AI_GATEWAY_API_KEY,
-        minimax: cfg.AI_GATEWAY_API_KEY
+        minimax: cfg.AI_GATEWAY_API_KEY,
+        sakana: cfg.SAKANA_API_KEY
       },
       dependencies: {
         logger,
@@ -294,7 +306,8 @@ async function exe() {
       moonshotai,
       zai,
       alibaba,
-      minimax
+      minimax,
+      sakana
     });
 
     const { TTSService } = await import("@/tts/index.ts");

@@ -17,6 +17,7 @@ import {
   MistralIcon,
   OpenAiIcon,
   QwenIcon,
+  SakanaIcon,
   VercelIcon as v0Icon,
   XAiIcon,
   Zai
@@ -56,6 +57,12 @@ const PROVIDERS = [
     Icon: MinimaxIcon
   },
   {
+    id: "sakana",
+    label: "Sakana",
+    colorVar: providerMetadata.sakana.color,
+    Icon: SakanaIcon
+  },
+  {
     id: "alibaba",
     label: "Alibaba",
     colorVar: providerMetadata.alibaba.color,
@@ -76,7 +83,8 @@ const initialOrder = [
   "moonshotai",
   "zai",
   "alibaba",
-  "minimax"
+  "minimax",
+  "sakana"
 ] satisfies Provider[];
 
 export function Reordering() {
@@ -102,7 +110,8 @@ export function Reordering() {
       moonshotai: PROVIDERS[8],
       zai: PROVIDERS[9],
       alibaba: PROVIDERS[10],
-      minimax: PROVIDERS[11]
+      minimax: PROVIDERS[11],
+      sakana: PROVIDERS[12]
     };
     return map;
   }, []);

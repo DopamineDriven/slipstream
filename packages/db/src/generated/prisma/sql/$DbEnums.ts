@@ -25,7 +25,7 @@ export interface $DbEnums {
   MessageBlockType: "ENCRYPTED_THINKING" | "THINKING" | "TEXT"
   ProviderAssetState: "PENDING" | "ACTIVE" | "EXPIRED" | "FAILED" | "DELETED"
   ProviderDocState: "PENDING" | "PROCESSING" | "ACTIVE" | "FAILED"
-  Provider: "ALIBABA" | "OPENAI" | "GROK" | "GEMINI" | "ANTHROPIC" | "META" | "VERCEL" | "MISTRAL" | "COHERE" | "MINIMAX" | "MOONSHOTAI" | "DEEPSEEK" | "ZAI"
+  Provider: "ALIBABA" | "ANTHROPIC" | "COHERE" | "DEEPSEEK" | "GEMINI" | "GROK" | "META" | "MINIMAX" | "MISTRAL" | "MOONSHOTAI" | "OPENAI" | "SAKANA" | "VERCEL" | "ZAI"
   TTSStatus: "NONE" | "QUEUED" | "PROCESSING" | "COUPLED" | "FAILED"
   ThemePreference: "LIGHT" | "DARK" | "SYSTEM"
   AnnotSubtype: "LINK" | "TEXT" | "HIGHLIGHT" | "WIDGET" | "MARKUP" | "REFERENCE" | "AUTOLINK"

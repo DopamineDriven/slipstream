@@ -24,6 +24,8 @@ import type {
   OpenAiDisplayNameUnion,
   OpenAiModelIdUnion,
   Provider,
+  SakanaDisplayNameUnion,
+  SakanaModelIdUnion,
   VercelDisplayNameUnion,
   VercelModelIdUnion,
   ZaiDisplayNameUnion,
@@ -47,6 +49,7 @@ import {
   MistralIcon,
   OpenAiIcon,
   QwenIcon,
+  SakanaIcon,
   VercelIcon as v0Icon,
   XAiIcon,
   Zai
@@ -119,6 +122,12 @@ export const providerMetadata = {
     color: "#3B5CFF",
     description: "Open-Source GLM Models for Coding and Agents"
   },
+  sakana: {
+    name: "Sakana",
+    icon: SakanaIcon,
+    color: "#E10600",
+    description: "Building Frontier AI in Japan"
+  },
   alibaba: {
     name: "Alibaba",
     icon: QwenIcon,
@@ -179,7 +188,14 @@ export type DisplayNameWorkup<T extends Provider> = T extends "openai"
                                 AlibabaModelIdUnion
                               >
                             >
-                          : never;
+                          : T extends "sakana"
+                            ? ReturnType<
+                                typeof getDisplayNameByModelId<
+                                  T,
+                                  SakanaModelIdUnion
+                                >
+                              >
+                            : never;
 
 export type ModelIdWorkup<T extends Provider> = T extends "openai"
   ? ReturnType<typeof getModelIdByDisplayName<T, OpenAiDisplayNameUnion>>
@@ -232,7 +248,14 @@ export type ModelIdWorkup<T extends Provider> = T extends "openai"
                                 AlibabaDisplayNameUnion
                               >
                             >
-                          : never;
+                          : T extends "sakana"
+                            ? ReturnType<
+                                typeof getModelIdByDisplayName<
+                                  T,
+                                  SakanaDisplayNameUnion
+                                >
+                              >
+                            : never;
 /**
  * use this in client components where the select options are
  * the display names (the keys of the object) which, on select, outputs the
@@ -319,10 +342,15 @@ export const defaultModelSelection: ModelSelection = {
                                 (defaultProvider = "alibaba"),
                                 defaultModelByProvider[defaultProvider]
                               )
-                            : getModelIdByDisplayName(
-                                (defaultProvider = "openai"),
-                                defaultModelByProvider[defaultProvider]
-                              )
+                            : defaultProvider === "sakana"
+                              ? getModelIdByDisplayName(
+                                  (defaultProvider = "sakana"),
+                                  defaultModelByProvider[defaultProvider]
+                                )
+                              : getModelIdByDisplayName(
+                                  (defaultProvider = "openai"),
+                                  defaultModelByProvider[defaultProvider]
+                                )
 };
 export function getModelDisplayName(
   toProvider: Provider,
@@ -376,15 +404,20 @@ export function getModelDisplayName(
                               toProvider,
                               model as MiniMaxModelIdUnion
                             )
-                          : toProvider === "openai"
+                          : toProvider === "sakana"
                             ? getDisplayNameByModelId(
                                 toProvider,
-                                model as OpenAiModelIdUnion
+                                model as SakanaModelIdUnion
                               )
-                            : getDisplayNameByModelId(
-                                "openai",
-                                model as OpenAiModelIdUnion
-                              );
+                            : toProvider === "openai"
+                              ? getDisplayNameByModelId(
+                                  toProvider,
+                                  model as OpenAiModelIdUnion
+                                )
+                              : getDisplayNameByModelId(
+                                  "openai",
+                                  model as OpenAiModelIdUnion
+                                );
 }
 export function isGeminiDisplayName(n: string) {
   return (
@@ -399,12 +432,10 @@ export function isGeminiDisplayName(n: string) {
     n === "Nano Banana 2" ||
     n === "Gemini 2.5 Flash" ||
     n === "Gemini 2.5 Flash-Lite" ||
-    n === "Deep Research Pro Preview (Dec-12-2025)" ||
+    n === "Deep Research Max Preview (Apr-21-2026)" ||
+    n === "Deep Research Preview (Apr-21-2026)" ||
     n === "Gemini 2.0 Flash" ||
     n === "Gemini 2.0 Flash-Lite" ||
-    n === "Imagen 4" ||
-    n === "Imagen 4 Fast" ||
-    n === "Imagen 4 Ultra" ||
     n === "Veo 3.1" ||
     n === "Veo 3.1 fast" ||
     n === "Veo 3" ||
@@ -535,6 +566,16 @@ export const getModel = <
       ) {
         return model;
       } else return "minimax-m3" as const as NonNullable<K>;
+    }
+    case "sakana": {
+      if (
+        model &&
+        providerModelChatApi[xTarget].includes(
+          model as GetModelUtilRT<"sakana">
+        )
+      ) {
+        return model;
+      } else return "fugu" as const as NonNullable<K>;
     }
     case "openai":
     default: {

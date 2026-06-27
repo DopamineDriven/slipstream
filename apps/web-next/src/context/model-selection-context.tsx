@@ -33,6 +33,7 @@ interface ModelSelectionContextType {
     | "mistral"
     | "moonshotai"
     | "openai"
+    | "sakana"
     | "vercel"
     | "zai"
   )[];

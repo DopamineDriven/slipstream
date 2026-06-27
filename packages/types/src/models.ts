@@ -210,6 +210,8 @@ export type DisplayNameModelMap = {
   >;
 };
 
+export type SakanaChatModels = ModelMap["sakana"];
+
 export type DeepSeekChatModels = ModelMap["deepseek"];
 
 export type KimiChatModels = ModelMap["moonshotai"];
@@ -265,7 +267,9 @@ export type GetModelUtilRT<T = Provider> = T extends "openai"
                         ? AlibabaChatModels
                         : T extends "minimax"
                           ? MiniMaxChatModels
-                          : never;
+                          : T extends "sakana"
+                            ? SakanaChatModels
+                            : never;
 
 export function toPrismaFormat<const T extends Providers>(provider: T) {
   return provider.toUpperCase() as Uppercase<T> satisfies $Enums.Provider;
@@ -369,7 +373,7 @@ export const getModelIdByDisplayName = <
           model as ModelDisplayNameToModelId<"alibaba">
         ] as (typeof displayNameToModelId)[V][K];
       } else
-        return defaultModelIdByProvider.zai as (typeof displayNameToModelId)[V][K];
+        return defaultModelIdByProvider.alibaba as (typeof displayNameToModelId)[V][K];
     }
     case "minimax": {
       if (model && model in displayNameToModelId[xTarget]) {
@@ -377,7 +381,15 @@ export const getModelIdByDisplayName = <
           model as ModelDisplayNameToModelId<"minimax">
         ] as (typeof displayNameToModelId)[V][K];
       } else
-        return defaultModelIdByProvider.zai as (typeof displayNameToModelId)[V][K];
+        return defaultModelIdByProvider.minimax as (typeof displayNameToModelId)[V][K];
+    }
+    case "sakana": {
+      if (model && model in displayNameToModelId[xTarget]) {
+        return displayNameToModelId[xTarget][
+          model as ModelDisplayNameToModelId<"sakana">
+        ] as (typeof displayNameToModelId)[V][K];
+      } else
+        return defaultModelIdByProvider.sakana as (typeof displayNameToModelId)[V][K];
     }
     case "openai":
     default: {
@@ -488,7 +500,7 @@ export const getDisplayNameByModelId = <
           model as ModelIdToModelDisplayName<"alibaba">
         ] as (typeof modelIdToDisplayName)[V][K];
       } else
-        return defaultModelDisplayNameByProvider.zai as (typeof modelIdToDisplayName)[V][K];
+        return defaultModelDisplayNameByProvider.alibaba as (typeof modelIdToDisplayName)[V][K];
     }
     case "minimax": {
       if (model && model in modelIdToDisplayName[xTarget]) {
@@ -496,7 +508,15 @@ export const getDisplayNameByModelId = <
           model as ModelIdToModelDisplayName<"minimax">
         ] as (typeof modelIdToDisplayName)[V][K];
       } else
-        return defaultModelDisplayNameByProvider.zai as (typeof modelIdToDisplayName)[V][K];
+        return defaultModelDisplayNameByProvider.minimax as (typeof modelIdToDisplayName)[V][K];
+    }
+    case "sakana": {
+      if (model && model in modelIdToDisplayName[xTarget]) {
+        return modelIdToDisplayName[xTarget][
+          model as ModelIdToModelDisplayName<"sakana">
+        ] as (typeof modelIdToDisplayName)[V][K];
+      } else
+        return defaultModelDisplayNameByProvider.sakana as (typeof modelIdToDisplayName)[V][K];
     }
     case "openai":
     default: {
@@ -523,7 +543,8 @@ export const defaultModelDisplayNameByProvider = {
   moonshotai: "Kimi K2.6" satisfies KimiDisplayNameUnion,
   zai: "GLM 5.1" satisfies ZaiDisplayNameUnion,
   alibaba: "Qwen3.6-Plus" satisfies AlibabaDisplayNameUnion,
-  minimax: "MiniMax-M3" satisfies MiniMaxDisplayNameUnion
+  minimax: "MiniMax-M3" satisfies MiniMaxDisplayNameUnion,
+  sakana: "Fugu" satisfies SakanaDisplayNameUnion
 } as const;
 
 export const defaultModelIdByProvider = {
@@ -539,7 +560,8 @@ export const defaultModelIdByProvider = {
   moonshotai: "kimi-k2.6" satisfies KimiModelIdUnion,
   zai: "glm-5.1" satisfies ZaiModelIdUnion,
   alibaba: "qwen3.6-plus" satisfies AlibabaModelIdUnion,
-  minimax: "minimax-m3" satisfies MiniMaxModelIdUnion
+  minimax: "minimax-m3" satisfies MiniMaxModelIdUnion,
+  sakana: "fugu" satisfies SakanaModelIdUnion
 } as const;
 
 export type ModelDisplayNameToModelId<T extends Provider> =
@@ -593,6 +615,11 @@ export type GeminiDisplayNameUnionImgGen =
  */
 export type GrokDisplayNameUnionImgGen =
   ModelDisplayNameToModelIdImgGen<"grok">;
+
+/**
+ * valid sakana model display names
+ */
+export type SakanaDisplayNameUnion = ModelDisplayNameToModelId<"sakana">;
 
 /**
  * valid alibaba model display names
@@ -677,6 +704,11 @@ export type GeminiModelIdUnionVideoGen =
  */
 export type GrokModelIdUnionVideoGen =
   ModelIdToModelDisplayNameVideoGen<"grok">;
+
+/**
+ * valid sakana models to call
+ */
+export type SakanaModelIdUnion = ModelIdToModelDisplayName<"sakana">;
 /**
  * valid alibaba models to call
  */
@@ -773,7 +805,9 @@ export type GetModelsForProviderRTImgGen<T extends Provider> =
                           ? undefined
                           : T extends "minimax"
                             ? undefined
-                            : never;
+                            : T extends "sakana"
+                              ? undefined
+                              : never;
 
 export type GetModelsForProviderRTVideoGen<T extends Provider> =
   T extends "gemini"
@@ -802,7 +836,9 @@ export type GetModelsForProviderRTVideoGen<T extends Provider> =
                           ? undefined
                           : T extends "minimax"
                             ? undefined
-                            : never;
+                            : T extends "sakana"
+                              ? undefined
+                              : never;
 
 export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
   T extends "gemini"
@@ -831,7 +867,9 @@ export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
                           ? undefined
                           : T extends "minimax"
                             ? undefined
-                            : never;
+                            : T extends "sakana"
+                              ? undefined
+                              : never;
 
 export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
   ? AnthropicModelIdUnion
@@ -859,7 +897,9 @@ export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
                         ? AlibabaModelIdUnion
                         : T extends "minimax"
                           ? MiniMaxModelIdUnion
-                          : never;
+                          : T extends "sakana"
+                            ? SakanaModelIdUnion
+                            : never;
 
 export type GetDisplayNamesForProviderRTVideoGen<T extends Provider> =
   T extends "gemini"
@@ -888,7 +928,9 @@ export type GetDisplayNamesForProviderRTVideoGen<T extends Provider> =
                           ? undefined
                           : T extends "minimax"
                             ? undefined
-                            : never;
+                            : T extends "sakana"
+                              ? undefined
+                              : never;
 
 export type GetDisplayNamesForProviderRT<T extends Provider> =
   T extends "anthropic"
@@ -917,7 +959,9 @@ export type GetDisplayNamesForProviderRT<T extends Provider> =
                           ? AlibabaDisplayNameUnion
                           : T extends "minimax"
                             ? MiniMaxDisplayNameUnion
-                            : never;
+                            : T extends "sakana"
+                              ? SakanaDisplayNameUnion
+                              : never;
 
 export function getModelsForProvider<const T extends Provider>(provider: T) {
   return Object.entries(displayNameToModelId[provider])
@@ -1029,7 +1073,8 @@ export const imgMimeSupportByProvider = {
   deepseek: ["image/jpeg", "image/png", "image/webp"],
   zai: ["image/jpeg", "image/png", "image/webp"],
   alibaba: ["image/jpeg", "image/png", "image/webp"],
-  minimax: ["image/jpeg", "image/png", "image/webp"]
+  minimax: ["image/jpeg", "image/png", "image/webp"],
+  sakana: ["image/jpeg", "image/png", "image/webp"]
 } as const;
 
 // direct input -- I have a document conversion pipeline set up
@@ -1047,6 +1092,7 @@ export const docMimeSupportByProvider = {
   zai: ["application/pdf"],
   alibaba: ["application/pdf"],
   minimax: ["application/pdf"],
+  sakana: ["application/pdf"],
   /**
    * https://ai.google.dev/gemini-api/docs/document-processing#technical-details
    */
@@ -1066,6 +1112,7 @@ export const audioMimeSupportByProvider = {
   zai: [],
   alibaba: [],
   minimax: [],
+  sakana: [],
   /**
    * https://ai.google.dev/gemini-api/docs/audio#supported-formats
    */
@@ -1106,5 +1153,6 @@ export const videoMimeSupportByProvider = {
   zai: [],
   anthropic: [],
   alibaba: [],
-  minimax: []
+  minimax: [],
+  sakana: []
 } as const;

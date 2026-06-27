@@ -16,6 +16,7 @@ import type {
   MistralDisplayNameUnion,
   OpenAiDisplayNameUnion,
   Provider,
+  SakanaDisplayNameUnion,
   ZaiDisplayNameUnion
 } from "@slipstream/types";
 import {
@@ -89,6 +90,15 @@ export function ProviderModelSelector({
         updateModel(
           displayName,
           getModelIdByDisplayName("cohere", displayName)
+        );
+        break;
+      }
+      case "sakana": {
+        const displayName = defaultModelByProvider.sakana;
+        updateProvider("sakana");
+        updateModel(
+          displayName,
+          getModelIdByDisplayName("sakana", displayName)
         );
         break;
       }
@@ -212,6 +222,11 @@ export function ProviderModelSelector({
       case "deepseek": {
         const dn = name as DeepSeekDisplayNameUnion;
         updateModel(dn, getModelIdByDisplayName("deepseek", dn));
+        break;
+      }
+      case "sakana": {
+        const dn = name as SakanaDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("sakana", dn));
         break;
       }
       case "zai": {

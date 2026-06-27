@@ -1,5 +1,7 @@
+type SharpFactory = typeof import("sharp").default;
+
 export class SharpService {
-  public readonly sharp: Promise<typeof import("sharp")>;
+  public readonly sharp: Promise<SharpFactory>;
 
   constructor() {
     this.sharp = import("sharp").then(d => d.default);

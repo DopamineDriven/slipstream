@@ -77,7 +77,7 @@ export const displayNameModelsByProvider = {
     "Grok Imagine Image",
     "Grok Imagine Image Quality",
     "Grok Imagine Video",
-    "Grok Imagine Video 1.5 Preview"
+    "Grok Imagine Video 1.5"
   ],
   anthropic: [
     "Claude Fable 5",
@@ -114,5 +114,6 @@ export const displayNameModelsByProvider = {
     "Qwen3.5-Plus",
     "Qwen3.5-Flash"
   ],
-  minimax: ["MiniMax-M3", "MiniMax-M2.7", "MiniMax-M2.5", "MiniMax-M2.1"]
+  minimax: ["MiniMax-M3", "MiniMax-M2.7", "MiniMax-M2.5", "MiniMax-M2.1"],
+  sakana: ["Fugu Ultra", "Fugu"]
 } as const;

@@ -43,6 +43,12 @@ const urlByProvider = {
     headers: {
       Authorization: `Bearer ` + (process.env.AI_GATEWAY_API_KEY ?? "")
     }
+  },
+  sakana: {
+    url: "https://api.sakana.ai/v1/models",
+    headers: {
+      Authorization: `Bearer ` + (process.env.SAKANA_API_KEY ?? "")
+    }
   }
 };
 

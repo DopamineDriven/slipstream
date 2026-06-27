@@ -16,8 +16,6 @@ import type {
 } from "@google/genai";
 import { FileSearchStoreService } from "@/gemini/fss.ts";
 import {
-  GoogleGenAI,
-  Interactions,
   PartMediaResolutionLevel,
   ThinkingLevel,
   Type
@@ -73,51 +71,51 @@ export class GeminiWorkupService extends FileSearchStoreService {
         level: PartMediaResolutionLevel.MEDIA_RESOLUTION_UNSPECIFIED
       } satisfies PartMediaResolution;
   }
-  protected async *resilientStream(
-    gemini: GoogleGenAI,
-    params: Interactions.CreateAgentInteractionParamsStreaming,
-    interactionId?: string,
-    lastEventId?: string
-  ): AsyncGenerator<Interactions.InteractionSSEEvent> {
-    let attempts = 0;
-    const maxAttempts = 5;
+  // protected async *resilientStream(
+  //   gemini: GoogleGenAI,
+  //   params: Interactions.CreateAgentInteractionParamsStreaming,
+  //   interactionId?: string,
+  //   lastEventId?: string
+  // ): AsyncGenerator<Interactions.InteractionSSEEvent> {
+  //   let attempts = 0;
+  //   const maxAttempts = 5;
 
-    while (attempts < maxAttempts) {
-      try {
-        const stream = interactionId
-          ? await gemini.interactions.get(
-              interactionId,
-              {
-                stream: true,
-                api_version: "v1alpha",
-                last_event_id: lastEventId
-              },
-              { stream: true }
-            )
-          : await gemini.interactions.create(params, { stream: true });
+  //   while (attempts < maxAttempts) {
+  //     try {
+  //       const stream = interactionId
+  //         ? await gemini.interactions.get(
+  //             interactionId,
+  //             {
+  //               stream: true,
+  //               api_version: "v1alpha",
+  //               last_event_id: lastEventId
+  //             },
+  //             { stream: true }
+  //           )
+  //         : await gemini.interactions.create(params, { stream: true });
 
-        for await (const event of stream) {
-          yield event;
-          if (event.event_id) lastEventId = event.event_id;
-          if (event.event_type === "interaction.created") {
-            interactionId = event.interaction?.id;
-          }
-        }
-        return; // Completed successfully
-      } catch (err) {
-        attempts++;
-        this.logger.warn(
-          { err, attempts, interactionId, lastEventId },
-          "deep_research_stream_interrupted"
-        );
-        await this.prisma.extractor.wait(2000 * attempts); // Exponential backoff
-      }
-    }
+  //       for await (const event of stream) {
+  //         yield event;
+  //         if (event.event_id) lastEventId = event.event_id;
+  //         if (event.event_type === "interaction.created") {
+  //           interactionId = event.interaction?.id;
+  //         }
+  //       }
+  //       return; // Completed successfully
+  //     } catch (err) {
+  //       attempts++;
+  //       this.logger.warn(
+  //         { err, attempts, interactionId, lastEventId },
+  //         "deep_research_stream_interrupted"
+  //       );
+  //       await this.prisma.extractor.wait(2000 * attempts); // Exponential backoff
+  //     }
+  //   }
 
-    throw new Error(
-      `Failed to complete research after ${maxAttempts} attempts`
-    );
-  }
+  //   throw new Error(
+  //     `Failed to complete research after ${maxAttempts} attempts`
+  //   );
+  // }
 
   // protected interactionsHandler = <
   //   const K extends keyof GeminiEventMap = keyof GeminiEventMap

@@ -11,6 +11,7 @@ import { MiniMaxService } from "@/minimax/index.ts";
 import { MistralService } from "@/mistral/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
+import { SakanaService } from "@/sakana/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { xAIService } from "@/xai/index.ts";
 import { ZaiService } from "@/zai/index.ts";
@@ -44,7 +45,9 @@ export type ProviderNarrowing<P extends Provider> = P extends "openai"
                         ? AlibabaService
                         : P extends "minimax"
                           ? MiniMaxService
-                          : never;
+                          : P extends "sakana"
+                            ? SakanaService
+                            : never;
 
 export interface ProviderMap {
   anthropic: AnthropicService;
@@ -60,6 +63,7 @@ export interface ProviderMap {
   zai: ZaiService;
   alibaba: AlibabaService;
   minimax: MiniMaxService;
+  sakana: SakanaService;
 }
 
 export type ProviderNarrowed<T extends keyof ProviderMap> = {
@@ -123,6 +127,7 @@ export interface ProviderOpts extends Partial<ProviderMap> {
     zai?: string;
     alibaba?: string;
     minimax?: string;
+    sakana?: string;
   };
 }
 
@@ -546,6 +551,74 @@ export function ZaiMixin<
       return !!(
         this.z ??
         (this.constructor as typeof ZaiServiceMixin)?.sharedZ ??
+        this.getDependencies()
+      );
+    }
+  };
+}
+
+export function SakanaMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = SakanaService;
+  return class SakanaServiceMixin extends Base {
+    fugu?: S;
+    fuguApiKey?: string;
+    static sharedFugu?: S;
+    static fuguFactory?: ProviderFactory<S>;
+    constructor(...args: any[]) {
+      super(...(args as (ProviderOpts | undefined)[]));
+
+      const opts = this.opts;
+
+      if (opts?.sakana) this.fugu = opts.sakana;
+
+      this.fuguApiKey = opts?.apiKeys?.sakana;
+    }
+    public get sakana() {
+      if (!this.fugu) {
+        const shared = (this.constructor as typeof SakanaServiceMixin)
+          .sharedFugu;
+        if (shared) {
+          this.fugu = shared;
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "Sakana deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
+          }
+
+          const factory = (this.constructor as typeof SakanaServiceMixin)
+            .fuguFactory;
+
+          this.fugu =
+            factory?.(deps, this.fuguApiKey) ??
+            new SakanaService(
+              deps.logger,
+              deps.prisma,
+              deps.userStore,
+              deps.s3,
+              deps.redis,
+              this.fuguApiKey ?? ""
+            );
+        }
+      }
+      return this.fugu;
+    }
+
+    static setSharedSakana(instance: S) {
+      this.sharedFugu = instance;
+    }
+
+    static setSakanaFactory(factory: ProviderFactory<S>) {
+      this.fuguFactory = factory;
+    }
+
+    public hasSakana() {
+      return !!(
+        this.sakana ??
+        (this.constructor as typeof SakanaServiceMixin)?.sharedFugu ??
         this.getDependencies()
       );
     }

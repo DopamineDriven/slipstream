@@ -68,6 +68,8 @@ const getPlaceholder = (provider: Provider) => {
       return "vck_********************************";
     case "minimax":
       return "vck_********************************";
+    case "sakana":
+      return "fish_********************************";
     case "openai":
     default:
       return "sk-************************************************";
@@ -88,7 +90,8 @@ const toProviderContext = (providerObj: ApiKeyData[]) => {
       moonshotai: false,
       zai: false,
       alibaba: false,
-      minimax: false
+      minimax: false,
+      sakana: false
     },
     isSet: {
       gemini: false,
@@ -103,7 +106,8 @@ const toProviderContext = (providerObj: ApiKeyData[]) => {
       moonshotai: false,
       zai: false,
       alibaba: false,
-      minimax: false
+      minimax: false,
+      sakana: false
     }
   };
   providerObj.forEach(function (o) {
@@ -134,7 +138,8 @@ function equalityCheck(
     "moonshotai",
     "zai",
     "alibaba",
-    "minimax"
+    "minimax",
+    "sakana"
   ] as const;
 
   for (const provider of p) {

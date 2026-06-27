@@ -78,7 +78,7 @@ export const displayNameToModelId = {
     "Grok Imagine Image": "grok-imagine-image",
     "Grok Imagine Image Quality": "grok-imagine-image-quality",
     "Grok Imagine Video": "grok-imagine-video",
-    "Grok Imagine Video 1.5 Preview": "grok-imagine-video-1.5-preview"
+    "Grok Imagine Video 1.5": "grok-imagine-video-1.5"
   },
   anthropic: {
     "Claude Fable 5": "claude-fable-5",
@@ -144,5 +144,9 @@ export const displayNameToModelId = {
     "MiniMax-M2.7": "minimax-m2.7",
     "MiniMax-M2.5": "minimax-m2.5",
     "MiniMax-M2.1": "minimax-m2.1"
+  },
+  sakana: {
+    "Fugu Ultra": "fugu-ultra",
+    Fugu: "fugu"
   }
 } as const;

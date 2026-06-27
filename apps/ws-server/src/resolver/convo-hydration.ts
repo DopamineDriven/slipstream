@@ -8,7 +8,7 @@ import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
 import { ResolverChatService } from "@/resolver/chat.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type { EventTypeMap } from "@slipstream/types";
+import type { EventTypeMap, HydrateConversationPage } from "@slipstream/types";
 
 export class ResolverHydrateConvoService extends ResolverChatService {
   public userStoreDocStatus = new Map<string, boolean>();
@@ -37,11 +37,31 @@ export class ResolverHydrateConvoService extends ResolverChatService {
   }
 
   protected async hydrateConversationAck(
-    _event: EventTypeMap["hydrate_conversation"],
-    _ws: WebSocket,
-    _userId: string,
+    event: EventTypeMap["hydrate_conversation"],
+    ws: WebSocket,
+    userId: string,
     _userData?: UserData
   ) {
-    
+    const pages = Array.of<HydrateConversationPage>();
+
+    for await (const page of this.wsServer.prisma.getConversationHydrationPages(
+      {
+        userId,
+        conversationId: event.conversationId,
+        lowestLoadedOrdinal: event.lowestLoadedOrdinal,
+        take: event.take
+      }
+    )) {
+      pages.push(page);
+    }
+
+    const payload = {
+      type: "hydrate_conversation_ack",
+      userId,
+      conversationId: event.conversationId,
+      pages
+    } satisfies EventTypeMap["hydrate_conversation_ack"];
+
+    ws.send(JSON.stringify(payload));
   }
 }

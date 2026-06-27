@@ -91,6 +91,7 @@ export { QuoteIcon } from "@/icons/quote";
 export { QwenIcon } from "@/icons/qwen";
 export { ReadAloud } from "@/icons/read-aloud";
 export { RetryIcon } from "@/icons/retry";
+export { SakanaIcon } from "@/icons/sakana";
 export { Save } from "@/icons/save";
 export { Search } from "@/icons/search";
 export { Send } from "@/icons/send";

@@ -47,7 +47,8 @@ function equalityCheck(
     "moonshotai",
     "zai",
     "alibaba",
-    "minimax"
+    "minimax",
+    "sakana"
   ] as const satisfies Lowercase<$Enums.Provider>[];
 
   for (const provider of p) {
