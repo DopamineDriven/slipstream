@@ -301,6 +301,16 @@ export class ModelService extends ProviderValidation {
           return model;
         } else return "minimax-m3" as const as NonNullable<K>;
       }
+      case "sakana": {
+        if (
+          model &&
+          providerModelChatApi[xTarget].includes(
+            model as GetModelUtilRT<"sakana">
+          )
+        ) {
+          return model;
+        } else return "fugu" as const as NonNullable<K>;
+      }
       case "openai":
       default: {
         if (
