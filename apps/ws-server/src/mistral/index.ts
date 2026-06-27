@@ -119,10 +119,58 @@ export class MistralService extends MistralStreamContentService {
     );
 
     const isFirstMistralMsg = lastIndex === -1;
+    const previouslySeenAttachmentIds = new Set<string>();
+
+    if (!isFirstMistralMsg) {
+      for (const msg of msgs.slice(0, lastIndex + 1)) {
+        for (const attachment of msg.attachments) {
+          previouslySeenAttachmentIds.add(attachment.id);
+        }
+      }
+    }
+
+    const inlineAttachmentKeys = new Set<string>();
+    const selectedAttachmentIds = new Set<string>();
+    let documentSelected = false;
+    let imageSelected = false;
+
+    for (
+      let msgIndex = msgs.length - 1;
+      msgIndex > lastIndex && (!documentSelected || !imageSelected);
+      msgIndex--
+    ) {
+      const msg = msgs[msgIndex];
+      if (!msg?.senderType || msg.senderType !== "USER") continue;
+
+      for (
+        let attachmentIndex = msg.attachments.length - 1;
+        attachmentIndex >= 0 && (!documentSelected || !imageSelected);
+        attachmentIndex--
+      ) {
+        const attachment = msg.attachments[attachmentIndex];
+        if (!attachment) continue;
+        if (previouslySeenAttachmentIds.has(attachment.id)) continue;
+        if (selectedAttachmentIds.has(attachment.id)) continue;
+
+        const activeCompat = attachment.compatStatus === "ACTIVE";
+        const url = activeCompat ? attachment.compatCdnUrl : attachment.cdnUrl;
+        const mime = activeCompat ? attachment.compatMime : attachment.mime;
+        if (!url || !mime) continue;
+
+        if (attachment.assetType === "DOCUMENT" && !documentSelected) {
+          inlineAttachmentKeys.add(`${msg.id}:${attachment.id}`);
+          selectedAttachmentIds.add(attachment.id);
+          documentSelected = true;
+        } else if (attachment.assetType === "IMAGE" && !imageSelected) {
+          inlineAttachmentKeys.add(`${msg.id}:${attachment.id}`);
+          selectedAttachmentIds.add(attachment.id);
+          imageSelected = true;
+        }
+      }
+    }
 
     for (const [msgIndex, msg] of msgs.entries()) {
       const isFreshContext = isFirstMistralMsg || msgIndex > lastIndex;
-      const isCurrentUserMsg = msgIndex === msgs.length - 1;
       if (msg.senderType === "USER") {
         const content = Array.of<ContentChunk>();
         const textParts = Array.of<string>();
@@ -147,16 +195,15 @@ export class MistralService extends MistralStreamContentService {
                 const name = `${filename}.${ext}`;
                 if (att.assetType === "DOCUMENT") {
                   try {
-                    if (isFreshContext) {
+                    if (
+                      isFreshContext &&
+                      inlineAttachmentKeys.has(`${msg.id}:${att.id}`)
+                    ) {
                       try {
-                        if (!isCurrentUserMsg) {
-                          textParts.push(`[${name}](${url})`);
-                        } else {
-                          content.push({
-                            documentUrl: url,
-                            type: "document_url"
-                          });
-                        }
+                        content.push({
+                          documentUrl: url,
+                          type: "document_url"
+                        });
                       } catch {
                         textParts.push(`[${name}](${url})`);
                       }
@@ -167,7 +214,10 @@ export class MistralService extends MistralStreamContentService {
                     textParts.push(`[${name}](${url})`);
                   }
                 } else if (att.assetType === "IMAGE") {
-                  if (isFreshContext && isCurrentUserMsg) {
+                  if (
+                    isFreshContext &&
+                    inlineAttachmentKeys.has(`${msg.id}:${att.id}`)
+                  ) {
                     content.push({
                       type: "image_url",
                       imageUrl: { url, detail: "high" }
