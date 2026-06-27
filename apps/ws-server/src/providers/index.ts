@@ -17,6 +17,7 @@ import {
   MistralMixin,
   OpenAIMixin,
   ProviderBaseMixin,
+  SakanaMixin,
   VercelMixin,
   ZaiMixin
 } from "@/mixins/index.ts";
@@ -88,25 +89,28 @@ class ProviderServiceBase {
     "moonshotai",
     "zai",
     "alibaba",
-    "minimax"
+    "minimax",
+    "sakana"
   ] as const satisfies Provider[];
 
   constructor(protected opts?: ProviderOpts) {}
 }
 
 export class ProviderService extends KimiMixin(
-  MiniMaxMixin(
-    AlibabaMixin(
-      ZaiMixin(
-        DeepSeekMixin(
-          MistralMixin(
-            CohereMixin(
-              VercelMixin(
-                MetaMixin(
-                  OpenAIMixin(
-                    GeminiMixin(
-                      GrokMixin(
-                        AnthropicMixin(ProviderBaseMixin(ProviderServiceBase))
+  SakanaMixin(
+    MiniMaxMixin(
+      AlibabaMixin(
+        ZaiMixin(
+          DeepSeekMixin(
+            MistralMixin(
+              CohereMixin(
+                VercelMixin(
+                  MetaMixin(
+                    OpenAIMixin(
+                      GeminiMixin(
+                        GrokMixin(
+                          AnthropicMixin(ProviderBaseMixin(ProviderServiceBase))
+                        )
                       )
                     )
                   )
@@ -371,6 +375,31 @@ export class ProviderService extends KimiMixin(
           hasProviderApiKeySet: false,
           initialized: true,
           provider: "zai",
+          initTime: performance.now(),
+          lastAccessed: performance.now()
+        }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return direct;
+      }
+      case "sakana": {
+        const storeCheck = this.#store.get("sakana") as
+          | ProviderEntry<"sakana">
+          | undefined;
+        if (
+          typeof storeCheck?.instance !== "undefined" &&
+          storeCheck.available
+        ) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          return storeCheck.instance;
+        }
+        const direct = this.sakana;
+        this.#store.set("sakana", {
+          instance: direct,
+          available: true,
+          hasProviderApiKeySet: false,
+          initialized: true,
+          provider: "sakana",
           initTime: performance.now(),
           lastAccessed: performance.now()
         }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment

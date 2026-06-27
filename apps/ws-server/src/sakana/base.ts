@@ -6,10 +6,11 @@ import { OpenAI } from "openai";
 import type { S3Storage } from "@slipstream/storage-s3";
 
 interface ReasoningProps {
-  effort: "high" | "xhigh" | "max";
+  effort: "high" | "xhigh";
 }
 
 export class SakanaBaseService {
+  protected baseUrl = "https://api.sakana.ai/v1";
   protected defaultClient: OpenAI;
   protected logger: PinoLogger;
   constructor(
@@ -28,10 +29,11 @@ export class SakanaBaseService {
     this.defaultClient = new OpenAI({
       logLevel: "debug",
       apiKey: this.apiKey,
-      baseURL: "https://api.sakana.ai/v1",
+      baseURL: this.baseUrl,
       logger: this.logger
     });
   }
+
   public getClient(overrideKey?: string) {
     const client = this.defaultClient;
     if (overrideKey) {
@@ -47,13 +49,14 @@ export class SakanaBaseService {
   protected handleReasoning(model: string, effort?: "high" | "xhigh" | "max") {
     if (!this.isSakanaModel(model)) return;
     else {
+      const normalizedEffort = effort === "max" ? "xhigh" : effort;
       if (model === "fugu") {
         return {
-          effort: effort ?? "xhigh"
+          effort: normalizedEffort ?? "high"
         } as const satisfies ReasoningProps;
       } else {
         return {
-          effort: effort ?? "max"
+          effort: normalizedEffort ?? "xhigh"
         } as const satisfies ReasoningProps;
       }
     }

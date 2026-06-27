@@ -120,6 +120,13 @@
         "dist/resolver/tts.d.ts",
         "dist/resolver/utils.d.ts"
       ],
+      "sakana": [
+        "dist/sakana/base.d.ts",
+        "dist/sakana/chat.d.ts",
+        "dist/sakana/index.d.ts",
+        "dist/sakana/store.d.ts",
+        "dist/sakana/workup.d.ts"
+      ],
       "sharp": [
         "dist/sharp/index.ts"
       ],

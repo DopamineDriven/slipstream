@@ -316,7 +316,7 @@ export class SakanaStoreService extends SakanaBaseService {
           callId: toolCall.call_id,
           error: this.prisma.safeErrMsg(error)
         },
-        "OpenAI function tool execution failed"
+        "Sakana function tool execution failed"
       );
       return {
         type: "function_call_output",
