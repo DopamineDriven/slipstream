@@ -1,6 +1,5 @@
 import type { PrismaClientBase } from "@/lib/prisma";
 import { ErrorHelperService } from "@/orm/err-helper";
-import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AttachmentSingleton,
   ConversationSingleton,
@@ -97,49 +96,6 @@ export class PrismaUserMessageService extends ErrorHelperService {
     return conversationId === "home" || conversationId === "new-chat";
   }
 
-  public fromPrismaFormat(provider?: $Enums.Provider | null) {
-    if (!provider) return null;
-    return provider.toLowerCase() as Lowercase<$Enums.Provider>;
-  }
-
-  public async getMsgsByCursorId(
-    conversationId: string,
-    take = 25,
-    id?: string
-  ) {
-    const cursor = id ? { id } : undefined;
-    const skip = id ? 1 : undefined;
-
-    const getMany = await this.prismaClient.message.findMany({
-      where: { conversationId },
-      cursor,
-      take,
-      skip,
-      orderBy: { createdAt: "desc" },
-      include: {
-        ttsJob: true,
-        imageGenJob: true,
-        messageBlocks: { orderBy: { ordinal: "asc" } },
-        attachments: {
-          orderBy: { createdAt: "asc" },
-          include: {
-            image: true,
-            document: true,
-            imageGenOutput: true,
-            audio: true
-          }
-        }
-      }
-    });
-    const msgs = getMany.map(t => {
-      return {
-        ...t,
-        ttsJob: t.ttsJob ?? undefined
-      };
-    });
-    return this.bigIntToIntMsg(msgs) satisfies MessageSingleton<true>[];
-  }
-
   /**
    * One ordinal-cursored page of a conversation, returned as the `{ convo, nextCursor, hasMore }` envelope the SWR
    * loader expects. `convo` is a `ConversationSingleton<true>` (same shape `ai_chat_response.convo` returns), so
@@ -161,7 +117,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
       include: {
         messages: {
           where:
-            cursorOrdinal !== undefined
+            typeof cursorOrdinal !== "undefined"
               ? { ordinal: { lt: cursorOrdinal } }
               : undefined,
           take,
@@ -185,6 +141,23 @@ export class PrismaUserMessageService extends ErrorHelperService {
       }
     });
     const { messages, ...rest } = convo;
+
+    /**
+    const msgs = getMany.map(t => {
+      const { ttsJob, ...rest } = t;
+      if (ttsJob) {
+        const { sizeBytes, ...restTTS } = ttsJob;
+        return {
+          ttsJob: { ...restTTS, sizeBytes: sizeBytes ? Number(sizeBytes) : 0 },
+          ...rest
+        };
+      }
+      return {
+        ...rest,
+        ttsJob: undefined
+      };
+    });
+     */
     const msgs = messages.map(t => {
       return {
         ...t,
@@ -226,42 +199,6 @@ export class PrismaUserMessageService extends ErrorHelperService {
     return {
       title: "New Chat"
     };
-  }
-
-  public async getMessagesByConversationIdWithAssets(conversationId: string) {
-    const convo = await this.prismaClient.conversation.findUniqueOrThrow({
-      where: { id: conversationId },
-      include: {
-        messages: {
-          orderBy: { createdAt: "asc" },
-          include: {
-            ttsJob: true,
-            imageGenJob: true,
-            messageBlocks: { orderBy: { ordinal: "asc" } },
-            attachments: {
-              orderBy: { createdAt: "asc" },
-              include: {
-                image: true,
-                document: true,
-                imageGenOutput: true,
-                audio: true
-              }
-            }
-          }
-        },
-        conversationSettings: true
-      }
-    });
-    const { messages, ...rest } = convo;
-    const msgs = messages.map(t => {
-      return {
-        ...t,
-        ttsJob: t.ttsJob ?? undefined
-      };
-    });
-
-    const c = { ...rest, messages: msgs };
-    return this.bigintToInt(c) satisfies ConversationSingleton<true>;
   }
 
   public async getTitleByConversationId(conversationId: string) {
