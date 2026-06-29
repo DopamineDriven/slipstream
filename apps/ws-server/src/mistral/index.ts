@@ -31,6 +31,8 @@ import type {
   MistralModelIdUnion
 } from "@slipstream/types";
 
+const MISTRAL_HISTORY_MESSAGE_LIMIT = 175;
+
 export class MistralService extends MistralStreamContentService {
   protected defaultClient: Mistral;
   protected logger: PinoLogger;
@@ -113,8 +115,12 @@ export class MistralService extends MistralStreamContentService {
   }
 
   protected formatHistory(msgs: MessageSingleton<true>[]) {
+    const historyMsgs =
+      msgs.length > MISTRAL_HISTORY_MESSAGE_LIMIT
+        ? msgs.slice(-MISTRAL_HISTORY_MESSAGE_LIMIT)
+        : msgs;
     const formatted = Array.of<MistralMessageReq>();
-    const lastIndex = msgs.findLastIndex(
+    const lastIndex = historyMsgs.findLastIndex(
       m => m.provider === "MISTRAL" && m.senderType === "AI"
     );
 
@@ -122,7 +128,7 @@ export class MistralService extends MistralStreamContentService {
     const previouslySeenAttachmentIds = new Set<string>();
 
     if (!isFirstMistralMsg) {
-      for (const msg of msgs.slice(0, lastIndex + 1)) {
+      for (const msg of historyMsgs.slice(0, lastIndex + 1)) {
         for (const attachment of msg.attachments) {
           previouslySeenAttachmentIds.add(attachment.id);
         }
@@ -135,11 +141,11 @@ export class MistralService extends MistralStreamContentService {
     let imageSelected = false;
 
     for (
-      let msgIndex = msgs.length - 1;
+      let msgIndex = historyMsgs.length - 1;
       msgIndex > lastIndex && (!documentSelected || !imageSelected);
       msgIndex--
     ) {
-      const msg = msgs[msgIndex];
+      const msg = historyMsgs[msgIndex];
       if (!msg?.senderType || msg.senderType !== "USER") continue;
 
       for (
@@ -169,7 +175,7 @@ export class MistralService extends MistralStreamContentService {
       }
     }
 
-    for (const [msgIndex, msg] of msgs.entries()) {
+    for (const [msgIndex, msg] of historyMsgs.entries()) {
       const isFreshContext = isFirstMistralMsg || msgIndex > lastIndex;
       if (msg.senderType === "USER") {
         const content = Array.of<ContentChunk>();

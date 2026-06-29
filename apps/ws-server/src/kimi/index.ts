@@ -36,6 +36,8 @@ import type {
   MessageSingleton
 } from "@slipstream/types";
 
+const KIMI_HISTORY_MESSAGE_LIMIT = 175;
+
 export class KimiService {
   private readonly baseUrl = "https://ai-gateway.vercel.sh/v1/chat/completions";
   private logger: PinoLogger;
@@ -116,16 +118,20 @@ export class KimiService {
   }
 
   private formatHistory(msgs: MessageSingleton<true>[]) {
+    const historyMsgs =
+      msgs.length > KIMI_HISTORY_MESSAGE_LIMIT
+        ? msgs.slice(-KIMI_HISTORY_MESSAGE_LIMIT)
+        : msgs;
     const formatted = Array.of<KimiBaseMessage>();
-    const lastIndex = msgs.findLastIndex(
+    const lastIndex = historyMsgs.findLastIndex(
       m => m.provider === "MOONSHOTAI" && m.senderType === "AI"
     );
 
     const isFirstKimiMsg = lastIndex === -1;
 
-    for (const [msgIndex, msg] of msgs.entries()) {
+    for (const [msgIndex, msg] of historyMsgs.entries()) {
       const isFreshContext = isFirstKimiMsg || msgIndex > lastIndex;
-      const isCurrentUserMsg = msgIndex === msgs.length - 1;
+      const isCurrentUserMsg = msgIndex === historyMsgs.length - 1;
 
       if (msg.senderType === "USER") {
         const content = Array.of<KimiUserContentPart>();

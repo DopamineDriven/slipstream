@@ -55,6 +55,8 @@ const ALIBABA_TOOLING_LIMITS = {
   maxToolRounds: number;
 };
 
+const ALIBABA_HISTORY_MESSAGE_LIMIT = 175;
+
 export class AlibabaService {
   private readonly baseUrl = "https://ai-gateway.vercel.sh/v1/chat/completions";
   private logger: PinoLogger;
@@ -135,16 +137,20 @@ export class AlibabaService {
   }
 
   private formatHistory(msgs: MessageSingleton<true>[]) {
+    const historyMsgs =
+      msgs.length > ALIBABA_HISTORY_MESSAGE_LIMIT
+        ? msgs.slice(-ALIBABA_HISTORY_MESSAGE_LIMIT)
+        : msgs;
     const formatted = Array.of<AlibabaBaseMessage>();
-    const lastIndex = msgs.findLastIndex(
+    const lastIndex = historyMsgs.findLastIndex(
       m => m.provider === "ALIBABA" && m.senderType === "AI"
     );
 
     const isFirstAlibabaMsg = lastIndex === -1;
 
-    for (const [msgIndex, msg] of msgs.entries()) {
+    for (const [msgIndex, msg] of historyMsgs.entries()) {
       const isFreshContext = isFirstAlibabaMsg || msgIndex > lastIndex;
-      const isCurrentUserMsg = msgIndex === msgs.length - 1;
+      const isCurrentUserMsg = msgIndex === historyMsgs.length - 1;
 
       if (msg.senderType === "USER") {
         const content = Array.of<AlibabaUserContentPart>();
