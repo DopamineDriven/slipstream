@@ -1,14 +1,8 @@
-import type { Metadata } from "next";
+"use client";
+
 import { AICoalesce } from "@slipstream/ui";
 
-export const metadata: Metadata = {
-  title: "Not available in your region — AI Coalesce",
-  description:
-    "AI Coalesce is not yet available in the EU and EEA. We're working to support your region soon.",
-  robots: { index: false, follow: false }
-};
-
-export default function UnsupportedPage() {
+export function UnsupportedComponent() {
   return (
     <main className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center px-6 py-16">
       <div className="flex w-full max-w-md flex-col items-center text-center">
