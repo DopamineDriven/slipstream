@@ -34,25 +34,27 @@ const EU_EEA_COUNTRY_CODES = [
   "RO",
   "SE",
   "SI",
-  "SK", // EU-27
+  "SK",
   "IS",
   "LI",
-  "NO", // EEA non-EU
+  "NO",
   "GF",
   "GP",
   "MQ",
   "YT",
   "RE",
-  "MF" // French OMRs
+  "MF"
 ] as const;
 
 const UNSUPPORTED_SET = new Set<string>(EU_EEA_COUNTRY_CODES);
 
-const UNSUPPORTED_PATH = "/unsupported";
+const UNSUPPORTED_PATH = "/unsupported-region/check-back";
+
 function isUnsupportedCountry(country: string | null | undefined) {
   if (!country) return true;
   return UNSUPPORTED_SET.has(country.toUpperCase());
 }
+
 function detectDeviceAndSetCookies(
   request: NextRequest,
   response: NextResponse
@@ -145,7 +147,6 @@ function resolveResponse(req: NextRequest) {
     pathname.startsWith(`${UNSUPPORTED_PATH}/`);
   const blocked = isUnsupportedCountry(country);
 
-  // Visitors from EU/EEA regions get sent to the unsupported page.
   if (blocked && !onUnsupportedPath) {
     const url = req.nextUrl.clone();
     url.pathname = UNSUPPORTED_PATH;
@@ -153,7 +154,6 @@ function resolveResponse(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Supported visitors should never sit on the unsupported page.
   if (!blocked && onUnsupportedPath) {
     const url = req.nextUrl.clone();
     url.pathname = "/";

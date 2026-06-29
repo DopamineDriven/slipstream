@@ -48,7 +48,7 @@ const EU_EEA_COUNTRY_CODES = [
 
 const UNSUPPORTED_SET = new Set<string>(EU_EEA_COUNTRY_CODES);
 
-const UNSUPPORTED_PATH = "/unsupported";
+const UNSUPPORTED_PATH = "/unsupported-region/check-back";
 
 function isUnsupportedCountry(country: string | null | undefined) {
   if (!country) return true;
