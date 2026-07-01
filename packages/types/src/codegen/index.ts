@@ -56,9 +56,7 @@ const providerModelVideosApi = {
   gemini: [
     "veo-3.1-generate-preview",
     "veo-3.1-fast-generate-preview",
-    "veo-3.0-generate-001",
-    "veo-3.0-fast-generate-001",
-    "veo-2.0-generate-001"
+    "veo-3.1-lite-generate-preview"
   ],
   grok: ["grok-imagine-video-1.5", "grok-imagine-video"]
 } as const;
@@ -129,9 +127,7 @@ const providerModelChatApi = {
     "gemini-2.0-flash-lite",
     "veo-3.1-generate-preview",
     "veo-3.1-fast-generate-preview",
-    "veo-3.0-generate-001",
-    "veo-3.0-fast-generate-001",
-    "veo-2.0-generate-001"
+    "veo-3.1-lite-generate-preview"
   ],
   grok: [
     "grok-4.3",
@@ -144,11 +140,8 @@ const providerModelChatApi = {
     "grok-imagine-video",
     "grok-imagine-video-1.5"
   ],
-  /**
-   * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-names
-   * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-aliases
-   */
   anthropic: [
+    "claude-sonnet-5",
     "claude-fable-5",
     "claude-opus-4-8",
     "claude-opus-4-7",

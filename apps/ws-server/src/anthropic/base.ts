@@ -37,7 +37,8 @@ export class AnthropicBaseService {
       mod === "claude-opus-4-6" ||
       mod === "claude-sonnet-4-6" ||
       mod === "claude-opus-4-5-20251101" ||
-      mod === "claude-fable-5"
+      mod === "claude-fable-5" ||
+      mod === "claude-sonnet-5"
     );
   }
 
@@ -56,6 +57,7 @@ export class AnthropicBaseService {
   ) {
     switch (model) {
       case "claude-fable-5":
+      case "claude-sonnet-5":
       case "claude-opus-4-8":
       case "claude-opus-4-7": {
         if (withLocalStore) {
@@ -123,7 +125,7 @@ export class AnthropicBaseService {
         }
       }
       // input context window 1m is only supported by claude sonnet 4 & 4.5 / Opus 4.6
-      case "claude-sonnet-4-5-20250929":{
+      case "claude-sonnet-4-5-20250929": {
         // advanced-tool-use supported by claude sonnet|opus 4.5/4.6 only
         if (withLocalStore && model === "claude-sonnet-4-5-20250929") {
           return [
@@ -157,6 +159,7 @@ export class AnthropicBaseService {
   }
 
   protected outputTokenCeilingByModel = {
+    "claude-sonnet-5": 128000,
     "claude-fable-5": 128000,
     "claude-opus-4-8": 128000,
     "claude-opus-4-7": 128000,
@@ -169,6 +172,7 @@ export class AnthropicBaseService {
   } as const;
 
   protected inputTokenCeilingByModel = {
+    "claude-sonnet-5": 1000000,
     "claude-fable-5": 1000000,
     "claude-opus-4-8": 1000000,
     "claude-opus-4-7": 1000000,

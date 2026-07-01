@@ -402,24 +402,24 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   private handleEffort(model: string | null) {
     if (!model) return;
     if (!this.isAdaptiveCapable(model)) return;
-    if (model === "claude-opus-4-8" || model === "claude-fable-5") {
+    if (
+      model === "claude-opus-4-8" ||
+      model === "claude-opus-4-6" ||
+      model === "claude-fable-5" ||
+      model === "claude-opus-4-7"
+    ) {
       return { effort: "max" } as const;
     }
-    if (model === "claude-opus-4-7") {
+    if (model === "claude-sonnet-5") {
       return { effort: "xhigh" } as const;
-    }
-    if (model === "claude-opus-4-6") {
-      return { effort: "max" } as const;
     } else {
       return { effort: "high" } as const;
     }
   }
 
-  private interceptFableTemporary(model: string | undefined) {
-    if (!model) return "claude-opus-4-6" as const;
-    if (!this.isAnthropicModel(model)) return "claude-opus-4-6" as const;
-    if (model === "claude-fable-5") return "claude-opus-4-8" as const;
-    else return model;
+  private handleModel(m: string | undefined) {
+    if (!m || !this.isAnthropicModel(m)) return "claude-sonnet-5" as const;
+    else return m;
   }
 
   protected async createStreamWorkup({
@@ -436,7 +436,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     topP,
     user_location
   }: MessageInputParams) {
-    const model = this.interceptFableTemporary(m);
+    const model = this.handleModel(m);
 
     const keyFingerprint = keyId ?? "server";
 

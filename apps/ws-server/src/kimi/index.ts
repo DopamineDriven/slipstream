@@ -38,6 +38,37 @@ import type {
 
 const KIMI_HISTORY_MESSAGE_LIMIT = 175;
 
+function selectKimiHistoryMessages(msgs: readonly MessageSingleton<true>[]) {
+  const orderedMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
+  if (orderedMsgs.length <= KIMI_HISTORY_MESSAGE_LIMIT) {
+    return orderedMsgs;
+  }
+
+  const selectedIds = new Set<string>();
+
+  for (
+    let msgIndex = orderedMsgs.length - 1;
+    msgIndex >= 0 && selectedIds.size < KIMI_HISTORY_MESSAGE_LIMIT;
+    msgIndex--
+  ) {
+    const msg = orderedMsgs[msgIndex];
+    if (!msg || msg.provider !== "MOONSHOTAI") continue;
+    selectedIds.add(msg.id);
+  }
+
+  for (
+    let msgIndex = orderedMsgs.length - 1;
+    msgIndex >= 0 && selectedIds.size < KIMI_HISTORY_MESSAGE_LIMIT;
+    msgIndex--
+  ) {
+    const msg = orderedMsgs[msgIndex];
+    if (!msg) continue;
+    selectedIds.add(msg.id);
+  }
+
+  return orderedMsgs.filter(msg => selectedIds.has(msg.id));
+}
+
 export class KimiService {
   private readonly baseUrl = "https://ai-gateway.vercel.sh/v1/chat/completions";
   private logger: PinoLogger;
@@ -118,10 +149,7 @@ export class KimiService {
   }
 
   private formatHistory(msgs: MessageSingleton<true>[]) {
-    const historyMsgs =
-      msgs.length > KIMI_HISTORY_MESSAGE_LIMIT
-        ? msgs.slice(-KIMI_HISTORY_MESSAGE_LIMIT)
-        : msgs;
+    const historyMsgs = selectKimiHistoryMessages(msgs);
     const formatted = Array.of<KimiBaseMessage>();
     const lastIndex = historyMsgs.findLastIndex(
       m => m.provider === "MOONSHOTAI" && m.senderType === "AI"
@@ -1038,7 +1066,8 @@ export class KimiService {
         type: "ai_chat_response",
         conversationId,
         userId,
-        provider, convo: d.convo,
+        provider,
+        convo: d.convo,
         userMsgId,
         aiMsgId: d.aiMsgId,
         imgGenEnabled: false,
@@ -1061,7 +1090,8 @@ export class KimiService {
       type: "ai_chat_response",
       conversationId,
       userId,
-      systemPrompt,      convo: d.convo,
+      systemPrompt,
+      convo: d.convo,
       userMsgId,
       aiMsgId: d.aiMsgId,
       imgGenEnabled: false,

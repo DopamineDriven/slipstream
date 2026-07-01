@@ -1,7 +1,4 @@
-import type {
-  AlibabaChatCompletionsRes,
-  AlibabaUsage
-} from "@/alibaba/sse.ts";
+import type { AlibabaChatCompletionsRes, AlibabaUsage } from "@/alibaba/sse.ts";
 import type {
   AlibabaAccumulatedToolCall,
   AlibabaActiveMessageBlock,
@@ -56,6 +53,37 @@ const ALIBABA_TOOLING_LIMITS = {
 };
 
 const ALIBABA_HISTORY_MESSAGE_LIMIT = 175;
+
+function selectAlibabaHistoryMessages(msgs: readonly MessageSingleton<true>[]) {
+  const orderedMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
+  if (orderedMsgs.length <= ALIBABA_HISTORY_MESSAGE_LIMIT) {
+    return orderedMsgs;
+  }
+
+  const selectedIds = new Set<string>();
+
+  for (
+    let msgIndex = orderedMsgs.length - 1;
+    msgIndex >= 0 && selectedIds.size < ALIBABA_HISTORY_MESSAGE_LIMIT;
+    msgIndex--
+  ) {
+    const msg = orderedMsgs[msgIndex];
+    if (!msg || msg.provider !== "ALIBABA") continue;
+    selectedIds.add(msg.id);
+  }
+
+  for (
+    let msgIndex = orderedMsgs.length - 1;
+    msgIndex >= 0 && selectedIds.size < ALIBABA_HISTORY_MESSAGE_LIMIT;
+    msgIndex--
+  ) {
+    const msg = orderedMsgs[msgIndex];
+    if (!msg) continue;
+    selectedIds.add(msg.id);
+  }
+
+  return orderedMsgs.filter(msg => selectedIds.has(msg.id));
+}
 
 export class AlibabaService {
   private readonly baseUrl = "https://ai-gateway.vercel.sh/v1/chat/completions";
@@ -137,10 +165,7 @@ export class AlibabaService {
   }
 
   private formatHistory(msgs: MessageSingleton<true>[]) {
-    const historyMsgs =
-      msgs.length > ALIBABA_HISTORY_MESSAGE_LIMIT
-        ? msgs.slice(-ALIBABA_HISTORY_MESSAGE_LIMIT)
-        : msgs;
+    const historyMsgs = selectAlibabaHistoryMessages(msgs);
     const formatted = Array.of<AlibabaBaseMessage>();
     const lastIndex = historyMsgs.findLastIndex(
       m => m.provider === "ALIBABA" && m.senderType === "AI"
@@ -933,9 +958,7 @@ export class AlibabaService {
                   : undefined,
               isThinking: false,
               thinkingText:
-                AlibabaThinkingAgg.length > 0
-                  ? AlibabaThinkingAgg
-                  : undefined,
+                AlibabaThinkingAgg.length > 0 ? AlibabaThinkingAgg : undefined,
               messageBlocks: currentChunkMessageBlock(),
               systemPrompt,
               temperature,

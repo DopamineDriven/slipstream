@@ -79,13 +79,15 @@ class ScriptGen extends Fs {
     super(process.cwd());
   }
 
-  private sanitizeBlockContent(content: string, model = "claude-opus-4-6") {
-    const out = content
-      .replace(/<model\s+provider="[^"]*"\s+name="[^"]*"\s*>/g, "")
-      .replace(/<\/model>/g, "")
-      .trim();
+  private sanitizeBlockContent(content: string, provider: $Enums.Provider) {
+    if (provider === "ANTHROPIC") {
+      const out = content
+        .replace(/<model\s+provider="[^"]*"\s+name="[^"]*"\s*>/g, "")
+        .replace(/<\/model>/g, "")
+        .trim();
 
-    return `<model provider="anthropic" name="${model}">\n\n${out}\n\n</model>`;
+      return out;
+    } else return content;
   }
 
   private safeErrMsg(err: unknown) {
@@ -248,12 +250,33 @@ class ScriptGen extends Fs {
       });
 
       const cleanedData = { ...c, messages: cleanS };
+      const { messages, ...r } = cleanedData;
+      const limpio = messages.map(t => {
+        const { content, messageBlocks, ...rest } = t;
+        const s = messageBlocks?.map(tt => {
+          if (tt.type === "TEXT") {
+            const { content, ...rest } = tt;
+            const c = this.sanitizeBlockContent(content, t.provider);
+            return {
+              ...rest,
+              content: c
+            };
+          } else return tt;
+        });
+        return {
+          ...rest,
+          content: this.sanitizeBlockContent(content, rest.provider),
+          messageBlocks: s
+        };
+      });
 
-      const slug = this.toSlug(cleanedData.title ?? "");
+      const cc = { ...r, messages: limpio };
+
+      const slug = this.toSlug(cc.title ?? "");
 
       this.withWs(
-        `src/__out__/conversations/${slug}/${cleanedData.id}.json`,
-        JSON.stringify(cleanedData, null, 2)
+        `src/__out__/conversations/${slug}/${cc.id}.json`,
+        JSON.stringify(cc, null, 2)
       );
 
       return { ...c, messages: cleanS };
@@ -303,13 +326,9 @@ class ScriptGen extends Fs {
             thinkingContent.push(b.content);
           }
           if (b.type === "TEXT") {
-            if (msg.provider === "ANTHROPIC" && msg.senderType === "AI") {
-              textContent.push(
-                this.sanitizeBlockContent(b.content, msg.model ?? undefined)
-              );
-            } else {
-              textContent.push(b.content);
-            }
+            textContent.push(
+              this.sanitizeBlockContent(b.content, msg.provider)
+            );
           }
         }
       }
