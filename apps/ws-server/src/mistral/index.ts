@@ -115,6 +115,7 @@ export class MistralService extends MistralStreamContentService {
   }
 
   protected formatHistory(msgs: MessageSingleton<true>[]) {
+    const allowFreshAttachments = msgs.length < MISTRAL_HISTORY_MESSAGE_LIMIT;
     const historyMsgs =
       msgs.length > MISTRAL_HISTORY_MESSAGE_LIMIT
         ? msgs.slice(-MISTRAL_HISTORY_MESSAGE_LIMIT)
@@ -140,37 +141,41 @@ export class MistralService extends MistralStreamContentService {
     let documentSelected = false;
     let imageSelected = false;
 
-    for (
-      let msgIndex = historyMsgs.length - 1;
-      msgIndex > lastIndex && (!documentSelected || !imageSelected);
-      msgIndex--
-    ) {
-      const msg = historyMsgs[msgIndex];
-      if (!msg?.senderType || msg.senderType !== "USER") continue;
-
+    if (allowFreshAttachments) {
       for (
-        let attachmentIndex = msg.attachments.length - 1;
-        attachmentIndex >= 0 && (!documentSelected || !imageSelected);
-        attachmentIndex--
+        let msgIndex = historyMsgs.length - 1;
+        msgIndex > lastIndex && (!documentSelected || !imageSelected);
+        msgIndex--
       ) {
-        const attachment = msg.attachments[attachmentIndex];
-        if (!attachment) continue;
-        if (previouslySeenAttachmentIds.has(attachment.id)) continue;
-        if (selectedAttachmentIds.has(attachment.id)) continue;
+        const msg = historyMsgs[msgIndex];
+        if (!msg?.senderType || msg.senderType !== "USER") continue;
 
-        const activeCompat = attachment.compatStatus === "ACTIVE";
-        const url = activeCompat ? attachment.compatCdnUrl : attachment.cdnUrl;
-        const mime = activeCompat ? attachment.compatMime : attachment.mime;
-        if (!url || !mime) continue;
+        for (
+          let attachmentIndex = msg.attachments.length - 1;
+          attachmentIndex >= 0 && (!documentSelected || !imageSelected);
+          attachmentIndex--
+        ) {
+          const attachment = msg.attachments[attachmentIndex];
+          if (!attachment) continue;
+          if (previouslySeenAttachmentIds.has(attachment.id)) continue;
+          if (selectedAttachmentIds.has(attachment.id)) continue;
 
-        if (attachment.assetType === "DOCUMENT" && !documentSelected) {
-          inlineAttachmentKeys.add(`${msg.id}:${attachment.id}`);
-          selectedAttachmentIds.add(attachment.id);
-          documentSelected = true;
-        } else if (attachment.assetType === "IMAGE" && !imageSelected) {
-          inlineAttachmentKeys.add(`${msg.id}:${attachment.id}`);
-          selectedAttachmentIds.add(attachment.id);
-          imageSelected = true;
+          const activeCompat = attachment.compatStatus === "ACTIVE";
+          const url = activeCompat
+            ? attachment.compatCdnUrl
+            : attachment.cdnUrl;
+          const mime = activeCompat ? attachment.compatMime : attachment.mime;
+          if (!url || !mime) continue;
+
+          if (attachment.assetType === "DOCUMENT" && !documentSelected) {
+            inlineAttachmentKeys.add(`${msg.id}:${attachment.id}`);
+            selectedAttachmentIds.add(attachment.id);
+            documentSelected = true;
+          } else if (attachment.assetType === "IMAGE" && !imageSelected) {
+            inlineAttachmentKeys.add(`${msg.id}:${attachment.id}`);
+            selectedAttachmentIds.add(attachment.id);
+            imageSelected = true;
+          }
         }
       }
     }
