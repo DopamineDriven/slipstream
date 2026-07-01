@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, it } from "node:test";
-import { MistralStreamContentService } from "@/mistral/stream-content.ts";
+import { fileURLToPath } from "node:url";
 import type { ContentChunk } from "@mistralai/mistralai/models/components";
+import { formatMistralHistory } from "@/mistral/index.ts";
+import { MistralStreamContentService } from "@/mistral/stream-content.ts";
+import type {
+  ConversationSingleton,
+  MessageSingleton
+} from "@slipstream/types";
 
 interface CapturedLikeMessageBlock {
   content: string;
@@ -14,6 +21,14 @@ interface ReplayBlock {
   type: "THINKING" | "TEXT";
 }
 
+interface TestHistoryMessageParams {
+  readonly content: string;
+  readonly model: string;
+  readonly ordinal: number;
+  readonly provider: MessageSingleton<true>["provider"];
+  readonly senderType: MessageSingleton<true>["senderType"];
+}
+
 type ReplayEvent =
   | {
       content: string | readonly ContentChunk[] | null | undefined;
@@ -22,6 +37,161 @@ type ReplayEvent =
   | {
       type: "tool_round_boundary";
     };
+
+function buildTestHistoryMessage({
+  content,
+  model,
+  ordinal,
+  provider,
+  senderType
+}: TestHistoryMessageParams) {
+  const timestamp = new Date(ordinal * 1000);
+
+  return {
+    attachments: Array.of<MessageSingleton<true>["attachments"][number]>(),
+    content,
+    conversationId: "test-conversation",
+    conversationMemoryChunkId: null,
+    createdAt: timestamp,
+    disliked: false,
+    id: `test-message-${ordinal}`,
+    isImageGen: false,
+    liked: false,
+    messageType: "TEXT",
+    model,
+    ordinal,
+    provider,
+    responseOutput: null,
+    senderType,
+    thinkingDuration: null,
+    thinkingText: null,
+    tryAgain: false,
+    updatedAt: timestamp,
+    userId: "test-user",
+    userKeyId: null
+  } satisfies MessageSingleton<true>;
+}
+
+function buildSparseMistralHistory() {
+  return Array.from({ length: 350 }, (_, ordinal) => {
+    if (ordinal === 0) {
+      return buildTestHistoryMessage({
+        content: "ancient mistral prompt",
+        model: "mistral-medium-3.5",
+        ordinal,
+        provider: "MISTRAL",
+        senderType: "USER"
+      });
+    }
+
+    if (ordinal === 1) {
+      return buildTestHistoryMessage({
+        content: "ancient mistral answer",
+        model: "mistral-medium-3.5",
+        ordinal,
+        provider: "MISTRAL",
+        senderType: "AI"
+      });
+    }
+
+    return buildTestHistoryMessage({
+      content: `recent-global-${ordinal}`,
+      model: ordinal % 2 === 0 ? "deepseek-v4-pro" : "command-a-03-2025",
+      ordinal,
+      provider: ordinal % 2 === 0 ? "DEEPSEEK" : "COHERE",
+      senderType: ordinal % 2 === 0 ? "USER" : "AI"
+    });
+  });
+}
+
+function loadFixtureConversation(filename: string) {
+  const candidatePaths = [
+    fileURLToPath(
+      new URL(
+        `../__out__/conversations/%D0%B4%D0%B2%D0%B5-%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D1%8B/${filename}`,
+        import.meta.url
+      )
+    ),
+    fileURLToPath(new URL(`./fixtures/${filename}`, import.meta.url))
+  ];
+  const path = candidatePaths.find(existsSync);
+  if (!path) return null;
+  return JSON.parse<ConversationSingleton<true>>(readFileSync(path, "utf8"));
+}
+
+const fixtureHistoryFormatterDeps = {
+  filenameToHexExtTuple(url, compatStatus, encoded = true) {
+    const urlObj = new URL(url);
+    const path = urlObj.pathname;
+    const pathname = path.slice(path.lastIndexOf("/") + 1);
+    const filename = compatStatus === "ACTIVE" ? pathname : pathname.slice(14);
+    const dbFile = filename || "file.pdf";
+    const withoutExt = dbFile.slice(0, dbFile.lastIndexOf("."));
+    const ext = dbFile.slice(dbFile.lastIndexOf(".") + 1);
+    const name = encoded
+      ? Buffer.from(withoutExt, "utf-8").toString("hex")
+      : withoutExt;
+
+    return [name, ext] as const;
+  },
+  logInfo() {},
+  safeErrMsg(error) {
+    return error instanceof Error ? error.message : String(error);
+  }
+} satisfies Parameters<typeof formatMistralHistory>[1];
+
+function formattedAssistantText(
+  message: Extract<
+    ReturnType<typeof formatMistralHistory>[number],
+    { role: "assistant" }
+  >
+) {
+  const { content } = message;
+
+  if (typeof content === "string") {
+    return content;
+  }
+
+  if (Array.isArray(content)) {
+    const parts = Array.of<string>();
+    for (const chunk of content) {
+      if ("text" in chunk && typeof chunk.text === "string") {
+        parts.push(chunk.text);
+      }
+    }
+
+    return parts.join("\n");
+  }
+
+  return "";
+}
+
+function formattedMessageText(
+  message: ReturnType<typeof formatMistralHistory>[number]
+) {
+  if (!("content" in message)) {
+    return "";
+  }
+
+  const { content } = message;
+
+  if (typeof content === "string") {
+    return content;
+  }
+
+  if (Array.isArray(content)) {
+    const parts = Array.of<string>();
+    for (const chunk of content) {
+      if ("text" in chunk && typeof chunk.text === "string") {
+        parts.push(chunk.text);
+      }
+    }
+
+    return parts.join("\n");
+  }
+
+  return "";
+}
 
 function thinkingChunk(text: string, closed: boolean) {
   return {
@@ -127,7 +297,75 @@ function buildCapturedLikeBlocks() {
   return blocks;
 }
 
-describe("Mistral thinking block lifecycle", () => {
+describe("Mistral history formatter and thinking block lifecycle", () => {
+  it("preserves sparse old Mistral turns before filling newest global context", () => {
+    const formatted = formatMistralHistory(
+      buildSparseMistralHistory(),
+      fixtureHistoryFormatterDeps
+    );
+    const texts = formatted.map(formattedMessageText);
+
+    assert.equal(formatted.length, 175);
+    assert.deepEqual(texts.slice(0, 2), [
+      "ancient mistral prompt",
+      "ancient mistral answer"
+    ]);
+    assert.equal(texts.includes("recent-global-176"), false);
+    assert.ok(texts.includes("recent-global-177"));
+    assert.ok(texts.includes("recent-global-349"));
+  });
+
+  it("formats the full fixture history without empty assistant messages", t => {
+    const convo = loadFixtureConversation("t6j6xpg4cn70iqdgh0fuowzm.json");
+    if (!convo) {
+      t.skip(
+        "large fixture is gitignored; regenerate with transcript-gen when needed"
+      );
+      return;
+    }
+
+    const formatted = formatMistralHistory(
+      convo.messages,
+      fixtureHistoryFormatterDeps
+    );
+    const assistantMessages = formatted.filter(
+      message => message.role === "assistant"
+    );
+    const emptyAssistantMessages = assistantMessages.filter(
+      message => formattedAssistantText(message).trim().length === 0
+    );
+    const providerTagOnlyMessages = assistantMessages.filter(
+      message =>
+        formattedAssistantText(message).trim() === "[deepseek/deepseek-v4-pro]"
+    );
+    const serialized = JSON.stringify(formatted);
+    const textChars = formatted.reduce(
+      (total, message) => total + formattedMessageText(message).length,
+      0
+    );
+    const assistantTextChars = assistantMessages.reduce(
+      (total, message) => total + formattedAssistantText(message).length,
+      0
+    );
+    const metrics = {
+      assistantTextChars,
+      emptyAssistantMessages: emptyAssistantMessages.length,
+      formattedMessages: formatted.length,
+      providerTagOnlyMessages: providerTagOnlyMessages.length,
+      serializedBytes: Buffer.byteLength(serialized, "utf8"),
+      sourceMessages: convo.messages.length,
+      textChars
+    };
+    const metricsJson = JSON.stringify(metrics);
+
+    t.diagnostic(metricsJson);
+    process.stderr.write(`# mistral_history_formatter_size ${metricsJson}\n`);
+
+    assert.equal(formatted.length, 175);
+    assert.equal(emptyAssistantMessages.length, 0);
+    assert.ok(providerTagOnlyMessages.length > 0);
+  });
+
   it("coalesces the captured token-fragmented thinking stream into one block", () => {
     const capturedBlocks = buildCapturedLikeBlocks();
     const replayEvents = capturedBlocks.map((block, index): ReplayEvent => {
@@ -138,7 +376,9 @@ describe("Mistral thinking block lifecycle", () => {
         };
       }
 
-      const content = Array.of<ContentChunk>(thinkingChunk(block.content, true));
+      const content = Array.of<ContentChunk>(
+        thinkingChunk(block.content, true)
+      );
 
       if (index % 20 === 0) {
         content.push(referenceChunk(index));

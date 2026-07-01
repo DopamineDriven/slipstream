@@ -33,6 +33,281 @@ import type {
 
 const MISTRAL_HISTORY_MESSAGE_LIMIT = 175;
 
+interface MistralAssistantHistoryTextMessage {
+  readonly content: string;
+  readonly model: string | null;
+  readonly provider: $Enums.Provider;
+}
+
+function formatMistralHistoryModelIdentifier(
+  msg: MistralAssistantHistoryTextMessage
+) {
+  return `[${msg.provider.toLowerCase()}/${msg.model ?? "model"}]`;
+}
+
+export function formatMistralAssistantHistoryText(
+  msg: MistralAssistantHistoryTextMessage,
+  textParts: readonly string[]
+) {
+  const joinedText = textParts.join("\n\n");
+
+  if (joinedText.trim().length > 0) {
+    return joinedText;
+  }
+
+  if (msg.content.trim().length > 0) {
+    return msg.content;
+  }
+
+  return formatMistralHistoryModelIdentifier(msg);
+}
+
+interface MistralHistoryFormatterDeps {
+  readonly filenameToHexExtTuple: (
+    url: string,
+    compatStatus: $Enums.CompatStatus | null,
+    encoded?: boolean
+  ) => readonly [filename: string, ext: string];
+  readonly logInfo: (message: string) => void;
+  readonly safeErrMsg: (error: unknown) => string;
+}
+
+function selectMistralHistoryMessages(msgs: readonly MessageSingleton<true>[]) {
+  const orderedMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
+  if (orderedMsgs.length <= MISTRAL_HISTORY_MESSAGE_LIMIT) {
+    return orderedMsgs;
+  }
+
+  const selectedIds = new Set<string>();
+
+  for (
+    let msgIndex = orderedMsgs.length - 1;
+    msgIndex >= 0 && selectedIds.size < MISTRAL_HISTORY_MESSAGE_LIMIT;
+    msgIndex--
+  ) {
+    const msg = orderedMsgs[msgIndex];
+    if (!msg || msg.provider !== "MISTRAL") continue;
+    selectedIds.add(msg.id);
+  }
+
+  for (
+    let msgIndex = orderedMsgs.length - 1;
+    msgIndex >= 0 && selectedIds.size < MISTRAL_HISTORY_MESSAGE_LIMIT;
+    msgIndex--
+  ) {
+    const msg = orderedMsgs[msgIndex];
+    if (!msg) continue;
+    selectedIds.add(msg.id);
+  }
+
+  return orderedMsgs.filter(msg => selectedIds.has(msg.id));
+}
+
+export function formatMistralHistory(
+  msgs: readonly MessageSingleton<true>[],
+  deps: MistralHistoryFormatterDeps
+) {
+  const historyMsgs = selectMistralHistoryMessages(msgs);
+  const allowFreshAttachments =
+    historyMsgs.length < MISTRAL_HISTORY_MESSAGE_LIMIT;
+  const formatted = Array.of<MistralMessageReq>();
+  const lastIndex = historyMsgs.findLastIndex(
+    m => m.provider === "MISTRAL" && m.senderType === "AI"
+  );
+
+  const isFirstMistralMsg = lastIndex === -1;
+  const previouslySeenAttachmentIds = new Set<string>();
+
+  if (!isFirstMistralMsg) {
+    for (const msg of historyMsgs.slice(0, lastIndex + 1)) {
+      for (const attachment of msg.attachments) {
+        previouslySeenAttachmentIds.add(attachment.id);
+      }
+    }
+  }
+
+  const inlineAttachmentKeys = new Set<string>();
+  const selectedAttachmentIds = new Set<string>();
+  let documentSelected = false;
+  let imageSelected = false;
+
+  if (allowFreshAttachments) {
+    for (
+      let msgIndex = historyMsgs.length - 1;
+      msgIndex > lastIndex && (!documentSelected || !imageSelected);
+      msgIndex--
+    ) {
+      const msg = historyMsgs[msgIndex];
+      if (!msg?.senderType || msg.senderType !== "USER") continue;
+
+      for (
+        let attachmentIndex = msg.attachments.length - 1;
+        attachmentIndex >= 0 && (!documentSelected || !imageSelected);
+        attachmentIndex--
+      ) {
+        const attachment = msg.attachments[attachmentIndex];
+        if (!attachment) continue;
+        if (previouslySeenAttachmentIds.has(attachment.id)) continue;
+        if (selectedAttachmentIds.has(attachment.id)) continue;
+
+        const activeCompat = attachment.compatStatus === "ACTIVE";
+        const url = activeCompat ? attachment.compatCdnUrl : attachment.cdnUrl;
+        const mime = activeCompat ? attachment.compatMime : attachment.mime;
+        if (!url || !mime) continue;
+
+        if (attachment.assetType === "DOCUMENT" && !documentSelected) {
+          inlineAttachmentKeys.add(`${msg.id}:${attachment.id}`);
+          selectedAttachmentIds.add(attachment.id);
+          documentSelected = true;
+        } else if (attachment.assetType === "IMAGE" && !imageSelected) {
+          inlineAttachmentKeys.add(`${msg.id}:${attachment.id}`);
+          selectedAttachmentIds.add(attachment.id);
+          imageSelected = true;
+        }
+      }
+    }
+  }
+
+  for (const [msgIndex, msg] of historyMsgs.entries()) {
+    const isFreshContext = isFirstMistralMsg || msgIndex > lastIndex;
+    if (msg.senderType === "USER") {
+      const content = Array.of<ContentChunk>();
+      const textParts = Array.of<string>();
+      try {
+        if (msg.attachments && msg.attachments.length > 0) {
+          for (const att of msg.attachments) {
+            const {
+              cdnUrl,
+              mime: ogMime,
+              compatStatus,
+              compatCdnUrl,
+              compatMime
+            } = att;
+            const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
+            const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
+            if (url && mime) {
+              const [filename, ext] = deps.filenameToHexExtTuple(
+                url,
+                att.compatStatus,
+                false
+              );
+              const name = `${filename}.${ext}`;
+              if (att.assetType === "DOCUMENT") {
+                try {
+                  if (
+                    isFreshContext &&
+                    inlineAttachmentKeys.has(`${msg.id}:${att.id}`)
+                  ) {
+                    try {
+                      content.push({
+                        documentUrl: url,
+                        type: "document_url"
+                      });
+                    } catch {
+                      textParts.push(`[${name}](${url})`);
+                    }
+                  } else {
+                    textParts.push(`[${name}](${url})`);
+                  }
+                } catch {
+                  textParts.push(`[${name}](${url})`);
+                }
+              } else if (att.assetType === "IMAGE") {
+                if (
+                  isFreshContext &&
+                  inlineAttachmentKeys.has(`${msg.id}:${att.id}`)
+                ) {
+                  content.push({
+                    type: "image_url",
+                    imageUrl: { url, detail: "high" }
+                  });
+                } else {
+                  textParts.push(`![${name}](${url})`);
+                }
+              } else {
+                textParts.push(`[${name}](${url})`);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        throw new Error(deps.safeErrMsg(err));
+      } finally {
+        if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+          const textBlocks = Array.of<string>();
+          for (const x of msg.messageBlocks) {
+            if (x.type === "TEXT") {
+              textBlocks.push(x.content);
+            }
+          }
+          textParts.push(textBlocks.join(`\n`));
+        } else {
+          textParts.push(msg.content);
+        }
+      }
+      content.push({ type: "text", text: textParts.join(`\n\n`) });
+      formatted.push({ role: "user", content });
+    } else {
+      const content = Array.of<ContentChunk>();
+      const textParts = Array.of<string>();
+      const modelIdentifier = formatMistralHistoryModelIdentifier(msg);
+
+      try {
+        if (msg.attachments && msg.attachments.length > 0) {
+          for (const att of msg.attachments) {
+            const {
+              cdnUrl,
+              mime: ogMime,
+              compatStatus,
+              assetType,
+              compatCdnUrl,
+              compatMime
+            } = att;
+            const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
+            const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
+
+            if (url && mime) {
+              const [filename, ext] = deps.filenameToHexExtTuple(
+                url,
+                att.compatStatus,
+                false
+              );
+
+              const name = `${filename}.${ext}`;
+
+              if (assetType === "IMAGE") {
+                textParts.push(`${modelIdentifier}\n![${name}](${url})`);
+              } else {
+                textParts.push(`${modelIdentifier}\n[${name}](${url})`);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        deps.logInfo(deps.safeErrMsg(err));
+      } finally {
+        if (msg.messageBlocks && msg.messageBlocks.length > 0) {
+          const textBlocks = Array.of<string>();
+          for (const x of msg.messageBlocks) {
+            if (x.type === "TEXT") {
+              textBlocks.push(x.content);
+            }
+          }
+          textParts.push(textBlocks.join(`\n\n`));
+        } else {
+          textParts.push(msg.content);
+        }
+      }
+      content.push({
+        type: "text",
+        text: formatMistralAssistantHistoryText(msg, textParts)
+      });
+      formatted.push({ role: "assistant", content });
+    }
+  }
+  return formatted;
+}
+
 export class MistralService extends MistralStreamContentService {
   protected defaultClient: Mistral;
   protected logger: PinoLogger;
@@ -115,206 +390,12 @@ export class MistralService extends MistralStreamContentService {
   }
 
   protected formatHistory(msgs: MessageSingleton<true>[]) {
-    const allowFreshAttachments = msgs.length < MISTRAL_HISTORY_MESSAGE_LIMIT;
-    const historyMsgs =
-      msgs.length > MISTRAL_HISTORY_MESSAGE_LIMIT
-        ? msgs.slice(-MISTRAL_HISTORY_MESSAGE_LIMIT)
-        : msgs;
-    const formatted = Array.of<MistralMessageReq>();
-    const lastIndex = historyMsgs.findLastIndex(
-      m => m.provider === "MISTRAL" && m.senderType === "AI"
-    );
-
-    const isFirstMistralMsg = lastIndex === -1;
-    const previouslySeenAttachmentIds = new Set<string>();
-
-    if (!isFirstMistralMsg) {
-      for (const msg of historyMsgs.slice(0, lastIndex + 1)) {
-        for (const attachment of msg.attachments) {
-          previouslySeenAttachmentIds.add(attachment.id);
-        }
-      }
-    }
-
-    const inlineAttachmentKeys = new Set<string>();
-    const selectedAttachmentIds = new Set<string>();
-    let documentSelected = false;
-    let imageSelected = false;
-
-    if (allowFreshAttachments) {
-      for (
-        let msgIndex = historyMsgs.length - 1;
-        msgIndex > lastIndex && (!documentSelected || !imageSelected);
-        msgIndex--
-      ) {
-        const msg = historyMsgs[msgIndex];
-        if (!msg?.senderType || msg.senderType !== "USER") continue;
-
-        for (
-          let attachmentIndex = msg.attachments.length - 1;
-          attachmentIndex >= 0 && (!documentSelected || !imageSelected);
-          attachmentIndex--
-        ) {
-          const attachment = msg.attachments[attachmentIndex];
-          if (!attachment) continue;
-          if (previouslySeenAttachmentIds.has(attachment.id)) continue;
-          if (selectedAttachmentIds.has(attachment.id)) continue;
-
-          const activeCompat = attachment.compatStatus === "ACTIVE";
-          const url = activeCompat
-            ? attachment.compatCdnUrl
-            : attachment.cdnUrl;
-          const mime = activeCompat ? attachment.compatMime : attachment.mime;
-          if (!url || !mime) continue;
-
-          if (attachment.assetType === "DOCUMENT" && !documentSelected) {
-            inlineAttachmentKeys.add(`${msg.id}:${attachment.id}`);
-            selectedAttachmentIds.add(attachment.id);
-            documentSelected = true;
-          } else if (attachment.assetType === "IMAGE" && !imageSelected) {
-            inlineAttachmentKeys.add(`${msg.id}:${attachment.id}`);
-            selectedAttachmentIds.add(attachment.id);
-            imageSelected = true;
-          }
-        }
-      }
-    }
-
-    for (const [msgIndex, msg] of historyMsgs.entries()) {
-      const isFreshContext = isFirstMistralMsg || msgIndex > lastIndex;
-      if (msg.senderType === "USER") {
-        const content = Array.of<ContentChunk>();
-        const textParts = Array.of<string>();
-        try {
-          if (msg.attachments && msg.attachments.length > 0) {
-            for (const att of msg.attachments) {
-              const {
-                cdnUrl,
-                mime: ogMime,
-                compatStatus,
-                compatCdnUrl,
-                compatMime
-              } = att;
-              const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
-              const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
-              if (url && mime) {
-                const [filename, ext] = this.prisma.filenameToHexExtTuple(
-                  url,
-                  att.compatStatus,
-                  false
-                );
-                const name = `${filename}.${ext}`;
-                if (att.assetType === "DOCUMENT") {
-                  try {
-                    if (
-                      isFreshContext &&
-                      inlineAttachmentKeys.has(`${msg.id}:${att.id}`)
-                    ) {
-                      try {
-                        content.push({
-                          documentUrl: url,
-                          type: "document_url"
-                        });
-                      } catch {
-                        textParts.push(`[${name}](${url})`);
-                      }
-                    } else {
-                      textParts.push(`[${name}](${url})`);
-                    }
-                  } catch {
-                    textParts.push(`[${name}](${url})`);
-                  }
-                } else if (att.assetType === "IMAGE") {
-                  if (
-                    isFreshContext &&
-                    inlineAttachmentKeys.has(`${msg.id}:${att.id}`)
-                  ) {
-                    content.push({
-                      type: "image_url",
-                      imageUrl: { url, detail: "high" }
-                    });
-                  } else {
-                    textParts.push(`![${name}](${url})`);
-                  }
-                } else {
-                  textParts.push(`[${name}](${url})`);
-                }
-              }
-            }
-          }
-        } catch (err) {
-          throw new Error(this.prisma.safeErrMsg(err));
-        } finally {
-          if (msg.messageBlocks && msg.messageBlocks.length > 0) {
-            const textBlocks = Array.of<string>();
-            for (const x of msg.messageBlocks) {
-              if (x.type === "TEXT") {
-                textBlocks.push(x.content);
-              }
-            }
-            textParts.push(textBlocks.join(`\n`));
-          } else {
-            textParts.push(msg.content);
-          }
-        }
-        content.push({ type: "text", text: textParts.join(`\n\n`) });
-        formatted.push({ role: "user", content });
-      } else {
-        const content = Array.of<ContentChunk>();
-        const textParts = Array.of<string>();
-        const modelIdentifier = `[${msg.provider.toLowerCase()}/${msg.model ?? "model"}]`;
-
-        try {
-          if (msg.attachments && msg.attachments.length > 0) {
-            for (const att of msg.attachments) {
-              const {
-                cdnUrl,
-                mime: ogMime,
-                compatStatus,
-                assetType,
-                compatCdnUrl,
-                compatMime
-              } = att;
-              const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
-              const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
-
-              if (url && mime) {
-                const [filename, ext] = this.prisma.filenameToHexExtTuple(
-                  url,
-                  att.compatStatus,
-                  false
-                );
-
-                const name = `${filename}.${ext}`;
-
-                if (assetType === "IMAGE") {
-                  textParts.push(`${modelIdentifier}\n![${name}](${url})`);
-                } else {
-                  textParts.push(`${modelIdentifier}\n[${name}](${url})`);
-                }
-              }
-            }
-          }
-        } catch (err) {
-          this.logger.info(this.prisma.safeErrMsg(err));
-        } finally {
-          if (msg.messageBlocks && msg.messageBlocks.length > 0) {
-            const textBlocks = Array.of<string>();
-            for (const x of msg.messageBlocks) {
-              if (x.type === "TEXT") {
-                textBlocks.push(x.content);
-              }
-            }
-            textParts.push(textBlocks.join(`\n\n`));
-          } else {
-            textParts.push(msg.content);
-          }
-        }
-        content.push({ type: "text", text: textParts.join(`\n\n`) });
-        formatted.push({ role: "assistant", content });
-      }
-    }
-    return formatted;
+    return formatMistralHistory(msgs, {
+      filenameToHexExtTuple: (url, compatStatus, encoded) =>
+        this.prisma.filenameToHexExtTuple(url, compatStatus, encoded),
+      logInfo: message => this.logger.info(message),
+      safeErrMsg: error => this.prisma.safeErrMsg(error)
+    } satisfies MistralHistoryFormatterDeps);
   }
 
   protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
