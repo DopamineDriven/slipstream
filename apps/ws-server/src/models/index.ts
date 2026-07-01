@@ -102,9 +102,7 @@ export class ModelService extends ProviderValidation {
       m === "gemini-2.5-flash-image" ||
       m === "gemini-2.0-flash" ||
       m === "gemini-2.0-flash-lite" ||
-      m === "veo-3.0-fast-generate-001" ||
-      m === "veo-3.0-generate-001" ||
-      m === "veo-2.0-generate-001" ||
+      m === "veo-3.1-lite-generate-preview" ||
       m === "veo-3.1-fast-generate-preview" ||
       m === "veo-3.1-generate-preview"
     );

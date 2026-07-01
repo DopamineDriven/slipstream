@@ -64,9 +64,7 @@ export const modelIdsByProvider = {
     "gemini-2.0-flash-lite",
     "veo-3.1-generate-preview",
     "veo-3.1-fast-generate-preview",
-    "veo-3.0-generate-001",
-    "veo-3.0-fast-generate-001",
-    "veo-2.0-generate-001"
+    "veo-3.1-lite-generate-preview"
   ],
   grok: [
     "grok-4.3",
@@ -80,6 +78,7 @@ export const modelIdsByProvider = {
     "grok-imagine-video-1.5"
   ],
   anthropic: [
+    "claude-sonnet-5",
     "claude-fable-5",
     "claude-opus-4-8",
     "claude-opus-4-7",

@@ -64,9 +64,7 @@ export const displayNameModelsByProvider = {
     "Gemini 2.0 Flash-Lite",
     "Veo 3.1",
     "Veo 3.1 fast",
-    "Veo 3",
-    "Veo 3 fast",
-    "Veo 2"
+    "Veo 3.1 lite"
   ],
   grok: [
     "Grok 4.3",
@@ -80,6 +78,7 @@ export const displayNameModelsByProvider = {
     "Grok Imagine Video 1.5"
   ],
   anthropic: [
+    "Claude Sonnet 5",
     "Claude Fable 5",
     "Claude Opus 4.8",
     "Claude Opus 4.7",
