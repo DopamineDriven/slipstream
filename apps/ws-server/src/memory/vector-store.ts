@@ -690,7 +690,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
 
   public get memoryCompactionConfig() {
     return {
-      enabled: false,
+      enabled: true,
       liveWindowMessages: 20
     } as const satisfies MemoryCompactionConfig;
   }
