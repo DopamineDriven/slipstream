@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -12,9 +13,10 @@ export class SakanaStoreService extends SakanaBaseService {
     prisma: PrismaService,
     userStoreVector: UserStoreVectorService,
     apiKey: string,
-    s3: S3Storage
+    s3: S3Storage,
+    memoryService: ConversationMemoryVectorService
   ) {
-    super(logger, prisma, userStoreVector, apiKey, s3);
+    super(logger, prisma, userStoreVector, apiKey, s3, memoryService);
   }
 
   protected fileSearchFunctionTool() {
@@ -58,6 +60,102 @@ export class SakanaStoreService extends SakanaBaseService {
           }
         },
         required: ["query"],
+        additionalProperties: false
+      }
+    } as const satisfies OpenAI.Responses.FunctionTool;
+  }
+
+  protected memorySearchFunctionTool() {
+    return {
+      type: "function",
+      name: "conversation_memory_search",
+      description:
+        "Search the user's indexed conversation history — older sections of this conversation and other conversations. " +
+        "Sections are ~8k-token transcript slices with model-written technical summaries; summary keyword hits outrank " +
+        "raw transcript hits in the fulltext lane. Semantic similarity by default; when search_terms is provided, also " +
+        "performs fulltext keyword search and returns { semantic_results, fulltext_results, overlap_results, metadata }. " +
+        "scope 'current_conversation' (default) reaches this conversation's older indexed sections — including messages " +
+        "beyond your context window; 'all_conversations' reaches the user's entire history, with conversation_id + " +
+        "conversation_title on every hit for citation. Sections are keyed by 0-based message ordinal ranges [start, end). " +
+        "Expand a hit with conversation_memory_get_chunk.",
+      strict: false,
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The semantic search query"
+          },
+          search_terms: {
+            type: "string",
+            description:
+              "Optional exact-match terms for the fulltext lane. Supports quoted phrases and negation (-deprecated)."
+          },
+          scope: {
+            type: "string",
+            enum: ["current_conversation", "all_conversations"],
+            description:
+              "Where to search (default current_conversation). Use all_conversations for cross-conversation recall."
+          },
+          max_results: {
+            type: "number",
+            description: "Maximum results per signal (1-10, default 5)"
+          },
+          threshold: {
+            type: "number",
+            description:
+              "Cosine similarity floor for the semantic lane (default 0)"
+          },
+          include_transcript: {
+            type: "boolean",
+            description:
+              "Return full section transcripts inline (default false — summaries + excerpts)"
+          }
+        },
+        required: ["query"],
+        additionalProperties: false
+      }
+    } as const satisfies OpenAI.Responses.FunctionTool;
+  }
+
+  protected memoryGetChunkFunctionTool() {
+    return {
+      type: "function",
+      name: "conversation_memory_get_chunk",
+      description:
+        "Fetch one indexed conversation-memory section in full: by chunk_id (from a conversation_memory_search hit), " +
+        "or by conversation_id + ordinal (the section covering that 0-based message ordinal). " +
+        "direction walks to the adjacent previous/next section — search finds the doorway, traversal walks the room. " +
+        "Returns the full transcript + summary by default, plus has_previous/has_next.",
+      strict: false,
+      parameters: {
+        type: "object",
+        properties: {
+          chunk_id: {
+            type: "string",
+            description: "Section id from a conversation_memory_search result"
+          },
+          conversation_id: {
+            type: "string",
+            description:
+              "Conversation id — pair with ordinal to fetch the covering section"
+          },
+          ordinal: {
+            type: "number",
+            description: "0-based message ordinal (pair with conversation_id)"
+          },
+          direction: {
+            type: "string",
+            enum: ["previous", "next"],
+            description:
+              "Optional: return the adjacent section instead of the resolved one"
+          },
+          include_transcript: {
+            type: "boolean",
+            description: "Include the full transcript (default true)"
+          }
+        },
+        required: [],
         additionalProperties: false
       }
     } as const satisfies OpenAI.Responses.FunctionTool;
@@ -291,28 +389,63 @@ export class SakanaStoreService extends SakanaBaseService {
 
   protected async executeFunctionToolCall(
     userId: string,
+    conversationId: string,
     toolCall: OpenAI.Responses.ResponseFunctionToolCall
   ) {
-    if (toolCall.name !== "file_search") {
-      return {
-        type: "function_call_output",
-        call_id: toolCall.call_id,
-        output: `Unknown tool: ${toolCall.name}`
-      } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
-    }
-
+    const toolName = toolCall.name;
     try {
-      const input = this.parseFileSearchInput(toolCall.arguments);
-      const output = await this.executeFileSearch(userId, input);
+      if (toolName === "file_search") {
+        const input = this.parseFileSearchInput(toolCall.arguments);
+        const output = await this.executeFileSearch(userId, input);
+        return {
+          type: "function_call_output",
+          call_id: toolCall.call_id,
+          output
+        } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
+      }
+
+      if (toolName === "conversation_memory_search") {
+        const parsed = this.userStoreVector.parseUserStoreArgs(
+          toolCall.arguments,
+          toolName
+        );
+        const output = await this.memoryService.searchMemoryFromToolInput(
+          userId,
+          conversationId,
+          parsed
+        );
+        return {
+          type: "function_call_output",
+          call_id: toolCall.call_id,
+          output
+        } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
+      }
+
+      if (toolName === "conversation_memory_get_chunk") {
+        const parsed = this.userStoreVector.parseUserStoreArgs(
+          toolCall.arguments,
+          toolName
+        );
+        const output = await this.memoryService.getMemoryChunkFromToolInput(
+          userId,
+          parsed
+        );
+        return {
+          type: "function_call_output",
+          call_id: toolCall.call_id,
+          output
+        } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
+      }
+
       return {
         type: "function_call_output",
         call_id: toolCall.call_id,
-        output
+        output: `Unknown tool: ${toolName}`
       } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
     } catch (error) {
       this.logger.error(
         {
-          toolName: toolCall.name,
+          toolName,
           callId: toolCall.call_id,
           error: this.prisma.safeErrMsg(error)
         },
@@ -321,7 +454,7 @@ export class SakanaStoreService extends SakanaBaseService {
       return {
         type: "function_call_output",
         call_id: toolCall.call_id,
-        output: `file_search error: ${this.prisma.safeErrMsg(error)}`
+        output: `${toolName} error: ${this.prisma.safeErrMsg(error)}`
       } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
     }
   }

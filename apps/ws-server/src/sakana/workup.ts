@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { OpenAI } from "openai";
@@ -33,9 +34,10 @@ export class SakanaWorkupService extends SakanaStoreService {
     prisma: PrismaService,
     userStoreVector: UserStoreVectorService,
     apiKey: string,
-    s3: S3Storage
+    s3: S3Storage,
+    memoryService: ConversationMemoryVectorService
   ) {
-    super(logger, prisma, userStoreVector, apiKey, s3);
+    super(logger, prisma, userStoreVector, apiKey, s3, memoryService);
   }
 
   protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
@@ -44,7 +46,8 @@ export class SakanaWorkupService extends SakanaStoreService {
     }
 
     const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
+      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
 
     return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
   }
@@ -320,6 +323,13 @@ export class SakanaWorkupService extends SakanaStoreService {
     if (hasUserStoreDocs) {
       tools.unshift(this.fileSearchFunctionTool());
     }
+
+    // memory tools attach unconditionally — conversation memory exists
+    // independently of uploaded documents
+    tools.push(
+      this.memorySearchFunctionTool(),
+      this.memoryGetChunkFunctionTool()
+    );
 
     return tools;
   }

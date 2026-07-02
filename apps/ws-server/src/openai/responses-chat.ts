@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
@@ -29,9 +30,10 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     userStoreVector: UserStoreVectorService,
     s3: S3Storage,
     redis: EnhancedRedisPubSub,
-    apiKey: string
+    apiKey: string,
+    memoryService: ConversationMemoryVectorService
   ) {
-    super(logger, prisma, userStoreVector, s3, redis, apiKey);
+    super(logger, prisma, userStoreVector, s3, redis, apiKey, memoryService);
   }
 
   private reasoningByModel(m: OpenAiModelIdUnion) {
@@ -448,7 +450,11 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       const toolOutputs =
         Array.of<OpenAI.Responses.ResponseInputItem.FunctionCallOutput>();
       for (const call of functionCalls) {
-        const output = await this.executeFunctionToolCall(userId, call);
+        const output = await this.executeFunctionToolCall(
+          userId,
+          conversationId,
+          call
+        );
         toolOutputs.push(output);
       }
 
@@ -547,7 +553,8 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       type: "ai_chat_response",
       conversationId,
       userId,
-      systemPrompt,      convo: d.convo,
+      systemPrompt,
+      convo: d.convo,
       temperature,
       userMsgId,
       title,

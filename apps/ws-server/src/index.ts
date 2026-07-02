@@ -119,6 +119,7 @@ async function exe() {
       redisInstance,
       s3,
       userStore,
+      memory,
       cfg.X_AI_KEY,
       process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
     );
@@ -129,6 +130,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.LLAMA_API_KEY
     );
 
@@ -139,6 +141,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -181,7 +184,8 @@ async function exe() {
       userStore,
       s3,
       redisInstance,
-      cfg.OPENAI_API_KEY
+      cfg.OPENAI_API_KEY,
+      memory
     );
 
     const { GeminiService } = await import("@/gemini/index.ts");
@@ -192,6 +196,7 @@ async function exe() {
       userStore,
       redisInstance,
       s3,
+      memory,
       cfg.GOOGLE_API_KEY
     );
 
@@ -213,7 +218,8 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
-      cfg.COHERE_API_KEY
+      cfg.COHERE_API_KEY,
+      memory
     );
 
     const { KimiService } = await import("@/kimi/index.ts");
@@ -234,6 +240,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -244,6 +251,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -265,6 +273,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -275,6 +284,7 @@ async function exe() {
       prisma,
       userStore,
       s3,
+      memory,
       redisInstance,
       cfg.SAKANA_API_KEY
     );

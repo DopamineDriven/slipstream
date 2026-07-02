@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { SakanaProviderChatRequestEntity } from "@/sakana/chat.ts";
 import type { SakanaUserLocation } from "@/sakana/workup.ts";
@@ -18,10 +19,11 @@ export class SakanaService extends SakanaChatService {
     prisma: PrismaService,
     userStoreVector: UserStoreVectorService,
     s3: S3Storage,
+    memoryService: ConversationMemoryVectorService,
     redis: EnhancedRedisPubSub,
     apiKey: string
   ) {
-    super(logger, prisma, userStoreVector, s3, redis, apiKey);
+    super(logger, prisma, userStoreVector, s3, memoryService, redis, apiKey);
   }
 
   public async routeSakana({ model, ...rest }: SakanaRouteRequestEntity) {

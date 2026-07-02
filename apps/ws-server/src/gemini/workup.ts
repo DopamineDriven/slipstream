@@ -1,5 +1,6 @@
 import type { GenerateContentResponseProps } from "@/gemini/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -15,11 +16,7 @@ import type {
   ToolConfig
 } from "@google/genai";
 import { FileSearchStoreService } from "@/gemini/fss.ts";
-import {
-  PartMediaResolutionLevel,
-  ThinkingLevel,
-  Type
-} from "@google/genai";
+import { PartMediaResolutionLevel, ThinkingLevel, Type } from "@google/genai";
 import type {
   AIChatRequestImgGenFields,
   AttachmentSingleton,
@@ -34,6 +31,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
     logger: LoggerService,
     prisma: PrismaService,
     protected store: UserStoreVectorService,
+    protected memoryService: ConversationMemoryVectorService,
     apiKey: string
   ) {
     super(logger, prisma, apiKey);
@@ -523,7 +521,8 @@ export class GeminiWorkupService extends FileSearchStoreService {
     }
 
     const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
+      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
 
     return (
       systemPrompt ? `${systemPrompt}\n\n${note}` : note
@@ -789,6 +788,95 @@ export class GeminiWorkupService extends FileSearchStoreService {
     } satisfies FunctionDeclaration;
   }
 
+  protected memorySearchTool() {
+    return {
+      name: "conversation_memory_search",
+      description:
+        "Search the user's indexed conversation history — older sections of this conversation and other conversations. " +
+        "Sections are ~8k-token transcript slices with model-written technical summaries; summary keyword hits outrank " +
+        "raw transcript hits in the fulltext lane. Semantic similarity by default; when search_terms is provided, also " +
+        "performs fulltext keyword search and returns { semantic_results, fulltext_results, overlap_results, metadata }. " +
+        "scope 'current_conversation' (default) reaches this conversation's older indexed sections — including messages " +
+        "beyond your context window; 'all_conversations' reaches the user's entire history, with conversation_id + " +
+        "conversation_title on every hit for citation. Sections are keyed by 0-based message ordinal ranges [start, end). " +
+        "Expand a hit with conversation_memory_get_chunk.",
+      parameters: {
+        type: Type.OBJECT,
+        properties: {
+          query: {
+            type: Type.STRING,
+            description: "The semantic search query"
+          },
+          search_terms: {
+            type: Type.STRING,
+            description:
+              "Optional exact-match terms for the fulltext lane. Supports quoted phrases and negation (-deprecated)."
+          },
+          scope: {
+            type: Type.STRING,
+            enum: ["current_conversation", "all_conversations"],
+            description:
+              "Where to search (default current_conversation). Use all_conversations for cross-conversation recall."
+          },
+          max_results: {
+            type: Type.NUMBER,
+            description: "Maximum results per signal (1-10, default 5)"
+          },
+          threshold: {
+            type: Type.NUMBER,
+            description:
+              "Cosine similarity floor for the semantic lane (default 0)"
+          },
+          include_transcript: {
+            type: Type.BOOLEAN,
+            description:
+              "Return full section transcripts inline (default false — summaries + excerpts)"
+          }
+        },
+        required: ["query"]
+      }
+    } satisfies FunctionDeclaration;
+  }
+
+  protected memoryGetChunkTool() {
+    return {
+      name: "conversation_memory_get_chunk",
+      description:
+        "Fetch one indexed conversation-memory section in full: by chunk_id (from a conversation_memory_search hit), " +
+        "or by conversation_id + ordinal (the section covering that 0-based message ordinal). " +
+        "direction walks to the adjacent previous/next section — search finds the doorway, traversal walks the room. " +
+        "Returns the full transcript + summary by default, plus has_previous/has_next.",
+      parameters: {
+        type: Type.OBJECT,
+        properties: {
+          chunk_id: {
+            type: Type.STRING,
+            description: "Section id from a conversation_memory_search result"
+          },
+          conversation_id: {
+            type: Type.STRING,
+            description:
+              "Conversation id — pair with ordinal to fetch the covering section"
+          },
+          ordinal: {
+            type: Type.NUMBER,
+            description: "0-based message ordinal (pair with conversation_id)"
+          },
+          direction: {
+            type: Type.STRING,
+            enum: ["previous", "next"],
+            description:
+              "Optional: return the adjacent section instead of the resolved one"
+          },
+          include_transcript: {
+            type: Type.BOOLEAN,
+            description: "Include the full transcript (default true)"
+          }
+        }
+      }
+    } satisfies FunctionDeclaration;
+  }
+
   private getToolConfig(
     latlng?: string,
     m: GeminiModelIdUnion = "gemini-3.1-pro-preview"
@@ -821,7 +909,11 @@ export class GeminiWorkupService extends FileSearchStoreService {
         {
           googleSearch: {},
           urlContext: {},
-          functionDeclarations: [this.userStoreSearchTool()]
+          functionDeclarations: [
+            this.userStoreSearchTool(),
+            this.memorySearchTool(),
+            this.memoryGetChunkTool()
+          ]
         }
       ] satisfies GenerateContentConfig["tools"];
     }
@@ -831,7 +923,11 @@ export class GeminiWorkupService extends FileSearchStoreService {
     if (m === "gemini-2.0-flash" || m === "gemini-2.0-flash-lite") {
       return [
         {
-          functionDeclarations: [this.userStoreSearchTool()]
+          functionDeclarations: [
+            this.userStoreSearchTool(),
+            this.memorySearchTool(),
+            this.memoryGetChunkTool()
+          ]
         }
       ] satisfies GenerateContentConfig["tools"];
     } else {

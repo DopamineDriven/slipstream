@@ -17,6 +17,7 @@ import type {
   GrokModelIdUnion,
   MessageSingleton
 } from "@slipstream/types";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 
 type xAIImageEditsInput = {
   url: string;
@@ -30,10 +31,11 @@ export class GrokImgGenService extends GrokStreamWorkupService {
     logger: LoggerService,
     prisma: PrismaService,
     userStore: UserStoreVectorService,
+    memoryService: ConversationMemoryVectorService,
     apiKey: string,
     managementKey: string
   ) {
-    super(logger, prisma, userStore, apiKey, managementKey);
+    super(logger, prisma, userStore, memoryService, apiKey, managementKey);
     this.nanoid = import("nanoid").then(d => d.nanoid);
   }
 

@@ -53,7 +53,7 @@ function selectKimiHistoryMessages(msgs: readonly MessageSingleton<true>[]) {
     msgIndex--
   ) {
     const msg = orderedMsgs[msgIndex];
-    if (!msg || msg.provider !== "MOONSHOTAI") continue;
+    if (!msg || msg?.provider !== "MOONSHOTAI") continue;
     selectedIds.add(msg.id);
   }
 

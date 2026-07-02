@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { ImageGenPartialArr } from "@/openai/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -33,7 +34,8 @@ export class OpenAIBaseService {
     protected prisma: PrismaService,
     protected userStoreVector: UserStoreVectorService,
     protected apiKey: string,
-    protected s3: S3Storage
+    protected s3: S3Storage,
+    protected memoryService: ConversationMemoryVectorService
   ) {
     this.logger = logger
       .getPinoInstance()

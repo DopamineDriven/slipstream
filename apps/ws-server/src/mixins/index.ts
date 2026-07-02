@@ -270,6 +270,7 @@ export function GeminiMixin<
               deps.userStore,
               deps.redis,
               deps.s3,
+              deps.memory,
               this.gemApiKey ?? ""
             );
         }
@@ -404,7 +405,8 @@ export function CohereMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
-              this.coApiKey ?? ""
+              this.coApiKey ?? "",
+              deps.memory
             );
         }
       }
@@ -471,6 +473,7 @@ export function DeepSeekMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.dsApiKey ?? ""
             );
         }
@@ -536,6 +539,7 @@ export function ZaiMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.zApiKey ?? ""
             );
         }
@@ -603,6 +607,7 @@ export function SakanaMixin<
               deps.prisma,
               deps.userStore,
               deps.s3,
+              deps.memory,
               deps.redis,
               this.fuguApiKey ?? ""
             );
@@ -805,6 +810,7 @@ export function MiniMaxMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.mApiKey ?? ""
             );
         }
@@ -873,7 +879,8 @@ export function OpenAIMixin<
               deps.userStore,
               deps.s3,
               deps.redis,
-              this.oaiApiKey ?? ""
+              this.oaiApiKey ?? "",
+              deps.memory
             );
         }
       }
@@ -942,6 +949,7 @@ export function GrokMixin<
               deps.redis,
               deps.s3,
               deps.userStore,
+              deps.memory,
               this.xaiApiKey ?? "",
               this.xaiManagementKey ?? ""
             );
@@ -1009,6 +1017,7 @@ export function VercelMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.v0ApiKey ?? ""
             );
         }
@@ -1074,6 +1083,7 @@ export function MetaMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.llamaApiKey ?? ""
             );
         }

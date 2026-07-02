@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { ImageGenPartialArr, ImgGenResProps } from "@/openai/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -36,9 +37,10 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     userStoreVector: UserStoreVectorService,
     s3: S3Storage,
     redis: EnhancedRedisPubSub,
-    apiKey: string
+    apiKey: string,
+    memoryStore: ConversationMemoryVectorService
   ) {
-    super(logger, prisma, userStoreVector, s3, redis, apiKey);
+    super(logger, prisma, userStoreVector, s3, redis, apiKey, memoryStore);
   }
   protected async handleOpenaiResponsesImgGen({
     chunks,
@@ -76,8 +78,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     const partialImgArr = Array.of<ImageGenPartialArr>();
 
     let finalImgObj:
-        | OpenAI.Responses.ResponseOutputItem.ImageGenerationCall
-        | undefined,
+        OpenAI.Responses.ResponseOutputItem.ImageGenerationCall | undefined,
       openaiThinkingDuration = 0,
       openaiThinkingAgg = "",
       tInitial = 0,
@@ -86,8 +87,8 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       partialImgsRequested = false,
       outputFormat: "png" | "jpeg" | "webp" = "png",
       partialImgAgg:
-        | [number, string, string, number, number, string]
-        | undefined = undefined,
+        [number, string, string, number, number, string] | undefined =
+        undefined,
       uploadtInitial = 0,
       uploadtDelta = 0,
       usage = 0;
@@ -249,7 +250,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
         output_format: r.output_format,
         partial_images: r.partialImagesRequested ?? 3,
         quality: "high",
-        size: (r.output_size ??"auto") as "auto"
+        size: (r.output_size ?? "auto") as "auto"
       } satisfies OpenAI.Responses.Tool.ImageGeneration
     );
 
@@ -1019,7 +1020,8 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
           userMsgId,
           aiMsgId: d.aiMsgId,
           imgGenAttachmentId: d.imgGenAttachmentId,
-          temperature,      convo: d.convo,
+          temperature,
+          convo: d.convo,
           usage,
           imgGenEnabled: true,
           imgGenFields: {

@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type {
   ImageGenPartialArr,
   OpenAIImgApiStreamFinal,
@@ -32,9 +33,10 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
     userStoreVector: UserStoreVectorService,
     s3: S3Storage,
     protected redis: EnhancedRedisPubSub,
-    apiKey: string
+    apiKey: string,
+    memoryService: ConversationMemoryVectorService
   ) {
-    super(logger, prisma, userStoreVector, apiKey, s3);
+    super(logger, prisma, userStoreVector, apiKey, s3, memoryService);
   }
 
   protected async handleEdits(
@@ -819,7 +821,8 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
           void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
             type: "ai_chat_response",
             conversationId,
-            userId,      convo: d.convo,
+            userId,
+            convo: d.convo,
             userMsgId,
             aiMsgId: d.aiMsgId,
             imgGenAttachmentId: d.imgGenAttachmentId,

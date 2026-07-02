@@ -20,6 +20,7 @@ import type {
   DeepSeekUserMessage
 } from "@/deepseek/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -64,6 +65,7 @@ export class DeepSeekService {
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     private userStoreVector: UserStoreVectorService,
+    private memory: ConversationMemoryVectorService,
     private apiKey?: string
   ) {
     this.logger = logger
@@ -129,7 +131,8 @@ export class DeepSeekService {
     }
 
     const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
+      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
 
     return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
   }
@@ -315,6 +318,104 @@ export class DeepSeekService {
             }
           },
           required: ["query"],
+          additionalProperties: false
+        }
+      }
+    } as const satisfies DeepSeekFunctionTool;
+  }
+
+  private memorySearchFunctionTool() {
+    return {
+      type: "function",
+      function: {
+        name: "conversation_memory_search",
+        description:
+          "Search the user's indexed conversation history — older sections of this conversation and other conversations. " +
+          "Sections are ~8k-token transcript slices with model-written technical summaries; summary keyword hits outrank " +
+          "raw transcript hits in the fulltext lane. Semantic similarity by default; when search_terms is provided, also " +
+          "performs fulltext keyword search and returns { semantic_results, fulltext_results, overlap_results, metadata }. " +
+          "scope 'current_conversation' (default) reaches this conversation's older indexed sections — including messages " +
+          "beyond your context window; 'all_conversations' reaches the user's entire history, with conversation_id + " +
+          "conversation_title on every hit for citation. Sections are keyed by 0-based message ordinal ranges [start, end). " +
+          "Expand a hit with conversation_memory_get_chunk.",
+        parameters: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "The semantic search query"
+            },
+            search_terms: {
+              type: "string",
+              description:
+                "Optional exact-match terms for the fulltext lane. Supports quoted phrases and negation (-deprecated)."
+            },
+            scope: {
+              type: "string",
+              enum: ["current_conversation", "all_conversations"],
+              description:
+                "Where to search (default current_conversation). Use all_conversations for cross-conversation recall."
+            },
+            max_results: {
+              type: "number",
+              description: "Maximum results per signal (1-10, default 5)"
+            },
+            threshold: {
+              type: "number",
+              description:
+                "Cosine similarity floor for the semantic lane (default 0)"
+            },
+            include_transcript: {
+              type: "boolean",
+              description:
+                "Return full section transcripts inline (default false — summaries + excerpts)"
+            }
+          },
+          required: ["query"],
+          additionalProperties: false
+        }
+      }
+    } as const satisfies DeepSeekFunctionTool;
+  }
+
+  private memoryGetChunkFunctionTool() {
+    return {
+      type: "function",
+      function: {
+        name: "conversation_memory_get_chunk",
+        description:
+          "Fetch one indexed conversation-memory section in full: by chunk_id (from a conversation_memory_search hit), " +
+          "or by conversation_id + ordinal (the section covering that 0-based message ordinal). " +
+          "direction walks to the adjacent previous/next section — search finds the doorway, traversal walks the room. " +
+          "Returns the full transcript + summary by default, plus has_previous/has_next.",
+        parameters: {
+          type: "object",
+          properties: {
+            chunk_id: {
+              type: "string",
+              description: "Section id from a conversation_memory_search result"
+            },
+            conversation_id: {
+              type: "string",
+              description:
+                "Conversation id — pair with ordinal to fetch the covering section"
+            },
+            ordinal: {
+              type: "number",
+              description: "0-based message ordinal (pair with conversation_id)"
+            },
+            direction: {
+              type: "string",
+              enum: ["previous", "next"],
+              description:
+                "Optional: return the adjacent section instead of the resolved one"
+            },
+            include_transcript: {
+              type: "boolean",
+              description: "Include the full transcript (default true)"
+            }
+          },
+          required: [],
           additionalProperties: false
         }
       }
@@ -557,28 +658,63 @@ export class DeepSeekService {
 
   private async executeToolCall(
     userId: string,
+    conversationId: string,
     toolCall: DeepSeekFunctionToolCall
   ) {
-    if (toolCall.function.name !== "file_search") {
-      return {
-        role: "tool",
-        tool_call_id: toolCall.id,
-        content: `Unknown tool: ${toolCall.function.name}`
-      } as const satisfies DeepSeekToolMessage;
-    }
-
+    const toolName = toolCall.function.name;
     try {
-      const input = this.parseFileSearchInput(toolCall.function.arguments);
-      const output = await this.executeFileSearch(userId, input);
+      if (toolName === "file_search") {
+        const input = this.parseFileSearchInput(toolCall.function.arguments);
+        const output = await this.executeFileSearch(userId, input);
+        return {
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: output
+        } as const satisfies DeepSeekToolMessage;
+      }
+
+      if (toolName === "conversation_memory_search") {
+        const parsed = this.userStoreVector.parseUserStoreArgs(
+          toolCall.function.arguments,
+          toolName
+        );
+        const output = await this.memory.searchMemoryFromToolInput(
+          userId,
+          conversationId,
+          parsed
+        );
+        return {
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: output
+        } as const satisfies DeepSeekToolMessage;
+      }
+
+      if (toolName === "conversation_memory_get_chunk") {
+        const parsed = this.userStoreVector.parseUserStoreArgs(
+          toolCall.function.arguments,
+          toolName
+        );
+        const output = await this.memory.getMemoryChunkFromToolInput(
+          userId,
+          parsed
+        );
+        return {
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: output
+        } as const satisfies DeepSeekToolMessage;
+      }
+
       return {
         role: "tool",
         tool_call_id: toolCall.id,
-        content: output
+        content: `Unknown tool: ${toolName}`
       } as const satisfies DeepSeekToolMessage;
     } catch (error) {
       this.logger.error(
         {
-          toolName: toolCall.function.name,
+          toolName,
           toolCallId: toolCall.id,
           error: this.prisma.safeErrMsg(error)
         },
@@ -587,7 +723,7 @@ export class DeepSeekService {
       return {
         role: "tool",
         tool_call_id: toolCall.id,
-        content: `file_search error: ${this.prisma.safeErrMsg(error)}`
+        content: `${toolName} error: ${this.prisma.safeErrMsg(error)}`
       } as const satisfies DeepSeekToolMessage;
     }
   }
@@ -756,9 +892,18 @@ export class DeepSeekService {
       return reasoningText;
     };
 
+    // memory tools attach unconditionally — conversation memory exists
+    // independently of uploaded documents
     const tools = hasUserStoreDocs
-      ? [this.fileSearchFunctionTool()]
-      : undefined;
+      ? [
+          this.fileSearchFunctionTool(),
+          this.memorySearchFunctionTool(),
+          this.memoryGetChunkFunctionTool()
+        ]
+      : [
+          this.memorySearchFunctionTool(),
+          this.memoryGetChunkFunctionTool()
+        ];
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
       systemPrompt
@@ -1002,7 +1147,9 @@ export class DeepSeekService {
 
       const toolMessages = Array.of<DeepSeekToolMessage>();
       for (const toolCall of materializedToolCalls) {
-        toolMessages.push(await this.executeToolCall(userId, toolCall));
+        toolMessages.push(
+          await this.executeToolCall(userId, conversationId, toolCall)
+        );
       }
 
       roundMessages = Array.of<DeepSeekRequestMessage>(

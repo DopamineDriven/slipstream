@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { Logger as PinoLogger } from "pino";
@@ -18,7 +19,8 @@ export class SakanaBaseService {
     protected prisma: PrismaService,
     protected userStoreVector: UserStoreVectorService,
     protected apiKey: string,
-    protected s3: S3Storage
+    protected s3: S3Storage,
+    protected memoryService: ConversationMemoryVectorService
   ) {
     this.logger = logger
       .getPinoInstance()

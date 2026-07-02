@@ -89,6 +89,25 @@ export type SlatherUserStoreTool = {
   strict?: boolean | null;
 };
 
+export type MemoryFunctionTool = {
+  type: "function";
+  name: "conversation_memory_search" | "conversation_memory_get_chunk";
+  description: string;
+  parameters: {
+    type: "object";
+    properties: Record<
+      string,
+      {
+        type: "string" | "number" | "boolean";
+        description: string;
+        enum?: readonly string[];
+      }
+    >;
+    required?: readonly string[];
+  };
+  strict?: boolean | null;
+};
+
 export type SlatherUserStoreToolInput =
   | {
       query: string;
@@ -124,7 +143,8 @@ export type ToolUnion =
   | XSearchTool
   | FileSearchTool
   | CodeInterpreterTool
-  | SlatherUserStoreTool;
+  | SlatherUserStoreTool
+  | MemoryFunctionTool;
 
 /**
  * Controls which (if any) tool is called by the model
@@ -255,6 +275,7 @@ export type ToolRequestInput = (
   | CodeInterpreterTool
   | FileSearchTool
   | SlatherUserStoreTool
+  | MemoryFunctionTool
 )[];
 
 export type LogProbsFields = {

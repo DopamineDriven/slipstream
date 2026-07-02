@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
@@ -27,10 +28,11 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     logger: LoggerService,
     prisma: PrismaService,
     userStore: UserStoreVectorService,
+    memoryService: ConversationMemoryVectorService,
     xaiKey: string,
     xaiManagementKey: string
   ) {
-    super(logger, prisma, userStore, xaiKey, xaiManagementKey);
+    super(logger, prisma, userStore, memoryService, xaiKey, xaiManagementKey);
   }
 
   protected messageText(msg: MessageSingleton<true>) {
@@ -239,7 +241,8 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
 
   protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
     const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.\n instead of file_search you have slather_user_store, a tool for spelunking a self-hosted vector store";
+      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.\n instead of file_search you have slather_user_store, a tool for spelunking a self-hosted vector store. " +
+      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
     if (isNewChat) {
       return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
     }
@@ -335,6 +338,15 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
 
     if (enableUserStoreSearch && this.canUseFunctionTools(model)) {
       tools.push(this.slatherUserStore());
+    }
+
+    // memory tools attach unconditionally — conversation memory exists
+    // independently of uploaded documents
+    if (this.canUseFunctionTools(model)) {
+      tools.push(
+        this.memorySearchFunctionTool(),
+        this.memoryGetChunkFunctionTool()
+      );
     }
 
     return tools.length > 0 ? tools : undefined;

@@ -10,8 +10,9 @@ interface ZaiFunctionTool {
       properties: Record<
         string,
         {
-          type: "string" | "number" | "array";
+          type: "string" | "number" | "array" | "boolean";
           description: string;
+          enum?: readonly string[];
           items?: { type: "string" };
           minItems?: number;
           maxItems?: number;

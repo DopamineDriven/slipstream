@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
@@ -22,10 +23,20 @@ export class GrokResponsesApiService extends GrokImgGenService {
     logger: LoggerService,
     prisma: PrismaService,
     userStore: UserStoreVectorService,
+    memoryService: ConversationMemoryVectorService,
     apiKey: string,
     managementKey: string
   ) {
-    super(redis, s3, logger, prisma, userStore, apiKey, managementKey);
+    super(
+      redis,
+      s3,
+      logger,
+      prisma,
+      userStore,
+      memoryService,
+      apiKey,
+      managementKey
+    );
   }
   protected encryptedTag = "*encrypted output...*" as const;
   private pushItemId = (itemIds: string[], itemId: string) => {
@@ -375,11 +386,9 @@ export class GrokResponsesApiService extends GrokImgGenService {
           let text: string | undefined = undefined;
           let thinkingText: string | undefined = undefined;
           let thinkingMessageBlock:
-            | ReturnType<typeof currentChunkMessageBlock>
-            | undefined = undefined;
+            ReturnType<typeof currentChunkMessageBlock> | undefined = undefined;
           let textMessageBlock:
-            | ReturnType<typeof currentChunkMessageBlock>
-            | undefined = undefined;
+            ReturnType<typeof currentChunkMessageBlock> | undefined = undefined;
 
           if (chunk.event === "response.created") {
             this.logger.info(
@@ -792,7 +801,9 @@ export class GrokResponsesApiService extends GrokImgGenService {
 
         const toolOutputs = Array.of<FunctionCallOutput<string>>();
         for (const call of functionCalls) {
-          toolOutputs.push(await this.executeFunctionToolCall(userId, call));
+          toolOutputs.push(
+            await this.executeFunctionToolCall(userId, conversationId, call)
+          );
         }
 
         roundInput = [...roundInput, ...functionCalls, ...toolOutputs];
@@ -895,7 +906,8 @@ export class GrokResponsesApiService extends GrokImgGenService {
         conversationId,
         userId,
         systemPrompt,
-        temperature,      convo: d.convo,
+        temperature,
+        convo: d.convo,
         title,
         userMsgId,
         usage,

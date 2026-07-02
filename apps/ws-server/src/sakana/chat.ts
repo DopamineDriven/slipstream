@@ -9,6 +9,7 @@ import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap, SakanaModelIdUnion } from "@slipstream/types";
+import { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 
 export interface SakanaProviderChatRequestEntity extends ProviderChatRequestEntity {
   model: SakanaModelIdUnion;
@@ -34,10 +35,11 @@ export class SakanaChatService extends SakanaWorkupService {
     prisma: PrismaService,
     userStoreVector: UserStoreVectorService,
     s3: S3Storage,
+     memoryService: ConversationMemoryVectorService,
     protected redis: EnhancedRedisPubSub,
     apiKey: string
   ) {
-    super(logger, prisma, userStoreVector, apiKey, s3);
+    super(logger, prisma, userStoreVector, apiKey, s3, memoryService);
   }
   protected async handleSakanaAiChatRequest({
     chunks,
@@ -380,7 +382,11 @@ export class SakanaChatService extends SakanaWorkupService {
       const toolOutputs =
         Array.of<OpenAI.Responses.ResponseInputItem.FunctionCallOutput>();
       for (const call of functionCalls) {
-        const output = await this.executeFunctionToolCall(userId, call);
+        const output = await this.executeFunctionToolCall(
+          userId,
+          conversationId,
+          call
+        );
         toolOutputs.push(output);
       }
 
