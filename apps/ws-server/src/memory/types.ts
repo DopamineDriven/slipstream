@@ -107,6 +107,13 @@ export type ConversationMemoryGetChunkTarget =
       readonly includeTranscript: boolean;
     };
 
+export interface MemoryCompactionConfig {
+  /** master switch — ships false; flip in dev first (plan §14 phase 7) */
+  enabled: boolean;
+  /** newest N ordinals always render verbatim in provider history */
+  liveWindowMessages: number;
+}
+
 export interface MemorySummarizerConfig {
   /** recorded per-chunk in summaryProvider — the v1 call path is Anthropic-pinned */
   provider: $Enums.Provider;

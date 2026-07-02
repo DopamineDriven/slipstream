@@ -4,6 +4,7 @@ import type {
   ConversationMemorySearchScope,
   ConversationMemorySearchToolInput,
   MemoryChunkAwaitingSummary,
+  MemoryCompactionConfig,
   MemoryHybridRow,
   MemorySectionDraft,
   MemorySummarizerConfig
@@ -683,6 +684,66 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       has_previous: resolved.chunkIndex > 0,
       has_next: next != null
     });
+  }
+
+  // ── Assembly-time compaction (provider payload only — db rows/ordinals untouched) ─
+
+  public get memoryCompactionConfig() {
+    return {
+      enabled: false,
+      liveWindowMessages: 20
+    } as const satisfies MemoryCompactionConfig;
+  }
+
+  /**
+   * The compactable prefix of a conversation's history: the contiguous-from-
+   * zero chain of INDEXED chunks with READY summaries, entirely below the
+   * live-window floor. Returns null when compaction is off or nothing
+   * qualifies.
+   *
+   * Prompt-cache stability: the returned block changes ONLY when a new
+   * chunk's summary becomes READY — never per-message — so long
+   * conversations keep their prefix cache hits between chunk landings.
+   */
+  public async getCompactionPlan(
+    conversationId: string,
+    maxOrdinalExclusive: number
+  ) {
+    const cfg = this.memoryCompactionConfig;
+    if (!cfg.enabled) return null;
+    const floor = maxOrdinalExclusive - cfg.liveWindowMessages;
+    if (floor <= 0) return null;
+
+    const chunks = await this.prisma.findCompactableChunks(
+      conversationId,
+      floor
+    );
+    if (chunks.length === 0) return null;
+
+    // contiguous prefix chain from ordinal 0 — a gap (unsummarized or
+    // still-embedding chunk) stops compaction at the boundary before it
+    const sections = Array.of<string>();
+    let cursor = 0;
+    for (const chunk of chunks) {
+      if (chunk.ordinalStart !== cursor) break;
+      if (chunk.summary == null || chunk.summary.length === 0) break;
+      sections.push(
+        `## messages [${chunk.ordinalStart}, ${chunk.ordinalEndExclusive})\n\n${chunk.summary}`
+      );
+      cursor = chunk.ordinalEndExclusive;
+    }
+    if (sections.length === 0 || cursor === 0) return null;
+
+    const block = [
+      `[conversation memory · messages 0-${cursor - 1} of this conversation are compacted into the summaries below · full transcripts remain retrievable]`,
+      ...sections,
+      `(Expand any range via conversation_memory_get_chunk — conversation_id + ordinal; search via conversation_memory_search.)`
+    ].join("\n\n");
+
+    return {
+      compactedThroughOrdinalExclusive: cursor,
+      block
+    } as const;
   }
 
   // ── Summary pass (frontier vision-capable, quality over cost) ────────

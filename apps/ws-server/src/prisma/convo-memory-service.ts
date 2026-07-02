@@ -252,6 +252,34 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
     });
   }
 
+  /**
+   * Chunks eligible for assembly-time compaction: INDEXED with a READY
+   * summary, entirely below the live-window floor. chunkIndex ASC — the
+   * caller takes the contiguous-from-zero prefix chain.
+   */
+  public async findCompactableChunks(
+    conversationId: string,
+    ordinalCeilingExclusive: number
+  ) {
+    return await this.prismaClient.conversationMemoryChunk.findMany({
+      where: {
+        conversationId,
+        chunkingState: "INDEXED",
+        summaryState: "READY",
+        deletedAt: null,
+        ordinalEndExclusive: { lte: ordinalCeilingExclusive }
+      },
+      orderBy: { chunkIndex: "asc" },
+      select: {
+        id: true,
+        chunkIndex: true,
+        ordinalStart: true,
+        ordinalEndExclusive: true,
+        summary: true
+      }
+    });
+  }
+
   public async findMemoryChunkById(chunkId: string) {
     return await this.prismaClient.conversationMemoryChunk.findUnique({
       where: { id: chunkId }

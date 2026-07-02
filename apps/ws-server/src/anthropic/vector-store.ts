@@ -350,9 +350,32 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     );
     const isFirstClaudeMsg = lastClaudeIndex === -1;
 
+    // config-gated memory compaction: messages covered by summarized chunks
+    // below the live window collapse into one leading memory block — provider
+    // payload only, db rows/ordinals untouched. Snapped to chunk boundaries
+    // so the prefix stays prompt-cache-stable between chunk landings.
+    const conversationId = msgs[0]?.conversationId;
+    const maxOrdinalExclusive = msgs.reduce(
+      (max, m) => (m.ordinal >= max ? m.ordinal + 1 : max),
+      0
+    );
+    const compaction =
+      !isNewChat && conversationId
+        ? await this.memoryService.getCompactionPlan(
+            conversationId,
+            maxOrdinalExclusive
+          )
+        : null;
+
     const messages = Array.of<Anthropic.Beta.BetaMessageParam>();
 
     for (const [msgIndex, msg] of msgs.entries()) {
+      if (
+        compaction &&
+        msg.ordinal < compaction.compactedThroughOrdinalExclusive
+      ) {
+        continue;
+      }
       const isFreshContext = isFirstClaudeMsg || msgIndex > lastClaudeIndex;
 
       if (msg.senderType === "USER") {
@@ -501,6 +524,20 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
           content: `<model provider="${msg.provider.toLowerCase()}" name="${msg.model}">\n${textParts.join("\n\n")}\n</model>`
         });
       }
+    }
+
+    if (compaction) {
+      // leading user turn; Anthropic combines consecutive same-role turns,
+      // so alternation is safe wherever the chunk boundary landed
+      messages.unshift({
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: compaction.block
+          } satisfies Anthropic.Beta.BetaTextBlockParam
+        ]
+      });
     }
 
     const systemNote = `Note: Previous responses may be tagged with their source provider-model combo for context.`;
