@@ -337,6 +337,7 @@ export function MistralMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.mistralApiKey ?? ""
             );
         }
@@ -669,6 +670,7 @@ export function KimiMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.kimiApiKey ?? ""
             );
         }
@@ -736,6 +738,7 @@ export function AlibabaMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.qwenApiKey ?? ""
             );
         }

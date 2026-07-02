@@ -202,6 +202,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.MISTRAL_API_KEY
     );
 
@@ -222,6 +223,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -252,6 +254,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.AI_GATEWAY_API_KEY
     );
 
