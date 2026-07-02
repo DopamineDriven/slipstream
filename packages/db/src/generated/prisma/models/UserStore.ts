@@ -939,11 +939,11 @@ export type $UserStorePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     userId: string
     storeName: string
     /**
-     * voyage-multimodal-3.5 for content containing visual media -- voyage-context-3 otherwise
+     * voyage-multimodal-3.5 for content containing visual media -- voyage-context-4 otherwise
      */
     defaultEmbeddingModel: string
     /**
-     * default:1024 -> voyage-multimodal-3.5 and voyage-context-3 both support 256 | 512 | 1024 | 2048
+     * default:1024 -> voyage-multimodal-3.5 and voyage-context-4 both support 256 | 512 | 1024 | 2048
      */
     defaultEmbeddingDim: number
     fileCount: number

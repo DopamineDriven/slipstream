@@ -2442,7 +2442,7 @@ export type $UserStoreDocPayload<ExtArgs extends runtime.Types.Extensions.Intern
     size: bigint
     schemaVersion: $Enums.UserStoreSchemaVersion
     /**
-     * `voyage-context-3` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
+     * `voyage-context-4` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
      */
     embeddingModel: string
     /**
