@@ -10,7 +10,7 @@ import { type $DbEnums } from "./$DbEnums.ts"
  * @param conversationId
  * @param chunkingState
  */
-export const getMemoryChunksByConversation = $runtime.makeTypedQueryFactory("\nSELECT\nmc.id,\nmc.\"provenanceId\",\nmc.\"contextId\",\nmc.\"chunkIndex\",\nmc.\"messageIdStart\",\nmc.\"messageIdEnd\",\nmc.\"messageTimestampStart\",\nmc.\"messageTimestampEnd\",\nmc.\"contentHash\",\nmc.\"tokenCount\",\nmc.\"chunkedMessagesCount\",\nmc.\"providerModelsRaw\",\nmc.\"hasAttachments\",\nmc.\"chunkingState\"::\"text\" as \"chunkingState\",\nmc.\"boundaryReason\"::\"text\" as \"boundaryReason\",\nmc.\"embeddingModel\",\nmc.\"embeddedAt\",\nmc.summary,\nmc.\"createdAt\"\nFROM \"ConversationMemoryChunk\" mc\nWHERE mc.\"conversationId\" = $1\nAND ($2::\"MemoryChunkingState\" IS NULL OR mc.\"chunkingState\" = $2::\"MemoryChunkingState\")\nORDER BY mc.\"chunkIndex\" ASC;") as (conversationId: string, chunkingState: $DbEnums["MemoryChunkingState"] | null) => $runtime.TypedSql<getMemoryChunksByConversation.Parameters, getMemoryChunksByConversation.Result>
+export const getMemoryChunksByConversation = $runtime.makeTypedQueryFactory("\nSELECT\nmc.id,\nmc.\"provenanceId\",\nmc.\"contextId\",\nmc.\"chunkIndex\",\nmc.\"ordinalStart\",\nmc.\"ordinalEndExclusive\",\nmc.\"messageIdStart\",\nmc.\"messageIdEnd\",\nmc.\"messageTimestampStart\",\nmc.\"messageTimestampEnd\",\nmc.\"contentHash\",\nmc.\"tokenCount\",\nmc.\"chunkedMessagesCount\",\nmc.\"providerModelsRaw\",\nmc.\"hasAttachments\",\nmc.\"chunkingState\"::text as \"chunkingState\",\nmc.\"boundaryReason\"::text as \"boundaryReason\",\nmc.\"embeddingModel\",\nmc.\"embeddedAt\",\nmc.summary,\nmc.\"summaryState\"::text as \"summaryState\",\nmc.\"summaryModel\",\nmc.\"summaryGeneratedAt\",\nmc.\"createdAt\"\nFROM \"ConversationMemoryChunk\" mc\nWHERE mc.\"conversationId\" = $1\nAND ($2::\"MemoryChunkingState\" IS NULL OR mc.\"chunkingState\" = $2::\"MemoryChunkingState\")\nAND mc.\"deletedAt\" IS NULL\nORDER BY mc.\"chunkIndex\" ASC;") as (conversationId: string, chunkingState: $DbEnums["MemoryChunkingState"] | null) => $runtime.TypedSql<getMemoryChunksByConversation.Parameters, getMemoryChunksByConversation.Result>
 
 export namespace getMemoryChunksByConversation {
   export type Parameters = [conversationId: string, chunkingState: $DbEnums["MemoryChunkingState"] | null]
@@ -19,6 +19,8 @@ export namespace getMemoryChunksByConversation {
     provenanceId: string
     contextId: string
     chunkIndex: number
+    ordinalStart: number
+    ordinalEndExclusive: number
     messageIdStart: string
     messageIdEnd: string
     messageTimestampStart: Date
@@ -33,6 +35,9 @@ export namespace getMemoryChunksByConversation {
     embeddingModel: string
     embeddedAt: Date | null
     summary: string | null
+    summaryState: string | null
+    summaryModel: string | null
+    summaryGeneratedAt: Date | null
     createdAt: Date
   }
 }

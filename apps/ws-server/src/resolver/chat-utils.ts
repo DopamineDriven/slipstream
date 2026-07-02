@@ -1,5 +1,6 @@
 import type { ImageCompatService } from "@/image/index.ts";
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { ProviderService } from "@/providers/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { TTSService } from "@/tts/index.ts";
@@ -41,6 +42,35 @@ export class ResolverChatUtilsService extends ResolverConnectionService {
       logger,
       ttsService
     );
+  }
+
+  /**
+   * Setter wiring (wsServer.setResolver precedent) — the memory service is
+   * constructed alongside the providers in src/index.ts; threading a tenth
+   * constructor arg through the whole resolver chain isn't worth the churn.
+   */
+  protected memoryService?: ConversationMemoryVectorService;
+
+  public setMemoryService(memoryService: ConversationMemoryVectorService) {
+    this.memoryService = memoryService;
+  }
+
+  /** watermark-driven and idempotent — safe to fire on every completed turn */
+  protected scheduleConversationMemoryIndexing(
+    conversationId: string,
+    userId: string,
+    conversationTitle?: string | null
+  ) {
+    const memory = this.memoryService;
+    if (!memory) return;
+    void memory
+      .onTurnPersisted(conversationId, userId, conversationTitle)
+      .catch(err => {
+        this.logger.warn(
+          { conversationId, err: this.wsServer.prisma.safeErrMsg(err) },
+          "memory indexing schedule failed"
+        );
+      });
   }
 
   protected scheduleUserStoreIndexing(message: MessageSingleton<true>) {

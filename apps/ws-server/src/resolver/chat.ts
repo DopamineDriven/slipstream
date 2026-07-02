@@ -343,6 +343,7 @@ export class ResolverChatService extends ResolverTTSService {
           break;
         }
       }
+      this.scheduleConversationMemoryIndexing(conversationId, userId, title);
     } catch (err) {
       console.error(`AI Stream Error`, this.wsServer.prisma.safeErrMsg(err));
       ws.send(

@@ -568,6 +568,13 @@ export type EnumProviderNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
 }
 
+export type EnumMemoryTranscriptRendererVersionFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemoryTranscriptRendererVersion | Prisma.EnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.MemoryTranscriptRendererVersion[] | Prisma.ListEnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemoryTranscriptRendererVersion[] | Prisma.ListEnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemoryTranscriptRendererVersionFilter<$PrismaModel> | $Enums.MemoryTranscriptRendererVersion
+}
+
 export type EnumMemoryChunkBoundaryReasonNullableFilter<$PrismaModel = never> = {
   equals?: $Enums.MemoryChunkBoundaryReason | Prisma.EnumMemoryChunkBoundaryReasonFieldRefInput<$PrismaModel> | null
   in?: $Enums.MemoryChunkBoundaryReason[] | Prisma.ListEnumMemoryChunkBoundaryReasonFieldRefInput<$PrismaModel> | null
@@ -580,6 +587,23 @@ export type EnumMemoryChunkingStateFilter<$PrismaModel = never> = {
   in?: $Enums.MemoryChunkingState[] | Prisma.ListEnumMemoryChunkingStateFieldRefInput<$PrismaModel>
   notIn?: $Enums.MemoryChunkingState[] | Prisma.ListEnumMemoryChunkingStateFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumMemoryChunkingStateFilter<$PrismaModel> | $Enums.MemoryChunkingState
+}
+
+export type EnumMemorySummaryStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemorySummaryState | Prisma.EnumMemorySummaryStateFieldRefInput<$PrismaModel>
+  in?: $Enums.MemorySummaryState[] | Prisma.ListEnumMemorySummaryStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemorySummaryState[] | Prisma.ListEnumMemorySummaryStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemorySummaryStateFilter<$PrismaModel> | $Enums.MemorySummaryState
+}
+
+export type EnumMemoryTranscriptRendererVersionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemoryTranscriptRendererVersion | Prisma.EnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.MemoryTranscriptRendererVersion[] | Prisma.ListEnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemoryTranscriptRendererVersion[] | Prisma.ListEnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemoryTranscriptRendererVersionWithAggregatesFilter<$PrismaModel> | $Enums.MemoryTranscriptRendererVersion
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMemoryTranscriptRendererVersionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMemoryTranscriptRendererVersionFilter<$PrismaModel>
 }
 
 export type EnumMemoryChunkBoundaryReasonNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -600,6 +624,16 @@ export type EnumMemoryChunkingStateWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumMemoryChunkingStateFilter<$PrismaModel>
   _max?: Prisma.NestedEnumMemoryChunkingStateFilter<$PrismaModel>
+}
+
+export type EnumMemorySummaryStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemorySummaryState | Prisma.EnumMemorySummaryStateFieldRefInput<$PrismaModel>
+  in?: $Enums.MemorySummaryState[] | Prisma.ListEnumMemorySummaryStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemorySummaryState[] | Prisma.ListEnumMemorySummaryStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemorySummaryStateWithAggregatesFilter<$PrismaModel> | $Enums.MemorySummaryState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMemorySummaryStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMemorySummaryStateFilter<$PrismaModel>
 }
 
 export type EnumSenderTypeFilter<$PrismaModel = never> = {
@@ -1379,6 +1413,13 @@ export type NestedEnumProviderNullableWithAggregatesFilter<$PrismaModel = never>
   _max?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
 }
 
+export type NestedEnumMemoryTranscriptRendererVersionFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemoryTranscriptRendererVersion | Prisma.EnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.MemoryTranscriptRendererVersion[] | Prisma.ListEnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemoryTranscriptRendererVersion[] | Prisma.ListEnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemoryTranscriptRendererVersionFilter<$PrismaModel> | $Enums.MemoryTranscriptRendererVersion
+}
+
 export type NestedEnumMemoryChunkBoundaryReasonNullableFilter<$PrismaModel = never> = {
   equals?: $Enums.MemoryChunkBoundaryReason | Prisma.EnumMemoryChunkBoundaryReasonFieldRefInput<$PrismaModel> | null
   in?: $Enums.MemoryChunkBoundaryReason[] | Prisma.ListEnumMemoryChunkBoundaryReasonFieldRefInput<$PrismaModel> | null
@@ -1391,6 +1432,23 @@ export type NestedEnumMemoryChunkingStateFilter<$PrismaModel = never> = {
   in?: $Enums.MemoryChunkingState[] | Prisma.ListEnumMemoryChunkingStateFieldRefInput<$PrismaModel>
   notIn?: $Enums.MemoryChunkingState[] | Prisma.ListEnumMemoryChunkingStateFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumMemoryChunkingStateFilter<$PrismaModel> | $Enums.MemoryChunkingState
+}
+
+export type NestedEnumMemorySummaryStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemorySummaryState | Prisma.EnumMemorySummaryStateFieldRefInput<$PrismaModel>
+  in?: $Enums.MemorySummaryState[] | Prisma.ListEnumMemorySummaryStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemorySummaryState[] | Prisma.ListEnumMemorySummaryStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemorySummaryStateFilter<$PrismaModel> | $Enums.MemorySummaryState
+}
+
+export type NestedEnumMemoryTranscriptRendererVersionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemoryTranscriptRendererVersion | Prisma.EnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.MemoryTranscriptRendererVersion[] | Prisma.ListEnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemoryTranscriptRendererVersion[] | Prisma.ListEnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemoryTranscriptRendererVersionWithAggregatesFilter<$PrismaModel> | $Enums.MemoryTranscriptRendererVersion
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMemoryTranscriptRendererVersionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMemoryTranscriptRendererVersionFilter<$PrismaModel>
 }
 
 export type NestedEnumMemoryChunkBoundaryReasonNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -1411,6 +1469,16 @@ export type NestedEnumMemoryChunkingStateWithAggregatesFilter<$PrismaModel = nev
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumMemoryChunkingStateFilter<$PrismaModel>
   _max?: Prisma.NestedEnumMemoryChunkingStateFilter<$PrismaModel>
+}
+
+export type NestedEnumMemorySummaryStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemorySummaryState | Prisma.EnumMemorySummaryStateFieldRefInput<$PrismaModel>
+  in?: $Enums.MemorySummaryState[] | Prisma.ListEnumMemorySummaryStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemorySummaryState[] | Prisma.ListEnumMemorySummaryStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemorySummaryStateWithAggregatesFilter<$PrismaModel> | $Enums.MemorySummaryState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMemorySummaryStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMemorySummaryStateFilter<$PrismaModel>
 }
 
 export type NestedEnumSenderTypeFilter<$PrismaModel = never> = {

@@ -1,5 +1,5 @@
 import type { ExtractService } from "@/extract/index.ts";
-import { PrismaConvoHydrationService } from "@/prisma/convo-hydration.ts";
+import { PrismaConversationMemoryService } from "@/prisma/convo-memory-service.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 
 /**
@@ -8,6 +8,10 @@ import type { PrismaDbService } from "@slipstream/db/factory";
  * [*parent*]
  *
  * `@/prisma/index.ts`
+ *
+ *  ⬆
+ *
+ * `@/prisma/convo-memory-service.ts`
  *
  *  ⬆
  *
@@ -52,7 +56,7 @@ import type { PrismaDbService } from "@slipstream/db/factory";
  * [*child*]
  */
 
-export class PrismaService extends PrismaConvoHydrationService {
+export class PrismaService extends PrismaConversationMemoryService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,

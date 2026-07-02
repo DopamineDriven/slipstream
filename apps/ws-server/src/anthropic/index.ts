@@ -7,6 +7,7 @@ import type {
   ToolUseAccumulator
 } from "@/anthropic/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
@@ -47,10 +48,11 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
     logger: LoggerService,
     prisma: PrismaService,
     userStoreVector: UserStoreVectorService,
+    memoryService: ConversationMemoryVectorService,
     private redis: EnhancedRedisPubSub,
     apiKey: string
   ) {
-    super(logger, prisma, userStoreVector, apiKey);
+    super(logger, prisma, userStoreVector, memoryService, apiKey);
   }
 
   /**
@@ -1064,6 +1066,67 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               type: "tool_result",
               tool_use_id: acc.id,
               content: `file_search error: ${String(e)}`,
+              is_error: true
+            });
+          }
+        } else if (acc.name === "conversation_memory_search") {
+          try {
+            const parsed = acc.inputJson
+              ? JSON.parse<Record<string, unknown>>(acc.inputJson)
+              : {};
+            const json = await this.executeConversationMemorySearch(
+              userId,
+              conversationId,
+              parsed
+            );
+            this.logger.info(
+              { resultLength: json.length },
+              "PTC conversation_memory_search result"
+            );
+            toolResults.push({
+              type: "tool_result",
+              tool_use_id: acc.id,
+              content: json
+            });
+          } catch (e) {
+            this.logger.error(
+              { inputJson: acc.inputJson, error: String(e) },
+              "PTC conversation_memory_search execution failed"
+            );
+            toolResults.push({
+              type: "tool_result",
+              tool_use_id: acc.id,
+              content: `conversation_memory_search error: ${String(e)}`,
+              is_error: true
+            });
+          }
+        } else if (acc.name === "conversation_memory_get_chunk") {
+          try {
+            const parsed = acc.inputJson
+              ? JSON.parse<Record<string, unknown>>(acc.inputJson)
+              : {};
+            const json = await this.executeConversationMemoryGetChunk(
+              userId,
+              parsed
+            );
+            this.logger.info(
+              { resultLength: json.length },
+              "PTC conversation_memory_get_chunk result"
+            );
+            toolResults.push({
+              type: "tool_result",
+              tool_use_id: acc.id,
+              content: json
+            });
+          } catch (e) {
+            this.logger.error(
+              { inputJson: acc.inputJson, error: String(e) },
+              "PTC conversation_memory_get_chunk execution failed"
+            );
+            toolResults.push({
+              type: "tool_result",
+              tool_use_id: acc.id,
+              content: `conversation_memory_get_chunk error: ${String(e)}`,
               is_error: true
             });
           }

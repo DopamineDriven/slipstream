@@ -59,6 +59,11 @@
       "logger": [
         "dist/logger/index.d.ts"
       ],
+      "memory": [
+        "dist/memory/types.d.ts",
+        "dist/memory/vector-store.d.ts",
+        "dist/memory/workup.d.ts"
+      ],
       "meta": [
         "dist/meta/index.d.ts"
       ],
@@ -95,6 +100,7 @@
         "dist/prisma/chat-request.d.ts",
         "dist/prisma/chat-response.d.ts",
         "dist/prisma/convo-hydration.d.ts",
+        "dist/prisma/convo-memory-service.d.ts",
         "dist/prisma/index.d.ts",
         "dist/prisma/provider-store.d.ts",
         "dist/prisma/tts.d.ts",

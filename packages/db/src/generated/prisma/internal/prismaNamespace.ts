@@ -1344,6 +1344,18 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
           args: Prisma.ConversationMemoryChunkFindManyArgs<ExtArgs>
           result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload>[]
         }
+        create: {
+          args: Prisma.ConversationMemoryChunkCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload>
+        }
+        createMany: {
+          args: Prisma.ConversationMemoryChunkCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ConversationMemoryChunkCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload>[]
+        }
         delete: {
           args: Prisma.ConversationMemoryChunkDeleteArgs<ExtArgs>
           result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload>
@@ -1363,6 +1375,10 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         updateManyAndReturn: {
           args: Prisma.ConversationMemoryChunkUpdateManyAndReturnArgs<ExtArgs>
           result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload>[]
+        }
+        upsert: {
+          args: Prisma.ConversationMemoryChunkUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload>
         }
         aggregate: {
           args: Prisma.ConversationMemoryChunkAggregateArgs<ExtArgs>
@@ -2913,8 +2929,7 @@ export const ConversationMemoryContextScalarFieldEnum = {
   rollingSummaryProvider: 'rollingSummaryProvider',
   rollingSummaryTokens: 'rollingSummaryTokens',
   rollingSummaryUpdatedAt: 'rollingSummaryUpdatedAt',
-  lastChunkedMessageId: 'lastChunkedMessageId',
-  lastChunkedMessageIndex: 'lastChunkedMessageIndex',
+  lastIndexedOrdinalExclusive: 'lastIndexedOrdinalExclusive',
   lastChunkedAt: 'lastChunkedAt',
   totalTurns: 'totalTurns',
   chunkedTurns: 'chunkedTurns',
@@ -2936,12 +2951,15 @@ export const ConversationMemoryChunkScalarFieldEnum = {
   storeId: 'storeId',
   conversationId: 'conversationId',
   chunkIndex: 'chunkIndex',
+  ordinalStart: 'ordinalStart',
+  ordinalEndExclusive: 'ordinalEndExclusive',
   messageIdStart: 'messageIdStart',
   messageIdEnd: 'messageIdEnd',
   messageTimestampStart: 'messageTimestampStart',
   messageTimestampEnd: 'messageTimestampEnd',
-  messageIdsRaw: 'messageIdsRaw',
   transcriptMarkdown: 'transcriptMarkdown',
+  rendererVersion: 'rendererVersion',
+  transcriptIncludesThinking: 'transcriptIncludesThinking',
   contentHash: 'contentHash',
   chunkedMessagesCount: 'chunkedMessagesCount',
   tokenCount: 'tokenCount',
@@ -2950,15 +2968,23 @@ export const ConversationMemoryChunkScalarFieldEnum = {
   chunkedAttachmentsCount: 'chunkedAttachmentsCount',
   attachmentProvenanceIdsRaw: 'attachmentProvenanceIdsRaw',
   embeddingModel: 'embeddingModel',
+  embeddingDim: 'embeddingDim',
+  embeddedAt: 'embeddedAt',
   schemaVersion: 'schemaVersion',
   boundaryReason: 'boundaryReason',
   chunkingState: 'chunkingState',
   chunkingError: 'chunkingError',
-  embeddedAt: 'embeddedAt',
+  retryCount: 'retryCount',
   summary: 'summary',
+  summaryState: 'summaryState',
   summaryModel: 'summaryModel',
   summaryProvider: 'summaryProvider',
+  summaryPromptVersion: 'summaryPromptVersion',
+  summaryTokens: 'summaryTokens',
+  summaryError: 'summaryError',
+  summaryRetryCount: 'summaryRetryCount',
   summaryGeneratedAt: 'summaryGeneratedAt',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -3606,6 +3632,20 @@ export type ListEnumMemorySchemaVersionFieldRefInput<$PrismaModel> = FieldRefInp
 
 
 /**
+ * Reference to a field of type 'MemoryTranscriptRendererVersion'
+ */
+export type EnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemoryTranscriptRendererVersion'>
+    
+
+
+/**
+ * Reference to a field of type 'MemoryTranscriptRendererVersion[]'
+ */
+export type ListEnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemoryTranscriptRendererVersion[]'>
+    
+
+
+/**
  * Reference to a field of type 'MemoryChunkBoundaryReason'
  */
 export type EnumMemoryChunkBoundaryReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemoryChunkBoundaryReason'>
@@ -3630,6 +3670,20 @@ export type EnumMemoryChunkingStateFieldRefInput<$PrismaModel> = FieldRefInputTy
  * Reference to a field of type 'MemoryChunkingState[]'
  */
 export type ListEnumMemoryChunkingStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemoryChunkingState[]'>
+    
+
+
+/**
+ * Reference to a field of type 'MemorySummaryState'
+ */
+export type EnumMemorySummaryStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemorySummaryState'>
+    
+
+
+/**
+ * Reference to a field of type 'MemorySummaryState[]'
+ */
+export type ListEnumMemorySummaryStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemorySummaryState[]'>
     
 
 

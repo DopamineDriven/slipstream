@@ -101,6 +101,16 @@ async function exe() {
       cfg.VOYAGE_API_KEY
     );
 
+    const { ConversationMemoryVectorService } =
+      await import("@/memory/vector-store.ts");
+
+    const memory = new ConversationMemoryVectorService(
+      logger,
+      voyage,
+      prisma,
+      cfg.ANTHROPIC_API_KEY
+    );
+
     const { xAIService } = await import("@/xai/index.ts");
 
     const xai = new xAIService(
@@ -158,6 +168,7 @@ async function exe() {
       logger,
       prisma,
       userStore,
+      memory,
       redisInstance,
       cfg.ANTHROPIC_API_KEY
     );
@@ -292,7 +303,8 @@ async function exe() {
         userStore,
         redis: redisInstance,
         s3,
-        isProd
+        isProd,
+        memory
       },
       anthropic,
       gemini,
@@ -337,6 +349,7 @@ async function exe() {
     );
 
     resolver.registerAll();
+    resolver.setMemoryService(memory);
 
     wsServer.setResolver(resolver);
     wsServer.setTTSService(ttsService);

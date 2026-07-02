@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import { AlibabaService } from "@/alibaba/index.ts";
 import { AnthropicService } from "@/anthropic/index.ts";
@@ -104,6 +105,7 @@ export interface ProviderDependencies {
   userStore: UserStoreVectorService;
   isProd: boolean;
   s3: S3Storage;
+  memory: ConversationMemoryVectorService;
 }
 export type ProviderFactory<T> = (
   deps: ProviderDependencies,
@@ -198,6 +200,7 @@ export function AnthropicMixin<
               deps.logger,
               deps.prisma,
               deps.userStore,
+              deps.memory,
               deps.redis,
               this.claudeApiKey ?? ""
             );

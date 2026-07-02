@@ -10,17 +10,20 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param embedding
  * @param limit
  * @param threshold
+ * @param embeddingModel
  */
-export const searchConversationMemory = $runtime.makeTypedQueryFactory("\nSELECT\nmc.id,\nmc.\"provenanceId\",\nmc.\"contextId\",\nmc.\"conversationId\",\nmc.\"chunkIndex\",\nmc.\"messageIdStart\",\nmc.\"messageIdEnd\",\nmc.\"messageTimestampStart\",\nmc.\"messageTimestampEnd\",\nmc.\"transcriptMarkdown\",\nmc.\"contentHash\",\nmc.\"tokenCount\",\nmc.\"chunkedMessagesCount\",\nmc.\"providerModelsRaw\",\nmc.\"hasAttachments\",\nmc.\"boundaryReason\"::\"text\" as \"boundaryReason\",\nmc.summary,\n1 - (mc.embedding <=> $2::vector) as score\nFROM \"ConversationMemoryChunk\" mc\nWHERE mc.\"storeId\" = $1\nAND mc.\"chunkingState\" = 'INDEXED'::\"MemoryChunkingState\"\nAND mc.embedding IS NOT NULL\nAND 1 - (mc.embedding <=> $2::vector) >= $4\nORDER BY mc.embedding <=> $2::vector\nLIMIT $3;") as (storeId: string, embedding: string, limit: number, threshold: number) => $runtime.TypedSql<searchConversationMemory.Parameters, searchConversationMemory.Result>
+export const searchConversationMemory = $runtime.makeTypedQueryFactory("\nSELECT\nmc.id,\nmc.\"provenanceId\",\nmc.\"contextId\",\nmc.\"conversationId\",\nmc.\"chunkIndex\",\nmc.\"ordinalStart\",\nmc.\"ordinalEndExclusive\",\nmc.\"messageIdStart\",\nmc.\"messageIdEnd\",\nmc.\"messageTimestampStart\",\nmc.\"messageTimestampEnd\",\nmc.\"transcriptMarkdown\",\nmc.\"contentHash\",\nmc.\"tokenCount\",\nmc.\"chunkedMessagesCount\",\nmc.\"providerModelsRaw\",\nmc.\"hasAttachments\",\nmc.\"boundaryReason\"::text as \"boundaryReason\",\nmc.summary,\nmc.\"summaryState\"::text as \"summaryState\",\n1 - (mc.embedding <=> $2::vector) as score\nFROM \"ConversationMemoryChunk\" mc\nWHERE mc.\"storeId\" = $1\nAND mc.\"embeddingModel\" = $5\nAND mc.\"chunkingState\" = 'INDEXED'::\"MemoryChunkingState\"\nAND mc.\"deletedAt\" IS NULL\nAND mc.embedding IS NOT NULL\nAND 1 - (mc.embedding <=> $2::vector) >= $4\nORDER BY mc.embedding <=> $2::vector\nLIMIT $3;") as (storeId: string, embedding: string, limit: number, threshold: number, embeddingModel: string) => $runtime.TypedSql<searchConversationMemory.Parameters, searchConversationMemory.Result>
 
 export namespace searchConversationMemory {
-  export type Parameters = [storeId: string, embedding: string, limit: number, threshold: number]
+  export type Parameters = [storeId: string, embedding: string, limit: number, threshold: number, embeddingModel: string]
   export type Result = {
     id: string
     provenanceId: string
     contextId: string
     conversationId: string
     chunkIndex: number
+    ordinalStart: number
+    ordinalEndExclusive: number
     messageIdStart: string
     messageIdEnd: string
     messageTimestampStart: Date
@@ -33,6 +36,7 @@ export namespace searchConversationMemory {
     hasAttachments: boolean
     boundaryReason: string | null
     summary: string | null
+    summaryState: string | null
     score: number | null
   }
 }

@@ -10,11 +10,12 @@ import { type $DbEnums } from "./$DbEnums.ts"
  * @param chunkId
  * @param chunkingState
  * @param chunkingError
+ * @param incrementRetry
  */
-export const updateMemoryChunkState = $runtime.makeTypedQueryFactory("\nUPDATE \"ConversationMemoryChunk\"\nSET\n\"chunkingState\" = $2::\"MemoryChunkingState\",\n\"chunkingError\" = $3,\n\"embeddedAt\"    = CASE WHEN $2 = 'INDEXED' THEN NOW() ELSE \"embeddedAt\" END,\n\"updatedAt\"     = NOW()\nWHERE id = $1\nRETURNING id, \"provenanceId\", \"chunkingState\"::\"text\" as \"chunkingState\";") as (chunkId: string, chunkingState: $DbEnums["MemoryChunkingState"], chunkingError: string | null) => $runtime.TypedSql<updateMemoryChunkState.Parameters, updateMemoryChunkState.Result>
+export const updateMemoryChunkState = $runtime.makeTypedQueryFactory("\nUPDATE \"ConversationMemoryChunk\"\nSET\n\"chunkingState\" = $2::\"MemoryChunkingState\",\n\"chunkingError\" = $3,\n\"retryCount\"    = \"retryCount\" + CASE WHEN $4 THEN 1 ELSE 0 END,\n\"updatedAt\"     = NOW()\nWHERE id = $1\nAND $2::\"MemoryChunkingState\" <> 'INDEXED'::\"MemoryChunkingState\"\nRETURNING id, \"provenanceId\", \"chunkingState\"::text as \"chunkingState\";") as (chunkId: string, chunkingState: $DbEnums["MemoryChunkingState"], chunkingError: string | null, incrementRetry: boolean) => $runtime.TypedSql<updateMemoryChunkState.Parameters, updateMemoryChunkState.Result>
 
 export namespace updateMemoryChunkState {
-  export type Parameters = [chunkId: string, chunkingState: $DbEnums["MemoryChunkingState"], chunkingError: string | null]
+  export type Parameters = [chunkId: string, chunkingState: $DbEnums["MemoryChunkingState"], chunkingError: string | null, incrementRetry: boolean]
   export type Result = {
     id: string
     provenanceId: string
