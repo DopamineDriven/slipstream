@@ -11,7 +11,8 @@ import type {
 } from "@/memory/types.ts";
 import type { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
-import { Anthropic } from "@anthropic-ai/sdk";
+import type { AnthropicSummarizerService } from "@/anthropic/summarizer.ts";
+import type { Anthropic } from "@anthropic-ai/sdk";
 import { ConversationMemoryWorkupService } from "@/memory/workup.ts";
 
 interface EmbedAndIndexTarget {
@@ -36,24 +37,14 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
   /** contextId → in-flight summary sweep; delete-on-settle */
   protected summarizingInFlight = new Map<string, Promise<void>>();
 
-  /**
-   * Raw SDK client, not AnthropicService — the summarizer is one non-streaming
-   * internal call; pulling in the chat service would couple us to the provider
-   * layer for nothing (and its getClient is protected by design).
-   */
-  private summarizerClient: Anthropic;
-
   constructor(
     logger: LoggerService,
     voyage: VoyageEmbeddingService,
     prisma: PrismaService,
-    anthropicApiKey: string
+    /** rides AnthropicBaseService's battle-tested call shape — betas, adaptive thinking, ceiling clamps */
+    protected summarizer: AnthropicSummarizerService
   ) {
     super(logger, voyage, prisma);
-    this.summarizerClient = new Anthropic({
-      apiKey: anthropicApiKey,
-      logger: this.logger
-    });
   }
 
   // ── Entry point (fire-and-forget from the resolver, post-response) ───
@@ -760,7 +751,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     return {
       provider: "ANTHROPIC",
       model: "claude-sonnet-5",
-      promptVersion: "memory-summary-v1_1",
+      promptVersion: "memory-summary-v1_2",
       maxOutputTokens: 120_000,
       maxAttachmentBlocks: 12,
       sweepBatchSize: 8
@@ -791,7 +782,7 @@ Output EXACTLY two tagged blocks and nothing else:
 Rich summary of THIS section per the mandates.
 </section_summary>
 <rolling_summary>
-Updated whole-conversation digest: fold the prior rolling summary together with this section. Preserve earlier decisions, corrections, and canonical creative material; compress superseded detail. Keep under roughly 600 words.
+Updated whole-conversation digest: fold the prior rolling summary together with this section. Preserve earlier decisions, corrections, and canonical creative material; compress only what has been superseded. Let its length grow in proportion to the conversation itself — completeness outranks brevity, and there is no word limit.
 </rolling_summary>` as const;
   }
 
@@ -823,7 +814,7 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
       attachmentIds.push(this.prisma.parseDocname(provenance).attachmentId);
     }
 
-    const blocks = Array.of<Anthropic.Messages.ContentBlockParam>();
+    const blocks = Array.of<Anthropic.Beta.BetaContentBlockParam>();
     if (attachmentIds.length === 0) return blocks;
 
     // images only — documents already live in the user store via the pdfdown
@@ -867,7 +858,7 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
       chunk.transcriptMarkdown
     ].join("\n");
 
-    const blocks = Array.of<Anthropic.Messages.ContentBlockParam>();
+    const blocks = Array.of<Anthropic.Beta.BetaContentBlockParam>();
     blocks.push({ type: "text", text: preamble });
     if (chunk.hasAttachments && chunk.attachmentProvenanceIdsRaw) {
       blocks.push(
@@ -892,10 +883,19 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
         rollingSummary: rolling && rolling.length > 0 ? rolling : null
       } as const;
     }
-    // malformed tags — take the whole output as the section summary, skip the fold
-    const fallback = raw.trim();
-    if (fallback.length === 0) return null;
-    return { sectionSummary: fallback, rollingSummary: null } as const;
+    // tag-noncompliant output: salvage a well-formed rolling block if present,
+    // strip any stray/unclosed tags, and treat the remainder as the section
+    // summary — never discard a parseable fold (the v1_1-era bug)
+    const remainder = raw
+      .replace(/<rolling_summary>[\s\S]*?<\/rolling_summary>/g, "")
+      .replace(/<\/?section_summary>/g, "")
+      .replace(/<\/?rolling_summary>/g, "")
+      .trim();
+    if (remainder.length === 0) return null;
+    return {
+      sectionSummary: remainder,
+      rollingSummary: rolling && rolling.length > 0 ? rolling : null
+    } as const;
   }
 
   protected async summarizeChunk(chunk: MemoryChunkAwaitingSummary) {
@@ -914,16 +914,12 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
       }
 
       const content = await this.buildSummaryContent(chunk, context);
-      // streaming-accumulate: the SDK refuses non-streaming calls whose
-      // max_tokens implies exceeding its timeout — 120k output demands a stream
-      const response = await this.summarizerClient.messages
-        .stream({
-          model: cfg.model,
-          max_tokens: cfg.maxOutputTokens,
-          system: this.summarySystemPrompt,
-          messages: [{ role: "user", content }]
-        })
-        .finalMessage();
+      const response = await this.summarizer.streamSummaryMessage({
+        model: cfg.model,
+        maxOutputTokens: cfg.maxOutputTokens,
+        system: this.summarySystemPrompt,
+        content
+      });
       const raw = response.content
         .filter(block => block.type === "text")
         .map(block => block.text)

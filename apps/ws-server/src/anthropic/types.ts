@@ -6,6 +6,7 @@ import type {
   DiscriminatedUnionToRecord,
   MessageSingleton
 } from "@slipstream/types";
+import { UTR } from "@slipstream/types";
 
 export interface AnthropicFileRecord {
   id: string;
@@ -107,15 +108,12 @@ export interface RoundRecord {
   assistantBlocks: Anthropic.Beta.BetaContentBlockParam[];
   toolResults: Anthropic.Beta.BetaToolResultBlockParam[];
 }
-export type BetaRawMessageStreamRecord = DiscriminatedUnionToRecord<
+export type BetaRawMessageStreamRecord = UTR<
   Anthropic.Beta.Messages.BetaRawMessageStreamEvent,
   "type"
 >;
 
-export type ContentBlockObj = DiscriminatedUnionToRecord<
-  Anthropic.Beta.BetaContentBlockParam,
-  "type"
->;
+export type ContentBlockObj = UTR<Anthropic.Beta.BetaContentBlockParam, "type">;
 
 export type MapContentBlock<T extends keyof ContentBlockObj> = {
   [P in T]: ContentBlockObj[P];

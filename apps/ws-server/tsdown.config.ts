@@ -13,6 +13,7 @@ export default defineConfig(
         "src/alibaba/types.ts",
         "src/anthropic/base.ts",
         "src/anthropic/index.ts",
+        "src/anthropic/summarizer.ts",
         "src/anthropic/types.ts",
         "src/anthropic/vector-store.ts",
         "src/anthropic/workup.ts",

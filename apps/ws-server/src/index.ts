@@ -101,6 +101,16 @@ async function exe() {
       cfg.VOYAGE_API_KEY
     );
 
+    const { AnthropicSummarizerService } = await import(
+      "@/anthropic/summarizer.ts"
+    );
+
+    const anthropicSummarizer = new AnthropicSummarizerService(
+      logger,
+      prisma,
+      cfg.ANTHROPIC_API_KEY
+    );
+
     const { ConversationMemoryVectorService } =
       await import("@/memory/vector-store.ts");
 
@@ -108,7 +118,7 @@ async function exe() {
       logger,
       voyage,
       prisma,
-      cfg.ANTHROPIC_API_KEY
+      anthropicSummarizer
     );
 
     const { xAIService } = await import("@/xai/index.ts");

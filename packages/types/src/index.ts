@@ -375,6 +375,7 @@ export type {
   TCN,
   Unenumerate,
   UnionToRecord,
+  UTR,
   Without,
   XOR
 } from "@/utils.ts";
