@@ -126,6 +126,8 @@ export interface MemorySummarizerConfig {
   maxAttachmentBlocks: number;
   /** hard cap on file_search round-trips per summary/fold call */
   maxToolUseRounds: number;
+  /** per-round wall-clock deadline — an immortal stream aborts into the ERROR/retry path instead of wedging its wave */
+  callDeadlineMs: number;
   /** wave width — pending chunks dispatched as concurrent detached jobs; the drain-fold chains the next wave until the backlog is dry */
   sweepBatchSize: number;
 }

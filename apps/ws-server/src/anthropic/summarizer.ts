@@ -25,6 +25,8 @@ export interface StreamSummaryMessageParams {
   executeToolCall?: (name: string, input: unknown) => Promise<string>;
   /** hard cap on tool round-trips — defense against foraging spirals */
   maxToolUseRounds?: number;
+  /** per-round wall-clock deadline; a stalled stream aborts instead of living forever */
+  callDeadlineMs?: number;
 }
 
 /**
@@ -51,6 +53,7 @@ export class AnthropicSummarizerService extends AnthropicBaseService {
     );
     const betas = this.handleBetaHeaders(params.model, false);
     const maxToolUseRounds = params.maxToolUseRounds ?? 0;
+    const callDeadlineMs = params.callDeadlineMs ?? 900_000;
     const { executeToolCall } = params;
 
     const messages = Array.of<Anthropic.Beta.BetaMessageParam>();
@@ -92,7 +95,15 @@ export class AnthropicSummarizerService extends AnthropicBaseService {
         }
       });
 
-      const message = await stream.finalMessage();
+      // wave forward-progress depends on every job settling — a stalled
+      // stream aborts into the caller's ERROR/retry path, never lives forever
+      const deadline = setTimeout(() => stream.abort(), callDeadlineMs);
+      let message: Anthropic.Beta.BetaMessage;
+      try {
+        message = await stream.finalMessage();
+      } finally {
+        clearTimeout(deadline);
+      }
 
       for (const block of message.content) {
         if (block.type === "thinking" && block.thinking.length > 0) {

@@ -62,6 +62,9 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     Map<string, $Enums.MemorySummaryState>
   >();
 
+  /** contextId → wave dispatch epoch ms — the age check that guarantees a wedged wave is eventually replaced */
+  protected summaryWaveBornAt = new Map<string, number>();
+
   constructor(
     logger: LoggerService,
     voyage: VoyageEmbeddingService,
@@ -961,6 +964,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       maxOutputTokens: 120_000,
       maxAttachmentBlocks: 12,
       maxToolUseRounds: 4,
+      callDeadlineMs: 900_000,
       sweepBatchSize: 8
     } as const satisfies MemorySummarizerConfig;
   }
@@ -1221,7 +1225,8 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
         tools: [this.summarizerFileSearchTool],
         executeToolCall: (name, input) =>
           this.executeSummarizerToolCall(userId, name, input),
-        maxToolUseRounds: cfg.maxToolUseRounds
+        maxToolUseRounds: cfg.maxToolUseRounds,
+        callDeadlineMs: cfg.callDeadlineMs
       });
       const sectionSummary = this.sanitizeSummaryOutput(result.text);
       if (!sectionSummary) throw new Error("summarizer returned empty output");
@@ -1282,10 +1287,23 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
    */
   public async summarizeQueuedChunks(contextId: string) {
     const existing = this.summaryJobRegistry.get(contextId);
-    if (existing && !this.waveDrained(existing)) return;
+    if (existing && !this.waveDrained(existing)) {
+      // belt-and-suspenders under the per-call deadline: a wave that outlives
+      // every possible round budget is wedged junk — replace, don't respect
+      const bornAt = this.summaryWaveBornAt.get(contextId) ?? 0;
+      const maxWaveMs =
+        this.memorySummarizerConfig.callDeadlineMs *
+        (this.memorySummarizerConfig.maxToolUseRounds + 2);
+      if (Date.now() - bornAt < maxWaveMs) return;
+      this.logger.warn(
+        { contextId, waveAgeMs: Date.now() - bornAt },
+        "abandoning over-age summary wave — replacing"
+      );
+    }
 
     const wave = new Map<string, $Enums.MemorySummaryState>();
     this.summaryJobRegistry.set(contextId, wave);
+    this.summaryWaveBornAt.set(contextId, Date.now());
     try {
       // a process killed mid-call strands SUMMARIZING rows — fold them back
       // into the retry pool once they exceed the stale threshold
@@ -1444,7 +1462,8 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
         tools: [this.summarizerFileSearchTool],
         executeToolCall: (name, input) =>
           this.executeSummarizerToolCall(userId, name, input),
-        maxToolUseRounds: cfg.maxToolUseRounds
+        maxToolUseRounds: cfg.maxToolUseRounds,
+        callDeadlineMs: cfg.callDeadlineMs
       });
       const folded = this.sanitizeSummaryOutput(result.text);
       if (!folded) throw new Error("fold call returned empty output");
