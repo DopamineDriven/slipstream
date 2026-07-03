@@ -79,8 +79,7 @@ export type MemoryHybridRow = Unenumerate<
 >;
 
 export type ConversationMemorySearchScope =
-  | "current_conversation"
-  | "all_conversations";
+  "current_conversation" | "all_conversations";
 
 export interface ConversationMemorySearchToolInput {
   query: string;

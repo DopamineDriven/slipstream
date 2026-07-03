@@ -1,3 +1,4 @@
+import type { AnthropicSummarizerService } from "@/anthropic/summarizer.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type {
   ConversationMemoryGetChunkTarget,
@@ -9,9 +10,8 @@ import type {
   MemorySectionDraft,
   MemorySummarizerConfig
 } from "@/memory/types.ts";
-import type { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
-import type { AnthropicSummarizerService } from "@/anthropic/summarizer.ts";
+import type { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { ConversationMemoryWorkupService } from "@/memory/workup.ts";
 
@@ -752,7 +752,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       provider: "ANTHROPIC",
       model: "claude-sonnet-5",
       promptVersion: "memory-summary-v1_2",
-      effort: "high",
+      effort: "xhigh",
       maxOutputTokens: 120_000,
       maxAttachmentBlocks: 12,
       sweepBatchSize: 8
@@ -792,9 +792,7 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
   }
 
   private attachmentUrlMime(
-    att: Awaited<
-      ReturnType<PrismaService["findAttachmentsByIds"]>
-    >[number]
+    att: Awaited<ReturnType<PrismaService["findAttachmentsByIds"]>>[number]
   ) {
     if (att.compatStatus === "ACTIVE" && att.compatCdnUrl && att.compatMime) {
       return { url: att.compatCdnUrl, mime: att.compatMime } as const;
