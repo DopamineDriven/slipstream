@@ -2929,6 +2929,11 @@ export const ConversationMemoryContextScalarFieldEnum = {
   rollingSummaryProvider: 'rollingSummaryProvider',
   rollingSummaryTokens: 'rollingSummaryTokens',
   rollingSummaryUpdatedAt: 'rollingSummaryUpdatedAt',
+  rollingSummaryState: 'rollingSummaryState',
+  rollingSummaryReasoningVersion: 'rollingSummaryReasoningVersion',
+  rollingSummaryReasoningDuration: 'rollingSummaryReasoningDuration',
+  rollingSummaryReasoningText: 'rollingSummaryReasoningText',
+  rollingSummaryReasoningToolUseRaw: 'rollingSummaryReasoningToolUseRaw',
   lastIndexedOrdinalExclusive: 'lastIndexedOrdinalExclusive',
   lastChunkedAt: 'lastChunkedAt',
   totalTurns: 'totalTurns',
@@ -2978,6 +2983,9 @@ export const ConversationMemoryChunkScalarFieldEnum = {
   summary: 'summary',
   summaryState: 'summaryState',
   summaryModel: 'summaryModel',
+  summaryReasoningDuration: 'summaryReasoningDuration',
+  summaryReasoningText: 'summaryReasoningText',
+  summaryToolUseRaw: 'summaryToolUseRaw',
   summaryProvider: 'summaryProvider',
   summaryPromptVersion: 'summaryPromptVersion',
   summaryTokens: 'summaryTokens',
@@ -3632,6 +3640,34 @@ export type ListEnumMemorySchemaVersionFieldRefInput<$PrismaModel> = FieldRefInp
 
 
 /**
+ * Reference to a field of type 'MemorySummaryState'
+ */
+export type EnumMemorySummaryStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemorySummaryState'>
+    
+
+
+/**
+ * Reference to a field of type 'MemorySummaryState[]'
+ */
+export type ListEnumMemorySummaryStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemorySummaryState[]'>
+    
+
+
+/**
+ * Reference to a field of type 'MemoryRollingSummaryReasoningVersion'
+ */
+export type EnumMemoryRollingSummaryReasoningVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemoryRollingSummaryReasoningVersion'>
+    
+
+
+/**
+ * Reference to a field of type 'MemoryRollingSummaryReasoningVersion[]'
+ */
+export type ListEnumMemoryRollingSummaryReasoningVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemoryRollingSummaryReasoningVersion[]'>
+    
+
+
+/**
  * Reference to a field of type 'MemoryTranscriptRendererVersion'
  */
 export type EnumMemoryTranscriptRendererVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemoryTranscriptRendererVersion'>
@@ -3674,16 +3710,16 @@ export type ListEnumMemoryChunkingStateFieldRefInput<$PrismaModel> = FieldRefInp
 
 
 /**
- * Reference to a field of type 'MemorySummaryState'
+ * Reference to a field of type 'MemoryChunkSummaryPromptVersion'
  */
-export type EnumMemorySummaryStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemorySummaryState'>
+export type EnumMemoryChunkSummaryPromptVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemoryChunkSummaryPromptVersion'>
     
 
 
 /**
- * Reference to a field of type 'MemorySummaryState[]'
+ * Reference to a field of type 'MemoryChunkSummaryPromptVersion[]'
  */
-export type ListEnumMemorySummaryStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemorySummaryState[]'>
+export type ListEnumMemoryChunkSummaryPromptVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemoryChunkSummaryPromptVersion[]'>
     
 
 

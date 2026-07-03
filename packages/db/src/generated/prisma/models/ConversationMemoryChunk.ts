@@ -35,6 +35,7 @@ export type ConversationMemoryChunkAvgAggregateOutputType = {
   chunkedAttachmentsCount: number | null
   embeddingDim: number | null
   retryCount: number | null
+  summaryReasoningDuration: number | null
   summaryTokens: number | null
   summaryRetryCount: number | null
 }
@@ -48,6 +49,7 @@ export type ConversationMemoryChunkSumAggregateOutputType = {
   chunkedAttachmentsCount: number | null
   embeddingDim: number | null
   retryCount: number | null
+  summaryReasoningDuration: number | null
   summaryTokens: number | null
   summaryRetryCount: number | null
 }
@@ -86,8 +88,11 @@ export type ConversationMemoryChunkMinAggregateOutputType = {
   summary: string | null
   summaryState: $Enums.MemorySummaryState | null
   summaryModel: string | null
+  summaryReasoningDuration: number | null
+  summaryReasoningText: string | null
+  summaryToolUseRaw: string | null
   summaryProvider: $Enums.Provider | null
-  summaryPromptVersion: string | null
+  summaryPromptVersion: $Enums.MemoryChunkSummaryPromptVersion | null
   summaryTokens: number | null
   summaryError: string | null
   summaryRetryCount: number | null
@@ -131,8 +136,11 @@ export type ConversationMemoryChunkMaxAggregateOutputType = {
   summary: string | null
   summaryState: $Enums.MemorySummaryState | null
   summaryModel: string | null
+  summaryReasoningDuration: number | null
+  summaryReasoningText: string | null
+  summaryToolUseRaw: string | null
   summaryProvider: $Enums.Provider | null
-  summaryPromptVersion: string | null
+  summaryPromptVersion: $Enums.MemoryChunkSummaryPromptVersion | null
   summaryTokens: number | null
   summaryError: string | null
   summaryRetryCount: number | null
@@ -176,6 +184,9 @@ export type ConversationMemoryChunkCountAggregateOutputType = {
   summary: number
   summaryState: number
   summaryModel: number
+  summaryReasoningDuration: number
+  summaryReasoningText: number
+  summaryToolUseRaw: number
   summaryProvider: number
   summaryPromptVersion: number
   summaryTokens: number
@@ -198,6 +209,7 @@ export type ConversationMemoryChunkAvgAggregateInputType = {
   chunkedAttachmentsCount?: true
   embeddingDim?: true
   retryCount?: true
+  summaryReasoningDuration?: true
   summaryTokens?: true
   summaryRetryCount?: true
 }
@@ -211,6 +223,7 @@ export type ConversationMemoryChunkSumAggregateInputType = {
   chunkedAttachmentsCount?: true
   embeddingDim?: true
   retryCount?: true
+  summaryReasoningDuration?: true
   summaryTokens?: true
   summaryRetryCount?: true
 }
@@ -249,6 +262,9 @@ export type ConversationMemoryChunkMinAggregateInputType = {
   summary?: true
   summaryState?: true
   summaryModel?: true
+  summaryReasoningDuration?: true
+  summaryReasoningText?: true
+  summaryToolUseRaw?: true
   summaryProvider?: true
   summaryPromptVersion?: true
   summaryTokens?: true
@@ -294,6 +310,9 @@ export type ConversationMemoryChunkMaxAggregateInputType = {
   summary?: true
   summaryState?: true
   summaryModel?: true
+  summaryReasoningDuration?: true
+  summaryReasoningText?: true
+  summaryToolUseRaw?: true
   summaryProvider?: true
   summaryPromptVersion?: true
   summaryTokens?: true
@@ -339,6 +358,9 @@ export type ConversationMemoryChunkCountAggregateInputType = {
   summary?: true
   summaryState?: true
   summaryModel?: true
+  summaryReasoningDuration?: true
+  summaryReasoningText?: true
+  summaryToolUseRaw?: true
   summaryProvider?: true
   summaryPromptVersion?: true
   summaryTokens?: true
@@ -471,8 +493,11 @@ export type ConversationMemoryChunkGroupByOutputType = {
   summary: string | null
   summaryState: $Enums.MemorySummaryState
   summaryModel: string | null
+  summaryReasoningDuration: number
+  summaryReasoningText: string | null
+  summaryToolUseRaw: string | null
   summaryProvider: $Enums.Provider | null
-  summaryPromptVersion: string | null
+  summaryPromptVersion: $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens: number
   summaryError: string | null
   summaryRetryCount: number
@@ -539,8 +564,11 @@ export type ConversationMemoryChunkWhereInput = {
   summary?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
   summaryState?: Prisma.EnumMemorySummaryStateFilter<"ConversationMemoryChunk"> | $Enums.MemorySummaryState
   summaryModel?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryReasoningDuration?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
+  summaryReasoningText?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryToolUseRaw?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
   summaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryChunk"> | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionFilter<"ConversationMemoryChunk"> | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
   summaryError?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
   summaryRetryCount?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
@@ -586,8 +614,11 @@ export type ConversationMemoryChunkOrderByWithRelationInput = {
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
   summaryState?: Prisma.SortOrder
   summaryModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryReasoningDuration?: Prisma.SortOrder
+  summaryReasoningText?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryToolUseRaw?: Prisma.SortOrderInput | Prisma.SortOrder
   summaryProvider?: Prisma.SortOrderInput | Prisma.SortOrder
-  summaryPromptVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryPromptVersion?: Prisma.SortOrder
   summaryTokens?: Prisma.SortOrder
   summaryError?: Prisma.SortOrderInput | Prisma.SortOrder
   summaryRetryCount?: Prisma.SortOrder
@@ -638,8 +669,11 @@ export type ConversationMemoryChunkWhereUniqueInput = Prisma.AtLeast<{
   summary?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
   summaryState?: Prisma.EnumMemorySummaryStateFilter<"ConversationMemoryChunk"> | $Enums.MemorySummaryState
   summaryModel?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryReasoningDuration?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
+  summaryReasoningText?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryToolUseRaw?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
   summaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryChunk"> | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionFilter<"ConversationMemoryChunk"> | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
   summaryError?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
   summaryRetryCount?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
@@ -685,8 +719,11 @@ export type ConversationMemoryChunkOrderByWithAggregationInput = {
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
   summaryState?: Prisma.SortOrder
   summaryModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryReasoningDuration?: Prisma.SortOrder
+  summaryReasoningText?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryToolUseRaw?: Prisma.SortOrderInput | Prisma.SortOrder
   summaryProvider?: Prisma.SortOrderInput | Prisma.SortOrder
-  summaryPromptVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryPromptVersion?: Prisma.SortOrder
   summaryTokens?: Prisma.SortOrder
   summaryError?: Prisma.SortOrderInput | Prisma.SortOrder
   summaryRetryCount?: Prisma.SortOrder
@@ -738,8 +775,11 @@ export type ConversationMemoryChunkScalarWhereWithAggregatesInput = {
   summary?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
   summaryState?: Prisma.EnumMemorySummaryStateWithAggregatesFilter<"ConversationMemoryChunk"> | $Enums.MemorySummaryState
   summaryModel?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
+  summaryReasoningDuration?: Prisma.IntWithAggregatesFilter<"ConversationMemoryChunk"> | number
+  summaryReasoningText?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
+  summaryToolUseRaw?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
   summaryProvider?: Prisma.EnumProviderNullableWithAggregatesFilter<"ConversationMemoryChunk"> | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionWithAggregatesFilter<"ConversationMemoryChunk"> | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntWithAggregatesFilter<"ConversationMemoryChunk"> | number
   summaryError?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
   summaryRetryCount?: Prisma.IntWithAggregatesFilter<"ConversationMemoryChunk"> | number
@@ -782,8 +822,11 @@ export type ConversationMemoryChunkCreateInput = {
   summary?: string | null
   summaryState?: $Enums.MemorySummaryState
   summaryModel?: string | null
+  summaryReasoningDuration?: number
+  summaryReasoningText?: string | null
+  summaryToolUseRaw?: string | null
   summaryProvider?: $Enums.Provider | null
-  summaryPromptVersion?: string | null
+  summaryPromptVersion?: $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: number
   summaryError?: string | null
   summaryRetryCount?: number
@@ -829,8 +872,11 @@ export type ConversationMemoryChunkUncheckedCreateInput = {
   summary?: string | null
   summaryState?: $Enums.MemorySummaryState
   summaryModel?: string | null
+  summaryReasoningDuration?: number
+  summaryReasoningText?: string | null
+  summaryToolUseRaw?: string | null
   summaryProvider?: $Enums.Provider | null
-  summaryPromptVersion?: string | null
+  summaryPromptVersion?: $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: number
   summaryError?: string | null
   summaryRetryCount?: number
@@ -874,8 +920,11 @@ export type ConversationMemoryChunkUpdateInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
   summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  summaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionFieldUpdateOperationsInput | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   summaryError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryRetryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -921,8 +970,11 @@ export type ConversationMemoryChunkUncheckedUpdateInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
   summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  summaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionFieldUpdateOperationsInput | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   summaryError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryRetryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -967,8 +1019,11 @@ export type ConversationMemoryChunkCreateManyInput = {
   summary?: string | null
   summaryState?: $Enums.MemorySummaryState
   summaryModel?: string | null
+  summaryReasoningDuration?: number
+  summaryReasoningText?: string | null
+  summaryToolUseRaw?: string | null
   summaryProvider?: $Enums.Provider | null
-  summaryPromptVersion?: string | null
+  summaryPromptVersion?: $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: number
   summaryError?: string | null
   summaryRetryCount?: number
@@ -1011,8 +1066,11 @@ export type ConversationMemoryChunkUpdateManyMutationInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
   summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  summaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionFieldUpdateOperationsInput | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   summaryError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryRetryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1056,8 +1114,11 @@ export type ConversationMemoryChunkUncheckedUpdateManyInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
   summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  summaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionFieldUpdateOperationsInput | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   summaryError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryRetryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1124,6 +1185,9 @@ export type ConversationMemoryChunkCountOrderByAggregateInput = {
   summary?: Prisma.SortOrder
   summaryState?: Prisma.SortOrder
   summaryModel?: Prisma.SortOrder
+  summaryReasoningDuration?: Prisma.SortOrder
+  summaryReasoningText?: Prisma.SortOrder
+  summaryToolUseRaw?: Prisma.SortOrder
   summaryProvider?: Prisma.SortOrder
   summaryPromptVersion?: Prisma.SortOrder
   summaryTokens?: Prisma.SortOrder
@@ -1144,6 +1208,7 @@ export type ConversationMemoryChunkAvgOrderByAggregateInput = {
   chunkedAttachmentsCount?: Prisma.SortOrder
   embeddingDim?: Prisma.SortOrder
   retryCount?: Prisma.SortOrder
+  summaryReasoningDuration?: Prisma.SortOrder
   summaryTokens?: Prisma.SortOrder
   summaryRetryCount?: Prisma.SortOrder
 }
@@ -1182,6 +1247,9 @@ export type ConversationMemoryChunkMaxOrderByAggregateInput = {
   summary?: Prisma.SortOrder
   summaryState?: Prisma.SortOrder
   summaryModel?: Prisma.SortOrder
+  summaryReasoningDuration?: Prisma.SortOrder
+  summaryReasoningText?: Prisma.SortOrder
+  summaryToolUseRaw?: Prisma.SortOrder
   summaryProvider?: Prisma.SortOrder
   summaryPromptVersion?: Prisma.SortOrder
   summaryTokens?: Prisma.SortOrder
@@ -1227,6 +1295,9 @@ export type ConversationMemoryChunkMinOrderByAggregateInput = {
   summary?: Prisma.SortOrder
   summaryState?: Prisma.SortOrder
   summaryModel?: Prisma.SortOrder
+  summaryReasoningDuration?: Prisma.SortOrder
+  summaryReasoningText?: Prisma.SortOrder
+  summaryToolUseRaw?: Prisma.SortOrder
   summaryProvider?: Prisma.SortOrder
   summaryPromptVersion?: Prisma.SortOrder
   summaryTokens?: Prisma.SortOrder
@@ -1247,6 +1318,7 @@ export type ConversationMemoryChunkSumOrderByAggregateInput = {
   chunkedAttachmentsCount?: Prisma.SortOrder
   embeddingDim?: Prisma.SortOrder
   retryCount?: Prisma.SortOrder
+  summaryReasoningDuration?: Prisma.SortOrder
   summaryTokens?: Prisma.SortOrder
   summaryRetryCount?: Prisma.SortOrder
 }
@@ -1310,8 +1382,8 @@ export type EnumMemoryChunkingStateFieldUpdateOperationsInput = {
   set?: $Enums.MemoryChunkingState
 }
 
-export type EnumMemorySummaryStateFieldUpdateOperationsInput = {
-  set?: $Enums.MemorySummaryState
+export type EnumMemoryChunkSummaryPromptVersionFieldUpdateOperationsInput = {
+  set?: $Enums.MemoryChunkSummaryPromptVersion
 }
 
 export type ConversationMemoryChunkCreateNestedOneWithoutMessagesInput = {
@@ -1363,8 +1435,11 @@ export type ConversationMemoryChunkCreateWithoutContextInput = {
   summary?: string | null
   summaryState?: $Enums.MemorySummaryState
   summaryModel?: string | null
+  summaryReasoningDuration?: number
+  summaryReasoningText?: string | null
+  summaryToolUseRaw?: string | null
   summaryProvider?: $Enums.Provider | null
-  summaryPromptVersion?: string | null
+  summaryPromptVersion?: $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: number
   summaryError?: string | null
   summaryRetryCount?: number
@@ -1408,8 +1483,11 @@ export type ConversationMemoryChunkUncheckedCreateWithoutContextInput = {
   summary?: string | null
   summaryState?: $Enums.MemorySummaryState
   summaryModel?: string | null
+  summaryReasoningDuration?: number
+  summaryReasoningText?: string | null
+  summaryToolUseRaw?: string | null
   summaryProvider?: $Enums.Provider | null
-  summaryPromptVersion?: string | null
+  summaryPromptVersion?: $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: number
   summaryError?: string | null
   summaryRetryCount?: number
@@ -1483,8 +1561,11 @@ export type ConversationMemoryChunkScalarWhereInput = {
   summary?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
   summaryState?: Prisma.EnumMemorySummaryStateFilter<"ConversationMemoryChunk"> | $Enums.MemorySummaryState
   summaryModel?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryReasoningDuration?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
+  summaryReasoningText?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryToolUseRaw?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
   summaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryChunk"> | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionFilter<"ConversationMemoryChunk"> | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
   summaryError?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
   summaryRetryCount?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
@@ -1527,8 +1608,11 @@ export type ConversationMemoryChunkCreateWithoutMessagesInput = {
   summary?: string | null
   summaryState?: $Enums.MemorySummaryState
   summaryModel?: string | null
+  summaryReasoningDuration?: number
+  summaryReasoningText?: string | null
+  summaryToolUseRaw?: string | null
   summaryProvider?: $Enums.Provider | null
-  summaryPromptVersion?: string | null
+  summaryPromptVersion?: $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: number
   summaryError?: string | null
   summaryRetryCount?: number
@@ -1573,8 +1657,11 @@ export type ConversationMemoryChunkUncheckedCreateWithoutMessagesInput = {
   summary?: string | null
   summaryState?: $Enums.MemorySummaryState
   summaryModel?: string | null
+  summaryReasoningDuration?: number
+  summaryReasoningText?: string | null
+  summaryToolUseRaw?: string | null
   summaryProvider?: $Enums.Provider | null
-  summaryPromptVersion?: string | null
+  summaryPromptVersion?: $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: number
   summaryError?: string | null
   summaryRetryCount?: number
@@ -1633,8 +1720,11 @@ export type ConversationMemoryChunkUpdateWithoutMessagesInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
   summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  summaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionFieldUpdateOperationsInput | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   summaryError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryRetryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1679,8 +1769,11 @@ export type ConversationMemoryChunkUncheckedUpdateWithoutMessagesInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
   summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  summaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionFieldUpdateOperationsInput | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   summaryError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryRetryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1723,8 +1816,11 @@ export type ConversationMemoryChunkCreateManyContextInput = {
   summary?: string | null
   summaryState?: $Enums.MemorySummaryState
   summaryModel?: string | null
+  summaryReasoningDuration?: number
+  summaryReasoningText?: string | null
+  summaryToolUseRaw?: string | null
   summaryProvider?: $Enums.Provider | null
-  summaryPromptVersion?: string | null
+  summaryPromptVersion?: $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: number
   summaryError?: string | null
   summaryRetryCount?: number
@@ -1767,8 +1863,11 @@ export type ConversationMemoryChunkUpdateWithoutContextInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
   summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  summaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionFieldUpdateOperationsInput | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   summaryError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryRetryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1812,8 +1911,11 @@ export type ConversationMemoryChunkUncheckedUpdateWithoutContextInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
   summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  summaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionFieldUpdateOperationsInput | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   summaryError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryRetryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1857,8 +1959,11 @@ export type ConversationMemoryChunkUncheckedUpdateManyWithoutContextInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
   summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  summaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  summaryPromptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryPromptVersion?: Prisma.EnumMemoryChunkSummaryPromptVersionFieldUpdateOperationsInput | $Enums.MemoryChunkSummaryPromptVersion
   summaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   summaryError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summaryRetryCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1933,6 +2038,9 @@ export type ConversationMemoryChunkSelect<ExtArgs extends runtime.Types.Extensio
   summary?: boolean
   summaryState?: boolean
   summaryModel?: boolean
+  summaryReasoningDuration?: boolean
+  summaryReasoningText?: boolean
+  summaryToolUseRaw?: boolean
   summaryProvider?: boolean
   summaryPromptVersion?: boolean
   summaryTokens?: boolean
@@ -1981,6 +2089,9 @@ export type ConversationMemoryChunkSelectCreateManyAndReturn<ExtArgs extends run
   summary?: boolean
   summaryState?: boolean
   summaryModel?: boolean
+  summaryReasoningDuration?: boolean
+  summaryReasoningText?: boolean
+  summaryToolUseRaw?: boolean
   summaryProvider?: boolean
   summaryPromptVersion?: boolean
   summaryTokens?: boolean
@@ -2027,6 +2138,9 @@ export type ConversationMemoryChunkSelectUpdateManyAndReturn<ExtArgs extends run
   summary?: boolean
   summaryState?: boolean
   summaryModel?: boolean
+  summaryReasoningDuration?: boolean
+  summaryReasoningText?: boolean
+  summaryToolUseRaw?: boolean
   summaryProvider?: boolean
   summaryPromptVersion?: boolean
   summaryTokens?: boolean
@@ -2073,6 +2187,9 @@ export type ConversationMemoryChunkSelectScalar = {
   summary?: boolean
   summaryState?: boolean
   summaryModel?: boolean
+  summaryReasoningDuration?: boolean
+  summaryReasoningText?: boolean
+  summaryToolUseRaw?: boolean
   summaryProvider?: boolean
   summaryPromptVersion?: boolean
   summaryTokens?: boolean
@@ -2084,7 +2201,7 @@ export type ConversationMemoryChunkSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ConversationMemoryChunkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "provenanceId" | "contextId" | "storeId" | "conversationId" | "chunkIndex" | "ordinalStart" | "ordinalEndExclusive" | "messageIdStart" | "messageIdEnd" | "messageTimestampStart" | "messageTimestampEnd" | "transcriptMarkdown" | "rendererVersion" | "transcriptIncludesThinking" | "contentHash" | "chunkedMessagesCount" | "tokenCount" | "providerModelsRaw" | "hasAttachments" | "chunkedAttachmentsCount" | "attachmentProvenanceIdsRaw" | "embeddingModel" | "embeddingDim" | "embeddedAt" | "schemaVersion" | "boundaryReason" | "chunkingState" | "chunkingError" | "retryCount" | "summary" | "summaryState" | "summaryModel" | "summaryProvider" | "summaryPromptVersion" | "summaryTokens" | "summaryError" | "summaryRetryCount" | "summaryGeneratedAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["conversationMemoryChunk"]>
+export type ConversationMemoryChunkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "provenanceId" | "contextId" | "storeId" | "conversationId" | "chunkIndex" | "ordinalStart" | "ordinalEndExclusive" | "messageIdStart" | "messageIdEnd" | "messageTimestampStart" | "messageTimestampEnd" | "transcriptMarkdown" | "rendererVersion" | "transcriptIncludesThinking" | "contentHash" | "chunkedMessagesCount" | "tokenCount" | "providerModelsRaw" | "hasAttachments" | "chunkedAttachmentsCount" | "attachmentProvenanceIdsRaw" | "embeddingModel" | "embeddingDim" | "embeddedAt" | "schemaVersion" | "boundaryReason" | "chunkingState" | "chunkingError" | "retryCount" | "summary" | "summaryState" | "summaryModel" | "summaryReasoningDuration" | "summaryReasoningText" | "summaryToolUseRaw" | "summaryProvider" | "summaryPromptVersion" | "summaryTokens" | "summaryError" | "summaryRetryCount" | "summaryGeneratedAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["conversationMemoryChunk"]>
 export type ConversationMemoryChunkInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   messages?: boolean | Prisma.ConversationMemoryChunk$messagesArgs<ExtArgs>
   context?: boolean | Prisma.ConversationMemoryContextDefaultArgs<ExtArgs>
@@ -2156,8 +2273,20 @@ export type $ConversationMemoryChunkPayload<ExtArgs extends runtime.Types.Extens
     summary: string | null
     summaryState: $Enums.MemorySummaryState
     summaryModel: string | null
+    /**
+     * wall-clock ms spent inside adaptive-thinking blocks across the summary call (stream-event timed)
+     */
+    summaryReasoningDuration: number
+    /**
+     * captured thinking-block text — visibility into how the summarizer reaches its conclusions
+     */
+    summaryReasoningText: string | null
+    /**
+     * JSON trace of in-house tool calls (file_search) during summarization: name, input, output per round
+     */
+    summaryToolUseRaw: string | null
     summaryProvider: $Enums.Provider | null
-    summaryPromptVersion: string | null
+    summaryPromptVersion: $Enums.MemoryChunkSummaryPromptVersion
     summaryTokens: number
     summaryError: string | null
     summaryRetryCount: number
@@ -2623,8 +2752,11 @@ export interface ConversationMemoryChunkFieldRefs {
   readonly summary: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
   readonly summaryState: Prisma.FieldRef<"ConversationMemoryChunk", 'MemorySummaryState'>
   readonly summaryModel: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly summaryReasoningDuration: Prisma.FieldRef<"ConversationMemoryChunk", 'Int'>
+  readonly summaryReasoningText: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly summaryToolUseRaw: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
   readonly summaryProvider: Prisma.FieldRef<"ConversationMemoryChunk", 'Provider'>
-  readonly summaryPromptVersion: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly summaryPromptVersion: Prisma.FieldRef<"ConversationMemoryChunk", 'MemoryChunkSummaryPromptVersion'>
   readonly summaryTokens: Prisma.FieldRef<"ConversationMemoryChunk", 'Int'>
   readonly summaryError: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
   readonly summaryRetryCount: Prisma.FieldRef<"ConversationMemoryChunk", 'Int'>

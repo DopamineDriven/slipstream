@@ -115,12 +115,17 @@ export interface MemorySummarizerConfig {
   provider: $Enums.Provider;
   /** typed against the registry — the compiler rejects nonexistent model ids */
   model: AnthropicModelIdUnion;
-  promptVersion: string;
+  /** section-summary prompt era — the DB enum is the single source of truth */
+  promptVersion: $Enums.MemoryChunkSummaryPromptVersion;
+  /** fold prompt era — versioned independently of the section prompt */
+  foldPromptVersion: $Enums.MemoryRollingSummaryReasoningVersion;
   /** adaptive-thinking effort — a background job pays no latency tax, think hard */
   effort: "high" | "xhigh" | "max";
   maxOutputTokens: number;
   /** image url blocks attached to the summarizer call, capped — documents stay in the user store (index once, retrieve everywhere) */
   maxAttachmentBlocks: number;
+  /** hard cap on file_search round-trips per summary/fold call */
+  maxToolUseRounds: number;
   /** wave width — pending chunks dispatched as concurrent detached jobs; the drain-fold chains the next wave until the backlog is dry */
   sweepBatchSize: number;
 }

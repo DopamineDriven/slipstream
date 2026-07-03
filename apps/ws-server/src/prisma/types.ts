@@ -216,6 +216,11 @@ export interface FoldRollingSummaryParams {
   rollingSummaryModel: string;
   rollingSummaryProvider: $Enums.Provider;
   rollingSummaryTokens: number;
+  /** wall-clock ms inside adaptive-thinking blocks across the fold call */
+  rollingSummaryReasoningDuration: number;
+  rollingSummaryReasoningText: string | null;
+  rollingSummaryReasoningToolUseRaw: string | null;
+  rollingSummaryReasoningVersion: $Enums.MemoryRollingSummaryReasoningVersion;
 }
 
 export interface UpdateMemoryContextAggregatesParams {

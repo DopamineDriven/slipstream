@@ -1,4 +1,4 @@
-# --- Node/PNPM/Turbo stuff ---
+# --- node/pnpm/turbo ---
 node_modules
 .pnpm
 .pnp.*
@@ -6,7 +6,7 @@ node_modules
 package-lock.json
 .git
 
-# --- Output/Build artifacts ---
+# --- output/build artifacts ---
 dist
 build
 out
@@ -33,7 +33,7 @@ Thumbs.db
 .env.*
 !.env.example
 
-# --- Directories not needed in image ---
+# --- dirs not needed in image ---
 .certs
 .changeset
 .claude
@@ -45,11 +45,10 @@ plans
 notes
 notes.md
 
-# --- Test/CI artifacts ---
+# --- test/CI artifacts ---
 tests/
 __tests__/
 test-results/
-coverage/
 reports/
 
 # --- Docker build artifacts ---
@@ -57,13 +56,13 @@ docker-out/
 .docker/
 *.pid
 
-apps/ws-server/src/test/__out__/
+# misc
 
+apps/ws-server/src/test/__out__/
 apps/ws-server/src/__out__/
 apps/ws-server/src/tests/fixtures/
 infra/
-# --- Ignore root lockfiles if only using workspace-level lockfiles ---
-# (Uncomment if you keep only pnpm-lock.yaml in the workspace root)
-# package-lock.json
-# yarn.lock
-
+apps/ws-server/notes/
+apps/ws-server/logs/
+architectural-decisions/
+docs/

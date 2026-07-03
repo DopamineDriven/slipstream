@@ -118,7 +118,8 @@ async function exe() {
       logger,
       voyage,
       prisma,
-      anthropicSummarizer
+      anthropicSummarizer,
+      userStore
     );
 
     // boot-time backlog kick — queued summaries stranded by a restart or the

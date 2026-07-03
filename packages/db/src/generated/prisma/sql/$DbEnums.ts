@@ -22,6 +22,8 @@ export interface $DbEnums {
   MemoryChunkBoundaryReason: "MESSAGE_COUNT" | "TOKEN_LIMIT" | "IDLE_TIME" | "TOPIC_SHIFT" | "SESSION_END" | "OTHER"
   MemorySchemaVersion: "v1_0"
   MemoryTranscriptRendererVersion: "v1_0"
+  MemoryChunkSummaryPromptVersion: "v1_0"
+  MemoryRollingSummaryReasoningVersion: "v1_0"
   MessageType: "AUDIO_GEN" | "COMPUTER_USE" | "IMAGE_GEN" | "DOC_GEN" | "DEEP_RESEARCH" | "TEXT" | "VIDEO_GEN"
   SenderType: "USER" | "AI" | "SYSTEM"
   MessageBlockType: "ENCRYPTED_THINKING" | "THINKING" | "TEXT"

@@ -237,6 +237,20 @@ export const MemoryTranscriptRendererVersion = {
 export type MemoryTranscriptRendererVersion = (typeof MemoryTranscriptRendererVersion)[keyof typeof MemoryTranscriptRendererVersion]
 
 
+export const MemoryChunkSummaryPromptVersion = {
+  v1_0: 'v1_0'
+} as const
+
+export type MemoryChunkSummaryPromptVersion = (typeof MemoryChunkSummaryPromptVersion)[keyof typeof MemoryChunkSummaryPromptVersion]
+
+
+export const MemoryRollingSummaryReasoningVersion = {
+  v1_0: 'v1_0'
+} as const
+
+export type MemoryRollingSummaryReasoningVersion = (typeof MemoryRollingSummaryReasoningVersion)[keyof typeof MemoryRollingSummaryReasoningVersion]
+
+
 export const MessageType = {
   AUDIO_GEN: 'AUDIO_GEN',
   COMPUTER_USE: 'COMPUTER_USE',

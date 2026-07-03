@@ -1,3 +1,4 @@
+import type { ExtractService } from "@/extract/index.ts";
 import type {
   CreateMemoryContextParams,
   CreateMemoryStoreParams,
@@ -6,10 +7,11 @@ import type {
   UpdateMemoryContextAggregatesParams,
   UpdateMemoryStoreCountersParams
 } from "@/prisma/types.ts";
-import type { ExtractService } from "@/extract/index.ts";
-import type { PrismaDbService } from "@slipstream/db/factory";
-import type { ConversationMemoryStoreSingleton, Rm } from "@slipstream/types";
+import { PrismaConvoHydrationService } from "@/prisma/convo-hydration.ts";
 import { createId } from "@paralleldrive/cuid2";
+import type { PrismaDbService } from "@slipstream/db/factory";
+import type { $Enums } from "@slipstream/db/node/generated/client";
+import type { ConversationMemoryStoreSingleton, Rm } from "@slipstream/types";
 import {
   claimMemorySection,
   findStaleMemoryClaims,
@@ -24,7 +26,6 @@ import {
   updateMemoryChunkSummary,
   updateMemoryChunkSummaryState
 } from "@slipstream/db/sql-node";
-import { PrismaConvoHydrationService } from "@/prisma/convo-hydration.ts";
 
 /**
  * Rollback vehicle for the claim transaction — throwing is Prisma's only
@@ -91,7 +92,11 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
 
   public async updateMemoryStoreCounters(
     storeId: string,
-    { chunksDelta = 0, tokensDelta = 0, conversationsDelta = 0 }: UpdateMemoryStoreCountersParams
+    {
+      chunksDelta = 0,
+      tokensDelta = 0,
+      conversationsDelta = 0
+    }: UpdateMemoryStoreCountersParams
   ) {
     return this.memoryStoreBigIntToNum(
       await this.prismaClient.conversationMemoryStore.update({
@@ -167,7 +172,11 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
     rollingSummary,
     rollingSummaryModel,
     rollingSummaryProvider,
-    rollingSummaryTokens
+    rollingSummaryTokens,
+    rollingSummaryReasoningDuration,
+    rollingSummaryReasoningText,
+    rollingSummaryReasoningToolUseRaw,
+    rollingSummaryReasoningVersion
   }: FoldRollingSummaryParams) {
     const res = await this.prismaClient.conversationMemoryContext.updateMany({
       where: {
@@ -179,10 +188,48 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
         rollingSummaryModel,
         rollingSummaryProvider,
         rollingSummaryTokens,
-        rollingSummaryUpdatedAt: new Date(Date.now())
+        rollingSummaryUpdatedAt: new Date(Date.now()),
+        rollingSummaryState: "READY",
+        rollingSummaryReasoningDuration,
+        rollingSummaryReasoningText,
+        rollingSummaryReasoningToolUseRaw,
+        rollingSummaryReasoningVersion
       }
     });
     return res.count === 1;
+  }
+
+  /** fold-job lifecycle setter — READY lands only via foldRollingSummaryCas */
+  public async setRollingSummaryState(
+    contextId: string,
+    state: $Enums.MemorySummaryState
+  ) {
+    await this.prismaClient.conversationMemoryContext.update({
+      where: { id: contextId },
+      data: { rollingSummaryState: state }
+    });
+  }
+
+  /**
+   * The user-driven scalpel: requeue ONLY version-behind READY summaries for
+   * ONE conversation. Never bulk, never automatic — a prompt-era bump alone
+   * must not cascade state changes.
+   */
+  public async requeueStaleSummaries(
+    conversationId: string,
+    currentVersion: $Enums.MemoryChunkSummaryPromptVersion
+  ) {
+    const res = await this.prismaClient.conversationMemoryChunk.updateMany({
+      where: {
+        conversationId,
+        chunkingState: "INDEXED",
+        deletedAt: null,
+        summaryState: "READY",
+        summaryPromptVersion: { not: currentVersion }
+      },
+      data: { summaryState: "QUEUED" }
+    });
+    return res.count;
   }
 
   /**
@@ -282,7 +329,9 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
         conversationId: true,
         conversationTitle: true,
         rollingSummary: true,
-        rollingSummaryUpdatedAt: true
+        rollingSummaryUpdatedAt: true,
+        // store scoping for the summarizer's file_search executor
+        memoryStore: { select: { userId: true } }
       }
     });
   }

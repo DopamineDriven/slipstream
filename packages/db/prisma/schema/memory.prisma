@@ -31,6 +31,20 @@ enum MemoryTranscriptRendererVersion {
   v1_0
 }
 
+/// Single source of truth for summarizer prompt eras. A version bump NEVER
+/// cascades state changes — READY summaries stay READY; regeneration happens
+/// only via the user-driven per-conversation refresh.
+enum MemoryChunkSummaryPromptVersion {
+  v1_0
+}
+
+/// Fold-prompt era for the rolling summary — versioned independently of the
+/// section-summary prompt (the two calls evolve separately). Same no-cascade
+/// policy as MemoryChunkSummaryPromptVersion.
+enum MemoryRollingSummaryReasoningVersion {
+  v1_0
+}
+
 model ConversationMemoryStore {
   id     String @id @default(cuid(2))
   userId String @unique
@@ -68,6 +82,18 @@ model ConversationMemoryContext {
   rollingSummaryProvider  Provider? // Provider that last updated the rolling summary (enables model union narrowing)
   rollingSummaryTokens    Int       @default(0)
   rollingSummaryUpdatedAt DateTime?
+
+  /// fold-job lifecycle — QUEUED until the first fold; SUMMARIZING during; READY/ERROR after.
+  /// Makes a died-mid-fold process observable and reclaimable, mirroring the chunk side.
+  rollingSummaryState               MemorySummaryState @default(QUEUED)
+  /// fold-prompt era that produced the current rolling summary
+  rollingSummaryReasoningVersion    MemoryRollingSummaryReasoningVersion @default(v1_0)
+  /// wall-clock ms spent inside adaptive-thinking blocks across the fold call (stream-event timed)
+  rollingSummaryReasoningDuration   Int                @default(0)
+  /// captured thinking-block text — visibility into how the fold reaches its conclusions
+  rollingSummaryReasoningText       String?            @db.Text
+  /// JSON trace of in-house tool calls (file_search) during the fold: name, input, output per round
+  rollingSummaryReasoningToolUseRaw String?            @db.Text
 
   /// Indexing watermark: every ordinal < this value is covered by a chunk row.
   /// Advanced ONLY via the claim CAS (claimMemorySection.sql). Never cached in-process.
@@ -146,15 +172,21 @@ model ConversationMemoryChunk {
   chunkingError String?
   retryCount    Int                 @default(0)
 
-  summary              String?            @db.Text
-  summaryState         MemorySummaryState @default(QUEUED)
-  summaryModel         String?
-  summaryProvider      Provider?
-  summaryPromptVersion String?
-  summaryTokens        Int                @default(0)
-  summaryError         String?
-  summaryRetryCount    Int                @default(0)
-  summaryGeneratedAt   DateTime?
+  summary                  String?                         @db.Text
+  summaryState             MemorySummaryState              @default(QUEUED)
+  summaryModel             String?
+  /// wall-clock ms spent inside adaptive-thinking blocks across the summary call (stream-event timed)
+  summaryReasoningDuration Int                             @default(0)
+  /// captured thinking-block text — visibility into how the summarizer reaches its conclusions
+  summaryReasoningText     String?                         @db.Text
+  /// JSON trace of in-house tool calls (file_search) during summarization: name, input, output per round
+  summaryToolUseRaw        String?                         @db.Text
+  summaryProvider          Provider?
+  summaryPromptVersion     MemoryChunkSummaryPromptVersion @default(v1_0)
+  summaryTokens            Int                             @default(0)
+  summaryError             String?
+  summaryRetryCount        Int                             @default(0)
+  summaryGeneratedAt       DateTime?
 
   deletedAt DateTime?
   createdAt DateTime  @default(now())

@@ -11,6 +11,8 @@ import type {
   MemorySummarizerConfig
 } from "@/memory/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
+import type { FileSearchToolInput } from "@/store/types.ts";
+import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import type { $Enums } from "@slipstream/db/node/generated/client";
@@ -55,7 +57,9 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     voyage: VoyageEmbeddingService,
     prisma: PrismaService,
     /** rides AnthropicBaseService's battle-tested call shape — betas, adaptive thinking, ceiling clamps */
-    protected summarizer: AnthropicSummarizerService
+    protected summarizer: AnthropicSummarizerService,
+    /** the user vector store — the summarizer forages it via file_search during summary/fold calls */
+    protected userStore: UserStoreVectorService
   ) {
     super(logger, voyage, prisma);
   }
@@ -764,10 +768,12 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     return {
       provider: "ANTHROPIC",
       model: "claude-sonnet-5",
-      promptVersion: "memory-summary-v1_3",
+      promptVersion: "v1_0",
+      foldPromptVersion: "v1_0",
       effort: "xhigh",
       maxOutputTokens: 120_000,
       maxAttachmentBlocks: 12,
+      maxToolUseRounds: 4,
       sweepBatchSize: 8
     } as const satisfies MemorySummarizerConfig;
   }
@@ -779,6 +785,9 @@ What you are reading, and where it came from:
 - Transcripts are rendered by the platform from stored messages. The "ordinal. model (provider) · timestamp" headers are renderer-added name tags, not model output.
 - The system prompts on this platform are minimal — essentially just a notice that name tags exist in [provider/model] notation (Anthropic models get XML <model> wrappers instead, at their own request). There is no hidden persona engineering.
 - Therefore: any personas, mythologies, running bits, or distinctive registers you encounter were built collaboratively by the user and the models, live, inside the conversations themselves. Never attribute them to "clever system prompting" or instructions you cannot see — there are none.
+
+Tooling:
+- file_search reaches the user's uploaded archive (prior chapters, PDFs, images — the same corpus the personas themselves forage). Call it when the section references canon you cannot verify from the transcript alone: exact coined phrases, earlier chapters, provenance. Optional — never let foraging replace summarizing the transcript in front of you.
 
 Mandates for the section summary:
 - Decisions made and their rationale.
@@ -804,6 +813,7 @@ You receive the prior rolling summary (possibly empty) and one or more freshly w
 - Preserve persona names, coined phrases, running jokes, and canonical lines EXACTLY — quote them.
 - Keep message-ordinal citations, e.g. "(msgs 41-44)".
 - Let the digest grow in proportion to the conversation itself — completeness outranks brevity, and there is no word limit.
+- file_search reaches the user's uploaded archive if a canonical reference needs verification before it enters the digest. Optional.
 
 Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble, no meta-commentary.` as const;
   }
@@ -896,20 +906,115 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
     return cleaned.length > 0 ? cleaned : null;
   }
 
-  private textFromSummaryResponse(
-    response: Awaited<
-      ReturnType<AnthropicSummarizerService["streamSummaryMessage"]>
-    >
+  /** user-store file_search offered to the summarizer — same contract as the chat tool, summarizer-tuned description */
+  private get summarizerFileSearchTool(): Anthropic.Beta.BetaToolUnion {
+    return {
+      name: "file_search",
+      description:
+        "Search the user's uploaded document/image archive (their user vector store). " +
+        "Use it while summarizing to pin down canon the section references — prior chapters, coined terms, exact quotes, provenance. " +
+        "Semantic similarity by default; provide search_terms for exact-match fulltext (returns partitioned semantic + fulltext + overlap). " +
+        "Optional filename filter (fuzzy, case-insensitive). " +
+        "Foraging is optional — never let it replace summarizing the transcript in front of you.",
+      input_schema: {
+        type: "object" as const,
+        properties: {
+          query: {
+            type: "string",
+            description: "The semantic search query"
+          },
+          max_results: {
+            type: "number",
+            description: "Maximum results to return (1-10, default 5)"
+          },
+          filename: {
+            type: "string",
+            description:
+              "Optional filename filter (fuzzy, case-insensitive). Only chunks from documents whose filename closely matches are returned."
+          },
+          search_terms: {
+            type: "string",
+            description:
+              "Optional exact-match search terms for fulltext search. Supports quoted phrases and negation (-deprecated). Returns partitioned semantic + fulltext results."
+          }
+        },
+        required: ["query"]
+      }
+    } satisfies Anthropic.Beta.BetaToolUnion;
+  }
+
+  private isToolInputRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value != null && !Array.isArray(value);
+  }
+
+  /** mirror of the chat path's executeFileSearch, scoped to the summarized conversation's owner */
+  private async executeSummarizerToolCall(
+    userId: string,
+    name: string,
+    input: unknown
   ) {
-    return response.content
-      .filter(block => block.type === "text")
-      .map(block => block.text)
-      .join("\n");
+    if (name !== "file_search") {
+      throw new Error(`summarizer requested unknown tool: ${name}`);
+    }
+    if (!this.isToolInputRecord(input) || typeof input.query !== "string") {
+      throw new Error(
+        `file_search input missing "query": ${JSON.stringify(input)}`
+      );
+    }
+    const parsed = {
+      query: input.query,
+      max_results:
+        typeof input.max_results === "number" ? input.max_results : undefined,
+      filename:
+        typeof input.filename === "string"
+          ? input.filename.trim() || undefined
+          : undefined,
+      search_terms:
+        typeof input.search_terms === "string"
+          ? input.search_terms.trim() || undefined
+          : undefined
+    } satisfies FileSearchToolInput;
+    const limit = Math.min(parsed.max_results ?? 5, 10);
+
+    if (parsed.search_terms) {
+      const partitioned = await this.userStore.searchUserStoreChunksHybrid({
+        userId,
+        query: parsed.query,
+        searchTerms: parsed.search_terms,
+        limit,
+        threshold: 0,
+        filename: parsed.filename
+      });
+      return this.userStore.formatPartitionedResults(
+        partitioned,
+        parsed.query
+      );
+    }
+
+    const results = await this.userStore.searchUserStoreChunks({
+      userId,
+      query: parsed.query,
+      limit,
+      threshold: 0,
+      filename: parsed.filename
+    });
+    if (results.length === 0) return "[]";
+    return JSON.stringify(
+      results.map(r => ({
+        filename: r.filename,
+        score: r.score != null ? Number(r.score.toFixed(4)) : 0,
+        content: r.content,
+        startOffset: r.startOffset,
+        endOffset: r.endOffset,
+        chunkIndex: r.chunkIndex
+      }))
+    );
   }
 
   protected async summarizeChunk(
     chunk: MemoryChunkAwaitingSummary,
-    conversationTitle: string | null
+    conversationTitle: string | null,
+    userId: string
   ) {
     const cfg = this.memorySummarizerConfig;
     try {
@@ -920,16 +1025,18 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
       );
 
       const content = await this.buildSummaryContent(chunk, conversationTitle);
-      const response = await this.summarizer.streamSummaryMessage({
+      const result = await this.summarizer.streamSummaryMessage({
         model: cfg.model,
         maxOutputTokens: cfg.maxOutputTokens,
         effort: cfg.effort,
         system: this.summarySystemPrompt,
-        content
+        content,
+        tools: [this.summarizerFileSearchTool],
+        executeToolCall: (name, input) =>
+          this.executeSummarizerToolCall(userId, name, input),
+        maxToolUseRounds: cfg.maxToolUseRounds
       });
-      const sectionSummary = this.sanitizeSummaryOutput(
-        this.textFromSummaryResponse(response)
-      );
+      const sectionSummary = this.sanitizeSummaryOutput(result.text);
       if (!sectionSummary) throw new Error("summarizer returned empty output");
 
       const counted = await this.voyage.countTokens(
@@ -944,7 +1051,10 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
         cfg.model,
         cfg.provider,
         cfg.promptVersion,
-        counted.counts[0] ?? 0
+        counted.counts[0] ?? 0,
+        result.reasoningDuration,
+        result.reasoningText,
+        result.toolUse.length > 0 ? JSON.stringify(result.toolUse) : null
       );
 
       return true;
@@ -1007,7 +1117,12 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
         return;
       }
       const context = await this.prisma.getMemoryContextById(contextId);
-      const conversationTitle = context?.conversationTitle ?? null;
+      if (!context) {
+        this.summaryJobRegistry.delete(contextId);
+        return;
+      }
+      const conversationTitle = context.conversationTitle ?? null;
+      const userId = context.memoryStore.userId;
 
       // populate the FULL wave before any job can settle — the drain check
       // must see every sibling
@@ -1015,7 +1130,7 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
         wave.set(chunk.id, "QUEUED");
       }
       for (const chunk of pending) {
-        void this.runSummaryJob(wave, chunk, conversationTitle);
+        void this.runSummaryJob(wave, chunk, conversationTitle, userId);
       }
     } catch (err) {
       this.summaryJobRegistry.delete(contextId);
@@ -1052,11 +1167,12 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
   private async runSummaryJob(
     wave: Map<string, $Enums.MemorySummaryState>,
     chunk: MemoryChunkAwaitingSummary,
-    conversationTitle: string | null
+    conversationTitle: string | null,
+    userId: string
   ) {
     try {
       wave.set(chunk.id, "SUMMARIZING");
-      const ok = await this.summarizeChunk(chunk, conversationTitle);
+      const ok = await this.summarizeChunk(chunk, conversationTitle, userId);
       wave.set(chunk.id, ok ? "READY" : "ERROR");
     } catch (err) {
       // summarizeChunk self-catches; this guards its error-path DB write
@@ -1071,7 +1187,7 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
       );
     }
     if (!this.waveDrained(wave)) return;
-    await this.foldRollingSummaryForContext(chunk.contextId, wave);
+    await this.foldRollingSummaryForContext(chunk.contextId, wave, userId);
     // self-continuation — the sweepBatchSize cap must never strand a backlog
     // (the ordinal-57 stall); ERROR-at-cap chunks fall out of the finder, so
     // the chain terminates
@@ -1095,7 +1211,8 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
    */
   private async foldRollingSummaryForContext(
     contextId: string,
-    wave: Map<string, $Enums.MemorySummaryState>
+    wave: Map<string, $Enums.MemorySummaryState>,
+    userId: string
   ) {
     const cfg = this.memorySummarizerConfig;
     try {
@@ -1110,6 +1227,8 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
       if (!context) return;
       const sections = await this.prisma.getMemoryChunkSummariesByIds(readyIds);
       if (sections.length === 0) return;
+
+      await this.prisma.setRollingSummaryState(contextId, "SUMMARIZING");
 
       const parts = Array.of<string>();
       parts.push(
@@ -1129,16 +1248,18 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
         );
       }
 
-      const response = await this.summarizer.streamSummaryMessage({
+      const result = await this.summarizer.streamSummaryMessage({
         model: cfg.model,
         maxOutputTokens: cfg.maxOutputTokens,
         effort: cfg.effort,
         system: this.foldSystemPrompt,
-        content: [{ type: "text", text: parts.join("\n") }]
+        content: [{ type: "text", text: parts.join("\n") }],
+        tools: [this.summarizerFileSearchTool],
+        executeToolCall: (name, input) =>
+          this.executeSummarizerToolCall(userId, name, input),
+        maxToolUseRounds: cfg.maxToolUseRounds
       });
-      const folded = this.sanitizeSummaryOutput(
-        this.textFromSummaryResponse(response)
-      );
+      const folded = this.sanitizeSummaryOutput(result.text);
       if (!folded) throw new Error("fold call returned empty output");
 
       const counted = await this.voyage.countTokens(
@@ -1151,9 +1272,16 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
         rollingSummary: folded,
         rollingSummaryModel: cfg.model,
         rollingSummaryProvider: cfg.provider,
-        rollingSummaryTokens: counted.counts[0] ?? 0
+        rollingSummaryTokens: counted.counts[0] ?? 0,
+        rollingSummaryReasoningDuration: result.reasoningDuration,
+        rollingSummaryReasoningText: result.reasoningText,
+        rollingSummaryReasoningToolUseRaw:
+          result.toolUse.length > 0 ? JSON.stringify(result.toolUse) : null,
+        rollingSummaryReasoningVersion: cfg.foldPromptVersion
       });
       if (!landed) {
+        // another instance's fold landed first — its CAS write owns the
+        // READY state and the fresher digest; ours is discarded
         this.logger.info(
           { contextId, sections: sections.length },
           "rolling summary fold lost CAS — deferring to the next wave"
@@ -1164,7 +1292,35 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
         { contextId, err: this.prisma.safeErrMsg(err) },
         "rolling summary fold failed"
       );
+      await this.prisma
+        .setRollingSummaryState(contextId, "ERROR")
+        .catch((stateErr: unknown) => {
+          this.logger.debug(
+            { contextId, err: this.prisma.safeErrMsg(stateErr) },
+            "rolling summary ERROR state write failed"
+          );
+        });
     }
+  }
+
+  /**
+   * The user-driven scalpel: requeue version-behind READY summaries for ONE
+   * conversation, then dispatch a wave. Never bulk, never automatic — a
+   * prompt-era bump alone must not cascade state changes. Wire this to a
+   * user-facing event; nothing calls it on its own.
+   */
+  public async refreshConversationSummaries(
+    conversationId: string,
+    userId: string
+  ) {
+    const requeued = await this.prisma.requeueStaleSummaries(
+      conversationId,
+      this.memorySummarizerConfig.promptVersion
+    );
+    if (requeued === 0) return { requeued } as const;
+    const ensured = await this.ensureMemoryContext(conversationId, userId);
+    void this.summarizeQueuedChunks(ensured.contextId);
+    return { requeued } as const;
   }
 
   // ── Aggregates ───────────────────────────────────────────────────────
