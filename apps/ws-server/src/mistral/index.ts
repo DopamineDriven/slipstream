@@ -29,8 +29,12 @@ import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type {
   EventTypeMap,
   MessageSingleton,
-  MistralModelIdUnion
+  MistralModelIdUnion,
+  UTR
 } from "@slipstream/types";
+
+
+type MistralContentChunk = UTR<ContentChunk, "type">
 
 const MISTRAL_HISTORY_MESSAGE_LIMIT = 175;
 
@@ -87,7 +91,7 @@ function selectMistralHistoryMessages(msgs: readonly MessageSingleton<true>[]) {
     msgIndex--
   ) {
     const msg = orderedMsgs[msgIndex];
-    if (!msg || msg.provider !== "MISTRAL") continue;
+    if (!msg || msg?.provider !== "MISTRAL") continue;
     selectedIds.add(msg.id);
   }
 
@@ -202,8 +206,9 @@ export function formatMistralHistory(
                     try {
                       content.push({
                         documentUrl: url,
+                        documentName: filename,
                         type: "document_url"
-                      });
+                      } satisfies MistralContentChunk["document_url"]);
                     } catch {
                       textParts.push(`[${name}](${url})`);
                     }
@@ -221,7 +226,7 @@ export function formatMistralHistory(
                   content.push({
                     type: "image_url",
                     imageUrl: { url, detail: "high" }
-                  });
+                  } satisfies MistralContentChunk['image_url']);
                 } else {
                   textParts.push(`![${name}](${url})`);
                 }

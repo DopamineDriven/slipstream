@@ -113,7 +113,7 @@ export class ZaiService {
 
     const note =
       "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
-      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
+      "Older messages of long conversations may be omitted from your view — use the conversation_memory_search tool to access them.";
 
     return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
   }
@@ -160,7 +160,7 @@ export class ZaiService {
                   if (isFreshContext && isCurrentUserMsg) {
                     content.push({
                       type: "image_url",
-                      image_url: { url, detail: "auto" }
+                      image_url: { url, detail: "high" }
                     } satisfies ZaiImageContentPart);
                   } else {
                     textParts.push(`![${name}](${url})`);

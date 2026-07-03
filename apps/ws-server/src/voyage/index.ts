@@ -158,7 +158,7 @@ export class VoyageEmbeddingService {
 
   public async countTokens(
     texts: readonly string[],
-    model: Voyage.ModelUnion = "voyage-context-3"
+    model: Voyage.ModelUnion = "voyage-context-4"
   ) {
     const script = this.pyTokenizeScript(texts, model, this.apiKey);
 

@@ -194,7 +194,7 @@ export class KimiService {
                   if (isFreshContext && isCurrentUserMsg) {
                     content.push({
                       type: "image_url",
-                      image_url: { url, detail: "auto" }
+                      image_url: { url, detail: "high" }
                     } satisfies KimiImageContentPart);
                   } else {
                     textParts.push(`![${name}](${url})`);

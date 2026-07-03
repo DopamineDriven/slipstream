@@ -69,7 +69,7 @@ function selectAlibabaHistoryMessages(msgs: readonly MessageSingleton<true>[]) {
     msgIndex--
   ) {
     const msg = orderedMsgs[msgIndex];
-    if (!msg || msg.provider !== "ALIBABA") continue;
+    if (!msg || msg?.provider !== "ALIBABA") continue;
     selectedIds.add(msg.id);
   }
 
@@ -210,7 +210,7 @@ export class AlibabaService {
                   if (isFreshContext && isCurrentUserMsg) {
                     content.push({
                       type: "image_url",
-                      image_url: { url, detail: "auto" }
+                      image_url: { url, detail: "high" }
                     } satisfies AlibabaImageContentPart);
                   } else {
                     textParts.push(`![${name}](${url})`);

@@ -179,7 +179,7 @@ export class DeepSeekService {
                   if (isFreshContext && isCurrentUserMsg) {
                     content.push({
                       type: "image_url",
-                      image_url: { url, detail: "auto" }
+                      image_url: { url, detail: "high" }
                     } satisfies DeepSeekImageContentPart);
                   } else {
                     textParts.push(`![${name}](${url})`);
