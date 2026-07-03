@@ -140,6 +140,10 @@ export interface ConversationMemoryIndexingConfig {
   headingTokenAllowance: number;
   /** hard guard under voyage-context-4's 32k per-input limit */
   embedInputCeilingTokens: number;
+  /** ≤32k tokens per inner list (one contextualized family) — probe-verified hard cap, meter agrees with countTokens exactly */
+  familyTokenBudget: number;
+  /** ≤120k tokens per contextualizedembeddings request — probe-verified hard cap */
+  requestTokenBudget: number;
   staleClaimMinutes: number;
   /** SUMMARIZING rows older than this rejoin the retry pool — a healthy adaptive-thinking call can run several minutes, keep well above that */
   staleSummaryMinutes: number;

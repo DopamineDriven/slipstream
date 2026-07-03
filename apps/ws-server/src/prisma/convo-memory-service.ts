@@ -286,6 +286,29 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
     return res.count;
   }
 
+  /** lean packing metadata — family boundaries derive from exact stored counts; the heavy transcript column stays behind */
+  public async getMemoryChunkEmbedMeta(conversationId: string) {
+    return await this.prismaClient.conversationMemoryChunk.findMany({
+      where: { conversationId, chunkingState: "INDEXED", deletedAt: null },
+      select: {
+        id: true,
+        chunkIndex: true,
+        tokenCount: true,
+        ordinalStart: true,
+        ordinalEndExclusive: true
+      },
+      orderBy: { chunkIndex: "asc" }
+    });
+  }
+
+  /** transcript hydration for refresh members whose family is re-embedding */
+  public async getMemoryChunkTranscriptsByIds(chunkIds: string[]) {
+    return await this.prismaClient.conversationMemoryChunk.findMany({
+      where: { id: { in: chunkIds } },
+      select: { id: true, transcriptMarkdown: true }
+    });
+  }
+
   /** wave-fold input — freshly READY sections re-read in chunkIndex order (row text is the source of truth) */
   public async getMemoryChunkSummariesByIds(chunkIds: string[]) {
     return await this.prismaClient.conversationMemoryChunk.findMany({

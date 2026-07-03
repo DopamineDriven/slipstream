@@ -29,6 +29,16 @@ interface EmbedAndIndexTarget {
   retryCount: number;
 }
 
+/** one member of a contextualized embed family (an inner list on the wire) */
+interface MemoryEmbedFamilyMember extends EmbedAndIndexTarget {
+  /**
+   * true → an already-INDEXED row re-embedded purely so its vector gains the
+   * new siblings' context: vector + embeddedAt re-mint through the same
+   * sole-owner SQL, no state transition, no message backfill.
+   */
+  isRefresh: boolean;
+}
+
 export class ConversationMemoryVectorService extends ConversationMemoryWorkupService {
   /**
    * conversationId → in-flight pass. Same-instance dedup only (a saved bridge
@@ -161,7 +171,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       ensured.contextId
     );
 
-    const claimedDrafts = Array.of<MemorySectionDraft>();
+    const claimed = Array.of<{ chunkId: string; draft: MemorySectionDraft }>();
     for (const draft of drafts) {
       const claim = await this.prisma.claimAndInsertMemorySection({
         provenanceId: draft.provenanceId,
@@ -203,26 +213,18 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
         break;
       }
 
-      claimedDrafts.push(draft);
-      // embed failure leaves a reclaimable CHUNKING row inside the watermark;
-      // the chain continues — later sections claim regardless
-      await this.embedAndIndexChunk({
-        chunkId: claim.chunk.id,
-        conversationId,
-        ordinalStart: draft.ordinalStart,
-        ordinalEndExclusive: draft.ordinalEndExclusive,
-        transcriptMarkdown: draft.transcriptMarkdown,
-        tokenCount: draft.tokenCount,
-        retryCount: 0
-      });
+      claimed.push({ chunkId: claim.chunk.id, draft });
     }
 
-    if (claimedDrafts.length > 0) {
+    if (claimed.length > 0) {
+      // embed failures leave reclaimable CHUNKING rows inside the watermark;
+      // aggregates record regardless — the reclaim sweep finishes the job
+      await this.embedClaimsWithFamilyContext(conversationId, claimed);
       await this.recordPassAggregates(
         ensured,
         context.contributingProviderModelsRaw,
         context.firstMessageAt,
-        claimedDrafts,
+        claimed.map(c => c.draft),
         maxOrdinalExclusive
       );
     }
@@ -254,78 +256,250 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     return transcriptMarkdown.slice(0, keep);
   }
 
-  protected async embedAndIndexChunk(target: EmbedAndIndexTarget) {
+  /**
+   * Greedy left-to-right family packing against the 32k contextualization
+   * window — append-stable: earlier family boundaries never move as a
+   * conversation grows, so only families containing a fresh member ever
+   * need (re-)embedding. Over-ceiling members ride solo (their truncated
+   * embed input ~fills the window, leaving no meaningful sibling room).
+   * Members MUST arrive in chunkIndex/ordinal order.
+   */
+  private packEmbedFamilies(members: readonly MemoryEmbedFamilyMember[]) {
     const cfg = this.memoryIndexingConfig;
-    try {
-      await this.prisma.updateMemoryChunkStateTyped(
-        target.chunkId,
-        "EMBEDDING",
-        null,
-        false
-      );
-
-      const result = await this.voyage.embedChunksContextual({
-        inputs: [
-          [this.embedInputFor(target.transcriptMarkdown, target.tokenCount)]
-        ],
-        input_type: "document",
-        model: cfg.embeddingModel,
-        output_dimension: cfg.embeddingDim
-      });
-      if ("detail" in result) {
-        throw new Error(
-          `voyage contextual embedding error: ${this.prisma.safeErrMsg(result.detail)}`
-        );
+    const families = Array.of<MemoryEmbedFamilyMember[]>();
+    let current = Array.of<MemoryEmbedFamilyMember>();
+    let currentTokens = 0;
+    const flush = () => {
+      if (current.length > 0) {
+        families.push(current);
+        current = Array.of<MemoryEmbedFamilyMember>();
+        currentTokens = 0;
       }
-      const embedding = result.data[0]?.data[0]?.embedding;
-      if (!embedding) {
-        throw new Error("no embedding returned from contextual endpoint");
+    };
+    for (const member of members) {
+      if (member.tokenCount > cfg.embedInputCeilingTokens) {
+        flush();
+        families.push([member]);
+        continue;
       }
-
-      await this.prisma.updateMemoryChunkEmbeddingTyped(
-        target.chunkId,
-        `[${embedding.join(",")}]`
-      );
-
-      const width = target.ordinalEndExclusive - target.ordinalStart;
-      const backfilled = await this.prisma.backfillMessageChunkIds(
-        target.conversationId,
-        target.ordinalStart,
-        target.ordinalEndExclusive,
-        target.chunkId
-      );
-      if (backfilled !== width) {
-        this.logger.warn(
-          {
-            chunkId: target.chunkId,
-            conversationId: target.conversationId,
-            backfilled,
-            width
-          },
-          "memory chunk backfill count mismatch"
-        );
-      }
-      return true;
-    } catch (err) {
-      const terminal = target.retryCount + 1 >= cfg.maxEmbedRetries;
-      this.logger.warn(
-        {
-          chunkId: target.chunkId,
-          conversationId: target.conversationId,
-          retryCount: target.retryCount,
-          terminal,
-          err: this.prisma.safeErrMsg(err)
-        },
-        "memory chunk embedding failed"
-      );
-      await this.prisma.updateMemoryChunkStateTyped(
-        target.chunkId,
-        terminal ? "ERROR" : "CHUNKING",
-        this.prisma.safeErrMsg(err),
-        true
-      );
-      return false;
+      if (currentTokens + member.tokenCount > cfg.familyTokenBudget) flush();
+      current.push(member);
+      currentTokens += member.tokenCount;
     }
+    flush();
+    return families;
+  }
+
+  /**
+   * families → requests under the 120k batch cap. Exact stored counts —
+   * probe-verified that voyage's billing meter and our countTokens agree to
+   * the token, so packing runs flush against both lines. Truncated members
+   * count as the ceiling (conservative: real truncated size is ~95% of it).
+   */
+  private packEmbedRequests(families: readonly MemoryEmbedFamilyMember[][]) {
+    const cfg = this.memoryIndexingConfig;
+    const effectiveTokens = (member: MemoryEmbedFamilyMember) =>
+      Math.min(member.tokenCount, cfg.embedInputCeilingTokens);
+    const requests = Array.of<MemoryEmbedFamilyMember[][]>();
+    let current = Array.of<MemoryEmbedFamilyMember[]>();
+    let currentTokens = 0;
+    for (const family of families) {
+      const familyTokens = family.reduce(
+        (acc, member) => acc + effectiveTokens(member),
+        0
+      );
+      if (
+        currentTokens + familyTokens > cfg.requestTokenBudget &&
+        current.length > 0
+      ) {
+        requests.push(current);
+        current = Array.of<MemoryEmbedFamilyMember[]>();
+        currentTokens = 0;
+      }
+      current.push(family);
+      currentTokens += familyTokens;
+    }
+    if (current.length > 0) requests.push(current);
+    return requests;
+  }
+
+  /**
+   * One contextualized call per packed request — every member's vector is
+   * minted knowing its family siblings (the whole point of context-4;
+   * single-element inner lists are documented context-agnostic). Fresh
+   * members transition to INDEXED + message backfill; refresh members
+   * re-mint vector + embeddedAt through the same sole-owner SQL and touch
+   * nothing else. A failed request rolls its fresh members back to the
+   * reclaim pool and the loop continues — one 4XX must not strand the rest.
+   */
+  protected async embedMemoryFamilies(
+    families: readonly MemoryEmbedFamilyMember[][]
+  ) {
+    const cfg = this.memoryIndexingConfig;
+    for (const request of this.packEmbedRequests(families)) {
+      const fresh = request.flat().filter(member => !member.isRefresh);
+      try {
+        // EMBEDDING is claim-lifecycle only — refresh members stay INDEXED
+        for (const member of fresh) {
+          await this.prisma.updateMemoryChunkStateTyped(
+            member.chunkId,
+            "EMBEDDING",
+            null,
+            false
+          );
+        }
+
+        const result = await this.voyage.embedChunksContextual({
+          inputs: request.map(family =>
+            family.map(member =>
+              this.embedInputFor(member.transcriptMarkdown, member.tokenCount)
+            )
+          ),
+          input_type: "document",
+          model: cfg.embeddingModel,
+          output_dimension: cfg.embeddingDim
+        });
+        if ("detail" in result) {
+          throw new Error(
+            `voyage contextual embedding error: ${this.prisma.safeErrMsg(result.detail)}`
+          );
+        }
+
+        for (const [familyIdx, family] of request.entries()) {
+          for (const [memberIdx, member] of family.entries()) {
+            const embedding =
+              result.data[familyIdx]?.data[memberIdx]?.embedding;
+            if (!embedding) {
+              throw new Error(
+                `no embedding at [${familyIdx}][${memberIdx}] from contextual endpoint`
+              );
+            }
+            await this.prisma.updateMemoryChunkEmbeddingTyped(
+              member.chunkId,
+              `[${embedding.join(",")}]`
+            );
+            if (member.isRefresh) continue;
+
+            const width = member.ordinalEndExclusive - member.ordinalStart;
+            const backfilled = await this.prisma.backfillMessageChunkIds(
+              member.conversationId,
+              member.ordinalStart,
+              member.ordinalEndExclusive,
+              member.chunkId
+            );
+            if (backfilled !== width) {
+              this.logger.warn(
+                {
+                  chunkId: member.chunkId,
+                  conversationId: member.conversationId,
+                  backfilled,
+                  width
+                },
+                "memory chunk backfill count mismatch"
+              );
+            }
+          }
+        }
+      } catch (err) {
+        // fresh members roll back to reclaimable CHUNKING (or terminal
+        // ERROR); refresh members keep their prior vector — stale context,
+        // never data loss
+        for (const member of fresh) {
+          const terminal = member.retryCount + 1 >= cfg.maxEmbedRetries;
+          this.logger.warn(
+            {
+              chunkId: member.chunkId,
+              conversationId: member.conversationId,
+              retryCount: member.retryCount,
+              terminal,
+              err: this.prisma.safeErrMsg(err)
+            },
+            "memory family embedding failed"
+          );
+          await this.prisma.updateMemoryChunkStateTyped(
+            member.chunkId,
+            terminal ? "ERROR" : "CHUNKING",
+            this.prisma.safeErrMsg(err),
+            true
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * Family assembly for a pass: the conversation's existing INDEXED chunks
+   * join the packing (lean metadata only) so fresh claims embed beside
+   * their predecessors, then only families containing a fresh member are
+   * (re-)embedded — packing is append-stable, so every other family's
+   * vectors are already contextually correct. Refresh members' transcripts
+   * hydrate lazily, only for families that actually re-embed.
+   */
+  private async embedClaimsWithFamilyContext(
+    conversationId: string,
+    claimed: readonly { chunkId: string; draft: MemorySectionDraft }[]
+  ) {
+    const existing = await this.prisma.getMemoryChunkEmbedMeta(conversationId);
+    const claimedIds = new Set(claimed.map(c => c.chunkId));
+
+    const members = Array.of<MemoryEmbedFamilyMember>();
+    for (const row of existing) {
+      if (claimedIds.has(row.id)) continue;
+      members.push({
+        chunkId: row.id,
+        conversationId,
+        ordinalStart: row.ordinalStart,
+        ordinalEndExclusive: row.ordinalEndExclusive,
+        transcriptMarkdown: "",
+        tokenCount: row.tokenCount,
+        retryCount: 0,
+        isRefresh: true
+      });
+    }
+    for (const { chunkId, draft } of claimed) {
+      members.push({
+        chunkId,
+        conversationId,
+        ordinalStart: draft.ordinalStart,
+        ordinalEndExclusive: draft.ordinalEndExclusive,
+        transcriptMarkdown: draft.transcriptMarkdown,
+        tokenCount: draft.tokenCount,
+        retryCount: 0,
+        isRefresh: false
+      });
+    }
+    // ordinal order == chunkIndex order — the watermark chain guarantees it
+    members.sort((a, b) => a.ordinalStart - b.ordinalStart);
+
+    const families = this.packEmbedFamilies(members).filter(family =>
+      family.some(member => !member.isRefresh)
+    );
+    if (families.length === 0) return;
+
+    const refreshIds = families
+      .flat()
+      .filter(member => member.isRefresh)
+      .map(member => member.chunkId);
+    if (refreshIds.length > 0) {
+      const transcripts =
+        await this.prisma.getMemoryChunkTranscriptsByIds(refreshIds);
+      const byId = new Map(transcripts.map(t => [t.id, t.transcriptMarkdown]));
+      for (const family of families) {
+        for (const member of family) {
+          if (!member.isRefresh) continue;
+          member.transcriptMarkdown = byId.get(member.chunkId) ?? "";
+        }
+      }
+    }
+    // a refresh member that failed to hydrate would corrupt its family's
+    // context — drop it rather than embed an empty string
+    const hydrated = families.map(family =>
+      family.filter(
+        member => !member.isRefresh || member.transcriptMarkdown.length > 0
+      )
+    );
+
+    await this.embedMemoryFamilies(hydrated);
   }
 
   // ── Reclaim (crash recovery — re-embed stored transcripts, never re-partition) ─
@@ -343,16 +517,29 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       { storeId, staleCount: stale.length },
       "reclaiming stale memory claims"
     );
+    // same family path as the pass, grouped per conversation — stale rows
+    // are usually adjacent sections from one crashed pass, so packing just
+    // them recovers most of the sibling context without extra hydration
+    const byConversation = new Map<string, MemoryEmbedFamilyMember[]>();
     for (const row of stale) {
-      await this.embedAndIndexChunk({
+      const member = {
         chunkId: row.id,
         conversationId: row.conversationId,
         ordinalStart: row.ordinalStart,
         ordinalEndExclusive: row.ordinalEndExclusive,
         transcriptMarkdown: row.transcriptMarkdown,
         tokenCount: row.tokenCount,
-        retryCount: row.retryCount
-      });
+        retryCount: row.retryCount,
+        isRefresh: false
+      } satisfies MemoryEmbedFamilyMember;
+      const existing = byConversation.get(row.conversationId);
+      existing
+        ? existing.push(member)
+        : byConversation.set(row.conversationId, [member]);
+    }
+    for (const members of byConversation.values()) {
+      members.sort((a, b) => a.ordinalStart - b.ordinalStart);
+      await this.embedMemoryFamilies(this.packEmbedFamilies(members));
     }
   }
 
