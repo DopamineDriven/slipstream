@@ -157,15 +157,15 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       description:
         "Search the user's indexed conversation history — the same 'Partitioned Foraging' contract as file_search, " +
         "but the territory is past conversation sections instead of uploaded documents. " +
-        "Sections are ~8k-token transcript slices with model-written technical summaries; " +
-        "summary keyword hits outrank raw transcript hits in the fulltext lane. " +
+        "Sections are ~8k-token transcript slices of firsthand conversation history; " +
+        "an invisible summary layer boosts fulltext ranking for conceptual keywords. " +
         "Semantic similarity by default; when search_terms is provided, also performs fulltext keyword search and returns " +
         "{ semantic_results, fulltext_results, overlap_results, metadata } with Jaccard overlap. " +
         "scope: 'current_conversation' (default) reaches this conversation's older indexed sections — useful when " +
         "context has been compacted or the thread is long; 'all_conversations' reaches the user's entire history — " +
         "results carry conversation_id + conversation_title so you can cite where a memory came from " +
         "(e.g. \"in 'Expansio', messages 40-58\"). Sections are keyed by 0-based message ordinal ranges [start, end). " +
-        "Results return summaries + short excerpts by default; expand a specific hit with conversation_memory_get_chunk.",
+        "Results return firsthand transcript excerpts; expand a specific hit with conversation_memory_get_chunk.",
       input_schema: {
         type: "object" as const,
         properties: {
@@ -177,8 +177,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
             type: "string",
             description:
               "Optional exact-match search terms for the fulltext lane. " +
-              "Supports quoted phrases and negation (-deprecated). " +
-              "Summary hits are weighted above transcript hits."
+              "Supports quoted phrases and negation (-deprecated)."
           },
           scope: {
             type: "string",
@@ -193,12 +192,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
           threshold: {
             type: "number",
             description: "Cosine similarity floor for the semantic lane (default 0)"
-          },
-          include_transcript: {
-            type: "boolean",
-            description:
-              "Return full section transcripts inline (default false — summaries + excerpts; " +
-              "prefer conversation_memory_get_chunk to expand one hit)"
           }
         },
         required: ["query"]
@@ -215,7 +208,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
         "or by conversation_id + ordinal (the section covering that 0-based message ordinal). " +
         "direction walks to the adjacent previous/next section in the same conversation — " +
         "search finds the doorway, traversal walks the room. " +
-        "Returns the full transcript + summary by default, plus has_previous/has_next for further traversal.",
+        "Returns the full firsthand transcript plus previous/next section refs for onward traversal.",
       input_schema: {
         type: "object" as const,
         properties: {
@@ -237,10 +230,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
             enum: ["previous", "next"],
             description:
               "Optional: return the adjacent section instead of the resolved one"
-          },
-          include_transcript: {
-            type: "boolean",
-            description: "Include the full transcript (default true)"
           }
         }
       }

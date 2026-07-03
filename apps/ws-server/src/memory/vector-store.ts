@@ -373,8 +373,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       max_results:
         typeof parsed.max_results === "number" ? parsed.max_results : undefined,
       threshold:
-        typeof parsed.threshold === "number" ? parsed.threshold : undefined,
-      include_transcript: parsed.include_transcript === true
+        typeof parsed.threshold === "number" ? parsed.threshold : undefined
     } satisfies ConversationMemorySearchToolInput;
   }
 
@@ -383,14 +382,12 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       parsed.direction === "previous" || parsed.direction === "next"
         ? parsed.direction
         : undefined;
-    const includeTranscript = parsed.include_transcript !== false;
 
     if ("chunk_id" in parsed && typeof parsed.chunk_id === "string") {
       return {
         mode: "by_id",
         chunkId: parsed.chunk_id,
-        direction,
-        includeTranscript
+        direction
       } as const satisfies ConversationMemoryGetChunkTarget;
     }
     if (
@@ -402,8 +399,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
         mode: "by_ordinal",
         conversationId: parsed.conversation_id,
         ordinal: parsed.ordinal,
-        direction,
-        includeTranscript
+        direction
       } as const satisfies ConversationMemoryGetChunkTarget;
     }
     throw new Error(
@@ -509,8 +505,8 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
 
   private memoryExcerpt(transcriptMarkdown: string | null) {
     const text = transcriptMarkdown ?? "";
-    if (text.length <= 600) return text;
-    return `${text.slice(0, 600)} …[truncated — expand via conversation_memory_get_chunk]`;
+    if (text.length <= 1200) return text;
+    return `${text.slice(0, 1200)} …[truncated — expand via conversation_memory_get_chunk]`;
   }
 
   private formatMemoryResults(
@@ -567,13 +563,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       chunk_index: r.chunkIndex,
       ordinal_start: r.ordinalStart,
       ordinal_end_exclusive: r.ordinalEndExclusive,
-      summary: r.summary,
-      transcript: input.include_transcript
-        ? (r.transcriptMarkdown ?? "")
-        : undefined,
-      excerpt: input.include_transcript
-        ? undefined
-        : this.memoryExcerpt(r.transcriptMarkdown),
+      excerpt: this.memoryExcerpt(r.transcriptMarkdown),
       token_count: r.tokenCount,
       message_timestamp_start: r.messageTimestampStart?.toISOString() ?? null,
       message_timestamp_end: r.messageTimestampEnd?.toISOString() ?? null,
@@ -625,7 +615,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
           );
 
     // storeId check doubles as the cross-user guard for hallucinated chunk ids
-    if (!base || base.storeId !== store.id || base.deletedAt != null) {
+    if (!base || base?.storeId !== store.id || base.deletedAt != null) {
       return JSON.stringify({ found: false, reason: "section not found" });
     }
 
@@ -652,13 +642,35 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       resolved = neighbor;
     }
 
-    const [conversationTitle, next] = await Promise.all([
+    const [conversationTitle, previous, next] = await Promise.all([
       this.prisma.getConversationTitle(resolved.conversationId),
+      resolved.chunkIndex > 0
+        ? this.prisma.findMemoryChunkByIndex(
+            resolved.contextId,
+            resolved.chunkIndex - 1
+          )
+        : Promise.resolve(null),
       this.prisma.findMemoryChunkByIndex(
         resolved.contextId,
         resolved.chunkIndex + 1
       )
     ]);
+
+    // refs, not summaries — the neighbor's substance stays one deliberate call away
+    const neighborRef = (
+      neighbor: {
+        id: string;
+        ordinalStart: number;
+        ordinalEndExclusive: number;
+      } | null
+    ) =>
+      neighbor
+        ? {
+            chunk_id: neighbor.id,
+            ordinal_start: neighbor.ordinalStart,
+            ordinal_end_exclusive: neighbor.ordinalEndExclusive
+          }
+        : null;
 
     return JSON.stringify({
       found: true,
@@ -676,13 +688,9 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       attachment_provenance_ids: resolved.attachmentProvenanceIdsRaw,
       message_timestamp_start: resolved.messageTimestampStart.toISOString(),
       message_timestamp_end: resolved.messageTimestampEnd.toISOString(),
-      summary: resolved.summary,
-      summary_state: resolved.summaryState,
-      transcript: target.includeTranscript
-        ? resolved.transcriptMarkdown
-        : undefined,
-      has_previous: resolved.chunkIndex > 0,
-      has_next: next != null
+      transcript: resolved.transcriptMarkdown,
+      previous: neighborRef(previous),
+      next: neighborRef(next)
     });
   }
 
@@ -753,8 +761,8 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       provider: "ANTHROPIC",
       model: "claude-sonnet-5",
       promptVersion: "memory-summary-v1_1",
-      maxOutputTokens: 3_000,
-      maxAttachmentBlocks: 8,
+      maxOutputTokens: 120_000,
+      maxAttachmentBlocks: 12,
       sweepBatchSize: 8
     } as const satisfies MemorySummarizerConfig;
   }
@@ -818,6 +826,10 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
     const blocks = Array.of<Anthropic.Messages.ContentBlockParam>();
     if (attachmentIds.length === 0) return blocks;
 
+    // images only — documents already live in the user store via the pdfdown
+    // pipeline (index once, retrieve everywhere; file_search + filename filter
+    // reaches them). The summarizer's vision pass gives images a text-lane
+    // retrieval path while multimodal embedding retrieval finds its voice.
     const attachments = await this.prisma.findAttachmentsByIds(attachmentIds);
     for (const att of attachments) {
       if (blocks.length >= cfg.maxAttachmentBlocks) break;
@@ -829,11 +841,6 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
       if (isImage) {
         blocks.push({
           type: "image",
-          source: { type: "url", url: resolved.url }
-        });
-      } else if (resolved.mime === "application/pdf") {
-        blocks.push({
-          type: "document",
           source: { type: "url", url: resolved.url }
         });
       }
@@ -907,12 +914,16 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
       }
 
       const content = await this.buildSummaryContent(chunk, context);
-      const response = await this.summarizerClient.messages.create({
-        model: cfg.model,
-        max_tokens: cfg.maxOutputTokens,
-        system: this.summarySystemPrompt,
-        messages: [{ role: "user", content }]
-      });
+      // streaming-accumulate: the SDK refuses non-streaming calls whose
+      // max_tokens implies exceeding its timeout — 120k output demands a stream
+      const response = await this.summarizerClient.messages
+        .stream({
+          model: cfg.model,
+          max_tokens: cfg.maxOutputTokens,
+          system: this.summarySystemPrompt,
+          messages: [{ role: "user", content }]
+        })
+        .finalMessage();
       const raw = response.content
         .filter(block => block.type === "text")
         .map(block => block.text)

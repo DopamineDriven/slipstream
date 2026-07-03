@@ -88,7 +88,6 @@ export interface ConversationMemorySearchToolInput {
   scope?: ConversationMemorySearchScope;
   max_results?: number;
   threshold?: number;
-  include_transcript?: boolean;
 }
 
 /** discriminated at parse time — the caller picks the lookup, no downstream narrowing */
@@ -97,14 +96,12 @@ export type ConversationMemoryGetChunkTarget =
       readonly mode: "by_id";
       readonly chunkId: string;
       readonly direction?: "previous" | "next";
-      readonly includeTranscript: boolean;
     }
   | {
       readonly mode: "by_ordinal";
       readonly conversationId: string;
       readonly ordinal: number;
       readonly direction?: "previous" | "next";
-      readonly includeTranscript: boolean;
     };
 
 export interface MemoryCompactionConfig {
@@ -121,7 +118,7 @@ export interface MemorySummarizerConfig {
   model: AnthropicModelIdUnion;
   promptVersion: string;
   maxOutputTokens: number;
-  /** image/document url blocks attached to the summarizer call, capped */
+  /** image url blocks attached to the summarizer call, capped — documents stay in the user store (index once, retrieve everywhere) */
   maxAttachmentBlocks: number;
   /** chunks summarized per sweep (chunkIndex order; remainder waits for the next tick) */
   sweepBatchSize: number;

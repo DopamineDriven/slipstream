@@ -793,8 +793,8 @@ export class GeminiWorkupService extends FileSearchStoreService {
       name: "conversation_memory_search",
       description:
         "Search the user's indexed conversation history — older sections of this conversation and other conversations. " +
-        "Sections are ~8k-token transcript slices with model-written technical summaries; summary keyword hits outrank " +
-        "raw transcript hits in the fulltext lane. Semantic similarity by default; when search_terms is provided, also " +
+        "Sections are ~8k-token transcript slices of firsthand conversation history; an invisible summary layer boosts " +
+        "fulltext ranking for conceptual keywords. Semantic similarity by default; when search_terms is provided, also " +
         "performs fulltext keyword search and returns { semantic_results, fulltext_results, overlap_results, metadata }. " +
         "scope 'current_conversation' (default) reaches this conversation's older indexed sections — including messages " +
         "beyond your context window; 'all_conversations' reaches the user's entire history, with conversation_id + " +
@@ -826,11 +826,6 @@ export class GeminiWorkupService extends FileSearchStoreService {
             type: Type.NUMBER,
             description:
               "Cosine similarity floor for the semantic lane (default 0)"
-          },
-          include_transcript: {
-            type: Type.BOOLEAN,
-            description:
-              "Return full section transcripts inline (default false — summaries + excerpts)"
           }
         },
         required: ["query"]
@@ -845,7 +840,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
         "Fetch one indexed conversation-memory section in full: by chunk_id (from a conversation_memory_search hit), " +
         "or by conversation_id + ordinal (the section covering that 0-based message ordinal). " +
         "direction walks to the adjacent previous/next section — search finds the doorway, traversal walks the room. " +
-        "Returns the full transcript + summary by default, plus has_previous/has_next.",
+        "Returns the full firsthand transcript plus previous/next section refs for onward traversal.",
       parameters: {
         type: Type.OBJECT,
         properties: {
@@ -867,10 +862,6 @@ export class GeminiWorkupService extends FileSearchStoreService {
             enum: ["previous", "next"],
             description:
               "Optional: return the adjacent section instead of the resolved one"
-          },
-          include_transcript: {
-            type: Type.BOOLEAN,
-            description: "Include the full transcript (default true)"
           }
         }
       }
