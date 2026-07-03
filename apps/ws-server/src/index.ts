@@ -121,6 +121,10 @@ async function exe() {
       anthropicSummarizer
     );
 
+    // boot-time backlog kick — queued summaries stranded by a restart or the
+    // sweepBatchSize cap regenerate without waiting for a conversation tick
+    void memory.resumeSummaryBacklog();
+
     const { xAIService } = await import("@/xai/index.ts");
 
     const xai = new xAIService(

@@ -13,6 +13,7 @@ import type {
 import type { PrismaService } from "@/prisma/index.ts";
 import type { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import { ConversationMemoryWorkupService } from "@/memory/workup.ts";
 
 interface EmbedAndIndexTarget {
@@ -34,8 +35,20 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
    */
   protected indexingInFlight = new Map<string, Promise<void>>();
 
-  /** contextId → in-flight summary sweep; delete-on-settle */
-  protected summarizingInFlight = new Map<string, Promise<void>>();
+  /**
+   * contextId → one Map per dispatched wave: chunkId → summaryState.
+   * Stash'n'dash job registry (xai pollDocumentIndexing lineage) — each
+   * pending chunk's summary is a detached concurrent job self-reporting
+   * here. Terminal states are RETAINED, not deleted-on-settle: the drain
+   * check ("no QUEUED/SUMMARIZING left") depends on them, and the next wave
+   * replaces the inner map wholesale. Sanctioned deviation from the registry
+   * lifecycle rules — bounded by sweepBatchSize, background path only,
+   * never consulted in place of the DB.
+   */
+  protected summaryJobRegistry = new Map<
+    string,
+    Map<string, $Enums.MemorySummaryState>
+  >();
 
   constructor(
     logger: LoggerService,
@@ -751,7 +764,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     return {
       provider: "ANTHROPIC",
       model: "claude-sonnet-5",
-      promptVersion: "memory-summary-v1_2",
+      promptVersion: "memory-summary-v1_3",
       effort: "xhigh",
       maxOutputTokens: 120_000,
       maxAttachmentBlocks: 12,
@@ -778,13 +791,21 @@ Mandates for the section summary:
 - If attachments are provided, note concretely what each shows.
 - No preamble, no meta-commentary — every sentence carries retrieval value.
 
-Output EXACTLY two tagged blocks and nothing else:
-<section_summary>
-Rich summary of THIS section per the mandates.
-</section_summary>
-<rolling_summary>
-Updated whole-conversation digest: fold the prior rolling summary together with this section. Preserve earlier decisions, corrections, and canonical creative material; compress only what has been superseded. Let its length grow in proportion to the conversation itself — completeness outranks brevity, and there is no word limit.
-</rolling_summary>` as const;
+Output ONLY the section summary per the mandates — plain markdown, no wrapper tags, no preamble.` as const;
+  }
+
+  private get foldSystemPrompt() {
+    return `You are the rolling-summary folder for a multi-provider AI chat platform's conversation memory. You maintain the whole-conversation digest that future searches and future model turns rely on.
+
+You receive the prior rolling summary (possibly empty) and one or more freshly written section summaries, in conversation order. Fold them into ONE updated digest.
+
+- Preserve earlier decisions, corrections, and canonical creative material; compress only what has been superseded.
+- Corrections the user issued outrank everything else.
+- Preserve persona names, coined phrases, running jokes, and canonical lines EXACTLY — quote them.
+- Keep message-ordinal citations, e.g. "(msgs 41-44)".
+- Let the digest grow in proportion to the conversation itself — completeness outranks brevity, and there is no word limit.
+
+Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble, no meta-commentary.` as const;
   }
 
   private get anthropicImageMimes() {
@@ -840,18 +861,11 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
 
   private async buildSummaryContent(
     chunk: MemoryChunkAwaitingSummary,
-    context: {
-      conversationTitle: string | null;
-      rollingSummary: string | null;
-    }
+    conversationTitle: string | null
   ) {
     const preamble = [
-      `Conversation: ${context.conversationTitle ?? "Untitled Conversation"}`,
+      `Conversation: ${conversationTitle ?? "Untitled Conversation"}`,
       `Section: messages [${chunk.ordinalStart}, ${chunk.ordinalEndExclusive}) · chunkIndex ${chunk.chunkIndex}`,
-      ``,
-      `Prior rolling summary:`,
-      context.rollingSummary ??
-        "(none yet — this is the first summarized section)",
       ``,
       `Section transcript:`,
       chunk.transcriptMarkdown
@@ -869,35 +883,34 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
     return blocks;
   }
 
-  private parseSummaryOutput(raw: string) {
-    const section = /<section_summary>([\s\S]*?)<\/section_summary>/
-      .exec(raw)?.[1]
-      ?.trim();
-    const rolling = /<rolling_summary>([\s\S]*?)<\/rolling_summary>/
-      .exec(raw)?.[1]
-      ?.trim();
-    if (section && section.length > 0) {
-      return {
-        sectionSummary: section,
-        rollingSummary: rolling && rolling.length > 0 ? rolling : null
-      } as const;
-    }
-    // tag-noncompliant output: salvage a well-formed rolling block if present,
-    // strip any stray/unclosed tags, and treat the remainder as the section
-    // summary — never discard a parseable fold (the v1_1-era bug)
-    const remainder = raw
-      .replace(/<rolling_summary>[\s\S]*?<\/rolling_summary>/g, "")
+  /**
+   * v1_3 calls are single-purpose and tag-free; stray tags from habit-formed
+   * models and NUL bytes are stripped defensively. Null = unusable output.
+   */
+  private sanitizeSummaryOutput(raw: string) {
+    const cleaned = raw
       .replace(/<\/?section_summary>/g, "")
       .replace(/<\/?rolling_summary>/g, "")
+      .replace(/\0/g, "")
       .trim();
-    if (remainder.length === 0) return null;
-    return {
-      sectionSummary: remainder,
-      rollingSummary: rolling && rolling.length > 0 ? rolling : null
-    } as const;
+    return cleaned.length > 0 ? cleaned : null;
   }
 
-  protected async summarizeChunk(chunk: MemoryChunkAwaitingSummary) {
+  private textFromSummaryResponse(
+    response: Awaited<
+      ReturnType<AnthropicSummarizerService["streamSummaryMessage"]>
+    >
+  ) {
+    return response.content
+      .filter(block => block.type === "text")
+      .map(block => block.text)
+      .join("\n");
+  }
+
+  protected async summarizeChunk(
+    chunk: MemoryChunkAwaitingSummary,
+    conversationTitle: string | null
+  ) {
     const cfg = this.memorySummarizerConfig;
     try {
       await this.prisma.updateMemoryChunkSummaryStateTyped(
@@ -906,13 +919,7 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
         null
       );
 
-      // fresh read — the rolling summary + its CAS timestamp move under us
-      const context = await this.prisma.getMemoryContextById(chunk.contextId);
-      if (!context) {
-        throw new Error(`memory context ${chunk.contextId} missing`);
-      }
-
-      const content = await this.buildSummaryContent(chunk, context);
+      const content = await this.buildSummaryContent(chunk, conversationTitle);
       const response = await this.summarizer.streamSummaryMessage({
         model: cfg.model,
         maxOutputTokens: cfg.maxOutputTokens,
@@ -920,18 +927,13 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
         system: this.summarySystemPrompt,
         content
       });
-      const raw = response.content
-        .filter(block => block.type === "text")
-        .map(block => block.text)
-        .join("\n");
+      const sectionSummary = this.sanitizeSummaryOutput(
+        this.textFromSummaryResponse(response)
+      );
+      if (!sectionSummary) throw new Error("summarizer returned empty output");
 
-      const parsed = this.parseSummaryOutput(raw);
-      if (!parsed) throw new Error("summarizer returned empty output");
-
-      const sectionSummary = parsed.sectionSummary.replace(/\0/g, "");
-      const rollingSummary = parsed.rollingSummary?.replace(/\0/g, "") ?? null;
       const counted = await this.voyage.countTokens(
-        rollingSummary ? [sectionSummary, rollingSummary] : [sectionSummary],
+        [sectionSummary],
         this.memoryIndexingConfig.embeddingModel
       );
 
@@ -945,24 +947,6 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
         counted.counts[0] ?? 0
       );
 
-      if (rollingSummary) {
-        const folded = await this.prisma.foldRollingSummaryCas({
-          contextId: chunk.contextId,
-          expectedRollingSummaryUpdatedAt: context.rollingSummaryUpdatedAt,
-          rollingSummary,
-          rollingSummaryModel: cfg.model,
-          rollingSummaryProvider: cfg.provider,
-          rollingSummaryTokens: counted.counts[1] ?? 0
-        });
-        if (!folded) {
-          // our rolling output embedded a stale prior — skip; the next
-          // chunk's fold reads the newer state and converges
-          this.logger.info(
-            { contextId: chunk.contextId, chunkId: chunk.id },
-            "rolling summary fold lost CAS — deferring to next fold"
-          );
-        }
-      }
       return true;
     } catch (err) {
       const terminal =
@@ -989,33 +973,197 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
     }
   }
 
-  /** never rejects — gated per context, sequential in chunkIndex order */
-  public summarizeQueuedChunks(contextId: string) {
-    const inFlight = this.summarizingInFlight.get(contextId);
-    if (inFlight) return inFlight;
+  /**
+   * Stash'n'dash wave dispatch (the xai pollDocumentIndexing pattern): every
+   * pending chunk becomes a detached per-chunk job — section summaries have
+   * zero cross-chunk dependency, so they run concurrently. Only the rolling
+   * fold is order-sensitive; it runs ONCE when the wave drains. Never rejects.
+   *
+   * The synchronous registry set is the dispatch claim — a re-entrant call
+   * sees an undrained wave and returns. A drained wave is replaced wholesale
+   * (one new Map per job wave; the DB owns terminal history).
+   */
+  public async summarizeQueuedChunks(contextId: string) {
+    const existing = this.summaryJobRegistry.get(contextId);
+    if (existing && !this.waveDrained(existing)) return;
 
-    const sweep = this.runSummarySweep(contextId)
-      .catch((err: unknown) => {
-        this.logger.warn(
-          { contextId, err: this.prisma.safeErrMsg(err) },
-          "memory summary sweep failed"
-        );
-      })
-      .finally(() => {
-        this.summarizingInFlight.delete(contextId);
-      });
-    this.summarizingInFlight.set(contextId, sweep);
-    return sweep;
+    const wave = new Map<string, $Enums.MemorySummaryState>();
+    this.summaryJobRegistry.set(contextId, wave);
+    try {
+      // a process killed mid-call strands SUMMARIZING rows — fold them back
+      // into the retry pool once they exceed the stale threshold
+      await this.prisma.reclaimStaleSummaryClaims(
+        contextId,
+        this.memoryIndexingConfig.staleSummaryMinutes
+      );
+      const pending = await this.prisma.findChunksAwaitingSummary(
+        contextId,
+        this.memoryIndexingConfig.maxSummaryRetries,
+        this.memorySummarizerConfig.sweepBatchSize
+      );
+      if (pending.length === 0) {
+        // release the claim — an empty wave never drains and would wedge the context
+        this.summaryJobRegistry.delete(contextId);
+        return;
+      }
+      const context = await this.prisma.getMemoryContextById(contextId);
+      const conversationTitle = context?.conversationTitle ?? null;
+
+      // populate the FULL wave before any job can settle — the drain check
+      // must see every sibling
+      for (const chunk of pending) {
+        wave.set(chunk.id, "QUEUED");
+      }
+      for (const chunk of pending) {
+        void this.runSummaryJob(wave, chunk, conversationTitle);
+      }
+    } catch (err) {
+      this.summaryJobRegistry.delete(contextId);
+      this.logger.warn(
+        { contextId, err: this.prisma.safeErrMsg(err) },
+        "memory summary wave dispatch failed"
+      );
+    }
   }
 
-  private async runSummarySweep(contextId: string) {
-    const pending = await this.prisma.findChunksAwaitingSummary(
-      contextId,
-      this.memoryIndexingConfig.maxSummaryRetries,
-      this.memorySummarizerConfig.sweepBatchSize
-    );
-    for (const chunk of pending) {
-      await this.summarizeChunk(chunk);
+  /** boot-time kick — requeued/backlogged conversations regenerate without waiting for a conversation tick */
+  public async resumeSummaryBacklog() {
+    try {
+      const contexts = await this.prisma.findContextsWithPendingSummaries(
+        this.memoryIndexingConfig.maxSummaryRetries
+      );
+      if (contexts.length === 0) return;
+      this.logger.info(
+        { contexts: contexts.length },
+        "resuming summary backlog"
+      );
+      for (const { contextId } of contexts) {
+        void this.summarizeQueuedChunks(contextId);
+      }
+    } catch (err) {
+      this.logger.warn(
+        { err: this.prisma.safeErrMsg(err) },
+        "summary backlog resume failed"
+      );
+    }
+  }
+
+  /** detached per-chunk job — never rejects; the last settler folds, then chains the next wave */
+  private async runSummaryJob(
+    wave: Map<string, $Enums.MemorySummaryState>,
+    chunk: MemoryChunkAwaitingSummary,
+    conversationTitle: string | null
+  ) {
+    try {
+      wave.set(chunk.id, "SUMMARIZING");
+      const ok = await this.summarizeChunk(chunk, conversationTitle);
+      wave.set(chunk.id, ok ? "READY" : "ERROR");
+    } catch (err) {
+      // summarizeChunk self-catches; this guards its error-path DB write
+      wave.set(chunk.id, "ERROR");
+      this.logger.warn(
+        {
+          chunkId: chunk.id,
+          contextId: chunk.contextId,
+          err: this.prisma.safeErrMsg(err)
+        },
+        "memory summary job crashed outside summarizeChunk"
+      );
+    }
+    if (!this.waveDrained(wave)) return;
+    await this.foldRollingSummaryForContext(chunk.contextId, wave);
+    // self-continuation — the sweepBatchSize cap must never strand a backlog
+    // (the ordinal-57 stall); ERROR-at-cap chunks fall out of the finder, so
+    // the chain terminates
+    void this.summarizeQueuedChunks(chunk.contextId);
+  }
+
+  /** a wave with no live jobs left; empty = a dispatch claim mid-populate, NOT drained */
+  private waveDrained(wave: Map<string, $Enums.MemorySummaryState>) {
+    if (wave.size === 0) return false;
+    for (const state of wave.values()) {
+      if (state === "QUEUED" || state === "SUMMARIZING") return false;
+    }
+    return true;
+  }
+
+  /**
+   * Wave-drain fold: ONE model call folds the wave's READY sections (re-read
+   * from the DB in chunkIndex order — row text is the source of truth, never
+   * the registry) into the rolling summary. CAS-guarded; a lost cross-instance
+   * race logs and defers, matching the sequential design's guarantee.
+   */
+  private async foldRollingSummaryForContext(
+    contextId: string,
+    wave: Map<string, $Enums.MemorySummaryState>
+  ) {
+    const cfg = this.memorySummarizerConfig;
+    try {
+      const readyIds = Array.of<string>();
+      for (const [chunkId, state] of wave) {
+        if (state === "READY") readyIds.push(chunkId);
+      }
+      if (readyIds.length === 0) return;
+
+      // fresh read — the CAS expectation must be current, not dispatch-era
+      const context = await this.prisma.getMemoryContextById(contextId);
+      if (!context) return;
+      const sections = await this.prisma.getMemoryChunkSummariesByIds(readyIds);
+      if (sections.length === 0) return;
+
+      const parts = Array.of<string>();
+      parts.push(
+        `Conversation: ${context.conversationTitle ?? "Untitled Conversation"}`,
+        ``,
+        `Prior rolling summary:`,
+        context.rollingSummary ?? "(none yet — this is the first fold)",
+        ``,
+        `New section summaries, in conversation order:`
+      );
+      for (const section of sections) {
+        if (section.summary == null || section.summary.length === 0) continue;
+        parts.push(
+          ``,
+          `## messages [${section.ordinalStart}, ${section.ordinalEndExclusive})`,
+          section.summary
+        );
+      }
+
+      const response = await this.summarizer.streamSummaryMessage({
+        model: cfg.model,
+        maxOutputTokens: cfg.maxOutputTokens,
+        effort: cfg.effort,
+        system: this.foldSystemPrompt,
+        content: [{ type: "text", text: parts.join("\n") }]
+      });
+      const folded = this.sanitizeSummaryOutput(
+        this.textFromSummaryResponse(response)
+      );
+      if (!folded) throw new Error("fold call returned empty output");
+
+      const counted = await this.voyage.countTokens(
+        [folded],
+        this.memoryIndexingConfig.embeddingModel
+      );
+      const landed = await this.prisma.foldRollingSummaryCas({
+        contextId,
+        expectedRollingSummaryUpdatedAt: context.rollingSummaryUpdatedAt,
+        rollingSummary: folded,
+        rollingSummaryModel: cfg.model,
+        rollingSummaryProvider: cfg.provider,
+        rollingSummaryTokens: counted.counts[0] ?? 0
+      });
+      if (!landed) {
+        this.logger.info(
+          { contextId, sections: sections.length },
+          "rolling summary fold lost CAS — deferring to the next wave"
+        );
+      }
+    } catch (err) {
+      this.logger.warn(
+        { contextId, err: this.prisma.safeErrMsg(err) },
+        "rolling summary fold failed"
+      );
     }
   }
 

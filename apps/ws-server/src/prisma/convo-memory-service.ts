@@ -212,6 +212,68 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
     });
   }
 
+  /**
+   * A process killed mid-call strands summaryState=SUMMARIZING — invisible to
+   * findChunksAwaitingSummary forever. Rows past the stale threshold rejoin
+   * the retry pool as ERROR (the increment keeps crash-loops bounded by the cap).
+   */
+  public async reclaimStaleSummaryClaims(
+    contextId: string,
+    staleSummaryMinutes: number
+  ) {
+    const cutoff = new Date(Date.now() - staleSummaryMinutes * 60_000);
+    const res = await this.prismaClient.conversationMemoryChunk.updateMany({
+      where: {
+        contextId,
+        summaryState: "SUMMARIZING",
+        deletedAt: null,
+        updatedAt: { lt: cutoff }
+      },
+      data: {
+        summaryState: "ERROR",
+        summaryError:
+          "stale SUMMARIZING claim reclaimed (process died mid-call)",
+        summaryRetryCount: { increment: 1 }
+      }
+    });
+    return res.count;
+  }
+
+  /** wave-fold input — freshly READY sections re-read in chunkIndex order (row text is the source of truth) */
+  public async getMemoryChunkSummariesByIds(chunkIds: string[]) {
+    return await this.prismaClient.conversationMemoryChunk.findMany({
+      where: { id: { in: chunkIds }, summaryState: "READY", deletedAt: null },
+      select: {
+        id: true,
+        chunkIndex: true,
+        ordinalStart: true,
+        ordinalEndExclusive: true,
+        summary: true
+      },
+      orderBy: { chunkIndex: "asc" }
+    });
+  }
+
+  /** boot-resume scan: contexts holding INDEXED chunks with pending (or stranded) summaries */
+  public async findContextsWithPendingSummaries(maxSummaryRetries: number) {
+    return await this.prismaClient.conversationMemoryChunk.findMany({
+      where: {
+        chunkingState: "INDEXED",
+        deletedAt: null,
+        OR: [
+          { summaryState: "QUEUED" },
+          { summaryState: "SUMMARIZING" },
+          {
+            summaryState: "ERROR",
+            summaryRetryCount: { lt: maxSummaryRetries }
+          }
+        ]
+      },
+      select: { contextId: true },
+      distinct: ["contextId"]
+    });
+  }
+
   public async getMemoryContextById(contextId: string) {
     return await this.prismaClient.conversationMemoryContext.findUnique({
       where: { id: contextId },

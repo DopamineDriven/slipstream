@@ -121,7 +121,7 @@ export interface MemorySummarizerConfig {
   maxOutputTokens: number;
   /** image url blocks attached to the summarizer call, capped — documents stay in the user store (index once, retrieve everywhere) */
   maxAttachmentBlocks: number;
-  /** chunks summarized per sweep (chunkIndex order; remainder waits for the next tick) */
+  /** wave width — pending chunks dispatched as concurrent detached jobs; the drain-fold chains the next wave until the backlog is dry */
   sweepBatchSize: number;
 }
 
@@ -136,6 +136,8 @@ export interface ConversationMemoryIndexingConfig {
   /** hard guard under voyage-context-4's 32k per-input limit */
   embedInputCeilingTokens: number;
   staleClaimMinutes: number;
+  /** SUMMARIZING rows older than this rejoin the retry pool — a healthy adaptive-thinking call can run several minutes, keep well above that */
+  staleSummaryMinutes: number;
   maxEmbedRetries: number;
   maxSummaryRetries: number;
   embeddingModel: Voyage.ModelUnion;
