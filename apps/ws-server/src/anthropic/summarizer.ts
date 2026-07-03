@@ -18,6 +18,7 @@ export class AnthropicSummarizerService extends AnthropicBaseService {
   public async streamSummaryMessage(params: {
     model: AnthropicModelIdUnion;
     maxOutputTokens: number;
+    effort: "high" | "xhigh" | "max";
     system: string;
     content: Anthropic.Beta.BetaContentBlockParam[];
   }) {
@@ -31,6 +32,7 @@ export class AnthropicSummarizerService extends AnthropicBaseService {
         model: params.model,
         max_tokens,
         thinking,
+        output_config: { effort: params.effort },
         system: params.system,
         messages: [{ role: "user", content: params.content }],
         betas: this.handleBetaHeaders(params.model, false)

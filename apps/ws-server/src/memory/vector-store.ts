@@ -752,6 +752,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       provider: "ANTHROPIC",
       model: "claude-sonnet-5",
       promptVersion: "memory-summary-v1_2",
+      effort: "high",
       maxOutputTokens: 120_000,
       maxAttachmentBlocks: 12,
       sweepBatchSize: 8
@@ -917,6 +918,7 @@ Updated whole-conversation digest: fold the prior rolling summary together with 
       const response = await this.summarizer.streamSummaryMessage({
         model: cfg.model,
         maxOutputTokens: cfg.maxOutputTokens,
+        effort: cfg.effort,
         system: this.summarySystemPrompt,
         content
       });

@@ -117,6 +117,8 @@ export interface MemorySummarizerConfig {
   /** typed against the registry — the compiler rejects nonexistent model ids */
   model: AnthropicModelIdUnion;
   promptVersion: string;
+  /** adaptive-thinking effort — a background job pays no latency tax, think hard */
+  effort: "high" | "xhigh" | "max";
   maxOutputTokens: number;
   /** image url blocks attached to the summarizer call, capped — documents stay in the user store (index once, retrieve everywhere) */
   maxAttachmentBlocks: number;
