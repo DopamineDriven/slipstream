@@ -15,6 +15,26 @@ export type MemoryRangeMessage = Unenumerate<
     ReturnType<PrismaConversationMemoryService["getMessagesByOrdinalRange"]>
   >
 >;
+export interface EmbedAndIndexTarget {
+  chunkId: string;
+  conversationId: string;
+  ordinalStart: number;
+  ordinalEndExclusive: number;
+  transcriptMarkdown: string;
+  tokenCount: number;
+  /** the row's retryCount BEFORE this attempt — drives the ERROR-at-cap transition */
+  retryCount: number;
+}
+
+/** one member of a contextualized embed family (an inner list on the wire) */
+export interface MemoryEmbedFamilyMember extends EmbedAndIndexTarget {
+  /**
+   * true → an already-INDEXED row re-embedded purely so its vector gains the
+   * new siblings' context: vector + embeddedAt re-mint through the same
+   * sole-owner SQL, no state transition, no message backfill.
+   */
+  isRefresh: boolean;
+}
 
 export interface RenderedMemoryMessage {
   ordinal: number;
@@ -135,6 +155,12 @@ export interface MemorySummarizerConfig {
 export interface ConversationMemoryIndexingConfig {
   /** unindexed ordinals required before a pass claims sections */
   messageThreshold: number;
+  /**
+   * the newest N ordinals stay un-indexed — the live conversational context
+   * renders verbatim as it always has, and sections (with their summaries)
+   * trail the conversation tip by design rather than chasing it
+   */
+  indexingHorizonOffset: number;
   targetSectionTokens: number;
   maxSectionTokens: number;
   minSectionTokens: number;

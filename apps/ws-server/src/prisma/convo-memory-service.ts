@@ -176,7 +176,8 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
     rollingSummaryReasoningDuration,
     rollingSummaryReasoningText,
     rollingSummaryReasoningToolUseRaw,
-    rollingSummaryReasoningVersion
+    rollingSummaryReasoningVersion,
+    foldedThroughGeneratedAt
   }: FoldRollingSummaryParams) {
     const res = await this.prismaClient.conversationMemoryContext.updateMany({
       where: {
@@ -188,7 +189,9 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
         rollingSummaryModel,
         rollingSummaryProvider,
         rollingSummaryTokens,
-        rollingSummaryUpdatedAt: new Date(Date.now()),
+        // fold watermark, NOT wall-clock: the newest summaryGeneratedAt the
+        // digest covers — hasUnfoldedSummaries compares against this
+        rollingSummaryUpdatedAt: foldedThroughGeneratedAt,
         rollingSummaryState: "READY",
         rollingSummaryReasoningDuration,
         rollingSummaryReasoningText,
@@ -309,16 +312,37 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
     });
   }
 
-  /** wave-fold input — freshly READY sections re-read in chunkIndex order (row text is the source of truth) */
-  public async getMemoryChunkSummariesByIds(chunkIds: string[]) {
+  /** digest staleness check — any READY summary newer than the fold watermark? */
+  public async hasUnfoldedSummaries(contextId: string, since: Date | null) {
+    const row = await this.prismaClient.conversationMemoryChunk.findFirst({
+      where: {
+        contextId,
+        chunkingState: "INDEXED",
+        deletedAt: null,
+        summaryState: "READY",
+        ...(since ? { summaryGeneratedAt: { gt: since } } : {})
+      },
+      select: { id: true }
+    });
+    return row != null;
+  }
+
+  /** the digest's complete secondary corpus — every READY section summary in chunkIndex order */
+  public async findReadySummariesForFold(contextId: string) {
     return await this.prismaClient.conversationMemoryChunk.findMany({
-      where: { id: { in: chunkIds }, summaryState: "READY", deletedAt: null },
+      where: {
+        contextId,
+        chunkingState: "INDEXED",
+        deletedAt: null,
+        summaryState: "READY"
+      },
       select: {
         id: true,
         chunkIndex: true,
         ordinalStart: true,
         ordinalEndExclusive: true,
-        summary: true
+        summary: true,
+        summaryGeneratedAt: true
       },
       orderBy: { chunkIndex: "asc" }
     });

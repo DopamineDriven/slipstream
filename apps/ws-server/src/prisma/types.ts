@@ -221,6 +221,8 @@ export interface FoldRollingSummaryParams {
   rollingSummaryReasoningText: string | null;
   rollingSummaryReasoningToolUseRaw: string | null;
   rollingSummaryReasoningVersion: $Enums.MemoryRollingSummaryReasoningVersion;
+  /** becomes the new rollingSummaryUpdatedAt — a fold WATERMARK (max folded summaryGeneratedAt), not wall-clock now; sections landing mid-fold stay newer than it and surface next check */
+  foldedThroughGeneratedAt: Date;
 }
 
 export interface UpdateMemoryContextAggregatesParams {

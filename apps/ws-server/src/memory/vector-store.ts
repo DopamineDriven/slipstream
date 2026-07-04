@@ -108,7 +108,13 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     const maxOrdinalExclusive =
       await this.prisma.getMaxOrdinalExclusive(conversationId);
     const watermark = context.lastIndexedOrdinalExclusive;
-    const unindexed = maxOrdinalExclusive - watermark;
+    // the horizon trails the conversation tip — the newest ordinals stay
+    // live/verbatim and sections never chase the active exchange
+    const horizonExclusive = Math.max(
+      0,
+      maxOrdinalExclusive - cfg.indexingHorizonOffset
+    );
+    const unindexed = horizonExclusive - watermark;
 
     if (unindexed < cfg.messageThreshold) {
       await this.reclaimStaleClaims(ensured.storeId);
@@ -120,7 +126,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     const messages = await this.prisma.getMessagesByOrdinalRange(
       conversationId,
       watermark,
-      maxOrdinalExclusive
+      horizonExclusive
     );
     if (messages.length !== unindexed) {
       // density is checked, never assumed — a concurrent-persist ordinal
@@ -129,6 +135,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
         {
           conversationId,
           watermark,
+          horizonExclusive,
           maxOrdinalExclusive,
           fetched: messages.length
         },
@@ -747,16 +754,12 @@ The System prompt given to all models in the source material being summarized is
 // }
 
   private get foldSystemPrompt() {
-    return `You are the rolling-summary folder for a multi-provider AI chat platform's conversation memory. You maintain the whole-conversation digest that future searches and future model turns rely on.
+    // prettier-ignore
+    return `Write the updated whole-conversation digest — a high-fidelity synopsis of the conversation so far that preserves the integrity and character of the source material. Output only the digest — plain markdown, no preamble. Prefer message ordinals for citations. Let the digest grow in proportion to the conversation — completeness outranks brevity.
 
-Note that the system prompts on this platform are minimal — essentially just a notice that name tags exist in [provider/model] notation (Anthropic models get XML <model> wrappers instead, at their own request). There is no hidden persona engineering.
+You receive the complete set of section summaries in conversation order (secondary sources) plus the prior digest for continuity. The firsthand transcripts they summarize are one call away: conversation_memory_get_chunk retrieves any section's full transcript (conversation_id + ordinal), conversation_memory_search searches them, and file_search reaches the user's uploaded archive — if a model searched for terms with success in the conversation, you can too. Prefer primary sources for anything you quote or that carries weight.
 
-You receive the prior rolling summary (possibly empty) and one or more freshly written section summaries, in conversation order. Fold them into ONE updated digest.
-- Use message-ordinal citations, e.g. "(msgs 41-44)".
-- Let the digest grow in proportion to the conversation itself — completeness outranks brevity (there is no word limit).
-- file_search reaches the user's uploaded archive -- if a model has searched for term(s) with success in a converastion then you can too.
-
-Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble, no meta-commentary.` as const;
+The System prompt given to all models in the source material being summarized is as follows: "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.\nOlder messages are made searchable via tooling to keep things light."` as const;
   }
 
   private get anthropicImageMimes() {
@@ -884,16 +887,99 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
     } satisfies Anthropic.Beta.BetaToolUnion;
   }
 
+  /** the conversation's own indexed history offered to the fold — the digest's primary sources */
+  private get summarizerMemorySearchTool(): Anthropic.Beta.BetaToolUnion {
+    return {
+      name: "conversation_memory_search",
+      description:
+        "Search the user's indexed conversation history — firsthand transcript sections. " +
+        "Semantic similarity by default; search_terms adds exact-match fulltext (partitioned semantic + fulltext + overlap). " +
+        "scope 'current_conversation' (default) reaches this conversation's indexed sections; 'all_conversations' reaches the user's entire history.",
+      input_schema: {
+        type: "object" as const,
+        properties: {
+          query: {
+            type: "string",
+            description: "The semantic search query"
+          },
+          search_terms: {
+            type: "string",
+            description:
+              "Optional exact-match terms for fulltext search (quoted phrases, -negation)"
+          },
+          scope: {
+            type: "string",
+            enum: ["current_conversation", "all_conversations"],
+            description: "Search scope (default current_conversation)"
+          },
+          max_results: {
+            type: "number",
+            description: "Maximum results to return (1-25, default 5)"
+          }
+        },
+        required: ["query"]
+      }
+    } satisfies Anthropic.Beta.BetaToolUnion;
+  }
+
+  private get summarizerMemoryGetChunkTool(): Anthropic.Beta.BetaToolUnion {
+    return {
+      name: "conversation_memory_get_chunk",
+      description:
+        "Retrieve a section's FULL firsthand transcript by chunk_id (from a search result) or by conversation_id + ordinal (any message ordinal the section covers). " +
+        "direction 'previous'/'next' walks to a neighboring section from the resolved one.",
+      input_schema: {
+        type: "object" as const,
+        properties: {
+          chunk_id: {
+            type: "string",
+            description: "Section id from a search result"
+          },
+          conversation_id: {
+            type: "string",
+            description: "Conversation id (pair with ordinal)"
+          },
+          ordinal: {
+            type: "number",
+            description: "Any message ordinal the section covers"
+          },
+          direction: {
+            type: "string",
+            enum: ["previous", "next"],
+            description: "Optional neighbor walk from the resolved section"
+          }
+        }
+      }
+    } satisfies Anthropic.Beta.BetaToolUnion;
+  }
+
   private isToolInputRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value != null && !Array.isArray(value);
   }
 
-  /** mirror of the chat path's executeFileSearch, scoped to the summarized conversation's owner */
+  /** mirror of the chat path's tool executors, scoped to the summarized conversation's owner */
   private async executeSummarizerToolCall(
     userId: string,
+    conversationId: string,
     name: string,
     input: unknown
   ) {
+    if (name === "conversation_memory_search") {
+      if (!this.isToolInputRecord(input)) {
+        throw new Error(
+          `conversation_memory_search input malformed: ${JSON.stringify(input)}`
+        );
+      }
+      return await this.searchMemoryFromToolInput(userId, conversationId, input);
+    }
+    if (name === "conversation_memory_get_chunk") {
+      if (!this.isToolInputRecord(input)) {
+        throw new Error(
+          `conversation_memory_get_chunk input malformed: ${JSON.stringify(input)}`
+        );
+      }
+      return await this.getMemoryChunkFromToolInput(userId, input);
+    }
     if (name !== "file_search") {
       throw new Error(`summarizer requested unknown tool: ${name}`);
     }
@@ -971,7 +1057,12 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
         content,
         tools: [this.summarizerFileSearchTool],
         executeToolCall: (name, input) =>
-          this.executeSummarizerToolCall(userId, name, input),
+          this.executeSummarizerToolCall(
+            userId,
+            chunk.conversationId,
+            name,
+            input
+          ),
         maxToolUseRounds: cfg.maxToolUseRounds,
         callDeadlineMs: cfg.callDeadlineMs
       });
@@ -1066,6 +1157,9 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
       if (pending.length === 0) {
         // release the claim — an empty wave never drains and would wedge the context
         this.summaryJobRegistry.delete(contextId);
+        // dry — the whole-backlog digest folds now (no-ops unless new
+        // summaries landed since the fold watermark)
+        void this.foldRollingSummaryForContext(contextId);
         return;
       }
       const context = await this.prisma.getMemoryContextById(contextId);
@@ -1139,10 +1233,10 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
       );
     }
     if (!this.waveDrained(wave)) return;
-    await this.foldRollingSummaryForContext(chunk.contextId, wave, userId);
     // self-continuation — the sweepBatchSize cap must never strand a backlog
     // (the ordinal-57 stall); ERROR-at-cap chunks fall out of the finder, so
-    // the chain terminates
+    // the chain terminates. The dry dispatch fires the digest fold over the
+    // WHOLE backlog — never per-wave slices.
     void this.summarizeQueuedChunks(chunk.contextId);
   }
 
@@ -1156,40 +1250,39 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
   }
 
   /**
-   * Wave-drain fold: ONE model call folds the wave's READY sections (re-read
-   * from the DB in chunkIndex order — row text is the source of truth, never
-   * the registry) into the rolling summary. CAS-guarded; a lost cross-instance
-   * race logs and defers, matching the sequential design's guarantee.
+   * Fold-when-dry: fires from the empty dispatch branch once a backlog chain
+   * exhausts (and on any sub-threshold tick — the staleness check makes it a
+   * no-op unless new summaries landed). The digest re-mints from the COMPLETE
+   * section-summary corpus — one level of meta, never a fold of folds — with
+   * the prior digest as continuity reference and the firsthand transcripts
+   * one tool call away. rollingSummaryUpdatedAt advances to the max folded
+   * summaryGeneratedAt (a fold watermark), so sections landing mid-fold
+   * surface on the next check instead of slipping through.
    */
-  private async foldRollingSummaryForContext(
-    contextId: string,
-    wave: Map<string, $Enums.MemorySummaryState>,
-    userId: string
-  ) {
+  private async foldRollingSummaryForContext(contextId: string) {
     const cfg = this.memorySummarizerConfig;
     try {
-      const readyIds = Array.of<string>();
-      for (const [chunkId, state] of wave) {
-        if (state === "READY") readyIds.push(chunkId);
-      }
-      if (readyIds.length === 0) return;
-
-      // fresh read — the CAS expectation must be current, not dispatch-era
       const context = await this.prisma.getMemoryContextById(contextId);
       if (!context) return;
-      const sections = await this.prisma.getMemoryChunkSummariesByIds(readyIds);
+      const behind = await this.prisma.hasUnfoldedSummaries(
+        contextId,
+        context.rollingSummaryUpdatedAt
+      );
+      if (!behind) return;
+      const sections = await this.prisma.findReadySummariesForFold(contextId);
       if (sections.length === 0) return;
+      const userId = context.memoryStore.userId;
 
       await this.prisma.setRollingSummaryState(contextId, "SUMMARIZING");
 
       const parts = Array.of<string>();
       parts.push(
-        `Conversation: ${context.conversationTitle ?? "Untitled Conversation"}`,
+        `Conversation: ${context.conversationTitle ?? "Untitled Conversation"} (conversation_id: ${context.conversationId})`,
         ``,
-        `Prior rolling summary:`,
-        context.rollingSummary ?? "(none yet — this is the first fold)",
+        `Prior digest (continuity reference — you are re-minting the whole digest, not appending):`,
+        context.rollingSummary ?? "(none yet — this is the first digest)",
         ``,
-        `New section summaries, in conversation order:`
+        `Section summaries, in conversation order:`
       );
       for (const section of sections) {
         if (section.summary == null || section.summary.length === 0) continue;
@@ -1206,9 +1299,18 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
         effort: cfg.effort,
         system: this.foldSystemPrompt,
         content: [{ type: "text", text: parts.join("\n") }],
-        tools: [this.summarizerFileSearchTool],
+        tools: [
+          this.summarizerFileSearchTool,
+          this.summarizerMemorySearchTool,
+          this.summarizerMemoryGetChunkTool
+        ],
         executeToolCall: (name, input) =>
-          this.executeSummarizerToolCall(userId, name, input),
+          this.executeSummarizerToolCall(
+            userId,
+            context.conversationId,
+            name,
+            input
+          ),
         maxToolUseRounds: cfg.maxToolUseRounds,
         callDeadlineMs: cfg.callDeadlineMs
       });
@@ -1219,6 +1321,18 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
         [folded],
         this.memoryIndexingConfig.embeddingModel
       );
+      // fold watermark: the newest summaryGeneratedAt this digest covers
+      let foldedThrough = new Date(0);
+      for (const section of sections) {
+        if (
+          section.summaryGeneratedAt &&
+          section.summaryGeneratedAt > foldedThrough
+        ) {
+          foldedThrough = section.summaryGeneratedAt;
+        }
+      }
+      if (foldedThrough.getTime() === 0) foldedThrough = new Date(Date.now());
+
       const landed = await this.prisma.foldRollingSummaryCas({
         contextId,
         expectedRollingSummaryUpdatedAt: context.rollingSummaryUpdatedAt,
@@ -1230,20 +1344,21 @@ Output ONLY the updated digest — plain markdown, no wrapper tags, no preamble,
         rollingSummaryReasoningText: result.reasoningText,
         rollingSummaryReasoningToolUseRaw:
           result.toolUse.length > 0 ? JSON.stringify(result.toolUse) : null,
-        rollingSummaryReasoningVersion: cfg.foldPromptVersion
+        rollingSummaryReasoningVersion: cfg.foldPromptVersion,
+        foldedThroughGeneratedAt: foldedThrough
       });
       if (!landed) {
         // another instance's fold landed first — its CAS write owns the
         // READY state and the fresher digest; ours is discarded
         this.logger.info(
           { contextId, sections: sections.length },
-          "rolling summary fold lost CAS — deferring to the next wave"
+          "digest fold lost CAS — deferring to the next dry tick"
         );
       }
     } catch (err) {
       this.logger.warn(
         { contextId, err: this.prisma.safeErrMsg(err) },
-        "rolling summary fold failed"
+        "digest fold failed"
       );
       await this.prisma
         .setRollingSummaryState(contextId, "ERROR")

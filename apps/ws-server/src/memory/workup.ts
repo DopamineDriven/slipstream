@@ -1,8 +1,13 @@
 import { createHash } from "node:crypto";
 import type { LoggerService } from "@/logger/index.ts";
 import type {
+  ConversationMemoryGetChunkTarget,
   ConversationMemoryIndexingConfig,
+  ConversationMemorySearchScope,
+  ConversationMemorySearchToolInput,
   MemoryContextRegistryEntry,
+  MemoryEmbedFamilyMember,
+  MemoryHybridRow,
   MemoryRangeMessage,
   MemorySectionDraft,
   MemorySectionPartition,
@@ -39,6 +44,9 @@ export class ConversationMemoryWorkupService {
   public get memoryIndexingConfig() {
     return {
       messageThreshold: 12,
+      // the verbatim tail breathes between offset and offset + threshold —
+      // recency stays live/un-summarized; keep liveWindowMessages ≤ this
+      indexingHorizonOffset: 50,
       targetSectionTokens: 8_000,
       maxSectionTokens: 24_000,
       minSectionTokens: 2_000,
@@ -600,5 +608,311 @@ export class ConversationMemoryWorkupService {
     }
 
     return drafts;
+  }
+
+  public parseMemorySearchInput(parsed: Record<string, unknown>) {
+    if (
+      !("query" in parsed) ||
+      typeof parsed.query !== "string" ||
+      parsed.query.trim().length === 0
+    ) {
+      throw new Error(
+        `conversation_memory_search input missing required "query"`
+      );
+    }
+    return {
+      query: parsed.query.trim(),
+      search_terms:
+        typeof parsed.search_terms === "string"
+          ? parsed.search_terms.trim() || undefined
+          : undefined,
+      scope:
+        parsed.scope === "all_conversations"
+          ? ("all_conversations" as const)
+          : ("current_conversation" as const),
+      max_results:
+        typeof parsed.max_results === "number" ? parsed.max_results : undefined,
+      threshold:
+        typeof parsed.threshold === "number" ? parsed.threshold : undefined
+    } satisfies ConversationMemorySearchToolInput;
+  }
+
+  public parseMemoryGetChunkInput(parsed: Record<string, unknown>) {
+    const direction =
+      parsed.direction === "previous" || parsed.direction === "next"
+        ? parsed.direction
+        : undefined;
+
+    if ("chunk_id" in parsed && typeof parsed.chunk_id === "string") {
+      return {
+        mode: "by_id",
+        chunkId: parsed.chunk_id,
+        direction
+      } as const satisfies ConversationMemoryGetChunkTarget;
+    }
+    if (
+      "conversation_id" in parsed &&
+      typeof parsed.conversation_id === "string" &&
+      typeof parsed.ordinal === "number"
+    ) {
+      return {
+        mode: "by_ordinal",
+        conversationId: parsed.conversation_id,
+        ordinal: parsed.ordinal,
+        direction
+      } as const satisfies ConversationMemoryGetChunkTarget;
+    }
+    throw new Error(
+      `conversation_memory_get_chunk requires "chunk_id", or "conversation_id" + "ordinal"`
+    );
+  }
+
+  private memoryExcerpt(transcriptMarkdown: string | null) {
+    const text = transcriptMarkdown ?? "";
+    if (text.length <= 1200) return text;
+    return `${text.slice(0, 1200)} …[truncated — expand via conversation_memory_get_chunk]`;
+  }
+
+  protected formatMemoryResults(
+    rows: readonly MemoryHybridRow[],
+    input: ConversationMemorySearchToolInput,
+    scope: ConversationMemorySearchScope,
+    threshold: number,
+    extraMeta?: { note: string }
+  ) {
+    const valid = rows.filter(
+      (
+        r
+      ): r is MemoryHybridRow & {
+        id: string;
+        conversationId: string;
+        ordinalStart: number;
+        ordinalEndExclusive: number;
+      } =>
+        r.id != null &&
+        r.conversationId != null &&
+        r.ordinalStart != null &&
+        r.ordinalEndExclusive != null
+    );
+
+    // dedupe per signal keeping highest score, then restore positional rank
+    valid.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+    const semanticSeen = new Set<string>();
+    const fulltextSeen = new Set<string>();
+    const semantic = Array.of<(typeof valid)[number]>();
+    const fulltext = Array.of<(typeof valid)[number]>();
+    for (const row of valid) {
+      if (row.signal === "semantic") {
+        if (!semanticSeen.has(row.id)) {
+          semanticSeen.add(row.id);
+          semantic.push(row);
+        }
+      } else if (row.signal === "fulltext") {
+        if (!fulltextSeen.has(row.id)) {
+          fulltextSeen.add(row.id);
+          fulltext.push(row);
+        }
+      }
+    }
+    semantic.sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0));
+    fulltext.sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0));
+
+    const overlapIds = [...semanticSeen].filter(id => fulltextSeen.has(id));
+    const unionSize = new Set([...semanticSeen, ...fulltextSeen]).size;
+
+    const toResult = (r: (typeof valid)[number]) => ({
+      chunk_id: r.id,
+      conversation_id: r.conversationId,
+      conversation_title: r.conversationTitle,
+      chunk_index: r.chunkIndex,
+      ordinal_start: r.ordinalStart,
+      ordinal_end_exclusive: r.ordinalEndExclusive,
+      excerpt: this.memoryExcerpt(r.transcriptMarkdown),
+      token_count: r.tokenCount,
+      message_timestamp_start: r.messageTimestampStart?.toISOString() ?? null,
+      message_timestamp_end: r.messageTimestampEnd?.toISOString() ?? null,
+      provider_models: r.providerModelsRaw,
+      has_attachments: r.hasAttachments === true,
+      score: r.score != null ? Number(r.score.toFixed(4)) : 0,
+      match_type: r.appearsInBothSignals === true ? "both" : r.signal
+    });
+
+    return JSON.stringify({
+      query: input.query,
+      search_terms: input.search_terms ?? null,
+      scope,
+      semantic_results: semantic.map(toResult),
+      fulltext_results: fulltext.map(toResult),
+      overlap_results: overlapIds,
+      metadata: {
+        semantic_count: semantic.length,
+        fulltext_count: fulltext.length,
+        overlap_count: overlapIds.length,
+        jaccard_similarity:
+          unionSize > 0
+            ? Number((overlapIds.length / unionSize).toFixed(4))
+            : 0,
+        semantic_threshold: threshold,
+        ...extraMeta
+      }
+    });
+  }
+  /**
+   * Truncates the EMBED INPUT only for over-ceiling sections — the full
+   * transcript is already persisted on the row; the fulltext lane and the
+   * summary pass see everything, only the vector is lossy.
+   */
+  protected embedInputFor(transcriptMarkdown: string, tokenCount: number) {
+    const ceiling = this.memoryIndexingConfig.embedInputCeilingTokens;
+    if (tokenCount <= ceiling) return transcriptMarkdown;
+    const keep = Math.max(
+      1,
+      Math.floor(transcriptMarkdown.length * (ceiling / tokenCount) * 0.95)
+    );
+    this.logger.warn(
+      { tokenCount, ceiling, keptChars: keep },
+      "truncating oversize memory section for embedding (full transcript persisted)"
+    );
+    return transcriptMarkdown.slice(0, keep);
+  }
+
+  /**
+   * Greedy left-to-right family packing against the 32k contextualization
+   * window — append-stable: earlier family boundaries never move as a
+   * conversation grows, so only families containing a fresh member ever
+   * need (re-)embedding. Over-ceiling members ride solo (their truncated
+   * embed input ~fills the window, leaving no meaningful sibling room).
+   * Members MUST arrive in chunkIndex/ordinal order.
+   */
+  protected packEmbedFamilies(members: readonly MemoryEmbedFamilyMember[]) {
+    const cfg = this.memoryIndexingConfig;
+    const families = Array.of<MemoryEmbedFamilyMember[]>();
+    let current = Array.of<MemoryEmbedFamilyMember>();
+    let currentTokens = 0;
+    const flush = () => {
+      if (current.length > 0) {
+        families.push(current);
+        current = Array.of<MemoryEmbedFamilyMember>();
+        currentTokens = 0;
+      }
+    };
+    for (const member of members) {
+      if (member.tokenCount > cfg.embedInputCeilingTokens) {
+        flush();
+        families.push([member]);
+        continue;
+      }
+      if (currentTokens + member.tokenCount > cfg.familyTokenBudget) flush();
+      current.push(member);
+      currentTokens += member.tokenCount;
+    }
+    flush();
+    return families;
+  }
+
+  /**
+   * families → requests under the 120k batch cap. Exact stored counts —
+   * probe-verified that voyage's billing meter and our countTokens agree to
+   * the token, so packing runs flush against both lines. Truncated members
+   * count as the ceiling (conservative: real truncated size is ~95% of it).
+   */
+  protected packEmbedRequests(families: readonly MemoryEmbedFamilyMember[][]) {
+    const cfg = this.memoryIndexingConfig;
+    const effectiveTokens = (member: MemoryEmbedFamilyMember) =>
+      Math.min(member.tokenCount, cfg.embedInputCeilingTokens);
+    const requests = Array.of<MemoryEmbedFamilyMember[][]>();
+    let current = Array.of<MemoryEmbedFamilyMember[]>();
+    let currentTokens = 0;
+    for (const family of families) {
+      const familyTokens = family.reduce(
+        (acc, member) => acc + effectiveTokens(member),
+        0
+      );
+      if (
+        currentTokens + familyTokens > cfg.requestTokenBudget &&
+        current.length > 0
+      ) {
+        requests.push(current);
+        current = Array.of<MemoryEmbedFamilyMember[]>();
+        currentTokens = 0;
+      }
+      current.push(family);
+      currentTokens += familyTokens;
+    }
+    if (current.length > 0) requests.push(current);
+    return requests;
+  }
+
+
+  // ── Aggregates ───────────────────────────────────────────────────────
+
+  private mergeProviderModelPairs(
+    existingRaw: string | null,
+    drafts: readonly MemorySectionDraft[]
+  ) {
+    const pairs = new Set<string>();
+    if (existingRaw) {
+      for (const pair of existingRaw.split("::")) {
+        if (pair.length > 0) pairs.add(pair);
+      }
+    }
+    for (const draft of drafts) {
+      for (const pair of draft.providerModelsRaw.split("::")) {
+        if (pair.length > 0) pairs.add(pair);
+      }
+    }
+    const providers = new Set<string>();
+    for (const pair of pairs) {
+      const [provider] = pair.split(":");
+      if (provider) providers.add(provider);
+    }
+    return {
+      raw: Array.from(pairs).join("::"),
+      hasMultipleProviders: providers.size > 1,
+      hasMultipleModels: pairs.size > 1
+    };
+  }
+
+  protected async recordPassAggregates(
+    ensured: { contextId: string; storeId: string; created: boolean },
+    existingProviderModelsRaw: string | null,
+    existingFirstMessageAt: Date | null,
+    claimedDrafts: readonly MemorySectionDraft[],
+    maxOrdinalExclusive: number
+  ) {
+    const firstDraft = claimedDrafts[0];
+    const lastDraft = claimedDrafts[claimedDrafts.length - 1];
+    if (!firstDraft || !lastDraft) return;
+
+    const merged = this.mergeProviderModelPairs(
+      existingProviderModelsRaw,
+      claimedDrafts
+    );
+    const tokensClaimed = claimedDrafts.reduce(
+      (sum, draft) => sum + draft.tokenCount,
+      0
+    );
+    const messagesClaimed = claimedDrafts.reduce(
+      (sum, draft) => sum + draft.chunkedMessagesCount,
+      0
+    );
+
+    await this.prisma.updateMemoryContextAggregates(ensured.contextId, {
+      chunkedTurnsDelta: messagesClaimed,
+      totalTokensDelta: tokensClaimed,
+      totalTurns: maxOrdinalExclusive,
+      contributingProviderModelsRaw: merged.raw,
+      hasMultipleProviders: merged.hasMultipleProviders,
+      hasMultipleModels: merged.hasMultipleModels,
+      firstMessageAt: existingFirstMessageAt
+        ? undefined
+        : firstDraft.messageTimestampStart,
+      lastMessageAt: lastDraft.messageTimestampEnd
+    });
+    await this.prisma.updateMemoryStoreCounters(ensured.storeId, {
+      chunksDelta: claimedDrafts.length,
+      tokensDelta: tokensClaimed,
+      conversationsDelta: ensured.created ? 1 : 0
+    });
   }
 }
