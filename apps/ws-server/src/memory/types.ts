@@ -112,7 +112,15 @@ export interface ConversationMemorySearchToolInput {
 export interface MemoryAssemblyConfig {
   /** master switch for substitution assembly (HMEM Part II §2) */
   enabled: boolean;
-  /** the newest N ordinals always render verbatim in provider history — the single recency knob */
+  /**
+   * the oldest N ordinals always render verbatim — the charter/primacy
+   * anchor. On a 12-provider platform an opening question carouseled across
+   * the fleet is [0-23] before the conversation proper starts; 30 covers a
+   * full carousel plus follow-through. Serial-position + lost-in-the-middle
+   * both favor verbatim material at the top of context
+   */
+  foundingWindowMessages: number;
+  /** the newest N ordinals always render verbatim in provider history — the recency anchor */
   liveWindowMessages: number;
 }
 
@@ -125,14 +133,18 @@ export type MemorySubstitutableChunk = Unenumerate<
 
 /**
  * The substitution plan for one conversation's provider history: every READY
- * section below the live-window floor, gap-tolerant (a gap renders verbatim),
- * each name-tagged to its summarizer. The formatter merges these with the
- * un-covered verbatim messages by ordinal.
+ * section between the founding window and the live-window floor, gap-tolerant
+ * (a gap renders verbatim), each name-tagged to its summarizer. The formatter
+ * merges these with the un-covered verbatim messages by ordinal — verbatim at
+ * both ends, consolidated episodic traces bridging the middle (the
+ * serial-position shape).
  */
 export interface MemoryAssemblyPlan {
+  /** ordinals < this always render verbatim — the charter/primacy anchor */
+  foundingCeilingExclusive: number;
   /** maxOrdinalExclusive - liveWindowMessages; ordinals ≥ this always render verbatim */
   liveWindowFloor: number;
-  /** ordered by ordinalStart; substitutions never overlap the live window */
+  /** ordered by ordinalStart; each extends past the founding ceiling and never overlaps the live window */
   substitutions: MemorySubstitutableChunk[];
 }
 

@@ -655,15 +655,16 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
   public get memoryAssemblyConfig() {
     return {
       enabled: true,
-      liveWindowMessages: 50
+      foundingWindowMessages: 30,
+      liveWindowMessages: 30
     } as const satisfies MemoryAssemblyConfig;
   }
 
   /**
    * The substitution plan for one conversation's provider history: every READY
-   * section below the live-window floor, gap-tolerant and name-tagged. Returns
-   * null when assembly is off, the conversation is too short to have a floor,
-   * or nothing below the floor is summarized yet.
+   * section between the founding window and the live-window floor, gap-tolerant
+   * and name-tagged. Returns null when assembly is off, the conversation is too
+   * short for a substitutable middle, or nothing in it is summarized yet.
    *
    * Prompt-cache stability: substitution text is keyed to immutable READY
    * chunks, so the prefix changes only when a new summary lands below the
@@ -675,16 +676,27 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
   ) {
     const cfg = this.memoryAssemblyConfig;
     if (!cfg.enabled) return null;
+    const foundingCeilingExclusive = cfg.foundingWindowMessages;
     const liveWindowFloor = maxOrdinalExclusive - cfg.liveWindowMessages;
-    if (liveWindowFloor <= 0) return null;
+    // no substitutable middle until the conversation outgrows both anchors
+    if (liveWindowFloor <= foundingCeilingExclusive) return null;
 
-    const substitutions = await this.prisma.findSubstitutableChunks(
+    const candidates = await this.prisma.findSubstitutableChunks(
       conversationId,
       liveWindowFloor
     );
+    // a section entirely inside the founding window never substitutes —
+    // verbatim wins at the charter end
+    const substitutions = candidates.filter(
+      s => s.ordinalEndExclusive > foundingCeilingExclusive
+    );
     if (substitutions.length === 0) return null;
 
-    return { liveWindowFloor, substitutions } satisfies MemoryAssemblyPlan;
+    return {
+      foundingCeilingExclusive,
+      liveWindowFloor,
+      substitutions
+    } satisfies MemoryAssemblyPlan;
   }
 
   /** the [provider/model] name tag for a substituted section — the fleet notation */
