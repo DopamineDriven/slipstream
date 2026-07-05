@@ -1,33 +1,11 @@
+import type {
+  StreamSummaryMessageParams,
+  SummarizerToolCallRecord
+} from "@/anthropic/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { AnthropicBaseService } from "@/anthropic/base.ts";
-import type { AnthropicModelIdUnion } from "@slipstream/types";
-
-/** one traced in-house tool round-trip — persisted raw for data-driven config feedback */
-export interface SummarizerToolCallRecord {
-  round: number;
-  name: string;
-  input: unknown;
-  output: string;
-  isError: boolean;
-}
-
-export interface StreamSummaryMessageParams {
-  model: AnthropicModelIdUnion;
-  maxOutputTokens: number;
-  effort: "high" | "xhigh" | "max";
-  system: string;
-  content: Anthropic.Beta.BetaContentBlockParam[];
-  /** in-house tools offered to the call (e.g. user-store file_search) */
-  tools?: Anthropic.Beta.BetaToolUnion[];
-  /** executes one tool call; results feed back into the loop until end_turn */
-  executeToolCall?: (name: string, input: unknown) => Promise<string>;
-  /** hard cap on tool round-trips — defense against foraging spirals */
-  maxToolUseRounds?: number;
-  /** per-round wall-clock deadline; a stalled stream aborts instead of living forever */
-  callDeadlineMs?: number;
-}
 
 /**
  * The conversation-memory summarizer rides the SAME battle-tested call shape

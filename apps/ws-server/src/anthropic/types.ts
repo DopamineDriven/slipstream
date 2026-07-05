@@ -3,10 +3,10 @@ import Anthropic from "@anthropic-ai/sdk";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import type { searchUserStoreChunksByStore } from "@slipstream/db/sql-node";
 import type {
-  DiscriminatedUnionToRecord,
-  MessageSingleton
+  AnthropicModelIdUnion,
+  MessageSingleton,
+  UTR
 } from "@slipstream/types";
-import { UTR } from "@slipstream/types";
 
 export interface AnthropicFileRecord {
   id: string;
@@ -92,11 +92,11 @@ export interface BlockBuilder {
   tool_use_id?: string;
   codeExecutionContent?: Anthropic.Beta.BetaCodeExecutionToolResultBlockParam["content"];
 }
-export type CodeExecutionContentRT = DiscriminatedUnionToRecord<
+export type CodeExecutionContentRT = UTR<
   Anthropic.Beta.BetaCodeExecutionToolResultBlockParam["content"],
   "type"
 >;
-export type ContentBlockParamObj = DiscriminatedUnionToRecord<
+export type ContentBlockParamObj = UTR<
   Anthropic.Beta.BetaContentBlockParam,
   "type"
 >;
@@ -118,3 +118,28 @@ export type ContentBlockObj = UTR<Anthropic.Beta.BetaContentBlockParam, "type">;
 export type MapContentBlock<T extends keyof ContentBlockObj> = {
   [P in T]: ContentBlockObj[P];
 }[T];
+
+/** one traced in-house tool round-trip — persisted raw for data-driven config feedback */
+export interface SummarizerToolCallRecord {
+  round: number;
+  name: string;
+  input: unknown;
+  output: string;
+  isError: boolean;
+}
+
+export interface StreamSummaryMessageParams {
+  model: AnthropicModelIdUnion;
+  maxOutputTokens: number;
+  effort: "high" | "xhigh" | "max";
+  system: string;
+  content: Anthropic.Beta.BetaContentBlockParam[];
+  /** in-house tools offered to the call (e.g. user-store file_search) */
+  tools?: Anthropic.Beta.BetaToolUnion[];
+  /** executes one tool call; results feed back into the loop until end_turn */
+  executeToolCall?: (name: string, input: unknown) => Promise<string>;
+  /** hard cap on tool round-trips — defense against foraging spirals */
+  maxToolUseRounds?: number;
+  /** per-round wall-clock deadline; a stalled stream aborts instead of living forever */
+  callDeadlineMs?: number;
+}
