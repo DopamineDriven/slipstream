@@ -662,6 +662,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       // produces a higher-fidelity summary then by all means; knowledge is king
       maxToolUseRounds: 10,
       callDeadlineMs: 900_000,
+      foldInputBudgetTokens: 130_000,
       sweepBatchSize: 8
     } as const satisfies MemorySummarizerConfig;
   }
@@ -677,7 +678,7 @@ The System prompt given to all models in the source material being summarized is
     // prettier-ignore
     return `Write the updated whole-conversation digest — a high-fidelity synopsis of the conversation so far that preserves the integrity and character of the source material. Output only the digest — plain markdown, no preamble. Prefer message ordinals for citations. Let the digest grow in proportion to the conversation — completeness outranks brevity.
 
-You receive the complete set of section summaries in conversation order (secondary sources) plus the prior digest for continuity. The firsthand transcripts they summarize are one call away: conversation_memory_get_chunk retrieves any section's full transcript (conversation_id + ordinal), conversation_memory_search searches them, and file_search reaches the user's uploaded archive — if a model searched for terms with success in the conversation, you can too. Prefer primary sources for anything you quote or that carries weight.
+You receive the complete set of section summaries in conversation order (secondary sources) plus the prior digest for continuity. When the conversation extends beyond the last summarized section, the un-sectioned live tail follows as a firsthand transcript — cover it in the digest too; it is primary source already in hand, and nothing exists beyond it. The firsthand transcripts behind the summaries are one call away: conversation_memory_get_chunk retrieves any section's full transcript (conversation_id + ordinal), conversation_memory_search searches them, and file_search reaches the user's uploaded archive — if a model searched for terms with success in the conversation, you can too. Prefer primary sources for anything you quote or that carries weight.
 
 The System prompt given to all models in the source material being summarized is as follows: "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.\nOlder messages are made searchable via tooling to keep things light."` as const;
   }
@@ -1193,6 +1194,65 @@ The System prompt given to all models in the source material being summarized is
       if (sections.length === 0) return;
       const userId = context.memoryStore.userId;
 
+      // the un-sectioned live tail — the fold's captured reasoning showed it
+      // burning thinking tokens hunting for exactly this range; hand it over
+      // firsthand instead (exclusively the rolling-summary model's input)
+      const maxOrdinalExclusive = await this.prisma.getMaxOrdinalExclusive(
+        context.conversationId
+      );
+      const tailStart = context.lastIndexedOrdinalExclusive;
+      let tailBlock: string | null = null;
+      if (maxOrdinalExclusive > tailStart) {
+        const tailMessages = await this.prisma.getMessagesByOrdinalRange(
+          context.conversationId,
+          tailStart,
+          maxOrdinalExclusive
+        );
+        if (tailMessages.length > 0) {
+          tailBlock = this.renderMemoryRange(tailMessages)
+            .map(r => r.markdown)
+            .join("\n\n");
+        }
+      }
+
+      // exact-count budget gate — a fold overflow is non-self-healing (the
+      // identical corpus re-folds into the identical 400 every dry tick), so
+      // the input is measured BEFORE any state transition: over budget drops
+      // the tail first, then defers the fold entirely
+      const sectionsTokens = sections.reduce(
+        (acc, s) => acc + s.summaryTokens,
+        0
+      );
+      const digestTokens = context.rollingSummaryTokens;
+      let tailTokens = 0;
+      if (tailBlock) {
+        const counted = await this.voyage.countTokens(
+          [tailBlock],
+          this.memoryIndexingConfig.embeddingModel
+        );
+        tailTokens = counted.counts[0] ?? 0;
+      }
+      let tailOmitted = false;
+      if (
+        tailBlock &&
+        sectionsTokens + digestTokens + tailTokens > cfg.foldInputBudgetTokens
+      ) {
+        tailBlock = null;
+        tailOmitted = true;
+      }
+      if (sectionsTokens + digestTokens > cfg.foldInputBudgetTokens) {
+        this.logger.warn(
+          {
+            contextId,
+            sectionsTokens,
+            digestTokens,
+            budget: cfg.foldInputBudgetTokens
+          },
+          "fold input exceeds budget even without the tail — deferring"
+        );
+        return;
+      }
+
       await this.prisma.setRollingSummaryState(contextId, "SUMMARIZING");
 
       const parts = Array.of<string>();
@@ -1210,6 +1270,18 @@ The System prompt given to all models in the source material being summarized is
           ``,
           `## messages [${section.ordinalStart}, ${section.ordinalEndExclusive})`,
           section.summary
+        );
+      }
+      if (tailBlock) {
+        parts.push(
+          ``,
+          `Live tail — messages [${tailStart}, ${maxOrdinalExclusive}) are not yet sectioned; firsthand transcript follows (complete — nothing exists beyond it):`,
+          tailBlock
+        );
+      } else if (tailOmitted) {
+        parts.push(
+          ``,
+          `(live tail omitted this fold — input budget; covered next cycle)`
         );
       }
 

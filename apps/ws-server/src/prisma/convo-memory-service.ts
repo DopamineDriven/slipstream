@@ -342,7 +342,9 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
         ordinalStart: true,
         ordinalEndExclusive: true,
         summary: true,
-        summaryGeneratedAt: true
+        summaryGeneratedAt: true,
+        // exact stored counts power the fold's input budget gate
+        summaryTokens: true
       },
       orderBy: { chunkIndex: "asc" }
     });
@@ -377,6 +379,8 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
         conversationTitle: true,
         rollingSummary: true,
         rollingSummaryUpdatedAt: true,
+        // exact stored count for the fold's input budget gate
+        rollingSummaryTokens: true,
         // where the live tail begins — the fold renders [watermark, max) firsthand
         lastIndexedOrdinalExclusive: true,
         // store scoping for the summarizer's file_search executor

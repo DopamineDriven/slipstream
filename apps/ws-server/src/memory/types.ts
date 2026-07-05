@@ -142,6 +142,14 @@ export interface MemorySummarizerConfig {
   maxToolUseRounds: number;
   /** per-round wall-clock deadline — an immortal stream aborts into the ERROR/retry path instead of wedging its wave */
   callDeadlineMs: number;
+  /**
+   * exact-count ceiling on the fold input (section corpus + prior digest +
+   * live tail), in voyage tokens — cross-tokenizer margin under the
+   * summarizer's 200k window. A fold overflow is non-self-healing (identical
+   * re-fold every dry tick) without this gate: over budget drops the tail
+   * first, then defers the fold with a warning instead of dying
+   */
+  foldInputBudgetTokens: number;
   /** wave width — pending chunks dispatched as concurrent detached jobs; the drain-fold chains the next wave until the backlog is dry */
   sweepBatchSize: number;
 }
@@ -150,9 +158,9 @@ export interface ConversationMemoryIndexingConfig {
   /** unindexed ordinals required before a pass claims sections */
   messageThreshold: number;
   /**
-   * the newest N ordinals stay un-indexed — the live conversational context
-   * renders verbatim as it always has, and sections (with their summaries)
-   * trail the conversation tip by design rather than chasing it
+   * ordinals held back from indexing at the tip. 0 = chase the tip (the
+   * sectioner's minSectionTokens band is the organic holdback); recency
+   * staging is an ASSEMBLY concern (liveWindowMessages), not an indexing one
    */
   indexingHorizonOffset: number;
   targetSectionTokens: number;

@@ -44,9 +44,11 @@ export class ConversationMemoryWorkupService {
   public get memoryIndexingConfig() {
     return {
       messageThreshold: 12,
-      // the verbatim tail breathes between offset and offset + threshold —
-      // recency stays live/un-summarized; keep liveWindowMessages ≤ this
-      indexingHorizonOffset: 50,
+      // 0 = indexing chases the conversation tip; the sectioner's
+      // minSectionTokens band is the natural "not a decent chunk yet"
+      // holdback. Recency staging lives at ASSEMBLY (liveWindowMessages,
+      // Part II §1) — not here.
+      indexingHorizonOffset: 0,
       targetSectionTokens: 8_000,
       maxSectionTokens: 24_000,
       minSectionTokens: 2_000,
