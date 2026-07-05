@@ -218,6 +218,24 @@ Ordered by dependency and value. Each phase is independently shippable and typec
 
 ---
 
+## 8.5 Proactive browse-triggered indexing (`user_pathname_update`)
+
+Today HMEM indexing fires only on `onTurnPersisted` — after a message send. A conversation you open and read but don't message never indexes, and the ~300-conversation prod backfill would otherwise need a synthetic message per conversation. The fix decouples the trigger from the send.
+
+**Mechanism: a WS event, NOT a cookie.** The socket reads cookies once at handshake (`handleConnection` parses `req.headers.cookie`; `ws.on("message")` never re-reads — WS frames carry no cookie header) and persists across the SPA's client-side navigations. A `currentPath` cookie updated by `proxy.ts` is therefore invisible to the open socket; only a reconnect would re-read it, which is strictly worse. So:
+
+- **Client** fires `user_pathname_update` on pathname change (app-router `useEffect`), debounced ~400ms so hot-potato clicking settles. Carries `conversationId`.
+- **Resolver** handles it → `onConversationViewed(conversationId, userId)`, a thin browse-triggered wrapper over the existing indexing pass. The `unindexed < messageThreshold` check bails cheaply on already-indexed conversations, so re-firing per navigation is near-free.
+- **Optional `user_pathname_update_ack`** — a lightweight UX signal (indexing kicked / N pending / already current); not load-bearing.
+
+**Jobs already survive navigation** — detached, per-context gated, socket-close doesn't abort them, boot-resume + stale-reclaim backstop. So this isn't fixing fragility; it's completing *coverage* and making backfill a consequence of browsing.
+
+**The new primitive it requires: a global concurrency cap.** Per-context gates (`indexingInFlight`, `summaryJobRegistry`) bound one conversation; browse-triggering fans out across many (10 un-indexed conversations × `sweepBatchSize` 8 = 80 concurrent summarizer calls → OTPM blowout; the 300-conversation backfill is the extreme). A global semaphore caps active passes/waves across all conversations, rest queued. This is the same concern as §6's rate-limit stacking viewed twice — the cap can rise as MoE arms spread load — so **sequence 8.5 alongside or just after §6/Phase 5**, not before the core.
+
+**Files:** `@slipstream/types` (event + ack in `EventTypeMap`), `apps/ws-server/src/resolver/*` (handler + `onConversationViewed`), `apps/ws-server/src/memory/vector-store.ts` (global semaphore around pass/wave dispatch), `apps/web/*` — the client half rides an **existing pathname context** (fire the event from there, debounced; no new plumbing needed).
+
+---
+
 ## 9. Deferred / filed (explicit non-goals for Part II)
 
 - **Dormancy repolish** — a background pass that re-embeds a quiet conversation's full family set bidirectionally, upgrading live-era trailing-window vectors to backfill-grade. Filed with the RRF experiment; the observability data decides whether boundary-blindness even shows up in retrieval before it's built.

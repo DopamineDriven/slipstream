@@ -338,9 +338,48 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     );
     const isFirstClaudeMsg = lastClaudeIndex === -1;
 
+    // HMEM substitution assembly (Part II §2): READY sections below the live
+    // window collapse into one name-tagged assistant block each, in ordinal
+    // position — gap-tolerant (an unsummarized range renders verbatim), db
+    // rows/ordinals untouched. Anthropic merges consecutive assistant turns,
+    // so per-chunk blocks are safe.
+    const conversationId = msgs[0]?.conversationId;
+    const maxOrdinalExclusive = msgs.reduce(
+      (max, m) => (m.ordinal >= max ? m.ordinal + 1 : max),
+      0
+    );
+    const plan = conversationId
+      ? await this.memoryService.getHistoryAssemblyPlan(
+          conversationId,
+          maxOrdinalExclusive
+        )
+      : null;
+    const subByStart = plan
+      ? new Map(plan.substitutions.map(s => [s.ordinalStart, s] as const))
+      : null;
+    const coveredOrdinals = new Set<number>();
+    if (plan) {
+      for (const sub of plan.substitutions) {
+        for (let o = sub.ordinalStart; o < sub.ordinalEndExclusive; o++) {
+          coveredOrdinals.add(o);
+        }
+      }
+    }
+
     const messages = Array.of<Anthropic.Beta.BetaMessageParam>();
 
     for (const [msgIndex, msg] of msgs.entries()) {
+      // substituted range → emit the name-tagged summary at its start, drop
+      // the covered messages (the summary stands in for the whole range)
+      const subStart = subByStart?.get(msg.ordinal);
+      if (subStart) {
+        messages.push({
+          role: "assistant",
+          content: `${this.memoryService.substitutionNameTag(subStart)} conversation memory · messages [${subStart.ordinalStart}-${subStart.ordinalEndExclusive - 1}]:\n${subStart.summary ?? ""}`
+        });
+        continue;
+      }
+      if (coveredOrdinals.has(msg.ordinal)) continue;
       const isFreshContext = isFirstClaudeMsg || msgIndex > lastClaudeIndex;
 
       if (msg.senderType === "USER") {
@@ -494,6 +533,18 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
           content: `[${msg.provider.toLowerCase()}/${msg.model ?? "unknown"}]\n${textParts.join("\n\n")}`
         });
       }
+    }
+
+    // leading-user requirement: if the prefix is fully substituted the first
+    // emitted turn is a summary (assistant) — Anthropic 400s on a leading
+    // assistant, so promote a constant memory-preamble user stub (constant =
+    // prompt-cache-stable)
+    if (messages[0]?.role === "assistant") {
+      messages.unshift({
+        role: "user",
+        content:
+          "[conversation memory — earlier messages are consolidated into the summaries that follow; expand any range verbatim via conversation_memory_get_chunk]"
+      });
     }
 
     return {

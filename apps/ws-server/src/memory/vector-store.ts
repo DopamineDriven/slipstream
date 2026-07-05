@@ -3,10 +3,13 @@ import type { LoggerService } from "@/logger/index.ts";
 import type {
   ConversationMemoryGetChunkTarget,
   ConversationMemorySearchToolInput,
+  MemoryAssemblyConfig,
+  MemoryAssemblyPlan,
   MemoryChunkAwaitingSummary,
   MemoryEmbedFamilyMember,
   MemoryHybridRow,
   MemorySectionDraft,
+  MemorySubstitutableChunk,
   MemorySummarizerConfig
 } from "@/memory/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -645,6 +648,50 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       previous: neighborRef(previous),
       next: neighborRef(next)
     });
+  }
+
+  // ── Substitution assembly (provider payload only — db rows/ordinals untouched) ─
+
+  public get memoryAssemblyConfig() {
+    return {
+      enabled: true,
+      liveWindowMessages: 50
+    } as const satisfies MemoryAssemblyConfig;
+  }
+
+  /**
+   * The substitution plan for one conversation's provider history: every READY
+   * section below the live-window floor, gap-tolerant and name-tagged. Returns
+   * null when assembly is off, the conversation is too short to have a floor,
+   * or nothing below the floor is summarized yet.
+   *
+   * Prompt-cache stability: substitution text is keyed to immutable READY
+   * chunks, so the prefix changes only when a new summary lands below the
+   * floor — never per-message.
+   */
+  public async getHistoryAssemblyPlan(
+    conversationId: string,
+    maxOrdinalExclusive: number
+  ) {
+    const cfg = this.memoryAssemblyConfig;
+    if (!cfg.enabled) return null;
+    const liveWindowFloor = maxOrdinalExclusive - cfg.liveWindowMessages;
+    if (liveWindowFloor <= 0) return null;
+
+    const substitutions = await this.prisma.findSubstitutableChunks(
+      conversationId,
+      liveWindowFloor
+    );
+    if (substitutions.length === 0) return null;
+
+    return { liveWindowFloor, substitutions } satisfies MemoryAssemblyPlan;
+  }
+
+  /** the [provider/model] name tag for a substituted section — the fleet notation */
+  public substitutionNameTag(sub: MemorySubstitutableChunk) {
+    const provider = sub.summaryProvider?.toLowerCase() ?? "unknown";
+    const model = sub.summaryModel ?? "unknown";
+    return `[${provider}/${model}]` as const;
   }
 
   // ── Summary pass (frontier vision-capable, quality over cost) ────────

@@ -109,6 +109,33 @@ export interface ConversationMemorySearchToolInput {
   threshold?: number;
 }
 
+export interface MemoryAssemblyConfig {
+  /** master switch for substitution assembly (HMEM Part II §2) */
+  enabled: boolean;
+  /** the newest N ordinals always render verbatim in provider history — the single recency knob */
+  liveWindowMessages: number;
+}
+
+/** row shape returned by PrismaConversationMemoryService.findSubstitutableChunks */
+export type MemorySubstitutableChunk = Unenumerate<
+  Awaited<
+    ReturnType<PrismaConversationMemoryService["findSubstitutableChunks"]>
+  >
+>;
+
+/**
+ * The substitution plan for one conversation's provider history: every READY
+ * section below the live-window floor, gap-tolerant (a gap renders verbatim),
+ * each name-tagged to its summarizer. The formatter merges these with the
+ * un-covered verbatim messages by ordinal.
+ */
+export interface MemoryAssemblyPlan {
+  /** maxOrdinalExclusive - liveWindowMessages; ordinals ≥ this always render verbatim */
+  liveWindowFloor: number;
+  /** ordered by ordinalStart; substitutions never overlap the live window */
+  substitutions: MemorySubstitutableChunk[];
+}
+
 /** discriminated at parse time — the caller picks the lookup, no downstream narrowing */
 export type ConversationMemoryGetChunkTarget =
   | {

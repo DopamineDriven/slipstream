@@ -416,6 +416,37 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
     });
   }
 
+  /**
+   * Substitution-assembly candidates: INDEXED chunks with a READY summary,
+   * entirely below the live-window floor. Gap-tolerant — returns ALL of them
+   * (not a contiguous prefix); the formatter renders gaps verbatim. Carries
+   * summaryModel/summaryProvider so each substituted block name-tags to its
+   * summarizer ([provider/model], the fleet notation).
+   */
+  public async findSubstitutableChunks(
+    conversationId: string,
+    ordinalCeilingExclusive: number
+  ) {
+    return await this.prismaClient.conversationMemoryChunk.findMany({
+      where: {
+        conversationId,
+        chunkingState: "INDEXED",
+        summaryState: "READY",
+        deletedAt: null,
+        ordinalEndExclusive: { lte: ordinalCeilingExclusive }
+      },
+      orderBy: { ordinalStart: "asc" },
+      select: {
+        id: true,
+        ordinalStart: true,
+        ordinalEndExclusive: true,
+        summary: true,
+        summaryModel: true,
+        summaryProvider: true
+      }
+    });
+  }
+
   public async findMemoryChunkById(chunkId: string) {
     return await this.prismaClient.conversationMemoryChunk.findUnique({
       where: { id: chunkId }
