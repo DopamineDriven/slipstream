@@ -239,19 +239,6 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     return formatted;
   }
 
-  protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.\n instead of file_search you have slather_user_store, a tool for spelunking a self-hosted vector store. " +
-      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
-    if (isNewChat) {
-      return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
-    }
-
-    return (
-      systemPrompt ? `${systemPrompt}\n\n${note}` : note
-    ) satisfies ResponsesContentInputSingleton["content"];
-  }
-
   protected resolveResponsesTools({
     collectionId: _c = undefined,
     enableFileSearch: _e = false,
@@ -353,7 +340,6 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
   }
 
   protected async getResponsesApiInputWorkup({
-    isNewChat,
     model = "grok-4.20-0309-reasoning",
     userId,
     msgs,
@@ -380,10 +366,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     parallel_tool_calls = true,
     include = ["reasoning.encrypted_content"]
   }: ResponsesApiInputWorkupParams) {
-    const systemInstruction = this.formatSystemInstruction(
-      isNewChat,
-      systemPrompt
-    );
+    const systemInstruction = this.prisma.formatSysNote(systemPrompt);
     let toolHandler: ToolUnion[] | undefined;
     const hasDocs = enableUserStoreSearch && hasUserStoreDocs;
     // "grok-4.20-multi-agent-0309" doesn't support calling functional tools yet (2026-03-24)
@@ -526,7 +509,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     } = typeof round_input !== "undefined"
       ? {
           input: round_input,
-          instructions: this.formatSystemInstruction(isNewChat, systemPrompt),
+          instructions: this.prisma.formatSysNote(systemPrompt),
           reasoning: undefined,
           max_output_tokens: max_tokens,
           model: (m ?? "grok-4.20-0309-reasoning") as GrokModelIdUnion,

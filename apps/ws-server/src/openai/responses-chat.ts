@@ -204,7 +204,7 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       undefined,
       hasUserStoreDocs
     );
-    const instructions = this.buildInstructions(systemPrompt);
+    const instructions = this.prisma.formatSysNote(systemPrompt);
     const MAX_TOOL_ROUNDS = 10;
     let roundInput = Array.of<OpenAI.Responses.ResponseInputItem>(...formatted);
     let forcedLoopStopReason: "MAX_ROUNDS" | undefined = undefined;

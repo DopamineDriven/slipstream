@@ -94,6 +94,7 @@ export default defineConfig(
         "src/types/index.ts",
         "src/vercel/index.ts",
         "src/vercel/sse.ts",
+        "src/vercel/types.ts",
         "src/voyage/index.ts",
         "src/voyage/types.ts",
         "src/ws-server/index.ts",

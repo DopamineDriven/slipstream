@@ -35,6 +35,17 @@ export class ModelService extends ProviderValidation {
   public decodeUTF8(bytes: Uint8Array | NodeJS.NonSharedUint8Array) {
     return ByteCodec.decode(bytes);
   }
+
+  public get sysNote(){
+    return "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.\nOlder messages are made searchable via tooling to keep things light." as const;
+  }
+
+  public formatSysNote(
+    systemPrompt?: string
+  ) {
+    return systemPrompt ? `${systemPrompt}\n\n${this.sysNote}` : this.sysNote;
+  }
+
   public isOpenAIModel(m: string) {
     return (
       m === "gpt-5.5" ||

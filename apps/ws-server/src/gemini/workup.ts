@@ -6,7 +6,6 @@ import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
   Content,
-  ContentUnion,
   FunctionDeclaration,
   GenerateContentConfig,
   GenerateContentParameters,
@@ -515,22 +514,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
     return formatted;
   }
 
-  protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
-    if (isNewChat) {
-      return systemPrompt;
-    }
-
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
-      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
-
-    return (
-      systemPrompt ? `${systemPrompt}\n\n${note}` : note
-    ) satisfies ContentUnion;
-  }
-
   protected async getHistoryAndInstruction(
-    isNewChat: boolean,
     msgs: MessageSingleton<true>[],
     keyFingerprint: string,
     systemPrompt?: string,
@@ -538,8 +522,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
     apiKey?: string,
     model?: GeminiModelIdUnion
   ) {
-    const systemInstruction = this.formatSystemInstruction(
-      isNewChat,
+    const systemInstruction = this.prisma.formatSysNote(
       systemPrompt
     );
 
@@ -1037,7 +1020,6 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }
 
   private async contentGenChat({
-    isNewChat,
     keyId,
     model,
     msgs,
@@ -1059,7 +1041,6 @@ export class GeminiWorkupService extends FileSearchStoreService {
     const maxOutputTokens = max_tokens;
     const { history: contents, systemInstruction } =
       await this.getHistoryAndInstruction(
-        isNewChat,
         msgs,
         keyFingerprint,
         systemPrompt,
@@ -1133,7 +1114,6 @@ export class GeminiWorkupService extends FileSearchStoreService {
    * Note: I intend to filter for previous nano bananas messages within a convo context else include up to the 5 most recent turns or a combo thereof (for nano banana messages, that includes the user and the agent response + attachments)
    */
   private async contentGenNanoBananas({
-    isNewChat,
     keyId,
     model,
     msgs,
@@ -1180,7 +1160,6 @@ export class GeminiWorkupService extends FileSearchStoreService {
     }
     const { history: contents, systemInstruction } =
       await this.getHistoryAndInstruction(
-        isNewChat,
         msgBananas,
         keyFingerprint,
         systemPrompt,

@@ -122,21 +122,6 @@ export class DeepSeekService {
     }
   }
 
-  private formatSystemInstruction(
-    isNewChat: boolean,
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"]
-  ) {
-    if (isNewChat) {
-      return systemPrompt;
-    }
-
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
-      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
-
-    return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
-  }
-
   private formatHistory(msgs: MessageSingleton<true>[]) {
     const formatted = Array.of<DeepSeekBaseMessage>();
     const lastIndex = msgs.findLastIndex(
@@ -788,7 +773,6 @@ export class DeepSeekService {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    isNewChat,
     max_tokens,
     model,
     systemPrompt,
@@ -891,14 +875,8 @@ export class DeepSeekService {
           this.memorySearchFunctionTool(),
           this.memoryGetChunkFunctionTool()
         ]
-      : [
-          this.memorySearchFunctionTool(),
-          this.memoryGetChunkFunctionTool()
-        ];
-    const systemInstruction = this.formatSystemInstruction(
-      isNewChat,
-      systemPrompt
-    );
+      : [this.memorySearchFunctionTool(), this.memoryGetChunkFunctionTool()];
+    const systemInstruction = this.prisma.formatSysNote(systemPrompt);
 
     let roundMessages = Array.of<DeepSeekRequestMessage>(
       ...(systemInstruction

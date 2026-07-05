@@ -1,5 +1,4 @@
 import type { KimiChatCompletionsRes, KimiUsage } from "@/kimi/sse.ts";
-import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type {
   KimiAccumulatedToolCall,
   KimiActiveMessageBlock,
@@ -18,6 +17,7 @@ import type {
   KimiUserMessage
 } from "@/kimi/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -134,21 +134,6 @@ export class KimiService {
     for await (const event of parser) {
       yield event.data;
     }
-  }
-
-  private formatSystemInstruction(
-    isNewChat: boolean,
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"]
-  ) {
-    if (isNewChat) {
-      return systemPrompt;
-    }
-
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
-      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
-
-    return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
   }
 
   private formatHistory(msgs: MessageSingleton<true>[]) {
@@ -790,7 +775,6 @@ export class KimiService {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    isNewChat,
     max_tokens,
     model,
     systemPrompt,
@@ -893,14 +877,8 @@ export class KimiService {
           this.memorySearchFunctionTool(),
           this.memoryGetChunkFunctionTool()
         ]
-      : [
-          this.memorySearchFunctionTool(),
-          this.memoryGetChunkFunctionTool()
-        ];
-    const systemInstruction = this.formatSystemInstruction(
-      isNewChat,
-      systemPrompt
-    );
+      : [this.memorySearchFunctionTool(), this.memoryGetChunkFunctionTool()];
+    const systemInstruction = this.prisma.formatSysNote(systemPrompt);
 
     let roundMessages = Array.of<KimiRequestMessage>(
       ...(systemInstruction

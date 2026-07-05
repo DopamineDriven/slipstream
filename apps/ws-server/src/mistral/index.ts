@@ -33,8 +33,7 @@ import type {
   UTR
 } from "@slipstream/types";
 
-
-type MistralContentChunk = UTR<ContentChunk, "type">
+type MistralContentChunk = UTR<ContentChunk, "type">;
 
 const MISTRAL_HISTORY_MESSAGE_LIMIT = 175;
 
@@ -226,7 +225,7 @@ export function formatMistralHistory(
                   content.push({
                     type: "image_url",
                     imageUrl: { url, detail: "high" }
-                  } satisfies MistralContentChunk['image_url']);
+                  } satisfies MistralContentChunk["image_url"]);
                 } else {
                   textParts.push(`![${name}](${url})`);
                 }
@@ -405,18 +404,6 @@ export class MistralService extends MistralStreamContentService {
     } satisfies MistralHistoryFormatterDeps);
   }
 
-  protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
-    if (isNewChat) {
-      return systemPrompt;
-    }
-
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
-      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
-
-    return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
-  }
-
   private fileSearchFunctionTool() {
     return {
       type: "function",
@@ -526,8 +513,7 @@ export class MistralService extends MistralStreamContentService {
           properties: {
             chunk_id: {
               type: "string",
-              description:
-                "Section id from a conversation_memory_search result"
+              description: "Section id from a conversation_memory_search result"
             },
             conversation_id: {
               type: "string",
@@ -536,8 +522,7 @@ export class MistralService extends MistralStreamContentService {
             },
             ordinal: {
               type: "number",
-              description:
-                "0-based message ordinal (pair with conversation_id)"
+              description: "0-based message ordinal (pair with conversation_id)"
             },
             direction: {
               type: "string",
@@ -954,7 +939,6 @@ export class MistralService extends MistralStreamContentService {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    isNewChat,
     max_tokens,
     model,
     systemPrompt,
@@ -1242,15 +1226,9 @@ export class MistralService extends MistralStreamContentService {
             this.memorySearchFunctionTool(),
             this.memoryGetChunkFunctionTool()
           ]
-        : [
-            this.memorySearchFunctionTool(),
-            this.memoryGetChunkFunctionTool()
-          ]
+        : [this.memorySearchFunctionTool(), this.memoryGetChunkFunctionTool()]
     ) satisfies ToolTypes;
-    const systemInstruction = this.formatSystemInstruction(
-      isNewChat,
-      systemPrompt
-    );
+    const systemInstruction = this.prisma.formatSysNote(systemPrompt);
     let roundMessages = Array.of<MistralMessageReq>(
       ...(systemInstruction
         ? [

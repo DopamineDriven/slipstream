@@ -819,7 +819,6 @@ export class AlibabaService {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    isNewChat,
     max_tokens,
     model,
     systemPrompt,
@@ -926,10 +925,8 @@ export class AlibabaService {
           this.memorySearchFunctionTool(),
           this.memoryGetChunkFunctionTool()
         ];
-    const systemInstruction = this.formatSystemInstruction(
-      isNewChat,
-      systemPrompt
-    );
+
+    const systemInstruction = this.prisma.formatSysNote(systemPrompt);
 
     let roundMessages = Array.of<AlibabaRequestMessage>(
       ...(systemInstruction

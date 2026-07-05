@@ -377,6 +377,8 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
         conversationTitle: true,
         rollingSummary: true,
         rollingSummaryUpdatedAt: true,
+        // where the live tail begins — the fold renders [watermark, max) firsthand
+        lastIndexedOrdinalExclusive: true,
         // store scoping for the summarizer's file_search executor
         memoryStore: { select: { userId: true } }
       }

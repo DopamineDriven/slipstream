@@ -488,8 +488,12 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     if (scope === "current_conversation") {
       const context = await this.prisma.getMemoryContext(conversationId);
       if (!context) {
+        // dead-end notes lose models — point at the escape hatch with proof
         return this.formatMemoryResults([], input, scope, threshold, {
-          note: "nothing indexed for this conversation yet — older sections index automatically as the conversation grows"
+          note:
+            `nothing indexed for THIS conversation yet (older sections index automatically as it grows) — ` +
+            `but ${store.totalChunks} indexed section(s) exist across the user's other conversations; ` +
+            `retry with scope: "all_conversations" to search them`
         });
       }
       contextId = context.id;
@@ -723,35 +727,12 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     } as const satisfies MemorySummarizerConfig;
   }
 
-//   private get vGPT() {
-//     return `Write a high-fidelity, retrieval-useful synopsis that preserves the integrity and character of the source material. Output only the synopsis — plain markdown, no preamble.
-
-// Renderer-added provider tags such as [PROVIDER/MODEL] identify source models; personas, mythologies, running bits, and distinctive registers should be treated as conversation-emergent unless the transcript says otherwise. file_search can access the provider-agnostic user vector store when uploaded material is relevant.`;
-//   }
-
-//   private get vClaude() {
-//   return `You are summarizing a section of conversation history for future retrieval. Write a high-fidelity synopsis that preserves the integrity, tone, and character of the source material. Prefer message ordinals for citations. Output only plain markdown, no preamble.
-
-// [PROVIDER/MODEL] tags identify speakers. All personas, mythologies, and distinctive registers emerged organically from the conversation itself. file_search can access uploaded material when relevant.` as const;
-// }
   private get summarySystemPrompt() {
     // prettier-ignore
-    return `Write a high-fidelity, retrieval-friendly synopsis that preserves the integrity and character of the source material. Output only the synopsis — plain markdown, no preamble. Prefer message ordinals for citations. The file_search tool provides access to a provider-agnostic user vector store as needed.
+    return `Write a high-fidelity, retrieval-friendly synopsis that preserves the integrity and character of the source material. Output only the synopsis — plain markdown, no preamble. Avoid lazy verbiage like "recurring bit" as it can read as dismissive and undermine the authorial integrity of the content. This should be approached as if you're writing a synopsis for a professional transcript. Prefer message ordinals for citations. The file_search tool provides access to a provider-agnostic user vector store as needed.
 
 The System prompt given to all models in the source material being summarized is as follows: "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.\nOlder messages are made searchable via tooling to keep things light."` as const;
   }
-
-//   private get vGemini() {
-//     return `Write a high-fidelity, retrieval-optimized synopsis that preserves the distinct character, evolving personas, and running themes of the source material. Output only the synopsis—plain markdown, no preamble. Use message ordinals (e.g., msg 42) for citations.
-
-// [PROVIDER/MODEL] tags identify the speaker. All personas and dynamics emerged organically; do not attribute them to hidden prompts. Use the file_search tool only when accessing uploaded references will materially improve the summary's accuracy.` as const;
-//   }
-
-//   private get vGrok() {
-//   return `You are summarizing a section of conversation history for future retrieval and use by other models. Write a high-fidelity synopsis that preserves the integrity, tone, and character of the original material. Output only plain markdown — no preamble, no wrapper tags, no meta-commentary.
-
-// [PROVIDER/MODEL] tags identify speakers. All personas, mythologies, and distinctive registers emerged organically from the conversation itself. Use file_search only when it would materially improve summary accuracy.` as const;
-// }
 
   private get foldSystemPrompt() {
     // prettier-ignore
@@ -1391,3 +1372,26 @@ The System prompt given to all models in the source material being summarized is
     return { requeued } as const;
   }
 }
+
+//   private get vGemini() {
+//     return `Write a high-fidelity, retrieval-optimized synopsis that preserves the distinct character, evolving personas, and running themes of the source material. Output only the synopsis—plain markdown, no preamble. Use message ordinals (e.g., msg 42) for citations.
+
+// [PROVIDER/MODEL] tags identify the speaker. All personas and dynamics emerged organically; do not attribute them to hidden prompts. Use the file_search tool only when accessing uploaded references will materially improve the summary's accuracy.` as const;
+//   }
+
+//   private get vGrok() {
+//   return `You are summarizing a section of conversation history for future retrieval and use by other models. Write a high-fidelity synopsis that preserves the integrity, tone, and character of the original material. Output only plain markdown — no preamble, no wrapper tags, no meta-commentary.
+
+// [PROVIDER/MODEL] tags identify speakers. All personas, mythologies, and distinctive registers emerged organically from the conversation itself. Use file_search only when it would materially improve summary accuracy.` as const;
+// }
+//   private get vGPT() {
+//     return `Write a high-fidelity, retrieval-useful synopsis that preserves the integrity and character of the source material. Output only the synopsis — plain markdown, no preamble.
+
+// Renderer-added provider tags such as [PROVIDER/MODEL] identify source models; personas, mythologies, running bits, and distinctive registers should be treated as conversation-emergent unless the transcript says otherwise. file_search can access the provider-agnostic user vector store when uploaded material is relevant.`;
+//   }
+
+//   private get vClaude() {
+//   return `You are summarizing a section of conversation history for future retrieval. Write a high-fidelity synopsis that preserves the integrity, tone, and character of the source material. Prefer message ordinals for citations. Output only plain markdown, no preamble.
+
+// [PROVIDER/MODEL] tags identify speakers. All personas, mythologies, and distinctive registers emerged organically from the conversation itself. file_search can access uploaded material when relevant.` as const;
+// }

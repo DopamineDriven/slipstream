@@ -90,30 +90,6 @@ export class LlamaService {
     return client;
   }
 
-  private buildSystemPrompt(
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
-    fileSearchEnabled = false
-  ) {
-    const basePrompt = fileSearchEnabled
-      ? "Tool policy: if document lookup would help, call the provided file_search tool using that exact name. Use file_search sparingly. Do not repeat the same query. If results are empty or not improving, stop using tools and answer directly with the best available guidance plus what is missing."
-      : undefined;
-
-    const historyNote =
-      "Note: Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
-      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
-
-    if (systemPrompt && basePrompt) {
-      return `${systemPrompt}\n\n${basePrompt}\n\n${historyNote}`;
-    }
-    if (systemPrompt) {
-      return `${systemPrompt}\n\n${historyNote}`;
-    }
-    if (basePrompt) {
-      return `${basePrompt}\n\n${historyNote}`;
-    }
-    return historyNote;
-  }
-
   private messageText(
     msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
   ) {
@@ -166,13 +142,12 @@ export class LlamaService {
         }
       | { readonly role: "assistant"; readonly content: string }
     )[],
-    systemPrompt?: string,
-    fileSearchEnabled = false
+    systemPrompt?: string
   ) {
     return [
       {
         role: "system",
-        content: this.buildSystemPrompt(systemPrompt, fileSearchEnabled)
+        content: this.prisma.formatSysNote(systemPrompt)
       },
       ...msgs
     ] as const satisfies Message[];
@@ -590,8 +565,7 @@ export class LlamaService {
   public llamaFormat(
     isNewChat: boolean,
     msgs: ProviderChatRequestEntity["msgs"],
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
-    fileSearchEnabled = false
+    systemPrompt?: ProviderChatRequestEntity["systemPrompt"]
   ) {
     const buildUserContent = (m: MessageSingleton<true>) => {
       const parts = Array.of<
@@ -616,7 +590,7 @@ export class LlamaService {
         return [
           {
             role: "system",
-            content: this.buildSystemPrompt(systemPrompt, fileSearchEnabled)
+            content: this.prisma.formatSysNote(systemPrompt)
           },
           { role: "user", content: "" }
         ] as const satisfies Message[];
@@ -629,7 +603,7 @@ export class LlamaService {
       return [
         {
           role: "system",
-          content: this.buildSystemPrompt(systemPrompt, fileSearchEnabled)
+          content: this.prisma.formatSysNote(systemPrompt)
         },
         userMsg
       ] as const satisfies Message[];
@@ -638,7 +612,7 @@ export class LlamaService {
     const last = msgs.at(-1);
     if (last?.senderType === "USER") {
       const history = this.prependProviderModelTag(msgs.slice(0, -1));
-      const base = this.formatMsgs(history, systemPrompt, fileSearchEnabled);
+      const base = this.formatMsgs(history, systemPrompt);
       const parts = buildUserContent(last);
       const userMsg =
         parts.length === 1 && parts[0]?.type === "text"
@@ -649,8 +623,7 @@ export class LlamaService {
 
     return this.formatMsgs(
       this.prependProviderModelTag(msgs),
-      systemPrompt,
-      fileSearchEnabled
+      systemPrompt
     ) satisfies Message[];
   }
 
@@ -908,17 +881,9 @@ export class LlamaService {
           this.memorySearchFunctionTool(),
           this.memoryGetChunkFunctionTool()
         ]
-      : [
-          this.memorySearchFunctionTool(),
-          this.memoryGetChunkFunctionTool()
-        ];
+      : [this.memorySearchFunctionTool(), this.memoryGetChunkFunctionTool()];
 
-    const initialMessages = this.llamaFormat(
-      isNewChat,
-      msgs,
-      systemPrompt,
-      hasUserStoreDocs
-    );
+    const initialMessages = this.llamaFormat(isNewChat, msgs, systemPrompt);
     let roundMessages = Array.of<Message>(...initialMessages);
     let toolConversationMessages = Array.of<Message>(
       ...this.buildToolContinuationBase(initialMessages)

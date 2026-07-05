@@ -54,7 +54,7 @@ export class SakanaBaseService {
       const normalizedEffort = effort === "max" ? "xhigh" : effort;
       if (model === "fugu") {
         return {
-          effort: normalizedEffort ?? "xhigh"
+          effort: normalizedEffort ?? "high"
         } as const satisfies ReasoningProps;
       } else {
         return {

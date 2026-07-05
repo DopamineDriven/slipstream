@@ -252,14 +252,6 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     }) satisfies ResponseInput;
   }
 
-  protected buildInstructions(systemPrompt?: string) {
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
-      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
-
-    return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
-  }
-
   protected ensureUserVectorStoreId(
     client: OpenAI,
     workspaceId: string | null | undefined,

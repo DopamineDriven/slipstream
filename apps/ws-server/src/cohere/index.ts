@@ -114,9 +114,7 @@ export class CohereService {
       return systemPrompt ?? fileSearchNote;
     }
 
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
-      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
+    const note = this.prisma.sysNote;
 
     if (systemPrompt && fileSearchNote) {
       return `${systemPrompt}\n\n${fileSearchNote}\n\n${note}`;

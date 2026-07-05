@@ -259,7 +259,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
         stream: true,
         stream_options: { include_obfuscation: false },
         input: formatted,
-        instructions: this.buildInstructions(systemPrompt),
+        instructions: this.prisma.formatSysNote(systemPrompt),
         store: false,
         reasoning: this.openaiReasoning(mod, "high", "auto", true),
         model: mod,

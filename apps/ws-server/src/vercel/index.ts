@@ -5,6 +5,23 @@ import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { v0ChatCompletionsRes, v0Usage } from "@/vercel/sse.ts";
+import type {
+  V0AccumulatedToolCall,
+  V0ActiveMessageBlock,
+  V0AssistantMessage,
+  V0AssistantToolCallMessage,
+  V0BaseMessage,
+  V0FinalizedMessageBlock,
+  V0ForcedLoopStopReason,
+  V0FunctionTool,
+  V0FunctionToolCall,
+  V0ImageContentPart,
+  V0RequestMessage,
+  V0TextContentPart,
+  V0ToolMessage,
+  V0UserContentPart,
+  V0UserMessage
+} from "@/vercel/types.ts";
 import type { Logger as PinoLogger } from "pino";
 import {
   createV0SSEParser,
@@ -19,109 +36,6 @@ import type {
   MessageSingleton,
   VercelModelIdUnion
 } from "@slipstream/types";
-
-interface V0FunctionTool {
-  type: "function";
-  function: {
-    name: string;
-    description: string;
-    parameters: {
-      type: "object";
-      properties: Record<
-        string,
-        {
-          type: "string" | "number" | "array" | "boolean";
-          description: string;
-          enum?: readonly string[];
-          items?: { type: "string" };
-          minItems?: number;
-          maxItems?: number;
-        }
-      >;
-      required: string[];
-      additionalProperties: boolean;
-    };
-  };
-}
-
-type V0FunctionToolCall = {
-  id: string;
-  type: "function";
-  function: {
-    name: string;
-    arguments: string;
-  };
-};
-
-type V0TextContentPart = {
-  type: "text";
-  text: string;
-};
-
-type V0ImageContentPart = {
-  type: "image_url";
-  image_url: {
-    url: string;
-    detail: "auto" | "low" | "high";
-  };
-};
-
-type V0UserContentPart = V0TextContentPart | V0ImageContentPart;
-
-type V0SystemMessage = {
-  role: "system";
-  content: string;
-};
-
-type V0UserMessage = {
-  role: "user";
-  content: string | readonly V0UserContentPart[];
-};
-
-type V0AssistantMessage = {
-  role: "assistant";
-  content: string;
-};
-
-type V0BaseMessage = V0SystemMessage | V0UserMessage | V0AssistantMessage;
-
-type V0AssistantToolCallMessage = {
-  role: "assistant";
-  content: "";
-  tool_calls: readonly V0FunctionToolCall[];
-};
-
-type V0ToolMessage = {
-  role: "tool";
-  tool_call_id: string;
-  content: string;
-};
-
-type V0RequestMessage =
-  V0BaseMessage | V0AssistantToolCallMessage | V0ToolMessage;
-
-type V0AccumulatedToolCall = {
-  id: string;
-  name: string;
-  arguments: string;
-};
-
-interface V0ActiveMessageBlock {
-  content: string;
-  reasoningChunkCount: number;
-  sawAggregateTail: boolean;
-  startedAt: number;
-  type: "THINKING" | "TEXT";
-}
-
-interface V0FinalizedMessageBlock {
-  content: string;
-  durationMs: number;
-  ordinal: number;
-  type: $Enums.MessageBlockType;
-}
-
-type V0ForcedLoopStopReason = "MAX_ROUNDS" | null;
 
 export class v0Service {
   private readonly baseUrl = "https://ai-gateway.vercel.sh/v1/chat/completions";
@@ -191,21 +105,6 @@ export class v0Service {
     for await (const event of parser) {
       yield event.data;
     }
-  }
-
-  private formatSystemInstruction(
-    isNewChat: boolean,
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"]
-  ) {
-    if (isNewChat) {
-      return systemPrompt;
-    }
-
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
-      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
-
-    return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
   }
 
   private formatHistory(msgs: MessageSingleton<true>[]) {
@@ -850,7 +749,6 @@ export class v0Service {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    isNewChat,
     max_tokens,
     model,
     systemPrompt,
@@ -983,14 +881,8 @@ export class v0Service {
           this.memorySearchFunctionTool(),
           this.memoryGetChunkFunctionTool()
         ]
-      : [
-          this.memorySearchFunctionTool(),
-          this.memoryGetChunkFunctionTool()
-        ];
-    const systemInstruction = this.formatSystemInstruction(
-      isNewChat,
-      systemPrompt
-    );
+      : [this.memorySearchFunctionTool(), this.memoryGetChunkFunctionTool()];
+    const systemInstruction = this.prisma.formatSysNote(systemPrompt);
 
     let roundMessages = Array.of<V0RequestMessage>(
       ...(systemInstruction
