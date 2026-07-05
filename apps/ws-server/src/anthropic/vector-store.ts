@@ -326,7 +326,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   }
 
   protected async formatAnthropicHistoryWithFiles(
-    isNewChat: boolean,
     msgs: MessageSingleton<true>[],
     model: AnthropicModelIdUnion,
     systemPrompt?: string,
@@ -339,32 +338,9 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     );
     const isFirstClaudeMsg = lastClaudeIndex === -1;
 
-    // config-gated memory compaction: messages covered by summarized chunks
-    // below the live window collapse into one leading memory block — provider
-    // payload only, db rows/ordinals untouched. Snapped to chunk boundaries
-    // so the prefix stays prompt-cache-stable between chunk landings.
-    const conversationId = msgs[0]?.conversationId;
-    const maxOrdinalExclusive = msgs.reduce(
-      (max, m) => (m.ordinal >= max ? m.ordinal + 1 : max),
-      0
-    );
-    const compaction =
-      !isNewChat && conversationId
-        ? await this.memoryService.getCompactionPlan(
-            conversationId,
-            maxOrdinalExclusive
-          )
-        : null;
-
     const messages = Array.of<Anthropic.Beta.BetaMessageParam>();
 
     for (const [msgIndex, msg] of msgs.entries()) {
-      if (
-        compaction &&
-        msg.ordinal < compaction.compactedThroughOrdinalExclusive
-      ) {
-        continue;
-      }
       const isFreshContext = isFirstClaudeMsg || msgIndex > lastClaudeIndex;
 
       if (msg.senderType === "USER") {
@@ -508,39 +484,26 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
           }
         }
 
+        // [provider/model] prefix — the SAME name-tag notation every other
+        // provider's formatter uses. The old XML <model> ENCLOSURE was the
+        // mimicry root cause: Claude saw its own turns wrapped and emitted
+        // wrappers, compounding one layer per generation (355 scrubbed
+        // incidents vs gemini's 4 under the prefix form).
         messages.push({
           role: "assistant",
-          content: `<model provider="${msg.provider.toLowerCase()}" name="${msg.model}">\n${textParts.join("\n\n")}\n</model>`
+          content: `[${msg.provider.toLowerCase()}/${msg.model ?? "unknown"}]\n${textParts.join("\n\n")}`
         });
       }
     }
-
-    if (compaction) {
-      // leading user turn; Anthropic combines consecutive same-role turns,
-      // so alternation is safe wherever the chunk boundary landed
-      messages.unshift({
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: compaction.block
-          } satisfies Anthropic.Beta.BetaTextBlockParam
-        ]
-      });
-    }
-
-    const systemNote = `Note: Previous responses may be tagged with their source provider-model combo for context.`;
-
-    const enhancedSystemPrompt = systemPrompt
-      ? `${systemPrompt}\n\n${systemNote}`
-      : systemNote;
 
     return {
       messages,
       system: [
         {
           type: "text",
-          text: enhancedSystemPrompt
+          // the centralized platform note — the same verbatim string the
+          // summarizer prompts quote, now true for anthropic too
+          text: this.prisma.formatSysNote(systemPrompt)
         }
       ] satisfies Anthropic.Beta.BetaTextBlockParam[]
     };
@@ -574,7 +537,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   }
 
   protected async createStreamWorkup({
-    isNewChat,
     messages: msgs,
     userId,
     apiKey,
@@ -593,7 +555,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
     // Use Files API for PDFs
     const { messages, system } = await this.formatAnthropicHistoryWithFiles(
-      isNewChat,
       msgs,
       model,
       systemPrompt,
