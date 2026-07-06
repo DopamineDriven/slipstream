@@ -32,12 +32,15 @@ export class ModelServiceWorkup extends ProviderValidation {
   }
 
   /**
-   * Persist-time twin of packages/db/src/test/scrub-model-wrappers.ts:
-   * anchored strip of model-mimicked <model provider name> wrapper stacks —
-   * leading opening-tag stacks and trailing closing-tag stacks ONLY; interior
-   * tags are content (the corpus quotes the notation). Idempotent; the trim
-   * fires only when a strip fired. Keeps prod from re-accumulating layers
-   * post-scrub (355 anthropic incidents before the prefix normalization).
+   * Twin of packages/db/src/test/scrub-model-wrappers.ts: anchored strip of
+   * model-mimicked <model provider name> wrapper stacks — leading opening-tag
+   * stacks and trailing closing-tag stacks ONLY; interior tags are content.
+   * Idempotent; the trim fires only when a strip fired.
+   *
+   * NOT operationalized (deliberate): the mimicry root cause was the anthropic
+   * formatter's XML enclosure — now bracket-prefixed — and the corpus is
+   * scrubbed, so persist-time scrubbing would be a hot-path pass against a
+   * cause that no longer exists. Kept as a utility.
    */
   public scrubModelWrappers(content: string) {
     const leading = /^(?:\s*<model\s+provider="[^"]*"\s+name="[^"]*"\s*>)+\s*/;

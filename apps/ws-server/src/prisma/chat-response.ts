@@ -86,11 +86,7 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
         ? Math.round(data.thinkingDuration)
         : undefined;
     const persistedMessageBlocks = data.messageBlocks?.map(block => ({
-      // TEXT blocks only — THINKING/ENCRYPTED_THINKING are never touched
-      content:
-        block.type === "TEXT"
-          ? this.scrubModelWrappers(block.content)
-          : block.content,
+      content: block.content,
       conversationId: data.conversationId,
       durationMs: Math.round(block.durationMs),
       ordinal: block.ordinal,
@@ -224,11 +220,7 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
               thinkingText: data?.thinkingText,
               isImageGen: data.imgGenEnabled ?? false,
               userKeyId: keyId,
-              // persist-time wrapper sanitation — mimicked <model> stacks
-              // never reach the db (all providers; mimicry crosses them)
-              content: this.scrubModelWrappers(
-                data.imgGenFields?.revisedPrompt ?? data.chunk
-              )
+              content: data.imgGenFields?.revisedPrompt ?? data.chunk
             }
           },
           userId,
