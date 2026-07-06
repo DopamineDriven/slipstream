@@ -246,6 +246,13 @@ export class LlamaService {
               description:
                 "Where to search (default current_conversation). Use all_conversations for cross-conversation recall."
             },
+            conversation_title: {
+              type: "string",
+              description:
+                "Optional fuzzy conversation-title filter (case-insensitive) — providing it implies all_conversations scope. " +
+                "Recall by name: 'the Catullan one' matches 'Catullan Odes & Combinatorics'. " +
+                "Same contract as the filename filter on the document-search tool."
+            },
             max_results: {
               type: "number",
               description: "Maximum results per signal (1-10, default 5)"

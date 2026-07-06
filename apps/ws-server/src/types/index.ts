@@ -81,7 +81,8 @@ export type IncludeCreateConvoWithImgGenProps = {
   conversationSettings: true;
   messages: {
     orderBy: {
-      createdAt: "asc";
+      // ordinal is the authoritative dense sequence — createdAt can tie
+      ordinal: "asc";
     };
     include: {
       imageGenJob: true;

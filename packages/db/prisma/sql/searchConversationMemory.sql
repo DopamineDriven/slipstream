@@ -3,6 +3,7 @@
 -- @param {Int} $3:limit
 -- @param {Float} $4:threshold
 -- @param {String} $5:embeddingModel
+-- @param {String} $6:conversationTitle?
 
 SELECT
   mc.id,
@@ -33,5 +34,10 @@ WHERE mc."storeId" = $1
   AND mc."deletedAt" IS NULL
   AND mc.embedding IS NOT NULL
   AND 1 - (mc.embedding <=> $2::vector) >= $4
+  AND ($6::text IS NULL OR EXISTS (
+    SELECT 1 FROM "Conversation" tc
+    WHERE tc.id = mc."conversationId"
+      AND similarity(lower(tc.title), lower($6)) >= 0.25
+  ))
 ORDER BY mc.embedding <=> $2::vector
 LIMIT $3;

@@ -1,6 +1,7 @@
 import type { MessageInputParams } from "@/anthropic/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
+import type { ToolCatalogService } from "@/tool-catalog/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -14,16 +15,19 @@ import type {
 export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   protected userStoreVector: UserStoreVectorService;
   protected memoryService: ConversationMemoryVectorService;
+  protected toolCatalog: ToolCatalogService;
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
     userStoreVector: UserStoreVectorService,
     memoryService: ConversationMemoryVectorService,
+    toolCatalog: ToolCatalogService,
     apiKey: string
   ) {
     super(logger, prisma, apiKey);
     this.userStoreVector = userStoreVector;
     this.memoryService = memoryService;
+    this.toolCatalog = toolCatalog;
   }
   protected async searchStore(
     userId: string,
@@ -185,6 +189,13 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
             description:
               "Where to search (default current_conversation). Use all_conversations for cross-conversation recall."
           },
+          conversation_title: {
+            type: "string",
+            description:
+              "Optional fuzzy conversation-title filter (case-insensitive) — providing it implies all_conversations scope. " +
+              "Recall by name: 'the Catullan one' matches 'Catullan Odes & Combinatorics'. " +
+              "Same contract as the filename filter on the document-search tool."
+          },
           max_results: {
             type: "number",
             description: "Maximum results per signal (1-10, default 5)"
@@ -258,6 +269,18 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     );
   }
 
+  protected toolCatalogTool(): Anthropic.Beta.BetaToolUnion {
+    return {
+      name: "tool_catalog",
+      allowed_callers: ["direct", "code_execution_20250825"],
+      description:
+        "Relational guidance for the in-house toolkit shipped with THIS request — what each tool is, " +
+        "what it's best for, and how the tools pair. No input required. " +
+        "Useful for orienting when tools are unfamiliar.",
+      input_schema: { type: "object" as const, properties: {} }
+    } satisfies Anthropic.Beta.BetaToolUnion;
+  }
+
   private webSearchTool(
     user_location:
       | Anthropic.WebSearchTool20250305["user_location"]
@@ -314,6 +337,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
         this.fileSearchTool(),
         this.conversationMemorySearchTool(),
         this.conversationMemoryGetChunkTool(),
+        this.toolCatalogTool(),
         this.webSearchTool(user_location),
         this.webFetchTool()
       ] satisfies Anthropic.Beta.BetaToolUnion[];

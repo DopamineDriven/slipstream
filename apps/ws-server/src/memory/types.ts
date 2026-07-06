@@ -105,6 +105,11 @@ export interface ConversationMemorySearchToolInput {
   query: string;
   search_terms?: string;
   scope?: ConversationMemorySearchScope;
+  /**
+   * fuzzy conversation-title filter (pg_trgm, same contract as the user
+   * store's filename filter) — providing it implies all_conversations scope
+   */
+  conversation_title?: string;
   max_results?: number;
   threshold?: number;
 }

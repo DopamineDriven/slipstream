@@ -5,6 +5,7 @@
 -- @param {String} $5:searchTerms?
 -- @param {Int} $6:fulltextLimit
 -- @param {String} $7:embeddingModel
+-- @param {String} $8:conversationTitle?
 
 WITH semantic_ranked AS (
   SELECT
@@ -33,6 +34,11 @@ WITH semantic_ranked AS (
     AND mc."deletedAt" IS NULL
     AND mc.embedding IS NOT NULL
     AND 1 - (mc.embedding <=> $2::vector) >= $4
+    AND ($8::text IS NULL OR EXISTS (
+      SELECT 1 FROM "Conversation" tc
+      WHERE tc.id = mc."conversationId"
+        AND similarity(lower(tc.title), lower($8)) >= 0.25
+    ))
   ORDER BY mc.embedding <=> $2::vector
   LIMIT $3
 ),
@@ -65,6 +71,11 @@ fulltext_ranked AS (
     AND mc."chunkingState" = 'INDEXED'::"MemoryChunkingState"
     AND mc."deletedAt" IS NULL
     AND mc."searchTsv" @@ websearch_to_tsquery('english', $5)
+    AND ($8::text IS NULL OR EXISTS (
+      SELECT 1 FROM "Conversation" tc
+      WHERE tc.id = mc."conversationId"
+        AND similarity(lower(tc.title), lower($8)) >= 0.25
+    ))
   LIMIT $6
 )
 SELECT

@@ -182,11 +182,15 @@ async function exe() {
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
+    const { ToolCatalogService } = await import("@/tool-catalog/index.ts");
+    const toolCatalog = new ToolCatalogService();
+
     const anthropic = new AnthropicService(
       logger,
       prisma,
       userStore,
       memory,
+      toolCatalog,
       redisInstance,
       cfg.ANTHROPIC_API_KEY
     );
@@ -332,7 +336,8 @@ async function exe() {
         redis: redisInstance,
         s3,
         isProd,
-        memory
+        memory,
+        toolCatalog
       },
       anthropic,
       gemini,

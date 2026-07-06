@@ -622,16 +622,23 @@ export class ConversationMemoryWorkupService {
         `conversation_memory_search input missing required "query"`
       );
     }
+    const conversationTitle =
+      typeof parsed.conversation_title === "string"
+        ? parsed.conversation_title.trim().slice(0, 200) || undefined
+        : undefined;
     return {
       query: parsed.query.trim(),
       search_terms:
         typeof parsed.search_terms === "string"
           ? parsed.search_terms.trim() || undefined
           : undefined,
+      // providing a title IS the opt-in to broad reunification — it implies
+      // all_conversations regardless of the scope the model passed
       scope:
-        parsed.scope === "all_conversations"
+        parsed.scope === "all_conversations" || conversationTitle
           ? ("all_conversations" as const)
           : ("current_conversation" as const),
+      conversation_title: conversationTitle,
       max_results:
         typeof parsed.max_results === "number" ? parsed.max_results : undefined,
       threshold:

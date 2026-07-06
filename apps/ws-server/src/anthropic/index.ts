@@ -10,6 +10,7 @@ import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { ToolCatalogService } from "@/tool-catalog/index.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { AnthropicVectorStoreWorkup } from "@/anthropic/vector-store.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
@@ -49,10 +50,11 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
     prisma: PrismaService,
     userStoreVector: UserStoreVectorService,
     memoryService: ConversationMemoryVectorService,
+    toolCatalog: ToolCatalogService,
     private redis: EnhancedRedisPubSub,
     apiKey: string
   ) {
-    super(logger, prisma, userStoreVector, memoryService, apiKey);
+    super(logger, prisma, userStoreVector, memoryService, toolCatalog, apiKey);
   }
 
   /**
@@ -1100,6 +1102,19 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               is_error: true
             });
           }
+        } else if (acc.name === "tool_catalog") {
+          // catalog ships only alongside the full in-house kit (tooling()),
+          // so the active list is accurate by construction
+          toolResults.push({
+            type: "tool_result",
+            tool_use_id: acc.id,
+            content: this.toolCatalog.buildCatalog("anthropic", [
+              "file_search",
+              "conversation_memory_search",
+              "conversation_memory_get_chunk",
+              "tool_catalog"
+            ])
+          });
         } else if (acc.name === "conversation_memory_get_chunk") {
           try {
             const parsed = acc.inputJson

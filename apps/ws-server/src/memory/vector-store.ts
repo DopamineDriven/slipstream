@@ -533,7 +533,8 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
             threshold,
             terms,
             limit,
-            cfg.embeddingModel
+            cfg.embeddingModel,
+            input.conversation_title ?? null
           )
         : contextId
           ? await this.prisma.searchMemoryByConversationHybridTyped(
