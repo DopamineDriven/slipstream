@@ -1,14 +1,9 @@
 import { createReadStream } from "node:fs";
 import type { LoggerService } from "@/logger/index.ts";
-import type { MemoryAssemblyView } from "@/memory/types.ts";
-import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { OpenAIFileSearchToolInput } from "@/openai/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
-import type {
-  InferPromiseRT,
-  ProviderOpenaiRequestEntity
-} from "@/types/index.ts";
+import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
 import type { OpenAI } from "openai";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import { OpenAIBaseService } from "@/openai/base.ts";
@@ -25,10 +20,9 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     prisma: PrismaService,
     userStoreVector: UserStoreVectorService,
     apiKey: string,
-    s3: S3Storage,
-    memoryService: ConversationMemoryVectorService
+    s3: S3Storage
   ) {
-    super(logger, prisma, userStoreVector, apiKey, s3, memoryService);
+    super(logger, prisma, userStoreVector, apiKey, s3);
   }
 
   private async ensureAssetUploadedToOpenAI(
@@ -131,93 +125,6 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     return content;
   }
 
-  // openai/index.ts
-  protected async formatOpenAiWithUploads(
-    isNewChat: boolean,
-    msgs: MessageSingleton<true>[],
-    client: OpenAI,
-    keyFingerprint = "server",
-    opts?: { onlyMostRecentUser?: boolean }
-  ) {
-    if (isNewChat) {
-      const first = msgs[0];
-      if (!first)
-        return [{ role: "user", content: "" }] as const satisfies ResponseInput;
-      const firstText = this.messageText(first);
-      const attContent = await this.buildAttachmentContentAsync(
-        first.attachments,
-        client,
-        keyFingerprint
-      );
-      return attContent.length
-        ? ([
-            {
-              role: "user",
-              content: [...attContent, { type: "input_text", text: firstText }]
-            }
-          ] as const satisfies ResponseInput)
-        : ([
-            { role: "user", content: firstText }
-          ] as const satisfies ResponseInput);
-    } else {
-      if (opts?.onlyMostRecentUser) {
-        const lastUser = [...msgs].reverse().find(t => t.senderType === "USER");
-        if (lastUser) {
-          const lastUserText = this.messageText(lastUser);
-          const attContent = await this.buildAttachmentContentAsync(
-            lastUser.attachments,
-            client,
-            keyFingerprint
-          );
-          return attContent.length
-            ? ([
-                {
-                  role: "user",
-                  content: [
-                    ...attContent,
-                    { type: "input_text", text: lastUserText }
-                  ]
-                }
-              ] as const satisfies ResponseInput)
-            : ([
-                { role: "user", content: lastUserText }
-              ] as const satisfies ResponseInput);
-        }
-      }
-      // HMEM substitution assembly (Part II §2)
-      const memoryView = await this.memoryService.getHistoryAssemblyView(
-        msgs[0]?.conversationId,
-        msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
-      );
-      const history = this.prependProviderModelTag(
-        msgs.slice(0, -1),
-        memoryView
-      );
-      const last = msgs.at(-1);
-      if (last?.senderType === "USER") {
-        const lastText = this.messageText(last);
-        const attContent = await this.buildAttachmentContentAsync(
-          last.attachments,
-          client,
-          keyFingerprint
-        );
-        return attContent.length
-          ? ([
-              ...history,
-              {
-                role: "user",
-                content: [...attContent, { type: "input_text", text: lastText }]
-              }
-            ] as const satisfies ResponseInput)
-          : ([
-              ...history,
-              { role: "user", content: lastText }
-            ] as const satisfies ResponseInput);
-      }
-      return this.formatMsgs(this.prependProviderModelTag(msgs, memoryView));
-    }
-  }
-
   protected messageText(
     msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
   ) {
@@ -236,47 +143,6 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     }
 
     return msg.content;
-  }
-
-  private prependProviderModelTag(
-    msgs: Pick<
-      MessageSingleton<true>,
-      | "senderType"
-      | "provider"
-      | "model"
-      | "content"
-      | "messageBlocks"
-      | "ordinal"
-    >[],
-    memoryView: MemoryAssemblyView | null
-  ) {
-    return msgs.flatMap<
-      | { readonly role: "user"; readonly content: string }
-      | { readonly role: "assistant"; readonly content: string }
-    >(msg => {
-      // HMEM substitution assembly (Part II §2)
-      const claim = memoryView?.claim(msg.ordinal);
-      if (claim) {
-        return claim.emit != null
-          ? [{ role: "assistant", content: claim.emit } as const]
-          : [];
-      }
-      const text = this.messageText(msg);
-
-      if (msg.senderType === "USER") {
-        return [{ role: "user", content: text } as const];
-      } else {
-        const provider = msg.provider.toLowerCase();
-        const model = msg.model ?? "";
-        const modelIdentifier = `[${provider}/${model}]`;
-        return [
-          {
-            role: "assistant",
-            content: `${modelIdentifier} \n${text}`
-          } as const
-        ];
-      }
-    }) satisfies ResponseInput;
   }
 
   protected ensureUserVectorStoreId(
@@ -314,52 +180,6 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     this.inflightVS.set(name, p);
     return p;
   }
-  protected hasFiles(
-    formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
-  ) {
-    return formatted.some(m => {
-      if (typeof m.content === "string") return false;
-      if (m.role !== "user") return false;
-      return m.content.some(
-        t =>
-          t.type === "input_file" &&
-          (typeof t?.file_id !== "undefined" ||
-            typeof t?.file_data !== "undefined")
-      );
-    });
-  }
-  protected hasImages(
-    formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
-  ) {
-    return formatted.some(m => {
-      if (typeof m.content === "string") return false;
-      if (m.role !== "user") return false;
-      return m.content.some(
-        t =>
-          t.type === "input_image" &&
-          (typeof t?.image_url !== "undefined" ||
-            typeof t?.file_id !== "undefined")
-      );
-    });
-  }
-  protected fileIds(
-    formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
-  ) {
-    const fileIdArr = Array.of<string>();
-    try {
-      for (const m of formatted) {
-        if (m.role !== "user") continue;
-        const c = m.content;
-        if (typeof c === "string") continue;
-        for (const p of c) {
-          if (p.type === "input_file" && p.file_id) fileIdArr.push(p.file_id);
-        }
-      }
-    } finally {
-      return fileIdArr;
-    }
-  }
-
   protected formatMsgs(
     msgs: (
       | {
@@ -761,80 +581,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
       }))
     );
   }
-
-  protected async executeFunctionToolCall(
-    userId: string,
-    conversationId: string,
-    toolCall: OpenAI.Responses.ResponseFunctionToolCall
-  ) {
-    const toolName = toolCall.name;
-    try {
-      if (toolName === "user_store_search") {
-        const input = this.parseFileSearchInput(toolCall.arguments);
-        const output = await this.executeUserStoreSearch(userId, input);
-        return {
-          type: "function_call_output",
-          call_id: toolCall.call_id,
-          output
-        } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
-      }
-
-      if (toolName === "conversation_memory_search") {
-        const parsed = this.userStoreVector.parseUserStoreArgs(
-          toolCall.arguments,
-          toolName
-        );
-        const output = await this.memoryService.searchMemoryFromToolInput(
-          userId,
-          conversationId,
-          parsed
-        );
-        return {
-          type: "function_call_output",
-          call_id: toolCall.call_id,
-          output
-        } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
-      }
-
-      if (toolName === "conversation_memory_get_chunk") {
-        const parsed = this.userStoreVector.parseUserStoreArgs(
-          toolCall.arguments,
-          toolName
-        );
-        const output = await this.memoryService.getMemoryChunkFromToolInput(
-          userId,
-          parsed
-        );
-        return {
-          type: "function_call_output",
-          call_id: toolCall.call_id,
-          output
-        } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
-      }
-
-      return {
-        type: "function_call_output",
-        call_id: toolCall.call_id,
-        output: `Unknown tool: ${toolName}`
-      } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
-    } catch (error) {
-      this.logger.error(
-        {
-          toolName,
-          callId: toolCall.call_id,
-          error: this.prisma.safeErrMsg(error)
-        },
-        "OpenAI function tool execution failed"
-      );
-      return {
-        type: "function_call_output",
-        call_id: toolCall.call_id,
-        output: `${toolName} error: ${this.prisma.safeErrMsg(error)}`
-      } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
-    }
-  }
-
-  // To continue this session, run codex resume 019b2b4a-3e12-7c90-8276-49994f1d3bd2
+  
   protected handleTooling(
     model: OpenAiModelIdUnion,
     fileSearchEnabled: boolean,
@@ -860,8 +607,12 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     }
     if (fileSearchEnabled && vector_store_ids && vector_store_ids.length >= 1) {
       if (imgGenEnabled === true && imgGen && pureImgModel === false) {
+        // memory rides the img-gen flow too — facilitators (gpt-5.5 et al.)
+        // think + write + recall while recruiting gpt-image-2
         return [
           imgGen,
+          this.memorySearchFunctionTool(),
+          this.memoryGetChunkFunctionTool(),
           {
             type: "web_search",
             user_location
@@ -879,7 +630,11 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
       ] satisfies OpenAI.Responses.Tool[];
     } else {
       if (imgGenEnabled === true && imgGen && pureImgModel === false) {
-        return [imgGen] satisfies OpenAI.Responses.Tool[];
+        return [
+          imgGen,
+          this.memorySearchFunctionTool(),
+          this.memoryGetChunkFunctionTool()
+        ] satisfies OpenAI.Responses.Tool[];
       }
       return [
         this.memorySearchFunctionTool(),
