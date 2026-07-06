@@ -247,6 +247,7 @@ export type CommonDiscriminants =
   | "kind"
   | "event"
   | "tag"
+  | "provider"
   | "_tag"
   | "__typename";
 

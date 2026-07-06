@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { MemoryAssemblyView } from "@/memory/types.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { OpenAIFileSearchToolInput } from "@/openai/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -113,23 +114,36 @@ export class LlamaService {
   private prependProviderModelTag(
     msgs: Pick<
       MessageSingleton<true>,
-      "senderType" | "provider" | "model" | "content" | "messageBlocks"
-    >[]
+      "senderType" | "provider" | "model" | "content" | "messageBlocks" | "ordinal"
+    >[],
+    memoryView: MemoryAssemblyView | null
   ) {
-    return msgs.map(msg => {
+    return msgs.flatMap<
+      | { readonly role: "user"; readonly content: string }
+      | { readonly role: "assistant"; readonly content: string }
+    >(msg => {
+      // HMEM substitution assembly (Part II §2)
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        return claim.emit != null
+          ? [{ role: "assistant", content: claim.emit } as const]
+          : [];
+      }
       const text = this.messageText(msg);
 
       if (msg.senderType === "USER") {
-        return { role: "user", content: text } as const;
+        return [{ role: "user", content: text } as const];
       }
 
       const provider = msg.provider.toLowerCase();
       const model = msg.model ?? "";
       const modelIdentifier = `[${provider}/${model}]`;
-      return {
-        role: "assistant",
-        content: `${modelIdentifier} \n${text}`
-      } as const;
+      return [
+        {
+          role: "assistant",
+          content: `${modelIdentifier} \n${text}`
+        } as const
+      ];
     }) satisfies (UserMessage | CompletionMessage)[];
   }
 
@@ -562,7 +576,7 @@ export class LlamaService {
     }
   }
 
-  public llamaFormat(
+  public async llamaFormat(
     isNewChat: boolean,
     msgs: ProviderChatRequestEntity["msgs"],
     systemPrompt?: ProviderChatRequestEntity["systemPrompt"]
@@ -609,9 +623,17 @@ export class LlamaService {
       ] as const satisfies Message[];
     }
 
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
+
     const last = msgs.at(-1);
     if (last?.senderType === "USER") {
-      const history = this.prependProviderModelTag(msgs.slice(0, -1));
+      const history = this.prependProviderModelTag(
+        msgs.slice(0, -1),
+        memoryView
+      );
       const base = this.formatMsgs(history, systemPrompt);
       const parts = buildUserContent(last);
       const userMsg =
@@ -622,7 +644,7 @@ export class LlamaService {
     }
 
     return this.formatMsgs(
-      this.prependProviderModelTag(msgs),
+      this.prependProviderModelTag(msgs, memoryView),
       systemPrompt
     ) satisfies Message[];
   }
@@ -883,7 +905,11 @@ export class LlamaService {
         ]
       : [this.memorySearchFunctionTool(), this.memoryGetChunkFunctionTool()];
 
-    const initialMessages = this.llamaFormat(isNewChat, msgs, systemPrompt);
+    const initialMessages = await this.llamaFormat(
+      isNewChat,
+      msgs,
+      systemPrompt
+    );
     let roundMessages = Array.of<Message>(...initialMessages);
     let toolConversationMessages = Array.of<Message>(
       ...this.buildToolContinuationBase(initialMessages)

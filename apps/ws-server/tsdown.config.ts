@@ -46,6 +46,7 @@ export default defineConfig(
         "src/mistral/types.ts",
         "src/mixins/index.ts",
         "src/models/index.ts",
+        "src/models/workup.ts",
         "src/openai/base.ts",
         "src/openai/gpt-image.ts",
         "src/openai/index.ts",

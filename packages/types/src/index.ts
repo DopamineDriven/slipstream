@@ -238,6 +238,7 @@ export type {
   GrokDisplayNameUnion,
   GrokDisplayNameUnionImgGen,
   GrokDisplayNameUnionVideoGen,
+  ProviderModelRecord,
   GrokImgGenModels,
   GrokModelIdUnion,
   GrokModelIdUnionImgGen,

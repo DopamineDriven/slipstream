@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { MemoryAssemblyView } from "@/memory/types.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type {
   MistralAccumulatedToolCall,
@@ -76,42 +77,14 @@ interface MistralHistoryFormatterDeps {
   readonly safeErrMsg: (error: unknown) => string;
 }
 
-function selectMistralHistoryMessages(msgs: readonly MessageSingleton<true>[]) {
-  const orderedMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
-  if (orderedMsgs.length <= MISTRAL_HISTORY_MESSAGE_LIMIT) {
-    return orderedMsgs;
-  }
-
-  const selectedIds = new Set<string>();
-
-  for (
-    let msgIndex = orderedMsgs.length - 1;
-    msgIndex >= 0 && selectedIds.size < MISTRAL_HISTORY_MESSAGE_LIMIT;
-    msgIndex--
-  ) {
-    const msg = orderedMsgs[msgIndex];
-    if (!msg || msg?.provider !== "MISTRAL") continue;
-    selectedIds.add(msg.id);
-  }
-
-  for (
-    let msgIndex = orderedMsgs.length - 1;
-    msgIndex >= 0 && selectedIds.size < MISTRAL_HISTORY_MESSAGE_LIMIT;
-    msgIndex--
-  ) {
-    const msg = orderedMsgs[msgIndex];
-    if (!msg) continue;
-    selectedIds.add(msg.id);
-  }
-
-  return orderedMsgs.filter(msg => selectedIds.has(msg.id));
-}
-
 export function formatMistralHistory(
   msgs: readonly MessageSingleton<true>[],
-  deps: MistralHistoryFormatterDeps
+  deps: MistralHistoryFormatterDeps,
+  memoryView: MemoryAssemblyView | null
 ) {
-  const historyMsgs = selectMistralHistoryMessages(msgs);
+  // HMEM substitution assembly (Part II §2) replaces the retired 175-slice;
+  // the limit survives only as the fresh-attachment gate below
+  const historyMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
   const allowFreshAttachments =
     historyMsgs.length < MISTRAL_HISTORY_MESSAGE_LIMIT;
   const formatted = Array.of<MistralMessageReq>();
@@ -173,6 +146,16 @@ export function formatMistralHistory(
   }
 
   for (const [msgIndex, msg] of historyMsgs.entries()) {
+    const claim = memoryView?.claim(msg.ordinal);
+    if (claim) {
+      if (claim.emit != null) {
+        formatted.push({
+          role: "assistant",
+          content: [{ type: "text", text: claim.emit }]
+        });
+      }
+      continue;
+    }
     const isFreshContext = isFirstMistralMsg || msgIndex > lastIndex;
     if (msg.senderType === "USER") {
       const content = Array.of<ContentChunk>();
@@ -395,13 +378,21 @@ export class MistralService extends MistralStreamContentService {
     });
   }
 
-  protected formatHistory(msgs: MessageSingleton<true>[]) {
-    return formatMistralHistory(msgs, {
-      filenameToHexExtTuple: (url, compatStatus, encoded) =>
-        this.prisma.filenameToHexExtTuple(url, compatStatus, encoded),
-      logInfo: message => this.logger.info(message),
-      safeErrMsg: error => this.prisma.safeErrMsg(error)
-    } satisfies MistralHistoryFormatterDeps);
+  protected async formatHistory(msgs: MessageSingleton<true>[]) {
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
+    return formatMistralHistory(
+      msgs,
+      {
+        filenameToHexExtTuple: (url, compatStatus, encoded) =>
+          this.prisma.filenameToHexExtTuple(url, compatStatus, encoded),
+        logInfo: message => this.logger.info(message),
+        safeErrMsg: error => this.prisma.safeErrMsg(error)
+      } satisfies MistralHistoryFormatterDeps,
+      memoryView
+    );
   }
 
   private fileSearchFunctionTool() {
@@ -1238,7 +1229,7 @@ export class MistralService extends MistralStreamContentService {
             } satisfies SystemMessage
           ]
         : []),
-      ...this.formatHistory(msgs)
+      ...(await this.formatHistory(msgs))
     );
 
     const MAX_TOOL_ROUNDS = 10;

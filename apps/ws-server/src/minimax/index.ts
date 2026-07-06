@@ -119,7 +119,13 @@ export class MiniMaxService {
     }
   }
 
-  private formatHistory(msgs: MessageSingleton<true>[]) {
+  private async formatHistory(msgs: MessageSingleton<true>[]) {
+    // HMEM substitution assembly (Part II §2) — msgs arrive ordinal-sorted
+    // from resolver/chat.ts
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
     const formatted = Array.of<MiniMaxBaseMessage>();
     const lastIndex = msgs.findLastIndex(
       m => m.provider === "MINIMAX" && m.senderType === "AI"
@@ -128,6 +134,16 @@ export class MiniMaxService {
     const isFirstMiniMaxMsg = lastIndex === -1;
 
     for (const [msgIndex, msg] of msgs.entries()) {
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          formatted.push({
+            role: "assistant",
+            content: claim.emit
+          } satisfies MiniMaxAssistantMessage);
+        }
+        continue;
+      }
       const isFreshContext = isFirstMiniMaxMsg || msgIndex > lastIndex;
       const isCurrentUserMsg = msgIndex === msgs.length - 1;
 
@@ -884,7 +900,7 @@ export class MiniMaxService {
             } satisfies MiniMaxBaseMessage
           ]
         : []),
-      ...this.formatHistory(msgs)
+      ...(await this.formatHistory(msgs))
     );
 
     const MAX_TOOL_ROUNDS = MINIMAX_TOOLING_LIMITS.maxToolRounds;

@@ -292,15 +292,30 @@ export class SakanaWorkupService extends SakanaStoreService {
     } satisfies OpenAI.Responses.EasyInputMessage;
   }
 
-  protected formatSakanaInput(msgs: MessageSingleton<true>[]) {
+  protected async formatSakanaInput(msgs: MessageSingleton<true>[]) {
     if (msgs.length === 0) {
       return [{ role: "user", content: "" }] as const satisfies ResponseInput;
     }
 
+    // HMEM substitution assembly (Part II §2)
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
     const selection = this.selectFreshAssets(msgs);
     const input = Array.of<OpenAI.Responses.ResponseInputItem>();
 
     for (const msg of msgs) {
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          input.push({
+            role: "assistant",
+            content: claim.emit
+          } satisfies OpenAI.Responses.EasyInputMessage);
+        }
+        continue;
+      }
       if (msg.senderType === "USER") {
         input.push(this.formatUserMessage(msg, selection));
       } else {

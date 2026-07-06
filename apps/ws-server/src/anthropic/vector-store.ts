@@ -1,6 +1,5 @@
 import type { MessageInputParams } from "@/anthropic/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
-import type { MemorySubstitutableChunk } from "@/memory/types.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchToolInput } from "@/store/types.ts";
@@ -347,45 +346,18 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     // serial-position shape. Anthropic merges consecutive assistant turns,
     // so per-chunk blocks are safe; assistant-first histories are accepted
     // (probed 2026-07-05, incl. full production posture), so no leading stub.
-    const conversationId = msgs[0]?.conversationId;
-    const maxOrdinalExclusive = msgs.reduce(
-      (max, m) => (m.ordinal >= max ? m.ordinal + 1 : max),
-      0
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
     );
-    const plan = conversationId
-      ? await this.memoryService.getHistoryAssemblyPlan(
-          conversationId,
-          maxOrdinalExclusive
-        )
-      : null;
-    // founding-window exemption is baked into the coverage map: ordinals
-    // below the ceiling are never mapped, so they render verbatim and each
-    // section emits at its first non-exempt covered ordinal
-    const subByOrdinal = new Map<number, MemorySubstitutableChunk>();
-    if (plan) {
-      for (const sub of plan.substitutions) {
-        const from = Math.max(sub.ordinalStart, plan.foundingCeilingExclusive);
-        for (let o = from; o < sub.ordinalEndExclusive; o++) {
-          subByOrdinal.set(o, sub);
-        }
-      }
-    }
-    const emittedSubIds = new Set<string>();
 
     const messages = Array.of<Anthropic.Beta.BetaMessageParam>();
 
     for (const [msgIndex, msg] of msgs.entries()) {
-      // substituted range → emit the name-tagged summary once, at the first
-      // covered ordinal encountered; the rest of the range drops (the
-      // summary stands in for it)
-      const sub = subByOrdinal.get(msg.ordinal);
-      if (sub) {
-        if (!emittedSubIds.has(sub.id)) {
-          emittedSubIds.add(sub.id);
-          messages.push({
-            role: "assistant",
-            content: `${this.memoryService.substitutionNameTag(sub)} conversation memory · messages [${sub.ordinalStart}-${sub.ordinalEndExclusive - 1}]:\n${sub.summary ?? ""}`
-          });
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          messages.push({ role: "assistant", content: claim.emit });
         }
         continue;
       }

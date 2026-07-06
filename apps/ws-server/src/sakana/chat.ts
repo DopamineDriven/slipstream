@@ -153,7 +153,7 @@ export class SakanaChatService extends SakanaWorkupService {
     };
 
     const client = this.getClient(apiKey ?? undefined);
-    const formatted = this.formatSakanaInput(msgs);
+    const formatted = await this.formatSakanaInput(msgs);
     const instructions = this.prisma.formatSysNote(systemPrompt);
     const loc = this.normalizeLocation(user_location);
     const tools = this.sakanaTools(hasUserStoreDocs, loc);

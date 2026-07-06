@@ -241,6 +241,34 @@ export type AllModelsUnion = ModelMap[Provider];
 
 export type AllDisplayNamesUnion = DisplayNameModelMap[Provider];
 
+// export type DiscriminatedUnionProviderModels = {
+//   type: "deepseek", model: DeepSeekChatModels
+// } |{
+//   type: "grok", model: GrokChatModels
+// } | {
+// type: "gemini", model: GeminiChatModels
+// } | {type: "mistral"; model: MistralChatModels};
+
+
+
+export type ProviderModelRecord ={
+  alibaba: AlibabaChatModels;
+  anthropic: AnthropicChatModels;
+  cohere: CohereChatModels;
+  deepseek: DeepSeekChatModels;
+  gemini: GeminiChatModels;
+  grok: GrokChatModels;
+  meta: MetaChatModels;
+  minimax: MiniMaxChatModels;
+  mistral: MistralChatModels;
+  moonshotai: KimiChatModels;
+  openai: OpenAIChatModels;
+  sakana: SakanaChatModels;
+  vercel: VercelChatModels;
+  zai: ZaiChatModels;
+}
+
+
 export type GetModelUtilRT<T = Provider> = T extends "openai"
   ? OpenAIChatModels
   : T extends "gemini"
@@ -563,6 +591,8 @@ export const defaultModelIdByProvider = {
   minimax: "minimax-m3" satisfies MiniMaxModelIdUnion,
   sakana: "fugu" satisfies SakanaModelIdUnion
 } as const;
+
+
 
 export type ModelDisplayNameToModelId<T extends Provider> =
   keyof (typeof displayNameToModelId)[T];

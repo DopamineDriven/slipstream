@@ -37,39 +37,6 @@ import type {
   MessageSingleton
 } from "@slipstream/types";
 
-const KIMI_HISTORY_MESSAGE_LIMIT = 175;
-
-function selectKimiHistoryMessages(msgs: readonly MessageSingleton<true>[]) {
-  const orderedMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
-  if (orderedMsgs.length <= KIMI_HISTORY_MESSAGE_LIMIT) {
-    return orderedMsgs;
-  }
-
-  const selectedIds = new Set<string>();
-
-  for (
-    let msgIndex = orderedMsgs.length - 1;
-    msgIndex >= 0 && selectedIds.size < KIMI_HISTORY_MESSAGE_LIMIT;
-    msgIndex--
-  ) {
-    const msg = orderedMsgs[msgIndex];
-    if (!msg || msg?.provider !== "MOONSHOTAI") continue;
-    selectedIds.add(msg.id);
-  }
-
-  for (
-    let msgIndex = orderedMsgs.length - 1;
-    msgIndex >= 0 && selectedIds.size < KIMI_HISTORY_MESSAGE_LIMIT;
-    msgIndex--
-  ) {
-    const msg = orderedMsgs[msgIndex];
-    if (!msg) continue;
-    selectedIds.add(msg.id);
-  }
-
-  return orderedMsgs.filter(msg => selectedIds.has(msg.id));
-}
-
 export class KimiService {
   private readonly baseUrl = "https://ai-gateway.vercel.sh/v1/chat/completions";
   private logger: PinoLogger;
@@ -136,8 +103,15 @@ export class KimiService {
     }
   }
 
-  private formatHistory(msgs: MessageSingleton<true>[]) {
-    const historyMsgs = selectKimiHistoryMessages(msgs);
+  private async formatHistory(msgs: MessageSingleton<true>[]) {
+    // HMEM substitution assembly (Part II §2) replaces the retired 175-slice:
+    // the last-175 selection amputated the founding window on long convos;
+    // summaries now stand in for the consolidated middle instead
+    const historyMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      historyMsgs[0]?.conversationId,
+      historyMsgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
     const formatted = Array.of<KimiBaseMessage>();
     const lastIndex = historyMsgs.findLastIndex(
       m => m.provider === "MOONSHOTAI" && m.senderType === "AI"
@@ -146,6 +120,16 @@ export class KimiService {
     const isFirstKimiMsg = lastIndex === -1;
 
     for (const [msgIndex, msg] of historyMsgs.entries()) {
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          formatted.push({
+            role: "assistant",
+            content: claim.emit
+          } satisfies KimiAssistantMessage);
+        }
+        continue;
+      }
       const isFreshContext = isFirstKimiMsg || msgIndex > lastIndex;
       const isCurrentUserMsg = msgIndex === historyMsgs.length - 1;
 
@@ -889,7 +873,7 @@ export class KimiService {
             } satisfies KimiBaseMessage
           ]
         : []),
-      ...this.formatHistory(msgs)
+      ...(await this.formatHistory(msgs))
     );
 
     const MAX_TOOL_ROUNDS = 10;

@@ -131,7 +131,12 @@ export class CohereService {
     return note;
   }
 
-  protected formatHistory(msgs: MessageSingleton<true>[]) {
+  protected async formatHistory(msgs: MessageSingleton<true>[]) {
+    // HMEM substitution assembly (Part II §2)
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
     const formatted = Array.of<CohereChatRequestMessage>();
 
     const lastIndex = msgs.findLastIndex(
@@ -141,6 +146,16 @@ export class CohereService {
     const isFirstCohereMsg = lastIndex === -1;
 
     for (const [msgIndex, msg] of msgs.entries()) {
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          formatted.push({
+            role: "assistant",
+            content: [{ type: "text", text: claim.emit }]
+          });
+        }
+        continue;
+      }
       const isFreshContext = isFirstCohereMsg || msgIndex > lastIndex;
       const isCurrentUserMsg = msgIndex === msgs.length - 1;
       if (msg.senderType === "USER") {
@@ -1128,7 +1143,7 @@ export class CohereService {
             } satisfies Cohere.ChatMessageV2.System
           ]
         : []),
-      ...this.formatHistory(msgs)
+      ...(await this.formatHistory(msgs))
     );
 
     const MAX_TOOL_ROUNDS = 10;

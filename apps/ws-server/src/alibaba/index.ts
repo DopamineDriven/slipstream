@@ -53,39 +53,6 @@ const ALIBABA_TOOLING_LIMITS = {
   maxToolRounds: number;
 };
 
-const ALIBABA_HISTORY_MESSAGE_LIMIT = 175;
-
-function selectAlibabaHistoryMessages(msgs: readonly MessageSingleton<true>[]) {
-  const orderedMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
-  if (orderedMsgs.length <= ALIBABA_HISTORY_MESSAGE_LIMIT) {
-    return orderedMsgs;
-  }
-
-  const selectedIds = new Set<string>();
-
-  for (
-    let msgIndex = orderedMsgs.length - 1;
-    msgIndex >= 0 && selectedIds.size < ALIBABA_HISTORY_MESSAGE_LIMIT;
-    msgIndex--
-  ) {
-    const msg = orderedMsgs[msgIndex];
-    if (!msg || msg?.provider !== "ALIBABA") continue;
-    selectedIds.add(msg.id);
-  }
-
-  for (
-    let msgIndex = orderedMsgs.length - 1;
-    msgIndex >= 0 && selectedIds.size < ALIBABA_HISTORY_MESSAGE_LIMIT;
-    msgIndex--
-  ) {
-    const msg = orderedMsgs[msgIndex];
-    if (!msg) continue;
-    selectedIds.add(msg.id);
-  }
-
-  return orderedMsgs.filter(msg => selectedIds.has(msg.id));
-}
-
 export class AlibabaService {
   private readonly baseUrl = "https://ai-gateway.vercel.sh/v1/chat/completions";
   private logger: PinoLogger;
@@ -167,8 +134,13 @@ export class AlibabaService {
     return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
   }
 
-  private formatHistory(msgs: MessageSingleton<true>[]) {
-    const historyMsgs = selectAlibabaHistoryMessages(msgs);
+  private async formatHistory(msgs: MessageSingleton<true>[]) {
+    // HMEM substitution assembly (Part II §2) replaces the retired 175-slice
+    const historyMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      historyMsgs[0]?.conversationId,
+      historyMsgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
     const formatted = Array.of<AlibabaBaseMessage>();
     const lastIndex = historyMsgs.findLastIndex(
       m => m.provider === "ALIBABA" && m.senderType === "AI"
@@ -177,6 +149,16 @@ export class AlibabaService {
     const isFirstAlibabaMsg = lastIndex === -1;
 
     for (const [msgIndex, msg] of historyMsgs.entries()) {
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          formatted.push({
+            role: "assistant",
+            content: claim.emit
+          } satisfies AlibabaAssistantMessage);
+        }
+        continue;
+      }
       const isFreshContext = isFirstAlibabaMsg || msgIndex > lastIndex;
       const isCurrentUserMsg = msgIndex === historyMsgs.length - 1;
 
@@ -937,7 +919,7 @@ export class AlibabaService {
             } satisfies AlibabaBaseMessage
           ]
         : []),
-      ...this.formatHistory(msgs)
+      ...(await this.formatHistory(msgs))
     );
 
     const MAX_TOOL_ROUNDS = ALIBABA_TOOLING_LIMITS.maxToolRounds;

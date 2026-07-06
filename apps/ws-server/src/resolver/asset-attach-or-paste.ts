@@ -86,13 +86,11 @@ export class ResolverAssetAttachOrPasteService extends ResolverAssetCompatServic
         ? filename
         : `${filename}.${extension === "md" ? "txt" : extension}`;
 
-      const sizeInfo = this.wsServer.prisma.getSize(size ?? 0, "auto", {
-        decimals: 2,
-        includeUnits: true
-      });
 
-      console.log(
-        `[${type}] User ${userId} attached ${properFilename} (${sizeInfo})`
+      const sizeInfo = this.wsServer.prisma.extractor.autoFileSizeRaw(size);
+
+      this.logger.info(
+        `[${type}] User ${userId} pasting ${properFilename} (${sizeInfo.value} ${sizeInfo.unit})`
       );
 
       const presignedData = await this.s3Service.generatePresignedUpload(
@@ -302,14 +300,10 @@ export class ResolverAssetAttachOrPasteService extends ResolverAssetCompatServic
         ? filename
         : `${filename}.${extension}`;
 
-      // ✅ Use fs package for human-readable size logging
-      const sizeInfo = this.wsServer.prisma.getSize(size ?? 0, "auto", {
-        decimals: 2,
-        includeUnits: true
-      });
+      const sizeInfo = this.wsServer.prisma.extractor.autoFileSizeRaw(size);
 
       console.log(
-        `[Asset Paste] User ${userId} pasting ${properFilename} (${sizeInfo})`
+        `[Asset Paste] User ${userId} pasting ${properFilename} (${sizeInfo.value} ${sizeInfo.unit})`
       );
 
       const presignedData = await this.s3Service.generatePresignedUpload(

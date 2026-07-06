@@ -122,7 +122,13 @@ export class DeepSeekService {
     }
   }
 
-  private formatHistory(msgs: MessageSingleton<true>[]) {
+  private async formatHistory(msgs: MessageSingleton<true>[]) {
+    // HMEM substitution assembly (Part II §2) — msgs arrive ordinal-sorted
+    // from resolver/chat.ts
+    const memoryView = await this.memory.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
     const formatted = Array.of<DeepSeekBaseMessage>();
     const lastIndex = msgs.findLastIndex(
       m => m.provider === "DEEPSEEK" && m.senderType === "AI"
@@ -131,6 +137,16 @@ export class DeepSeekService {
     const isFirstDeepSeekMsg = lastIndex === -1;
 
     for (const [msgIndex, msg] of msgs.entries()) {
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          formatted.push({
+            role: "assistant",
+            content: claim.emit
+          } satisfies DeepSeekAssistantMessage);
+        }
+        continue;
+      }
       const isFreshContext = isFirstDeepSeekMsg || msgIndex > lastIndex;
       const isCurrentUserMsg = msgIndex === msgs.length - 1;
 
@@ -887,7 +903,7 @@ export class DeepSeekService {
             } satisfies DeepSeekBaseMessage
           ]
         : []),
-      ...this.formatHistory(msgs)
+      ...(await this.formatHistory(msgs))
     );
 
     const MAX_TOOL_ROUNDS = DEEPSEEK_TOOLING_LIMITS.maxToolRounds;

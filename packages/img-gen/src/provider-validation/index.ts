@@ -847,7 +847,8 @@ export class ProviderValidation {
       includeWithAttachments = {
         conversationSettings: true,
         messages: {
-          orderBy: { createdAt: "asc" },
+          // ordinal is the authoritative dense sequence — createdAt can tie
+          orderBy: { ordinal: "asc" },
           include: {
             imageGenJob: true,
             messageBlocks: { orderBy: { ordinal: "asc" } },
@@ -877,7 +878,8 @@ export class ProviderValidation {
       includeSansAttachments = {
         conversationSettings: true,
         messages: {
-          orderBy: { createdAt: "asc" },
+          // ordinal is the authoritative dense sequence — createdAt can tie
+          orderBy: { ordinal: "asc" },
           include: {
             imageGenJob: true,
             messageBlocks: { orderBy: { ordinal: "asc" } },

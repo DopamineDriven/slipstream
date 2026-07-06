@@ -107,7 +107,13 @@ export class v0Service {
     }
   }
 
-  private formatHistory(msgs: MessageSingleton<true>[]) {
+  private async formatHistory(msgs: MessageSingleton<true>[]) {
+    // HMEM substitution assembly (Part II §2) — msgs arrive ordinal-sorted
+    // from resolver/chat.ts
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
     const formatted = Array.of<V0BaseMessage>();
     const lastIndex = msgs.findLastIndex(
       m => m.provider === "VERCEL" && m.senderType === "AI"
@@ -116,6 +122,16 @@ export class v0Service {
     const isFirstV0Msg = lastIndex === -1;
 
     for (const [msgIndex, msg] of msgs.entries()) {
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          formatted.push({
+            role: "assistant",
+            content: claim.emit
+          } satisfies V0AssistantMessage);
+        }
+        continue;
+      }
       const isFreshContext = isFirstV0Msg || msgIndex > lastIndex;
       const isCurrentUserMsg = msgIndex === msgs.length - 1;
 
@@ -893,7 +909,7 @@ export class v0Service {
             } satisfies V0BaseMessage
           ]
         : []),
-      ...this.formatHistory(msgs)
+      ...(await this.formatHistory(msgs))
     );
 
     const MAX_TOOL_ROUNDS = 10;

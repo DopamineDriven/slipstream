@@ -148,6 +148,17 @@ export interface MemoryAssemblyPlan {
   substitutions: MemorySubstitutableChunk[];
 }
 
+/**
+ * The claim-driven per-request assembly view formatters iterate with
+ * (structural mirror of getHistoryAssemblyView's return — kept structural so
+ * pure-function formatters can take it as a parameter without importing the
+ * service). claim(ordinal): null → verbatim; { emit: string } → push the
+ * block as an assistant turn, drop the message; { emit: null } → drop only.
+ */
+export interface MemoryAssemblyView {
+  claim: (ordinal: number) => { readonly emit: string | null } | null;
+}
+
 /** discriminated at parse time — the caller picks the lookup, no downstream narrowing */
 export type ConversationMemoryGetChunkTarget =
   | {

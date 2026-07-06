@@ -318,6 +318,11 @@ export class GeminiWorkupService extends FileSearchStoreService {
     apiKey?: string,
     m: GeminiModelIdUnion = "gemini-3.1-pro-preview"
   ) {
+    // HMEM substitution assembly (Part II §2)
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
     const formatted = Array.of<Content>();
     const lastIndex = msgs.findLastIndex(
       m => m.provider === "GEMINI" && m.senderType === "AI"
@@ -325,6 +330,16 @@ export class GeminiWorkupService extends FileSearchStoreService {
 
     const isFirstGemMsg = lastIndex === -1;
     for (const [msgIndex, msg] of msgs.entries()) {
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          formatted.push({
+            role: "model",
+            parts: [{ text: claim.emit }]
+          } as const);
+        }
+        continue;
+      }
       const isFreshContext = isFirstGemMsg || msgIndex > lastIndex;
       const isCurrentUserMsg = msgIndex === msgs.length - 1;
       if (msg.senderType === "USER") {

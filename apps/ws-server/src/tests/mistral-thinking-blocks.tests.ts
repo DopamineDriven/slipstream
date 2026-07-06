@@ -298,21 +298,56 @@ function buildCapturedLikeBlocks() {
 }
 
 describe("Mistral history formatter and thinking block lifecycle", () => {
-  it("preserves sparse old Mistral turns before filling newest global context", () => {
+  it("renders full history — the 175-slice is retired in favor of HMEM substitution", () => {
     const formatted = formatMistralHistory(
       buildSparseMistralHistory(),
-      fixtureHistoryFormatterDeps
+      fixtureHistoryFormatterDeps,
+      null
     );
     const texts = formatted.map(formattedMessageText);
 
-    assert.equal(formatted.length, 175);
+    assert.equal(formatted.length, 350);
     assert.deepEqual(texts.slice(0, 2), [
       "ancient mistral prompt",
       "ancient mistral answer"
     ]);
-    assert.equal(texts.includes("recent-global-176"), false);
-    assert.ok(texts.includes("recent-global-177"));
+    assert.ok(texts.includes("recent-global-176"));
     assert.ok(texts.includes("recent-global-349"));
+  });
+
+  it("substitutes covered ranges with name-tagged summary blocks via the assembly view", () => {
+    const emitted = new Set<string>();
+    // mirrors getHistoryAssemblyView: one section covering [30, 42), founding
+    // window exempting nothing here (all covered ordinals ≥ 30)
+    const view = {
+      claim: (ordinal: number) => {
+        if (ordinal < 30 || ordinal >= 42) return null;
+        if (emitted.has("section-1")) return { emit: null } as const;
+        emitted.add("section-1");
+        return {
+          emit: "[anthropic/claude-sonnet-5] conversation memory · messages [30-41]:\nConsolidated."
+        } as const;
+      }
+    };
+    const formatted = formatMistralHistory(
+      buildSparseMistralHistory(),
+      fixtureHistoryFormatterDeps,
+      view
+    );
+    const texts = formatted.map(formattedMessageText);
+
+    // 350 - 12 covered + 1 summary block
+    assert.equal(formatted.length, 339);
+    assert.ok(
+      texts.some(t =>
+        t.startsWith(
+          "[anthropic/claude-sonnet-5] conversation memory · messages [30-41]:"
+        )
+      )
+    );
+    assert.equal(texts.includes("recent-global-35"), false);
+    assert.ok(texts.includes("recent-global-29"));
+    assert.ok(texts.includes("recent-global-42"));
   });
 
   it("formats the full fixture history without empty assistant messages", t => {
@@ -326,7 +361,8 @@ describe("Mistral history formatter and thinking block lifecycle", () => {
 
     const formatted = formatMistralHistory(
       convo.messages,
-      fixtureHistoryFormatterDeps
+      fixtureHistoryFormatterDeps,
+      null
     );
     const assistantMessages = formatted.filter(
       message => message.role === "assistant"
@@ -361,7 +397,8 @@ describe("Mistral history formatter and thinking block lifecycle", () => {
     t.diagnostic(metricsJson);
     process.stderr.write(`# mistral_history_formatter_size ${metricsJson}\n`);
 
-    assert.equal(formatted.length, 175);
+    // slice retired: without an assembly view the full history renders
+    assert.equal(formatted.length, convo.messages.length);
     assert.equal(emptyAssistantMessages.length, 0);
     assert.ok(providerTagOnlyMessages.length > 0);
   });

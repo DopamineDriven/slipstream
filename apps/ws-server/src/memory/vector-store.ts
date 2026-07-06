@@ -706,6 +706,54 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     return `[${provider}/${model}]` as const;
   }
 
+  /** the canonical substituted-section text — name-tagged, ordinal-range prefixed */
+  public substitutionBlockText(sub: MemorySubstitutableChunk) {
+    return `${this.substitutionNameTag(sub)} conversation memory · messages [${sub.ordinalStart}-${sub.ordinalEndExclusive - 1}]:\n${sub.summary ?? ""}`;
+  }
+
+  /**
+   * The per-request assembly view every provider formatter drives its history
+   * loop with. One call per ordinal: `claim(ordinal)` returns
+   *   - `null` → not covered; render the message verbatim
+   *   - `{ emit: string }` → first covered ordinal of a section; push the
+   *     block as an assistant turn and drop the message
+   *   - `{ emit: null }` → interior of an already-emitted section; drop the
+   *     message
+   * The founding-window exemption is baked into the coverage map (ordinals
+   * below the ceiling are never mapped), so emission lands at each section's
+   * first non-exempt covered ordinal with no formatter-side special-casing.
+   */
+  public async getHistoryAssemblyView(
+    conversationId: string | undefined,
+    maxOrdinalExclusive: number
+  ) {
+    if (!conversationId) return null;
+    const plan = await this.getHistoryAssemblyPlan(
+      conversationId,
+      maxOrdinalExclusive
+    );
+    if (!plan) return null;
+
+    const subByOrdinal = new Map<number, MemorySubstitutableChunk>();
+    for (const sub of plan.substitutions) {
+      const from = Math.max(sub.ordinalStart, plan.foundingCeilingExclusive);
+      for (let o = from; o < sub.ordinalEndExclusive; o++) {
+        subByOrdinal.set(o, sub);
+      }
+    }
+    const emitted = new Set<string>();
+
+    return {
+      claim: (ordinal: number) => {
+        const sub = subByOrdinal.get(ordinal);
+        if (!sub) return null;
+        if (emitted.has(sub.id)) return { emit: null } as const;
+        emitted.add(sub.id);
+        return { emit: this.substitutionBlockText(sub) } as const;
+      }
+    };
+  }
+
   // ── Summary pass (frontier vision-capable, quality over cost) ────────
 
   public get memorySummarizerConfig() {

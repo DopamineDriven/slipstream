@@ -60,6 +60,11 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     apiKey = this.xaiKey,
     mgmtKey = this.xaiManagementKey
   ) {
+    // HMEM substitution assembly (Part II §2)
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
     const formatted = Array.of<ResponsesComprehensive>();
 
     const lastIndex = msgs.findLastIndex(
@@ -69,6 +74,18 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     const isFirstGrokMsg = lastIndex === -1;
 
     for (const [msgIndex, msg] of msgs.entries()) {
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          formatted.push({
+            role: "assistant",
+            content: [
+              { type: "input_text", text: claim.emit } satisfies TextContentBlock
+            ]
+          } as const satisfies ResponsesComprehensive);
+        }
+        continue;
+      }
       const isFreshContext = isFirstGrokMsg || msgIndex > lastIndex;
       const isCurrentUserMsg = msgIndex === msgs.length - 1;
       const collectionId = this.collectionRegistry.get(userId) ?? null;
