@@ -25,10 +25,12 @@ export class ToolCatalogService {
     } as const satisfies Partial<Record<Provider, Record<string, string>>>;
   }
 
-  private get entries() {
+  private entries(p: Provider) {
+    // resolved ONCE here — ids and pairsWith references below are wire names
+    const file_search = this.toolNameFor("file_search", p);
     return [
       {
-        id: "file_search",
+        id: file_search,
         category: "document_retrieval",
         summary:
           "Partitioned Foraging over the user's uploaded documents — semantic by default, plus a fulltext lane (with Jaccard overlap) when search_terms is provided.",
@@ -60,7 +62,7 @@ export class ToolCatalogService {
             how: "search is the lay of the land; get_chunk is to dig in and expand — dual wield"
           },
           {
-            tool: "file_search",
+            tool: file_search,
             how: "when a remembered discussion cites an uploaded doc, chase the citation into the archive"
           }
         ]
@@ -107,20 +109,11 @@ export class ToolCatalogService {
     return canonicalId;
   }
 
-  /**
-   * the registry with wire names resolved for one provider — the single
-   * resolution point (entry names AND pairsWith references)
-   */
+  /** the registry for one provider — entries(p) already carries wire names */
   public entriesFor(provider: Provider) {
-    return this.entries.map(entry => ({
-      name: this.toolNameFor(entry.id, provider),
-      category: entry.category,
-      summary: entry.summary,
-      bestFor: entry.bestFor,
-      pairsWith: entry.pairsWith.map(p => ({
-        tool: this.toolNameFor(p.tool, provider),
-        how: p.how
-      }))
+    return this.entries(provider).map(({ id, ...rest }) => ({
+      name: id,
+      ...rest
     }));
   }
 
