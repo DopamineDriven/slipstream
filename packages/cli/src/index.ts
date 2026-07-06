@@ -1,5 +1,3 @@
-import type { Socket } from "net";
-
 declare global {
   interface JSON {
     parse<T = unknown>(
@@ -24,11 +22,6 @@ declare global {
   }
 }
 
-declare module "ws" {
-  interface WebSocket {
-    _socket: Socket;
-  }
-}
 export { CliConfigService } from "@/config.ts";
 export { SlipstreamClientService } from "@/client.ts";
 export { CliRendererService } from "@/render.ts";

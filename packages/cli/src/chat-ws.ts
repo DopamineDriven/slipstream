@@ -1,4 +1,3 @@
-import type { WebSocket } from "ws";
 import type { EventTypeMap } from "@slipstream/types";
 import type { WithImplicitCoercion } from "buffer";
 

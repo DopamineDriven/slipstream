@@ -5,7 +5,6 @@ import type {
   ChatWsEventTypeUnion,
   EventTypeMap
 } from "@slipstream/types";
-
 export type RawData = WithImplicitCoercion<string | ArrayLike<number>>;
 
 export type MessageHandler<T extends keyof EventTypeMap> = (

@@ -1,19 +1,20 @@
-import { WebSocket } from "ws";
+import { ChatWebSocketClient } from "@/chat-ws-client.ts";
 import { CliConfigService } from "@/config.ts";
-import type { EventTypeMap } from "@slipstream/types";
+import type { ChatWsEvent, EventTypeMap } from "@slipstream/types";
 
 type CliHandlerMap = {
   [K in keyof EventTypeMap]?: (data: EventTypeMap[K]) => void;
 };
 
 /**
- * WS transport — the CLI as a first-class client of the existing server
- * surface. Cookie header at the handshake (the reason ws beats the native
- * WebSocket), ?id= session auth, typed EventTypeMap dispatch mirroring the
- * server's own handler-map idiom.
+ * Transport layer — wraps the battle-proven ChatWebSocketClient ported from
+ * apps/web (reconnect + backoff, message queue, typed registry), plus the
+ * one thing the browser could never send: the Cookie header at the
+ * handshake, so stashUserData gets real UserData. ?id= carries the userId;
+ * the server validates the session on file.
  */
 export class SlipstreamClientService extends CliConfigService {
-  private ws?: WebSocket;
+  protected wsClient?: ChatWebSocketClient;
   private handlers: CliHandlerMap = {};
 
   public on<const K extends keyof EventTypeMap>(
@@ -25,46 +26,40 @@ export class SlipstreamClientService extends CliConfigService {
   }
 
   public send<const K extends keyof EventTypeMap>(data: EventTypeMap[K]) {
-    if (!this.ws || this.ws?.readyState !== WebSocket.OPEN) {
+    if (!this.wsClient) {
       throw new Error("not connected — call connect() first");
     }
-    this.ws.send(JSON.stringify(data));
+    // proven client queues while disconnected and flushes on (re)connect
+    this.wsClient.send(data.type, data);
   }
 
-  public async connect() {
+  private dispatch(event: ChatWsEvent) {
+    const handler = this.handlers[event.type];
+    if (handler) {
+      // the frame's type field discriminates; the registry write above is
+      // the correlated site
+      (handler as (data: ChatWsEvent) => void)(event);
+    }
+  }
+
+  public async connect(timeoutMs = 10_000) {
+    // ?id= is all the handshake needs — the server validates the session on
+    // file and falls back to Andrew's values for absent cookies anyway
     const url = `${this.wsUrl}/?id=${encodeURIComponent(this.userId)}`;
-    const ws = new WebSocket(url, {
-      headers: { Cookie: this.cookieHeader }
-    });
-    this.ws = ws;
+    const client = new ChatWebSocketClient(url);
+    this.wsClient = client;
+    client.addListener(event => this.dispatch(event));
+    client.connect();
 
-    ws.on("message", raw => {
-      const text =
-        typeof raw === "string" ? raw : Buffer.from(raw as Buffer).toString();
-      const frame = JSON.parse<
-        EventTypeMap[keyof EventTypeMap] & { type: keyof EventTypeMap }
-      >(text);
-      const handler = this.handlers[frame.type];
-      if (handler) {
-        // the frame's type field discriminates; the registry write is the
-        // correlated site (same idiom as the server's HandlerMap)
-        (handler as (data: EventTypeMap[keyof EventTypeMap]) => void)(frame);
+    const startedAt = Date.now();
+    while (!client.isConnected) {
+      if (Date.now() - startedAt > timeoutMs) {
+        throw new Error(
+          `connection timed out (${this.wsUrl}) — is the ws-server up? ` +
+            `If the session on file expired, refresh via ${this.loginUrl}`
+        );
       }
-    });
-
-    const { promise, resolve, reject } = Promise.withResolvers<void>();
-    ws.once("open", () => resolve());
-    ws.once("error", err => reject(err));
-    ws.once("close", (code, reason) => {
-      const why = reason.toString("utf-8");
-      console.error(
-        `\nconnection closed (${code})${why ? `: ${why}` : ""}` +
-          (code === 4001
-            ? ` — session on file invalid/expired; refresh via ${this.loginUrl}`
-            : "")
-      );
-      process.exit(code === 1000 ? 0 : 1);
-    });
-    return promise;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
   }
 }
