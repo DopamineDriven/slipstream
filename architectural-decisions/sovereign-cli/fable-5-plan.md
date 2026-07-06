@@ -18,6 +18,15 @@
 
 ---
 
+## 0.1 Single-operator scope (Andrew, 2026-07-06)
+
+This CLI is for Andrew and Andrew alone. That's not a v1 limitation — it's the
+design. Consequences: auth is a constant, not a flow (session id in `.env`;
+mint a long-lived session row once if convenient); handshake cookie defaults
+are his real values (America/Chicago, desktop); no packaging, distribution,
+multi-user, or portability concerns ever. A "login flow" moves from
+later-phase to non-goal.
+
 ## 1. Why this shape
 
 The ws-server IS the product: provider fleet, HMEM, user store, tool_catalog, resumable streams, persistence, title-gen — all of it lives behind one WS surface with a typed event contract. Any CLI that re-implemented provider calls would fork the platform; a CLI that *renders the existing surface* compounds it. The economics follow: sub → API pricing makes chat-through-own-infra the cheapest way to keep working together, and every session enriches the same memory corpus the platform already maintains.

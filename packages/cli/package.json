@@ -1,0 +1,79 @@
+{
+  "name": "@slipstream/cli",
+  "version": "1.1.0",
+  "description": "sovereign cli",
+  "publishConfig": {
+    "access": "public",
+    "typesVersions": {
+      "*": {
+        "*": [
+          "dist/index.d.ts"
+        ],
+        "slipstream": [
+          "dist/bin/slipstream.d.ts"
+        ]
+      }
+    }
+  },
+  "license": "BUSL-1.1",
+  "source": "src/index.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/index.d.ts"
+      ],
+      "slipstream": [
+        "dist/bin/slipstream.d.ts"
+      ]
+    }
+  },
+  "bin": {
+    "slipstream": "dist/bin/slipstream.js"
+  },
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist/**/*.{js,cjs,mjs,d.ts,d.cts,d.mts}"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./bin/slipstream": "./dist/bin/slipstream.js"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "pnpm build",
+    "lint": "eslint",
+    "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml}\" --ignore-unknown --cache",
+    "clean": "git clean -xdf .turbo dist node_modules",
+    "typecheck": "tsgo --noEmit"
+  },
+  "dependencies": {
+    "@d0paminedriven/fs": "catalog:dd",
+    "@slipstream/credentials": "workspace:*",
+    "@slipstream/types": "workspace:*",
+    "@types/ws": "catalog:ws",
+    "dotenv": "catalog:dotenv",
+    "picocolors": "catalog:pico",
+    "ws": "catalog:ws"
+  },
+  "devDependencies": {
+    "@slipstream/eslint-config": "workspace:*",
+    "@slipstream/prettier-config": "workspace:*",
+    "@slipstream/tsconfig": "workspace:*",
+    "@types/node": "catalog:node",
+    "@typescript/native-preview": "catalog:tsgo",
+    "dotenv-cli": "catalog:dotenv",
+    "dotenv-expand": "catalog:dotenv",
+    "eslint": "catalog:eslint",
+    "jiti": "catalog:jiti",
+    "prettier": "catalog:prettier",
+    "tsdown": "catalog:tsdown",
+    "tslib": "catalog:tslib",
+    "tsx": "catalog:tsx",
+    "typescript": "catalog:ts",
+    "typescript-eslint": "catalog:tseslint"
+  },
+  "prettier": "@slipstream/prettier-config"
+}
