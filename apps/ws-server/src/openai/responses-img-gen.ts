@@ -68,7 +68,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     user_location
   }: ProviderOpenaiRequestEntity) {
     const mod = model as OpenAiModelIdUnion;
-    if (!this.isImgGenFacilitating(mod))
+    if (!this.prisma.isOpenAIImgGenFacilitating(mod))
       throw new Error(
         `${mod} does not support openai's responses api image-gen tooling.`
       );

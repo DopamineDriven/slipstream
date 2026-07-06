@@ -240,8 +240,8 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
               "auto",
               false
             ),
-            // Local file_search tool outputs can be large; keep calls sequential.
-            parallel_tool_calls: false,
+            // Local user_store_search tool outputs can be large; keep calls sequential.
+            parallel_tool_calls: true,
             tools
           },
           { stream: true }

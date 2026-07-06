@@ -90,6 +90,8 @@ export default defineConfig(
         "src/store/types.ts",
         "src/store/vector-store.ts",
         "src/store/workup.ts",
+        "src/tool-catalog/index.ts",
+        "src/tool-catalog/types.ts",
         "src/tts/index.ts",
         "src/tts/types.ts",
         "src/types/index.ts",

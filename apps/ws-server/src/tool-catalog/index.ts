@@ -1,20 +1,5 @@
+import type { ToolCatalogEntry } from "@/tool-catalog/types.ts";
 import type { Provider } from "@slipstream/types";
-
-export type ToolCatalogCategory =
-  | "document_retrieval"
-  | "conversation_memory"
-  | "meta";
-
-export interface ToolCatalogEntry {
-  /** canonical tool id — providers map to their wire names via toolNameFor */
-  id: string;
-  category: ToolCatalogCategory;
-  /** one-breath description: what it is + when to reach for it */
-  summary: string;
-  bestFor: readonly string[];
-  /** the relational layer descriptions can't carry — how tools compose */
-  pairsWith: readonly { tool: string; how: string }[];
-}
 
 /**
  * Provider-agnostic tool catalog — the single registry the `tool_catalog`
@@ -26,9 +11,16 @@ export interface ToolCatalogEntry {
  * Dep-free by design (mirrors the models service) — pure registry + formatting.
  */
 export class ToolCatalogService {
-  /** xAI reserves file_search for its own collections — grok ships slather_user_store */
+  /**
+   * canonical id (left) → provider wire name (right). Standard for 9 of 12;
+   * gemini, grok, and openai deviate because file_search clashes with internal
+   * provider tool naming (xAI reserves it for collections; openai and gemini
+   * providers ship user_store_search).
+   */
   private get providerNameOverrides() {
     return {
+      openai: { file_search: "user_store_search" },
+      gemini: { file_search: "user_store_search" },
       grok: { file_search: "slather_user_store" }
     } as const satisfies Partial<Record<Provider, Record<string, string>>>;
   }
@@ -95,14 +87,16 @@ export class ToolCatalogService {
         category: "meta",
         summary:
           "This catalog — relational guidance for the toolkit shipped with THIS request.",
-        bestFor: ["orienting after waking up mid-conversation with unfamiliar tools"],
+        bestFor: [
+          "orienting after waking up mid-conversation with unfamiliar tools"
+        ],
         pairsWith: []
       }
     ] as const satisfies readonly ToolCatalogEntry[];
   }
 
   /** the wire name a canonical tool ships under for a given provider */
-  public toolNameFor(canonicalId: string, provider: Provider) {
+  private toolNameFor(canonicalId: string, provider: Provider) {
     const overrides = this.providerNameOverrides;
     if (provider in overrides) {
       const map = overrides[provider as keyof typeof overrides];
@@ -114,6 +108,23 @@ export class ToolCatalogService {
   }
 
   /**
+   * the registry with wire names resolved for one provider — the single
+   * resolution point (entry names AND pairsWith references)
+   */
+  public entriesFor(provider: Provider) {
+    return this.entries.map(entry => ({
+      name: this.toolNameFor(entry.id, provider),
+      category: entry.category,
+      summary: entry.summary,
+      bestFor: entry.bestFor,
+      pairsWith: entry.pairsWith.map(p => ({
+        tool: this.toolNameFor(p.tool, provider),
+        how: p.how
+      }))
+    }));
+  }
+
+  /**
    * Build the catalog response from the tool names ACTUALLY shipped in the
    * request (wire names, post-mapping). Unknown/native tools (web_search,
    * code_execution, ...) pass through unlisted — the catalog documents the
@@ -121,18 +132,7 @@ export class ToolCatalogService {
    */
   public buildCatalog(provider: Provider, activeToolNames: readonly string[]) {
     const active = new Set(activeToolNames);
-    const tools = this.entries
-      .filter(entry => active.has(this.toolNameFor(entry.id, provider)))
-      .map(entry => ({
-        name: this.toolNameFor(entry.id, provider),
-        category: entry.category,
-        summary: entry.summary,
-        bestFor: entry.bestFor,
-        pairsWith: entry.pairsWith.map(p => ({
-          tool: this.toolNameFor(p.tool, provider),
-          how: p.how
-        }))
-      }));
+    const tools = this.entriesFor(provider).filter(t => active.has(t.name));
     return JSON.stringify({
       tools,
       note: "Catalog reflects tools available in this request. Use as liberally or conservatively as you see fit."

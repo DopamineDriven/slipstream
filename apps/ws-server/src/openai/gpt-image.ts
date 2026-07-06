@@ -180,7 +180,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
         "image options must be defined for the image endpoint api!"
       );
 
-    if (this.isImgGenNative(m) && resImg.n === 1) {
+    if (this.prisma.isOpenAIImgModel(m) && resImg.n === 1) {
       const r = resImg satisfies GptImageAndFacilitatorsImgGenWorkupRT;
       partialImgsRequested = typeof r.partialImagesRequested !== "undefined";
       outputFormat = r.output_format;

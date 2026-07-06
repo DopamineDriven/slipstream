@@ -85,117 +85,7 @@ export class OpenAIBaseService {
             ? "image/jpeg"
             : "application/octet-stream";
   }
-
-  protected isImgGenModel(m: OpenAiModelIdUnion) {
-    return (
-      m === "gpt-image-1" ||
-      m === "gpt-image-1-mini" ||
-      m === "gpt-image-1.5" ||
-      m === "gpt-image-2"
-    );
-  }
-
-  protected isDeepResearchModel(m: OpenAiModelIdUnion) {
-    return (
-      m === "gpt-5-pro" ||
-      m === "gpt-5.2-pro" ||
-      m === "gpt-5.4-pro" ||
-      m === "gpt-5.5-pro" ||
-      m === "o1-pro" ||
-      m === "o3-pro" ||
-      m === "o3-deep-research" ||
-      m === "o4-mini-deep-research"
-    );
-  }
-
-  protected isOpenAIModel(m: string) {
-    return (
-      m === "gpt-5.5" ||
-      m === "gpt-5.5-pro" ||
-      m === "gpt-5.4-mini" ||
-      m === "gpt-5.4-nano" ||
-      m === "gpt-4.1" ||
-      m === "gpt-4.1-mini" ||
-      m === "gpt-4.1-nano" ||
-      m === "gpt-5" ||
-      m === "gpt-5.2-chat-latest" ||
-      m === "gpt-5.1-chat-latest" ||
-      m === "o4-mini" ||
-      m === "gpt-5-chat-latest" ||
-      m === "gpt-5-mini" ||
-      m === "gpt-5-nano" ||
-      m === "gpt-5-pro" ||
-      m === "gpt-5.1" ||
-      m === "gpt-5.2" ||
-      m === "gpt-5.2-pro" ||
-      m === "gpt-5.4" ||
-      m === "gpt-5.4-pro" ||
-      m === "o3" ||
-      m === "gpt-4o" ||
-      m === "gpt-4o-mini" ||
-      m === "o1-pro" ||
-      m === "o3-pro" ||
-      m === "o3-deep-research" ||
-      m === "o4-mini-deep-research" ||
-      m === "gpt-image-1" ||
-      m === "gpt-image-1-mini" ||
-      m === "gpt-image-1.5" ||
-      m === "gpt-image-2" ||
-      m === "sora-2" ||
-      m === "sora-2-pro" ||
-      m === "gpt-5.3-codex" ||
-      m === "gpt-5.2-codex" ||
-      m === "gpt-5.1-codex-max" ||
-      m === "gpt-5.1-codex-mini" ||
-      m === "gpt-5.1-codex" ||
-      m === "gpt-5-codex" ||
-      m === "gpt-3.5-turbo" ||
-      m === "gpt-4-turbo" ||
-      m === "gpt-4" ||
-      m === "o1" ||
-      m === "o3-mini" ||
-      m === "chatgpt-4o-latest"
-    );
-  }
-
-  protected isImgGenFacilitating(m: OpenAiModelIdUnion) {
-    return (
-      m === "gpt-5.5" ||
-      m === "gpt-5.5-pro" ||
-      m === "gpt-5.4-mini" ||
-      m === "gpt-5.4-nano" ||
-      m === "gpt-4.1" ||
-      m === "gpt-4.1-mini" ||
-      m === "gpt-4.1-nano" ||
-      m === "gpt-5" ||
-      m === "gpt-5-chat-latest" ||
-      m === "gpt-5-mini" ||
-      m === "gpt-5-nano" ||
-      m === "gpt-5-pro" ||
-      m === "gpt-5.1" ||
-      m === "gpt-5.2" ||
-      m === "gpt-5.2-pro" ||
-      m === "gpt-5.4" ||
-      m === "gpt-5.4-pro" ||
-      m === "o3" ||
-      m === "gpt-4o" ||
-      m === "gpt-4o-mini"
-    );
-  }
-
-  protected isImgGenNative(m: string) {
-    return (
-      m === "gpt-image-1" ||
-      m === "gpt-image-1-mini" ||
-      m === "gpt-image-1.5" ||
-      m === "gpt-image-2"
-    );
-  }
-
-  protected isImgGenCapable(m: OpenAiModelIdUnion) {
-    return this.isImgGenModel(m) || this.isImgGenFacilitating(m);
-  }
-
+  
   protected async generateId(target: "itemId" | "generationGroupId") {
     const nanoid = await this.nanoId;
     if (target === "generationGroupId") {
@@ -276,7 +166,7 @@ export class OpenAIBaseService {
     });
     const sharedOpts = {
       input_image_mask,
-      isPureImgGenModel: pureImgGenModel ?? this.isImgGenModel(model),
+      isPureImgGenModel: pureImgGenModel ?? this.prisma.isOpenAIImgModel(model),
       msgBoundImgAssets,
       n: this.prisma.handleImgGenCount(model, { n }),
       moderation: moderate,
@@ -299,7 +189,7 @@ export class OpenAIBaseService {
             : "auto"
       }),
       output_background: bg,
-      targetApi: this.isImgGenFacilitating(model)
+      targetApi: this.prisma.isOpenAIImgGenFacilitating(model)
         ? ("responses" as const)
         : ("images" as const),
       partialImagesRequested: this.prisma.handlePartialImgGen(model, {
@@ -461,11 +351,7 @@ export class OpenAIBaseService {
   }
 
   protected canCallImageApi(model: OpenAiModelIdUnion) {
-    return this.isImgGenModel(model);
-  }
-
-  protected imageGenToolCompat(model: OpenAiModelIdUnion) {
-    return this.isImgGenFacilitating(model);
+    return this.prisma.isOpenAIImgModel(model);
   }
 
   protected openaiReasoning(

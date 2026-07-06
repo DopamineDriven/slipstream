@@ -20,14 +20,14 @@ export class OpenAIService extends OpenAIResponsesChatService {
     super(logger, prisma, userStoreVector, s3, redis, apiKey, memoryService);
   }
   public async routeOpenAI({ model, ...rest }: ProviderOpenaiRequestEntity) {
-    if (!model || !this.isOpenAIModel(model)) return;
-    if (this.isImgGenNative(model)) {
+    if (!model || !this.prisma.isOpenAIModel(model)) return;
+    if (this.prisma.isOpenAIImgModel(model)) {
       return this.handleOpenaiNativeImageRequestGptImage1({
         ...rest,
         model
       });
     } else if (
-      this.isImgGenFacilitating(model) &&
+      this.prisma.isOpenAIImgGenFacilitating(model) &&
       typeof rest.imgGenFields !== "undefined" &&
       rest.imgGenEnabled === true
     ) {

@@ -241,7 +241,12 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
   private prependProviderModelTag(
     msgs: Pick<
       MessageSingleton<true>,
-      "senderType" | "provider" | "model" | "content" | "messageBlocks" | "ordinal"
+      | "senderType"
+      | "provider"
+      | "model"
+      | "content"
+      | "messageBlocks"
+      | "ordinal"
     >[],
     memoryView: MemoryAssemblyView | null
   ) {
@@ -388,10 +393,10 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     ) satisfies OpenAI.Responses.WebSearchTool.UserLocation | null | undefined;
   }
 
-  protected fileSearchFunctionTool() {
+  protected userStoreSearchFunctionTool() {
     return {
       type: "function",
-      name: "file_search",
+      name: "user_store_search",
       description:
         "This tool utilizes a 'Partitioned Foraging' approach which recognizes that for the 200,000+ years that humans have existed " +
         "95%+ of it has been as foragers. Agents are trained exclusively on data aggregated/curated by humans; " +
@@ -562,9 +567,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     });
   }
 
-  protected parseFileSearchInput(
-    rawArguments: string
-  ): OpenAIFileSearchToolInput {
+  protected parseFileSearchInput(rawArguments: string) {
     const parsed = this.parseFileSearchArguments(rawArguments);
 
     if ("query" in parsed && typeof parsed.query === "string") {
@@ -607,7 +610,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     const firstQuery = uniqueQueries[0];
     if (!firstQuery) {
       throw new Error(
-        `file_search input missing required "query": ${rawArguments}`
+        `user_store_search input missing required "query": ${rawArguments}`
       );
     }
 
@@ -654,7 +657,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
           recoveredPreview: recovered.slice(0, 300),
           error: this.prisma.safeErrMsg(error)
         },
-        "Recovered malformed OpenAI file_search arguments"
+        "Recovered malformed OpenAI user_store_search arguments"
       );
       return JSON.parse<Record<string, unknown>>(recovered);
     }
@@ -707,7 +710,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     return undefined;
   }
 
-  protected async executeFileSearch(
+  protected async executeUserStoreSearch(
     userId: string,
     input: OpenAIFileSearchToolInput
   ) {
@@ -766,9 +769,9 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
   ) {
     const toolName = toolCall.name;
     try {
-      if (toolName === "file_search") {
+      if (toolName === "user_store_search") {
         const input = this.parseFileSearchInput(toolCall.arguments);
-        const output = await this.executeFileSearch(userId, input);
+        const output = await this.executeUserStoreSearch(userId, input);
         return {
           type: "function_call_output",
           call_id: toolCall.call_id,
@@ -846,7 +849,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     // independently of uploaded documents
     if (localFileSearchEnabled) {
       return [
-        this.fileSearchFunctionTool(),
+        this.userStoreSearchFunctionTool(),
         this.memorySearchFunctionTool(),
         this.memoryGetChunkFunctionTool(),
         {
@@ -889,4 +892,3 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     }
   }
 }
-// To continue this session, run codex resume 019b2b4a-3e12-7c90-8276-49994f1d3bd2

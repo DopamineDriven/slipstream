@@ -9,7 +9,7 @@ export class ModelService extends ModelServiceWorkup {
   constructor() {
     super();
   }
-  protected isOpenAIImgGenFacilitating(m: string) {
+  public isOpenAIImgGenFacilitating(m: string) {
     return (
       m === "gpt-5.5" ||
       m === "gpt-5.5-pro" ||
