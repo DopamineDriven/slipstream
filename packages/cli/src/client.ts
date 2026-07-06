@@ -32,7 +32,7 @@ export class SlipstreamClientService extends CliConfigService {
   }
 
   public async connect() {
-    const url = `${this.wsUrl}/?id=${encodeURIComponent(this.sessionId)}`;
+    const url = `${this.wsUrl}/?id=${encodeURIComponent(this.userId)}`;
     const ws = new WebSocket(url, {
       headers: { Cookie: this.cookieHeader }
     });
@@ -59,7 +59,9 @@ export class SlipstreamClientService extends CliConfigService {
       const why = reason.toString("utf-8");
       console.error(
         `\nconnection closed (${code})${why ? `: ${why}` : ""}` +
-          (code === 4001 ? ` — session invalid; visit ${this.loginUrl}` : "")
+          (code === 4001
+            ? ` — session on file invalid/expired; refresh via ${this.loginUrl}`
+            : "")
       );
       process.exit(code === 1000 ? 0 : 1);
     });

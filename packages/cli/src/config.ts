@@ -23,15 +23,14 @@ export class CliConfigService {
     );
   }
 
-  public get sessionId() {
-    const sessionId = process.env.SLIPSTREAM_SESSION_ID;
-    if (!sessionId) {
-      console.error(
-        `SLIPSTREAM_SESSION_ID is required (packages/cli/.env) — grab one after ${this.loginUrl}`
-      );
-      process.exit(1);
-    }
-    return sessionId;
+  /**
+   * the ?id= handshake param is the USER id — the server validates the
+   * session on file for it (getAndValidateUserSessionById). Single-operator:
+   * Andrew's id is the default; expired session → refresh via loginUrl in
+   * the browser.
+   */
+  public get userId() {
+    return process.env.SLIPSTREAM_USER_ID ?? "nrr6h4r4480f6kviycyo1zhf";
   }
 
   /**
