@@ -7,7 +7,6 @@ import type { InferPromiseRT } from "@/types/index.ts";
 import type { OpenAI } from "openai";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import { OpenAIServiceWorkup } from "@/openai/workup.ts";
-import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { MessageSingleton } from "@slipstream/types";
 
@@ -17,7 +16,6 @@ export class OpenAIMemoryService extends OpenAIServiceWorkup {
     prisma: PrismaService,
     userStoreVector: UserStoreVectorService,
     s3: S3Storage,
-    protected redis: EnhancedRedisPubSub,
     apiKey: string,
     // memory ownership STARTS here — base/workup below are memory-free so the
     // summarizer arm can extend OpenAIServiceWorkup without the ctor cycle
@@ -200,31 +198,6 @@ export class OpenAIMemoryService extends OpenAIServiceWorkup {
     }
   }
 
-  protected async handleEdits(
-    imgCounts: number,
-    msgs: MessageSingleton<true>[],
-    requestMessageId?: string
-  ) {
-    if (imgCounts < 1) return;
-
-    const findUser = msgs.find(t => t.id === (requestMessageId ?? ""));
-    if (!findUser) return;
-    const rsArr = Array.of<Response>();
-    for (const x of findUser.attachments) {
-      if (x.assetType !== "IMAGE") continue;
-      let url: string | null;
-      if (x.compatStatus === "ACTIVE") {
-        url = x.compatCdnUrl ?? x.cdnUrl;
-      } else {
-        url = x.cdnUrl ?? x.compatCdnUrl;
-      }
-      if (!url) continue;
-
-      const fetcher = await fetch(url);
-      rsArr.push(fetcher);
-    }
-    return { images: rsArr, text: this.messageText(findUser) };
-  }
   protected async executeFunctionToolCall(
     userId: string,
     conversationId: string,
