@@ -30,6 +30,21 @@ export class ModelServiceWorkup extends ProviderValidation {
   public formatSysNote(systemPrompt?: string) {
     return systemPrompt ? `${systemPrompt}\n\n${this.sysNote}` : this.sysNote;
   }
+
+  /**
+   * Persist-time twin of packages/db/src/test/scrub-model-wrappers.ts:
+   * anchored strip of model-mimicked <model provider name> wrapper stacks —
+   * leading opening-tag stacks and trailing closing-tag stacks ONLY; interior
+   * tags are content (the corpus quotes the notation). Idempotent; the trim
+   * fires only when a strip fired. Keeps prod from re-accumulating layers
+   * post-scrub (355 anthropic incidents before the prefix normalization).
+   */
+  public scrubModelWrappers(content: string) {
+    const leading = /^(?:\s*<model\s+provider="[^"]*"\s+name="[^"]*"\s*>)+\s*/;
+    const trailing = /(?:\s*<\/model>)+\s*$/;
+    const stripped = content.replace(leading, "").replace(trailing, "");
+    return stripped === content ? content : stripped.trim();
+  }
   public arrToArrOfArrs = <const T = unknown>(
     arr: readonly T[],
     int = 10,
