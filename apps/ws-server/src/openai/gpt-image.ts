@@ -28,8 +28,9 @@ import type {
   OpenAIImgGenModels,
   OpenAiModelIdUnion
 } from "@slipstream/types";
+import { OpenAIMemoryService } from "./memory.ts";
 
-export class OpenAIGPTImageService extends OpenAIServiceWorkup {
+export class OpenAIGPTImageService extends OpenAIMemoryService {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
