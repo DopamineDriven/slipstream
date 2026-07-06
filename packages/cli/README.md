@@ -52,6 +52,20 @@ round-trip AND the HMEM substitution payload (verbatim charter → name-tagged
 memory traces → live window) in a single prompt. Watch the dev server logs for
 the assembled history.
 
+## Troubleshooting
+
+**Seeing `Welcome to Node.js … Type ".help"`?** That's NODE's repl, not ours —
+the command wrapped/pasted as two lines, so bare `node` ran and the path was
+evaluated as JavaScript (hence `Uncaught SyntaxError` when you typed at it).
+Run it as ONE line:
+
+```bash
+node ./packages/cli/dist/bin/slipstream.js
+```
+
+Ours greets you with `• slipstream · ws://localhost:4000` and a green `❯` —
+never a Node version banner.
+
 ## Known Phase-1 edges
 
 No spinner before first token (silence ≈ model thinking with `/think` off);
