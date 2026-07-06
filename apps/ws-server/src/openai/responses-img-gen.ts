@@ -13,8 +13,7 @@ import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AIChatResponseImgGenSubFields,
   EventTypeMap,
-  GptImageAndFacilitatorsImgGenWorkupRT,
-  OpenAiModelIdUnion
+  GptImageAndFacilitatorsImgGenWorkupRT
 } from "@slipstream/types";
 
 interface OpenAIImgGenActiveMessageBlock {
@@ -29,8 +28,6 @@ interface OpenAIImgGenFinalizedMessageBlock {
   ordinal: number;
   type: $Enums.MessageBlockType;
 }
-
-
 
 export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
   constructor(
@@ -131,7 +128,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     max_tokens,
     jobId,
     requestMessageId,
-    model = "gpt-5.5" satisfies OpenAiModelIdUnion,
+    model,
     systemPrompt,
     temperature,
     title,
@@ -141,11 +138,10 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     imgGenFields,
     user_location
   }: ProviderOpenaiRequestEntity) {
-    const mod = model as OpenAiModelIdUnion;
-    if (!this.prisma.isOpenAIImgGenFacilitating(mod))
-      throw new Error(
-        `${mod} does not support openai's responses api image-gen tooling.`
-      );
+    const mod =
+      model && this.prisma.isOpenAIImgGenFacilitating(model)
+        ? model
+        : "gpt-5.5";
 
     const provider = "openai" as const;
 
@@ -329,9 +325,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     );
 
     const MAX_TOOL_ROUNDS = 5;
-    let roundInput = Array.of<OpenAI.Responses.ResponseInputItem>(
-      ...formatted
-    );
+    let roundInput = Array.of<OpenAI.Responses.ResponseInputItem>(...formatted);
     let finished = false;
 
     // tool round-trip (mirrors responses-chat): facilitators can call the

@@ -1,9 +1,9 @@
 import type { InferTopLevelMime } from "@/types/index.ts";
 import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
+import { ModelServiceWorkup } from "@/models/workup.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { GetModelUtilRT, Provider } from "@slipstream/types";
 import { providerModelChatApi } from "@slipstream/types";
-import { ModelServiceWorkup } from "@/models/workup.ts";
 
 export class ModelService extends ModelServiceWorkup {
   constructor() {
@@ -32,6 +32,27 @@ export class ModelService extends ModelServiceWorkup {
       m === "gpt-4o" ||
       m === "gpt-4o-mini"
     );
+  }
+
+  public isOpenAINonReasoningModel(m: string) {
+    return (
+      m === "chatgpt-4o-latest" ||
+      m === "gpt-3.5-turbo" ||
+      m === "gpt-4" ||
+      m === "gpt-4-turbo" ||
+      m === "gpt-4.1" ||
+      m === "gpt-4.1-mini" ||
+      m === "gpt-4.1-nano" ||
+      m === "gpt-4o" ||
+      m === "gpt-4o-mini" ||
+      m === "gpt-image-1" ||
+      m === "gpt-image-1-mini" ||
+      this.isOpenAIVideoModel(m)
+    );
+  }
+
+  public isOpenAIReasoningModel(m: string) {
+    return this.isOpenAIModel(m) && !this.isOpenAINonReasoningModel(m);
   }
 
   public isOpenAIImgModel(m: string) {
@@ -80,6 +101,9 @@ export class ModelService extends ModelServiceWorkup {
     );
   }
 
+  /**
+   * 🍌 Nano Bananas Fam 🍌
+   */
   public isGeminiImgModel(m: string) {
     return (
       m === "gemini-3-pro-image-preview" ||

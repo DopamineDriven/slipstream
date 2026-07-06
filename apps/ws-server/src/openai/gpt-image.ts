@@ -21,9 +21,7 @@ import type {
   AIChatResponseImgGenSubFields,
   EventTypeMap,
   GptImageAndFacilitatorsImgGenWorkupRT,
-  MessageSingleton,
-  OpenAIImgGenModels,
-  OpenAiModelIdUnion
+  MessageSingleton
 } from "@slipstream/types";
 
 export class OpenAIGPTImageService extends OpenAIMemoryService {
@@ -84,14 +82,14 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
     systemPrompt,
     temperature,
     topP,
-    model = "gpt-image-1.5" satisfies OpenAiModelIdUnion,
+    model,
     title,
     currentMsgBoundAssets,
     imgGenEnabled,
     imgGenFields
   }: ProviderOpenaiRequestEntity) {
-    const m = model as OpenAIImgGenModels;
-
+    const m =
+      model && this.prisma.isOpenAIImgModel(model) ? model : "gpt-image-2";
     const provider = "openai" as const;
 
     const partialImgArr = Array.of<ImageGenPartialArr>();
@@ -182,7 +180,7 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
         "image options must be defined for the image endpoint api!"
       );
 
-    if (this.prisma.isOpenAIImgModel(m) && resImg.n === 1) {
+    if (resImg.n === 1) {
       const r = resImg satisfies GptImageAndFacilitatorsImgGenWorkupRT;
       partialImgsRequested = typeof r.partialImagesRequested !== "undefined";
       outputFormat = r.output_format;

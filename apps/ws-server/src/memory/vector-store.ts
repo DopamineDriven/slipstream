@@ -1,5 +1,6 @@
 import type { AnthropicSummarizerService } from "@/anthropic/summarizer.ts";
 import type { LoggerService } from "@/logger/index.ts";
+import type { OpenAISummarizerService } from "@/openai/summarizer.ts";
 import type {
   ConversationMemoryGetChunkTarget,
   ConversationMemorySearchToolInput,
@@ -768,6 +769,12 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       maxAttachmentBlocks: 12,
       // fleet default is 10 (deepseek gets 15) — if 8 rounds of foraging
       // produces a higher-fidelity summary then by all means; knowledge is king
+      openaiArm: {
+        provider: "OPENAI",
+        model: "gpt-5.5",
+        effort: "xhigh",
+        maxOutputTokens: 120_000
+      },
       maxToolUseRounds: 10,
       callDeadlineMs: 900_000,
       foldInputBudgetTokens: 130_000,
@@ -840,6 +847,38 @@ The System prompt given to all models in the source material being summarized is
       }
     }
     return blocks;
+  }
+
+  /**
+   * The GPT-5.5 arm (§6.2) — setter injection (the setResolver precedent):
+   * memory→arm is the only circular construction edge, so the arm arrives
+   * post-construction. Unset → sonnet-5-only behavior (today's posture).
+   */
+  private openaiSummarizerArm?: OpenAISummarizerService;
+  public setOpenAISummarizerArm(arm: OpenAISummarizerService) {
+    this.openaiSummarizerArm = arm;
+  }
+
+  /** anthropic summary content blocks → Responses input parts (text + url images) */
+  private toOpenAISummaryContent(
+    blocks: Anthropic.Beta.BetaContentBlockParam[]
+  ) {
+    const parts = Array.of<
+      | { type: "input_text"; text: string }
+      | { type: "input_image"; image_url: string; detail: "auto" }
+    >();
+    for (const block of blocks) {
+      if (block.type === "text") {
+        parts.push({ type: "input_text", text: block.text });
+      } else if (block.type === "image" && block.source.type === "url") {
+        parts.push({
+          type: "input_image",
+          image_url: block.source.url,
+          detail: "auto"
+        });
+      }
+    }
+    return parts;
   }
 
   private async buildSummaryContent(
@@ -1070,6 +1109,11 @@ The System prompt given to all models in the source material being summarized is
     userId: string
   ) {
     const cfg = this.memorySummarizerConfig;
+    // per-chunk deterministic alternation (§6.2): odd chunkIndex → the
+    // GPT-5.5 arm when wired, even → the sonnet-5 anchor. Stable across
+    // retries (unlike LRU), and every row carries its arm's receipts.
+    const openaiArm =
+      chunk.chunkIndex % 2 === 1 ? this.openaiSummarizerArm : undefined;
     try {
       await this.prisma.updateMemoryChunkSummaryStateTyped(
         chunk.id,
@@ -1078,25 +1122,56 @@ The System prompt given to all models in the source material being summarized is
       );
 
       const content = await this.buildSummaryContent(chunk, conversationTitle);
-      const result = await this.summarizer.streamSummaryMessage({
-        model: cfg.model,
-        maxOutputTokens: cfg.maxOutputTokens,
-        effort: cfg.effort,
-        system: this.summarySystemPrompt,
-        content,
-        tools: [this.summarizerFileSearchTool],
-        executeToolCall: (name, input) =>
-          this.executeSummarizerToolCall(
-            userId,
-            chunk.conversationId,
-            name,
-            input
-          ),
-        maxToolUseRounds: cfg.maxToolUseRounds,
-        callDeadlineMs: cfg.callDeadlineMs
-      });
+      const executeToolCall = (name: string, input: unknown) =>
+        this.executeSummarizerToolCall(
+          userId,
+          chunk.conversationId,
+          name,
+          input
+        );
+      const result = openaiArm
+        ? await openaiArm.streamSummaryMessage({
+            model: cfg.openaiArm.model,
+            maxOutputTokens: cfg.openaiArm.maxOutputTokens,
+            effort: cfg.openaiArm.effort,
+            system: this.summarySystemPrompt,
+            content: this.toOpenAISummaryContent(content),
+            executeToolCall,
+            maxToolUseRounds: cfg.maxToolUseRounds,
+            callDeadlineMs: cfg.callDeadlineMs
+          })
+        : await this.summarizer.streamSummaryMessage({
+            model: cfg.model,
+            maxOutputTokens: cfg.maxOutputTokens,
+            effort: cfg.effort,
+            system: this.summarySystemPrompt,
+            content,
+            tools: [this.summarizerFileSearchTool],
+            executeToolCall,
+            maxToolUseRounds: cfg.maxToolUseRounds,
+            callDeadlineMs: cfg.callDeadlineMs
+          });
       const sectionSummary = this.sanitizeSummaryOutput(result.text);
       if (!sectionSummary) throw new Error("summarizer returned empty output");
+
+      // §6.3 audition receipts — per-round provider-reported usage (the
+      // effective-cost signal unit price can't give); log until the
+      // summaryUsageRaw column lands
+      if (
+        "usage" in result &&
+        Array.isArray(result.usage) &&
+        result.usage.length > 0
+      ) {
+        this.logger.info(
+          {
+            chunkId: chunk.id,
+            model: cfg.openaiArm.model,
+            rounds: result.usage.length,
+            usage: result.usage
+          },
+          "summarizer arm usage"
+        );
+      }
 
       const counted = await this.voyage.countTokens(
         [sectionSummary],
@@ -1107,8 +1182,8 @@ The System prompt given to all models in the source material being summarized is
       await this.prisma.updateMemoryChunkSummaryTyped(
         chunk.id,
         sectionSummary,
-        cfg.model,
-        cfg.provider,
+        openaiArm ? cfg.openaiArm.model : cfg.model,
+        openaiArm ? cfg.openaiArm.provider : cfg.provider,
         cfg.promptVersion,
         counted.counts[0] ?? 0,
         result.reasoningDuration,

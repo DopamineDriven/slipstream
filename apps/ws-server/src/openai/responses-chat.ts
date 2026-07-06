@@ -8,7 +8,7 @@ import { OpenAIResponsesImgGenService } from "@/openai/responses-img-gen.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type { EventTypeMap, OpenAiModelIdUnion } from "@slipstream/types";
+import type { EventTypeMap } from "@slipstream/types";
 
 interface OpenAIActiveMessageBlock {
   content: string;
@@ -36,7 +36,7 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     super(logger, prisma, userStoreVector, s3, redis, apiKey, memoryService);
   }
 
-  private reasoningByModel(m: OpenAiModelIdUnion) {
+  private reasoningByModel(m: string) {
     if (
       m === "gpt-5.5" ||
       m === "gpt-5.5-pro" ||
@@ -85,14 +85,20 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     max_tokens,
     jobId,
     requestMessageId,
-    model = "gpt-5.4" satisfies OpenAiModelIdUnion,
+    model,
     systemPrompt,
     temperature,
     title,
     topP,
     user_location
   }: ProviderOpenaiRequestEntity) {
-    const m = model as OpenAiModelIdUnion;
+    const m =
+      model &&
+      this.prisma.isOpenAIModel(model) &&
+      !this.prisma.isOpenAIImgModel(model) &&
+      !this.prisma.isOpenAIVideoModel(model)
+        ? model
+        : "gpt-5.5";
 
     const provider = "openai" as const;
 
@@ -219,11 +225,7 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
             instructions,
             store: false,
             model: m,
-            text: this.openAiVerbosity(
-              model as OpenAiModelIdUnion,
-              "medium",
-              false
-            ),
+            text: this.openAiVerbosity(m, "medium", false),
             include: [
               "reasoning.encrypted_content",
               "code_interpreter_call.outputs",

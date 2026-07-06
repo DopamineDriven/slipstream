@@ -83,7 +83,7 @@ export class OpenAIBaseService {
             ? "image/jpeg"
             : "application/octet-stream";
   }
-  
+
   protected async generateId(target: "itemId" | "generationGroupId") {
     const nanoid = await this.nanoId;
     if (target === "generationGroupId") {
@@ -311,54 +311,33 @@ export class OpenAIBaseService {
     });
   }
 
-  protected isReasoningModel(m: OpenAiModelIdUnion) {
-    return (
-      m === "gpt-5.5" ||
-      m === "gpt-5.5-pro" ||
-      m === "gpt-5.4" ||
-      m === "gpt-5.4-mini" ||
-      m === "gpt-5.4-nano" ||
-      m === "gpt-5.2-codex" ||
-      m === "gpt-5.3-codex" ||
-      m === "gpt-5.4-pro" ||
-      m === "gpt-5" ||
-      m === "gpt-5-chat-latest" ||
-      m === "gpt-5-codex" ||
-      m === "gpt-5-mini" ||
-      m === "gpt-5-nano" ||
-      m === "gpt-5-pro" ||
-      m === "o1" ||
-      m === "o3" ||
-      m === "o3-mini" ||
-      m === "o4-mini" ||
-      m === "gpt-5.2-pro" ||
-      m === "gpt-5.2" ||
-      m === "gpt-5.2-chat-latest" ||
-      m === "gpt-5.1" ||
-      m === "gpt-5.1-chat-latest" ||
-      m === "gpt-5.1-codex-max" ||
-      m === "gpt-5.1-codex" ||
-      m === "gpt-5.1-codex-mini" ||
-      m === "gpt-image-1.5" ||
-      m === "gpt-image-2" ||
-      m === "o3-pro" ||
-      m === "o1-pro" ||
-      m === "o3-deep-research" ||
-      m === "o4-mini-deep-research"
-    );
-  }
-
   protected canCallImageApi(model: OpenAiModelIdUnion) {
     return this.prisma.isOpenAIImgModel(model);
   }
 
+  private isEffortHighMedLow(effort: string) {
+    return effort === "high" || effort === "low" || effort === "medium";
+  }
+
+  private isEffortMinimal(effort: string) {
+    return effort === "minimal";
+  }
+
+  private isEffortNone(effort: string) {
+    return effort === "none";
+  }
+
+  private isEffortXHigh(effort: string) {
+    return effort === "xhigh";
+  }
+
   protected openaiReasoning(
-    m: OpenAiModelIdUnion,
+    m: string,
     effort: ReasoningEffort = "high",
     summary: Reasoning["summary"] = "auto",
     imgGenEnabled = false
   ) {
-    if (!this.isReasoningModel(m)) return;
+    if (!this.prisma.isOpenAIReasoningModel(m)) return;
     switch (m) {
       // gpt-5-pro only supports high reasoning
       case "gpt-5-pro": {
@@ -373,13 +352,16 @@ export class OpenAIBaseService {
         if (imgGenEnabled === true) {
           return { effort: "low", summary } as const satisfies Reasoning;
         } else {
-          if (effort === "high" || effort === "low" || effort === "medium") {
+          if (effort && this.isEffortHighMedLow(effort)) {
             return { effort, summary } as const satisfies Reasoning;
           } else {
             return { effort: "high", summary } as const satisfies Reasoning;
           }
         }
       }
+      /**
+       * minimal only supported by gpt-5, gpt-5-mini, and gpt-5-nano
+       */
       case "gpt-5":
       case "gpt-5-mini":
       case "gpt-5-nano": {
@@ -387,10 +369,8 @@ export class OpenAIBaseService {
           return { effort: "minimal", summary } as const satisfies Reasoning;
         } else {
           if (
-            effort === "high" ||
-            effort === "low" ||
-            effort === "medium" ||
-            effort === "minimal"
+            effort &&
+            (this.isEffortHighMedLow(effort) || this.isEffortMinimal(effort))
           ) {
             return { effort, summary } as const satisfies Reasoning;
           } else {
@@ -398,15 +378,16 @@ export class OpenAIBaseService {
           }
         }
       }
+      /**
+       * gpt-5.1 only supports "none" | "low" | "medium" | "high"
+       */
       case "gpt-5.1": {
         if (imgGenEnabled === true) {
           return { effort: "low", summary } as const satisfies Reasoning;
         } else {
           if (
-            effort === "high" ||
-            effort === "low" ||
-            effort === "medium" ||
-            effort === "none"
+            effort &&
+            (this.isEffortHighMedLow(effort) || this.isEffortNone(effort))
           ) {
             return { effort, summary } as const satisfies Reasoning;
           } else {
@@ -418,10 +399,8 @@ export class OpenAIBaseService {
       case "gpt-5.3-codex":
       case "gpt-5.1-codex-max": {
         if (
-          effort === "high" ||
-          effort === "low" ||
-          effort === "medium" ||
-          effort === "xhigh"
+          effort &&
+          (this.isEffortHighMedLow(effort) || this.isEffortXHigh(effort))
         ) {
           return { effort, summary } as const satisfies Reasoning;
         } else {
@@ -437,11 +416,10 @@ export class OpenAIBaseService {
           return { effort: "medium", summary } as const satisfies Reasoning;
         } else {
           if (
-            effort === "xhigh" ||
-            effort === "high" ||
-            effort === "low" ||
-            effort === "medium" ||
-            effort === "none"
+            effort &&
+            (this.isEffortHighMedLow(effort) ||
+              this.isEffortXHigh(effort) ||
+              this.isEffortNone(effort))
           ) {
             return { effort, summary } as const satisfies Reasoning;
           }
@@ -458,7 +436,7 @@ export class OpenAIBaseService {
       case "gpt-5.5-pro":
       case "gpt-5.4-pro":
       case "gpt-5.2-pro": {
-        if (effort === "xhigh") {
+        if (effort && this.isEffortXHigh(effort)) {
           return { effort, summary } as const satisfies Reasoning;
         } else {
           return { effort: "xhigh", summary } as const satisfies Reasoning;
@@ -475,7 +453,7 @@ export class OpenAIBaseService {
       case "o4-mini":
       case "gpt-5.1-chat-latest":
       default: {
-        if (effort === "high" || effort === "low" || effort === "medium") {
+        if (effort && this.isEffortHighMedLow(effort)) {
           return { effort, summary } as const satisfies Reasoning;
         } else {
           return { effort: "medium", summary } as const satisfies Reasoning;
@@ -485,10 +463,11 @@ export class OpenAIBaseService {
   }
 
   protected openAiVerbosity(
-    model: OpenAiModelIdUnion,
+    model: string,
     verbosity: ResponseTextConfig["verbosity"] = "medium",
     imgGenEnabled = false
   ) {
+    
     switch (model) {
       case "gpt-5.5":
       case "gpt-5.5-pro":

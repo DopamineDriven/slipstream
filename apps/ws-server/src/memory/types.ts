@@ -1,7 +1,12 @@
 import type { PrismaConversationMemoryService } from "@/prisma/convo-memory-service.ts";
 import type { Voyage } from "@/voyage/types.ts";
+import type { ReasoningEffort } from "openai/resources/shared.mjs";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { AnthropicModelIdUnion, Unenumerate } from "@slipstream/types";
+import type {
+  AnthropicModelIdUnion,
+  OpenAiModelIdUnion,
+  Unenumerate
+} from "@slipstream/types";
 
 /** conversationId → immutable ids only — the watermark is NEVER cached in-process */
 export interface MemoryContextRegistryEntry {
@@ -193,6 +198,17 @@ export interface MemorySummarizerConfig {
   maxOutputTokens: number;
   /** image url blocks attached to the summarizer call, capped — documents stay in the user store (index once, retrieve everywhere) */
   maxAttachmentBlocks: number;
+  /**
+   * the GPT-5.5 arm's posture (§6.2 — per-arm knobs are config, not
+   * hardcode); shared maxToolUseRounds/callDeadlineMs govern both arms so
+   * the wave failsafe stays a single computation
+   */
+  openaiArm: {
+    provider: $Enums.Provider;
+    model: OpenAiModelIdUnion;
+    effort: ReasoningEffort;
+    maxOutputTokens: number;
+  };
   /** hard cap on file_search round-trips per summary/fold call */
   maxToolUseRounds: number;
   /** per-round wall-clock deadline — an immortal stream aborts into the ERROR/retry path instead of wedging its wave */
