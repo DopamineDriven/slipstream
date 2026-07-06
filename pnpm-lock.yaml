@@ -1536,6 +1536,9 @@ importers:
       prettier:
         specifier: catalog:prettier
         version: 3.9.4
+      rolldown:
+        specifier: catalog:rolldown
+        version: 1.1.4
       tsdown:
         specifier: catalog:tsdown
         version: 0.22.3(@typescript/native-preview@7.0.0-dev.20260705.1)(oxc-resolver@11.20.0)(tsx@4.23.0)(typescript@6.0.3)

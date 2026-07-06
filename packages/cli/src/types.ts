@@ -1,4 +1,4 @@
-import type { AllModelsUnion, Provider } from "@slipstream/types";
+import type { AllModelsUnion, Provider, UTR } from "@slipstream/types";
 
 export interface CliModelEntry {
   alias: string;
@@ -20,6 +20,8 @@ export const CLI_MODELS = [
 ] as const satisfies readonly CliModelEntry[];
 
 export type CliRosterEntry = (typeof CLI_MODELS)[number];
+
+export type CliRosterRecord = UTR<CliRosterEntry, "alias">;
 
 export interface ChatSessionState {
   conversationId: string;

@@ -25,7 +25,7 @@ export class SlipstreamClientService extends CliConfigService {
   }
 
   public send<const K extends keyof EventTypeMap>(data: EventTypeMap[K]) {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+    if (!this.ws || this.ws?.readyState !== WebSocket.OPEN) {
       throw new Error("not connected — call connect() first");
     }
     this.ws.send(JSON.stringify(data));

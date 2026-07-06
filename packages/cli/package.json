@@ -22,8 +22,23 @@
       "*": [
         "dist/index.d.ts"
       ],
+      "client": [
+        "dist/client.d.ts"
+      ],
+      "config": [
+        "dist/config.d.ts"
+      ],
+      "render": [
+        "dist/render.d.ts"
+      ],
+      "repl": [
+        "dist/repl.d.ts"
+      ],
       "slipstream": [
         "dist/bin/slipstream.d.ts"
+      ],
+      "types": [
+        "dist/types.d.ts"
       ]
     }
   },
@@ -39,7 +54,12 @@
   ],
   "exports": {
     ".": "./dist/index.js",
-    "./bin/slipstream": "./dist/bin/slipstream.js"
+    "./bin/slipstream": "./dist/bin/slipstream.js",
+    "./client": "./dist/client.js",
+    "./config": "./dist/config.js",
+    "./renderer": "./dist/renderer.js",
+    "./repl": "./dist/repl.js",
+    "./types": "./dist/types.js"
   },
   "scripts": {
     "build": "tsdown",
@@ -69,6 +89,7 @@
     "eslint": "catalog:eslint",
     "jiti": "catalog:jiti",
     "prettier": "catalog:prettier",
+    "rolldown": "catalog:rolldown",
     "tsdown": "catalog:tsdown",
     "tslib": "catalog:tslib",
     "tsx": "catalog:tsx",

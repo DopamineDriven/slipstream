@@ -7,7 +7,13 @@ export default defineConfig(
     ({
       ...options,
       entry: [
-        "src/index.ts"
+        "src/index.ts",
+        "src/client.ts",
+        "src/config.ts",
+        "src/render.ts",
+        "src/repl.ts",
+        "src/types.ts",
+        "src/bin/slipstream.ts"
       ],
       cwd: process.cwd(),
       target: ["node26"],
