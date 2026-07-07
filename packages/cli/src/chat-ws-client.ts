@@ -142,7 +142,7 @@ class EventHandlerRegistry {
 
       default:
         // Log other events at debug level
-        console.debug(`Received ${event.type} event`);
+        dlog(`Received ${event.type} event`);
     }
 
     // Then dispatch to registered handlers
