@@ -65,8 +65,8 @@ export class ResolverConvoListService extends ResolverHydrateConvoService {
    * pushes unprompted right after connection_established, mirroring the
    * providerContext bootstrap — session starts with autocomplete warm.
    */
-  protected override sendInitialConversationList(ws: WebSocket, userId: string) {
-    void this.conversationList(
+  protected async sendInitialConversationList(ws: WebSocket, userId: string) {
+    return await this.conversationList(
       { type: "conversation_list" },
       ws,
       userId

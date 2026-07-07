@@ -11,15 +11,15 @@ import type {
 import type { WSServer } from "@/ws-server/index.ts";
 import type { Responses } from "openai/resources";
 import type { WebSocket } from "ws";
-import { ResolverConnectionService } from "@/resolver/connection.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   EventTypeMap,
   MessageSingleton,
   Provider
 } from "@slipstream/types";
+import { ResolverAssetCompleteService } from "./asset-complete.ts";
 
-export class ResolverChatUtilsService extends ResolverConnectionService {
+export class ResolverChatUtilsService extends ResolverAssetCompleteService {
   constructor(
     wsServer: WSServer,
     providers: ProviderService,

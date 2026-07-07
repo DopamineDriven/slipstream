@@ -6,12 +6,11 @@ import type { TTSService } from "@/tts/index.ts";
 import type { UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
-import { ResolverAssetCompleteService } from "@/resolver/asset-complete.ts";
+import { ResolverConvoListService } from "@/resolver/convo-list.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { ClientContextWorkupProps, EventTypeMap } from "@slipstream/types";
 
-export class ResolverConnectionService extends ResolverAssetCompleteService {
-  protected userStoreDocStatus = new Map<string, boolean>();
+export class ResolverConnectionService extends ResolverConvoListService {
   constructor(
     wsServer: WSServer,
     providers: ProviderService,
@@ -35,14 +34,17 @@ export class ResolverConnectionService extends ResolverAssetCompleteService {
       ttsService
     );
   }
-  // xai's collections api is broken
-  protected async postHandleConnectionEstablishedJob(userId: string) {
+  protected async postHandleConnectionEstablishedJob(
+    ws: WebSocket,
+    userId: string
+  ) {
     //  delete previous entry by userId on connect or reconnect
     this.userStoreDocStatus.delete(userId);
 
     // const gemini = this.providers.getInstance("gemini");
     const anthropic = this.providers.getInstance("anthropic");
     // const grok = this.providers.getInstance("grok");
+    void this.sendInitialConversationList(ws, userId);
     return await Promise.all([
       this.userVectorStore.syncUserStoreByName(userId),
       anthropic.syncFileRegistry(userId, true),
@@ -55,9 +57,6 @@ export class ResolverConnectionService extends ResolverAssetCompleteService {
       })
     ]);
   }
-
-  /** no-op at this layer — ResolverConvoListService overrides with the real push */
-  protected sendInitialConversationList(_ws: WebSocket, _userId: string) {}
 
   public async handleConnectionEstablished(
     ws: WebSocket,
@@ -80,14 +79,12 @@ export class ResolverConnectionService extends ResolverAssetCompleteService {
       } satisfies EventTypeMap["connection_established"];
 
       ws.send(JSON.stringify(payload));
-      // overridden in ResolverConvoListService (below in the chain) — the
-      // conversation index pushes unprompted, mirroring providerContext
-      this.sendInitialConversationList(ws, userId);
-      void this.postHandleConnectionEstablishedJob(userId);
+      void this.postHandleConnectionEstablishedJob(ws, userId);
     } catch (err) {
       this.wsServer.prisma.safeErrMsg(err);
     }
   }
+
   protected async handleProviderContextPing(
     _event: EventTypeMap["provider_context_ping"],
     ws: WebSocket,

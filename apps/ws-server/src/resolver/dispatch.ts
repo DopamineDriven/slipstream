@@ -6,7 +6,7 @@ import type { TTSService } from "@/tts/index.ts";
 import type { BufferLike, UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
-import { ResolverConvoListService } from "@/resolver/convo-list.ts";
+import { ResolverConnectionService } from "@/resolver/connection.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AnyEvent,
@@ -14,7 +14,7 @@ import type {
   EventTypeMap
 } from "@slipstream/types";
 
-export class ResolverDispatchService extends ResolverConvoListService {
+export class ResolverDispatchService extends ResolverConnectionService {
   constructor(
     wsServer: WSServer,
     providers: ProviderService,
