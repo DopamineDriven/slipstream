@@ -174,6 +174,7 @@ export class SlipstreamReplService extends CliRendererService {
   }
 
   private async sendPrompt(prompt: string) {
+    this.beginTurnRender();
     this.turn = Promise.withResolvers<void>();
     this.send({
       type: "ai_chat_request",

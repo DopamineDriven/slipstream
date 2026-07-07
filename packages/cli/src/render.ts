@@ -9,7 +9,14 @@ import type { EventTypeMap } from "@slipstream/types";
  */
 export class CliRendererService extends CliProviderContextService {
   private wasThinking = false;
+  private thinkingAgg = "";
   protected showThinking = true;
+
+  /** reset per-turn render state — call at send time */
+  protected beginTurnRender() {
+    this.wasThinking = false;
+    this.thinkingAgg = "";
+  }
 
   protected nameTag(provider: string, model: string | undefined) {
     return pc.cyan(`[${provider.toLowerCase()}/${model ?? "unknown"}]`);
@@ -17,12 +24,26 @@ export class CliRendererService extends CliProviderContextService {
 
   protected renderChunk(data: EventTypeMap["ai_chat_chunk"]) {
     if (data.thinkingText) {
-      if (!this.showThinking) return;
+      // providers MIX thinking semantics — anthropic streams deltas, gemini
+      // interleaves deltas with full-aggregate frames (thinkingAgg re-sent
+      // per text chunk). Print only the unseen suffix: correct for both.
+      const incoming = data.thinkingText;
+      let printable: string;
+      if (incoming.startsWith(this.thinkingAgg)) {
+        printable = incoming.slice(this.thinkingAgg.length);
+        this.thinkingAgg = incoming;
+      } else if (this.thinkingAgg.endsWith(incoming)) {
+        printable = ""; // stale re-send of a suffix we already printed
+      } else {
+        printable = incoming;
+        this.thinkingAgg += incoming;
+      }
+      if (!this.showThinking || printable.length === 0) return;
       if (!this.wasThinking) {
         process.stdout.write(pc.dim("\n∴ thinking…\n"));
         this.wasThinking = true;
       }
-      process.stdout.write(pc.dim(data.thinkingText));
+      process.stdout.write(pc.dim(printable));
       return;
     }
     if (data.chunk) {

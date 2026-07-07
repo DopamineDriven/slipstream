@@ -12,7 +12,7 @@ export interface CliModelEntry {
  */
 export const CLI_MODELS = [
   { alias: "fable", model: "claude-fable-5", provider: "anthropic" },
-  { alias: "opus", model: "claude-opus-4-8", provider: "anthropic" },
+  { alias: "opus", model: "claude-opus-4-6", provider: "anthropic" },
   { alias: "gpt", model: "gpt-5.5", provider: "openai" },
   { alias: "grok", model: "grok-4.3", provider: "grok" },
   { alias: "gemini", model: "gemini-3.1-pro-preview", provider: "gemini" },
