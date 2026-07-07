@@ -114,7 +114,12 @@ export class LlamaService {
   private prependProviderModelTag(
     msgs: Pick<
       MessageSingleton<true>,
-      "senderType" | "provider" | "model" | "content" | "messageBlocks" | "ordinal"
+      | "senderType"
+      | "provider"
+      | "model"
+      | "content"
+      | "messageBlocks"
+      | "ordinal"
     >[],
     memoryView: MemoryAssemblyView | null
   ) {

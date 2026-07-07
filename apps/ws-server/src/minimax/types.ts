@@ -46,9 +46,7 @@ type MiniMaxImageContentPart = {
   };
 };
 
-type MiniMaxUserContentPart =
-  | MiniMaxTextContentPart
-  | MiniMaxImageContentPart;
+type MiniMaxUserContentPart = MiniMaxTextContentPart | MiniMaxImageContentPart;
 
 type MiniMaxSystemMessage = {
   role: "system";
@@ -66,9 +64,7 @@ type MiniMaxAssistantMessage = {
 };
 
 type MiniMaxBaseMessage =
-  | MiniMaxSystemMessage
-  | MiniMaxUserMessage
-  | MiniMaxAssistantMessage;
+  MiniMaxSystemMessage | MiniMaxUserMessage | MiniMaxAssistantMessage;
 
 type MiniMaxAssistantToolCallMessage = {
   role: "assistant";
@@ -83,9 +79,7 @@ type MiniMaxToolMessage = {
 };
 
 type MiniMaxRequestMessage =
-  | MiniMaxBaseMessage
-  | MiniMaxAssistantToolCallMessage
-  | MiniMaxToolMessage;
+  MiniMaxBaseMessage | MiniMaxAssistantToolCallMessage | MiniMaxToolMessage;
 
 type MiniMaxReasoningDetail = {
   type: "reasoning.text";

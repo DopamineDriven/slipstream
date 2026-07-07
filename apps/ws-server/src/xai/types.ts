@@ -50,11 +50,7 @@ export type FieldDefinition = {
 };
 
 export type GrokEncodingNameUnion =
-  | "o200k_base"
-  | "cl100k_base"
-  | "p50k_base"
-  | "p50k_edit"
-  | "r50k_base";
+  "o200k_base" | "cl100k_base" | "p50k_base" | "p50k_edit" | "r50k_base";
 
 export type TokensConfiguration = {
   max_chunk_size_tokens: number;
@@ -133,10 +129,7 @@ export type IndexConfiguration = {
 };
 
 export type DocumentStatusSuffix =
-  | "UNKNOWN"
-  | "FAILED"
-  | "PROCESSING"
-  | "PROCESSED";
+  "UNKNOWN" | "FAILED" | "PROCESSING" | "PROCESSED";
 
 export type DocumentStatus = `DOCUMENT_STATUS_${DocumentStatusSuffix}`;
 
@@ -208,11 +201,7 @@ export interface CollectionDocument {
 export type UploadStatus = "Initializing" | "Uploading" | "Complete" | "Failed";
 
 export type ProcessingStatus =
-  | "Pending"
-  | "Processing"
-  | "Complete"
-  | "Failed"
-  | "Skipped";
+  "Pending" | "Processing" | "Complete" | "Failed" | "Skipped";
 
 export interface DocumentFilemetadata {
   file_id: string;

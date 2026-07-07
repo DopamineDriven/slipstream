@@ -537,9 +537,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
     apiKey?: string,
     model?: GeminiModelIdUnion
   ) {
-    const systemInstruction = this.prisma.formatSysNote(
-      systemPrompt
-    );
+    const systemInstruction = this.prisma.formatSysNote(systemPrompt);
 
     const history = await this.formatHistoryForSession(
       msgs,

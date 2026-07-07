@@ -46,9 +46,7 @@ type AlibabaImageContentPart = {
   };
 };
 
-type AlibabaUserContentPart =
-  | AlibabaTextContentPart
-  | AlibabaImageContentPart;
+type AlibabaUserContentPart = AlibabaTextContentPart | AlibabaImageContentPart;
 
 type AlibabaSystemMessage = {
   role: "system";
@@ -66,9 +64,7 @@ type AlibabaAssistantMessage = {
 };
 
 type AlibabaBaseMessage =
-  | AlibabaSystemMessage
-  | AlibabaUserMessage
-  | AlibabaAssistantMessage;
+  AlibabaSystemMessage | AlibabaUserMessage | AlibabaAssistantMessage;
 
 type AlibabaAssistantToolCallMessage = {
   role: "assistant";
@@ -83,9 +79,7 @@ type AlibabaToolMessage = {
 };
 
 type AlibabaRequestMessage =
-  | AlibabaBaseMessage
-  | AlibabaAssistantToolCallMessage
-  | AlibabaToolMessage;
+  AlibabaBaseMessage | AlibabaAssistantToolCallMessage | AlibabaToolMessage;
 
 type AlibabaReasoningDetail = {
   type: "reasoning.text";

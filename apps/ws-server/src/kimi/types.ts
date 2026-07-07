@@ -64,9 +64,7 @@ type KimiAssistantMessage = {
 };
 
 type KimiBaseMessage =
-  | KimiSystemMessage
-  | KimiUserMessage
-  | KimiAssistantMessage;
+  KimiSystemMessage | KimiUserMessage | KimiAssistantMessage;
 
 type KimiAssistantToolCallMessage = {
   role: "assistant";
@@ -81,9 +79,7 @@ type KimiToolMessage = {
 };
 
 type KimiRequestMessage =
-  | KimiBaseMessage
-  | KimiAssistantToolCallMessage
-  | KimiToolMessage;
+  KimiBaseMessage | KimiAssistantToolCallMessage | KimiToolMessage;
 
 type KimiReasoningDetail = {
   type: "reasoning.text";

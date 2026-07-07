@@ -10,16 +10,12 @@ const fs = new Fs(process.cwd());
 const getFileName = (p: string) =>
   p.split("?")[0]?.split("/").reverse()[0] ?? "";
 let p0 = 0;
-const _y =(async () => {
+const _y = (async () => {
   const absPath = resolve(fs.tmpDir, getFileName(url));
-console.log(absPath)
+  console.log(absPath);
   p0 = performance.now();
   return await fs
-    .fetchRemoteWriteLocalLargeFiles(
-      url,
-      absPath,
-      false
-    )
+    .fetchRemoteWriteLocalLargeFiles(url, absPath, false)
     .then(_ => {
       console.log(performance.now() - p0);
       console.log(fs.readTmp(getFileName(url)));

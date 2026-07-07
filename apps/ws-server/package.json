@@ -11,8 +11,7 @@
   "typesVersions": {
     "*": {
       "*": [
-        "dist/*.d.ts",
-        "dist/*/index.d.ts"
+        "dist/index.d.ts"
       ],
       "alibaba": [
         "dist/alibaba/index.d.ts",
@@ -22,6 +21,7 @@
       "anthropic": [
         "dist/anthropic/base.d.ts",
         "dist/anthropic/index.d.ts",
+        "dist/anthropic/summarizer.d.ts",
         "dist/anthropic/types.d.ts",
         "dist/anthropic/vector-store.d.ts",
         "dist/anthropic/workup.d.ts"
@@ -73,6 +73,7 @@
         "dist/minimax/types.d.ts"
       ],
       "mistral": [
+        "dist/mistral/base.d.ts",
         "dist/mistral/index.d.ts",
         "dist/mistral/stream-content.d.ts",
         "dist/mistral/types.d.ts"
@@ -81,13 +82,17 @@
         "dist/mixins/index.d.ts"
       ],
       "models": [
-        "dist/models/index.d.ts"
+        "dist/models/index.d.ts",
+        "dist/models/workup.d.ts"
       ],
       "openai": [
+        "dist/openai/base.d.ts",
         "dist/openai/gpt-image.d.ts",
         "dist/openai/index.d.ts",
+        "dist/openai/memory.d.ts",
         "dist/openai/responses-chat.d.ts",
         "dist/openai/responses-img-gen.d.ts",
+        "dist/openai/summarizer.d.ts",
         "dist/openai/types.d.ts",
         "dist/openai/workup.d.ts"
       ],
@@ -100,6 +105,7 @@
         "dist/prisma/chat-request.d.ts",
         "dist/prisma/chat-response.d.ts",
         "dist/prisma/convo-hydration.d.ts",
+        "dist/prisma/convo-list.d.ts",
         "dist/prisma/convo-memory-service.d.ts",
         "dist/prisma/index.d.ts",
         "dist/prisma/provider-store.d.ts",
@@ -121,6 +127,7 @@
         "dist/resolver/chat.d.ts",
         "dist/resolver/connection.d.ts",
         "dist/resolver/convo-hydration.d.ts",
+        "dist/resolver/convo-list.d.ts",
         "dist/resolver/dispatch.d.ts",
         "dist/resolver/index.d.ts",
         "dist/resolver/tts.d.ts",
@@ -137,20 +144,25 @@
         "dist/sharp/index.ts"
       ],
       "store": [
-        "dist/store/vector-store.ts",
-        "dist/store/types.ts",
-        "dist/store/workup.ts"
+        "dist/store/vector-store.d.ts",
+        "dist/store/types.d.ts",
+        "dist/store/workup.d.ts"
+      ],
+      "tool-catalog": [
+        "dist/tool-catalog/index.d.ts",
+        "dist/tool-catalog/types.d.ts"
       ],
       "tts": [
-        "dist/tts/types.ts",
-        "dist/tts/index.ts"
+        "dist/tts/types.d.ts",
+        "dist/tts/index.d.ts"
       ],
       "types": [
         "dist/types/index.d.ts"
       ],
       "vercel": [
         "dist/vercel/index.d.ts",
-        "dist/vercel/sse.d.ts"
+        "dist/vercel/sse.d.ts",
+        "dist/vercel/types.d.ts"
       ],
       "voyage": [
         "dist/voyage/index.d.ts",
@@ -184,10 +196,12 @@
   },
   "scripts": {
     "build": "tsdown",
+    "prebuild": "pnpm gen:tsdown && prettier --write tsdown.config.ts --ignore-unknown --cache",
+    "gen:tsdown": "tsx src/test/automate-tsdown.ts --target gen",
     "pre:build": "pnpm db:generate",
     "db:generate": "pnpm --filter @slipstream/db db:generate",
     "db:migrate": "pnpm --filter @slipstream/db db:migrate",
-    "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,md}\" --ignore-unknown --cache",
+    "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,md}\" \"*.{ts,json}\" --ignore-unknown --cache",
     "prisma:studio": "pnpm --filter @slipstream/db prisma:studio",
     "clean": "git clean -xdf .turbo dist node_modules",
     "dev": "nodemon --watch src --ext ts --exit-child --exec \"tsx src/index.ts\"",

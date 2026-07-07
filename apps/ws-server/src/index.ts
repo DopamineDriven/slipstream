@@ -101,9 +101,8 @@ async function exe() {
       cfg.VOYAGE_API_KEY
     );
 
-    const { AnthropicSummarizerService } = await import(
-      "@/anthropic/summarizer.ts"
-    );
+    const { AnthropicSummarizerService } =
+      await import("@/anthropic/summarizer.ts");
 
     const anthropicSummarizer = new AnthropicSummarizerService(
       logger,

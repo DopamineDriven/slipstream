@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
@@ -17,7 +18,6 @@ import type {
   GrokModelIdUnion,
   MessageSingleton
 } from "@slipstream/types";
-import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 
 type xAIImageEditsInput = {
   url: string;

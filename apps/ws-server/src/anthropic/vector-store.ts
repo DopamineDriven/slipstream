@@ -1,10 +1,10 @@
 import type { MessageInputParams } from "@/anthropic/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
-import type { ToolCatalogService } from "@/tool-catalog/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { ToolCatalogService } from "@/tool-catalog/index.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { AnthropicWorkup } from "@/anthropic/workup.ts";
 import type {
@@ -202,7 +202,8 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
           },
           threshold: {
             type: "number",
-            description: "Cosine similarity floor for the semantic lane (default 0)"
+            description:
+              "Cosine similarity floor for the semantic lane (default 0)"
           }
         },
         required: ["query"]
@@ -263,10 +264,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     userId: string,
     parsed: Record<string, unknown>
   ) {
-    return await this.memoryService.getMemoryChunkFromToolInput(
-      userId,
-      parsed
-    );
+    return await this.memoryService.getMemoryChunkFromToolInput(userId, parsed);
   }
 
   protected toolCatalogTool(): Anthropic.Beta.BetaToolUnion {
@@ -283,9 +281,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
   private webSearchTool(
     user_location:
-      | Anthropic.WebSearchTool20250305["user_location"]
-      | null
-      | undefined
+      Anthropic.WebSearchTool20250305["user_location"] | null | undefined
   ) {
     return {
       type: "web_search_20250305",
@@ -324,9 +320,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   protected tooling(
     m: AnthropicModelIdUnion,
     user_location:
-      | Anthropic.WebSearchTool20250305["user_location"]
-      | null
-      | undefined,
+      Anthropic.WebSearchTool20250305["user_location"] | null | undefined,
     hasLocalStore = false
   ) {
     // advanced tool usage header is a prerequisite for file search (programmatic)
@@ -566,7 +560,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       model === "claude-fable-5" ||
       model === "claude-opus-4-7"
     ) {
-      return { effort: "max"} as const;
+      return { effort: "max" } as const;
     }
     if (model === "claude-sonnet-5") {
       return { effort: "xhigh" } as const;

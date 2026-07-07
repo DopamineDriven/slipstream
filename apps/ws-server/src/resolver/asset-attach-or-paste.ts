@@ -86,7 +86,6 @@ export class ResolverAssetAttachOrPasteService extends ResolverAssetCompatServic
         ? filename
         : `${filename}.${extension === "md" ? "txt" : extension}`;
 
-
       const sizeInfo = this.wsServer.prisma.extractor.autoFileSizeRaw(size);
 
       this.logger.info(

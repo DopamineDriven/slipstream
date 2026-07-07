@@ -6,7 +6,7 @@
   "license": "BUSL-1.1",
   "prettier": "@slipstream/prettier-config",
   "scripts": {
-    "dev": "next dev -p 3030",
+    "dev": "rm -rf .next && next dev -p 3030",
     "build": "next build",
     "format": "prettier --write \"src/**/*.{ts,tsx,cts,mts,js,jsx,mjs,cjs,json,yaml,yml,css,html,md,mdx,graphql,gql}\" --ignore-unknown --cache",
     "start": "next start",

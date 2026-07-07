@@ -20,14 +20,11 @@ export type ZaiDelta = Partial<{
   content: string | null;
   refusal: string | null;
   tool_calls: ZaiToolCallDelta[];
-}> & ZaiReasoningDelta;
+}> &
+  ZaiReasoningDelta;
 
 export type ZaiFinishReason =
-  | "stop"
-  | "length"
-  | "tool_calls"
-  | "content_filter"
-  | null;
+  "stop" | "length" | "tool_calls" | "content_filter" | null;
 
 export type ZaiChoice = {
   index: number;

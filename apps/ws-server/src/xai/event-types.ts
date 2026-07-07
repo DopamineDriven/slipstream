@@ -448,8 +448,7 @@ export namespace xAIResponses {
         sequence_number: number;
         type: "response.output_text.annotation.added";
         annotation:
-          | Added.UrlCitationSansSpecificity
-          | Added.UrlCitationWithSpecificity;
+          Added.UrlCitationSansSpecificity | Added.UrlCitationWithSpecificity;
         annotation_index: number;
         content_index: number;
         item_id: string;

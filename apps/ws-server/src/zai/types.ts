@@ -78,9 +78,7 @@ type ZaiToolMessage = {
 };
 
 type ZaiRequestMessage =
-  | ZaiBaseMessage
-  | ZaiAssistantToolCallMessage
-  | ZaiToolMessage;
+  ZaiBaseMessage | ZaiAssistantToolCallMessage | ZaiToolMessage;
 
 type ZaiReasoningDetail = {
   type: "reasoning.text";

@@ -174,13 +174,11 @@ export class ImageCompatService {
 
   private async sharpWorkup(buf: Buffer<ArrayBuffer>, specs: ExpandedImgSpecs) {
     const sharpInstance = await this.sharp;
-    if (
-      !(
-        specs.format === "png" ||
-        specs.format === "jpeg" ||
-        specs.format === "webp"
-      )
-    ) {
+    if (!(
+      specs.format === "png" ||
+      specs.format === "jpeg" ||
+      specs.format === "webp"
+    )) {
       const target = this.pickCompatExt(specs);
 
       if (specs.width >= 2000 || specs.height >= 2000) {

@@ -3,9 +3,7 @@
   "p0_valid_family": {
     "status": 200,
     "innerResults": 1,
-    "embeddingsPerResult": [
-      3
-    ],
+    "embeddingsPerResult": [3],
     "totalTokensBilled": 29703,
     "chunkerVersion": null
   },

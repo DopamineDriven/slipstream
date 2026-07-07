@@ -275,10 +275,7 @@ export class GrokApiMethodsService extends GrokApiWorkupService {
         const dbDocData = await this.prisma.upsertGrokProviderDoc({
           attachmentId: att.id,
           docRef: result.doc.file_metadata.file_id,
-          docUri: this.xaiURI(
-            storeRef,
-            result.doc.file_metadata.file_id
-          ),
+          docUri: this.xaiURI(storeRef, result.doc.file_metadata.file_id),
           filename: result.doc.file_metadata.name,
           last_indexed_at: result.doc.last_indexed_at
             ? new Date(result.doc.last_indexed_at)

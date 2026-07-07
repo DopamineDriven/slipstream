@@ -67,8 +67,7 @@ export class PrismaUtilsService extends ModelService {
 
   protected bigintToNumber<
     const T extends "image_gen_request" | "ai_chat_request" =
-      | "image_gen_request"
-      | "ai_chat_request"
+      "image_gen_request" | "ai_chat_request"
   >(
     _target: T,
     props: BigIntToCompatProps<T>["props"]
@@ -105,8 +104,7 @@ export class PrismaUtilsService extends ModelService {
 
   protected toCompatPropsExtened<
     const T extends "image_gen_request" | "ai_chat_request" =
-      | "image_gen_request"
-      | "ai_chat_request"
+      "image_gen_request" | "ai_chat_request"
   >(
     _target: T,
     rt: BigIntToCompatProps<T>["rt"],

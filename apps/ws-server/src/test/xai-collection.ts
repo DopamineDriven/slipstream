@@ -116,7 +116,7 @@ export class GrokFileCollectionService {
     const tmpPrefix = `xai-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
     const tmpName = this.fs.uniqueTmpName(tmpPrefix, extension);
     const urlObj = new URL(url);
-    const safeFilename = filename ?? urlObj.pathname.replace(/\//gmi, "-");
+    const safeFilename = filename ?? urlObj.pathname.replace(/\//gim, "-");
     const absTmpPath = resolve(tmpdir(), tmpName);
     return {
       tmpFilenamePrefix: tmpPrefix,
@@ -148,7 +148,6 @@ export async function uploadToCollections(
   filename?: string,
   contentType = "text/markdown"
 ) {
-
   const buffer = fs.fileToBuffer(filePath);
 
   const specs = await meta.extractRemote(buffer, 4096 * 96);

@@ -110,7 +110,10 @@ export class KimiService {
     const historyMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
     const memoryView = await this.memoryService.getHistoryAssemblyView(
       historyMsgs[0]?.conversationId,
-      historyMsgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+      historyMsgs.reduce(
+        (max, m) => (m.ordinal >= max ? m.ordinal + 1 : max),
+        0
+      )
     );
     const formatted = Array.of<KimiBaseMessage>();
     const lastIndex = historyMsgs.findLastIndex(

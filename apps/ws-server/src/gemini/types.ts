@@ -127,10 +127,7 @@ export interface FssDoc {
   displayName?: string;
   /** The current state of the Document */
   state?:
-    | "STATE_UNSPECIFIED"
-    | "STATE_PENDING"
-    | "STATE_ACTIVE"
-    | "STATE_FAILED";
+    "STATE_UNSPECIFIED" | "STATE_PENDING" | "STATE_ACTIVE" | "STATE_FAILED";
   /** The size of the Document in bytes */
   sizeBytes?: string;
   /** The MIME type of the Document */
@@ -151,10 +148,7 @@ export interface FssDocSurfacedMeta {
   name?: string;
   displayName?: string;
   state?:
-    | "STATE_UNSPECIFIED"
-    | "STATE_PENDING"
-    | "STATE_ACTIVE"
-    | "STATE_FAILED";
+    "STATE_UNSPECIFIED" | "STATE_PENDING" | "STATE_ACTIVE" | "STATE_FAILED";
   sizeBytes?: string;
   mimeType?: string;
   createTime?: string;
@@ -260,12 +254,7 @@ export type GoogleImgGenMimeType =
   | "image/heif"
   | (string & {});
 export type GoogleImgGenExt =
-  | "png"
-  | "webp"
-  | "jpeg"
-  | "heic"
-  | "heif"
-  | (string & {});
+  "png" | "webp" | "jpeg" | "heic" | "heif" | (string & {});
 
 export type ImageGenObj = {
   index: number;

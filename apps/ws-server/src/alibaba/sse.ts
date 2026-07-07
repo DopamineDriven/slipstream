@@ -20,14 +20,11 @@ export type AlibabaDelta = Partial<{
   content: string | null;
   refusal: string | null;
   tool_calls: AlibabaToolCallDelta[];
-}> & AlibabaReasoningDelta;
+}> &
+  AlibabaReasoningDelta;
 
 export type AlibabaFinishReason =
-  | "stop"
-  | "length"
-  | "tool_calls"
-  | "content_filter"
-  | null;
+  "stop" | "length" | "tool_calls" | "content_filter" | null;
 
 export type AlibabaChoice = {
   index: number;
@@ -187,7 +184,9 @@ export function isReasoningDelta(
   );
 }
 
-export function isContentDelta(delta: AlibabaDelta): delta is { content: string } {
+export function isContentDelta(
+  delta: AlibabaDelta
+): delta is { content: string } {
   return typeof delta.content === "string";
 }
 
@@ -198,5 +197,7 @@ export function hasToolCallDelta(
 }
 
 export function isTerminalTextChunk(chunk: AlibabaChatCompletionsRes) {
-  return Array.isArray(chunk.choices) && chunk.choices.length === 0 && !!chunk.usage;
+  return (
+    Array.isArray(chunk.choices) && chunk.choices.length === 0 && !!chunk.usage
+  );
 }

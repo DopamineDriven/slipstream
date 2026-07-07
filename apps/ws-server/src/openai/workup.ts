@@ -581,7 +581,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
       }))
     );
   }
-  
+
   protected handleTooling(
     model: OpenAiModelIdUnion,
     fileSearchEnabled: boolean,

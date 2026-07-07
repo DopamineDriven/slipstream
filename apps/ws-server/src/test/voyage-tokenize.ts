@@ -121,7 +121,9 @@ async function countBulkTextTokens() {
     }
   }
 
-  console.log(`Collected ${texts.length} text chunks from ${paths.length} PDFs`);
+  console.log(
+    `Collected ${texts.length} text chunks from ${paths.length} PDFs`
+  );
 
   try {
     const result = await voyage.countTokens(texts, "voyage-context-3");
@@ -208,7 +210,9 @@ async function probeContextualLimits() {
 
   // P0 control — a valid ~3-block family, should succeed with 3 embeddings
   const familyOk = Array.from({ length: 3 }, () => block);
-  console.log(`P0 control: 1 inner list × 3 chunks ≈ ${3 * blockTokens} tokens`);
+  console.log(
+    `P0 control: 1 inner list × 3 chunks ≈ ${3 * blockTokens} tokens`
+  );
   results.p0_valid_family = await post({
     inputs: [familyOk],
     input_type: "document",

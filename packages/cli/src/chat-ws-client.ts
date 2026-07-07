@@ -5,6 +5,7 @@ import type {
   ChatWsEventTypeUnion,
   EventTypeMap
 } from "@slipstream/types";
+
 export type RawData = WithImplicitCoercion<string | ArrayLike<number>>;
 
 export type MessageHandler<T extends keyof EventTypeMap> = (
@@ -21,6 +22,7 @@ export type ChatEventListener = (event: ChatWsEvent) => void;
 /** CLI addition: ported-client console narration is opt-in (repl /debug) */
 export const wsDebug = { enabled: false };
 const dlog = (...args: Parameters<typeof console.log>) => {
+  // eslint-disable-next-line
   if (wsDebug.enabled) console.log(...args);
 };
 
@@ -509,9 +511,7 @@ export class ChatWebSocketClient {
       // CLI addition: let the REPL settle an in-flight turn on socket death
       this.onDisconnect?.(event.code);
 
-      dlog(
-        `WebSocket closed: code=${event.code}, reason=${event.reason}`
-      );
+      dlog(`WebSocket closed: code=${event.code}, reason=${event.reason}`);
 
       if (this.reconnectAttempts < this.maxReconnectAttempts) {
         this.reconnectAttempts += 1;

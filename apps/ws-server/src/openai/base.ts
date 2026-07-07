@@ -467,7 +467,6 @@ export class OpenAIBaseService {
     verbosity: ResponseTextConfig["verbosity"] = "medium",
     imgGenEnabled = false
   ) {
-    
     switch (model) {
       case "gpt-5.5":
       case "gpt-5.5-pro":

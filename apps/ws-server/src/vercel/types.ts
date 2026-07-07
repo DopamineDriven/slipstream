@@ -63,7 +63,8 @@ export type V0AssistantMessage = {
   content: string;
 };
 
-export type V0BaseMessage = V0SystemMessage | V0UserMessage | V0AssistantMessage;
+export type V0BaseMessage =
+  V0SystemMessage | V0UserMessage | V0AssistantMessage;
 
 export type V0AssistantToolCallMessage = {
   role: "assistant";

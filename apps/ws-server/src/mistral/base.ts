@@ -5,8 +5,6 @@ import type { Logger as PinoLogger } from "pino";
 import { Mistral } from "@mistralai/mistralai";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
-
-
 export class MistralBaseService {
   protected defaultClient: Mistral;
   protected logger: PinoLogger;

@@ -602,8 +602,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
                 const caller =
                   "caller" in block
                     ? (block.caller as
-                        | Anthropic.Beta.BetaServerToolCaller
-                        | undefined)
+                        Anthropic.Beta.BetaServerToolCaller | undefined)
                     : undefined;
                 if (caller?.type === "code_execution_20250825") {
                   bb.caller = caller;

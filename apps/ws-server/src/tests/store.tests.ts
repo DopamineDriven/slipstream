@@ -2,23 +2,23 @@ import assert from "node:assert/strict";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { after, before, describe, it } from "node:test";
-import * as dotenv from "dotenv";
+import type { OffsetCache, PageOffsetEntry } from "@/store/types.ts";
 import type {
   PageAnnotation,
   PageBox,
   StructuredPageText
 } from "@d0paminedriven/pdfdown";
-import { Fs } from "@d0paminedriven/fs";
+import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { ExtractService } from "@/extract/index.ts";
 import { SharpService } from "@/sharp/index.ts";
-import type { OffsetCache, PageOffsetEntry } from "@/store/types.ts";
 import { UserStoreVectorService } from "@/store/vector-store.ts";
 import { UserStoreWorkupService } from "@/store/workup.ts";
 import { VoyageEmbeddingService } from "@/voyage/index.ts";
-import { PrismaDbService } from "@slipstream/db/factory";
+import { Fs } from "@d0paminedriven/fs";
+import * as dotenv from "dotenv";
 import { Client } from "pg";
+import { PrismaDbService } from "@slipstream/db/factory";
 
 dotenv.config({ quiet: true });
 
@@ -100,7 +100,10 @@ class StoreWorkupHarness extends UserStoreWorkupService {
     return this.detectCdnCompatStatus(new URL(uri));
   }
 
-  public pageBoxes(attId: string, meta: Parameters<typeof this.pageBoxHelper>[1]) {
+  public pageBoxes(
+    attId: string,
+    meta: Parameters<typeof this.pageBoxHelper>[1]
+  ) {
     return this.pageBoxHelper(attId, meta);
   }
 }
@@ -258,7 +261,11 @@ describe("pdfdown extraction + offset cache (Geminastics-Pt-I)", () => {
     let prevEnd = 0;
     for (const entry of offsets) {
       const [start, end] = entry.offsets;
-      assert.equal(start, prevEnd, `page ${entry.page} start should equal prev end`);
+      assert.equal(
+        start,
+        prevEnd,
+        `page ${entry.page} start should equal prev end`
+      );
       assert.ok(end >= start, `page ${entry.page} end >= start`);
       prevEnd = end;
     }
@@ -296,7 +303,11 @@ describe("pdfdown extraction + offset cache (Geminastics-Pt-I)", () => {
           entry.globalStart,
           `empty page ${entry.page} should have zero-length span`
         );
-        assert.equal(entry.bodyLength, 0, `empty page ${entry.page} body length should be 0`);
+        assert.equal(
+          entry.bodyLength,
+          0,
+          `empty page ${entry.page} body length should be 0`
+        );
       } else {
         assert.ok(
           entry.globalEnd > entry.globalStart,
@@ -401,7 +412,9 @@ describe("page box + annotation resolution (Geminastics-Pt-I)", () => {
 
   const extractedPdf = () => {
     if (!extracted) {
-      throw new Error("missing extracted PDF fixture for annotation resolution");
+      throw new Error(
+        "missing extracted PDF fixture for annotation resolution"
+      );
     }
     return extracted;
   };
@@ -424,7 +437,10 @@ describe("page box + annotation resolution (Geminastics-Pt-I)", () => {
     const cache = store.getOffsetCache(attId);
 
     for (const annot of resolved) {
-      assert.ok(annot.startOffset >= 0, `startOffset >= 0 on page ${annot.pageNumber}`);
+      assert.ok(
+        annot.startOffset >= 0,
+        `startOffset >= 0 on page ${annot.pageNumber}`
+      );
       assert.ok(
         annot.endOffset >= annot.startOffset,
         `endOffset >= startOffset on page ${annot.pageNumber}`
@@ -462,8 +478,15 @@ describe("page box + annotation resolution (Geminastics-Pt-I)", () => {
     for (const annot of resolved) {
       if (annot.uri && URL.canParse(annot.uri)) {
         const host = new URL(annot.uri).hostname;
-        if (host !== "assets.aicoalesce.com" && host !== "assets-dev.aicoalesce.com") {
-          assert.equal(annot.isCdnLink, false, `URI ${annot.uri} should not be CDN`);
+        if (
+          host !== "assets.aicoalesce.com" &&
+          host !== "assets-dev.aicoalesce.com"
+        ) {
+          assert.equal(
+            annot.isCdnLink,
+            false,
+            `URI ${annot.uri} should not be CDN`
+          );
         }
       }
     }
@@ -517,7 +540,11 @@ describe("annotation offset resolution (synthetic)", () => {
 
     const pageBoxes = Array.of<PageBox>();
 
-    const resolved = await store.resolveOffsets(attachmentId, annots, pageBoxes);
+    const resolved = await store.resolveOffsets(
+      attachmentId,
+      annots,
+      pageBoxes
+    );
     assert.equal(resolved.length, 4);
 
     const top = resolved[0];
@@ -696,12 +723,18 @@ describe("page box helper (Ascension-Through-Fire)", () => {
     const data = extractedPdf();
     const result = store.pageBoxes("att-ascension", data.meta);
 
-    assert.ok(result.pageBoxCache.length > 0, "should have at least one page box");
+    assert.ok(
+      result.pageBoxCache.length > 0,
+      "should have at least one page box"
+    );
     assert.equal(result.pageCount, data.meta.pageCount);
 
     // Coverage should sum to approximately 1 for non-anomaly entries
     for (const box of result.pageBoxCache) {
-      assert.ok(box.coverage > 0 && box.coverage <= 1, `coverage ${box.coverage} in (0, 1]`);
+      assert.ok(
+        box.coverage > 0 && box.coverage <= 1,
+        `coverage ${box.coverage} in (0, 1]`
+      );
       assert.ok(box.width > 0, "width > 0");
       assert.ok(box.height > 0, "height > 0");
     }
@@ -760,8 +793,8 @@ describe("store workup offset cache (synthetic)", () => {
 
 describe("vector retrieval probe (real DB + Voyage)", () => {
   it("retrieves Claudtullus and Geminsea chunks from a default user store", async t => {
-  const pg = new Client(process.env.DATABASE_URL ?? "");
- await pg.connect()
+    const pg = new Client(process.env.DATABASE_URL ?? "");
+    await pg.connect();
     const candidateRows = await db.p(false).$queryRaw<
       RetrievalProbeStoreCandidate[]
     >`
@@ -989,7 +1022,9 @@ describe("semantic search diagnostics (real DB + Voyage)", () => {
     `;
 
     if (broken.length === 0) {
-      t.diagnostic("Embedding integrity: PASS — no READY chunks with NULL embeddings");
+      t.diagnostic(
+        "Embedding integrity: PASS — no READY chunks with NULL embeddings"
+      );
     } else {
       t.diagnostic(
         `Embedding integrity: FAIL — ${broken.length} READY chunks with NULL embedding:`
@@ -1031,7 +1066,10 @@ describe("semantic search diagnostics (real DB + Voyage)", () => {
       models.push(row.embeddingModel);
     }
 
-    if (models.includes("voyage-context-3") && models.includes("voyage-multimodal-3.5")) {
+    if (
+      models.includes("voyage-context-3") &&
+      models.includes("voyage-multimodal-3.5")
+    ) {
       t.diagnostic(
         "\n  WARNING: Store has chunks from BOTH embedding models. " +
           "Queries must use the correct model per chunk for reliable cosine similarity."
@@ -1086,7 +1124,9 @@ describe("semantic search diagnostics (real DB + Voyage)", () => {
           LIMIT 5;
         `;
 
-        t.diagnostic(`  Raw top-5 closest (multimodal-3.5 query, no threshold):`);
+        t.diagnostic(
+          `  Raw top-5 closest (multimodal-3.5 query, no threshold):`
+        );
         for (const row of top5) {
           const snippet = row.content.replace(/\n/g, " ");
           t.diagnostic(
@@ -1279,8 +1319,7 @@ describe("semantic search diagnostics (real DB + Voyage)", () => {
     const mmEmb = multimodalEmbeddings.get(firstTerm);
     const ctxEmb = contextEmbeddings.get(firstTerm);
 
-    const l2Norm = (v: number[]) =>
-      Math.sqrt(v.reduce((s, x) => s + x * x, 0));
+    const l2Norm = (v: number[]) => Math.sqrt(v.reduce((s, x) => s + x * x, 0));
 
     t.diagnostic(`Query embedding sanity for "${firstTerm}":\n`);
 
@@ -1288,7 +1327,12 @@ describe("semantic search diagnostics (real DB + Voyage)", () => {
       t.diagnostic(`  voyage-multimodal-3.5:`);
       t.diagnostic(`    dimension: ${mmEmb.length}`);
       t.diagnostic(`    L2 norm:   ${l2Norm(mmEmb).toFixed(6)}`);
-      t.diagnostic(`    first 5:   [${mmEmb.slice(0, 5).map(v => v.toFixed(6)).join(", ")}]`);
+      t.diagnostic(
+        `    first 5:   [${mmEmb
+          .slice(0, 5)
+          .map(v => v.toFixed(6))
+          .join(", ")}]`
+      );
     } else {
       t.diagnostic("  voyage-multimodal-3.5: UNAVAILABLE");
     }
@@ -1297,7 +1341,12 @@ describe("semantic search diagnostics (real DB + Voyage)", () => {
       t.diagnostic(`  voyage-context-3:`);
       t.diagnostic(`    dimension: ${ctxEmb.length}`);
       t.diagnostic(`    L2 norm:   ${l2Norm(ctxEmb).toFixed(6)}`);
-      t.diagnostic(`    first 5:   [${ctxEmb.slice(0, 5).map(v => v.toFixed(6)).join(", ")}]`);
+      t.diagnostic(
+        `    first 5:   [${ctxEmb
+          .slice(0, 5)
+          .map(v => v.toFixed(6))
+          .join(", ")}]`
+      );
     } else {
       t.diagnostic("  voyage-context-3: UNAVAILABLE");
     }
@@ -1311,9 +1360,12 @@ describe("semantic search diagnostics (real DB + Voyage)", () => {
       }
       const normA = l2Norm(mmEmb);
       const normB = l2Norm(ctxEmb);
-      const crossSim = normA > 0 && normB > 0 ? dotProduct / (normA * normB) : 0;
+      const crossSim =
+        normA > 0 && normB > 0 ? dotProduct / (normA * normB) : 0;
 
-      t.diagnostic(`\n  Cross-model cosine similarity (same query, different models): ${crossSim.toFixed(6)}`);
+      t.diagnostic(
+        `\n  Cross-model cosine similarity (same query, different models): ${crossSim.toFixed(6)}`
+      );
 
       if (crossSim < 0.5) {
         t.diagnostic(

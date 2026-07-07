@@ -1,23 +1,28 @@
 import { Fs } from "@d0paminedriven/fs";
-type CollapseSpaces<S extends string> =
-  S extends `${infer T}  ${infer U}` ? CollapseSpaces<`${T} ${U}`> : S;
+
+type CollapseSpaces<S extends string> = S extends `${infer T}  ${infer U}`
+  ? CollapseSpaces<`${T} ${U}`>
+  : S;
 
 type Hyphenate<S extends string> = S extends `${infer T} ${infer U}`
   ? `${T}-${Hyphenate<U>}`
   : S;
 
-type HyphenateUnderScores<T extends string> =
-  T extends `${infer X}_${infer Y}` ? `${X}-${HyphenateUnderScores<Y>}` : T;
+type HyphenateUnderScores<T extends string> = T extends `${infer X}_${infer Y}`
+  ? `${X}-${HyphenateUnderScores<Y>}`
+  : T;
 
-type OmitQuestionMark<T extends string> =
-  T extends `${infer U}?${infer Z}` ? `${U}${OmitQuestionMark<Z>}` : T;
+type OmitQuestionMark<T extends string> = T extends `${infer U}?${infer Z}`
+  ? `${U}${OmitQuestionMark<Z>}`
+  : T;
 
 type OmitSemiColon<T extends string> = T extends `${infer U};${infer V}`
   ? `${U}${OmitSemiColon<V>}`
   : T;
 
-type OmitExclamationMark<T extends string> =
-  T extends `${infer U}!${infer X}` ? `${U}${OmitExclamationMark<X>}` : T;
+type OmitExclamationMark<T extends string> = T extends `${infer U}!${infer X}`
+  ? `${U}${OmitExclamationMark<X>}`
+  : T;
 
 type OmitCommas<T extends string> = T extends `${infer U},${infer X}`
   ? `${U}${OmitCommas<X>}`
@@ -35,11 +40,17 @@ type OmitColons<T extends string> = T extends `${infer U}:${infer X}`
   ? `${U}${OmitColons<X>}`
   : T;
 
-type HandleFloats<T extends string> = T extends `${infer U}.${infer X}` ? U & X extends number ?`${U}-point-${X}` : T : T;
+type HandleFloats<T extends string> = T extends `${infer U}.${infer X}`
+  ? U & X extends number
+    ? `${U}-point-${X}`
+    : T
+  : T;
 
 type Clean<T extends string> = OmitSemiColon<
   OmitApostrophe<
-    OmitQuestionMark<OmitExclamationMark<OmitColons<OmitCommas<OmitPeriod<HandleFloats<T>>>>>>
+    OmitQuestionMark<
+      OmitExclamationMark<OmitColons<OmitCommas<OmitPeriod<HandleFloats<T>>>>>
+    >
   >
 >;
 
@@ -47,12 +58,11 @@ type ToSlug<T extends string> = Lowercase<
   HyphenateUnderScores<Hyphenate<CollapseSpaces<Clean<T>>>>
 >;
 
-
-
-const floatSlugifier = <const T extends string>(input:T) =>input
-  .replace( /\b(\d+)\.(\d+)\b/, (_whole, intPart:number, decPart: number) => `${intPart}-point-${decPart}`) as HandleFloats<T>
-
-
+const floatSlugifier = <const T extends string>(input: T) =>
+  input.replace(
+    /\b(\d+)\.(\d+)\b/,
+    (_whole, intPart: number, decPart: number) => `${intPart}-point-${decPart}`
+  ) as HandleFloats<T>;
 
 function slugify<const T extends string>(title: T) {
   return floatSlugifier(title)
@@ -68,7 +78,6 @@ function slugify<const T extends string>(title: T) {
     .replace(/-+$/, "") as ToSlug<T>;
 }
 
-
 const aiChatResponse = {
   type: "ai_chat_response",
   conversationId: "sf87jjxf99n27vxwm6g5v3kd",
@@ -82,9 +91,6 @@ const aiChatResponse = {
 };
 const fs = new Fs(process.cwd());
 
-const path = `src/__out__/${aiChatResponse.provider}/${aiChatResponse.model}/${slugify(aiChatResponse.title)}.md`
+const path = `src/__out__/${aiChatResponse.provider}/${aiChatResponse.model}/${slugify(aiChatResponse.title)}.md`;
 
-fs.withWs(
-  path,
-  aiChatResponse.chunk
-);
+fs.withWs(path, aiChatResponse.chunk);

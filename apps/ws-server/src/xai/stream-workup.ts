@@ -80,7 +80,10 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
           formatted.push({
             role: "assistant",
             content: [
-              { type: "input_text", text: claim.emit } satisfies TextContentBlock
+              {
+                type: "input_text",
+                text: claim.emit
+              } satisfies TextContentBlock
             ]
           } as const satisfies ResponsesComprehensive);
         }

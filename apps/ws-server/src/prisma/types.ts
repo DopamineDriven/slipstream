@@ -242,7 +242,6 @@ export interface UpdateMemoryStoreCountersParams {
   conversationsDelta?: number;
 }
 
-
 export interface GetConversationHydrationPagesParams {
   readonly userId: string;
   readonly conversationId: string;

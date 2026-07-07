@@ -1,10 +1,10 @@
-import * as dotenv from "dotenv";
 import type { MemorySectionDraft } from "@/memory/types.ts";
-import { ConversationMemoryWorkupService } from "@/memory/workup.ts";
 import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
+import { ConversationMemoryWorkupService } from "@/memory/workup.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { VoyageEmbeddingService } from "@/voyage/index.ts";
+import * as dotenv from "dotenv";
 import { PrismaDbService } from "@slipstream/db/factory";
 
 dotenv.config({ quiet: true });

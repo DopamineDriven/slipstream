@@ -47,8 +47,7 @@ type DeepSeekImageContentPart = {
 };
 
 type DeepSeekUserContentPart =
-  | DeepSeekTextContentPart
-  | DeepSeekImageContentPart;
+  DeepSeekTextContentPart | DeepSeekImageContentPart;
 
 type DeepSeekSystemMessage = {
   role: "system";
@@ -66,9 +65,7 @@ type DeepSeekAssistantMessage = {
 };
 
 type DeepSeekBaseMessage =
-  | DeepSeekSystemMessage
-  | DeepSeekUserMessage
-  | DeepSeekAssistantMessage;
+  DeepSeekSystemMessage | DeepSeekUserMessage | DeepSeekAssistantMessage;
 
 type DeepSeekAssistantToolCallMessage = {
   role: "assistant";
@@ -83,9 +80,7 @@ type DeepSeekToolMessage = {
 };
 
 type DeepSeekRequestMessage =
-  | DeepSeekBaseMessage
-  | DeepSeekAssistantToolCallMessage
-  | DeepSeekToolMessage;
+  DeepSeekBaseMessage | DeepSeekAssistantToolCallMessage | DeepSeekToolMessage;
 
 type DeepSeekReasoningDetail = {
   type: "reasoning.text";

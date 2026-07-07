@@ -1,6 +1,5 @@
 import type { AnthropicSummarizerService } from "@/anthropic/summarizer.ts";
 import type { LoggerService } from "@/logger/index.ts";
-import type { OpenAISummarizerService } from "@/openai/summarizer.ts";
 import type {
   ConversationMemoryGetChunkTarget,
   ConversationMemorySearchToolInput,
@@ -13,6 +12,7 @@ import type {
   MemorySubstitutableChunk,
   MemorySummarizerConfig
 } from "@/memory/types.ts";
+import type { OpenAISummarizerService } from "@/openai/summarizer.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -1038,7 +1038,11 @@ The System prompt given to all models in the source material being summarized is
           `conversation_memory_search input malformed: ${JSON.stringify(input)}`
         );
       }
-      return await this.searchMemoryFromToolInput(userId, conversationId, input);
+      return await this.searchMemoryFromToolInput(
+        userId,
+        conversationId,
+        input
+      );
     }
     if (name === "conversation_memory_get_chunk") {
       if (!this.isToolInputRecord(input)) {

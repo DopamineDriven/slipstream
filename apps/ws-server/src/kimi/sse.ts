@@ -20,14 +20,11 @@ export type KimiDelta = Partial<{
   content: string | null;
   refusal: string | null;
   tool_calls: KimiToolCallDelta[];
-}> & KimiReasoningDelta;
+}> &
+  KimiReasoningDelta;
 
 export type KimiFinishReason =
-  | "stop"
-  | "length"
-  | "tool_calls"
-  | "content_filter"
-  | null;
+  "stop" | "length" | "tool_calls" | "content_filter" | null;
 
 export type KimiChoice = {
   index: number;
@@ -198,5 +195,7 @@ export function hasToolCallDelta(
 }
 
 export function isTerminalTextChunk(chunk: KimiChatCompletionsRes) {
-  return Array.isArray(chunk.choices) && chunk.choices.length === 0 && !!chunk.usage;
+  return (
+    Array.isArray(chunk.choices) && chunk.choices.length === 0 && !!chunk.usage
+  );
 }

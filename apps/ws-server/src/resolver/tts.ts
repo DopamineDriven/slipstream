@@ -48,7 +48,7 @@ export class ResolverTTSService extends ResolverChatUtilsService {
     const sampleRate = event.sampleRate ?? 24000;
     const bitRate = event.bitRate ?? 128000;
     const composite = `${event.conversationId}:${event.messageId}`;
-    try { 
+    try {
       let job: TTSJobSingleton<true> | undefined;
       const findMatch = this.ttsService.ttsJobCache.get(composite);
       if (findMatch) {
@@ -59,7 +59,10 @@ export class ResolverTTSService extends ResolverChatUtilsService {
           userId
         );
         if (dbRef) {
-          this.logger.info(dbRef,"tts cache not synced properly, had to use a fallback db check path")
+          this.logger.info(
+            dbRef,
+            "tts cache not synced properly, had to use a fallback db check path"
+          );
           job = dbRef;
         }
       }

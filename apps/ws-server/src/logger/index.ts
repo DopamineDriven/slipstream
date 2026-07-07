@@ -3,11 +3,11 @@ import { resolve } from "node:path";
 import type {
   LoggerOptions,
   Logger as PinoLogger,
-  TransportMultiOptions} from "pino";
+  TransportMultiOptions
+} from "pino";
 import type { PrettyOptions } from "pino-pretty";
 import { UserData } from "@/types/index.ts";
 import pino, { stdTimeFunctions } from "pino";
-
 
 export interface EventLogContext<T extends Record<string, object>> {
   type: T;

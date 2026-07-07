@@ -1,5 +1,4 @@
 import type { AlibabaChatCompletionsRes, AlibabaUsage } from "@/alibaba/sse.ts";
-import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type {
   AlibabaAccumulatedToolCall,
   AlibabaActiveMessageBlock,
@@ -18,6 +17,7 @@ import type {
   AlibabaUserMessage
 } from "@/alibaba/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -139,7 +139,10 @@ export class AlibabaService {
     const historyMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
     const memoryView = await this.memoryService.getHistoryAssemblyView(
       historyMsgs[0]?.conversationId,
-      historyMsgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+      historyMsgs.reduce(
+        (max, m) => (m.ordinal >= max ? m.ordinal + 1 : max),
+        0
+      )
     );
     const formatted = Array.of<AlibabaBaseMessage>();
     const lastIndex = historyMsgs.findLastIndex(
@@ -910,10 +913,7 @@ export class AlibabaService {
           this.memorySearchFunctionTool(),
           this.memoryGetChunkFunctionTool()
         ]
-      : [
-          this.memorySearchFunctionTool(),
-          this.memoryGetChunkFunctionTool()
-        ];
+      : [this.memorySearchFunctionTool(), this.memoryGetChunkFunctionTool()];
 
     const systemInstruction = this.prisma.formatSysNote(systemPrompt);
 
