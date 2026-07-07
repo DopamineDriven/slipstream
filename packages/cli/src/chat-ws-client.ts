@@ -429,6 +429,9 @@ export class ChatWebSocketClient {
   private _isConnected = false;
   private registry = new EventHandlerRegistry();
 
+  /** CLI addition — invoked on every socket close (before reconnect scheduling) */
+  public onDisconnect?: (code: number) => void;
+
   constructor(private readonly url: string) {}
 
   // Expose handlers for backward compatibility
@@ -483,6 +486,8 @@ export class ChatWebSocketClient {
     this.socket.onclose = event => {
       this._isConnected = false;
       this.socket = null;
+      // CLI addition: let the REPL settle an in-flight turn on socket death
+      this.onDisconnect?.(event.code);
 
       console.log(
         `WebSocket closed: code=${event.code}, reason=${event.reason}`

@@ -1,5 +1,5 @@
 import pc from "picocolors";
-import { SlipstreamClientService } from "@/client.ts";
+import { CliProviderContextService } from "@/provider-context.ts";
 import type { EventTypeMap } from "@slipstream/types";
 
 /**
@@ -7,7 +7,7 @@ import type { EventTypeMap } from "@slipstream/types";
  * between upstream and terminal, the house doctrine), dim thinking blocks,
  * provider-tinted name tags, a finalize line on ai_chat_response.
  */
-export class CliRendererService extends SlipstreamClientService {
+export class CliRendererService extends CliProviderContextService {
   private wasThinking = false;
   protected showThinking = true;
 

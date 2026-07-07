@@ -24,6 +24,7 @@ declare global {
 
 export { CliConfigService } from "@/config.ts";
 export { SlipstreamClientService } from "@/client.ts";
+export { CliProviderContextService } from "@/provider-context.ts";
 export { CliRendererService } from "@/render.ts";
 export { SlipstreamReplService } from "@/repl.ts";
 export { CLI_MODELS } from "@/types.ts";
