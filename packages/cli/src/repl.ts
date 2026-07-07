@@ -19,6 +19,8 @@ export class SlipstreamReplService extends CliRendererService {
   });
 
   private turn?: PromiseWithResolvers<void>;
+  /** a trailing message from `/convo <id> <msg>` — sent once the attach acks */
+  private pendingPrompt?: string;
 
   private state: ChatSessionState = {
     conversationId: this.freshConversationId(),
@@ -61,19 +63,22 @@ export class SlipstreamReplService extends CliRendererService {
     [
       "convo",
       args => {
-        const id = args.trim();
+        // first token = id; anything after it is a prompt to send post-attach
+        const [id = "", ...rest] = args.trim().split(/\s+/);
         if (!id) {
-          this.renderNotice("usage: /convo <conversationId>");
+          this.renderNotice("usage: /convo <conversationId> [first message]");
           return;
         }
+        const followUp = rest.join(" ");
+        if (followUp) this.pendingPrompt = followUp;
         this.state.conversationId = id;
         this.state.title = null;
-        // hydrate the tail over the wire (ordinal < cursor server-side, so
-        // MAX_SAFE_INTEGER = "newest page")
+        // hydrate the tail over the wire (ordinal < cursor server-side).
+        // int4 max — MAX_SAFE_INTEGER overflows Postgres integer (22003)
         this.send({
           type: "hydrate_conversation",
           conversationId: id,
-          lowestLoadedOrdinal: Number.MAX_SAFE_INTEGER
+          lowestLoadedOrdinal: 2_147_483_647
         });
         this.renderNotice(`attaching to ${id}…`);
       }
@@ -159,6 +164,12 @@ export class SlipstreamReplService extends CliRendererService {
       if (data.conversationId !== this.state.conversationId) return;
       const title = this.renderHydratedTail(data);
       if (title) this.state.title = title;
+      if (this.pendingPrompt) {
+        const prompt = this.pendingPrompt;
+        this.pendingPrompt = undefined;
+        process.stdout.write("\n");
+        void this.sendPrompt(prompt);
+      }
     });
   }
 

@@ -50,6 +50,24 @@ export class ResolverDispatchService extends ResolverHydrateConvoService {
       ws.send(JSON.stringify({ error: "Invalid message" }));
       return;
     }
+    try {
+      await this.routeEvent(event, ws, userId, userData);
+    } catch (err) {
+      // a throw from ANY handler must never kill the process (P2025 via a
+      // malformed conversationId has done so twice — chat persist, hydration)
+      console.error(
+        `handler error for ${event.type}:`,
+        this.wsServer.prisma.safeErrMsg(err)
+      );
+    }
+  }
+
+  private async routeEvent(
+    event: NonNullable<ReturnType<typeof this.parseEvent>>,
+    ws: WebSocket,
+    userId: string,
+    userData?: UserData
+  ) {
     switch (event.type) {
       case "typing":
         await this.handleTyping(event, ws, userId);
