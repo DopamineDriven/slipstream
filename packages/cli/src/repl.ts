@@ -1,5 +1,6 @@
 import { createInterface } from "node:readline/promises";
 import pc from "picocolors";
+import { wsDebug } from "@/chat-ws-client.ts";
 import { CliRendererService } from "@/render.ts";
 import { CLI_MODELS } from "@/types.ts";
 import type { ChatSessionState } from "@/types.ts";
@@ -38,7 +39,7 @@ export class SlipstreamReplService extends CliRendererService {
       "help",
       () =>
         this.renderNotice(
-          "/model <alias|fuzzy> · /new · /convo <id> · /system <text|clear> · /think · /quit"
+          "/model <alias|fuzzy> · /new · /convo <id> · /system <text|clear> · /think · /debug · /quit"
         )
     ],
     [
@@ -93,6 +94,15 @@ export class SlipstreamReplService extends CliRendererService {
       () => {
         this.showThinking = !this.showThinking;
         this.renderNotice(`thinking ${this.showThinking ? "shown" : "hidden"}`);
+      }
+    ],
+    [
+      "debug",
+      () => {
+        wsDebug.enabled = !wsDebug.enabled;
+        this.renderNotice(
+          `transport narration ${wsDebug.enabled ? "on" : "off"}`
+        );
       }
     ]
   ]);

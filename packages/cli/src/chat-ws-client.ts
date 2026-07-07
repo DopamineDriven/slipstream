@@ -18,6 +18,12 @@ export type HandlerMap = {
 
 export type ChatEventListener = (event: ChatWsEvent) => void;
 
+/** CLI addition: ported-client console narration is opt-in (repl /debug) */
+export const wsDebug = { enabled: false };
+const dlog = (...args: Parameters<typeof console.log>) => {
+  if (wsDebug.enabled) console.log(...args);
+};
+
 // Type-safe event handler registry with built-in dispatch
 class EventHandlerRegistry {
   private handlers: HandlerMap = {};
@@ -447,7 +453,7 @@ export class ChatWebSocketClient {
     this.socket.onopen = () => {
       this._isConnected = true;
       this.reconnectAttempts = 0;
-      console.log("WebSocket connected");
+      dlog("WebSocket connected");
 
       while (
         this.messageQueue.length > 0 &&
@@ -489,14 +495,14 @@ export class ChatWebSocketClient {
       // CLI addition: let the REPL settle an in-flight turn on socket death
       this.onDisconnect?.(event.code);
 
-      console.log(
+      dlog(
         `WebSocket closed: code=${event.code}, reason=${event.reason}`
       );
 
       if (this.reconnectAttempts < this.maxReconnectAttempts) {
         this.reconnectAttempts += 1;
         const delay = 1000 * Math.pow(2, this.reconnectAttempts);
-        console.log(
+        dlog(
           `Reconnecting in ${delay}ms... (attempt ${this.reconnectAttempts})`
         );
         this.reconnectTimeout = setTimeout(() => this.connect(), delay);
@@ -522,13 +528,13 @@ export class ChatWebSocketClient {
     // Intentionally suppress verbose ai_chat_request payload logs in production
 
     if (this.socket && this.socket?.readyState === WebSocket.OPEN) {
-      console.log(`[WebSocketClient] Message sent immediately via WebSocket`);
+      dlog(`[WebSocketClient] Message sent immediately via WebSocket`);
       this.socket.send(msg);
     } else {
-      console.log(`[WebSocketClient] Message queued (socket not ready)`);
+      dlog(`[WebSocketClient] Message queued (socket not ready)`);
       this.messageQueue.push(msg);
       if (!this.socket) {
-        console.log("Socket not connected, initiating connection...");
+        dlog("Socket not connected, initiating connection...");
         this.connect();
       }
     }
@@ -559,7 +565,7 @@ export class ChatWebSocketClient {
     this.listeners.clear();
     this.messageQueue = [];
 
-    console.log("WebSocket client closed");
+    dlog("WebSocket client closed");
   }
 
   public on<const K extends keyof HandlerMap>(
