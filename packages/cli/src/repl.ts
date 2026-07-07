@@ -4,6 +4,7 @@ import { wsDebug } from "@/chat-ws-client.ts";
 import { CliRendererService } from "@/render.ts";
 import { CLI_MODELS } from "@/types.ts";
 import type { ChatSessionState } from "@/types.ts";
+import type { MessageSingleton } from "@slipstream/types";
 
 /**
  * The loop — orchestration top of the chain (config → client → renderer →
@@ -21,6 +22,13 @@ export class SlipstreamReplService extends CliRendererService {
   private turn?: PromiseWithResolvers<void>;
   /** a trailing message from `/convo <id> <msg>` — sent once the attach acks */
   private pendingPrompt?: string;
+
+  /**
+   * ordinal → full message, fed by hydration acks AND live response commits
+   * (idempotent upserts — the ChatStore.byId discipline, keyed by ordinal).
+   * /expand reads from here; cleared on /new and /convo.
+   */
+  private messageIndex = new Map<number, MessageSingleton<true>>();
 
   private state: ChatSessionState = {
     conversationId: this.freshConversationId(),
@@ -41,7 +49,7 @@ export class SlipstreamReplService extends CliRendererService {
       "help",
       () =>
         this.renderNotice(
-          "/model <alias|fuzzy> · /new · /convo <id> · /system <text|clear> · /think · /debug · /quit"
+          "/model <alias|fuzzy> · /new · /convo <id> [msg] · /expand <ordinal> · /system <text|clear> · /think · /debug · /quit"
         )
     ],
     [
@@ -57,6 +65,7 @@ export class SlipstreamReplService extends CliRendererService {
       () => {
         this.state.conversationId = this.freshConversationId();
         this.state.title = null;
+        this.messageIndex.clear();
         this.renderNotice("fresh conversation");
       }
     ],
@@ -73,6 +82,7 @@ export class SlipstreamReplService extends CliRendererService {
         if (followUp) this.pendingPrompt = followUp;
         this.state.conversationId = id;
         this.state.title = null;
+        this.messageIndex.clear();
         // hydrate the tail over the wire (ordinal < cursor server-side).
         // int4 max — MAX_SAFE_INTEGER overflows Postgres integer (22003)
         this.send({
@@ -99,6 +109,24 @@ export class SlipstreamReplService extends CliRendererService {
       () => {
         this.showThinking = !this.showThinking;
         this.renderNotice(`thinking ${this.showThinking ? "shown" : "hidden"}`);
+      }
+    ],
+    [
+      "expand",
+      args => {
+        const ordinal = Number.parseInt(args.trim(), 10);
+        if (Number.isNaN(ordinal)) {
+          this.renderNotice("usage: /expand <ordinal>");
+          return;
+        }
+        const msg = this.messageIndex.get(ordinal);
+        if (!msg) {
+          this.renderNotice(
+            `ordinal ${ordinal} not in the local index — hydrated tails and live turns populate it`
+          );
+          return;
+        }
+        this.renderExpanded(msg);
       }
     ],
     [
@@ -153,6 +181,9 @@ export class SlipstreamReplService extends CliRendererService {
       if (data.title) {
         this.state.title = data.title;
       }
+      for (const msg of data.convo.messages) {
+        this.messageIndex.set(msg.ordinal, msg);
+      }
       this.renderResponse(data);
       this.turn?.resolve();
     });
@@ -162,6 +193,11 @@ export class SlipstreamReplService extends CliRendererService {
     });
     this.on("hydrate_conversation_ack", data => {
       if (data.conversationId !== this.state.conversationId) return;
+      for (const page of data.pages) {
+        for (const msg of page.convo.messages) {
+          this.messageIndex.set(msg.ordinal, msg);
+        }
+      }
       const title = this.renderHydratedTail(data);
       if (title) this.state.title = title;
       if (this.pendingPrompt) {
