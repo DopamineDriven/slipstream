@@ -301,6 +301,18 @@ class EventHandlerRegistry {
           handler(event, socket);
         }
       },
+      conversation_list: () => {
+        const handler = this.handlers.conversation_list;
+        if (handler && event.type === "conversation_list") {
+          handler(event, socket);
+        }
+      },
+      conversation_list_ack: () => {
+        const handler = this.handlers.conversation_list_ack;
+        if (handler && event.type === "conversation_list_ack") {
+          handler(event, socket);
+        }
+      },
       hydrate_conversation: () => {
         const handler = this.handlers["hydrate_conversation"];
         if (handler && event.type === "hydrate_conversation") {
