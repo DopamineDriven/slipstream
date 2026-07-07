@@ -49,4 +49,31 @@ export class CliRendererService extends CliProviderContextService {
   protected renderNotice(text: string) {
     process.stdout.write(`${pc.yellow("•")} ${pc.dim(text)}\n`);
   }
+
+  /** compact tail of a hydrated conversation — context on /convo attach */
+  protected renderHydratedTail(
+    data: EventTypeMap["hydrate_conversation_ack"],
+    tailCount = 8
+  ) {
+    const messages = data.pages
+      .flatMap(page => page.convo.messages)
+      .sort((a, b) => a.ordinal - b.ordinal);
+    const title = data.pages[0]?.convo.title ?? null;
+    const tail = messages.slice(-tailCount);
+    process.stdout.write("\n");
+    for (const msg of tail) {
+      const oneLine = msg.content.replace(/\s+/g, " ").trim();
+      const preview =
+        oneLine.length > 160 ? `${oneLine.slice(0, 160)}…` : oneLine;
+      const speaker =
+        msg.senderType === "USER"
+          ? pc.green(`[${msg.ordinal}] you`)
+          : `${pc.dim(`[${msg.ordinal}]`)} ${this.nameTag(msg.provider, msg.model ?? undefined)}`;
+      process.stdout.write(`${speaker} ${pc.dim(preview)}\n`);
+    }
+    this.renderNotice(
+      `attached · ${title ?? "untitled"} · ${messages.length} message(s) hydrated (showing last ${tail.length})`
+    );
+    return title;
+  }
 }

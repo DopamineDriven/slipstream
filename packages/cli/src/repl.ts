@@ -67,7 +67,14 @@ export class SlipstreamReplService extends CliRendererService {
         }
         this.state.conversationId = id;
         this.state.title = null;
-        this.renderNotice(`attached to ${id}`);
+        // hydrate the tail over the wire (ordinal < cursor server-side, so
+        // MAX_SAFE_INTEGER = "newest page")
+        this.send({
+          type: "hydrate_conversation",
+          conversationId: id,
+          lowestLoadedOrdinal: Number.MAX_SAFE_INTEGER
+        });
+        this.renderNotice(`attaching to ${id}…`);
       }
     ],
     [
@@ -137,6 +144,11 @@ export class SlipstreamReplService extends CliRendererService {
     this.on("ai_chat_error", data => {
       this.renderNotice(`error frame: ${JSON.stringify(data)}`);
       this.turn?.resolve();
+    });
+    this.on("hydrate_conversation_ack", data => {
+      if (data.conversationId !== this.state.conversationId) return;
+      const title = this.renderHydratedTail(data);
+      if (title) this.state.title = title;
     });
   }
 
