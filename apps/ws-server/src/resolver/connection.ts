@@ -56,6 +56,9 @@ export class ResolverConnectionService extends ResolverAssetCompleteService {
     ]);
   }
 
+  /** no-op at this layer — ResolverConvoListService overrides with the real push */
+  protected sendInitialConversationList(_ws: WebSocket, _userId: string) {}
+
   public async handleConnectionEstablished(
     ws: WebSocket,
     userId: string,
@@ -77,6 +80,9 @@ export class ResolverConnectionService extends ResolverAssetCompleteService {
       } satisfies EventTypeMap["connection_established"];
 
       ws.send(JSON.stringify(payload));
+      // overridden in ResolverConvoListService (below in the chain) — the
+      // conversation index pushes unprompted, mirroring providerContext
+      this.sendInitialConversationList(ws, userId);
       void this.postHandleConnectionEstablishedJob(userId);
     } catch (err) {
       this.wsServer.prisma.safeErrMsg(err);

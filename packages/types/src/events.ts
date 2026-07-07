@@ -33,6 +33,24 @@ import type { ConversationSingleton } from "@/types.ts";
 import type { CTR, DX, Rm, UTR } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 
+export type ConversationListEntry = {
+  id: string;
+  title: string | null;
+  updatedAt: number;
+  messageCount: number;
+};
+
+export type ConversationList = {
+  type: "conversation_list";
+  take?: number; // server clamps (default 50, max ~100)
+};
+
+export type ConversationListAck = {
+  type: "conversation_list_ack";
+  userId: string;
+  conversations: ConversationListEntry[];
+};
+
 export type ChatChunkAndResMsgBlock = {
   type: $Enums.MessageBlockType;
   content: string;
@@ -859,6 +877,8 @@ export type AnyEvent =
   | AssetUploadRequest
   | AssetUploadResponse
   | ConnectionEstablished
+  | ConversationList
+  | ConversationListAck
   | HydrateConversation
   | HydrateConversationAck
   | ImageGenError

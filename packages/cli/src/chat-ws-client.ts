@@ -56,6 +56,8 @@ class EventHandlerRegistry {
     "asset_upload_response",
     "asset_uploaded",
     "connection_established",
+    "conversation_list",
+    "conversation_list_ack",
     "hydrate_conversation",
     "hydrate_conversation_ack",
     "image_gen_error",

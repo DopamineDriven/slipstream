@@ -1,4 +1,5 @@
 import type { ExtractService } from "@/extract/index.ts";
+import type { GetConversationHydrationPagesParams } from "@/prisma/types.ts";
 import { PrismaChatResponseService } from "@/prisma/chat-response.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type {
@@ -9,14 +10,6 @@ import type {
 const CONVERSATION_PAGE_SIZE = 12;
 const MAX_CONVERSATION_HYDRATE_PAGES = 4;
 const MAX_CONVERSATION_HYDRATE_TAKE = 50;
-
-interface GetConversationHydrationPagesParams {
-  readonly userId: string;
-  readonly conversationId: string;
-  readonly lowestLoadedOrdinal: number;
-  readonly take?: number;
-  readonly maxPages?: number;
-}
 
 export class PrismaConvoHydrationService extends PrismaChatResponseService {
   constructor(

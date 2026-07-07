@@ -6,7 +6,7 @@ import type { TTSService } from "@/tts/index.ts";
 import type { BufferLike, UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
-import { ResolverHydrateConvoService } from "@/resolver/convo-hydration.ts";
+import { ResolverConvoListService } from "@/resolver/convo-list.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AnyEvent,
@@ -14,7 +14,7 @@ import type {
   EventTypeMap
 } from "@slipstream/types";
 
-export class ResolverDispatchService extends ResolverHydrateConvoService {
+export class ResolverDispatchService extends ResolverConvoListService {
   constructor(
     wsServer: WSServer,
     providers: ProviderService,
@@ -105,6 +105,9 @@ export class ResolverDispatchService extends ResolverHydrateConvoService {
       case "hydrate_conversation":
         await this.hydrateConversationAck(event, ws, userId, userData);
         break;
+      case "conversation_list":
+        await this.conversationList(event, ws, userId, userData);
+        break;
       default:
         await this.wsServer.redis.publish(
           this.wsServer.channel,
@@ -139,6 +142,8 @@ export class ResolverDispatchService extends ResolverHydrateConvoService {
     "asset_upload_response",
     "asset_uploaded",
     "connection_established",
+    "conversation_list",
+    "conversation_list_ack",
     "hydrate_conversation",
     "hydrate_conversation_ack",
     "image_gen_error",
@@ -281,5 +286,6 @@ export class ResolverDispatchService extends ResolverHydrateConvoService {
       "hydrate_conversation",
       this.hydrateConversationAck.bind(this)
     );
+    this.wsServer.on("conversation_list", this.conversationList.bind(this));
   }
 }

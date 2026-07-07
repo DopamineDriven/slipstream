@@ -4,7 +4,10 @@ import { wsDebug } from "@/chat-ws-client.ts";
 import { CliRendererService } from "@/render.ts";
 import { CLI_MODELS } from "@/types.ts";
 import type { ChatSessionState } from "@/types.ts";
-import type { MessageSingleton } from "@slipstream/types";
+import type {
+  ConversationListEntry,
+  MessageSingleton
+} from "@slipstream/types";
 
 /**
  * The loop — orchestration top of the chain (config → client → renderer →
@@ -16,8 +19,41 @@ import type { MessageSingleton } from "@slipstream/types";
 export class SlipstreamReplService extends CliRendererService {
   private rl = createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
+    completer: (line: string): [string[], string] => this.complete(line)
   });
+
+  /**
+   * id → conversation metadata, warmed by the post-handshake push (one ack
+   * per generator page, newest first) and kept fresh by rekey upserts +
+   * /convos refresh. Powers Tab-completion and title-based /convo attach.
+   */
+  private convoIndex = new Map<string, ConversationListEntry>();
+
+  /** readline Tab-completion — commands, roster aliases, conversation titles */
+  private complete(line: string): [string[], string] {
+    if (line.startsWith("/convo ")) {
+      const partial = line.slice("/convo ".length).toLowerCase();
+      const hits = [...this.convoIndex.values()]
+        .filter(c => (c.title ?? "").toLowerCase().includes(partial))
+        .map(c => `/convo ${c.title ?? c.id}`);
+      return [hits, line];
+    }
+    if (line.startsWith("/model ")) {
+      const partial = line.slice("/model ".length).toLowerCase();
+      const hits = CLI_MODELS.filter(m => m.alias.startsWith(partial)).map(
+        m => `/model ${m.alias}`
+      );
+      return [hits, line];
+    }
+    if (line.startsWith("/")) {
+      const hits = [...this.commands.keys()]
+        .filter(cmd => `/${cmd}`.startsWith(line))
+        .map(cmd => `/${cmd}`);
+      return [hits, line];
+    }
+    return [[], line];
+  }
 
   private turn?: PromiseWithResolvers<void>;
   /** a trailing message from `/convo <id> <msg>` — sent once the attach acks */
@@ -49,7 +85,7 @@ export class SlipstreamReplService extends CliRendererService {
       "help",
       () =>
         this.renderNotice(
-          "/model <alias|fuzzy> · /new · /convo <id> [msg] · /expand <ordinal> · /system <text|clear> · /think · /debug · /quit"
+          "/model <alias|fuzzy> · /new · /convos · /convo <id|title> [msg] · /expand <ordinal> · /system <text|clear> · /think · /debug · /quit — Tab completes"
         )
     ],
     [
@@ -72,13 +108,27 @@ export class SlipstreamReplService extends CliRendererService {
     [
       "convo",
       args => {
-        // first token = id; anything after it is a prompt to send post-attach
-        const [id = "", ...rest] = args.trim().split(/\s+/);
-        if (!id) {
-          this.renderNotice("usage: /convo <conversationId> [first message]");
+        const raw = args.trim();
+        if (!raw) {
+          this.renderNotice("usage: /convo <id|title> [first message]");
           return;
         }
-        const followUp = rest.join(" ");
+        // title-first resolution: if the whole arg (or its prefix) matches a
+        // known title from the index, attach by title — else first token is
+        // the id, remainder a prompt to send post-attach
+        const byTitle = [...this.convoIndex.values()].find(
+          c => c.title && raw.toLowerCase().startsWith(c.title.toLowerCase())
+        );
+        let id: string;
+        let followUp: string;
+        if (byTitle?.title) {
+          id = byTitle.id;
+          followUp = raw.slice(byTitle.title.length).trim();
+        } else {
+          const [first = "", ...rest] = raw.split(/\s+/);
+          id = first;
+          followUp = rest.join(" ");
+        }
         if (followUp) this.pendingPrompt = followUp;
         this.state.conversationId = id;
         this.state.title = null;
@@ -109,6 +159,25 @@ export class SlipstreamReplService extends CliRendererService {
       () => {
         this.showThinking = !this.showThinking;
         this.renderNotice(`thinking ${this.showThinking ? "shown" : "hidden"}`);
+      }
+    ],
+    [
+      "convos",
+      () => {
+        this.send({ type: "conversation_list" });
+        const entries = [...this.convoIndex.values()].sort(
+          (a, b) => b.updatedAt - a.updatedAt
+        );
+        if (entries.length === 0) {
+          this.renderNotice("index warming — try again in a moment");
+          return;
+        }
+        for (const c of entries.slice(0, 25)) {
+          this.renderNotice(
+            `${c.title ?? "(untitled)"} · ${c.messageCount} msgs · ${c.id}`
+          );
+        }
+        this.renderNotice(`${entries.length} conversation(s) indexed`);
       }
     ],
     [
@@ -168,6 +237,14 @@ export class SlipstreamReplService extends CliRendererService {
       // adopts the real id immediately (the easy half of the web's dance)
       if (data.conversationId && this.state.conversationId === "new-chat") {
         this.state.conversationId = data.conversationId;
+        // own-session freshness: the rekey hands us id + title — the index
+        // stays current without a push-on-create event
+        this.convoIndex.set(data.conversationId, {
+          id: data.conversationId,
+          title: data.title ?? null,
+          updatedAt: Date.now(),
+          messageCount: 0
+        });
       }
       if (data.title && !this.state.title) {
         this.state.title = data.title;
@@ -190,6 +267,11 @@ export class SlipstreamReplService extends CliRendererService {
     this.on("ai_chat_error", data => {
       this.renderNotice(`error frame: ${JSON.stringify(data)}`);
       this.turn?.resolve();
+    });
+    this.on("conversation_list_ack", data => {
+      for (const entry of data.conversations) {
+        this.convoIndex.set(entry.id, entry);
+      }
     });
     this.on("hydrate_conversation_ack", data => {
       if (data.conversationId !== this.state.conversationId) return;

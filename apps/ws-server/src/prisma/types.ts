@@ -241,3 +241,12 @@ export interface UpdateMemoryStoreCountersParams {
   tokensDelta?: number;
   conversationsDelta?: number;
 }
+
+
+export interface GetConversationHydrationPagesParams {
+  readonly userId: string;
+  readonly conversationId: string;
+  readonly lowestLoadedOrdinal: number;
+  readonly take?: number;
+  readonly maxPages?: number;
+}
