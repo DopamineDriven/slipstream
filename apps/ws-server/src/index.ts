@@ -110,6 +110,17 @@ async function exe() {
       cfg.ANTHROPIC_API_KEY
     );
 
+    // the GPT-5.5 summarizer arm (HMEM §6.2) — extends the memory-free
+    // workup, so it constructs BEFORE memory as a first-class dep
+    const { OpenAISummarizerService } = await import("@/openai/summarizer.ts");
+    const openaiSummarizerArm = new OpenAISummarizerService(
+      logger,
+      prisma,
+      userStore,
+      cfg.OPENAI_API_KEY,
+      s3
+    );
+
     const { ConversationMemoryVectorService } =
       await import("@/memory/vector-store.ts");
 
@@ -118,6 +129,7 @@ async function exe() {
       voyage,
       prisma,
       anthropicSummarizer,
+      openaiSummarizerArm,
       userStore
     );
 
@@ -205,19 +217,6 @@ async function exe() {
       cfg.OPENAI_API_KEY,
       memory
     );
-
-    // the GPT-5.5 summarizer arm (HMEM §6.2) — extends the memory-free
-    // workup; tool execution arrives via the memory service's executor
-    // closure, so the only circular edge (memory→arm) is this setter
-    const { OpenAISummarizerService } = await import("@/openai/summarizer.ts");
-    const openaiSummarizerArm = new OpenAISummarizerService(
-      logger,
-      prisma,
-      userStore,
-      cfg.OPENAI_API_KEY,
-      s3
-    );
-    memory.setOpenAISummarizerArm(openaiSummarizerArm);
 
     const { GeminiService } = await import("@/gemini/index.ts");
 

@@ -53,6 +53,8 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     prisma: PrismaService,
     /** rides AnthropicBaseService's battle-tested call shape — betas, adaptive thinking, ceiling clamps */
     protected summarizer: AnthropicSummarizerService,
+    /** the GPT-5.5 arm (§6.2) — first-class dep since the memory-free workup repartition killed the ctor cycle */
+    protected openaiSummarizerArm: OpenAISummarizerService,
     /** the user vector store — the summarizer forages it via file_search during summary/fold calls */
     protected userStore: UserStoreVectorService
   ) {
@@ -847,16 +849,6 @@ The System prompt given to all models in the source material being summarized is
       }
     }
     return blocks;
-  }
-
-  /**
-   * The GPT-5.5 arm (§6.2) — setter injection (the setResolver precedent):
-   * memory→arm is the only circular construction edge, so the arm arrives
-   * post-construction. Unset → sonnet-5-only behavior (today's posture).
-   */
-  private openaiSummarizerArm?: OpenAISummarizerService;
-  public setOpenAISummarizerArm(arm: OpenAISummarizerService) {
-    this.openaiSummarizerArm = arm;
   }
 
   /** anthropic summary content blocks → Responses input parts (text + url images) */
