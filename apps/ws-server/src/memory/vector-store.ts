@@ -777,6 +777,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
         effort: "xhigh",
         maxOutputTokens: 120_000
       },
+      rawTranscriptAb: true,
       maxToolUseRounds: 10,
       callDeadlineMs: 900_000,
       foldInputBudgetTokens: 130_000,
@@ -875,18 +876,23 @@ The System prompt given to all models in the source material being summarized is
 
   private async buildSummaryContent(
     chunk: MemoryChunkAwaitingSummary,
-    conversationTitle: string | null
+    conversationTitle: string | null,
+    raw = false
   ) {
-    const preamble = [
-      `Conversation: ${conversationTitle ?? "Untitled Conversation"}`,
-      `Section: messages [${chunk.ordinalStart}, ${chunk.ordinalEndExclusive}) · chunkIndex ${chunk.chunkIndex}`,
-      ``,
-      `Section transcript:`,
-      chunk.transcriptMarkdown
-    ].join("\n");
+    // raw variant (rawTranscriptAb): the transcript alone — no preamble
+    // scaffolding — betting on flexibility/diversity of delivery
+    const text = raw
+      ? chunk.transcriptMarkdown
+      : [
+          `Conversation: ${conversationTitle ?? "Untitled Conversation"}`,
+          `Section: messages [${chunk.ordinalStart}, ${chunk.ordinalEndExclusive}) · chunkIndex ${chunk.chunkIndex}`,
+          ``,
+          `Section transcript:`,
+          chunk.transcriptMarkdown
+        ].join("\n");
 
     const blocks = Array.of<Anthropic.Beta.BetaContentBlockParam>();
-    blocks.push({ type: "text", text: preamble });
+    blocks.push({ type: "text", text });
     if (chunk.hasAttachments && chunk.attachmentProvenanceIdsRaw) {
       blocks.push(
         ...(await this.resolveSummaryAttachmentBlocks(
@@ -1117,7 +1123,24 @@ The System prompt given to all models in the source material being summarized is
         null
       );
 
-      const content = await this.buildSummaryContent(chunk, conversationTitle);
+      // 2×2 cell: variant bit is floor(chunkIndex/2) % 2 so it never
+      // confounds with the arm parity bit (chunkIndex % 4 = the cell)
+      const rawVariant =
+        cfg.rawTranscriptAb && Math.floor(chunk.chunkIndex / 2) % 2 === 1;
+      this.logger.info(
+        {
+          chunkId: chunk.id,
+          chunkIndex: chunk.chunkIndex,
+          arm: openaiArm ? cfg.openaiArm.model : cfg.model,
+          variant: rawVariant ? "raw" : "structured"
+        },
+        "summarizer content variant"
+      );
+      const content = await this.buildSummaryContent(
+        chunk,
+        conversationTitle,
+        rawVariant
+      );
       const executeToolCall = (name: string, input: unknown) =>
         this.executeSummarizerToolCall(
           userId,

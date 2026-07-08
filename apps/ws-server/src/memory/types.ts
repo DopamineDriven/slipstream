@@ -208,6 +208,18 @@ export interface MemorySummarizerConfig {
     effort: ReasoningEffort;
     maxOutputTokens: number;
   };
+  /**
+   * content-delivery A/B (Andrew, 2026-07-07): when true, summarizers
+   * alternate between the structured preamble build and the RAW
+   * transcriptMarkdown (system prompt + transcript, nothing else —
+   * flexibility/diversity of delivery). 2×2 factorial against the arm
+   * rotation: arm = chunkIndex % 2, variant = floor(chunkIndex / 2) % 2 —
+   * parity-on-parity would perfectly confound arm×variant. Variant is
+   * derivable from chunkIndex (cell = chunkIndex % 4), so no migration:
+   * 0 sonnet/structured · 1 gpt/structured · 2 sonnet/raw · 3 gpt/raw.
+   * Fold unaffected; attachments ride both variants (content, not structure).
+   */
+  rawTranscriptAb: boolean;
   /** hard cap on file_search round-trips per summary/fold call */
   maxToolUseRounds: number;
   /** per-round wall-clock deadline — an immortal stream aborts into the ERROR/retry path instead of wedging its wave */

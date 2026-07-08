@@ -152,7 +152,7 @@ export class SlipstreamReplService extends CliRendererService {
           ? this.lastListing[Number.parseInt(numbered[1] ?? "", 10) - 1]
           : undefined;
         if (numbered && nth) {
-          this.attachTo(nth.id, numbered[2]?.trim() || undefined);
+          this.attachTo(nth.id, numbered[2]?.trim() ?? undefined);
           return;
         }
         const byTitle = [...this.convoIndex.values()].find(
