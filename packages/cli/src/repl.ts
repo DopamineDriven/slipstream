@@ -30,26 +30,42 @@ export class SlipstreamReplService extends CliRendererService {
    */
   private convoIndex = new Map<string, ConversationListEntry>();
 
-  /** readline Tab-completion — commands, roster aliases, conversation titles */
+  /** the order /convos last printed — powers the `/convo <number>` shortcut */
+  private lastListing = Array.of<ConversationListEntry>();
+
+  /**
+   * readline Tab-completion — commands, roster aliases, conversation titles.
+   * Contract: return [candidates, matchedPortion] where candidates REPLACE
+   * the matched portion — readline inline-completes their common prefix and
+   * lists them on ambiguity. Returning the whole line as matchedPortion (the
+   * v1 bug) made inline completion impossible and dumped the full list.
+   */
   private complete(line: string): [string[], string] {
     if (line.startsWith("/convo ")) {
-      const partial = line.slice("/convo ".length).toLowerCase();
-      const hits = [...this.convoIndex.values()]
-        .filter(c => (c.title ?? "").toLowerCase().includes(partial))
-        .map(c => `/convo ${c.title ?? c.id}`);
-      return [hits, line];
+      const partial = line.slice("/convo ".length);
+      const q = partial.toLowerCase();
+      const titles = [...this.convoIndex.values()]
+        .sort((a, b) => b.updatedAt - a.updatedAt)
+        .map(c => c.title ?? c.id);
+      const starts = titles.filter(t => t.toLowerCase().startsWith(q));
+      // startsWith hits inline-complete; fall back to listing contains-hits
+      const hits =
+        starts.length > 0
+          ? starts
+          : titles.filter(t => t.toLowerCase().includes(q));
+      return [hits, partial];
     }
     if (line.startsWith("/model ")) {
-      const partial = line.slice("/model ".length).toLowerCase();
-      const hits = CLI_MODELS.filter(m => m.alias.startsWith(partial)).map(
-        m => `/model ${m.alias}`
+      const partial = line.slice("/model ".length);
+      const hits = CLI_MODELS.map(m => m.alias).filter(a =>
+        a.startsWith(partial.toLowerCase())
       );
-      return [hits, line];
+      return [hits, partial];
     }
     if (line.startsWith("/")) {
       const hits = [...this.commands.keys()]
-        .filter(cmd => `/${cmd}`.startsWith(line))
-        .map(cmd => `/${cmd}`);
+        .map(cmd => `/${cmd}`)
+        .filter(cmd => cmd.startsWith(line));
       return [hits, line];
     }
     return [[], line];
@@ -73,6 +89,22 @@ export class SlipstreamReplService extends CliRendererService {
     systemPrompt: undefined,
     showThinking: true
   };
+
+  /** shared attach: repoint state, clear the index, hydrate the tail */
+  private attachTo(id: string, followUp?: string) {
+    if (followUp) this.pendingPrompt = followUp;
+    this.state.conversationId = id;
+    this.state.title = null;
+    this.messageIndex.clear();
+    // hydrate the tail over the wire (ordinal < cursor server-side).
+    // int4 max — MAX_SAFE_INTEGER overflows Postgres integer (22003)
+    this.send({
+      type: "hydrate_conversation",
+      conversationId: id,
+      lowestLoadedOrdinal: 2_147_483_647
+    });
+    this.renderNotice(`attaching to ${id}…`);
+  }
 
   private freshConversationId() {
     // the LITERAL sentinel — chat-request.ts branches on exact equality
@@ -113,9 +145,16 @@ export class SlipstreamReplService extends CliRendererService {
           this.renderNotice("usage: /convo <id|title> [first message]");
           return;
         }
-        // title-first resolution: if the whole arg (or its prefix) matches a
-        // known title from the index, attach by title — else first token is
-        // the id, remainder a prompt to send post-attach
+        // resolution order: /convos listing number → title prefix → raw id.
+        // Remainder after the resolved portion is a prompt to send post-attach
+        const numbered = /^(\d{1,2})(?:\s+(.*))?$/.exec(raw);
+        const nth = numbered
+          ? this.lastListing[Number.parseInt(numbered[1] ?? "", 10) - 1]
+          : undefined;
+        if (numbered && nth) {
+          this.attachTo(nth.id, numbered[2]?.trim() || undefined);
+          return;
+        }
         const byTitle = [...this.convoIndex.values()].find(
           c => c.title && raw.toLowerCase().startsWith(c.title.toLowerCase())
         );
@@ -129,18 +168,7 @@ export class SlipstreamReplService extends CliRendererService {
           id = first;
           followUp = rest.join(" ");
         }
-        if (followUp) this.pendingPrompt = followUp;
-        this.state.conversationId = id;
-        this.state.title = null;
-        this.messageIndex.clear();
-        // hydrate the tail over the wire (ordinal < cursor server-side).
-        // int4 max — MAX_SAFE_INTEGER overflows Postgres integer (22003)
-        this.send({
-          type: "hydrate_conversation",
-          conversationId: id,
-          lowestLoadedOrdinal: 2_147_483_647
-        });
-        this.renderNotice(`attaching to ${id}…`);
+        this.attachTo(id, followUp || undefined);
       }
     ],
     [
@@ -172,12 +200,15 @@ export class SlipstreamReplService extends CliRendererService {
           this.renderNotice("index warming — try again in a moment");
           return;
         }
-        for (const c of entries.slice(0, 25)) {
+        this.lastListing = entries.slice(0, 25);
+        for (const [i, c] of this.lastListing.entries()) {
           this.renderNotice(
-            `${c.title ?? "(untitled)"} · ${c.messageCount} msgs · ${c.id}`
+            `${i + 1}. ${c.title ?? "(untitled)"} · ${c.messageCount} msgs`
           );
         }
-        this.renderNotice(`${entries.length} conversation(s) indexed`);
+        this.renderNotice(
+          `${entries.length} conversation(s) indexed — /convo <number|title|id> attaches`
+        );
       }
     ],
     [
