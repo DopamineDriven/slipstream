@@ -5,6 +5,10 @@
 // @ts-nocheck 
 export { type $DbEnums } from "./sql/$DbEnums.ts"
 
+export * from "./sql/claimMemorySection.ts"
+
+export * from "./sql/findStaleMemoryClaims.ts"
+
 export * from "./sql/getMemoryChunksByConversation.ts"
 
 export * from "./sql/insertMemoryChunk.ts"
@@ -15,7 +19,11 @@ export * from "./sql/insertUserStoreDocAnnot.ts"
 
 export * from "./sql/searchConversationMemory.ts"
 
+export * from "./sql/searchConversationMemoryHybrid.ts"
+
 export * from "./sql/searchMemoryByConversation.ts"
+
+export * from "./sql/searchMemoryByConversationHybrid.ts"
 
 export * from "./sql/searchUserStoreChunksByDoc.ts"
 
@@ -25,7 +33,13 @@ export * from "./sql/searchUserStoreChunksByStoreAndModel.ts"
 
 export * from "./sql/searchUserStoreChunksHybrid.ts"
 
+export * from "./sql/updateMemoryChunkEmbedding.ts"
+
 export * from "./sql/updateMemoryChunkState.ts"
+
+export * from "./sql/updateMemoryChunkSummary.ts"
+
+export * from "./sql/updateMemoryChunkSummaryState.ts"
 
 export * from "./sql/updateUserStoreChunkState.ts"
 

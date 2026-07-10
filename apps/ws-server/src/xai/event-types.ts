@@ -168,7 +168,12 @@ export namespace xAIResponses {
          */
         arguments: string;
         call_id: string;
-        name: "slather_user_store" | (string & {});
+        name:
+          | "slather_user_store"
+          | "conversation_memory_search"
+          | "conversation_memory_get_chunk"
+          | "tool_catalog"
+          | (string & {});
         type: "function_call";
         /**
          * id starts with `fc_`
@@ -272,7 +277,12 @@ export namespace xAIResponses {
          */
         arguments: string;
         call_id: string;
-        name: "slather_user_store" | (string & {});
+        name:
+          | "slather_user_store"
+          | "conversation_memory_search"
+          | "conversation_memory_get_chunk"
+          | "tool_catalog"
+          | (string & {});
         type: "function_call";
         /**
          * id starts with `fc_`
@@ -438,8 +448,7 @@ export namespace xAIResponses {
         sequence_number: number;
         type: "response.output_text.annotation.added";
         annotation:
-          | Added.UrlCitationSansSpecificity
-          | Added.UrlCitationWithSpecificity;
+          Added.UrlCitationSansSpecificity | Added.UrlCitationWithSpecificity;
         annotation_index: number;
         content_index: number;
         item_id: string;

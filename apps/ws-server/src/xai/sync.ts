@@ -301,10 +301,7 @@ export class GrokSyncService extends GrokApiMethodsService {
     mgmtApiKey = this.xaiManagementKey
   ) {
     try {
-      const d= await this.ensureUserCollection(
-        userId,
-        mgmtApiKey
-      );
+      const d = await this.ensureUserCollection(userId, mgmtApiKey);
       const collectionId = d.collectionId;
       return collectionId;
     } catch (err) {

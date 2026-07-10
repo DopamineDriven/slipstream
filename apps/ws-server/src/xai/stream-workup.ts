@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
@@ -27,10 +28,11 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     logger: LoggerService,
     prisma: PrismaService,
     userStore: UserStoreVectorService,
+    memoryService: ConversationMemoryVectorService,
     xaiKey: string,
     xaiManagementKey: string
   ) {
-    super(logger, prisma, userStore, xaiKey, xaiManagementKey);
+    super(logger, prisma, userStore, memoryService, xaiKey, xaiManagementKey);
   }
 
   protected messageText(msg: MessageSingleton<true>) {
@@ -58,6 +60,11 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     apiKey = this.xaiKey,
     mgmtKey = this.xaiManagementKey
   ) {
+    // HMEM substitution assembly (Part II §2)
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
     const formatted = Array.of<ResponsesComprehensive>();
 
     const lastIndex = msgs.findLastIndex(
@@ -67,6 +74,21 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     const isFirstGrokMsg = lastIndex === -1;
 
     for (const [msgIndex, msg] of msgs.entries()) {
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          formatted.push({
+            role: "assistant",
+            content: [
+              {
+                type: "input_text",
+                text: claim.emit
+              } satisfies TextContentBlock
+            ]
+          } as const satisfies ResponsesComprehensive);
+        }
+        continue;
+      }
       const isFreshContext = isFirstGrokMsg || msgIndex > lastIndex;
       const isCurrentUserMsg = msgIndex === msgs.length - 1;
       const collectionId = this.collectionRegistry.get(userId) ?? null;
@@ -237,18 +259,6 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     return formatted;
   }
 
-  protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.\n instead of file_search you have slather_user_store, a tool for spelunking a self-hosted vector store";
-    if (isNewChat) {
-      return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
-    }
-
-    return (
-      systemPrompt ? `${systemPrompt}\n\n${note}` : note
-    ) satisfies ResponsesContentInputSingleton["content"];
-  }
-
   protected resolveResponsesTools({
     collectionId: _c = undefined,
     enableFileSearch: _e = false,
@@ -337,11 +347,19 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
       tools.push(this.slatherUserStore());
     }
 
+    // memory tools attach unconditionally — conversation memory exists
+    // independently of uploaded documents
+    if (this.canUseFunctionTools(model)) {
+      tools.push(
+        this.memorySearchFunctionTool(),
+        this.memoryGetChunkFunctionTool()
+      );
+    }
+
     return tools.length > 0 ? tools : undefined;
   }
 
   protected async getResponsesApiInputWorkup({
-    isNewChat,
     model = "grok-4.20-0309-reasoning",
     userId,
     msgs,
@@ -368,10 +386,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     parallel_tool_calls = true,
     include = ["reasoning.encrypted_content"]
   }: ResponsesApiInputWorkupParams) {
-    const systemInstruction = this.formatSystemInstruction(
-      isNewChat,
-      systemPrompt
-    );
+    const systemInstruction = this.prisma.formatSysNote(systemPrompt);
     let toolHandler: ToolUnion[] | undefined;
     const hasDocs = enableUserStoreSearch && hasUserStoreDocs;
     // "grok-4.20-multi-agent-0309" doesn't support calling functional tools yet (2026-03-24)
@@ -432,7 +447,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         max_output_tokens,
         user: userId
       } as const;
-    } else if (this.isGrok4Point3(model)) {
+    } else if (this.isGrok4Point3(model) || this.isGrok4Point5(model)) {
       return {
         input: history,
         model,
@@ -514,16 +529,16 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     } = typeof round_input !== "undefined"
       ? {
           input: round_input,
-          instructions: this.formatSystemInstruction(isNewChat, systemPrompt),
+          instructions: this.prisma.formatSysNote(systemPrompt),
           reasoning: undefined,
           max_output_tokens: max_tokens,
-          model: (m ?? "grok-4.20-0309-reasoning") as GrokModelIdUnion,
+          model: (m ?? "grok-4.5") as GrokModelIdUnion,
           parallel_tool_calls: parallel_tool_calling,
           tool_choice: tool_choice_input,
           store: false,
           stream,
           tools: this.handleTooling({
-            model: (m ?? "grok-4.20-0309-reasoning") as GrokModelIdUnion,
+            model: (m ?? "grok-4.5") as GrokModelIdUnion,
             collectionId: cId,
             enableFileSearch,
             enableUserStoreSearch: hasUserStoreDocs,
@@ -539,7 +554,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         }
       : await this.getResponsesApiInputWorkup({
           isNewChat,
-          model: (m ?? "grok-4.20-0309-reasoning") as GrokModelIdUnion,
+          model: (m ?? "grok-4.5") as GrokModelIdUnion,
           userId,
           msgs,
           keyFingerprint: keyId ?? "server",

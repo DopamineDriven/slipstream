@@ -16,6 +16,9 @@ dotenv.config({ quiet: true });
 
 const providerModelImagesApi = {
   openai: [
+    "gpt-5.6-sol",
+    "gpt-5.6-terra",
+    "gpt-5.6-luna",
     "gpt-5.5",
     "gpt-5.5-pro",
     "gpt-5.4",
@@ -63,6 +66,9 @@ const providerModelVideosApi = {
 
 const providerModelChatApi = {
   openai: [
+    "gpt-5.6-sol",
+    "gpt-5.6-terra",
+    "gpt-5.6-luna",
     "gpt-5.5",
     "gpt-5.4",
     "gpt-5.4-mini",
@@ -130,6 +136,7 @@ const providerModelChatApi = {
     "veo-3.1-lite-generate-preview"
   ],
   grok: [
+    "grok-4.5",
     "grok-4.3",
     "grok-4.20-multi-agent-0309",
     "grok-4.20-0309-reasoning",
@@ -170,7 +177,7 @@ const providerModelChatApi = {
     "command-a-reasoning-08-2025",
     "command-a-03-2025"
   ],
-  moonshotai: ["kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
+  moonshotai: ["kimi-k2.7-code", "kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
   deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
   zai: ["glm-5.2", "glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
   alibaba: [
@@ -217,6 +224,7 @@ const LLAMA_NAME_OVERRIDES = {
 } as const;
 
 const GROK_NAME_OVERRIDES = {
+  "grok-4.5": "Grok 4.5",
   "grok-imagine-image": "Grok Imagine Image",
   "grok-imagine-image-quality": "Grok Imagine Image Quality",
   "grok-imagine-video": "Grok Imagine Video",
@@ -266,6 +274,7 @@ const ZAI_NAME_OVERRIDES = {
 } as const;
 
 const KIMI_NAME_OVERRIDES = {
+  "kimi-k2.7-code": "Kimi K2.7 Code",
   "kimi-k2-thinking": "Kimi K2 Thinking",
   "kimi-k2.5": "Kimi K2.5",
   "kimi-k2.6": "Kimi K2.6"
@@ -307,6 +316,7 @@ function filterForAlibaba(id: string) {
 
 function filterForGrok(id: string) {
   return (
+    id === "grok-4.5" ||
     id === "grok-4.3" ||
     id === "grok-4.20-multi-agent-0309" ||
     id === "grok-4.20-0309-reasoning" ||
@@ -320,7 +330,12 @@ function filterForGrok(id: string) {
 }
 
 function filterForKimi(id: string) {
-  return id === "kimi-k2-thinking" || id === "kimi-k2.5" || id === "kimi-k2.6";
+  return (
+    id === "kimi-k2-thinking" ||
+    id === "kimi-k2.5" ||
+    id === "kimi-k2.6" ||
+    id === "kimi-k2.7-code"
+  );
 }
 
 function filterForDeepseek(id: string) {
@@ -499,6 +514,9 @@ function prettyModelName(id: string, provider: Provider = "openai") {
 }
 
 const gptNameMap = {
+  "gpt-5.6-sol": "GPT-5.6 Sol",
+  "gpt-5.6-terra": "GPT-5.6 Terra",
+  "gpt-5.6-luna": "GPT-5.6 Luna",
   "gpt-image-1": "GPT Image 1",
   "gpt-image-1-mini": "GPT Image 1 mini",
   "gpt-image-1.5": "GPT Image 1.5",
@@ -520,6 +538,9 @@ const gptNameMap = {
 
 function filterForGPT(s: string) {
   return (
+    s === "gpt-5.6-sol" ||
+    s === "gpt-5.6-terra" ||
+    s === "gpt-5.6-luna" ||
     s === "gpt-image-1" ||
     s === "gpt-image-1.5" ||
     s === "gpt-image-2" ||

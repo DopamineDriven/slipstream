@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
@@ -30,10 +31,11 @@ export class GrokImgGenService extends GrokStreamWorkupService {
     logger: LoggerService,
     prisma: PrismaService,
     userStore: UserStoreVectorService,
+    memoryService: ConversationMemoryVectorService,
     apiKey: string,
     managementKey: string
   ) {
-    super(logger, prisma, userStore, apiKey, managementKey);
+    super(logger, prisma, userStore, memoryService, apiKey, managementKey);
     this.nanoid = import("nanoid").then(d => d.nanoid);
   }
 

@@ -1,5 +1,7 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { ToolCatalogService } from "@/tool-catalog/index.ts";
 import { AlibabaService } from "@/alibaba/index.ts";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { CohereService } from "@/cohere/index.ts";
@@ -104,6 +106,8 @@ export interface ProviderDependencies {
   userStore: UserStoreVectorService;
   isProd: boolean;
   s3: S3Storage;
+  memory: ConversationMemoryVectorService;
+  toolCatalog: ToolCatalogService;
 }
 export type ProviderFactory<T> = (
   deps: ProviderDependencies,
@@ -198,6 +202,8 @@ export function AnthropicMixin<
               deps.logger,
               deps.prisma,
               deps.userStore,
+              deps.memory,
+              deps.toolCatalog,
               deps.redis,
               this.claudeApiKey ?? ""
             );
@@ -267,6 +273,7 @@ export function GeminiMixin<
               deps.userStore,
               deps.redis,
               deps.s3,
+              deps.memory,
               this.gemApiKey ?? ""
             );
         }
@@ -334,6 +341,7 @@ export function MistralMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.mistralApiKey ?? ""
             );
         }
@@ -400,7 +408,8 @@ export function CohereMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
-              this.coApiKey ?? ""
+              this.coApiKey ?? "",
+              deps.memory
             );
         }
       }
@@ -467,6 +476,7 @@ export function DeepSeekMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.dsApiKey ?? ""
             );
         }
@@ -532,6 +542,7 @@ export function ZaiMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.zApiKey ?? ""
             );
         }
@@ -599,6 +610,7 @@ export function SakanaMixin<
               deps.prisma,
               deps.userStore,
               deps.s3,
+              deps.memory,
               deps.redis,
               this.fuguApiKey ?? ""
             );
@@ -666,6 +678,7 @@ export function KimiMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.kimiApiKey ?? ""
             );
         }
@@ -733,6 +746,7 @@ export function AlibabaMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.qwenApiKey ?? ""
             );
         }
@@ -799,6 +813,7 @@ export function MiniMaxMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.mApiKey ?? ""
             );
         }
@@ -867,7 +882,8 @@ export function OpenAIMixin<
               deps.userStore,
               deps.s3,
               deps.redis,
-              this.oaiApiKey ?? ""
+              this.oaiApiKey ?? "",
+              deps.memory
             );
         }
       }
@@ -936,6 +952,7 @@ export function GrokMixin<
               deps.redis,
               deps.s3,
               deps.userStore,
+              deps.memory,
               this.xaiApiKey ?? "",
               this.xaiManagementKey ?? ""
             );
@@ -1003,6 +1020,7 @@ export function VercelMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.v0ApiKey ?? ""
             );
         }
@@ -1068,6 +1086,7 @@ export function MetaMixin<
               deps.prisma,
               deps.redis,
               deps.userStore,
+              deps.memory,
               this.llamaApiKey ?? ""
             );
         }

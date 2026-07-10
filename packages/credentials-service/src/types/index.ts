@@ -80,6 +80,8 @@ export interface CredentialEntity {
   COHERE_API_KEY?: string;
   COHERE_TRIAL_KEY?: string;
   SAKANA_API_KEY?: string;
+  SLIPSTREAM_LOGIN_URL?: string;
+  SLIPSTREAM_WS_URL?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

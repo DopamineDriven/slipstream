@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
@@ -13,19 +14,20 @@ export class OpenAIService extends OpenAIResponsesChatService {
     userStoreVector: UserStoreVectorService,
     s3: S3Storage,
     redis: EnhancedRedisPubSub,
-    apiKey: string
+    apiKey: string,
+    memoryService: ConversationMemoryVectorService
   ) {
-    super(logger, prisma, userStoreVector, s3, redis, apiKey);
+    super(logger, prisma, userStoreVector, s3, redis, apiKey, memoryService);
   }
   public async routeOpenAI({ model, ...rest }: ProviderOpenaiRequestEntity) {
-    if (!model || !this.isOpenAIModel(model)) return;
-    if (this.isImgGenNative(model)) {
+    if (!model || !this.prisma.isOpenAIModel(model)) return;
+    if (this.prisma.isOpenAIImgModel(model)) {
       return this.handleOpenaiNativeImageRequestGptImage1({
         ...rest,
         model
       });
     } else if (
-      this.isImgGenFacilitating(model) &&
+      this.prisma.isOpenAIImgGenFacilitating(model) &&
       typeof rest.imgGenFields !== "undefined" &&
       rest.imgGenEnabled === true
     ) {

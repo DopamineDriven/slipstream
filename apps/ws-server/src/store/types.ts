@@ -168,10 +168,7 @@ export interface UserStoreChunkDraft {
 }
 
 export type ChunkBudgetAdjustReason =
-  | "RESIZED"
-  | "TEXT_ONLY_FALLBACK"
-  | "TEXT_RECHUNK"
-  | "IMAGE_RECHUNK";
+  "RESIZED" | "TEXT_ONLY_FALLBACK" | "TEXT_RECHUNK" | "IMAGE_RECHUNK";
 
 export interface UserStoreChunkReady extends UserStoreChunkDraft {
   tokenCount: number;

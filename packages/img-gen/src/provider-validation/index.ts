@@ -113,6 +113,9 @@ export class ProviderValidation {
 
   public openAIFacilitatingImgGenModel(model: string) {
     return (
+      model === "gpt-5.6-sol" ||
+      model === "gpt-5.6-terra" ||
+      model === "gpt-5.6-luna" ||
       model === "gpt-5.5" ||
       model === "gpt-5.5-pro" ||
       model === "gpt-5.4" ||
@@ -183,13 +186,11 @@ export class ProviderValidation {
   public isPureImgGenModel<const V extends AllModelsUnion = AllModelsUnion>(
     model = "gpt-5.5" as V
   ) {
-    if (
-      !(
-        this.grokImgGenCapable(model) ||
-        this.geminiImgGenCapable(model) ||
-        this.openAIGptImgModel(model)
-      )
-    ) {
+    if (!(
+      this.grokImgGenCapable(model) ||
+      this.geminiImgGenCapable(model) ||
+      this.openAIGptImgModel(model)
+    )) {
       return false;
     } else {
       if (
@@ -233,7 +234,7 @@ export class ProviderValidation {
     data?: { n?: number }
   ): undefined;
   public handleImgGenCount(
-    model: AllModelsUnion = "gpt-5.5",
+    model: AllModelsUnion = "gpt-5.6-sol",
     data?: { n?: number }
   ) {
     if (this.grokImgGenCapable(model)) {
@@ -270,7 +271,7 @@ export class ProviderValidation {
     return b === "auto" || b === "transparent" || b === "opaque";
   }
   public handleImgGenOutputFormat(
-    model: AllModelsUnion = "gpt-5.4",
+    model: AllModelsUnion = "gpt-5.6-sol",
     data?: { format?: ModelToOutputFormatOpts<typeof model> }
   ) {
     const m = model;
@@ -354,12 +355,9 @@ export class ProviderValidation {
     data?: { moderation?: "auto" | "low" | (string & {}) }
   ) {
     if (!model) return;
-    if (
-      !(
-        this.openAIFacilitatingImgGenModel(model) ||
-        this.openAIGptImgModel(model)
-      )
-    )
+    if (!(
+      this.openAIFacilitatingImgGenModel(model) || this.openAIGptImgModel(model)
+    ))
       return;
     if (
       typeof data?.moderation !== "undefined" &&
@@ -440,9 +438,7 @@ export class ProviderValidation {
     m: GeminiImgGenModels,
     data?: {
       output_size:
-        | BaseNanoBananaOutputAR
-        | NanoBanana2OutputAR
-        | ImagenOutputSize;
+        BaseNanoBananaOutputAR | NanoBanana2OutputAR | ImagenOutputSize;
     }
   ) {
     if (!data?.output_size) return;
@@ -472,7 +468,7 @@ export class ProviderValidation {
   }
 
   public handleImgGenOutputQuality(
-    model: AllModelsUnion = "gpt-5.5",
+    model: AllModelsUnion = "gpt-5.6-sol",
     data?: { output_quality: ModelToQualityOpts<typeof model> }
   ) {
     const q = data?.output_quality;
@@ -648,7 +644,7 @@ export class ProviderValidation {
   }
 
   public handlePartialImgGen(
-    model: AllModelsUnion = "gpt-5.5",
+    model: AllModelsUnion = "gpt-5.6-sol",
     data?: { partialImagesRequested?: number }
   ) {
     if (this.openAIImgGenCapable(model)) {
@@ -670,18 +666,16 @@ export class ProviderValidation {
   }
 
   public handleOutputSize<const M extends AllModelsUnion = AllModelsUnion>(
-    model = "gpt-5.5" as M,
+    model = "gpt-5.6-sol" as M,
     data?: { output_size?: ModelToAspectRatioOpts<typeof model> }
   ) {
     if (!model) return;
     const m = model;
-    if (
-      !(
-        this.geminiImgGenCapable(m) ||
-        this.grokImagineImgGenModel(m) ||
-        this.openAIImgGenCapable(m)
-      )
-    )
+    if (!(
+      this.geminiImgGenCapable(m) ||
+      this.grokImagineImgGenModel(m) ||
+      this.openAIImgGenCapable(m)
+    ))
       return;
 
     if (this.grokImagineImgGenModel(m)) {
@@ -745,10 +739,7 @@ export class ProviderValidation {
         background: data.imgGenFields?.output_background,
         format:
           (data.imgGenFields?.output_format as
-            | "jpeg"
-            | "png"
-            | "webp"
-            | undefined) ?? "png"
+            "jpeg" | "png" | "webp" | undefined) ?? "png"
       }),
       moderation = this.handleModeration(model, {
         moderation: data.imgGenFields?.moderation
@@ -847,7 +838,8 @@ export class ProviderValidation {
       includeWithAttachments = {
         conversationSettings: true,
         messages: {
-          orderBy: { createdAt: "asc" },
+          // ordinal is the authoritative dense sequence — createdAt can tie
+          orderBy: { ordinal: "asc" },
           include: {
             imageGenJob: true,
             messageBlocks: { orderBy: { ordinal: "asc" } },
@@ -877,7 +869,8 @@ export class ProviderValidation {
       includeSansAttachments = {
         conversationSettings: true,
         messages: {
-          orderBy: { createdAt: "asc" },
+          // ordinal is the authoritative dense sequence — createdAt can tie
+          orderBy: { ordinal: "asc" },
           include: {
             imageGenJob: true,
             messageBlocks: { orderBy: { ordinal: "asc" } },

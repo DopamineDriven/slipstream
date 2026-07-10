@@ -102,16 +102,46 @@ export class ResolverChatService extends ResolverTTSService {
       metadata: userData
     };
     let res: HandleAiChatRequestRT, hasUserStoreDocs: boolean;
-    const getStatus = this.userStoreDocStatus.get(userId);
-    if (typeof getStatus === "undefined" || getStatus === false) {
-      [res, hasUserStoreDocs] = await Promise.all([
-        this.wsServer.prisma.handleAiChatRequest(reqObj),
-        this.wsServer.prisma.hasUserStoreDocs(userId)
-      ]);
-      this.userStoreDocStatus.set(userId, hasUserStoreDocs);
-    } else {
-      hasUserStoreDocs = getStatus;
-      res = await this.wsServer.prisma.handleAiChatRequest(reqObj);
+    // the provider dispatch below has its own catch — this one guards the
+    // persist step, where a malformed conversationId (eg, a client sending
+    // anything other than the literal "new-chat" sentinel or a real id)
+    // P2025s; uncaught, that killed the whole process
+    try {
+      const getStatus = this.userStoreDocStatus.get(userId);
+      if (typeof getStatus === "undefined" || getStatus === false) {
+        [res, hasUserStoreDocs] = await Promise.all([
+          this.wsServer.prisma.handleAiChatRequest(reqObj),
+          this.wsServer.prisma.hasUserStoreDocs(userId)
+        ]);
+        this.userStoreDocStatus.set(userId, hasUserStoreDocs);
+      } else {
+        hasUserStoreDocs = getStatus;
+        res = await this.wsServer.prisma.handleAiChatRequest(reqObj);
+      }
+    } catch (err) {
+      console.error(
+        `AI Chat Request persist error`,
+        this.wsServer.prisma.safeErrMsg(err)
+      );
+      ws.send(
+        JSON.stringify({
+          type: "ai_chat_error",
+          provider,
+          conversationId: conversationIdInitial,
+          model,
+          systemPrompt,
+          userMsgId: "no-msg-id-yet",
+          temperature,
+          imgGenEnabled: false,
+          imgGenFields: undefined,
+          topP,
+          title: undefined,
+          userId,
+          done: true,
+          message: this.wsServer.prisma.safeErrMsg(err)
+        } satisfies EventTypeMap["ai_chat_error"])
+      );
+      return;
     }
 
     const { docCounts, imgCounts } = this.getCurrentMsgAttCounts(res);
@@ -343,6 +373,7 @@ export class ResolverChatService extends ResolverTTSService {
           break;
         }
       }
+      this.scheduleConversationMemoryIndexing(conversationId, userId, title);
     } catch (err) {
       console.error(`AI Stream Error`, this.wsServer.prisma.safeErrMsg(err));
       ws.send(

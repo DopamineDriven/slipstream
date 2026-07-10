@@ -75,7 +75,6 @@ const p = new Promotion(process.env.X_AI_MANAGEMENT_API_KEY ?? "");
 const collectionId = "collection_b338d912-6f45-4c57-9646-4dfe957974d9";
 
 (async () => {
-
   for (const s of [
     {
       file_metadata: {
@@ -103,20 +102,17 @@ const collectionId = "collection_b338d912-6f45-4c57-9646-4dfe957974d9";
   ]) {
     const fileId = s.file_metadata.file_id;
     const filename = s.file_metadata.name;
-    await p.promoteToCollection(
-      fileId,
-      collectionId,
-      filename,
-      p.xaiManagementKey
-    ).then((t) =>{
-      if (!t.ok) {
-        console.log(t.status);
-        console.log(t.statusText);
-      } else {
-        t.json().then((v) =>{
-          console.log(v);
-        })
-      }
-    });
+    await p
+      .promoteToCollection(fileId, collectionId, filename, p.xaiManagementKey)
+      .then(t => {
+        if (!t.ok) {
+          console.log(t.status);
+          console.log(t.statusText);
+        } else {
+          t.json().then(v => {
+            console.log(v);
+          });
+        }
+      });
   }
 })();

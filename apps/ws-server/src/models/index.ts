@@ -1,42 +1,19 @@
-import fsSync from "fs";
-import { join, relative, resolve } from "path";
 import type { InferTopLevelMime } from "@/types/index.ts";
 import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
-import { ByteCodec } from "@/byte-codec/index.ts";
+import { ModelServiceWorkup } from "@/models/workup.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type {
-  GeminiImgGenModels,
-  GetModelUtilRT,
-  GrokImgGenModels,
-  OpenAIImgGenModels,
-  Provider
-} from "@slipstream/types";
-import { ProviderValidation } from "@slipstream/img-gen";
+import type { GetModelUtilRT, Provider } from "@slipstream/types";
 import { providerModelChatApi } from "@slipstream/types";
-import { imageModelSets } from "@slipstream/types/models";
 
-export class ModelService extends ProviderValidation {
+export class ModelService extends ModelServiceWorkup {
   constructor() {
     super();
   }
-  public mapParams = <const T extends readonly [string, string][] | string[][]>(
-    params: T
-  ) =>
-    params
-      .reduce<string[]>((arr, [k, v]) => {
-        if (v) arr.push(`${k}=${encodeURIComponent(v)}`);
-        return arr;
-      }, [])
-      .join("&");
-  public encodeUTF8(text: string) {
-    return ByteCodec.encode(text);
-  }
-
-  public decodeUTF8(bytes: Uint8Array | NodeJS.NonSharedUint8Array) {
-    return ByteCodec.decode(bytes);
-  }
-  public isOpenAIModel(m: string) {
+  public isOpenAIImgGenFacilitating(m: string) {
     return (
+      m === "gpt-5.6-sol" ||
+      m === "gpt-5.6-terra" ||
+      m === "gpt-5.6-luna" ||
       m === "gpt-5.5" ||
       m === "gpt-5.5-pro" ||
       m === "gpt-5.4-mini" ||
@@ -45,9 +22,6 @@ export class ModelService extends ProviderValidation {
       m === "gpt-4.1-mini" ||
       m === "gpt-4.1-nano" ||
       m === "gpt-5" ||
-      m === "gpt-5.2-chat-latest" ||
-      m === "gpt-5.1-chat-latest" ||
-      m === "o4-mini" ||
       m === "gpt-5-chat-latest" ||
       m === "gpt-5-mini" ||
       m === "gpt-5-nano" ||
@@ -59,29 +33,100 @@ export class ModelService extends ProviderValidation {
       m === "gpt-5.4-pro" ||
       m === "o3" ||
       m === "gpt-4o" ||
+      m === "gpt-4o-mini"
+    );
+  }
+
+  public isOpenAINonReasoningModel(m: string) {
+    return (
+      m === "chatgpt-4o-latest" ||
+      m === "gpt-3.5-turbo" ||
+      m === "gpt-4" ||
+      m === "gpt-4-turbo" ||
+      m === "gpt-4.1" ||
+      m === "gpt-4.1-mini" ||
+      m === "gpt-4.1-nano" ||
+      m === "gpt-4o" ||
       m === "gpt-4o-mini" ||
-      m === "o1-pro" ||
-      m === "o3-pro" ||
-      m === "o3-deep-research" ||
-      m === "o4-mini-deep-research" ||
       m === "gpt-image-1" ||
       m === "gpt-image-1-mini" ||
-      m === "gpt-image-1.5" ||
+      this.isOpenAIVideoModel(m)
+    );
+  }
+
+  public isOpenAIReasoningModel(m: string) {
+    return this.isOpenAIModel(m) && !this.isOpenAINonReasoningModel(m);
+  }
+
+  public isOpenAIImgModel(m: string) {
+    return (
       m === "gpt-image-2" ||
-      m === "sora-2" ||
-      m === "sora-2-pro" ||
+      m === "gpt-image-1.5" ||
+      m === "gpt-image-1" ||
+      m === "gpt-image-1-mini"
+    );
+  }
+
+  public isOpenAIVideoModel(m: string) {
+    return m === "sora-2" || m === "sora-2-pro";
+  }
+
+  public isOpenAICodexModel(m: string) {
+    return (
       m === "gpt-5.3-codex" ||
       m === "gpt-5.2-codex" ||
       m === "gpt-5.1-codex-max" ||
       m === "gpt-5.1-codex-mini" ||
       m === "gpt-5.1-codex" ||
-      m === "gpt-5-codex" ||
-      m === "gpt-3.5-turbo" ||
-      m === "gpt-4-turbo" ||
-      m === "gpt-4" ||
-      m === "o1" ||
+      m === "gpt-5-codex"
+    );
+  }
+
+  public isOpenAIModel(m: string) {
+    return (
+      this.isOpenAIImgGenFacilitating(m) ||
+      this.isOpenAIImgModel(m) ||
+      this.isOpenAIVideoModel(m) ||
+      this.isOpenAICodexModel(m) ||
+      m === "gpt-5.2-chat-latest" ||
+      m === "gpt-5.1-chat-latest" ||
+      m === "chatgpt-4o-latest" ||
+      m === "o4-mini" ||
+      m === "o4-mini-deep-research" ||
+      m === "o3-deep-research" ||
+      m === "o3-pro" ||
       m === "o3-mini" ||
-      m === "chatgpt-4o-latest"
+      m === "o1" ||
+      m === "o1-pro" ||
+      m === "gpt-4" ||
+      m === "gpt-4-turbo" ||
+      m === "gpt-3.5-turbo"
+    );
+  }
+
+  /**
+   * 🍌 Nano Bananas Fam 🍌
+   */
+  public isGeminiImgModel(m: string) {
+    return (
+      m === "gemini-3-pro-image-preview" ||
+      m === "gemini-3.1-flash-image-preview" ||
+      m === "gemini-2.5-flash-image"
+    );
+  }
+
+  public isGeminiVideoModel(m: string) {
+    return (
+      m === "veo-3.1-lite-generate-preview" ||
+      m === "veo-3.1-fast-generate-preview" ||
+      m === "veo-3.1-generate-preview"
+    );
+  }
+
+  public isGeminiDeepResearchModel(m: string) {
+    return (
+      m === "deep-research-max-preview-04-2026" ||
+      m === "deep-research-preview-04-2026"
     );
   }
 
@@ -95,18 +140,143 @@ export class ModelService extends ProviderValidation {
       m === "gemini-2.5-pro" ||
       m === "gemini-2.5-flash-lite" ||
       m === "gemini-2.5-flash" ||
-      m === "deep-research-max-preview-04-2026" ||
-      m === "deep-research-preview-04-2026" ||
-      m === "gemini-3-pro-image-preview" ||
-      m === "gemini-3.1-flash-image-preview" ||
-      m === "gemini-2.5-flash-image" ||
       m === "gemini-2.0-flash" ||
       m === "gemini-2.0-flash-lite" ||
-      m === "veo-3.1-lite-generate-preview" ||
-      m === "veo-3.1-fast-generate-preview" ||
-      m === "veo-3.1-generate-preview"
+      this.isGeminiDeepResearchModel(m) ||
+      this.isGeminiImgModel(m) ||
+      this.isGeminiVideoModel(m)
     );
   }
+
+  public isGrokImgModel(m: string) {
+    return m === "grok-imagine-image-quality" || m === "grok-imagine-image";
+  }
+
+  public isGrokVideoModel(m: string) {
+    return m === "grok-imagine-video" || m === "grok-imagine-video-1.5";
+  }
+
+  public isGrokModel(m: string) {
+    return (
+      this.isGrokVideoModel(m) ||
+      this.isGrokImgModel(m) ||
+      m === "grok-4.5" ||
+      m === "grok-4.3" ||
+      m === "grok-4.20-multi-agent-0309" ||
+      m === "grok-4.20-0309-reasoning" ||
+      m === "grok-4.20-0309-non-reasoning" ||
+      m === "grok-build-0.1"
+    );
+  }
+  public isAnthropicAdaptiveModel(mod: string) {
+    return (
+      mod === "claude-opus-4-8" ||
+      mod === "claude-opus-4-7" ||
+      mod === "claude-opus-4-6" ||
+      mod === "claude-sonnet-4-6" ||
+      mod === "claude-fable-5" ||
+      mod === "claude-sonnet-5"
+    );
+  }
+
+  public isAnthropicNonAdaptiveModel(m: string) {
+    return (
+      m === "claude-opus-4-5-20251101" ||
+      m === "claude-sonnet-4-5-20250929" ||
+      m === "claude-haiku-4-5-20251001" ||
+      m === "claude-opus-4-1-20250805"
+    );
+  }
+  public isAnthropicModel(m: string) {
+    return (
+      this.isAnthropicNonAdaptiveModel(m) || this.isAnthropicAdaptiveModel(m)
+    );
+  }
+
+  public isMetaModel(m: string) {
+    return (
+      m === "Llama-4-Maverick-17B-128E-Instruct-FP8" ||
+      m === "Llama-4-Scout-17B-16E-Instruct-FP8" ||
+      m === "Llama-3.3-70B-Instruct" ||
+      m === "Llama-3.3-8B-Instruct"
+    );
+  }
+
+  public isV0Model(m: string) {
+    return m === "v0-1.5-md" || m === "v0-1.0-md";
+  }
+  public isMistralReasoningModel(m: string) {
+    return (
+      m === "mistral-small-latest" ||
+      m === "mistral-medium-3" ||
+      m === "mistral-medium-3.5"
+    );
+  }
+  public isMistralModel(m: string) {
+    return this.isMistralReasoningModel(m) || m === "mistral-large-latest";
+  }
+
+  public isCohereReasoningModel(m: string) {
+    return (
+      m === "command-a-plus-05-2026" || m === "command-a-reasoning-08-2025"
+    );
+  }
+
+  public isCohereModel(m: string) {
+    return this.isCohereReasoningModel(m) || m === "command-a-03-2025";
+  }
+
+  public isKimiModel(m: string) {
+    return (
+      m === "kimi-k2.7-code" ||
+      m === "kimi-k2.6" ||
+      m === "kimi-k2.5" ||
+      m === "kimi-k2-thinking"
+    );
+  }
+
+  public isDeepSeekModel(m: string) {
+    return (
+      m === "deepseek-r1" ||
+      m === "deepseek-v4-pro" ||
+      m === "deepseek-v4-flash"
+    );
+  }
+
+  public isZaiModel(m: string) {
+    return (
+      m === "glm-5.2" ||
+      m === "glm-5.1" ||
+      m === "glm-5" ||
+      m === "glm-4.7" ||
+      m === "glm-4.6" ||
+      m === "glm-4.5"
+    );
+  }
+
+  public isQwenModel(m: string) {
+    return (
+      m === "qwen3.7-max" ||
+      m === "qwen3.7-plus" ||
+      m === "qwen3.6-plus" ||
+      m === "qwen3.5-plus" ||
+      m === "qwen3.5-flash"
+    );
+  }
+
+  public isMinimaxModel(m: string) {
+    return (
+      m === "minimax-m3" ||
+      m === "minimax-m2.7" ||
+      m === "minimax-m2.5" ||
+      m === "minimax-m2.1"
+    );
+  }
+
+  public isSakanaModel(m: string) {
+    return m === "fugu" || m === "fugu-ultra";
+  }
+
   public concatBytes(arrays: Uint8Array[]) {
     const totalLength = arrays.reduce((sum, arr) => sum + arr.length, 0);
     const result = new Uint8Array(totalLength);
@@ -138,16 +308,6 @@ export class ModelService extends ProviderValidation {
     return -1;
   }
 
-  public toPathnameExtTuple(path: string) {
-    const extAndPath = (path.split(/\//gim).at(-1) ?? "")?.split(/\./gm);
-    if (extAndPath.length > 2) {
-      const handleFalsePositives = extAndPath
-        .slice(0, extAndPath.length - 1)
-        ?.join("--");
-      const ext = extAndPath.at(-1) ?? "";
-      return [handleFalsePositives, ext] as const;
-    } else return [extAndPath?.[0] ?? "", extAndPath.at?.(-1) ?? ""] as const;
-  }
   public sanitizeTitle = (generatedTitle: string) => {
     return generatedTitle.trim().replace(/^(['"])(.*?)\1$/, "$2");
   };
@@ -171,6 +331,147 @@ export class ModelService extends ProviderValidation {
     | "font" {
     return target.split("/")?.[0] as InferTopLevelMime<typeof target>;
   }
+
+  // TODO finish this
+  // public getMod<const Z extends "alibaba" = "alibaba", const L extends ProviderModelRecord[Z] = ProviderModelRecord[Z]>(
+  //   provider: Z,
+  //   model: L
+  // ): typeof model
+  // public getMod<const Z extends "anthropic", const L extends GetModelUtilRT<Z>>(
+  //   provider: Z,
+  //   model?: L
+  // ): typeof model extends undefined
+  //   ? "claude-opus-4.6"
+  //   : Exclude<typeof model, undefined>;
+  // public getMod<const Z extends "cohere", const L extends GetModelUtilRT<Z>>(
+  //   provider: Z,
+  //   model?: L
+  // ): typeof model extends undefined
+  //   ? "command-a-plus-05-2026"
+  //   : Exclude<typeof model, undefined>;
+  // public getMod<const Z extends "deepseek", const L extends GetModelUtilRT<Z>>(
+  //   provider: Z,
+  //   model?: L
+  // ): typeof model extends undefined
+  //   ? "deepseek-v4-pro"
+  //   : Exclude<typeof model, undefined>;
+  // public getMod<const Z extends "gemini", const L extends GetModelUtilRT<Z>>(
+  //   provider: Z,
+  //   model?: L
+  // ): typeof model extends undefined
+  //   ? "gemini-3.1-pro-preview"
+  //   : Exclude<typeof model, undefined>;
+  // public getMod<const Z extends "grok", const L extends GetModelUtilRT<Z>>(
+  //   provider: Z,
+  //   model?: L
+  // ): typeof model extends undefined
+  //   ? "grok-4.20-0309-reasoning"
+  //   : Exclude<typeof model, undefined>;
+  // public getMod<const Z extends "meta", const L extends GetModelUtilRT<Z>>(
+  //   provider: Z,
+  //   model?: L
+  // ): typeof model extends undefined
+  //   ? "Llama-4-Maverick-17B-128E-Instruct-FP8"
+  //   : Exclude<typeof model, undefined>;
+  // public getMod<const Z extends "minimax", const L extends GetModelUtilRT<Z>>(
+  //   provider: Z,
+  //   model?: L
+  // ): typeof model extends undefined
+  //   ? "minimax-m3"
+  //   : Exclude<typeof model, undefined>;
+  // public getMod<
+  //   const Z extends "moonshotai",
+  //   const L extends GetModelUtilRT<Z>
+  // >(
+  //   provider: Z,
+  //   model?: L
+  // ): typeof model extends undefined
+  //   ? "kimi-k2.6"
+  //   : Exclude<typeof model, undefined>;
+  // public getMod<
+  //   const Z extends "openai",
+  //   const L extends OpenAiModelIdUnion | undefined
+  // >(
+  //   provider: Z,
+  //   model?: L
+  // ): L extends undefined ? "gpt-5.5" : Exclude<L, undefined>;
+  // public getMod<const Z extends "sakana", const L extends GetModelUtilRT<Z>>(
+  //   provider: Z,
+  //   model?: L
+  // ): typeof model extends undefined ? "fugu" : Exclude<typeof model, undefined>;
+  // public getMod<const Z extends "vercel", const L extends GetModelUtilRT<Z>>(
+  //   provider: Z,
+  //   model?: L
+  // ): typeof model extends undefined
+  //   ? "vercel-md-1.5"
+  //   : Exclude<typeof model, undefined>;
+  // public getMod<const Z extends "zai", const L extends GetModelUtilRT<Z>>(
+  //   provider: Z,
+  //   model?: L
+  // ): typeof model extends undefined
+  //   ? "glm-5.2"
+  //   : Exclude<typeof model, undefined>;
+  // public getMod<const Z extends Provider>(provider: Z, model?: ModelMap[Z]) {
+  //   if (provider === "alibaba") {
+  //     if (model && this.isQwenModel(model)) return model;
+  //     return "qwen3.7-plus";
+  //   }
+  //   if (provider === "anthropic") {
+  //     if (model && this.isAnthropicModel(model)) return model;
+  //     return "claude-opus-4-6";
+  //   }
+  //   if (provider === "cohere") {
+  //     if (model && this.isCohereModel(model)) return model;
+  //     return "command-a-plus-05-2026";
+  //   }
+  //   if (provider === "deepseek") {
+  //     if (model && this.isDeepSeekModel(model)) return model;
+  //     return "deepseek-v4-pro";
+  //   }
+  //   if (provider === "gemini") {
+  //     if (model && this.isGeminiModel(model)) return model;
+  //     return "gemini-3.1-pro-preview";
+  //   }
+  //   if (provider === "grok") {
+  //     if (model && this.isGrokModel(model)) return model;
+  //     return "grok-4.20-0309-reasoning";
+  //   }
+  //   if (provider === "meta") {
+  //     if (model && this.isMetaModel(model)) return model;
+  //     return "Llama-4-Maverick-17B-128E-Instruct-FP8";
+  //   }
+  //   if (provider === "minimax") {
+  //     if (model && this.isMinimaxModel(model)) return model;
+  //     return "minimax-m3";
+  //   }
+  //   if (provider === "mistral") {
+  //     if (model && this.isMistralModel(model)) return model;
+  //     return "mistral-medium-3.5";
+  //   }
+  //   if (provider === "moonshotai") {
+  //     if (model && this.isKimiModel(model)) return model;
+  //     return "kimi-k2.6";
+  //   }
+  //   if (provider === "openai") {
+  //     if (model && this.isOpenAIModel(model)) return model;
+  //     return "gpt-5.5";
+  //   }
+  //   if (provider === "sakana") {
+  //     if (model && this.isSakanaModel(model)) return model;
+  //     return "fugu";
+  //   }
+  //   if (provider === "vercel") {
+  //     if (model && this.isV0Model(model)) return model;
+  //     return "v0-1.5-md";
+  //   }
+  //   if (provider === "zai") {
+  //     if (model && this.isZaiModel(model)) return model;
+  //     return "glm-5.2";
+  //   } else
+  //     throw new Error(
+  //       `incorrect provider (${provider}) model (${model}) combo`
+  //     );
+  // }
 
   public getModel = <
     const V extends Provider,
@@ -199,7 +500,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "grok-4.3" as const as NonNullable<K>;
+        } else return "grok-4.5" as const as NonNullable<K>;
       }
       case "anthropic": {
         if (
@@ -287,7 +588,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "qwen3.7-max" as const as NonNullable<K>;
+        } else return "qwen3.7-plus" as const as NonNullable<K>;
       }
       case "minimax": {
         if (
@@ -318,7 +619,7 @@ export class ModelService extends ProviderValidation {
           )
         ) {
           return model;
-        } else return "gpt-5.5" as const as NonNullable<K>;
+        } else return "gpt-5.6-sol" as const as NonNullable<K>;
       }
     }
   };
@@ -487,6 +788,20 @@ export class ModelService extends ProviderValidation {
         return "Vercel";
       case "mistral":
         return "Mistral";
+      case "alibaba":
+        return "Alibaba";
+      case "cohere":
+        return "Cohere";
+      case "deepseek":
+        return "DeepSeek";
+      case "minimax":
+        return "MiniMax";
+      case "moonshotai":
+        return "Moonshotai";
+      case "sakana":
+        return "Sakana";
+      case "zai":
+        return "Zai";
       case "openai":
       default:
         return "OpenAI";
@@ -515,616 +830,7 @@ export class ModelService extends ProviderValidation {
     return [lat, lng] as const;
   }
 
-  public isImgGenModel<
-    const K extends Provider = Provider,
-    const V extends GetModelUtilRT<K> = GetModelUtilRT<K>
-  >(target: K, model: V) {
-    switch (target) {
-      case "gemini":
-        return imageModelSets.gemini.has(model as GeminiImgGenModels);
-      case "grok":
-        return imageModelSets.grok.has(model as GrokImgGenModels);
-      case "openai":
-        return imageModelSets.openai.has(model as OpenAIImgGenModels);
-      case "anthropic":
-      case "meta":
-      case "vercel":
-      default:
-        return false;
-    }
-  }
-
   public providerToPrismaFormat<const T extends Provider>(provider: T) {
     return provider.toUpperCase() as Uppercase<T>;
-  }
-  /**
-   *
-   * @param target path to the file or directory to check for existence
-   * @returns true if the file or directory exists, false otherwise
-   * @example
-   * ```ts
-   * const fs = new Fs(process.cwd());
-   * const exists = fs.exists("my-file.txt");
-   * console.log(exists); // true if the file exists, false otherwise
-   * ```
-   * @description
-   * This method checks if a file or directory exists at the specified path input
-   *
-   * Additional Note:
-   *
-   * say you have a directory that begins with a dot, such as `.turbo`;
-   *
-   * in this scenario, both `./.turbo` and `.turbo` will return true if the directory exists
-   *
-   */
-  public exists<const T extends string>(target: T) {
-    if (!/\//gm.test(target)) {
-      if (/\./g.test(target)) {
-        return fsSync.existsSync(resolve(join(process.cwd(), target)));
-      } else {
-        const statsSync = fsSync.statSync(
-          resolve(join(process.cwd(), target)),
-          {
-            throwIfNoEntry: false
-          }
-        );
-        const isDir = statsSync?.isDirectory();
-        if (isDir) {
-          return isDir;
-        } else return false;
-      }
-    } else {
-      if (/\./g.test(target)) {
-        return fsSync.existsSync(relative(process.cwd(), target));
-      } else {
-        const statsSync = fsSync.statSync(relative(process.cwd(), target), {
-          throwIfNoEntry: false
-        });
-        const isDir = statsSync?.isDirectory();
-        if (isDir) {
-          return isDir;
-        } else return false;
-      }
-    }
-  }
-
-  public arrToArrOfArrs = <const T = unknown>(
-    arr: readonly T[],
-    int = 10,
-    agg = Array.of<T[]>()
-  ) => {
-    for (let i = 0; i < arr.length; i += int) {
-      agg.push(arr.slice(i, i + int));
-    }
-    return agg;
-  };
-
-  public extToContentType(metadata?: ExpandedImgSpecs | ExpandedDocSpecs) {
-    return metadata?.format && metadata.format !== "unknown"
-      ? metadata.type === "IMAGE"
-        ? this.extToMime[metadata.format][0]
-        : metadata.type === "DOCUMENT"
-          ? (metadata.mimeType ?? "application/octet-stream")
-          : "application/octet-stream"
-      : "application/octet-stream";
-  }
-
-  public mimeToExt = {
-    "application/dash+xml": ["mpd"],
-    "application/epub+zip": ["epub"],
-    "application/font-sfnt": ["ttf"],
-    "application/gzip": ["gz"],
-    "application/java-archive": ["jar"],
-    "application/json": ["json", "jsonc"],
-    "application/jsonc": ["jsonc"],
-    "application/json5": ["json5"],
-    "application/ld+json": ["jsonld"],
-    "application/manifest+json": ["webmanifest"],
-    "application/msword": ["doc"],
-    "application/node": ["node", "js"],
-    "application/octet-stream": ["bin", "obj"],
-    "application/ogg": ["ogx"],
-    "application/pdf": ["pdf"],
-    "application/rtf": ["rtf"],
-    "application/sql": ["sql"],
-    "application/text": ["md"],
-    "application/toml": ["toml"],
-    "application/vnd.amazon.ebook": ["azw"],
-    "application/vnd.apple.installer+xml": ["mpkg"],
-    "application/vnd.apple.mpegurl": ["m3u8"],
-    "application/vnd.apple.pkpass": ["pkpass"],
-    "application/vnd.json5": ["json5"],
-    "application/vnd.mozilla.xul+xml": ["xul"],
-    "application/vnd.ms-excel": ["xls"],
-    "application/vnd.ms-fontobject": ["eot"],
-    "application/vnd.ms-powerpoint": ["ppt"],
-    "application/vnd.oasis.opendocument.presentation": ["odp"],
-    "application/vnd.oasis.opendocument.spreadsheet": ["ods"],
-    "application/vnd.oasis.opendocument.text": ["odt"],
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-      ["pptx"],
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
-      "xlsx"
-    ],
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
-      "docx"
-    ],
-    "application/vnd.rar": ["rar"],
-    "application/vnd.visio": ["vsd"],
-    "application/wasm": ["wasm"],
-    "application/x-7z-compressed": ["7z"],
-    "application/x-abiword": ["abw"],
-    "application/x-bzip": ["bz"],
-    "application/x-bzip2": ["bz2"],
-    "application/x-cdf": ["cda"],
-    "application/x-csh": ["csh"],
-    "application/x-freearc": ["arc"],
-    "application/x-gzip": ["gz"],
-    "application/x-httpd-php": ["php"],
-    "application/x-mdx": ["mdx"],
-    "application/x-ndjson": ["ndjson"],
-    "application/x-python-code": ["pyc"],
-    "application/x-sh": ["sh"],
-    "application/x-tar": ["tar"],
-    "application/x-zip-compressed": ["zip"],
-    "application/xhtml+xml": ["xhtml"],
-    "application/xml": ["xml"],
-    "application/yaml": ["yml", "yaml"],
-    "application/zip": ["zip"],
-    "audio/aac": ["aac"],
-    "audio/midi": ["mid"],
-    "audio/mp4": ["m4a"],
-    "audio/mpeg": ["mp3"],
-    "audio/ogg": ["opus", "ogg", "oga"],
-    "audio/wav": ["wav"],
-    "audio/webm": ["weba"],
-    "audio/x-midi": ["midi"],
-    "font/otf": ["otf"],
-    "font/ttf": ["ttf"],
-    "font/woff": ["woff"],
-    "font/woff2": ["woff2"],
-    "haptics/hjif": ["hjif"],
-    "haptics/hmpg": ["hmpg"],
-    "haptics/ivs": ["ivs", "ivt"],
-    "image/aces": ["aces"],
-    "image/apng": ["apng"],
-    "image/avci": ["avci"],
-    "image/avif": ["avif"],
-    "image/bmp": ["bmp"],
-    "image/dpx": ["dpx"],
-    "image/emf": ["emf"],
-    "image/gif": ["gif"],
-    "image/heic": ["heic"],
-    "image/jpeg": ["jpg", "jpeg"],
-    "image/ktx": ["ktx"],
-    "image/ktx2": ["ktx2"],
-    "image/png": ["png"],
-    "image/svg+xml": ["svg"],
-    "image/tiff": ["tiff"],
-    "image/vnd.microsoft.icon": ["ico"],
-    "image/webp": ["webp"],
-    "image/x-icon": ["ico", "cur"],
-    "model/gltf-binary": ["glb"],
-    "model/gltf+json": ["gltf"],
-    "model/obj": ["obj"],
-    "model/vnd.usdz+zip": ["usdz"],
-    "multipart/voice-message": ["bin"],
-    "text/calendar": ["ics"],
-    "text/css": ["css"],
-    "text/csv": ["csv"],
-    "text/event-stream": ["sse", "ts", "rs", "py", "txt"],
-    "text/html": ["html", "htm"],
-    "text/javascript": ["cjs", "js", "mjs"],
-    "text/markdown": ["md"],
-    "text/plain": ["txt"],
-    "text/rust": ["rs"],
-    "text/typescript": ["ts"],
-    "text/vtt": ["vtt"],
-    "text/x-c": ["c"],
-    "text/x-c++": ["cpp"],
-    "text/x-csharp": ["cs"],
-    "text/x-java": ["java"],
-    "text/x-php": ["php"],
-    "text/x-python": ["py"],
-    "text/x-ruby": ["rb"],
-    "text/x-script.python": ["py"],
-    "text/x-tex": ["tex"],
-    "text/xml": ["xml"],
-    "video/3gpp": ["3gp"],
-    "video/3gpp2": ["3g2"],
-    "video/mp2t": ["ts"],
-    "video/mp4": ["mp4"],
-    "video/mpeg": ["mpeg"],
-    "video/ogg": ["ogv"],
-    "video/vnd.dlna.mpeg-tts": ["ts"],
-    "video/webm": ["weba"],
-    "video/x-msvideo": ["avi"]
-  } as const;
-
-  public extToMime = {
-    aac: ["audio/aac"],
-    abw: ["application/x-abiword"],
-    aces: ["image/aces"],
-    apng: ["image/apng"],
-    arc: ["application/x-freearc"],
-    avci: ["image/avci"],
-    avif: ["image/avif"],
-    avi: ["video/x-msvideo"],
-    azw: ["application/vnd.amazon.ebook"],
-    bin: ["application/octet-stream", "multipart/voice-message"],
-    bmp: ["image/bmp"],
-    bz: ["application/x-bzip"],
-    bz2: ["application/x-bzip2"],
-    c: ["text/x-c"],
-    cda: ["application/x-cdf"],
-    cjs: ["text/javascript", "application/node"],
-    cpp: ["text/x-c++"],
-    cs: ["text/x-csharp"],
-    csh: ["application/x-csh"],
-    css: ["text/css"],
-    csv: ["text/csv"],
-    cur: ["image/x-icon"],
-    doc: ["application/msword"],
-    docx: [
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ],
-    dpx: ["image/dpx"],
-    emf: ["image/emf"],
-    eot: ["application/vnd.ms-fontobject"],
-    epub: ["application/epub+zip"],
-    gif: ["image/gif"],
-    glb: ["model/gltf-binary"],
-    gltf: ["model/gltf+json"],
-    gz: ["application/gzip", "application/x-gzip"],
-    heic: ["image/heic"],
-    hjif: ["haptics/hjif"],
-    hmpg: ["haptics/hmpg"],
-    htm: ["text/html"],
-    html: ["text/html"],
-    ico: ["image/vnd.microsoft.icon", "image/x-icon"],
-    ics: ["text/calendar"],
-    ivs: ["haptics/ivs"],
-    ivt: ["haptics/ivs"],
-    jar: ["application/java-archive"],
-    java: ["text/x-java"],
-    jfif: ["image/jpeg"],
-    jif: ["image/jpeg"],
-    jpe: ["image/jpeg"],
-    jpeg: ["image/jpeg"],
-    jpg: ["image/jpeg"],
-    js: ["text/javascript", "application/node"],
-    json: ["application/json"],
-    jsonc: ["application/json", "application/jsonc"],
-    json5: ["application/json", "application/json5"],
-    jsonld: ["application/ld+json"],
-    ktx: ["image/ktx"],
-    ktx2: ["image/ktx2"],
-    m3u8: ["application/vnd.apple.mpegurl"],
-    m4a: ["audio/mp4"],
-    m4v: ["video/mp4"],
-    md: ["text/markdown"],
-    mdx: ["application/x-mdx"],
-    mid: ["audio/midi"],
-    midi: ["audio/x-midi"],
-    mjs: ["text/javascript"],
-    mp3: ["audio/mpeg"],
-    mp4: ["video/mp4"],
-    mpd: ["application/dash+xml"],
-    mpeg: ["video/mpeg"],
-    mpkg: ["application/vnd.apple.installer+xml"],
-    mtlx: ["application/xml"],
-    ndjson: ["application/x-ndjson"],
-    node: ["application/node", "text/javascript"],
-    obj: ["model/obj", "application/octet-stream", "text/plain"],
-    odp: ["application/vnd.oasis.opendocument.presentation"],
-    ods: ["application/vnd.oasis.opendocument.spreadsheet"],
-    odt: ["application/vnd.oasis.opendocument.text"],
-    oga: ["audio/ogg"],
-    ogg: ["audio/ogg"],
-    ogv: ["video/ogg"],
-    ogx: ["application/ogg"],
-    opus: ["audio/ogg"],
-    otf: ["font/otf"],
-    pk1: ["application/octet-stream"],
-    png: ["image/png"],
-    pdf: ["application/pdf"],
-    php: ["text/x-php", "application/x-httpd-php"],
-    pjp: ["image/jpeg"],
-    pjpeg: ["image/jpeg"],
-    pkpass: ["application/vnd.apple.pkpass"],
-    ppt: ["application/vnd.ms-powerpoint"],
-    pptx: [
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-    ],
-    py: ["text/x-python", "text/x-script.python"],
-    pyc: ["application/x-python-code"],
-    rar: ["application/vnd.rar"],
-    rb: ["text/x-ruby"],
-    rs: ["text/rust"],
-    rtf: ["application/rtf"],
-    sh: ["application/x-sh"],
-    sql: ["application/sql"],
-    sse: ["text/event-stream"],
-    svg: ["image/svg+xml"],
-    tar: ["application/x-tar"],
-    tex: ["text/x-tex"],
-    tif: ["image/tiff"],
-    tiff: ["image/tiff"],
-    toml: ["application/toml"],
-    ts: [
-      "text/typescript",
-      "application/typescript",
-      "video/mp2t",
-      "video/vnd.dlna.mpeg-tts"
-    ],
-    ttf: ["application/font-sfnt", "font/ttf"],
-    txt: ["text/plain"],
-    usdz: ["model/vnd.usdz+zip"],
-    vsd: ["application/vnd.visio"],
-    vtt: ["text/vtt"],
-    wasm: ["application/wasm"],
-    wav: ["audio/wav"],
-    weba: ["audio/webm"],
-    webm: ["video/webm"],
-    webmanifest: ["application/manifest+json"],
-    webp: ["image/webp"],
-    woff: ["font/woff"],
-    woff2: ["font/woff2"],
-    xhtml: ["application/xhtml+xml"],
-    xls: ["application/vnd.ms-excel"],
-    xlsx: ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
-    xml: ["application/xml", "text/xml"],
-    xul: ["application/vnd.mozilla.xul+xml"],
-    yaml: ["application/yaml"],
-    yml: ["application/yaml"],
-    zip: ["application/zip", "application/x-zip-compressed"],
-    "3gp": ["video/3gpp"],
-    "3g2": ["video/3gpp2"],
-    "7z": ["application/x-7z-compressed"]
-  } as const;
-
-  public isSupportedType(
-    type: "IMAGE" | "DOCUMENT" | "VIDEO" | "AUDIO" | "UNKNOWN",
-    ext: string
-  ) {
-    switch (type) {
-      case "IMAGE": {
-        if (
-          [
-            "apng",
-            "png",
-            "jpeg",
-            "jpg",
-            "heic",
-            "heif",
-            "svg",
-            "ico",
-            "gif",
-            "bmp",
-            "webp",
-            "avif",
-            "tiff",
-            "tif"
-          ].includes(ext)
-        ) {
-          return true;
-        } else return false;
-      }
-      case "DOCUMENT": {
-        if (
-          [
-            "pdf",
-            "docx",
-            "doc",
-            "md",
-            "txt",
-            "csv",
-            "tsv",
-            "json",
-            "ndjson",
-            "jsonl",
-            "yaml",
-            "htm",
-            "html",
-            "mhtml",
-            "pages",
-            "numbers",
-            "keynote",
-            "xps",
-            "yml",
-            "xml",
-            "tex",
-            "rtf",
-            "odt",
-            "pptx",
-            "ppt",
-            "xlsx",
-            "xls",
-            "ods",
-            "odp",
-            "epub",
-            "mobi",
-            "azw",
-            "fb2",
-            "js",
-            "jsx",
-            "mjs",
-            "cjs",
-            "ts",
-            "tsx",
-            "mts",
-            "cts",
-            "py",
-            "java",
-            "cpp",
-            "c",
-            "cs",
-            "go",
-            "rs",
-            "rb",
-            "swift",
-            "sql",
-            "php",
-            "sh",
-            "toml"
-          ].includes(ext)
-        ) {
-          return true;
-        } else return false;
-      }
-      case "AUDIO": {
-        if (
-          [
-            "mp3",
-            "aac",
-            "ogg",
-            "opus",
-            "wma",
-            "m4a", // music/general audio
-            "m4b", // audiobooks
-            "m4p", // protected/DRM audio (iTunes Store)
-            "m4r", // iPhone ringtones
-            "amr",
-            "flac",
-            "alac",
-            "ape",
-            "wv",
-            "tta",
-            "wav",
-            "aiff",
-            "pcm",
-            "dsd",
-            "mka",
-            "ac3",
-            "dts",
-            "webm",
-            "m3u8",
-            "weba",
-            "oga"
-          ].includes(ext)
-        ) {
-          return true;
-        } else return false;
-      }
-      case "VIDEO": {
-        if (["mp4", "mkv", "webm", "mov", "ogv", "avi"].includes(ext)) {
-          return true;
-        } else return false;
-      }
-      case "UNKNOWN":
-      default: {
-        return false;
-      }
-    }
-  }
-
-  private units = {
-    PB: 5,
-    TB: 4,
-    GB: 3,
-    MB: 2,
-    KB: 1,
-    B: 0
-  } as const;
-  private u = ["B", "KB", "MB", "GB", "TB", "PB"] as const;
-
-  public autoFileSizeRaw(size: number | bigint) {
-    let s = typeof size === "bigint" ? Number(size) : size;
-    let i = 0;
-    while (s >= 1024 && i < this.u.length - 1) {
-      s /= 1024;
-      i++;
-    }
-    return { value: s, unit: this.u[i] };
-  }
-
-  public getSize<
-    const S extends
-      | keyof typeof this.units
-      | Lowercase<keyof typeof this.units>
-      | "auto"
-  >(
-    size: number | bigint,
-    target: S,
-    opts: { decimals?: number; includeUnits?: boolean } = {
-      decimals: 4,
-      includeUnits: true
-    }
-  ) {
-    const { decimals, includeUnits } = opts;
-
-    if (target === "auto") {
-      const { value, unit } = this.autoFileSizeRaw(size);
-      const rounded = value.toFixed(decimals);
-      return includeUnits ? `${rounded} ${unit}` : Number.parseFloat(rounded);
-    }
-
-    const key = (
-      target as Exclude<S, "auto">
-    ).toUpperCase() as keyof typeof this.units;
-    const exp = this.units[key];
-    const divisor =
-      typeof size === "bigint" ? 1024n ** BigInt(exp) : 1024 ** exp;
-    let v = 0;
-    if (typeof size === "bigint" || typeof divisor === "bigint") {
-      if (typeof size === "bigint" && typeof divisor === "bigint")
-        v = Number(size / divisor);
-      else if (typeof size !== "bigint" && typeof divisor === "bigint")
-        v = size / Number(divisor);
-      else if (typeof size === "bigint" && typeof divisor !== "bigint")
-        v = Number(size) / divisor;
-    } else if (typeof size === "number" && typeof divisor === "number") {
-      v = size / divisor;
-    }
-    const rounded = v.toFixed(decimals);
-
-    return includeUnits
-      ? (`${rounded} ${key}` as const)
-      : Number.parseFloat(rounded);
-  }
-
-  public fileSizeMb<const T extends string>(path: T) {
-    return fsSync.statSync(relative(process.cwd(), path)).size / (1024 * 1024);
-  }
-
-  public fileSize<
-    const T extends string,
-    const S extends
-      | keyof typeof this.units
-      | Lowercase<keyof typeof this.units>
-      | "auto"
-  >(path: T, target: S, opts?: { decimals?: number; includeUnits?: boolean }) {
-    if (!this.exists(path)) throw new Error(`path ${path} does not exist`);
-    else {
-      return this.getSize(
-        fsSync.statSync(relative(process.cwd(), path)).size,
-        target,
-        opts
-      );
-    }
-  }
-
-  public chunkArray<T extends number>(arr: string[], maxChunkLength: T) {
-    const chunks = Array.of<string[]>();
-    let currentChunkLength = 0;
-    let currentChunk = Array.of<string>();
-
-    for (const [index, val] of arr.entries()) {
-      if (val.length + currentChunkLength >= maxChunkLength) {
-        if (currentChunk.length) {
-          chunks.push(currentChunk);
-        }
-        currentChunkLength = val.length;
-        currentChunk = [val];
-      } else {
-        currentChunk.push(val);
-        currentChunkLength += val.length + 1; // for comma
-      }
-
-      if (arr.length === index + 1) {
-        chunks.push(currentChunk);
-      }
-    }
-    return chunks.length ? chunks : [arr];
   }
 }

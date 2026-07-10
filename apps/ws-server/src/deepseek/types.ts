@@ -10,8 +10,9 @@ interface DeepSeekFunctionTool {
       properties: Record<
         string,
         {
-          type: "string" | "number" | "array";
+          type: "string" | "number" | "array" | "boolean";
           description: string;
+          enum?: readonly string[];
           items?: { type: "string" };
           minItems?: number;
           maxItems?: number;
@@ -46,8 +47,7 @@ type DeepSeekImageContentPart = {
 };
 
 type DeepSeekUserContentPart =
-  | DeepSeekTextContentPart
-  | DeepSeekImageContentPart;
+  DeepSeekTextContentPart | DeepSeekImageContentPart;
 
 type DeepSeekSystemMessage = {
   role: "system";
@@ -65,9 +65,7 @@ type DeepSeekAssistantMessage = {
 };
 
 type DeepSeekBaseMessage =
-  | DeepSeekSystemMessage
-  | DeepSeekUserMessage
-  | DeepSeekAssistantMessage;
+  DeepSeekSystemMessage | DeepSeekUserMessage | DeepSeekAssistantMessage;
 
 type DeepSeekAssistantToolCallMessage = {
   role: "assistant";
@@ -82,9 +80,7 @@ type DeepSeekToolMessage = {
 };
 
 type DeepSeekRequestMessage =
-  | DeepSeekBaseMessage
-  | DeepSeekAssistantToolCallMessage
-  | DeepSeekToolMessage;
+  DeepSeekBaseMessage | DeepSeekAssistantToolCallMessage | DeepSeekToolMessage;
 
 type DeepSeekReasoningDetail = {
   type: "reasoning.text";

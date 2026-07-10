@@ -49,7 +49,7 @@ const data = async (provider: $Enums.Provider, userId: string) => {
 (async () => {
   return await data("GROK", "nrr6h4r4480f6kviycyo1zhf");
 })().then(d => {
-    fs.withWs(
+  fs.withWs(
     "src/test/__out__/xai/provider-store-with-docs/inspect.json",
     JSON.stringify(d, null, 2)
   );

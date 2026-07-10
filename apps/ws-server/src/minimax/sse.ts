@@ -24,11 +24,7 @@ export type MiniMaxDelta = Partial<{
   MiniMaxReasoningDelta;
 
 export type MiniMaxFinishReason =
-  | "stop"
-  | "length"
-  | "tool_calls"
-  | "content_filter"
-  | null;
+  "stop" | "length" | "tool_calls" | "content_filter" | null;
 
 export type MiniMaxChoice = {
   index: number;

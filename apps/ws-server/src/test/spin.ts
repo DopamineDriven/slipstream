@@ -8,10 +8,10 @@ class ScriptTest extends Fs {
   }
 
   private data = async (env: string) => {
-    const { PrismaDbService } = await import(
-      "@slipstream/db/factory"
+    const { PrismaDbService } = await import("@slipstream/db/factory");
+    const prismaClient = new PrismaDbService({ connectionString: env }).p(
+      false
     );
-    const prismaClient = new PrismaDbService({connectionString: env }).p(false);
     try {
       prismaClient.$connect();
       return await prismaClient.conversation.findMany({

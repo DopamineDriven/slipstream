@@ -44,6 +44,9 @@ export const allImgSupportingProviderModels = {
 
 export const providerModelImageGenFacilitatingApi = {
   openai: [
+    "gpt-5.6-sol",
+    "gpt-5.6-terra",
+    "gpt-5.6-luna",
     "gpt-5.5",
     "gpt-5.4",
     "gpt-5.4-mini",
@@ -115,9 +118,9 @@ export type ImgGenModelMap = {
 };
 
 export type ImgGenFacilitatingModelMap = {
-  readonly [P in keyof typeof providerModelImageGenFacilitatingApi]: Unenumerate<
-    (typeof providerModelImageGenFacilitatingApi)[P]
-  >;
+  readonly [
+    P in keyof typeof providerModelImageGenFacilitatingApi
+  ]: Unenumerate<(typeof providerModelImageGenFacilitatingApi)[P]>;
 };
 
 export type OpenAIImgGenModels = ImgGenModelMap["openai"];
@@ -240,6 +243,31 @@ export type MiniMaxChatModels = ModelMap["minimax"];
 export type AllModelsUnion = ModelMap[Provider];
 
 export type AllDisplayNamesUnion = DisplayNameModelMap[Provider];
+
+// export type DiscriminatedUnionProviderModels = {
+//   type: "deepseek", model: DeepSeekChatModels
+// } |{
+//   type: "grok", model: GrokChatModels
+// } | {
+// type: "gemini", model: GeminiChatModels
+// } | {type: "mistral"; model: MistralChatModels};
+
+export type ProviderModelRecord = {
+  alibaba: AlibabaChatModels;
+  anthropic: AnthropicChatModels;
+  cohere: CohereChatModels;
+  deepseek: DeepSeekChatModels;
+  gemini: GeminiChatModels;
+  grok: GrokChatModels;
+  meta: MetaChatModels;
+  minimax: MiniMaxChatModels;
+  mistral: MistralChatModels;
+  moonshotai: KimiChatModels;
+  openai: OpenAIChatModels;
+  sakana: SakanaChatModels;
+  vercel: VercelChatModels;
+  zai: ZaiChatModels;
+};
 
 export type GetModelUtilRT<T = Provider> = T extends "openai"
   ? OpenAIChatModels
@@ -531,9 +559,9 @@ export const getDisplayNameByModelId = <
 };
 
 export const defaultModelDisplayNameByProvider = {
-  openai: "GPT-5.5" satisfies OpenAiDisplayNameUnion,
+  openai: "GPT-5.6 Sol" satisfies OpenAiDisplayNameUnion,
   gemini: "Gemini 3.1 Pro Preview" satisfies GeminiDisplayNameUnion,
-  grok: "Grok 4.3" satisfies GrokDisplayNameUnion,
+  grok: "Grok 4.5" satisfies GrokDisplayNameUnion,
   anthropic: "Claude Sonnet 5" satisfies AnthropicDisplayNameUnion,
   meta: "Llama 3.3 (70B, Instruct)" satisfies MetaDisplayNameUnion,
   vercel: "v0 medium" satisfies VercelDisplayNameUnion,
@@ -548,9 +576,9 @@ export const defaultModelDisplayNameByProvider = {
 } as const;
 
 export const defaultModelIdByProvider = {
-  openai: "gpt-5.5" satisfies OpenAiModelIdUnion,
+  openai: "gpt-5.6-sol" satisfies OpenAiModelIdUnion,
   gemini: "gemini-3.1-pro-preview" satisfies GeminiModelIdUnion,
-  grok: "grok-4.3" satisfies GrokModelIdUnion,
+  grok: "grok-4.5" satisfies GrokModelIdUnion,
   anthropic: "claude-sonnet-5" satisfies AnthropicModelIdUnion,
   meta: "Llama-3.3-70B-Instruct" satisfies MetaModelIdUnion,
   vercel: "v0-1.5-md" satisfies VercelModelIdUnion,

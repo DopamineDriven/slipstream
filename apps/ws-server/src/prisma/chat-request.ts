@@ -225,7 +225,8 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       include: {
         conversationSettings: true,
         messages: {
-          orderBy: { createdAt: "asc" },
+          // ordinal is the authoritative dense sequence — createdAt can tie
+          orderBy: { ordinal: "asc" },
           include: {
             imageGenJob: true,
             messageBlocks: true,
@@ -313,7 +314,8 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       include: {
         conversationSettings: true,
         messages: {
-          orderBy: { createdAt: "asc" },
+          // ordinal is the authoritative dense sequence — createdAt can tie
+          orderBy: { ordinal: "asc" },
           include: {
             imageGenJob: true,
             messageBlocks: true,
@@ -403,7 +405,8 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       include: {
         conversationSettings: true,
         messages: {
-          orderBy: { createdAt: "asc" },
+          // ordinal is the authoritative dense sequence — createdAt can tie
+          orderBy: { ordinal: "asc" },
           include: {
             imageGenJob: true,
             messageBlocks: true,
@@ -603,7 +606,8 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       include: {
         conversationSettings: true,
         messages: {
-          orderBy: { createdAt: "asc" },
+          // ordinal is the authoritative dense sequence — createdAt can tie
+          orderBy: { ordinal: "asc" },
           include: {
             messageBlocks: true,
             imageGenJob: true,

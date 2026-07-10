@@ -6,7 +6,7 @@ import type { TTSService } from "@/tts/index.ts";
 import type { BufferLike, UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
-import { ResolverHydrateConvoService } from "@/resolver/convo-hydration.ts";
+import { ResolverConnectionService } from "@/resolver/connection.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AnyEvent,
@@ -14,7 +14,7 @@ import type {
   EventTypeMap
 } from "@slipstream/types";
 
-export class ResolverDispatchService extends ResolverHydrateConvoService {
+export class ResolverDispatchService extends ResolverConnectionService {
   constructor(
     wsServer: WSServer,
     providers: ProviderService,
@@ -50,6 +50,24 @@ export class ResolverDispatchService extends ResolverHydrateConvoService {
       ws.send(JSON.stringify({ error: "Invalid message" }));
       return;
     }
+    try {
+      await this.routeEvent(event, ws, userId, userData);
+    } catch (err) {
+      // a throw from ANY handler must never kill the process (P2025 via a
+      // malformed conversationId has done so twice — chat persist, hydration)
+      console.error(
+        `handler error for ${event.type}:`,
+        this.wsServer.prisma.safeErrMsg(err)
+      );
+    }
+  }
+
+  private async routeEvent(
+    event: NonNullable<ReturnType<typeof this.parseEvent>>,
+    ws: WebSocket,
+    userId: string,
+    userData?: UserData
+  ) {
     switch (event.type) {
       case "typing":
         await this.handleTyping(event, ws, userId);
@@ -87,6 +105,9 @@ export class ResolverDispatchService extends ResolverHydrateConvoService {
       case "hydrate_conversation":
         await this.hydrateConversationAck(event, ws, userId, userData);
         break;
+      case "conversation_list":
+        await this.conversationList(event, ws, userId, userData);
+        break;
       default:
         await this.wsServer.redis.publish(
           this.wsServer.channel,
@@ -121,6 +142,8 @@ export class ResolverDispatchService extends ResolverHydrateConvoService {
     "asset_upload_response",
     "asset_uploaded",
     "connection_established",
+    "conversation_list",
+    "conversation_list_ack",
     "hydrate_conversation",
     "hydrate_conversation_ack",
     "image_gen_error",
@@ -263,5 +286,6 @@ export class ResolverDispatchService extends ResolverHydrateConvoService {
       "hydrate_conversation",
       this.hydrateConversationAck.bind(this)
     );
+    this.wsServer.on("conversation_list", this.conversationList.bind(this));
   }
 }

@@ -1308,7 +1308,7 @@ export type $UserStoreDocChunkPayload<ExtArgs extends runtime.Types.Extensions.I
      */
     pageEndOffset: number | null
     /**
-     * `voyage-context-3` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
+     * `voyage-context-4` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
      */
     embeddingModel: string
     hasImages: boolean

@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { SakanaUserLocation } from "@/sakana/workup.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -34,15 +35,15 @@ export class SakanaChatService extends SakanaWorkupService {
     prisma: PrismaService,
     userStoreVector: UserStoreVectorService,
     s3: S3Storage,
+    memoryService: ConversationMemoryVectorService,
     protected redis: EnhancedRedisPubSub,
     apiKey: string
   ) {
-    super(logger, prisma, userStoreVector, apiKey, s3);
+    super(logger, prisma, userStoreVector, apiKey, s3, memoryService);
   }
   protected async handleSakanaAiChatRequest({
     chunks,
     conversationId,
-    isNewChat,
     msgs,
     streamChannel,
     thinkingChunks,
@@ -152,8 +153,8 @@ export class SakanaChatService extends SakanaWorkupService {
     };
 
     const client = this.getClient(apiKey ?? undefined);
-    const formatted = this.formatSakanaInput(msgs);
-    const instructions = this.formatSystemInstruction(isNewChat, systemPrompt);
+    const formatted = await this.formatSakanaInput(msgs);
+    const instructions = this.prisma.formatSysNote(systemPrompt);
     const loc = this.normalizeLocation(user_location);
     const tools = this.sakanaTools(hasUserStoreDocs, loc);
     const MAX_TOOL_ROUNDS = 10;
@@ -167,11 +168,12 @@ export class SakanaChatService extends SakanaWorkupService {
           {
             stream: true,
             input: roundInput,
+            store: false,
             instructions,
             model,
             max_output_tokens: max_tokens,
             reasoning: this.handleReasoning(model),
-            parallel_tool_calls: false,
+            parallel_tool_calls: true,
             tools
           },
           { stream: true }
@@ -380,7 +382,11 @@ export class SakanaChatService extends SakanaWorkupService {
       const toolOutputs =
         Array.of<OpenAI.Responses.ResponseInputItem.FunctionCallOutput>();
       for (const call of functionCalls) {
-        const output = await this.executeFunctionToolCall(userId, call);
+        const output = await this.executeFunctionToolCall(
+          userId,
+          conversationId,
+          call
+        );
         toolOutputs.push(output);
       }
 

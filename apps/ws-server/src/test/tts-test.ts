@@ -4,12 +4,11 @@ import { Client } from "pg";
 dotenv.config({ quiet: true });
 
 async function main() {
-
-  const {Credentials} = await import("@slipstream/credentials");
+  const { Credentials } = await import("@slipstream/credentials");
   const creds = new Credentials();
   const connectionString = await creds.get("DATABASE_URL");
   const client = new Client({
-    connectionString: process.env.DATABASE_URL ??connectionString,
+    connectionString: process.env.DATABASE_URL ?? connectionString,
     connectionTimeoutMillis: 30000
   });
 
@@ -81,7 +80,9 @@ async function main() {
 
     const missing = {
       noAttachment: rows.filter(r => !r.attachmentId),
-      noAttCdn: rows.filter(r => r.attachmentId && !r.attCdnUrl && !r.attCompatCdnUrl),
+      noAttCdn: rows.filter(
+        r => r.attachmentId && !r.attCdnUrl && !r.attCompatCdnUrl
+      ),
       noAudioMeta: rows.filter(r => r.attachmentId && !r.audioMetaId),
       mismatchedCdn: rows.filter(r => {
         const attUrl = r.attCdnUrl ?? r.attCompatCdnUrl;
@@ -93,13 +94,13 @@ async function main() {
       const attUrl = row.attCdnUrl ?? row.attCompatCdnUrl ?? "NONE";
       console.log(
         `[${row.status}] ${row.ttsJobId}\n` +
-        `  msg:        ${row.sourceMessageId} (${row.msgProvider}/${row.msgModel}) [${row.msgType}]\n` +
-        `  content:    "${row.msgContent}..."\n` +
-        `  tts cdn:    ${row.ttsCdnUrl ?? "NULL"}\n` +
-        `  att id:     ${row.attachmentId ?? "NULL"}\n` +
-        `  att cdn:    ${attUrl}\n` +
-        `  att asset:  ${row.attAssetType ?? "N/A"} | origin: ${row.attOrigin ?? "N/A"}\n` +
-        `  audioMeta:  ${row.audioMetaId ? `${row.audioDuration}ms / ${row.audioSampleRate}Hz / ${row.audioChannels}ch` : "MISSING"}\n`
+          `  msg:        ${row.sourceMessageId} (${row.msgProvider}/${row.msgModel}) [${row.msgType}]\n` +
+          `  content:    "${row.msgContent}..."\n` +
+          `  tts cdn:    ${row.ttsCdnUrl ?? "NULL"}\n` +
+          `  att id:     ${row.attachmentId ?? "NULL"}\n` +
+          `  att cdn:    ${attUrl}\n` +
+          `  att asset:  ${row.attAssetType ?? "N/A"} | origin: ${row.attOrigin ?? "N/A"}\n` +
+          `  audioMeta:  ${row.audioMetaId ? `${row.audioDuration}ms / ${row.audioSampleRate}Hz / ${row.audioChannels}ch` : "MISSING"}\n`
       );
     }
 
@@ -107,13 +108,19 @@ async function main() {
     console.log(`  Total TTSJobs:              ${rows.length}`);
     console.log(`  Missing attachmentId:       ${missing.noAttachment.length}`);
     console.log(`  Has attachment, no CDN:     ${missing.noAttCdn.length}`);
-    console.log(`  Has attachment, no AudioMeta: ${missing.noAudioMeta.length}`);
-    console.log(`  CDN mismatch (tts vs att):  ${missing.mismatchedCdn.length}`);
+    console.log(
+      `  Has attachment, no AudioMeta: ${missing.noAudioMeta.length}`
+    );
+    console.log(
+      `  CDN mismatch (tts vs att):  ${missing.mismatchedCdn.length}`
+    );
 
     if (missing.noAttachment.length > 0) {
       console.log(`\n  ⚠ TTSJobs with NULL attachmentId:`);
       for (const r of missing.noAttachment) {
-        console.log(`    ${r.ttsJobId} [${r.status}] → msg ${r.sourceMessageId}`);
+        console.log(
+          `    ${r.ttsJobId} [${r.status}] → msg ${r.sourceMessageId}`
+        );
       }
     }
   } catch (err) {

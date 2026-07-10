@@ -817,6 +817,20 @@ export type MessageUpdateOneRequiredWithoutImageGenJobNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutImageGenJobInput, Prisma.MessageUpdateWithoutImageGenJobInput>, Prisma.MessageUncheckedUpdateWithoutImageGenJobInput>
 }
 
+export type MessageCreateNestedManyWithoutConversationMemoryChunkInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationMemoryChunkInput, Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput> | Prisma.MessageCreateWithoutConversationMemoryChunkInput[] | Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput | Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput[]
+  createMany?: Prisma.MessageCreateManyConversationMemoryChunkInputEnvelope
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+}
+
+export type MessageUncheckedCreateNestedManyWithoutConversationMemoryChunkInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationMemoryChunkInput, Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput> | Prisma.MessageCreateWithoutConversationMemoryChunkInput[] | Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput | Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput[]
+  createMany?: Prisma.MessageCreateManyConversationMemoryChunkInputEnvelope
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+}
+
 export type MessageUpdateManyWithoutConversationMemoryChunkNestedInput = {
   create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationMemoryChunkInput, Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput> | Prisma.MessageCreateWithoutConversationMemoryChunkInput[] | Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput[]
   connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput | Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput[]
@@ -1324,15 +1338,15 @@ export type MessageCreateOrConnectWithoutConversationMemoryChunkInput = {
   create: Prisma.XOR<Prisma.MessageCreateWithoutConversationMemoryChunkInput, Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput>
 }
 
+export type MessageCreateManyConversationMemoryChunkInputEnvelope = {
+  data: Prisma.MessageCreateManyConversationMemoryChunkInput | Prisma.MessageCreateManyConversationMemoryChunkInput[]
+  skipDuplicates?: boolean
+}
+
 export type MessageUpsertWithWhereUniqueWithoutConversationMemoryChunkInput = {
   where: Prisma.MessageWhereUniqueInput
   update: Prisma.XOR<Prisma.MessageUpdateWithoutConversationMemoryChunkInput, Prisma.MessageUncheckedUpdateWithoutConversationMemoryChunkInput>
   create: Prisma.XOR<Prisma.MessageCreateWithoutConversationMemoryChunkInput, Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput>
-}
-
-export type MessageCreateManyConversationMemoryChunkInputEnvelope = {
-  data: Prisma.MessageCreateManyConversationMemoryChunkInput | Prisma.MessageCreateManyConversationMemoryChunkInput[]
-  skipDuplicates?: boolean
 }
 
 export type MessageUpdateWithWhereUniqueWithoutConversationMemoryChunkInput = {
@@ -1759,6 +1773,28 @@ export type MessageUncheckedUpdateManyWithoutConversationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type MessageCreateManyConversationMemoryChunkInput = {
+  id?: string
+  ordinal: number
+  conversationId: string
+  userId?: string | null
+  senderType?: $Enums.SenderType
+  provider: $Enums.Provider
+  model?: string | null
+  userKeyId?: string | null
+  content: string
+  thinkingText?: string | null
+  thinkingDuration?: number | null
+  responseOutput?: string | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
 export type MessageUpdateWithoutConversationMemoryChunkInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ordinal?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1809,28 +1845,6 @@ export type MessageUncheckedUpdateWithoutConversationMemoryChunkInput = {
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
-}
-
-export type MessageCreateManyConversationMemoryChunkInput = {
-  id?: string
-  ordinal: number
-  conversationId: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
-  provider: $Enums.Provider
-  model?: string | null
-  userKeyId?: string | null
-  content: string
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type MessageUncheckedUpdateManyWithoutConversationMemoryChunkInput = {

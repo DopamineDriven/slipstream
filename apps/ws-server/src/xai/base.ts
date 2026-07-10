@@ -25,6 +25,10 @@ export class GrokBaseService {
     return m === "grok-build-0.1";
   }
 
+  protected isGrok4Point5(m: string) {
+    return m ==="grok-4.5";
+  }
+
   protected isGrok4Point3(m: string) {
     return m === "grok-4.3";
   }
@@ -33,6 +37,7 @@ export class GrokBaseService {
     return (
       m === "grok-4.20-0309-reasoning" ||
       m === "grok-4.20-0309-non-reasoning" ||
+      this.isGrok4Point5(m) ||
       this.isGrok4Point3(m) ||
       this.isMultiAgent(m) ||
       this.isGrokBuild(m)

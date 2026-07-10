@@ -160,8 +160,7 @@ export namespace Voyage {
       encoding_format?: Output.EncodingFormat;
     }
     export type Output<T extends Model = "voyage-4-large"> =
-      | Output.Success<T>["response"]
-      | Output.Error["response"];
+      Output.Success<T>["response"] | Output.Error["response"];
   }
 
   export interface Embeddings<T extends Embeddings.Model = "voyage-4-large"> {
@@ -226,8 +225,7 @@ export namespace Voyage {
       }
     }
     export type Output<T extends InputType = "document"> =
-      | Output.Success<T>["response"]
-      | Output.Error["response"];
+      Output.Success<T>["response"] | Output.Error["response"];
 
     export type Model = "voyage-context-3" | "voyage-context-4";
 
@@ -342,9 +340,7 @@ export namespace Voyage {
 
   export namespace Batch {
     export type Endpoints =
-      | "v1/contextualizedembeddings"
-      | "v1/rerank"
-      | "v1/embeddings";
+      "v1/contextualizedembeddings" | "v1/rerank" | "v1/embeddings";
     export namespace Input {
       export type Inputs<T extends Endpoints = "v1/contextualizedembeddings"> =
         T extends "v1/embeddings"

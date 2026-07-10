@@ -1,0 +1,100 @@
+{
+  "name": "@slipstream/cli",
+  "version": "1.1.0",
+  "description": "sovereign cli",
+  "publishConfig": {
+    "access": "public",
+    "typesVersions": {
+      "*": {
+        "*": [
+          "dist/index.d.ts"
+        ],
+        "slipstream": [
+          "dist/bin/slipstream.d.ts"
+        ]
+      }
+    }
+  },
+  "license": "BUSL-1.1",
+  "source": "src/index.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/index.d.ts"
+      ],
+      "client": [
+        "dist/client.d.ts"
+      ],
+      "config": [
+        "dist/config.d.ts"
+      ],
+      "render": [
+        "dist/render.d.ts"
+      ],
+      "repl": [
+        "dist/repl.d.ts"
+      ],
+      "slipstream": [
+        "dist/bin/slipstream.d.ts"
+      ],
+      "types": [
+        "dist/types.d.ts"
+      ]
+    }
+  },
+  "bin": {
+    "slipstream": "dist/bin/slipstream.js"
+  },
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist/**/*.{js,cjs,mjs,d.ts,d.cts,d.mts}"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./bin/slipstream": "./dist/bin/slipstream.js",
+    "./client": "./dist/client.js",
+    "./config": "./dist/config.js",
+    "./renderer": "./dist/renderer.js",
+    "./repl": "./dist/repl.js",
+    "./types": "./dist/types.js"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "pnpm build",
+    "lint": "eslint",
+    "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml}\" --ignore-unknown --cache",
+    "clean": "git clean -xdf .turbo dist node_modules",
+    "typecheck": "tsgo --noEmit"
+  },
+  "dependencies": {
+    "@d0paminedriven/fs": "catalog:dd",
+    "@slipstream/credentials": "workspace:*",
+    "@slipstream/types": "workspace:*",
+    "@types/ws": "catalog:ws",
+    "dotenv": "catalog:dotenv",
+    "picocolors": "catalog:pico",
+    "ws": "catalog:ws"
+  },
+  "devDependencies": {
+    "@slipstream/eslint-config": "workspace:*",
+    "@slipstream/prettier-config": "workspace:*",
+    "@slipstream/tsconfig": "workspace:*",
+    "@types/node": "catalog:node",
+    "@typescript/native-preview": "catalog:tsgo",
+    "dotenv-cli": "catalog:dotenv",
+    "dotenv-expand": "catalog:dotenv",
+    "eslint": "catalog:eslint",
+    "jiti": "catalog:jiti",
+    "prettier": "catalog:prettier",
+    "rolldown": "catalog:rolldown",
+    "tsdown": "catalog:tsdown",
+    "tslib": "catalog:tslib",
+    "tsx": "catalog:tsx",
+    "typescript": "catalog:ts",
+    "typescript-eslint": "catalog:tseslint"
+  },
+  "prettier": "@slipstream/prettier-config"
+}

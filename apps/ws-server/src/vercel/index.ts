@@ -1,9 +1,27 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { OpenAIFileSearchToolInput } from "@/openai/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { v0ChatCompletionsRes, v0Usage } from "@/vercel/sse.ts";
+import type {
+  V0AccumulatedToolCall,
+  V0ActiveMessageBlock,
+  V0AssistantMessage,
+  V0AssistantToolCallMessage,
+  V0BaseMessage,
+  V0FinalizedMessageBlock,
+  V0ForcedLoopStopReason,
+  V0FunctionTool,
+  V0FunctionToolCall,
+  V0ImageContentPart,
+  V0RequestMessage,
+  V0TextContentPart,
+  V0ToolMessage,
+  V0UserContentPart,
+  V0UserMessage
+} from "@/vercel/types.ts";
 import type { Logger as PinoLogger } from "pino";
 import {
   createV0SSEParser,
@@ -19,110 +37,6 @@ import type {
   VercelModelIdUnion
 } from "@slipstream/types";
 
-interface V0FunctionTool {
-  type: "function";
-  function: {
-    name: string;
-    description: string;
-    parameters: {
-      type: "object";
-      properties: Record<
-        string,
-        {
-          type: "string" | "number" | "array";
-          description: string;
-          items?: { type: "string" };
-          minItems?: number;
-          maxItems?: number;
-        }
-      >;
-      required: string[];
-      additionalProperties: boolean;
-    };
-  };
-}
-
-type V0FunctionToolCall = {
-  id: string;
-  type: "function";
-  function: {
-    name: string;
-    arguments: string;
-  };
-};
-
-type V0TextContentPart = {
-  type: "text";
-  text: string;
-};
-
-type V0ImageContentPart = {
-  type: "image_url";
-  image_url: {
-    url: string;
-    detail: "auto" | "low" | "high";
-  };
-};
-
-type V0UserContentPart = V0TextContentPart | V0ImageContentPart;
-
-type V0SystemMessage = {
-  role: "system";
-  content: string;
-};
-
-type V0UserMessage = {
-  role: "user";
-  content: string | readonly V0UserContentPart[];
-};
-
-type V0AssistantMessage = {
-  role: "assistant";
-  content: string;
-};
-
-type V0BaseMessage = V0SystemMessage | V0UserMessage | V0AssistantMessage;
-
-type V0AssistantToolCallMessage = {
-  role: "assistant";
-  content: "";
-  tool_calls: readonly V0FunctionToolCall[];
-};
-
-type V0ToolMessage = {
-  role: "tool";
-  tool_call_id: string;
-  content: string;
-};
-
-type V0RequestMessage =
-  | V0BaseMessage
-  | V0AssistantToolCallMessage
-  | V0ToolMessage;
-
-type V0AccumulatedToolCall = {
-  id: string;
-  name: string;
-  arguments: string;
-};
-
-interface V0ActiveMessageBlock {
-  content: string;
-  reasoningChunkCount: number;
-  sawAggregateTail: boolean;
-  startedAt: number;
-  type: "THINKING" | "TEXT";
-}
-
-interface V0FinalizedMessageBlock {
-  content: string;
-  durationMs: number;
-  ordinal: number;
-  type: $Enums.MessageBlockType;
-}
-
-type V0ForcedLoopStopReason = "MAX_ROUNDS" | null;
-
 export class v0Service {
   private readonly baseUrl = "https://ai-gateway.vercel.sh/v1/chat/completions";
   private logger: PinoLogger;
@@ -132,6 +46,7 @@ export class v0Service {
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     private userStoreVector: UserStoreVectorService,
+    private memoryService: ConversationMemoryVectorService,
     private apiKey?: string
   ) {
     this.logger = logger
@@ -192,21 +107,13 @@ export class v0Service {
     }
   }
 
-  private formatSystemInstruction(
-    isNewChat: boolean,
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"]
-  ) {
-    if (isNewChat) {
-      return systemPrompt;
-    }
-
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
-
-    return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
-  }
-
-  private formatHistory(msgs: MessageSingleton<true>[]) {
+  private async formatHistory(msgs: MessageSingleton<true>[]) {
+    // HMEM substitution assembly (Part II §2) — msgs arrive ordinal-sorted
+    // from resolver/chat.ts
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
     const formatted = Array.of<V0BaseMessage>();
     const lastIndex = msgs.findLastIndex(
       m => m.provider === "VERCEL" && m.senderType === "AI"
@@ -215,6 +122,16 @@ export class v0Service {
     const isFirstV0Msg = lastIndex === -1;
 
     for (const [msgIndex, msg] of msgs.entries()) {
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          formatted.push({
+            role: "assistant",
+            content: claim.emit
+          } satisfies V0AssistantMessage);
+        }
+        continue;
+      }
       const isFreshContext = isFirstV0Msg || msgIndex > lastIndex;
       const isCurrentUserMsg = msgIndex === msgs.length - 1;
 
@@ -382,6 +299,102 @@ export class v0Service {
             }
           },
           required: ["query"],
+          additionalProperties: false
+        }
+      }
+    } as const satisfies V0FunctionTool;
+  }
+
+  private memorySearchFunctionTool() {
+    return {
+      type: "function",
+      function: {
+        name: "conversation_memory_search",
+        description:
+          "Search the user's indexed conversation history — older sections of this conversation and other conversations. " +
+          "Sections are ~8k-token transcript slices of firsthand conversation history; an invisible summary layer boosts " +
+          "fulltext ranking for conceptual keywords. Semantic similarity by default; when search_terms is provided, also " +
+          "performs fulltext keyword search and returns { semantic_results, fulltext_results, overlap_results, metadata }. " +
+          "scope 'current_conversation' (default) reaches this conversation's older indexed sections — including messages " +
+          "beyond your context window; 'all_conversations' reaches the user's entire history, with conversation_id + " +
+          "conversation_title on every hit for citation. Sections are keyed by 0-based message ordinal ranges [start, end). " +
+          "Expand a hit with conversation_memory_get_chunk.",
+        parameters: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "The semantic search query"
+            },
+            search_terms: {
+              type: "string",
+              description:
+                "Optional exact-match terms for the fulltext lane. Supports quoted phrases and negation (-deprecated)."
+            },
+            scope: {
+              type: "string",
+              enum: ["current_conversation", "all_conversations"],
+              description:
+                "Where to search (default current_conversation). Use all_conversations for cross-conversation recall."
+            },
+            conversation_title: {
+              type: "string",
+              description:
+                "Optional fuzzy conversation-title filter (case-insensitive) — providing it implies all_conversations scope. " +
+                "Recall by name: 'the Catullan one' matches 'Catullan Odes & Combinatorics'. " +
+                "Same contract as the filename filter on the document-search tool."
+            },
+            max_results: {
+              type: "number",
+              description: "Maximum results per signal (1-10, default 5)"
+            },
+            threshold: {
+              type: "number",
+              description:
+                "Cosine similarity floor for the semantic lane (default 0)"
+            }
+          },
+          required: ["query"],
+          additionalProperties: false
+        }
+      }
+    } as const satisfies V0FunctionTool;
+  }
+
+  private memoryGetChunkFunctionTool() {
+    return {
+      type: "function",
+      function: {
+        name: "conversation_memory_get_chunk",
+        description:
+          "Fetch one indexed conversation-memory section in full: by chunk_id (from a conversation_memory_search hit), " +
+          "or by conversation_id + ordinal (the section covering that 0-based message ordinal). " +
+          "direction walks to the adjacent previous/next section — search finds the doorway, traversal walks the room. " +
+          "Returns the full firsthand transcript plus previous/next section refs for onward traversal.",
+        parameters: {
+          type: "object",
+          properties: {
+            chunk_id: {
+              type: "string",
+              description: "Section id from a conversation_memory_search result"
+            },
+            conversation_id: {
+              type: "string",
+              description:
+                "Conversation id — pair with ordinal to fetch the covering section"
+            },
+            ordinal: {
+              type: "number",
+              description: "0-based message ordinal (pair with conversation_id)"
+            },
+            direction: {
+              type: "string",
+              enum: ["previous", "next"],
+              description:
+                "Optional: return the adjacent section instead of the resolved one"
+            }
+          },
+          required: [],
           additionalProperties: false
         }
       }
@@ -620,27 +633,65 @@ export class v0Service {
     );
   }
 
-  private async executeToolCall(userId: string, toolCall: V0FunctionToolCall) {
-    if (toolCall.function.name !== "file_search") {
-      return {
-        role: "tool",
-        tool_call_id: toolCall.id,
-        content: `Unknown tool: ${toolCall.function.name}`
-      } as const satisfies V0ToolMessage;
-    }
-
+  private async executeToolCall(
+    userId: string,
+    conversationId: string,
+    toolCall: V0FunctionToolCall
+  ) {
+    const toolName = toolCall.function.name;
     try {
-      const input = this.parseFileSearchInput(toolCall.function.arguments);
-      const output = await this.executeFileSearch(userId, input);
+      if (toolName === "file_search") {
+        const input = this.parseFileSearchInput(toolCall.function.arguments);
+        const output = await this.executeFileSearch(userId, input);
+        return {
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: output
+        } as const satisfies V0ToolMessage;
+      }
+
+      if (toolName === "conversation_memory_search") {
+        const parsed = this.userStoreVector.parseUserStoreArgs(
+          toolCall.function.arguments,
+          toolName
+        );
+        const output = await this.memoryService.searchMemoryFromToolInput(
+          userId,
+          conversationId,
+          parsed
+        );
+        return {
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: output
+        } as const satisfies V0ToolMessage;
+      }
+
+      if (toolName === "conversation_memory_get_chunk") {
+        const parsed = this.userStoreVector.parseUserStoreArgs(
+          toolCall.function.arguments,
+          toolName
+        );
+        const output = await this.memoryService.getMemoryChunkFromToolInput(
+          userId,
+          parsed
+        );
+        return {
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: output
+        } as const satisfies V0ToolMessage;
+      }
+
       return {
         role: "tool",
         tool_call_id: toolCall.id,
-        content: output
+        content: `Unknown tool: ${toolName}`
       } as const satisfies V0ToolMessage;
     } catch (error) {
       this.logger.error(
         {
-          toolName: toolCall.function.name,
+          toolName,
           toolCallId: toolCall.id,
           error: this.prisma.safeErrMsg(error)
         },
@@ -649,7 +700,7 @@ export class v0Service {
       return {
         role: "tool",
         tool_call_id: toolCall.id,
-        content: `file_search error: ${this.prisma.safeErrMsg(error)}`
+        content: `${toolName} error: ${this.prisma.safeErrMsg(error)}`
       } as const satisfies V0ToolMessage;
     }
   }
@@ -721,7 +772,6 @@ export class v0Service {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    isNewChat,
     max_tokens,
     model,
     systemPrompt,
@@ -846,13 +896,16 @@ export class v0Service {
       return emittedThinkingText;
     };
 
+    // memory tools attach unconditionally — conversation memory exists
+    // independently of uploaded documents
     const tools = hasUserStoreDocs
-      ? [this.fileSearchFunctionTool()]
-      : undefined;
-    const systemInstruction = this.formatSystemInstruction(
-      isNewChat,
-      systemPrompt
-    );
+      ? [
+          this.fileSearchFunctionTool(),
+          this.memorySearchFunctionTool(),
+          this.memoryGetChunkFunctionTool()
+        ]
+      : [this.memorySearchFunctionTool(), this.memoryGetChunkFunctionTool()];
+    const systemInstruction = this.prisma.formatSysNote(systemPrompt);
 
     let roundMessages = Array.of<V0RequestMessage>(
       ...(systemInstruction
@@ -863,7 +916,7 @@ export class v0Service {
             } satisfies V0BaseMessage
           ]
         : []),
-      ...this.formatHistory(msgs)
+      ...(await this.formatHistory(msgs))
     );
 
     const MAX_TOOL_ROUNDS = 10;
@@ -1083,7 +1136,9 @@ export class v0Service {
 
       const toolMessages = Array.of<V0ToolMessage>();
       for (const toolCall of materializedToolCalls) {
-        toolMessages.push(await this.executeToolCall(userId, toolCall));
+        toolMessages.push(
+          await this.executeToolCall(userId, conversationId, toolCall)
+        );
       }
 
       roundMessages = Array.of<V0RequestMessage>(

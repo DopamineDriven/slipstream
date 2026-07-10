@@ -44,7 +44,7 @@ class ExtractSSE extends Fs {
     const item_id = this.extractTargeted("item_id");
     const iId = item_id?.[0];
     if (!iId) {
-     return Date.now().toString(10);
+      return Date.now().toString(10);
     }
     return iId;
   }
@@ -94,7 +94,7 @@ class ExtractSSE extends Fs {
   }
 }
 if (process.argv?.[2] === "--sse" && process.argv?.[3]) {
-const s = new ExtractSSE(`src/test/openai/${process.argv[3]}`);
+  const s = new ExtractSSE(`src/test/openai/${process.argv[3]}`);
 
-s.exe("both").then(() => {});
+  s.exe("both").then(() => {});
 }

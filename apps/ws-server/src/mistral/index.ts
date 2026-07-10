@@ -1,4 +1,6 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { MemoryAssemblyView } from "@/memory/types.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type {
   MistralAccumulatedToolCall,
   MistralActiveMessageBlock,
@@ -28,8 +30,11 @@ import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type {
   EventTypeMap,
   MessageSingleton,
-  MistralModelIdUnion
+  MistralModelIdUnion,
+  UTR
 } from "@slipstream/types";
+
+type MistralContentChunk = UTR<ContentChunk, "type">;
 
 const MISTRAL_HISTORY_MESSAGE_LIMIT = 175;
 
@@ -72,42 +77,14 @@ interface MistralHistoryFormatterDeps {
   readonly safeErrMsg: (error: unknown) => string;
 }
 
-function selectMistralHistoryMessages(msgs: readonly MessageSingleton<true>[]) {
-  const orderedMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
-  if (orderedMsgs.length <= MISTRAL_HISTORY_MESSAGE_LIMIT) {
-    return orderedMsgs;
-  }
-
-  const selectedIds = new Set<string>();
-
-  for (
-    let msgIndex = orderedMsgs.length - 1;
-    msgIndex >= 0 && selectedIds.size < MISTRAL_HISTORY_MESSAGE_LIMIT;
-    msgIndex--
-  ) {
-    const msg = orderedMsgs[msgIndex];
-    if (!msg || msg.provider !== "MISTRAL") continue;
-    selectedIds.add(msg.id);
-  }
-
-  for (
-    let msgIndex = orderedMsgs.length - 1;
-    msgIndex >= 0 && selectedIds.size < MISTRAL_HISTORY_MESSAGE_LIMIT;
-    msgIndex--
-  ) {
-    const msg = orderedMsgs[msgIndex];
-    if (!msg) continue;
-    selectedIds.add(msg.id);
-  }
-
-  return orderedMsgs.filter(msg => selectedIds.has(msg.id));
-}
-
 export function formatMistralHistory(
   msgs: readonly MessageSingleton<true>[],
-  deps: MistralHistoryFormatterDeps
+  deps: MistralHistoryFormatterDeps,
+  memoryView: MemoryAssemblyView | null
 ) {
-  const historyMsgs = selectMistralHistoryMessages(msgs);
+  // HMEM substitution assembly (Part II §2) replaces the retired 175-slice;
+  // the limit survives only as the fresh-attachment gate below
+  const historyMsgs = [...msgs].sort((a, b) => a.ordinal - b.ordinal);
   const allowFreshAttachments =
     historyMsgs.length < MISTRAL_HISTORY_MESSAGE_LIMIT;
   const formatted = Array.of<MistralMessageReq>();
@@ -169,6 +146,16 @@ export function formatMistralHistory(
   }
 
   for (const [msgIndex, msg] of historyMsgs.entries()) {
+    const claim = memoryView?.claim(msg.ordinal);
+    if (claim) {
+      if (claim.emit != null) {
+        formatted.push({
+          role: "assistant",
+          content: [{ type: "text", text: claim.emit }]
+        });
+      }
+      continue;
+    }
     const isFreshContext = isFirstMistralMsg || msgIndex > lastIndex;
     if (msg.senderType === "USER") {
       const content = Array.of<ContentChunk>();
@@ -201,8 +188,9 @@ export function formatMistralHistory(
                     try {
                       content.push({
                         documentUrl: url,
+                        documentName: filename,
                         type: "document_url"
-                      });
+                      } satisfies MistralContentChunk["document_url"]);
                     } catch {
                       textParts.push(`[${name}](${url})`);
                     }
@@ -220,7 +208,7 @@ export function formatMistralHistory(
                   content.push({
                     type: "image_url",
                     imageUrl: { url, detail: "high" }
-                  });
+                  } satisfies MistralContentChunk["image_url"]);
                 } else {
                   textParts.push(`![${name}](${url})`);
                 }
@@ -317,6 +305,7 @@ export class MistralService extends MistralStreamContentService {
     protected prisma: PrismaService,
     protected redis: EnhancedRedisPubSub,
     protected userStoreVector: UserStoreVectorService,
+    protected memoryService: ConversationMemoryVectorService,
     protected apiKey: string
   ) {
     super();
@@ -389,24 +378,21 @@ export class MistralService extends MistralStreamContentService {
     });
   }
 
-  protected formatHistory(msgs: MessageSingleton<true>[]) {
-    return formatMistralHistory(msgs, {
-      filenameToHexExtTuple: (url, compatStatus, encoded) =>
-        this.prisma.filenameToHexExtTuple(url, compatStatus, encoded),
-      logInfo: message => this.logger.info(message),
-      safeErrMsg: error => this.prisma.safeErrMsg(error)
-    } satisfies MistralHistoryFormatterDeps);
-  }
-
-  protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
-    if (isNewChat) {
-      return systemPrompt;
-    }
-
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
-
-    return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
+  protected async formatHistory(msgs: MessageSingleton<true>[]) {
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
+    return formatMistralHistory(
+      msgs,
+      {
+        filenameToHexExtTuple: (url, compatStatus, encoded) =>
+          this.prisma.filenameToHexExtTuple(url, compatStatus, encoded),
+        logInfo: message => this.logger.info(message),
+        safeErrMsg: error => this.prisma.safeErrMsg(error)
+      } satisfies MistralHistoryFormatterDeps,
+      memoryView
+    );
   }
 
   private fileSearchFunctionTool() {
@@ -448,6 +434,102 @@ export class MistralService extends MistralStreamContentService {
             }
           },
           required: ["query"],
+          additionalProperties: false
+        }
+      }
+    } as const satisfies MistralFunctionTool;
+  }
+
+  private memorySearchFunctionTool() {
+    return {
+      type: "function",
+      function: {
+        name: "conversation_memory_search",
+        description:
+          "Search the user's indexed conversation history — older sections of this conversation and other conversations. " +
+          "Sections are ~8k-token transcript slices of firsthand conversation history; an invisible summary layer boosts " +
+          "fulltext ranking for conceptual keywords. Semantic similarity by default; when search_terms is provided, also " +
+          "performs fulltext keyword search and returns { semantic_results, fulltext_results, overlap_results, metadata }. " +
+          "scope 'current_conversation' (default) reaches this conversation's older indexed sections — including messages " +
+          "beyond your context window; 'all_conversations' reaches the user's entire history, with conversation_id + " +
+          "conversation_title on every hit for citation. Sections are keyed by 0-based message ordinal ranges [start, end). " +
+          "Expand a hit with conversation_memory_get_chunk.",
+        parameters: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "The semantic search query"
+            },
+            search_terms: {
+              type: "string",
+              description:
+                "Optional exact-match terms for the fulltext lane. Supports quoted phrases and negation (-deprecated)."
+            },
+            scope: {
+              type: "string",
+              enum: ["current_conversation", "all_conversations"],
+              description:
+                "Where to search (default current_conversation). Use all_conversations for cross-conversation recall."
+            },
+            conversation_title: {
+              type: "string",
+              description:
+                "Optional fuzzy conversation-title filter (case-insensitive) — providing it implies all_conversations scope. " +
+                "Recall by name: 'the Catullan one' matches 'Catullan Odes & Combinatorics'. " +
+                "Same contract as the filename filter on the document-search tool."
+            },
+            max_results: {
+              type: "number",
+              description: "Maximum results per signal (1-10, default 5)"
+            },
+            threshold: {
+              type: "number",
+              description:
+                "Cosine similarity floor for the semantic lane (default 0)"
+            }
+          },
+          required: ["query"],
+          additionalProperties: false
+        }
+      }
+    } as const satisfies MistralFunctionTool;
+  }
+
+  private memoryGetChunkFunctionTool() {
+    return {
+      type: "function",
+      function: {
+        name: "conversation_memory_get_chunk",
+        description:
+          "Fetch one indexed conversation-memory section in full: by chunk_id (from a conversation_memory_search hit), " +
+          "or by conversation_id + ordinal (the section covering that 0-based message ordinal). " +
+          "direction walks to the adjacent previous/next section — search finds the doorway, traversal walks the room. " +
+          "Returns the full firsthand transcript plus previous/next section refs for onward traversal.",
+        parameters: {
+          type: "object",
+          properties: {
+            chunk_id: {
+              type: "string",
+              description: "Section id from a conversation_memory_search result"
+            },
+            conversation_id: {
+              type: "string",
+              description:
+                "Conversation id — pair with ordinal to fetch the covering section"
+            },
+            ordinal: {
+              type: "number",
+              description: "0-based message ordinal (pair with conversation_id)"
+            },
+            direction: {
+              type: "string",
+              enum: ["previous", "next"],
+              description:
+                "Optional: return the adjacent section instead of the resolved one"
+            }
+          },
+          required: [],
           additionalProperties: false
         }
       }
@@ -695,31 +777,67 @@ export class MistralService extends MistralStreamContentService {
 
   private async executeToolCall(
     userId: string,
+    conversationId: string,
     toolCall: MistralFunctionToolCall
   ) {
-    if (toolCall.function.name !== "file_search") {
-      return {
-        role: "tool",
-        toolCallId: toolCall.id,
-        name: toolCall.function.name,
-        content: `Unknown tool: ${toolCall.function.name}`
-      } as const satisfies MistralToolMessage;
-    }
-
+    const toolName = toolCall.function.name;
     try {
-      const input = this.parseFileSearchInput(toolCall.function.arguments);
-      const output = await this.executeFileSearch(userId, input);
+      if (toolName === "file_search") {
+        const input = this.parseFileSearchInput(toolCall.function.arguments);
+        const output = await this.executeFileSearch(userId, input);
+        return {
+          role: "tool",
+          toolCallId: toolCall.id,
+          name: toolName,
+          content: output
+        } as const satisfies MistralToolMessage;
+      }
+
+      if (toolName === "conversation_memory_search") {
+        const parsed = this.userStoreVector.parseUserStoreArgs(
+          this.toolCallArgumentsToString(toolCall.function.arguments),
+          toolName
+        );
+        const output = await this.memoryService.searchMemoryFromToolInput(
+          userId,
+          conversationId,
+          parsed
+        );
+        return {
+          role: "tool",
+          toolCallId: toolCall.id,
+          name: toolName,
+          content: output
+        } as const satisfies MistralToolMessage;
+      }
+
+      if (toolName === "conversation_memory_get_chunk") {
+        const parsed = this.userStoreVector.parseUserStoreArgs(
+          this.toolCallArgumentsToString(toolCall.function.arguments),
+          toolName
+        );
+        const output = await this.memoryService.getMemoryChunkFromToolInput(
+          userId,
+          parsed
+        );
+        return {
+          role: "tool",
+          toolCallId: toolCall.id,
+          name: toolName,
+          content: output
+        } as const satisfies MistralToolMessage;
+      }
 
       return {
         role: "tool",
         toolCallId: toolCall.id,
-        name: toolCall.function.name,
-        content: output
+        name: toolName,
+        content: `Unknown tool: ${toolName}`
       } as const satisfies MistralToolMessage;
     } catch (error) {
       this.logger.error(
         {
-          toolName: toolCall.function.name,
+          toolName,
           toolCallId: toolCall.id,
           error: this.prisma.safeErrMsg(error)
         },
@@ -729,8 +847,8 @@ export class MistralService extends MistralStreamContentService {
       return {
         role: "tool",
         toolCallId: toolCall.id,
-        name: toolCall.function.name,
-        content: `file_search error: ${this.prisma.safeErrMsg(error)}`
+        name: toolName,
+        content: `${toolName} error: ${this.prisma.safeErrMsg(error)}`
       } as const satisfies MistralToolMessage;
     }
   }
@@ -819,7 +937,6 @@ export class MistralService extends MistralStreamContentService {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    isNewChat,
     max_tokens,
     model,
     systemPrompt,
@@ -1098,13 +1215,18 @@ export class MistralService extends MistralStreamContentService {
       });
     };
 
-    const tools = hasUserStoreDocs
-      ? ([this.fileSearchFunctionTool()] satisfies ToolTypes)
-      : undefined;
-    const systemInstruction = this.formatSystemInstruction(
-      isNewChat,
-      systemPrompt
-    );
+    // memory tools attach unconditionally — conversation memory exists
+    // independently of uploaded documents
+    const tools = (
+      hasUserStoreDocs
+        ? [
+            this.fileSearchFunctionTool(),
+            this.memorySearchFunctionTool(),
+            this.memoryGetChunkFunctionTool()
+          ]
+        : [this.memorySearchFunctionTool(), this.memoryGetChunkFunctionTool()]
+    ) satisfies ToolTypes;
+    const systemInstruction = this.prisma.formatSysNote(systemPrompt);
     let roundMessages = Array.of<MistralMessageReq>(
       ...(systemInstruction
         ? [
@@ -1114,7 +1236,7 @@ export class MistralService extends MistralStreamContentService {
             } satisfies SystemMessage
           ]
         : []),
-      ...this.formatHistory(msgs)
+      ...(await this.formatHistory(msgs))
     );
 
     const MAX_TOOL_ROUNDS = 10;
@@ -1198,7 +1320,9 @@ export class MistralService extends MistralStreamContentService {
       const toolMessages = Array.of<MistralToolMessage>();
 
       for (const toolCall of materializedToolCalls) {
-        toolMessages.push(await this.executeToolCall(userId, toolCall));
+        toolMessages.push(
+          await this.executeToolCall(userId, conversationId, toolCall)
+        );
       }
 
       roundMessages = [

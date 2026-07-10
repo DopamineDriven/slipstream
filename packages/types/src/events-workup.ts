@@ -83,11 +83,7 @@ export type AssetReadyPayload = {
 export type AssetStatus = $Enums.AssetStatus;
 
 export type AssetUploadAbortReason =
-  | "SERVER"
-  | "USER"
-  | "NETWORK"
-  | "TIMEOUT"
-  | "UNKNOWN";
+  "SERVER" | "USER" | "NETWORK" | "TIMEOUT" | "UNKNOWN";
 
 export type UserRxnAction = "like" | "dislike";
 
@@ -157,10 +153,7 @@ export type UserMetadata = {
 };
 
 export type AIChatEventTypeUnion =
-  | "chunk"
-  | "error"
-  | "inline_data"
-  | "response";
+  "chunk" | "error" | "inline_data" | "response";
 
 export type S3ObjectId = `s3://${string}/${string}#${string}`;
 

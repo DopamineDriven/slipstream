@@ -1,5 +1,5 @@
-import { Fs } from "@d0paminedriven/fs";
 import type { BufferEncodingUnion } from "@d0paminedriven/fs";
+import { Fs } from "@d0paminedriven/fs";
 
 type Opts = {
   encoding?: BufferEncodingUnion | null | undefined;
@@ -107,7 +107,8 @@ class OutputMd extends Fs {
             : target === "src/index"
               ? `src/${file}`
               : `${target}/${file}`;
-        const fileExtension = this.fileExt(file) === "rels" ? "xml" : this.fileExt(file);
+        const fileExtension =
+          this.fileExt(file) === "rels" ? "xml" : this.fileExt(file);
         const fileContent =
           this.fileToBuffer(handleInjectedTarget).toString("utf-8");
 
@@ -129,7 +130,7 @@ ${this.handleComments(target, fileContent, removeComments)}
 
 ---
 
-`
+`;
         arr.push(toInject);
         return toInject;
       });

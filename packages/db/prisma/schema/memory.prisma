@@ -6,7 +6,16 @@ enum MemoryChunkingState {
   ERROR
 }
 
+enum MemorySummaryState {
+  QUEUED
+  SUMMARIZING
+  READY
+  ERROR
+  SKIPPED
+}
+
 enum MemoryChunkBoundaryReason {
+  MESSAGE_COUNT
   TOKEN_LIMIT
   IDLE_TIME
   TOPIC_SHIFT // semantic similarity dropped below xyz threshold
@@ -18,16 +27,34 @@ enum MemorySchemaVersion {
   v1_0
 }
 
+enum MemoryTranscriptRendererVersion {
+  v1_0
+}
+
+/// Single source of truth for summarizer prompt eras. A version bump NEVER
+/// cascades state changes — READY summaries stay READY; regeneration happens
+/// only via the user-driven per-conversation refresh.
+enum MemoryChunkSummaryPromptVersion {
+  v1_0
+}
+
+/// Fold-prompt era for the rolling summary — versioned independently of the
+/// section-summary prompt (the two calls evolve separately). Same no-cascade
+/// policy as MemoryChunkSummaryPromptVersion.
+enum MemoryRollingSummaryReasoningVersion {
+  v1_0
+}
+
 model ConversationMemoryStore {
   id     String @id @default(cuid(2))
   userId String @unique
 
-  embeddingModel String @default("voyage-context-3")
+  embeddingModel String @default("voyage-context-4")
   embeddingDim   Int    @default(1024)
 
-  totalChunks        Int @default(0)
+  totalChunks        Int    @default(0)
   totalTokens        BigInt @default(0)
-  totalConversations Int @default(0)
+  totalConversations Int    @default(0)
 
   schemaVersion MemorySchemaVersion @default(v1_0)
   lastSyncedAt  DateTime?
@@ -56,17 +83,29 @@ model ConversationMemoryContext {
   rollingSummaryTokens    Int       @default(0)
   rollingSummaryUpdatedAt DateTime?
 
-  // Chunking progress
-  lastChunkedMessageId    String?
-  lastChunkedMessageIndex Int?
-  lastChunkedAt           DateTime?
+  /// fold-job lifecycle — QUEUED until the first fold; SUMMARIZING during; READY/ERROR after.
+  /// Makes a died-mid-fold process observable and reclaimable, mirroring the chunk side.
+  rollingSummaryState               MemorySummaryState @default(QUEUED)
+  /// fold-prompt era that produced the current rolling summary
+  rollingSummaryReasoningVersion    MemoryRollingSummaryReasoningVersion @default(v1_0)
+  /// wall-clock ms spent inside adaptive-thinking blocks across the fold call (stream-event timed)
+  rollingSummaryReasoningDuration   Int                @default(0)
+  /// captured thinking-block text — visibility into how the fold reaches its conclusions
+  rollingSummaryReasoningText       String?            @db.Text
+  /// JSON trace of in-house tool calls (file_search) during the fold: name, input, output per round
+  rollingSummaryReasoningToolUseRaw String?            @db.Text
+
+  /// Indexing watermark: every ordinal < this value is covered by a chunk row.
+  /// Advanced ONLY via the claim CAS (claimMemorySection.sql). Never cached in-process.
+  lastIndexedOrdinalExclusive Int       @default(0)
+  lastChunkedAt               DateTime?
 
   // Conversation stats (provider-agnostic aggregates)
   totalTurns   Int @default(0)
   chunkedTurns Int @default(0)
   totalTokens  Int @default(0)
 
-  contributingProviderModelsRaw String?  // "ANTHROPIC:claude-opus-4-5-20251101::GROK:grok-4-1-fast-reasoning"
+  contributingProviderModelsRaw String? // "ANTHROPIC:claude-opus-4-5-20251101::GROK:grok-4-1-fast-reasoning"
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -84,61 +123,89 @@ model ConversationMemoryContext {
 
 model ConversationMemoryChunk {
   id             String @id @default(cuid(2))
-  provenanceId   String @unique // "${conversationId}-${messageIdStart}-${messageIdEnd}-${chunkIndex}"
+  /// "${conversationId}-${ordinalStart}-${ordinalEndExclusive}-${schemaVersion}"
+  provenanceId   String @unique
   contextId      String
   storeId        String
   conversationId String
 
-  chunkIndex            Int
+  chunkIndex Int
+
+  /// covered messages: ordinalStart <= msg.ordinal < ordinalEndExclusive (0-based)
+  ordinalStart        Int
+  ordinalEndExclusive Int
+
   messageIdStart        String
   messageIdEnd          String
   messageTimestampStart DateTime
   messageTimestampEnd   DateTime
-  messageIdsRaw         String // "msgIdStart::...::msgIdEnd"
 
-  transcriptMarkdown   String @db.Text
-  contentHash          String
-  chunkedMessagesCount Int    @default(0)
-  tokenCount           Int    @default(0)
+  /// Rendered from Message rows ordered by ordinal ASC. Append-only history is a
+  /// standing assumption — a future message-edit feature must invalidate covering chunks.
+  transcriptMarkdown         String                          @db.Text
+  rendererVersion            MemoryTranscriptRendererVersion @default(v1_0)
+  transcriptIncludesThinking Boolean                         @default(false)
+  contentHash                String
+  chunkedMessagesCount       Int                             @default(0)
+  tokenCount                 Int                             @default(0)
+  /// "ANTHROPIC:claude-opus-4-5-20251101::GROK:grok-4-1-fast-reasoning::GEMINI:gemini-3.1-pro-preview::.."
+  providerModelsRaw          String
 
-  providerModelsRaw String   // "ANTHROPIC:claude-opus-4-5-20251101::GROK:grok-4-1-fast-reasoning"
+  hasAttachments             Boolean @default(false)
+  chunkedAttachmentsCount    Int?
+  /// "convId-msgId-attId-hexEncodedFilename.ext::convId-msgId-attId-hexEncodedFilename.ext"
+  attachmentProvenanceIdsRaw String?
 
-  hasAttachments          Boolean @default(false)
-  chunkedAttachmentsCount Int?
+  embedding      Unsupported("vector(1024)")?
+  embeddingModel String                       @default("voyage-context-4")
+  /// metadata for mixed-era retrieval; the column type itself pins 1024
+  embeddingDim   Int                          @default(1024)
+  embeddedAt     DateTime?
 
-  attachmentProvenanceIdsRaw String? // "convId-msgId-attId-hexEncodedFilename.ext::convId-msgId-attId-hexEncodedFilename.ext"
+  /// weighted composite maintained by trigger: setweight(summary,'A') || setweight(transcript,'B')
+  searchTsv Unsupported("tsvector")?
 
-  embedding      Unsupported("vector(1024)")
-  embeddingModel String                      @default("voyage-context-3")
-  schemaVersion  MemorySchemaVersion         @default(v1_0)
+  schemaVersion  MemorySchemaVersion        @default(v1_0)
   boundaryReason MemoryChunkBoundaryReason?
 
   chunkingState MemoryChunkingState @default(QUEUED)
   chunkingError String?
+  retryCount    Int                 @default(0)
 
-  embeddedAt DateTime?
+  summary                  String?                         @db.Text
+  summaryState             MemorySummaryState              @default(QUEUED)
+  summaryModel             String?
+  /// wall-clock ms spent inside adaptive-thinking blocks across the summary call (stream-event timed)
+  summaryReasoningDuration Int                             @default(0)
+  /// captured thinking-block text — visibility into how the summarizer reaches its conclusions
+  summaryReasoningText     String?                         @db.Text
+  /// JSON trace of in-house tool calls (file_search) during summarization: name, input, output per round
+  summaryToolUseRaw        String?                         @db.Text
+  summaryProvider          Provider?
+  summaryPromptVersion     MemoryChunkSummaryPromptVersion @default(v1_0)
+  summaryTokens            Int                             @default(0)
+  summaryError             String?
+  summaryRetryCount        Int                             @default(0)
+  summaryGeneratedAt       DateTime?
 
-  // Optional chunk-level summary
-  summary            String?   @db.Text
-  summaryModel       String?
-  summaryProvider    Provider?
-  summaryGeneratedAt DateTime?
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  createdAt DateTime                  @default(now())
-  updatedAt DateTime                  @updatedAt
-  messages  Message[]
-  context   ConversationMemoryContext @relation(fields: [contextId], references: [id], onDelete: Cascade)
+  messages Message[]
+  context  ConversationMemoryContext @relation(fields: [contextId], references: [id], onDelete: Cascade)
 
-  @@index([contextId])
-  @@index([storeId])
-  @@index([conversationId])
-  @@index([conversationId, chunkIndex])
-  @@index([messageIdStart, messageIdEnd])
+  @@unique([conversationId, ordinalStart, ordinalEndExclusive, schemaVersion])
+  @@unique([contextId, chunkIndex, schemaVersion])
+  @@index([conversationId, ordinalStart])
+  @@index([conversationId, ordinalEndExclusive])
   @@index([messageTimestampStart, messageTimestampEnd])
   @@index([chunkingState])
+  @@index([summaryState])
   @@index([contentHash])
   @@index([embeddedAt])
   @@index([embedding], map: "idx_memory_chunk_embedding_hnsw")
   @@index([storeId], map: "idx_memory_chunk_store_indexed")
   @@index([contextId], map: "idx_memory_chunk_context_indexed")
+  @@index([searchTsv], map: "idx_memory_chunk_search_tsv", type: Gin)
 }

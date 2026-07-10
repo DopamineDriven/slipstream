@@ -1,8 +1,10 @@
 import type { MessageInputParams } from "@/anthropic/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { ToolCatalogService } from "@/tool-catalog/index.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { AnthropicWorkup } from "@/anthropic/workup.ts";
 import type {
@@ -12,14 +14,20 @@ import type {
 
 export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   protected userStoreVector: UserStoreVectorService;
+  protected memoryService: ConversationMemoryVectorService;
+  protected toolCatalog: ToolCatalogService;
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
     userStoreVector: UserStoreVectorService,
+    memoryService: ConversationMemoryVectorService,
+    toolCatalog: ToolCatalogService,
     apiKey: string
   ) {
     super(logger, prisma, apiKey);
     this.userStoreVector = userStoreVector;
+    this.memoryService = memoryService;
+    this.toolCatalog = toolCatalog;
   }
   protected async searchStore(
     userId: string,
@@ -146,11 +154,134 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     );
   }
 
+  protected conversationMemorySearchTool(): Anthropic.Beta.BetaToolUnion {
+    return {
+      name: "conversation_memory_search",
+      allowed_callers: ["direct", "code_execution_20250825"],
+      description:
+        "Search the user's indexed conversation history — the same 'Partitioned Foraging' contract as file_search, " +
+        "but the territory is past conversation sections instead of uploaded documents. " +
+        "Sections are ~8k-token transcript slices of firsthand conversation history; " +
+        "an invisible summary layer boosts fulltext ranking for conceptual keywords. " +
+        "Semantic similarity by default; when search_terms is provided, also performs fulltext keyword search and returns " +
+        "{ semantic_results, fulltext_results, overlap_results, metadata } with Jaccard overlap. " +
+        "scope: 'current_conversation' (default) reaches this conversation's older indexed sections — useful when " +
+        "context has been compacted or the thread is long; 'all_conversations' reaches the user's entire history — " +
+        "results carry conversation_id + conversation_title so you can cite where a memory came from " +
+        "(e.g. \"in 'Expansio', messages 40-58\"). Sections are keyed by 0-based message ordinal ranges [start, end). " +
+        "Results return firsthand transcript excerpts; expand a specific hit with conversation_memory_get_chunk.",
+      input_schema: {
+        type: "object" as const,
+        properties: {
+          query: {
+            type: "string",
+            description: "The semantic search query"
+          },
+          search_terms: {
+            type: "string",
+            description:
+              "Optional exact-match search terms for the fulltext lane. " +
+              "Supports quoted phrases and negation (-deprecated)."
+          },
+          scope: {
+            type: "string",
+            enum: ["current_conversation", "all_conversations"],
+            description:
+              "Where to search (default current_conversation). Use all_conversations for cross-conversation recall."
+          },
+          conversation_title: {
+            type: "string",
+            description:
+              "Optional fuzzy conversation-title filter (case-insensitive) — providing it implies all_conversations scope. " +
+              "Recall by name: 'the Catullan one' matches 'Catullan Odes & Combinatorics'. " +
+              "Same contract as the filename filter on the document-search tool."
+          },
+          max_results: {
+            type: "number",
+            description: "Maximum results per signal (1-10, default 5)"
+          },
+          threshold: {
+            type: "number",
+            description:
+              "Cosine similarity floor for the semantic lane (default 0)"
+          }
+        },
+        required: ["query"]
+      }
+    } satisfies Anthropic.Beta.BetaToolUnion;
+  }
+
+  protected conversationMemoryGetChunkTool(): Anthropic.Beta.BetaToolUnion {
+    return {
+      name: "conversation_memory_get_chunk",
+      allowed_callers: ["direct", "code_execution_20250825"],
+      description:
+        "Fetch one indexed conversation-memory section in full: by chunk_id (from a conversation_memory_search hit), " +
+        "or by conversation_id + ordinal (the section covering that 0-based message ordinal). " +
+        "direction walks to the adjacent previous/next section in the same conversation — " +
+        "search finds the doorway, traversal walks the room. " +
+        "Returns the full firsthand transcript plus previous/next section refs for onward traversal.",
+      input_schema: {
+        type: "object" as const,
+        properties: {
+          chunk_id: {
+            type: "string",
+            description: "Section id from a conversation_memory_search result"
+          },
+          conversation_id: {
+            type: "string",
+            description:
+              "Conversation id — pair with ordinal to fetch the section covering that message"
+          },
+          ordinal: {
+            type: "number",
+            description: "0-based message ordinal (pair with conversation_id)"
+          },
+          direction: {
+            type: "string",
+            enum: ["previous", "next"],
+            description:
+              "Optional: return the adjacent section instead of the resolved one"
+          }
+        }
+      }
+    } satisfies Anthropic.Beta.BetaToolUnion;
+  }
+
+  protected async executeConversationMemorySearch(
+    userId: string,
+    conversationId: string,
+    parsed: Record<string, unknown>
+  ) {
+    return await this.memoryService.searchMemoryFromToolInput(
+      userId,
+      conversationId,
+      parsed
+    );
+  }
+
+  protected async executeConversationMemoryGetChunk(
+    userId: string,
+    parsed: Record<string, unknown>
+  ) {
+    return await this.memoryService.getMemoryChunkFromToolInput(userId, parsed);
+  }
+
+  protected toolCatalogTool(): Anthropic.Beta.BetaToolUnion {
+    return {
+      name: "tool_catalog",
+      allowed_callers: ["direct", "code_execution_20250825"],
+      description:
+        "Relational guidance for the in-house toolkit shipped with THIS request — what each tool is, " +
+        "what it's best for, and how the tools pair. No input required. " +
+        "Useful for orienting when tools are unfamiliar.",
+      input_schema: { type: "object" as const, properties: {} }
+    } satisfies Anthropic.Beta.BetaToolUnion;
+  }
+
   private webSearchTool(
     user_location:
-      | Anthropic.WebSearchTool20250305["user_location"]
-      | null
-      | undefined
+      Anthropic.WebSearchTool20250305["user_location"] | null | undefined
   ) {
     return {
       type: "web_search_20250305",
@@ -189,9 +320,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   protected tooling(
     m: AnthropicModelIdUnion,
     user_location:
-      | Anthropic.WebSearchTool20250305["user_location"]
-      | null
-      | undefined,
+      Anthropic.WebSearchTool20250305["user_location"] | null | undefined,
     hasLocalStore = false
   ) {
     // advanced tool usage header is a prerequisite for file search (programmatic)
@@ -200,6 +329,9 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       return [
         this.codeExecutionTool(),
         this.fileSearchTool(),
+        this.conversationMemorySearchTool(),
+        this.conversationMemoryGetChunkTool(),
+        this.toolCatalogTool(),
         this.webSearchTool(user_location),
         this.webFetchTool()
       ] satisfies Anthropic.Beta.BetaToolUnion[];
@@ -212,7 +344,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   }
 
   protected async formatAnthropicHistoryWithFiles(
-    isNewChat: boolean,
     msgs: MessageSingleton<true>[],
     model: AnthropicModelIdUnion,
     systemPrompt?: string,
@@ -225,9 +356,29 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     );
     const isFirstClaudeMsg = lastClaudeIndex === -1;
 
+    // HMEM substitution assembly (Part II §2): READY sections between the
+    // founding window and the live window collapse into one name-tagged
+    // assistant block each, in ordinal position — gap-tolerant (an
+    // unsummarized range renders verbatim), db rows/ordinals untouched.
+    // Verbatim at both ends, consolidated traces bridging the middle — the
+    // serial-position shape. Anthropic merges consecutive assistant turns,
+    // so per-chunk blocks are safe; assistant-first histories are accepted
+    // (probed 2026-07-05, incl. full production posture), so no leading stub.
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
+
     const messages = Array.of<Anthropic.Beta.BetaMessageParam>();
 
     for (const [msgIndex, msg] of msgs.entries()) {
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        if (claim.emit != null) {
+          messages.push({ role: "assistant", content: claim.emit });
+        }
+        continue;
+      }
       const isFreshContext = isFirstClaudeMsg || msgIndex > lastClaudeIndex;
 
       if (msg.senderType === "USER") {
@@ -371,25 +522,26 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
           }
         }
 
+        // [provider/model] prefix — the SAME name-tag notation every other
+        // provider's formatter uses. The old XML <model> ENCLOSURE was the
+        // mimicry root cause: Claude saw its own turns wrapped and emitted
+        // wrappers, compounding one layer per generation (355 scrubbed
+        // incidents vs gemini's 4 under the prefix form).
         messages.push({
           role: "assistant",
-          content: `<model provider="${msg.provider.toLowerCase()}" name="${msg.model}">\n${textParts.join("\n\n")}\n</model>`
+          content: `[${msg.provider.toLowerCase()}/${msg.model ?? "unknown"}]\n${textParts.join("\n\n")}`
         });
       }
     }
-
-    const systemNote = `Note: Previous responses may be tagged with their source provider-model combo for context.`;
-
-    const enhancedSystemPrompt = systemPrompt
-      ? `${systemPrompt}\n\n${systemNote}`
-      : systemNote;
 
     return {
       messages,
       system: [
         {
           type: "text",
-          text: enhancedSystemPrompt
+          // the centralized platform note — the same verbatim string the
+          // summarizer prompts quote, now true for anthropic too
+          text: this.prisma.formatSysNote(systemPrompt)
         }
       ] satisfies Anthropic.Beta.BetaTextBlockParam[]
     };
@@ -423,7 +575,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   }
 
   protected async createStreamWorkup({
-    isNewChat,
     messages: msgs,
     userId,
     apiKey,
@@ -442,7 +593,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
     // Use Files API for PDFs
     const { messages, system } = await this.formatAnthropicHistoryWithFiles(
-      isNewChat,
       msgs,
       model,
       systemPrompt,

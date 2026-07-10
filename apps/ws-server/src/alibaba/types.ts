@@ -10,8 +10,9 @@ interface AlibabaFunctionTool {
       properties: Record<
         string,
         {
-          type: "string" | "number" | "array";
+          type: "string" | "number" | "array" | "boolean";
           description: string;
+          enum?: readonly string[];
           items?: { type: "string" };
           minItems?: number;
           maxItems?: number;
@@ -45,9 +46,7 @@ type AlibabaImageContentPart = {
   };
 };
 
-type AlibabaUserContentPart =
-  | AlibabaTextContentPart
-  | AlibabaImageContentPart;
+type AlibabaUserContentPart = AlibabaTextContentPart | AlibabaImageContentPart;
 
 type AlibabaSystemMessage = {
   role: "system";
@@ -65,9 +64,7 @@ type AlibabaAssistantMessage = {
 };
 
 type AlibabaBaseMessage =
-  | AlibabaSystemMessage
-  | AlibabaUserMessage
-  | AlibabaAssistantMessage;
+  AlibabaSystemMessage | AlibabaUserMessage | AlibabaAssistantMessage;
 
 type AlibabaAssistantToolCallMessage = {
   role: "assistant";
@@ -82,9 +79,7 @@ type AlibabaToolMessage = {
 };
 
 type AlibabaRequestMessage =
-  | AlibabaBaseMessage
-  | AlibabaAssistantToolCallMessage
-  | AlibabaToolMessage;
+  AlibabaBaseMessage | AlibabaAssistantToolCallMessage | AlibabaToolMessage;
 
 type AlibabaReasoningDetail = {
   type: "reasoning.text";

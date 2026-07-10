@@ -78,9 +78,9 @@ model UserStore {
   id                    String @id @default(cuid(2))
   userId                String
   storeName             String
-  /// voyage-multimodal-3.5 for content containing visual media -- voyage-context-3 otherwise
+  /// voyage-multimodal-3.5 for content containing visual media -- voyage-context-4 otherwise
   defaultEmbeddingModel String @default("voyage-multimodal-3.5")
-  /// default:1024 -> voyage-multimodal-3.5 and voyage-context-3 both support 256 | 512 | 1024 | 2048
+  /// default:1024 -> voyage-multimodal-3.5 and voyage-context-4 both support 256 | 512 | 1024 | 2048
   defaultEmbeddingDim   Int    @default(1024)
 
   fileCount   Int     @default(0)
@@ -118,7 +118,7 @@ model UserStoreDoc {
   size                BigInt
 
   schemaVersion  UserStoreSchemaVersion @default(v1_0)
-  /// `voyage-context-3` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
+  /// `voyage-context-4` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
   embeddingModel String                 @default("voyage-multimodal-3.5")
   /// 256 | 512 | 1024 | 2048
   embeddingDim   Int                    @default(1024)
@@ -226,7 +226,7 @@ model UserStoreDocChunk {
   pageStartOffset Int?
   /// only applicable for pdfs
   pageEndOffset   Int?
-  /// `voyage-context-3` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
+  /// `voyage-context-4` (if no media detected or a txt based file) | `voyage-multimodal-3.5` (for preservation of all media in embedded context)
   embeddingModel  String @default("voyage-multimodal-3.5")
 
   hasImages    Boolean
@@ -247,7 +247,6 @@ model UserStoreDocChunk {
 
   @@unique([docId, chunkIndex, schemaVersion])
   @@index([docId])
-  @@index([storeId])
   @@index([attachmentId])
   @@index([conversationId, messageId])
   @@index([contentHash])

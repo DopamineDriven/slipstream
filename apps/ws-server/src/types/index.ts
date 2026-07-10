@@ -61,8 +61,7 @@ export type S3FinalizePayload = {
 };
 
 export type HandleAiChatRequestRT = (
-  | ImageGenReqDbRes<true>
-  | ConversationSingleton<true>
+  ImageGenReqDbRes<true> | ConversationSingleton<true>
 ) & {
   apiKey?: string | null;
   requestMessageId?: string;
@@ -81,7 +80,8 @@ export type IncludeCreateConvoWithImgGenProps = {
   conversationSettings: true;
   messages: {
     orderBy: {
-      createdAt: "asc";
+      // ordinal is the authoritative dense sequence — createdAt can tie
+      ordinal: "asc";
     };
     include: {
       imageGenJob: true;
@@ -125,11 +125,7 @@ export type MessageDataWorkupProps = {
       progress: 0;
       seed: number | undefined;
       personGeneration:
-        | (string & {})
-        | "DONT_ALLOW"
-        | "ALLOW_ADULT"
-        | "ALLOW_ALL"
-        | undefined;
+        (string & {}) | "DONT_ALLOW" | "ALLOW_ADULT" | "ALLOW_ALL" | undefined;
       stage: "QUEUED";
       outputQuality: string | undefined;
       topP: number | undefined;

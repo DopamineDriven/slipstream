@@ -13,12 +13,7 @@ export type TTSCodec = GrokAudioCodecTTS | OpenAICodecTTS | GeminiCodecTTS;
 export type GrokVoiceTTS = "eve" | "ara" | "rex" | "sal" | "leo" | "una";
 
 export type GrokVoiceDisplayNameTTS =
-  | "Eve"
-  | "Ara"
-  | "Sal"
-  | "Rex"
-  | "Leo"
-  | "Una";
+  "Eve" | "Ara" | "Sal" | "Rex" | "Leo" | "Una";
 
 export const grokVoiceIdsTTS = [
   "eve",

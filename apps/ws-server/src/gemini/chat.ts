@@ -1,5 +1,6 @@
 import type { ProviderGeminiChatRequestEntity } from "@/gemini/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -41,9 +42,10 @@ export class GeminiChatService extends GeminiWorkupService {
     store: UserStoreVectorService,
     protected redis: EnhancedRedisPubSub,
     protected s3: S3Storage,
+    memoryService: ConversationMemoryVectorService,
     apiKey: string
   ) {
-    super(logger, prisma, store, apiKey);
+    super(logger, prisma, store, memoryService, apiKey);
   }
 
   private parseUserStoreSearchInput(args?: Record<string, unknown>) {
@@ -98,43 +100,77 @@ export class GeminiChatService extends GeminiWorkupService {
 
   protected async executeGeminiFunctionCall(
     userId: string,
+    conversationId: string,
     functionCall: FunctionCall
   ) {
     const toolName = functionCall.name ?? "unknown_tool";
 
-    if (toolName !== "user_store_search") {
+    try {
+      if (toolName === "user_store_search") {
+        const input = this.parseUserStoreSearchInput(functionCall.args);
+        this.logger.info(
+          {
+            toolName,
+            toolCallId: functionCall.id ?? null,
+            query: input.query,
+            max_results: input.max_results,
+            filename: input.filename
+          },
+          "Gemini user_store_search query"
+        );
+
+        const output = await this.executeUserStoreSearch(userId, input);
+
+        return {
+          functionResponse: {
+            ...(functionCall.id ? { id: functionCall.id } : {}),
+            name: toolName,
+            response: {
+              output: this.normalizeFunctionResponseOutput(output)
+            }
+          }
+        } satisfies Part;
+      }
+
+      if (toolName === "conversation_memory_search") {
+        const output = await this.memoryService.searchMemoryFromToolInput(
+          userId,
+          conversationId,
+          functionCall.args ?? {}
+        );
+        return {
+          functionResponse: {
+            ...(functionCall.id ? { id: functionCall.id } : {}),
+            name: toolName,
+            response: {
+              output: this.normalizeFunctionResponseOutput(output)
+            }
+          }
+        } satisfies Part;
+      }
+
+      if (toolName === "conversation_memory_get_chunk") {
+        const output = await this.memoryService.getMemoryChunkFromToolInput(
+          userId,
+          functionCall.args ?? {}
+        );
+        return {
+          functionResponse: {
+            ...(functionCall.id ? { id: functionCall.id } : {}),
+            name: toolName,
+            response: {
+              output: this.normalizeFunctionResponseOutput(output)
+            }
+          }
+        } satisfies Part;
+      }
+
       return {
         functionResponse: {
           ...(functionCall.id ? { id: functionCall.id } : {}),
           name: toolName,
           response: {
             error: `Unknown tool: ${toolName}`
-          }
-        }
-      } satisfies Part;
-    }
-
-    try {
-      const input = this.parseUserStoreSearchInput(functionCall.args);
-      this.logger.info(
-        {
-          toolName,
-          toolCallId: functionCall.id ?? null,
-          query: input.query,
-          max_results: input.max_results,
-          filename: input.filename
-        },
-        "Gemini user_store_search query"
-      );
-
-      const output = await this.executeUserStoreSearch(userId, input);
-
-      return {
-        functionResponse: {
-          ...(functionCall.id ? { id: functionCall.id } : {}),
-          name: toolName,
-          response: {
-            output: this.normalizeFunctionResponseOutput(output)
           }
         }
       } satisfies Part;
@@ -631,7 +667,11 @@ export class GeminiChatService extends GeminiWorkupService {
 
       for (const functionCall of roundFunctionCalls) {
         toolResponseParts.push(
-          await this.executeGeminiFunctionCall(userId, functionCall)
+          await this.executeGeminiFunctionCall(
+            userId,
+            conversationId,
+            functionCall
+          )
         );
       }
 

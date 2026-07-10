@@ -358,16 +358,10 @@ export type NanoBanana2OutputAR =
 export type GptImageOutputSize = BaseOpenAISize | undefined;
 
 export type ImagenOutputSize =
-  | "1:1"
-  | "9:16"
-  | "16:9"
-  | "3:4"
-  | "4:3"
-  | undefined;
+  "1:1" | "9:16" | "16:9" | "3:4" | "4:3" | undefined;
 
 export type OpenAIImgCapableModels =
-  | OpenAIImgGenFacilitatingModels
-  | OpenAIImgGenModels;
+  OpenAIImgGenFacilitatingModels | OpenAIImgGenModels;
 
 export type GeminiImageSize = {
   "gemini-3-pro-image-preview": BaseNanoBananaOutputAR;
@@ -1207,12 +1201,7 @@ export type AIChatResponseImgGenFieldsFinal = {
 };
 
 export type ImgGenStage =
-  | "queued"
-  | "processing"
-  | "persisting"
-  | "finalizing"
-  | "refusal"
-  | "aborted";
+  "queued" | "processing" | "persisting" | "finalizing" | "refusal" | "aborted";
 
 export type GptImageAndFacilitatorsImgGenWorkupRT = {
   input_image_mask:
@@ -1246,6 +1235,9 @@ export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> =
     : undefined;
 
 export type ImgGenWorkupRTObj = {
+  "gpt-5.6-sol": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5.6-terra": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5.6-luna": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-image-1.5": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-image-1": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-image-1-mini": GptImageAndFacilitatorsImgGenWorkupRT;
@@ -1295,5 +1287,4 @@ export type ImgGenWorkupRTObj = {
 };
 
 export type ImgGenWorkupResRT<T extends keyof ImgGenWorkupRTObj> =
-  | { [P in T]: ImgGenWorkupRTObj[P] }[T]
-  | undefined;
+  { [P in T]: ImgGenWorkupRTObj[P] }[T] | undefined;

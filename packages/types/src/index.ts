@@ -167,6 +167,9 @@ export type {
   ChatWsEvent,
   ChatWsEventTypeUnion,
   ConnectionEstablished,
+  ConversationList,
+  ConversationListAck,
+  ConversationListEntry,
   EventMap,
   EventTypeMap,
   HydrateConversation,
@@ -238,6 +241,7 @@ export type {
   GrokDisplayNameUnion,
   GrokDisplayNameUnionImgGen,
   GrokDisplayNameUnionVideoGen,
+  ProviderModelRecord,
   GrokImgGenModels,
   GrokModelIdUnion,
   GrokModelIdUnionImgGen,
@@ -375,6 +379,7 @@ export type {
   TCN,
   Unenumerate,
   UnionToRecord,
+  UTR,
   Without,
   XOR
 } from "@/utils.ts";

@@ -36,7 +36,6 @@ export class AnthropicBaseService {
       mod === "claude-opus-4-7" ||
       mod === "claude-opus-4-6" ||
       mod === "claude-sonnet-4-6" ||
-      mod === "claude-opus-4-5-20251101" ||
       mod === "claude-fable-5" ||
       mod === "claude-sonnet-5"
     );
@@ -45,6 +44,7 @@ export class AnthropicBaseService {
   protected isAnthropicModel(m: string) {
     return (
       this.supportsAdaptive(m) ||
+      m === "claude-opus-4-5-20251101" ||
       m === "claude-sonnet-4-5-20250929" ||
       m === "claude-haiku-4-5-20251001" ||
       m === "claude-opus-4-1-20250805"
@@ -56,37 +56,20 @@ export class AnthropicBaseService {
     withLocalStore = false
   ) {
     switch (model) {
+      /**
+       * Avoid paying the prompt-cache cost twice when you retry a refused Claude Fable 5 request on another model.
+       * https://platform.claude.com/docs/en/build-with-claude/fallback-credit
+       */
       case "claude-fable-5":
       case "claude-sonnet-5":
       case "claude-opus-4-8":
-      case "claude-opus-4-7": {
-        if (withLocalStore) {
-          return [
-            "advanced-tool-use-2025-11-20",
-            "context-1m-2025-08-07",
-            "files-api-2025-04-14",
-            //     "output-300k-2026-03-24",
-            "extended-cache-ttl-2025-04-11",
-            "web-fetch-2025-09-10",
-            "code-execution-2025-08-25"
-          ] satisfies Anthropic.Beta.AnthropicBeta[];
-        } else {
-          return [
-            "context-1m-2025-08-07",
-            //     "output-300k-2026-03-24",
-            "files-api-2025-04-14",
-            "extended-cache-ttl-2025-04-11",
-            "code-execution-2025-08-25"
-          ] satisfies Anthropic.Beta.AnthropicBeta[];
-        }
-      }
+      case "claude-opus-4-7":
       case "claude-sonnet-4-6":
       case "claude-opus-4-6": {
         if (withLocalStore) {
           return [
             "advanced-tool-use-2025-11-20",
-            //     "output-300k-2026-03-24",
-            "context-1m-2025-08-07",
+            "fallback-credit-2026-06-01",
             "files-api-2025-04-14",
             "extended-cache-ttl-2025-04-11",
             "web-fetch-2025-09-10",
@@ -94,18 +77,15 @@ export class AnthropicBaseService {
           ] satisfies Anthropic.Beta.AnthropicBeta[];
         } else {
           return [
-            "context-1m-2025-08-07",
             "files-api-2025-04-14",
-            //     "output-300k-2026-03-24",
+            "fallback-credit-2026-06-01",
             "extended-cache-ttl-2025-04-11",
             "code-execution-2025-08-25"
           ] satisfies Anthropic.Beta.AnthropicBeta[];
         }
       }
-      // effort parameter is only supported by claude opus 4.5
       case "claude-opus-4-5-20251101": {
         if (withLocalStore) {
-          // advanced-tool-use supported by claude sonnet|opus 4.5/4.6 only
           return [
             "advanced-tool-use-2025-11-20",
             "effort-2025-11-24",
@@ -124,23 +104,19 @@ export class AnthropicBaseService {
           ] satisfies Anthropic.Beta.AnthropicBeta[];
         }
       }
-      // input context window 1m is only supported by claude sonnet 4 & 4.5 / Opus 4.6
       case "claude-sonnet-4-5-20250929": {
-        // advanced-tool-use supported by claude sonnet|opus 4.5/4.6 only
-        if (withLocalStore && model === "claude-sonnet-4-5-20250929") {
+        if (withLocalStore) {
           return [
             "advanced-tool-use-2025-11-20",
             "files-api-2025-04-14",
             "extended-cache-ttl-2025-04-11",
             "web-fetch-2025-09-10",
-            "context-1m-2025-08-07",
             "code-execution-2025-08-25"
           ] satisfies Anthropic.Beta.AnthropicBeta[];
         } else {
           return [
             "files-api-2025-04-14",
             "extended-cache-ttl-2025-04-11",
-            "context-1m-2025-08-07",
             "web-fetch-2025-09-10",
             "code-execution-2025-08-25"
           ] satisfies Anthropic.Beta.AnthropicBeta[];
@@ -151,8 +127,7 @@ export class AnthropicBaseService {
         return [
           "files-api-2025-04-14",
           "extended-cache-ttl-2025-04-11",
-          "web-fetch-2025-09-10",
-          "code-execution-2025-08-25"
+          "web-fetch-2025-09-10"
         ] satisfies Anthropic.Beta.AnthropicBeta[];
       }
     }
@@ -163,12 +138,12 @@ export class AnthropicBaseService {
     "claude-fable-5": 128000,
     "claude-opus-4-8": 128000,
     "claude-opus-4-7": 128000,
-    "claude-sonnet-4-6": 64000,
+    "claude-sonnet-4-6": 128000,
     "claude-opus-4-6": 128000,
-    "claude-opus-4-1-20250805": 32000,
     "claude-opus-4-5-20251101": 64000,
     "claude-haiku-4-5-20251001": 64000,
-    "claude-sonnet-4-5-20250929": 64000
+    "claude-sonnet-4-5-20250929": 64000,
+    "claude-opus-4-1-20250805": 32000
   } as const;
 
   protected inputTokenCeilingByModel = {
@@ -178,10 +153,10 @@ export class AnthropicBaseService {
     "claude-opus-4-7": 1000000,
     "claude-sonnet-4-6": 1000000,
     "claude-opus-4-6": 1000000,
-    "claude-opus-4-1-20250805": 200000,
+    "claude-sonnet-4-5-20250929": 200000,
     "claude-opus-4-5-20251101": 200000,
     "claude-haiku-4-5-20251001": 200000,
-    "claude-sonnet-4-5-20250929": 1000000
+    "claude-opus-4-1-20250805": 200000
   } as const;
 
   protected getMaxTokens = <const T extends AnthropicModelIdUnion>(
@@ -203,7 +178,8 @@ export class AnthropicBaseService {
     if (this.handleMaxTokens(mod, max_tokens) >= 1024) {
       if (this.supportsAdaptive(mod)) {
         return {
-          type: "adaptive"
+          type: "adaptive",
+          display: "summarized"
         } as const satisfies Anthropic.Beta.BetaThinkingConfigAdaptive;
       }
       return {
@@ -213,7 +189,8 @@ export class AnthropicBaseService {
     } else {
       if (this.supportsAdaptive(mod)) {
         return {
-          type: "adaptive"
+          type: "adaptive",
+          display: "summarized"
         } as const satisfies Anthropic.Beta.BetaThinkingConfigAdaptive;
       }
       return {

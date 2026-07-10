@@ -9,10 +9,10 @@ class Extractor extends Fs {
   }
 
   private data = async (env: string, id: string) => {
-  const { PrismaDbService } = await import("@slipstream/db/factory");
-  const prismaClient = new PrismaDbService({
-    connectionString: env
-  }).p(false);
+    const { PrismaDbService } = await import("@slipstream/db/factory");
+    const prismaClient = new PrismaDbService({
+      connectionString: env
+    }).p(false);
     try {
       prismaClient.$connect();
       return await prismaClient.attachment.findMany({

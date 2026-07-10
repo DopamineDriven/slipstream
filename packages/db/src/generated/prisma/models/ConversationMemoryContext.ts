@@ -28,7 +28,8 @@ export type AggregateConversationMemoryContext = {
 
 export type ConversationMemoryContextAvgAggregateOutputType = {
   rollingSummaryTokens: number | null
-  lastChunkedMessageIndex: number | null
+  rollingSummaryReasoningDuration: number | null
+  lastIndexedOrdinalExclusive: number | null
   totalTurns: number | null
   chunkedTurns: number | null
   totalTokens: number | null
@@ -36,7 +37,8 @@ export type ConversationMemoryContextAvgAggregateOutputType = {
 
 export type ConversationMemoryContextSumAggregateOutputType = {
   rollingSummaryTokens: number | null
-  lastChunkedMessageIndex: number | null
+  rollingSummaryReasoningDuration: number | null
+  lastIndexedOrdinalExclusive: number | null
   totalTurns: number | null
   chunkedTurns: number | null
   totalTokens: number | null
@@ -55,8 +57,12 @@ export type ConversationMemoryContextMinAggregateOutputType = {
   rollingSummaryProvider: $Enums.Provider | null
   rollingSummaryTokens: number | null
   rollingSummaryUpdatedAt: Date | null
-  lastChunkedMessageId: string | null
-  lastChunkedMessageIndex: number | null
+  rollingSummaryState: $Enums.MemorySummaryState | null
+  rollingSummaryReasoningVersion: $Enums.MemoryRollingSummaryReasoningVersion | null
+  rollingSummaryReasoningDuration: number | null
+  rollingSummaryReasoningText: string | null
+  rollingSummaryReasoningToolUseRaw: string | null
+  lastIndexedOrdinalExclusive: number | null
   lastChunkedAt: Date | null
   totalTurns: number | null
   chunkedTurns: number | null
@@ -81,8 +87,12 @@ export type ConversationMemoryContextMaxAggregateOutputType = {
   rollingSummaryProvider: $Enums.Provider | null
   rollingSummaryTokens: number | null
   rollingSummaryUpdatedAt: Date | null
-  lastChunkedMessageId: string | null
-  lastChunkedMessageIndex: number | null
+  rollingSummaryState: $Enums.MemorySummaryState | null
+  rollingSummaryReasoningVersion: $Enums.MemoryRollingSummaryReasoningVersion | null
+  rollingSummaryReasoningDuration: number | null
+  rollingSummaryReasoningText: string | null
+  rollingSummaryReasoningToolUseRaw: string | null
+  lastIndexedOrdinalExclusive: number | null
   lastChunkedAt: Date | null
   totalTurns: number | null
   chunkedTurns: number | null
@@ -107,8 +117,12 @@ export type ConversationMemoryContextCountAggregateOutputType = {
   rollingSummaryProvider: number
   rollingSummaryTokens: number
   rollingSummaryUpdatedAt: number
-  lastChunkedMessageId: number
-  lastChunkedMessageIndex: number
+  rollingSummaryState: number
+  rollingSummaryReasoningVersion: number
+  rollingSummaryReasoningDuration: number
+  rollingSummaryReasoningText: number
+  rollingSummaryReasoningToolUseRaw: number
+  lastIndexedOrdinalExclusive: number
   lastChunkedAt: number
   totalTurns: number
   chunkedTurns: number
@@ -124,7 +138,8 @@ export type ConversationMemoryContextCountAggregateOutputType = {
 
 export type ConversationMemoryContextAvgAggregateInputType = {
   rollingSummaryTokens?: true
-  lastChunkedMessageIndex?: true
+  rollingSummaryReasoningDuration?: true
+  lastIndexedOrdinalExclusive?: true
   totalTurns?: true
   chunkedTurns?: true
   totalTokens?: true
@@ -132,7 +147,8 @@ export type ConversationMemoryContextAvgAggregateInputType = {
 
 export type ConversationMemoryContextSumAggregateInputType = {
   rollingSummaryTokens?: true
-  lastChunkedMessageIndex?: true
+  rollingSummaryReasoningDuration?: true
+  lastIndexedOrdinalExclusive?: true
   totalTurns?: true
   chunkedTurns?: true
   totalTokens?: true
@@ -151,8 +167,12 @@ export type ConversationMemoryContextMinAggregateInputType = {
   rollingSummaryProvider?: true
   rollingSummaryTokens?: true
   rollingSummaryUpdatedAt?: true
-  lastChunkedMessageId?: true
-  lastChunkedMessageIndex?: true
+  rollingSummaryState?: true
+  rollingSummaryReasoningVersion?: true
+  rollingSummaryReasoningDuration?: true
+  rollingSummaryReasoningText?: true
+  rollingSummaryReasoningToolUseRaw?: true
+  lastIndexedOrdinalExclusive?: true
   lastChunkedAt?: true
   totalTurns?: true
   chunkedTurns?: true
@@ -177,8 +197,12 @@ export type ConversationMemoryContextMaxAggregateInputType = {
   rollingSummaryProvider?: true
   rollingSummaryTokens?: true
   rollingSummaryUpdatedAt?: true
-  lastChunkedMessageId?: true
-  lastChunkedMessageIndex?: true
+  rollingSummaryState?: true
+  rollingSummaryReasoningVersion?: true
+  rollingSummaryReasoningDuration?: true
+  rollingSummaryReasoningText?: true
+  rollingSummaryReasoningToolUseRaw?: true
+  lastIndexedOrdinalExclusive?: true
   lastChunkedAt?: true
   totalTurns?: true
   chunkedTurns?: true
@@ -203,8 +227,12 @@ export type ConversationMemoryContextCountAggregateInputType = {
   rollingSummaryProvider?: true
   rollingSummaryTokens?: true
   rollingSummaryUpdatedAt?: true
-  lastChunkedMessageId?: true
-  lastChunkedMessageIndex?: true
+  rollingSummaryState?: true
+  rollingSummaryReasoningVersion?: true
+  rollingSummaryReasoningDuration?: true
+  rollingSummaryReasoningText?: true
+  rollingSummaryReasoningToolUseRaw?: true
+  lastIndexedOrdinalExclusive?: true
   lastChunkedAt?: true
   totalTurns?: true
   chunkedTurns?: true
@@ -316,8 +344,12 @@ export type ConversationMemoryContextGroupByOutputType = {
   rollingSummaryProvider: $Enums.Provider | null
   rollingSummaryTokens: number
   rollingSummaryUpdatedAt: Date | null
-  lastChunkedMessageId: string | null
-  lastChunkedMessageIndex: number | null
+  rollingSummaryState: $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion: $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration: number
+  rollingSummaryReasoningText: string | null
+  rollingSummaryReasoningToolUseRaw: string | null
+  lastIndexedOrdinalExclusive: number
   lastChunkedAt: Date | null
   totalTurns: number
   chunkedTurns: number
@@ -365,8 +397,12 @@ export type ConversationMemoryContextWhereInput = {
   rollingSummaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryContext"> | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number
   rollingSummaryUpdatedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  lastChunkedMessageId?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  lastChunkedMessageIndex?: Prisma.IntNullableFilter<"ConversationMemoryContext"> | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFilter<"ConversationMemoryContext"> | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFilter<"ConversationMemoryContext"> | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFilter<"ConversationMemoryContext"> | number
+  rollingSummaryReasoningText?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFilter<"ConversationMemoryContext"> | number
   lastChunkedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
   totalTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number
   chunkedTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number
@@ -394,8 +430,12 @@ export type ConversationMemoryContextOrderByWithRelationInput = {
   rollingSummaryProvider?: Prisma.SortOrderInput | Prisma.SortOrder
   rollingSummaryTokens?: Prisma.SortOrder
   rollingSummaryUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastChunkedMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrderInput | Prisma.SortOrder
+  rollingSummaryState?: Prisma.SortOrder
+  rollingSummaryReasoningVersion?: Prisma.SortOrder
+  rollingSummaryReasoningDuration?: Prisma.SortOrder
+  rollingSummaryReasoningText?: Prisma.SortOrderInput | Prisma.SortOrder
+  rollingSummaryReasoningToolUseRaw?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastIndexedOrdinalExclusive?: Prisma.SortOrder
   lastChunkedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   totalTurns?: Prisma.SortOrder
   chunkedTurns?: Prisma.SortOrder
@@ -426,8 +466,12 @@ export type ConversationMemoryContextWhereUniqueInput = Prisma.AtLeast<{
   rollingSummaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryContext"> | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number
   rollingSummaryUpdatedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  lastChunkedMessageId?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  lastChunkedMessageIndex?: Prisma.IntNullableFilter<"ConversationMemoryContext"> | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFilter<"ConversationMemoryContext"> | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFilter<"ConversationMemoryContext"> | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFilter<"ConversationMemoryContext"> | number
+  rollingSummaryReasoningText?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFilter<"ConversationMemoryContext"> | number
   lastChunkedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
   totalTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number
   chunkedTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number
@@ -455,8 +499,12 @@ export type ConversationMemoryContextOrderByWithAggregationInput = {
   rollingSummaryProvider?: Prisma.SortOrderInput | Prisma.SortOrder
   rollingSummaryTokens?: Prisma.SortOrder
   rollingSummaryUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastChunkedMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrderInput | Prisma.SortOrder
+  rollingSummaryState?: Prisma.SortOrder
+  rollingSummaryReasoningVersion?: Prisma.SortOrder
+  rollingSummaryReasoningDuration?: Prisma.SortOrder
+  rollingSummaryReasoningText?: Prisma.SortOrderInput | Prisma.SortOrder
+  rollingSummaryReasoningToolUseRaw?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastIndexedOrdinalExclusive?: Prisma.SortOrder
   lastChunkedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   totalTurns?: Prisma.SortOrder
   chunkedTurns?: Prisma.SortOrder
@@ -489,8 +537,12 @@ export type ConversationMemoryContextScalarWhereWithAggregatesInput = {
   rollingSummaryProvider?: Prisma.EnumProviderNullableWithAggregatesFilter<"ConversationMemoryContext"> | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number
   rollingSummaryUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryContext"> | Date | string | null
-  lastChunkedMessageId?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null
-  lastChunkedMessageIndex?: Prisma.IntNullableWithAggregatesFilter<"ConversationMemoryContext"> | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateWithAggregatesFilter<"ConversationMemoryContext"> | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionWithAggregatesFilter<"ConversationMemoryContext"> | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number
+  rollingSummaryReasoningText?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number
   lastChunkedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryContext"> | Date | string | null
   totalTurns?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number
   chunkedTurns?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number
@@ -513,8 +565,12 @@ export type ConversationMemoryContextCreateInput = {
   rollingSummaryProvider?: $Enums.Provider | null
   rollingSummaryTokens?: number
   rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
+  rollingSummaryState?: $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: number
+  rollingSummaryReasoningText?: string | null
+  rollingSummaryReasoningToolUseRaw?: string | null
+  lastIndexedOrdinalExclusive?: number
   lastChunkedAt?: Date | string | null
   totalTurns?: number
   chunkedTurns?: number
@@ -542,8 +598,12 @@ export type ConversationMemoryContextUncheckedCreateInput = {
   rollingSummaryProvider?: $Enums.Provider | null
   rollingSummaryTokens?: number
   rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
+  rollingSummaryState?: $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: number
+  rollingSummaryReasoningText?: string | null
+  rollingSummaryReasoningToolUseRaw?: string | null
+  lastIndexedOrdinalExclusive?: number
   lastChunkedAt?: Date | string | null
   totalTurns?: number
   chunkedTurns?: number
@@ -567,8 +627,12 @@ export type ConversationMemoryContextUpdateInput = {
   rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFieldUpdateOperationsInput | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  rollingSummaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFieldUpdateOperationsInput | number
   lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
   chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
@@ -596,8 +660,12 @@ export type ConversationMemoryContextUncheckedUpdateInput = {
   rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFieldUpdateOperationsInput | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  rollingSummaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFieldUpdateOperationsInput | number
   lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
   chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
@@ -623,8 +691,12 @@ export type ConversationMemoryContextCreateManyInput = {
   rollingSummaryProvider?: $Enums.Provider | null
   rollingSummaryTokens?: number
   rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
+  rollingSummaryState?: $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: number
+  rollingSummaryReasoningText?: string | null
+  rollingSummaryReasoningToolUseRaw?: string | null
+  lastIndexedOrdinalExclusive?: number
   lastChunkedAt?: Date | string | null
   totalTurns?: number
   chunkedTurns?: number
@@ -647,8 +719,12 @@ export type ConversationMemoryContextUpdateManyMutationInput = {
   rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFieldUpdateOperationsInput | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  rollingSummaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFieldUpdateOperationsInput | number
   lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
   chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
@@ -673,8 +749,12 @@ export type ConversationMemoryContextUncheckedUpdateManyInput = {
   rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFieldUpdateOperationsInput | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  rollingSummaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFieldUpdateOperationsInput | number
   lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
   chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
@@ -714,8 +794,12 @@ export type ConversationMemoryContextCountOrderByAggregateInput = {
   rollingSummaryProvider?: Prisma.SortOrder
   rollingSummaryTokens?: Prisma.SortOrder
   rollingSummaryUpdatedAt?: Prisma.SortOrder
-  lastChunkedMessageId?: Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrder
+  rollingSummaryState?: Prisma.SortOrder
+  rollingSummaryReasoningVersion?: Prisma.SortOrder
+  rollingSummaryReasoningDuration?: Prisma.SortOrder
+  rollingSummaryReasoningText?: Prisma.SortOrder
+  rollingSummaryReasoningToolUseRaw?: Prisma.SortOrder
+  lastIndexedOrdinalExclusive?: Prisma.SortOrder
   lastChunkedAt?: Prisma.SortOrder
   totalTurns?: Prisma.SortOrder
   chunkedTurns?: Prisma.SortOrder
@@ -729,7 +813,8 @@ export type ConversationMemoryContextCountOrderByAggregateInput = {
 
 export type ConversationMemoryContextAvgOrderByAggregateInput = {
   rollingSummaryTokens?: Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrder
+  rollingSummaryReasoningDuration?: Prisma.SortOrder
+  lastIndexedOrdinalExclusive?: Prisma.SortOrder
   totalTurns?: Prisma.SortOrder
   chunkedTurns?: Prisma.SortOrder
   totalTokens?: Prisma.SortOrder
@@ -748,8 +833,12 @@ export type ConversationMemoryContextMaxOrderByAggregateInput = {
   rollingSummaryProvider?: Prisma.SortOrder
   rollingSummaryTokens?: Prisma.SortOrder
   rollingSummaryUpdatedAt?: Prisma.SortOrder
-  lastChunkedMessageId?: Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrder
+  rollingSummaryState?: Prisma.SortOrder
+  rollingSummaryReasoningVersion?: Prisma.SortOrder
+  rollingSummaryReasoningDuration?: Prisma.SortOrder
+  rollingSummaryReasoningText?: Prisma.SortOrder
+  rollingSummaryReasoningToolUseRaw?: Prisma.SortOrder
+  lastIndexedOrdinalExclusive?: Prisma.SortOrder
   lastChunkedAt?: Prisma.SortOrder
   totalTurns?: Prisma.SortOrder
   chunkedTurns?: Prisma.SortOrder
@@ -774,8 +863,12 @@ export type ConversationMemoryContextMinOrderByAggregateInput = {
   rollingSummaryProvider?: Prisma.SortOrder
   rollingSummaryTokens?: Prisma.SortOrder
   rollingSummaryUpdatedAt?: Prisma.SortOrder
-  lastChunkedMessageId?: Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrder
+  rollingSummaryState?: Prisma.SortOrder
+  rollingSummaryReasoningVersion?: Prisma.SortOrder
+  rollingSummaryReasoningDuration?: Prisma.SortOrder
+  rollingSummaryReasoningText?: Prisma.SortOrder
+  rollingSummaryReasoningToolUseRaw?: Prisma.SortOrder
+  lastIndexedOrdinalExclusive?: Prisma.SortOrder
   lastChunkedAt?: Prisma.SortOrder
   totalTurns?: Prisma.SortOrder
   chunkedTurns?: Prisma.SortOrder
@@ -789,7 +882,8 @@ export type ConversationMemoryContextMinOrderByAggregateInput = {
 
 export type ConversationMemoryContextSumOrderByAggregateInput = {
   rollingSummaryTokens?: Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrder
+  rollingSummaryReasoningDuration?: Prisma.SortOrder
+  lastIndexedOrdinalExclusive?: Prisma.SortOrder
   totalTurns?: Prisma.SortOrder
   chunkedTurns?: Prisma.SortOrder
   totalTokens?: Prisma.SortOrder
@@ -878,6 +972,20 @@ export type NullableEnumProviderFieldUpdateOperationsInput = {
   set?: $Enums.Provider | null
 }
 
+export type EnumMemorySummaryStateFieldUpdateOperationsInput = {
+  set?: $Enums.MemorySummaryState
+}
+
+export type EnumMemoryRollingSummaryReasoningVersionFieldUpdateOperationsInput = {
+  set?: $Enums.MemoryRollingSummaryReasoningVersion
+}
+
+export type ConversationMemoryContextCreateNestedOneWithoutMemoryChunksInput = {
+  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryChunksInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryChunksInput>
+  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryChunksInput
+  connect?: Prisma.ConversationMemoryContextWhereUniqueInput
+}
+
 export type ConversationMemoryContextUpdateOneRequiredWithoutMemoryChunksNestedInput = {
   create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryChunksInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryChunksInput>
   connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryChunksInput
@@ -897,8 +1005,12 @@ export type ConversationMemoryContextCreateWithoutConversationInput = {
   rollingSummaryProvider?: $Enums.Provider | null
   rollingSummaryTokens?: number
   rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
+  rollingSummaryState?: $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: number
+  rollingSummaryReasoningText?: string | null
+  rollingSummaryReasoningToolUseRaw?: string | null
+  lastIndexedOrdinalExclusive?: number
   lastChunkedAt?: Date | string | null
   totalTurns?: number
   chunkedTurns?: number
@@ -924,8 +1036,12 @@ export type ConversationMemoryContextUncheckedCreateWithoutConversationInput = {
   rollingSummaryProvider?: $Enums.Provider | null
   rollingSummaryTokens?: number
   rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
+  rollingSummaryState?: $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: number
+  rollingSummaryReasoningText?: string | null
+  rollingSummaryReasoningToolUseRaw?: string | null
+  lastIndexedOrdinalExclusive?: number
   lastChunkedAt?: Date | string | null
   totalTurns?: number
   chunkedTurns?: number
@@ -965,8 +1081,12 @@ export type ConversationMemoryContextUpdateWithoutConversationInput = {
   rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFieldUpdateOperationsInput | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  rollingSummaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFieldUpdateOperationsInput | number
   lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
   chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
@@ -992,8 +1112,12 @@ export type ConversationMemoryContextUncheckedUpdateWithoutConversationInput = {
   rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFieldUpdateOperationsInput | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  rollingSummaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFieldUpdateOperationsInput | number
   lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
   chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1017,8 +1141,12 @@ export type ConversationMemoryContextCreateWithoutMemoryStoreInput = {
   rollingSummaryProvider?: $Enums.Provider | null
   rollingSummaryTokens?: number
   rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
+  rollingSummaryState?: $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: number
+  rollingSummaryReasoningText?: string | null
+  rollingSummaryReasoningToolUseRaw?: string | null
+  lastIndexedOrdinalExclusive?: number
   lastChunkedAt?: Date | string | null
   totalTurns?: number
   chunkedTurns?: number
@@ -1044,8 +1172,12 @@ export type ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput = {
   rollingSummaryProvider?: $Enums.Provider | null
   rollingSummaryTokens?: number
   rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
+  rollingSummaryState?: $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: number
+  rollingSummaryReasoningText?: string | null
+  rollingSummaryReasoningToolUseRaw?: string | null
+  lastIndexedOrdinalExclusive?: number
   lastChunkedAt?: Date | string | null
   totalTurns?: number
   chunkedTurns?: number
@@ -1100,8 +1232,12 @@ export type ConversationMemoryContextScalarWhereInput = {
   rollingSummaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryContext"> | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number
   rollingSummaryUpdatedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  lastChunkedMessageId?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  lastChunkedMessageIndex?: Prisma.IntNullableFilter<"ConversationMemoryContext"> | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFilter<"ConversationMemoryContext"> | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFilter<"ConversationMemoryContext"> | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFilter<"ConversationMemoryContext"> | number
+  rollingSummaryReasoningText?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFilter<"ConversationMemoryContext"> | number
   lastChunkedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
   totalTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number
   chunkedTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number
@@ -1124,8 +1260,12 @@ export type ConversationMemoryContextCreateWithoutMemoryChunksInput = {
   rollingSummaryProvider?: $Enums.Provider | null
   rollingSummaryTokens?: number
   rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
+  rollingSummaryState?: $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: number
+  rollingSummaryReasoningText?: string | null
+  rollingSummaryReasoningToolUseRaw?: string | null
+  lastIndexedOrdinalExclusive?: number
   lastChunkedAt?: Date | string | null
   totalTurns?: number
   chunkedTurns?: number
@@ -1152,8 +1292,12 @@ export type ConversationMemoryContextUncheckedCreateWithoutMemoryChunksInput = {
   rollingSummaryProvider?: $Enums.Provider | null
   rollingSummaryTokens?: number
   rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
+  rollingSummaryState?: $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: number
+  rollingSummaryReasoningText?: string | null
+  rollingSummaryReasoningToolUseRaw?: string | null
+  lastIndexedOrdinalExclusive?: number
   lastChunkedAt?: Date | string | null
   totalTurns?: number
   chunkedTurns?: number
@@ -1192,8 +1336,12 @@ export type ConversationMemoryContextUpdateWithoutMemoryChunksInput = {
   rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFieldUpdateOperationsInput | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  rollingSummaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFieldUpdateOperationsInput | number
   lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
   chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1220,8 +1368,12 @@ export type ConversationMemoryContextUncheckedUpdateWithoutMemoryChunksInput = {
   rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFieldUpdateOperationsInput | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  rollingSummaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFieldUpdateOperationsInput | number
   lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
   chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1245,8 +1397,12 @@ export type ConversationMemoryContextCreateManyMemoryStoreInput = {
   rollingSummaryProvider?: $Enums.Provider | null
   rollingSummaryTokens?: number
   rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
+  rollingSummaryState?: $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: number
+  rollingSummaryReasoningText?: string | null
+  rollingSummaryReasoningToolUseRaw?: string | null
+  lastIndexedOrdinalExclusive?: number
   lastChunkedAt?: Date | string | null
   totalTurns?: number
   chunkedTurns?: number
@@ -1269,8 +1425,12 @@ export type ConversationMemoryContextUpdateWithoutMemoryStoreInput = {
   rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFieldUpdateOperationsInput | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  rollingSummaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFieldUpdateOperationsInput | number
   lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
   chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1296,8 +1456,12 @@ export type ConversationMemoryContextUncheckedUpdateWithoutMemoryStoreInput = {
   rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFieldUpdateOperationsInput | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  rollingSummaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFieldUpdateOperationsInput | number
   lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
   chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1322,8 +1486,12 @@ export type ConversationMemoryContextUncheckedUpdateManyWithoutMemoryStoreInput 
   rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
   rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rollingSummaryState?: Prisma.EnumMemorySummaryStateFieldUpdateOperationsInput | $Enums.MemorySummaryState
+  rollingSummaryReasoningVersion?: Prisma.EnumMemoryRollingSummaryReasoningVersionFieldUpdateOperationsInput | $Enums.MemoryRollingSummaryReasoningVersion
+  rollingSummaryReasoningDuration?: Prisma.IntFieldUpdateOperationsInput | number
+  rollingSummaryReasoningText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollingSummaryReasoningToolUseRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIndexedOrdinalExclusive?: Prisma.IntFieldUpdateOperationsInput | number
   lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
   chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1379,8 +1547,12 @@ export type ConversationMemoryContextSelect<ExtArgs extends runtime.Types.Extens
   rollingSummaryProvider?: boolean
   rollingSummaryTokens?: boolean
   rollingSummaryUpdatedAt?: boolean
-  lastChunkedMessageId?: boolean
-  lastChunkedMessageIndex?: boolean
+  rollingSummaryState?: boolean
+  rollingSummaryReasoningVersion?: boolean
+  rollingSummaryReasoningDuration?: boolean
+  rollingSummaryReasoningText?: boolean
+  rollingSummaryReasoningToolUseRaw?: boolean
+  lastIndexedOrdinalExclusive?: boolean
   lastChunkedAt?: boolean
   totalTurns?: boolean
   chunkedTurns?: boolean
@@ -1409,8 +1581,12 @@ export type ConversationMemoryContextSelectCreateManyAndReturn<ExtArgs extends r
   rollingSummaryProvider?: boolean
   rollingSummaryTokens?: boolean
   rollingSummaryUpdatedAt?: boolean
-  lastChunkedMessageId?: boolean
-  lastChunkedMessageIndex?: boolean
+  rollingSummaryState?: boolean
+  rollingSummaryReasoningVersion?: boolean
+  rollingSummaryReasoningDuration?: boolean
+  rollingSummaryReasoningText?: boolean
+  rollingSummaryReasoningToolUseRaw?: boolean
+  lastIndexedOrdinalExclusive?: boolean
   lastChunkedAt?: boolean
   totalTurns?: boolean
   chunkedTurns?: boolean
@@ -1437,8 +1613,12 @@ export type ConversationMemoryContextSelectUpdateManyAndReturn<ExtArgs extends r
   rollingSummaryProvider?: boolean
   rollingSummaryTokens?: boolean
   rollingSummaryUpdatedAt?: boolean
-  lastChunkedMessageId?: boolean
-  lastChunkedMessageIndex?: boolean
+  rollingSummaryState?: boolean
+  rollingSummaryReasoningVersion?: boolean
+  rollingSummaryReasoningDuration?: boolean
+  rollingSummaryReasoningText?: boolean
+  rollingSummaryReasoningToolUseRaw?: boolean
+  lastIndexedOrdinalExclusive?: boolean
   lastChunkedAt?: boolean
   totalTurns?: boolean
   chunkedTurns?: boolean
@@ -1465,8 +1645,12 @@ export type ConversationMemoryContextSelectScalar = {
   rollingSummaryProvider?: boolean
   rollingSummaryTokens?: boolean
   rollingSummaryUpdatedAt?: boolean
-  lastChunkedMessageId?: boolean
-  lastChunkedMessageIndex?: boolean
+  rollingSummaryState?: boolean
+  rollingSummaryReasoningVersion?: boolean
+  rollingSummaryReasoningDuration?: boolean
+  rollingSummaryReasoningText?: boolean
+  rollingSummaryReasoningToolUseRaw?: boolean
+  lastIndexedOrdinalExclusive?: boolean
   lastChunkedAt?: boolean
   totalTurns?: boolean
   chunkedTurns?: boolean
@@ -1478,7 +1662,7 @@ export type ConversationMemoryContextSelectScalar = {
   hasMultipleModels?: boolean
 }
 
-export type ConversationMemoryContextOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "storeId" | "conversationId" | "schemaVersion" | "conversationTitle" | "firstMessageAt" | "lastMessageAt" | "rollingSummary" | "rollingSummaryModel" | "rollingSummaryProvider" | "rollingSummaryTokens" | "rollingSummaryUpdatedAt" | "lastChunkedMessageId" | "lastChunkedMessageIndex" | "lastChunkedAt" | "totalTurns" | "chunkedTurns" | "totalTokens" | "contributingProviderModelsRaw" | "createdAt" | "updatedAt" | "hasMultipleProviders" | "hasMultipleModels", ExtArgs["result"]["conversationMemoryContext"]>
+export type ConversationMemoryContextOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "storeId" | "conversationId" | "schemaVersion" | "conversationTitle" | "firstMessageAt" | "lastMessageAt" | "rollingSummary" | "rollingSummaryModel" | "rollingSummaryProvider" | "rollingSummaryTokens" | "rollingSummaryUpdatedAt" | "rollingSummaryState" | "rollingSummaryReasoningVersion" | "rollingSummaryReasoningDuration" | "rollingSummaryReasoningText" | "rollingSummaryReasoningToolUseRaw" | "lastIndexedOrdinalExclusive" | "lastChunkedAt" | "totalTurns" | "chunkedTurns" | "totalTokens" | "contributingProviderModelsRaw" | "createdAt" | "updatedAt" | "hasMultipleProviders" | "hasMultipleModels", ExtArgs["result"]["conversationMemoryContext"]>
 export type ConversationMemoryContextInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs>
   conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
@@ -1514,8 +1698,32 @@ export type $ConversationMemoryContextPayload<ExtArgs extends runtime.Types.Exte
     rollingSummaryProvider: $Enums.Provider | null
     rollingSummaryTokens: number
     rollingSummaryUpdatedAt: Date | null
-    lastChunkedMessageId: string | null
-    lastChunkedMessageIndex: number | null
+    /**
+     * fold-job lifecycle — QUEUED until the first fold; SUMMARIZING during; READY/ERROR after.
+     * Makes a died-mid-fold process observable and reclaimable, mirroring the chunk side.
+     */
+    rollingSummaryState: $Enums.MemorySummaryState
+    /**
+     * fold-prompt era that produced the current rolling summary
+     */
+    rollingSummaryReasoningVersion: $Enums.MemoryRollingSummaryReasoningVersion
+    /**
+     * wall-clock ms spent inside adaptive-thinking blocks across the fold call (stream-event timed)
+     */
+    rollingSummaryReasoningDuration: number
+    /**
+     * captured thinking-block text — visibility into how the fold reaches its conclusions
+     */
+    rollingSummaryReasoningText: string | null
+    /**
+     * JSON trace of in-house tool calls (file_search) during the fold: name, input, output per round
+     */
+    rollingSummaryReasoningToolUseRaw: string | null
+    /**
+     * Indexing watermark: every ordinal < this value is covered by a chunk row.
+     * Advanced ONLY via the claim CAS (claimMemorySection.sql). Never cached in-process.
+     */
+    lastIndexedOrdinalExclusive: number
     lastChunkedAt: Date | null
     totalTurns: number
     chunkedTurns: number
@@ -1963,8 +2171,12 @@ export interface ConversationMemoryContextFieldRefs {
   readonly rollingSummaryProvider: Prisma.FieldRef<"ConversationMemoryContext", 'Provider'>
   readonly rollingSummaryTokens: Prisma.FieldRef<"ConversationMemoryContext", 'Int'>
   readonly rollingSummaryUpdatedAt: Prisma.FieldRef<"ConversationMemoryContext", 'DateTime'>
-  readonly lastChunkedMessageId: Prisma.FieldRef<"ConversationMemoryContext", 'String'>
-  readonly lastChunkedMessageIndex: Prisma.FieldRef<"ConversationMemoryContext", 'Int'>
+  readonly rollingSummaryState: Prisma.FieldRef<"ConversationMemoryContext", 'MemorySummaryState'>
+  readonly rollingSummaryReasoningVersion: Prisma.FieldRef<"ConversationMemoryContext", 'MemoryRollingSummaryReasoningVersion'>
+  readonly rollingSummaryReasoningDuration: Prisma.FieldRef<"ConversationMemoryContext", 'Int'>
+  readonly rollingSummaryReasoningText: Prisma.FieldRef<"ConversationMemoryContext", 'String'>
+  readonly rollingSummaryReasoningToolUseRaw: Prisma.FieldRef<"ConversationMemoryContext", 'String'>
+  readonly lastIndexedOrdinalExclusive: Prisma.FieldRef<"ConversationMemoryContext", 'Int'>
   readonly lastChunkedAt: Prisma.FieldRef<"ConversationMemoryContext", 'DateTime'>
   readonly totalTurns: Prisma.FieldRef<"ConversationMemoryContext", 'Int'>
   readonly chunkedTurns: Prisma.FieldRef<"ConversationMemoryContext", 'Int'>

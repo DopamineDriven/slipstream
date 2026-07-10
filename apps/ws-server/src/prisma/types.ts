@@ -166,3 +166,86 @@ export interface FindManyProviderStoreDocsAgg {
   mimeType: string;
   lastAccessed: Date | null;
 }
+
+export interface CreateMemoryStoreParams {
+  userId: string;
+  embeddingModel?: Voyage.ModelUnion;
+  embeddingDim?: Voyage.EmbeddingDims;
+  schemaVersion?: $Enums.MemorySchemaVersion;
+}
+
+export interface CreateMemoryContextParams {
+  storeId: string;
+  conversationId: string;
+  conversationTitle?: string | null;
+  schemaVersion?: $Enums.MemorySchemaVersion;
+}
+
+export interface InsertMemoryChunkParams {
+  provenanceId: string;
+  contextId: string;
+  storeId: string;
+  conversationId: string;
+  chunkIndex: number;
+  ordinalStart: number;
+  ordinalEndExclusive: number;
+  messageIdStart: string;
+  messageIdEnd: string;
+  messageTimestampStart: Date;
+  messageTimestampEnd: Date;
+  transcriptMarkdown: string;
+  contentHash: string;
+  chunkedMessagesCount: number;
+  tokenCount: number;
+  providerModelsRaw: string;
+  hasAttachments: boolean;
+  chunkedAttachmentsCount?: number | null;
+  attachmentProvenanceIdsRaw?: string | null;
+  embeddingModel?: Voyage.ModelUnion;
+  boundaryReason?: $Enums.MemoryChunkBoundaryReason | null;
+  schemaVersion?: $Enums.MemorySchemaVersion;
+  rendererVersion?: $Enums.MemoryTranscriptRendererVersion;
+  transcriptIncludesThinking?: boolean;
+}
+
+export interface FoldRollingSummaryParams {
+  contextId: string;
+  /** CAS guard — the rollingSummaryUpdatedAt value read BEFORE summarizing (null on first fold) */
+  expectedRollingSummaryUpdatedAt: Date | null;
+  rollingSummary: string;
+  rollingSummaryModel: string;
+  rollingSummaryProvider: $Enums.Provider;
+  rollingSummaryTokens: number;
+  /** wall-clock ms inside adaptive-thinking blocks across the fold call */
+  rollingSummaryReasoningDuration: number;
+  rollingSummaryReasoningText: string | null;
+  rollingSummaryReasoningToolUseRaw: string | null;
+  rollingSummaryReasoningVersion: $Enums.MemoryRollingSummaryReasoningVersion;
+  /** becomes the new rollingSummaryUpdatedAt — a fold WATERMARK (max folded summaryGeneratedAt), not wall-clock now; sections landing mid-fold stay newer than it and surface next check */
+  foldedThroughGeneratedAt: Date;
+}
+
+export interface UpdateMemoryContextAggregatesParams {
+  chunkedTurnsDelta?: number;
+  totalTokensDelta?: number;
+  totalTurns?: number;
+  contributingProviderModelsRaw?: string;
+  hasMultipleProviders?: boolean;
+  hasMultipleModels?: boolean;
+  firstMessageAt?: Date;
+  lastMessageAt?: Date;
+}
+
+export interface UpdateMemoryStoreCountersParams {
+  chunksDelta?: number;
+  tokensDelta?: number;
+  conversationsDelta?: number;
+}
+
+export interface GetConversationHydrationPagesParams {
+  readonly userId: string;
+  readonly conversationId: string;
+  readonly lowestLoadedOrdinal: number;
+  readonly take?: number;
+  readonly maxPages?: number;
+}

@@ -4,9 +4,7 @@ import type {
 } from "@/xai/responses-types.ts";
 
 export class ResponseSSEWorkupService {
-  protected xaiResponsesSSETransformer(
-    chunk: string
-  ) {
+  protected xaiResponsesSSETransformer(chunk: string) {
     let eventType: string | undefined = undefined;
     const dataLines = Array.of<string>();
 

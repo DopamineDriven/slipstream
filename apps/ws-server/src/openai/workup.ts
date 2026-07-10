@@ -3,10 +3,7 @@ import type { LoggerService } from "@/logger/index.ts";
 import type { OpenAIFileSearchToolInput } from "@/openai/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
-import type {
-  InferPromiseRT,
-  ProviderOpenaiRequestEntity
-} from "@/types/index.ts";
+import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
 import type { OpenAI } from "openai";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import { OpenAIBaseService } from "@/openai/base.ts";
@@ -128,91 +125,6 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     return content;
   }
 
-  // openai/index.ts
-  protected async formatOpenAiWithUploads(
-    isNewChat: boolean,
-    msgs: MessageSingleton<true>[],
-    client: OpenAI,
-    keyFingerprint = "server",
-    opts?: { onlyMostRecentUser?: boolean }
-  ) {
-    if (isNewChat) {
-      const first = msgs[0];
-      if (!first)
-        return [{ role: "user", content: "" }] as const satisfies ResponseInput;
-      const firstText = this.messageText(first);
-      const attContent = await this.buildAttachmentContentAsync(
-        first.attachments,
-        client,
-        keyFingerprint
-      );
-      return attContent.length
-        ? ([
-            {
-              role: "user",
-              content: [
-                ...attContent,
-                { type: "input_text", text: firstText }
-              ]
-            }
-          ] as const satisfies ResponseInput)
-        : ([
-            { role: "user", content: firstText }
-          ] as const satisfies ResponseInput);
-    } else {
-      if (opts?.onlyMostRecentUser) {
-        const lastUser = [...msgs].reverse().find(t => t.senderType === "USER");
-        if (lastUser) {
-          const lastUserText = this.messageText(lastUser);
-          const attContent = await this.buildAttachmentContentAsync(
-            lastUser.attachments,
-            client,
-            keyFingerprint
-          );
-          return attContent.length
-            ? ([
-                {
-                  role: "user",
-                  content: [
-                    ...attContent,
-                    { type: "input_text", text: lastUserText }
-                  ]
-                }
-              ] as const satisfies ResponseInput)
-            : ([
-                { role: "user", content: lastUserText }
-              ] as const satisfies ResponseInput);
-        }
-      }
-      const history = this.prependProviderModelTag(msgs.slice(0, -1));
-      const last = msgs.at(-1);
-      if (last?.senderType === "USER") {
-        const lastText = this.messageText(last);
-        const attContent = await this.buildAttachmentContentAsync(
-          last.attachments,
-          client,
-          keyFingerprint
-        );
-        return attContent.length
-          ? ([
-              ...history,
-              {
-                role: "user",
-                content: [
-                  ...attContent,
-                  { type: "input_text", text: lastText }
-                ]
-              }
-            ] as const satisfies ResponseInput)
-          : ([
-              ...history,
-              { role: "user", content: lastText }
-            ] as const satisfies ResponseInput);
-      }
-      return this.formatMsgs(this.prependProviderModelTag(msgs));
-    }
-  }
-
   protected messageText(
     msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
   ) {
@@ -231,35 +143,6 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     }
 
     return msg.content;
-  }
-
-  private prependProviderModelTag(
-    msgs: Pick<
-      MessageSingleton<true>,
-      "senderType" | "provider" | "model" | "content" | "messageBlocks"
-    >[]
-  ) {
-    return msgs.map(msg => {
-      const text = this.messageText(msg);
-
-      if (msg.senderType === "USER") {
-        return { role: "user", content: text } as const;
-      } else {
-        const provider = msg.provider.toLowerCase();
-        const model = msg.model ?? "";
-        const modelIdentifier = `[${provider}/${model}]`;
-        return {
-          role: "assistant",
-          content: `${modelIdentifier} \n${text}`
-        } as const;
-      }
-    }) satisfies ResponseInput;
-  }
-
-  protected buildInstructions(systemPrompt?: string) {
-    return systemPrompt
-      ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
-      : "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
   }
 
   protected ensureUserVectorStoreId(
@@ -297,52 +180,6 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     this.inflightVS.set(name, p);
     return p;
   }
-  protected hasFiles(
-    formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
-  ) {
-    return formatted.some(m => {
-      if (typeof m.content === "string") return false;
-      if (m.role !== "user") return false;
-      return m.content.some(
-        t =>
-          t.type === "input_file" &&
-          (typeof t?.file_id !== "undefined" ||
-            typeof t?.file_data !== "undefined")
-      );
-    });
-  }
-  protected hasImages(
-    formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
-  ) {
-    return formatted.some(m => {
-      if (typeof m.content === "string") return false;
-      if (m.role !== "user") return false;
-      return m.content.some(
-        t =>
-          t.type === "input_image" &&
-          (typeof t?.image_url !== "undefined" ||
-            typeof t?.file_id !== "undefined")
-      );
-    });
-  }
-  protected fileIds(
-    formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
-  ) {
-    const fileIdArr = Array.of<string>();
-    try {
-      for (const m of formatted) {
-        if (m.role !== "user") continue;
-        const c = m.content;
-        if (typeof c === "string") continue;
-        for (const p of c) {
-          if (p.type === "input_file" && p.file_id) fileIdArr.push(p.file_id);
-        }
-      }
-    } finally {
-      return fileIdArr;
-    }
-  }
-
   protected formatMsgs(
     msgs: (
       | {
@@ -376,12 +213,12 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     ) satisfies OpenAI.Responses.WebSearchTool.UserLocation | null | undefined;
   }
 
-  protected fileSearchFunctionTool() {
+  protected userStoreSearchFunctionTool() {
     return {
       type: "function",
-      name: "file_search",
+      name: "user_store_search",
       description:
-              "This tool utilizes a 'Partitioned Foraging' approach which recognizes that for the 200,000+ years that humans have existed " +
+        "This tool utilizes a 'Partitioned Foraging' approach which recognizes that for the 200,000+ years that humans have existed " +
         "95%+ of it has been as foragers. Agents are trained exclusively on data aggregated/curated by humans; " +
         "think of it as agentic foraging complete with Jaccard similarity scores for cross-analyzing your bounties. " +
         "Search the user's uploaded documents. Uses semantic similarity by default. " +
@@ -422,6 +259,100 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     } as const satisfies OpenAI.Responses.FunctionTool;
   }
 
+  protected memorySearchFunctionTool() {
+    return {
+      type: "function",
+      name: "conversation_memory_search",
+      description:
+        "Search the user's indexed conversation history — older sections of this conversation and other conversations. " +
+        "Sections are ~8k-token transcript slices of firsthand conversation history; an invisible summary layer boosts " +
+        "fulltext ranking for conceptual keywords. Semantic similarity by default; when search_terms is provided, also " +
+        "performs fulltext keyword search and returns { semantic_results, fulltext_results, overlap_results, metadata }. " +
+        "scope 'current_conversation' (default) reaches this conversation's older indexed sections — including messages " +
+        "beyond your context window; 'all_conversations' reaches the user's entire history, with conversation_id + " +
+        "conversation_title on every hit for citation. Sections are keyed by 0-based message ordinal ranges [start, end). " +
+        "Expand a hit with conversation_memory_get_chunk.",
+      strict: false,
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The semantic search query"
+          },
+          search_terms: {
+            type: "string",
+            description:
+              "Optional exact-match terms for the fulltext lane. Supports quoted phrases and negation (-deprecated)."
+          },
+          scope: {
+            type: "string",
+            enum: ["current_conversation", "all_conversations"],
+            description:
+              "Where to search (default current_conversation). Use all_conversations for cross-conversation recall."
+          },
+          conversation_title: {
+            type: "string",
+            description:
+              "Optional fuzzy conversation-title filter (case-insensitive) — providing it implies all_conversations scope. " +
+              "Recall by name: 'the Catullan one' matches 'Catullan Odes & Combinatorics'. " +
+              "Same contract as the filename filter on the document-search tool."
+          },
+          max_results: {
+            type: "number",
+            description: "Maximum results per signal (1-10, default 5)"
+          },
+          threshold: {
+            type: "number",
+            description:
+              "Cosine similarity floor for the semantic lane (default 0)"
+          }
+        },
+        required: ["query"],
+        additionalProperties: false
+      }
+    } as const satisfies OpenAI.Responses.FunctionTool;
+  }
+
+  protected memoryGetChunkFunctionTool() {
+    return {
+      type: "function",
+      name: "conversation_memory_get_chunk",
+      description:
+        "Fetch one indexed conversation-memory section in full: by chunk_id (from a conversation_memory_search hit), " +
+        "or by conversation_id + ordinal (the section covering that 0-based message ordinal). " +
+        "direction walks to the adjacent previous/next section — search finds the doorway, traversal walks the room. " +
+        "Returns the full firsthand transcript plus previous/next section refs for onward traversal.",
+      strict: false,
+      parameters: {
+        type: "object",
+        properties: {
+          chunk_id: {
+            type: "string",
+            description: "Section id from a conversation_memory_search result"
+          },
+          conversation_id: {
+            type: "string",
+            description:
+              "Conversation id — pair with ordinal to fetch the covering section"
+          },
+          ordinal: {
+            type: "number",
+            description: "0-based message ordinal (pair with conversation_id)"
+          },
+          direction: {
+            type: "string",
+            enum: ["previous", "next"],
+            description:
+              "Optional: return the adjacent section instead of the resolved one"
+          }
+        },
+        required: [],
+        additionalProperties: false
+      }
+    } as const satisfies OpenAI.Responses.FunctionTool;
+  }
+
   protected async searchStore(
     userId: string,
     query: string,
@@ -456,9 +387,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     });
   }
 
-  protected parseFileSearchInput(
-    rawArguments: string
-  ): OpenAIFileSearchToolInput {
+  protected parseFileSearchInput(rawArguments: string) {
     const parsed = this.parseFileSearchArguments(rawArguments);
 
     if ("query" in parsed && typeof parsed.query === "string") {
@@ -501,7 +430,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     const firstQuery = uniqueQueries[0];
     if (!firstQuery) {
       throw new Error(
-        `file_search input missing required "query": ${rawArguments}`
+        `user_store_search input missing required "query": ${rawArguments}`
       );
     }
 
@@ -548,7 +477,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
           recoveredPreview: recovered.slice(0, 300),
           error: this.prisma.safeErrMsg(error)
         },
-        "Recovered malformed OpenAI file_search arguments"
+        "Recovered malformed OpenAI user_store_search arguments"
       );
       return JSON.parse<Record<string, unknown>>(recovered);
     }
@@ -601,7 +530,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     return undefined;
   }
 
-  protected async executeFileSearch(
+  protected async executeUserStoreSearch(
     userId: string,
     input: OpenAIFileSearchToolInput
   ) {
@@ -653,44 +582,6 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     );
   }
 
-  protected async executeFunctionToolCall(
-    userId: string,
-    toolCall: OpenAI.Responses.ResponseFunctionToolCall
-  ) {
-    if (toolCall.name !== "file_search") {
-      return {
-        type: "function_call_output",
-        call_id: toolCall.call_id,
-        output: `Unknown tool: ${toolCall.name}`
-      } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
-    }
-
-    try {
-      const input = this.parseFileSearchInput(toolCall.arguments);
-      const output = await this.executeFileSearch(userId, input);
-      return {
-        type: "function_call_output",
-        call_id: toolCall.call_id,
-        output
-      } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
-    } catch (error) {
-      this.logger.error(
-        {
-          toolName: toolCall.name,
-          callId: toolCall.call_id,
-          error: this.prisma.safeErrMsg(error)
-        },
-        "OpenAI function tool execution failed"
-      );
-      return {
-        type: "function_call_output",
-        call_id: toolCall.call_id,
-        output: `file_search error: ${this.prisma.safeErrMsg(error)}`
-      } as const satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput;
-    }
-  }
-
-  // To continue this session, run codex resume 019b2b4a-3e12-7c90-8276-49994f1d3bd2
   protected handleTooling(
     model: OpenAiModelIdUnion,
     fileSearchEnabled: boolean,
@@ -701,9 +592,13 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     localFileSearchEnabled = false
   ) {
     const pureImgModel = this.canCallImageApi(model);
+    // memory tools attach unconditionally — conversation memory exists
+    // independently of uploaded documents
     if (localFileSearchEnabled) {
       return [
-        this.fileSearchFunctionTool(),
+        this.userStoreSearchFunctionTool(),
+        this.memorySearchFunctionTool(),
+        this.memoryGetChunkFunctionTool(),
         {
           type: "web_search",
           user_location
@@ -712,8 +607,12 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     }
     if (fileSearchEnabled && vector_store_ids && vector_store_ids.length >= 1) {
       if (imgGenEnabled === true && imgGen && pureImgModel === false) {
+        // memory rides the img-gen flow too — facilitators (gpt-5.5 et al.)
+        // think + write + recall while recruiting gpt-image-2
         return [
           imgGen,
+          this.memorySearchFunctionTool(),
+          this.memoryGetChunkFunctionTool(),
           {
             type: "web_search",
             user_location
@@ -722,6 +621,8 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
       }
       return [
         { type: "file_search", vector_store_ids, max_num_results: 10 },
+        this.memorySearchFunctionTool(),
+        this.memoryGetChunkFunctionTool(),
         {
           type: "web_search",
           user_location
@@ -729,9 +630,15 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
       ] satisfies OpenAI.Responses.Tool[];
     } else {
       if (imgGenEnabled === true && imgGen && pureImgModel === false) {
-        return [imgGen] satisfies OpenAI.Responses.Tool[];
+        return [
+          imgGen,
+          this.memorySearchFunctionTool(),
+          this.memoryGetChunkFunctionTool()
+        ] satisfies OpenAI.Responses.Tool[];
       }
       return [
+        this.memorySearchFunctionTool(),
+        this.memoryGetChunkFunctionTool(),
         {
           type: "web_search",
           user_location
@@ -740,4 +647,3 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     }
   }
 }
-// To continue this session, run codex resume 019b2b4a-3e12-7c90-8276-49994f1d3bd2

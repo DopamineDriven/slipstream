@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
@@ -7,7 +8,7 @@ import { OpenAIResponsesImgGenService } from "@/openai/responses-img-gen.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type { EventTypeMap, OpenAiModelIdUnion } from "@slipstream/types";
+import type { EventTypeMap } from "@slipstream/types";
 
 interface OpenAIActiveMessageBlock {
   content: string;
@@ -29,13 +30,17 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     userStoreVector: UserStoreVectorService,
     s3: S3Storage,
     redis: EnhancedRedisPubSub,
-    apiKey: string
+    apiKey: string,
+    memoryService: ConversationMemoryVectorService
   ) {
-    super(logger, prisma, userStoreVector, s3, redis, apiKey);
+    super(logger, prisma, userStoreVector, s3, redis, apiKey, memoryService);
   }
 
-  private reasoningByModel(m: OpenAiModelIdUnion) {
+  private reasoningByModel(m: string) {
     if (
+      m==="gpt-5.6=sol" ||
+      m==="gpt-5.6-terra"||
+      m==="gpt-5.6-luna" ||
       m === "gpt-5.5" ||
       m === "gpt-5.5-pro" ||
       m === "gpt-5.2" ||
@@ -83,14 +88,20 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     max_tokens,
     jobId,
     requestMessageId,
-    model = "gpt-5.4" satisfies OpenAiModelIdUnion,
+    model,
     systemPrompt,
     temperature,
     title,
     topP,
     user_location
   }: ProviderOpenaiRequestEntity) {
-    const m = model as OpenAiModelIdUnion;
+    const m =
+      model &&
+      this.prisma.isOpenAIModel(model) &&
+      !this.prisma.isOpenAIImgModel(model) &&
+      !this.prisma.isOpenAIVideoModel(model)
+        ? model
+        : "gpt-5.5";
 
     const provider = "openai" as const;
 
@@ -202,7 +213,7 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       undefined,
       hasUserStoreDocs
     );
-    const instructions = this.buildInstructions(systemPrompt);
+    const instructions = this.prisma.formatSysNote(systemPrompt);
     const MAX_TOOL_ROUNDS = 10;
     let roundInput = Array.of<OpenAI.Responses.ResponseInputItem>(...formatted);
     let forcedLoopStopReason: "MAX_ROUNDS" | undefined = undefined;
@@ -217,11 +228,7 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
             instructions,
             store: false,
             model: m,
-            text: this.openAiVerbosity(
-              model as OpenAiModelIdUnion,
-              "medium",
-              false
-            ),
+            text: this.openAiVerbosity(m, "medium", false),
             include: [
               "reasoning.encrypted_content",
               "code_interpreter_call.outputs",
@@ -238,8 +245,8 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
               "auto",
               false
             ),
-            // Local file_search tool outputs can be large; keep calls sequential.
-            parallel_tool_calls: false,
+            // Local user_store_search tool outputs can be large; keep calls sequential.
+            parallel_tool_calls: true,
             tools
           },
           { stream: true }
@@ -448,7 +455,11 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       const toolOutputs =
         Array.of<OpenAI.Responses.ResponseInputItem.FunctionCallOutput>();
       for (const call of functionCalls) {
-        const output = await this.executeFunctionToolCall(userId, call);
+        const output = await this.executeFunctionToolCall(
+          userId,
+          conversationId,
+          call
+        );
         toolOutputs.push(output);
       }
 
@@ -547,7 +558,8 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       type: "ai_chat_response",
       conversationId,
       userId,
-      systemPrompt,      convo: d.convo,
+      systemPrompt,
+      convo: d.convo,
       temperature,
       userMsgId,
       title,

@@ -22,11 +22,7 @@ export type v0Delta = Partial<{
 }>;
 
 export type v0FinishReason =
-  | "stop"
-  | "length"
-  | "tool_calls"
-  | "content_filter"
-  | null;
+  "stop" | "length" | "tool_calls" | "content_filter" | null;
 
 export type v0Choice = {
   index: number;
@@ -191,5 +187,7 @@ export function hasToolCallDelta(
 }
 
 export function isTerminalTextChunk(chunk: v0ChatCompletionsRes) {
-  return Array.isArray(chunk.choices) && chunk.choices.length === 0 && !!chunk.usage;
+  return (
+    Array.isArray(chunk.choices) && chunk.choices.length === 0 && !!chunk.usage
+  );
 }

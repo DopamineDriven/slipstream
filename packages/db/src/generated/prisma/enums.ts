@@ -200,7 +200,19 @@ export const MemoryChunkingState = {
 export type MemoryChunkingState = (typeof MemoryChunkingState)[keyof typeof MemoryChunkingState]
 
 
+export const MemorySummaryState = {
+  QUEUED: 'QUEUED',
+  SUMMARIZING: 'SUMMARIZING',
+  READY: 'READY',
+  ERROR: 'ERROR',
+  SKIPPED: 'SKIPPED'
+} as const
+
+export type MemorySummaryState = (typeof MemorySummaryState)[keyof typeof MemorySummaryState]
+
+
 export const MemoryChunkBoundaryReason = {
+  MESSAGE_COUNT: 'MESSAGE_COUNT',
   TOKEN_LIMIT: 'TOKEN_LIMIT',
   IDLE_TIME: 'IDLE_TIME',
   TOPIC_SHIFT: 'TOPIC_SHIFT',
@@ -216,6 +228,27 @@ export const MemorySchemaVersion = {
 } as const
 
 export type MemorySchemaVersion = (typeof MemorySchemaVersion)[keyof typeof MemorySchemaVersion]
+
+
+export const MemoryTranscriptRendererVersion = {
+  v1_0: 'v1_0'
+} as const
+
+export type MemoryTranscriptRendererVersion = (typeof MemoryTranscriptRendererVersion)[keyof typeof MemoryTranscriptRendererVersion]
+
+
+export const MemoryChunkSummaryPromptVersion = {
+  v1_0: 'v1_0'
+} as const
+
+export type MemoryChunkSummaryPromptVersion = (typeof MemoryChunkSummaryPromptVersion)[keyof typeof MemoryChunkSummaryPromptVersion]
+
+
+export const MemoryRollingSummaryReasoningVersion = {
+  v1_0: 'v1_0'
+} as const
+
+export type MemoryRollingSummaryReasoningVersion = (typeof MemoryRollingSummaryReasoningVersion)[keyof typeof MemoryRollingSummaryReasoningVersion]
 
 
 export const MessageType = {

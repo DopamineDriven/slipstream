@@ -240,4 +240,4 @@ const _template = (name: string) => `curl -X POST "https://api.anthropic.com/v1/
      -H "anthropic-version: 2023-06-01" \
      -H "anthropic-beta: files-api-2025-04-14" \
      -F "file=src/test/chapters/${name}"
-`
+`;

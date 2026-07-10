@@ -22,10 +22,7 @@ export type ChatCompletionRequest = {
   random_seed?: number | null | undefined;
   metadata?: { [k: string]: unknown } | null | undefined;
   messages: (
-    | CTR<AssistantMessage, "role">
-    | SystemMessage
-    | ToolMessage
-    | UserMessage
+    CTR<AssistantMessage, "role"> | SystemMessage | ToolMessage | UserMessage
   )[];
   response_format?: ResponseFormat | undefined;
   tools?: ToolTypes;
@@ -42,10 +39,7 @@ export type ChatCompletionRequest = {
 };
 
 export type MistralMessageReq =
-  | CTR<AssistantMessage, "role">
-  | SystemMessage
-  | ToolMessage
-  | UserMessage;
+  CTR<AssistantMessage, "role"> | SystemMessage | ToolMessage | UserMessage;
 
 export type MistralReqMessage = (
   | SystemMessage
@@ -71,8 +65,9 @@ export interface MistralFunctionTool {
       properties: Record<
         string,
         {
-          type: "string" | "number" | "array";
+          type: "string" | "number" | "array" | "boolean";
           description: string;
+          enum?: readonly string[];
           items?: { type: "string" };
           minItems?: number;
           maxItems?: number;
@@ -95,8 +90,7 @@ export type MistralFunctionToolCall = {
 };
 
 export type MistralBaseMessage =
-  | UserMessage
-  | (AssistantMessage & { role: "assistant" });
+  UserMessage | (AssistantMessage & { role: "assistant" });
 
 export type MistralAssistantToolCallMessage = {
   role: "assistant";
@@ -158,9 +152,7 @@ export type MistralToolReferenceChunk = {
 export type MistralThinkingChunk = {
   type?: "thinking";
   thinking: readonly (
-    | MistralReferenceChunk
-    | MistralTextChunk
-    | MistralToolReferenceChunk
+    MistralReferenceChunk | MistralTextChunk | MistralToolReferenceChunk
   )[];
   closed?: boolean;
 };

@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type {
   ImageGenPartialArr,
   OpenAIImgApiStreamFinal,
@@ -13,28 +14,29 @@ import type {
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { OpenAI } from "openai";
 import type { Stream } from "openai/core/streaming.mjs";
-import { OpenAIServiceWorkup } from "@/openai/workup.ts";
+import { OpenAIMemoryService } from "@/openai/memory.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AIChatResponseImgGenSubFields,
   EventTypeMap,
   GptImageAndFacilitatorsImgGenWorkupRT,
-  MessageSingleton,
-  OpenAIImgGenModels,
-  OpenAiModelIdUnion
+  MessageSingleton
 } from "@slipstream/types";
 
-export class OpenAIGPTImageService extends OpenAIServiceWorkup {
+export class OpenAIGPTImageService extends OpenAIMemoryService {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
     userStoreVector: UserStoreVectorService,
     s3: S3Storage,
     protected redis: EnhancedRedisPubSub,
-    apiKey: string
+    apiKey: string,
+    // memory ownership STARTS here — base/workup below are memory-free so the
+    // summarizer arm can extend OpenAIServiceWorkup without the ctor cycle
+    protected memoryService: ConversationMemoryVectorService
   ) {
-    super(logger, prisma, userStoreVector, apiKey, s3);
+    super(logger, prisma, userStoreVector, s3, apiKey, memoryService);
   }
 
   protected async handleEdits(
@@ -80,14 +82,14 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
     systemPrompt,
     temperature,
     topP,
-    model = "gpt-image-1.5" satisfies OpenAiModelIdUnion,
+    model,
     title,
     currentMsgBoundAssets,
     imgGenEnabled,
     imgGenFields
   }: ProviderOpenaiRequestEntity) {
-    const m = model as OpenAIImgGenModels;
-
+    const m =
+      model && this.prisma.isOpenAIImgModel(model) ? model : "gpt-image-2";
     const provider = "openai" as const;
 
     const partialImgArr = Array.of<ImageGenPartialArr>();
@@ -178,7 +180,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
         "image options must be defined for the image endpoint api!"
       );
 
-    if (this.isImgGenNative(m) && resImg.n === 1) {
+    if (resImg.n === 1) {
       const r = resImg satisfies GptImageAndFacilitatorsImgGenWorkupRT;
       partialImgsRequested = typeof r.partialImagesRequested !== "undefined";
       outputFormat = r.output_format;
@@ -819,7 +821,8 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
           void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
             type: "ai_chat_response",
             conversationId,
-            userId,      convo: d.convo,
+            userId,
+            convo: d.convo,
             userMsgId,
             aiMsgId: d.aiMsgId,
             imgGenAttachmentId: d.imgGenAttachmentId,

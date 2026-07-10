@@ -64,4 +64,3 @@ pullCollectionRecord().then(res => {
   console.log(toJSON);
   return toJSON;
 });
-

@@ -1,4 +1,6 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { MemoryAssemblyView } from "@/memory/types.ts";
+import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { OpenAIFileSearchToolInput } from "@/openai/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -54,10 +56,7 @@ type LlamaAccumulatedToolCall = {
 };
 
 type LlamaForcedLoopStopReason =
-  | "MAX_ROUNDS"
-  | "MAX_FILE_SEARCH_CALLS"
-  | "REPEATED_TOOL_CALLS"
-  | null;
+  "MAX_ROUNDS" | "MAX_FILE_SEARCH_CALLS" | "REPEATED_TOOL_CALLS" | null;
 
 export class LlamaService {
   private defaultClient: LlamaAPIClient;
@@ -67,6 +66,7 @@ export class LlamaService {
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     private userStoreVector: UserStoreVectorService,
+    private memoryService: ConversationMemoryVectorService,
     private apiKey: string
   ) {
     this.logger = logger
@@ -89,29 +89,6 @@ export class LlamaService {
     }
 
     return client;
-  }
-
-  private buildSystemPrompt(
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
-    fileSearchEnabled = false
-  ) {
-    const basePrompt = fileSearchEnabled
-      ? "Tool policy: if document lookup would help, call the provided file_search tool using that exact name. Use file_search sparingly. Do not repeat the same query. If results are empty or not improving, stop using tools and answer directly with the best available guidance plus what is missing."
-      : undefined;
-
-    const historyNote =
-      "Note: Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
-
-    if (systemPrompt && basePrompt) {
-      return `${systemPrompt}\n\n${basePrompt}\n\n${historyNote}`;
-    }
-    if (systemPrompt) {
-      return `${systemPrompt}\n\n${historyNote}`;
-    }
-    if (basePrompt) {
-      return `${basePrompt}\n\n${historyNote}`;
-    }
-    return historyNote;
   }
 
   private messageText(
@@ -137,23 +114,41 @@ export class LlamaService {
   private prependProviderModelTag(
     msgs: Pick<
       MessageSingleton<true>,
-      "senderType" | "provider" | "model" | "content" | "messageBlocks"
-    >[]
+      | "senderType"
+      | "provider"
+      | "model"
+      | "content"
+      | "messageBlocks"
+      | "ordinal"
+    >[],
+    memoryView: MemoryAssemblyView | null
   ) {
-    return msgs.map(msg => {
+    return msgs.flatMap<
+      | { readonly role: "user"; readonly content: string }
+      | { readonly role: "assistant"; readonly content: string }
+    >(msg => {
+      // HMEM substitution assembly (Part II §2)
+      const claim = memoryView?.claim(msg.ordinal);
+      if (claim) {
+        return claim.emit != null
+          ? [{ role: "assistant", content: claim.emit } as const]
+          : [];
+      }
       const text = this.messageText(msg);
 
       if (msg.senderType === "USER") {
-        return { role: "user", content: text } as const;
+        return [{ role: "user", content: text } as const];
       }
 
       const provider = msg.provider.toLowerCase();
       const model = msg.model ?? "";
       const modelIdentifier = `[${provider}/${model}]`;
-      return {
-        role: "assistant",
-        content: `${modelIdentifier} \n${text}`
-      } as const;
+      return [
+        {
+          role: "assistant",
+          content: `${modelIdentifier} \n${text}`
+        } as const
+      ];
     }) satisfies (UserMessage | CompletionMessage)[];
   }
 
@@ -162,18 +157,16 @@ export class LlamaService {
       | {
           readonly role: "user";
           readonly content:
-            | string
-            | (MessageTextContentItem | MessageImageContentItem)[];
+            string | (MessageTextContentItem | MessageImageContentItem)[];
         }
       | { readonly role: "assistant"; readonly content: string }
     )[],
-    systemPrompt?: string,
-    fileSearchEnabled = false
+    systemPrompt?: string
   ) {
     return [
       {
         role: "system",
-        content: this.buildSystemPrompt(systemPrompt, fileSearchEnabled)
+        content: this.prisma.formatSysNote(systemPrompt)
       },
       ...msgs
     ] as const satisfies Message[];
@@ -222,6 +215,104 @@ export class LlamaService {
           additionalProperties: false
         },
         strict: true
+      }
+    } as const satisfies LlamaFunctionTool;
+  }
+
+  private memorySearchFunctionTool() {
+    return {
+      type: "function",
+      function: {
+        name: "conversation_memory_search",
+        description:
+          "Search the user's indexed conversation history — older sections of this conversation and other conversations. " +
+          "Sections are ~8k-token transcript slices of firsthand conversation history; an invisible summary layer boosts " +
+          "fulltext ranking for conceptual keywords. Semantic similarity by default; when search_terms is provided, also " +
+          "performs fulltext keyword search and returns { semantic_results, fulltext_results, overlap_results, metadata }. " +
+          "scope 'current_conversation' (default) reaches this conversation's older indexed sections — including messages " +
+          "beyond your context window; 'all_conversations' reaches the user's entire history, with conversation_id + " +
+          "conversation_title on every hit for citation. Sections are keyed by 0-based message ordinal ranges [start, end). " +
+          "Expand a hit with conversation_memory_get_chunk.",
+        parameters: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "The semantic search query"
+            },
+            search_terms: {
+              type: "string",
+              description:
+                "Optional exact-match terms for the fulltext lane. Supports quoted phrases and negation (-deprecated)."
+            },
+            scope: {
+              type: "string",
+              enum: ["current_conversation", "all_conversations"],
+              description:
+                "Where to search (default current_conversation). Use all_conversations for cross-conversation recall."
+            },
+            conversation_title: {
+              type: "string",
+              description:
+                "Optional fuzzy conversation-title filter (case-insensitive) — providing it implies all_conversations scope. " +
+                "Recall by name: 'the Catullan one' matches 'Catullan Odes & Combinatorics'. " +
+                "Same contract as the filename filter on the document-search tool."
+            },
+            max_results: {
+              type: "number",
+              description: "Maximum results per signal (1-10, default 5)"
+            },
+            threshold: {
+              type: "number",
+              description:
+                "Cosine similarity floor for the semantic lane (default 0)"
+            }
+          },
+          required: ["query"],
+          additionalProperties: false
+        },
+        strict: false
+      }
+    } as const satisfies LlamaFunctionTool;
+  }
+
+  private memoryGetChunkFunctionTool() {
+    return {
+      type: "function",
+      function: {
+        name: "conversation_memory_get_chunk",
+        description:
+          "Fetch one indexed conversation-memory section in full: by chunk_id (from a conversation_memory_search hit), " +
+          "or by conversation_id + ordinal (the section covering that 0-based message ordinal). " +
+          "direction walks to the adjacent previous/next section — search finds the doorway, traversal walks the room. " +
+          "Returns the full firsthand transcript plus previous/next section refs for onward traversal.",
+        parameters: {
+          type: "object",
+          properties: {
+            chunk_id: {
+              type: "string",
+              description: "Section id from a conversation_memory_search result"
+            },
+            conversation_id: {
+              type: "string",
+              description:
+                "Conversation id — pair with ordinal to fetch the covering section"
+            },
+            ordinal: {
+              type: "number",
+              description: "0-based message ordinal (pair with conversation_id)"
+            },
+            direction: {
+              type: "string",
+              enum: ["previous", "next"],
+              description:
+                "Optional: return the adjacent section instead of the resolved one"
+            }
+          },
+          required: [],
+          additionalProperties: false
+        },
+        strict: false
       }
     } as const satisfies LlamaFunctionTool;
   }
@@ -427,28 +518,63 @@ export class LlamaService {
 
   private async executeToolCall(
     userId: string,
+    conversationId: string,
     toolCall: CompletionMessage.ToolCall
   ) {
-    if (toolCall.function.name !== "file_search") {
-      return {
-        role: "tool",
-        tool_call_id: toolCall.id,
-        content: `Unknown tool: ${toolCall.function.name}`
-      } as const satisfies ToolResponseMessage;
-    }
-
+    const toolName = toolCall.function.name;
     try {
-      const input = this.parseFileSearchInput(toolCall.function.arguments);
-      const output = await this.executeFileSearch(userId, input);
+      if (toolName === "file_search") {
+        const input = this.parseFileSearchInput(toolCall.function.arguments);
+        const output = await this.executeFileSearch(userId, input);
+        return {
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: output
+        } as const satisfies ToolResponseMessage;
+      }
+
+      if (toolName === "conversation_memory_search") {
+        const parsed = this.userStoreVector.parseUserStoreArgs(
+          toolCall.function.arguments,
+          toolName
+        );
+        const output = await this.memoryService.searchMemoryFromToolInput(
+          userId,
+          conversationId,
+          parsed
+        );
+        return {
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: output
+        } as const satisfies ToolResponseMessage;
+      }
+
+      if (toolName === "conversation_memory_get_chunk") {
+        const parsed = this.userStoreVector.parseUserStoreArgs(
+          toolCall.function.arguments,
+          toolName
+        );
+        const output = await this.memoryService.getMemoryChunkFromToolInput(
+          userId,
+          parsed
+        );
+        return {
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: output
+        } as const satisfies ToolResponseMessage;
+      }
+
       return {
         role: "tool",
         tool_call_id: toolCall.id,
-        content: output
+        content: `Unknown tool: ${toolName}`
       } as const satisfies ToolResponseMessage;
     } catch (error) {
       this.logger.error(
         {
-          toolName: toolCall.function.name,
+          toolName,
           toolCallId: toolCall.id,
           error: this.prisma.safeErrMsg(error)
         },
@@ -457,16 +583,15 @@ export class LlamaService {
       return {
         role: "tool",
         tool_call_id: toolCall.id,
-        content: `file_search error: ${this.prisma.safeErrMsg(error)}`
+        content: `${toolName} error: ${this.prisma.safeErrMsg(error)}`
       } as const satisfies ToolResponseMessage;
     }
   }
 
-  public llamaFormat(
+  public async llamaFormat(
     isNewChat: boolean,
     msgs: ProviderChatRequestEntity["msgs"],
-    systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
-    fileSearchEnabled = false
+    systemPrompt?: ProviderChatRequestEntity["systemPrompt"]
   ) {
     const buildUserContent = (m: MessageSingleton<true>) => {
       const parts = Array.of<
@@ -491,7 +616,7 @@ export class LlamaService {
         return [
           {
             role: "system",
-            content: this.buildSystemPrompt(systemPrompt, fileSearchEnabled)
+            content: this.prisma.formatSysNote(systemPrompt)
           },
           { role: "user", content: "" }
         ] as const satisfies Message[];
@@ -504,16 +629,24 @@ export class LlamaService {
       return [
         {
           role: "system",
-          content: this.buildSystemPrompt(systemPrompt, fileSearchEnabled)
+          content: this.prisma.formatSysNote(systemPrompt)
         },
         userMsg
       ] as const satisfies Message[];
     }
 
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
+    );
+
     const last = msgs.at(-1);
     if (last?.senderType === "USER") {
-      const history = this.prependProviderModelTag(msgs.slice(0, -1));
-      const base = this.formatMsgs(history, systemPrompt, fileSearchEnabled);
+      const history = this.prependProviderModelTag(
+        msgs.slice(0, -1),
+        memoryView
+      );
+      const base = this.formatMsgs(history, systemPrompt);
       const parts = buildUserContent(last);
       const userMsg =
         parts.length === 1 && parts[0]?.type === "text"
@@ -523,9 +656,8 @@ export class LlamaService {
     }
 
     return this.formatMsgs(
-      this.prependProviderModelTag(msgs),
-      systemPrompt,
-      fileSearchEnabled
+      this.prependProviderModelTag(msgs, memoryView),
+      systemPrompt
     ) satisfies Message[];
   }
 
@@ -775,15 +907,20 @@ export class LlamaService {
       } as const;
     };
 
+    // memory tools attach unconditionally — conversation memory exists
+    // independently of uploaded documents
     const tools = hasUserStoreDocs
-      ? [this.fileSearchFunctionTool()]
-      : undefined;
+      ? [
+          this.fileSearchFunctionTool(),
+          this.memorySearchFunctionTool(),
+          this.memoryGetChunkFunctionTool()
+        ]
+      : [this.memorySearchFunctionTool(), this.memoryGetChunkFunctionTool()];
 
-    const initialMessages = this.llamaFormat(
+    const initialMessages = await this.llamaFormat(
       isNewChat,
       msgs,
-      systemPrompt,
-      hasUserStoreDocs
+      systemPrompt
     );
     let roundMessages = Array.of<Message>(...initialMessages);
     let toolConversationMessages = Array.of<Message>(
@@ -990,7 +1127,9 @@ export class LlamaService {
 
       const toolMessages = Array.of<ToolResponseMessage>();
       for (const toolCall of materializedToolCalls) {
-        toolMessages.push(await this.executeToolCall(userId, toolCall));
+        toolMessages.push(
+          await this.executeToolCall(userId, conversationId, toolCall)
+        );
       }
 
       toolConversationMessages = Array.of<Message>(
@@ -1072,7 +1211,8 @@ export class LlamaService {
       userId,
       userMsgId,
       aiMsgId: d.aiMsgId,
-      systemPrompt,      convo: d.convo,
+      systemPrompt,
+      convo: d.convo,
       temperature,
       title,
       topP,

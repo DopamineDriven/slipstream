@@ -8,7 +8,6 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "test": {
-
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/vitest.config.ts"],
       "outputs": ["coverage.json"],
       "dependsOn": ["transit", "@slipstream/vitest-config#build"]
@@ -122,6 +121,17 @@
     "S3_API",
     "SAFETY_ID_SECRET",
     "SAKANA_API_KEY",
+    "SLIPSTREAM_CITY",
+    "SLIPSTREAM_COUNTRY",
+    "SLIPSTREAM_IP",
+    "SLIPSTREAM_LATLNG",
+    "SLIPSTREAM_LOGIN_URL",
+    "SLIPSTREAM_POSTAL",
+    "SLIPSTREAM_REGION",
+    "SLIPSTREAM_SESSION_ID",
+    "SLIPSTREAM_TZ",
+    "SLIPSTREAM_USER_ID",
+    "SLIPSTREAM_WS_URL",
     "STACK_SECRET_SERVER_KEY",
     "TAVILY_API_KEY",
     "VERCEL_TARGET_ENV",

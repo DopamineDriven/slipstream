@@ -1,0 +1,26 @@
+{
+  "blockTokens": 9901,
+  "p0_valid_family": {
+    "status": 200,
+    "innerResults": 1,
+    "embeddingsPerResult": [3],
+    "totalTokensBilled": 29703,
+    "chunkerVersion": null
+  },
+  "p1_inner_list_over_32k": {
+    "status": 400,
+    "detail": "Request to model 'voyage-context-4' failed. The example at index 0 in your batch has too many tokens and does not fit into the model's context window of 32000 tokens. Contextualized chunk embeddings do not support truncation. Either lower the number of tokens in the listed example(s), or pass `enable_auto_chunking=true` with `input_type=\"document\"` and one string per input to have the server split oversize documents."
+  },
+  "p2_request_over_120k": {
+    "status": 400,
+    "detail": "Request to model 'voyage-context-4' failed. The max allowed tokens per submitted batch is 120000. Your batch has 148515 tokens after truncation. Please lower the number of tokens in the batch."
+  },
+  "p3_autochunk_mega_doc": {
+    "status": 400,
+    "detail": "Request to model 'voyage-context-4' failed. The max allowed tokens per submitted batch is 120000. Your batch has 128713 tokens after truncation. Please lower the number of tokens in the batch."
+  },
+  "p4_mega_doc_prechunked_lane": {
+    "status": 400,
+    "detail": "Request to model 'voyage-context-4' failed. The example at index 0 in your batch has too many tokens and does not fit into the model's context window of 32000 tokens. Contextualized chunk embeddings do not support truncation. Either lower the number of tokens in the listed example(s), or pass `enable_auto_chunking=true` with `input_type=\"document\"` and one string per input to have the server split oversize documents."
+  }
+}

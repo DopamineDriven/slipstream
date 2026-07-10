@@ -26,5 +26,3 @@ function toTaskDefFormat(props: { [k: string]: string }) {
 // awk -v ORS='\\n' '1'
 console.log(JSON.stringify(toTaskDefFormat(manipulate), null, 2));
 console.log(JSON.stringify(manipulate, null, 2));
-
-

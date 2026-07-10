@@ -101,6 +101,95 @@ async function exe() {
       cfg.VOYAGE_API_KEY
     );
 
+    const { AnthropicSummarizerService } =
+      await import("@/anthropic/summarizer.ts");
+
+    const anthropicSummarizer = new AnthropicSummarizerService(
+      logger,
+      prisma,
+      cfg.ANTHROPIC_API_KEY
+    );
+
+    // the GPT-5.6 Sol summarizer arm (HMEM §6.2) — extends the memory-free
+    // workup, so it constructs BEFORE memory as a first-class dep
+    const { OpenAISummarizerService } = await import("@/openai/summarizer.ts");
+    const openaiSummarizerArm = new OpenAISummarizerService(
+      logger,
+      prisma,
+      userStore,
+      cfg.OPENAI_API_KEY,
+      s3
+    );
+
+    // the five gateway summarizer arms (HMEM §6.2 roster) — memory-free
+    // workup children riding the Vercel AI Gateway (ZDR-flagged), so they
+    // construct BEFORE memory as first-class deps
+    const { DeepSeekSummarizerService } = await import(
+      "@/deepseek/summarizer.ts"
+    );
+    const { KimiSummarizerService } = await import("@/kimi/summarizer.ts");
+    const { MiniMaxSummarizerService } = await import(
+      "@/minimax/summarizer.ts"
+    );
+    const { ZaiSummarizerService } = await import("@/zai/summarizer.ts");
+    const { AlibabaSummarizerService } = await import(
+      "@/alibaba/summarizer.ts"
+    );
+    const gatewayArms = {
+      deepseek: new DeepSeekSummarizerService(
+        logger,
+        prisma,
+        redisInstance,
+        userStore,
+        cfg.AI_GATEWAY_API_KEY
+      ),
+      kimi: new KimiSummarizerService(
+        logger,
+        prisma,
+        redisInstance,
+        userStore,
+        cfg.AI_GATEWAY_API_KEY
+      ),
+      minimax: new MiniMaxSummarizerService(
+        logger,
+        prisma,
+        redisInstance,
+        userStore,
+        cfg.AI_GATEWAY_API_KEY
+      ),
+      zai: new ZaiSummarizerService(
+        logger,
+        prisma,
+        redisInstance,
+        userStore,
+        cfg.AI_GATEWAY_API_KEY
+      ),
+      alibaba: new AlibabaSummarizerService(
+        logger,
+        prisma,
+        redisInstance,
+        userStore,
+        cfg.AI_GATEWAY_API_KEY
+      )
+    };
+
+    const { ConversationMemoryVectorService } =
+      await import("@/memory/vector-store.ts");
+
+    const memory = new ConversationMemoryVectorService(
+      logger,
+      voyage,
+      prisma,
+      anthropicSummarizer,
+      openaiSummarizerArm,
+      userStore,
+      gatewayArms
+    );
+
+    // boot-time backlog kick — queued summaries stranded by a restart or the
+    // sweepBatchSize cap regenerate without waiting for a conversation tick
+    void memory.resumeSummaryBacklog();
+
     const { xAIService } = await import("@/xai/index.ts");
 
     const xai = new xAIService(
@@ -109,6 +198,7 @@ async function exe() {
       redisInstance,
       s3,
       userStore,
+      memory,
       cfg.X_AI_KEY,
       process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
     );
@@ -119,6 +209,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.LLAMA_API_KEY
     );
 
@@ -129,6 +220,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -154,10 +246,15 @@ async function exe() {
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
+    const { ToolCatalogService } = await import("@/tool-catalog/index.ts");
+    const toolCatalog = new ToolCatalogService();
+
     const anthropic = new AnthropicService(
       logger,
       prisma,
       userStore,
+      memory,
+      toolCatalog,
       redisInstance,
       cfg.ANTHROPIC_API_KEY
     );
@@ -170,7 +267,8 @@ async function exe() {
       userStore,
       s3,
       redisInstance,
-      cfg.OPENAI_API_KEY
+      cfg.OPENAI_API_KEY,
+      memory
     );
 
     const { GeminiService } = await import("@/gemini/index.ts");
@@ -181,6 +279,7 @@ async function exe() {
       userStore,
       redisInstance,
       s3,
+      memory,
       cfg.GOOGLE_API_KEY
     );
 
@@ -191,6 +290,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.MISTRAL_API_KEY
     );
 
@@ -201,7 +301,8 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
-      cfg.COHERE_API_KEY
+      cfg.COHERE_API_KEY,
+      memory
     );
 
     const { KimiService } = await import("@/kimi/index.ts");
@@ -211,6 +312,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -221,6 +323,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -231,6 +334,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -241,6 +345,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -251,6 +356,7 @@ async function exe() {
       prisma,
       redisInstance,
       userStore,
+      memory,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -261,6 +367,7 @@ async function exe() {
       prisma,
       userStore,
       s3,
+      memory,
       redisInstance,
       cfg.SAKANA_API_KEY
     );
@@ -292,7 +399,9 @@ async function exe() {
         userStore,
         redis: redisInstance,
         s3,
-        isProd
+        isProd,
+        memory,
+        toolCatalog
       },
       anthropic,
       gemini,
@@ -337,6 +446,7 @@ async function exe() {
     );
 
     resolver.registerAll();
+    resolver.setMemoryService(memory);
 
     wsServer.setResolver(resolver);
     wsServer.setTTSService(ttsService);

@@ -1,4 +1,6 @@
 export const appleEmojiArr = [
+  "https://raw.githubusercontent.com/zhdsmy/apple-emoji/refs/heads/ios-18.4/fonts/ApplColorEmoji.ttf",
+  "https://raw.githubusercontent.com/zhdsmy/apple-emoji/refs/heads/ios-18.4/fonts/AppleColorEmoji_WindowsCompatible.ttf",
   "https://raw.githubusercontent.com/zhdsmy/apple-emoji/refs/heads/ios-18.4/png/160/emoji_u0023_20e3.png",
   "https://raw.githubusercontent.com/zhdsmy/apple-emoji/refs/heads/ios-18.4/png/160/emoji_u0023_20e3.png",
   "https://raw.githubusercontent.com/zhdsmy/apple-emoji/refs/heads/ios-18.4/png/160/emoji_u0023_fe0f.png",

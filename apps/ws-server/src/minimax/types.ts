@@ -10,8 +10,9 @@ interface MiniMaxFunctionTool {
       properties: Record<
         string,
         {
-          type: "string" | "number" | "array";
+          type: "string" | "number" | "array" | "boolean";
           description: string;
+          enum?: readonly string[];
           items?: { type: "string" };
           minItems?: number;
           maxItems?: number;
@@ -45,9 +46,7 @@ type MiniMaxImageContentPart = {
   };
 };
 
-type MiniMaxUserContentPart =
-  | MiniMaxTextContentPart
-  | MiniMaxImageContentPart;
+type MiniMaxUserContentPart = MiniMaxTextContentPart | MiniMaxImageContentPart;
 
 type MiniMaxSystemMessage = {
   role: "system";
@@ -65,9 +64,7 @@ type MiniMaxAssistantMessage = {
 };
 
 type MiniMaxBaseMessage =
-  | MiniMaxSystemMessage
-  | MiniMaxUserMessage
-  | MiniMaxAssistantMessage;
+  MiniMaxSystemMessage | MiniMaxUserMessage | MiniMaxAssistantMessage;
 
 type MiniMaxAssistantToolCallMessage = {
   role: "assistant";
@@ -82,9 +79,7 @@ type MiniMaxToolMessage = {
 };
 
 type MiniMaxRequestMessage =
-  | MiniMaxBaseMessage
-  | MiniMaxAssistantToolCallMessage
-  | MiniMaxToolMessage;
+  MiniMaxBaseMessage | MiniMaxAssistantToolCallMessage | MiniMaxToolMessage;
 
 type MiniMaxReasoningDetail = {
   type: "reasoning.text";

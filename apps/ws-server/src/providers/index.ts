@@ -157,8 +157,7 @@ export class ProviderService extends KimiMixin(
     switch (provider) {
       case "anthropic": {
         const storeCheck = this.#store.get("anthropic") as
-          | ProviderEntry<"anthropic">
-          | undefined;
+          ProviderEntry<"anthropic"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -183,8 +182,7 @@ export class ProviderService extends KimiMixin(
       }
       case "gemini": {
         const storeCheck = this.#store.get("gemini") as
-          | ProviderEntry<"gemini">
-          | undefined;
+          ProviderEntry<"gemini"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -208,8 +206,7 @@ export class ProviderService extends KimiMixin(
       }
       case "cohere": {
         const storeCheck = this.#store.get("cohere") as
-          | ProviderEntry<"cohere">
-          | undefined;
+          ProviderEntry<"cohere"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -233,8 +230,7 @@ export class ProviderService extends KimiMixin(
       }
       case "mistral": {
         const storeCheck = this.#store.get("mistral") as
-          | ProviderEntry<"mistral">
-          | undefined;
+          ProviderEntry<"mistral"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -258,8 +254,7 @@ export class ProviderService extends KimiMixin(
       }
       case "moonshotai": {
         const storeCheck = this.#store.get("moonshotai") as
-          | ProviderEntry<"moonshotai">
-          | undefined;
+          ProviderEntry<"moonshotai"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -283,8 +278,7 @@ export class ProviderService extends KimiMixin(
       }
       case "alibaba": {
         const storeCheck = this.#store.get("alibaba") as
-          | ProviderEntry<"alibaba">
-          | undefined;
+          ProviderEntry<"alibaba"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -308,8 +302,7 @@ export class ProviderService extends KimiMixin(
       }
       case "minimax": {
         const storeCheck = this.#store.get("minimax") as
-          | ProviderEntry<"minimax">
-          | undefined;
+          ProviderEntry<"minimax"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -333,8 +326,7 @@ export class ProviderService extends KimiMixin(
       }
       case "deepseek": {
         const storeCheck = this.#store.get("deepseek") as
-          | ProviderEntry<"deepseek">
-          | undefined;
+          ProviderEntry<"deepseek"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -358,8 +350,7 @@ export class ProviderService extends KimiMixin(
       }
       case "zai": {
         const storeCheck = this.#store.get("zai") as
-          | ProviderEntry<"zai">
-          | undefined;
+          ProviderEntry<"zai"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -383,8 +374,7 @@ export class ProviderService extends KimiMixin(
       }
       case "sakana": {
         const storeCheck = this.#store.get("sakana") as
-          | ProviderEntry<"sakana">
-          | undefined;
+          ProviderEntry<"sakana"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -408,8 +398,7 @@ export class ProviderService extends KimiMixin(
       }
       case "grok": {
         const storeCheck = this.#store.get("grok") as
-          | ProviderEntry<"grok">
-          | undefined;
+          ProviderEntry<"grok"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -433,8 +422,7 @@ export class ProviderService extends KimiMixin(
       }
       case "meta": {
         const storeCheck = this.#store.get("meta") as
-          | ProviderEntry<"meta">
-          | undefined;
+          ProviderEntry<"meta"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -458,8 +446,7 @@ export class ProviderService extends KimiMixin(
       }
       case "openai": {
         const storeCheck = this.#store.get("openai") as
-          | ProviderEntry<"openai">
-          | undefined;
+          ProviderEntry<"openai"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available
@@ -483,8 +470,7 @@ export class ProviderService extends KimiMixin(
       }
       case "vercel": {
         const storeCheck = this.#store.get("vercel") as
-          | ProviderEntry<"vercel">
-          | undefined;
+          ProviderEntry<"vercel"> | undefined;
         if (
           typeof storeCheck?.instance !== "undefined" &&
           storeCheck.available

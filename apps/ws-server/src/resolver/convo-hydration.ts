@@ -11,7 +11,6 @@ import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap, HydrateConversationPage } from "@slipstream/types";
 
 export class ResolverHydrateConvoService extends ResolverChatService {
-  public userStoreDocStatus = new Map<string, boolean>();
   constructor(
     wsServer: WSServer,
     providers: ProviderService,

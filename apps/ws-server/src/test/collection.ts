@@ -40,49 +40,49 @@ const managementApiKey = process.env.X_AI_MANAGEMENT_API_KEY ?? "";
   ] as const;
 
   const body = {
-      chunk_configuration: {
-        inject_name_into_chunks: true,
-        strip_whitespace: true,
-        // ast_configuration: {
-        //   encoding_name: "o200k_base",
-        //   max_chunk_size_tokens: 1024
-        // },
-        // chars_configuration: {
-        //   chunk_overlap_chars: 200,
-        //   max_chunk_size_chars: 1024
-        // },
-        // code_chars_configuration: {
-        //   chunk_overlap_chars: 200,
-        //   max_chunk_size_chars: 1024
-        // },
-        // code_tokens_configuration: {
-        //   chunk_overlap_tokens: 200,
-        //   encoding_name: "o200k_base",
-        //   max_chunk_size_tokens: 1024
-        // },
-        // markdown_chars_configuration: {
-        //   chunk_overlap_chars: 200,
-        //   max_chunk_size_chars: 1024
-        // },
-        // markdown_tokens_configuration: {
-        //   chunk_overlap_tokens: 200,
-        //   encoding_name: "o200k_base",
-        //   max_chunk_size_tokens: 1024
-        // },
-        // table_configuration: {
-        //   encoding_name: "o200k_base",
-        //   max_chunk_size_tokens: 1024
-        // },
-        tokens_configuration: {
-          chunk_overlap_tokens: 256,
-          encoding_name: "o200k_base",
-          max_chunk_size_tokens: 1024
-        }
-      },
-      collection_name: `migrate-${userId}`,
-      index_configuration: { model_name: "grok-embedding-small" },
-      field_definitions: fields,
-      metric_space: "HNSW_METRIC_COSINE"
+    chunk_configuration: {
+      inject_name_into_chunks: true,
+      strip_whitespace: true,
+      // ast_configuration: {
+      //   encoding_name: "o200k_base",
+      //   max_chunk_size_tokens: 1024
+      // },
+      // chars_configuration: {
+      //   chunk_overlap_chars: 200,
+      //   max_chunk_size_chars: 1024
+      // },
+      // code_chars_configuration: {
+      //   chunk_overlap_chars: 200,
+      //   max_chunk_size_chars: 1024
+      // },
+      // code_tokens_configuration: {
+      //   chunk_overlap_tokens: 200,
+      //   encoding_name: "o200k_base",
+      //   max_chunk_size_tokens: 1024
+      // },
+      // markdown_chars_configuration: {
+      //   chunk_overlap_chars: 200,
+      //   max_chunk_size_chars: 1024
+      // },
+      // markdown_tokens_configuration: {
+      //   chunk_overlap_tokens: 200,
+      //   encoding_name: "o200k_base",
+      //   max_chunk_size_tokens: 1024
+      // },
+      // table_configuration: {
+      //   encoding_name: "o200k_base",
+      //   max_chunk_size_tokens: 1024
+      // },
+      tokens_configuration: {
+        chunk_overlap_tokens: 256,
+        encoding_name: "o200k_base",
+        max_chunk_size_tokens: 1024
+      }
+    },
+    collection_name: `migrate-${userId}`,
+    index_configuration: { model_name: "grok-embedding-small" },
+    field_definitions: fields,
+    metric_space: "HNSW_METRIC_COSINE"
   } as const;
 
   return await fetch("https://management-api.x.ai/v1/collections", {
