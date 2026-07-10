@@ -1,8 +1,11 @@
+import type { StreamSummaryMessageParams } from "@/anthropic/types.ts";
 import type { AnthropicSummarizerService } from "@/anthropic/summarizer.ts";
 import type { LoggerService } from "@/logger/index.ts";
+import type { GatewayRequestContentPart } from "@/memory/summarizer-loop.ts";
 import type {
   ConversationMemoryGetChunkTarget,
   ConversationMemorySearchToolInput,
+  GatewaySummarizerArms,
   MemoryAssemblyConfig,
   MemoryAssemblyPlan,
   MemoryChunkAwaitingSummary,
@@ -10,7 +13,8 @@ import type {
   MemoryHybridRow,
   MemorySectionDraft,
   MemorySubstitutableChunk,
-  MemorySummarizerConfig
+  MemorySummarizerConfig,
+  SummarizerArmEntry
 } from "@/memory/types.ts";
 import type { OpenAISummarizerService } from "@/openai/summarizer.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -56,7 +60,9 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     /** the GPT-5.6 Sol arm (§6.2) — first-class dep since the memory-free workup repartition killed the ctor cycle */
     protected openaiSummarizerArm: OpenAISummarizerService,
     /** the user vector store — the summarizer forages it via file_search during summary/fold calls */
-    protected userStore: UserStoreVectorService
+    protected userStore: UserStoreVectorService,
+    /** the five gateway arms (§6.2 roster) — memory-free workup children, constructed before this service */
+    protected gatewayArms: GatewaySummarizerArms
   ) {
     super(logger, voyage, prisma);
   }
@@ -762,27 +768,86 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
 
   public get memorySummarizerConfig() {
     return {
-      provider: "ANTHROPIC",
-      model: "claude-sonnet-5",
       promptVersion: "v1_0",
       foldPromptVersion: "v1_0",
-      effort: "xhigh",
-      maxOutputTokens: 120_000,
       maxAttachmentBlocks: 12,
+      /**
+       * §6.2 roster — rotation = enabled entries in declaration order.
+       * Bake-off receipts (2026-07-10, Whimsical Merge chunk 5): deepseek
+       * $0.0055 · minimax $0.0068 · qwen $0.0087 · kimi-k2.7-code $0.0193
+       * per section; Sol folds per the dev-probe digest verdict.
+       */
+      arms: [
+        // pruned from rotation 2026-07-10 ("Sol remembers, sonnet logs") — constructed for a config-flip re-enable
+        {
+          key: "sonnet",
+          enabled: false,
+          provider: "ANTHROPIC",
+          model: "claude-sonnet-5",
+          effort: "xhigh",
+          maxOutputTokens: 120_000
+        },
+        {
+          key: "sol",
+          enabled: true,
+          provider: "OPENAI",
+          model: "gpt-5.6-sol",
+          effort: "xhigh",
+          maxOutputTokens: 128_000
+        },
+        {
+          key: "deepseek",
+          enabled: true,
+          provider: "DEEPSEEK",
+          model: "deepseek-v4-pro",
+          maxOutputTokens: 16_000
+        },
+        {
+          key: "minimax",
+          enabled: true,
+          provider: "MINIMAX",
+          model: "minimax-m3",
+          maxOutputTokens: 16_000
+        },
+        {
+          key: "qwen",
+          enabled: true,
+          provider: "ALIBABA",
+          model: "qwen3.7-plus",
+          maxOutputTokens: 16_000
+        },
+        {
+          key: "kimi",
+          enabled: true,
+          provider: "MOONSHOTAI",
+          model: "kimi-k2.7-code",
+          maxOutputTokens: 16_000
+        },
+        // gateway probe 2026-07-10: zai/glm-5.2 401'd once then hung 300s+ —
+        // flip when the gateway's zai routing behaves (glm-5v-turbo is
+        // ZDR-ineligible outright; glm-5.2-fast prices out at ~$0.054/section)
+        {
+          key: "glm",
+          enabled: false,
+          provider: "ZAI",
+          model: "glm-5.2",
+          maxOutputTokens: 16_000
+        }
+      ],
+      foldArmKey: "sol",
+      rawTranscriptAb: true,
       // fleet default is 10 (deepseek gets 15) — if 8 rounds of foraging
       // produces a higher-fidelity summary then by all means; knowledge is king
-      openaiArm: {
-        provider: "OPENAI",
-        model: "gpt-5.6-sol",
-        effort: "xhigh",
-        maxOutputTokens: 128_000
-      },
-      rawTranscriptAb: true,
       maxToolUseRounds: 10,
       callDeadlineMs: 900_000,
       foldInputBudgetTokens: 130_000,
       sweepBatchSize: 8
     } as const satisfies MemorySummarizerConfig;
+  }
+
+  /** enabled roster in declaration order — chunkIndex % length picks the arm */
+  private get summarizerRotation() {
+    return this.memorySummarizerConfig.arms.filter(arm => arm.enabled);
   }
 
   private get summarySystemPrompt() {
@@ -872,6 +937,121 @@ The System prompt given to all models in the source material being summarized is
       }
     }
     return parts;
+  }
+
+  /** anthropic summary content blocks → gateway chat-completions content (plain string when text-only) */
+  private toGatewaySummaryContent(
+    blocks: Anthropic.Beta.BetaContentBlockParam[]
+  ) {
+    const parts = Array.of<GatewayRequestContentPart>();
+    let hasImages = false;
+    for (const block of blocks) {
+      if (block.type === "text") {
+        parts.push({ type: "text", text: block.text });
+      } else if (block.type === "image" && block.source.type === "url") {
+        hasImages = true;
+        parts.push({
+          type: "image_url",
+          image_url: { url: block.source.url }
+        });
+      }
+    }
+    if (!hasImages) {
+      const texts = Array.of<string>();
+      for (const part of parts) {
+        if (part.type === "text") texts.push(part.text);
+      }
+      return texts.join("\n\n");
+    }
+    return parts;
+  }
+
+  /**
+   * §6.2 arm dispatch — exhaustive on the roster entry's provider; every arm
+   * returns the common envelope {text, reasoningText, reasoningDuration,
+   * toolUse, usage}. Content conversion happens here: the anthropic block
+   * build is canonical, the Responses/chat-completions shapes derive.
+   */
+  private async invokeSummarizerArm(
+    entry: SummarizerArmEntry,
+    system: string,
+    content: Anthropic.Beta.BetaContentBlockParam[],
+    executeToolCall: StreamSummaryMessageParams["executeToolCall"],
+    anthropicTools: StreamSummaryMessageParams["tools"]
+  ) {
+    const cfg = this.memorySummarizerConfig;
+    const shared = {
+      maxToolUseRounds: cfg.maxToolUseRounds,
+      callDeadlineMs: cfg.callDeadlineMs
+    } as const;
+    switch (entry.provider) {
+      case "ANTHROPIC":
+        return await this.summarizer.streamSummaryMessage({
+          model: entry.model,
+          maxOutputTokens: entry.maxOutputTokens,
+          effort: entry.effort,
+          system,
+          content,
+          tools: anthropicTools,
+          executeToolCall,
+          ...shared
+        });
+      case "OPENAI":
+        return await this.openaiSummarizerArm.streamSummaryMessage({
+          model: entry.model,
+          maxOutputTokens: entry.maxOutputTokens,
+          effort: entry.effort,
+          system,
+          content: this.toOpenAISummaryContent(content),
+          executeToolCall,
+          ...shared
+        });
+      case "DEEPSEEK":
+        return await this.gatewayArms.deepseek.streamSummaryMessage({
+          model: entry.model,
+          maxOutputTokens: entry.maxOutputTokens,
+          system,
+          content: this.toGatewaySummaryContent(content),
+          executeToolCall,
+          ...shared
+        });
+      case "MOONSHOTAI":
+        return await this.gatewayArms.kimi.streamSummaryMessage({
+          model: entry.model,
+          maxOutputTokens: entry.maxOutputTokens,
+          system,
+          content: this.toGatewaySummaryContent(content),
+          executeToolCall,
+          ...shared
+        });
+      case "MINIMAX":
+        return await this.gatewayArms.minimax.streamSummaryMessage({
+          model: entry.model,
+          maxOutputTokens: entry.maxOutputTokens,
+          system,
+          content: this.toGatewaySummaryContent(content),
+          executeToolCall,
+          ...shared
+        });
+      case "ZAI":
+        return await this.gatewayArms.zai.streamSummaryMessage({
+          model: entry.model,
+          maxOutputTokens: entry.maxOutputTokens,
+          system,
+          content: this.toGatewaySummaryContent(content),
+          executeToolCall,
+          ...shared
+        });
+      case "ALIBABA":
+        return await this.gatewayArms.alibaba.streamSummaryMessage({
+          model: entry.model,
+          maxOutputTokens: entry.maxOutputTokens,
+          system,
+          content: this.toGatewaySummaryContent(content),
+          executeToolCall,
+          ...shared
+        });
+    }
   }
 
   private async buildSummaryContent(
@@ -1111,27 +1291,33 @@ The System prompt given to all models in the source material being summarized is
     userId: string
   ) {
     const cfg = this.memorySummarizerConfig;
-    // per-chunk deterministic alternation (§6.2): odd chunkIndex → the
-    // GPT-5.6 Sol arm when wired, even → the sonnet-5 anchor. Stable across
-    // retries (unlike LRU), and every row carries its arm's receipts.
-    const openaiArm =
-      chunk.chunkIndex % 2 === 1 ? this.openaiSummarizerArm : undefined;
+    // §6.2 roster rotation: deterministic per-chunk arm — stable across
+    // retries (unlike LRU), and every row carries its arm's receipts
+    const rotation = this.summarizerRotation;
+    const entry =
+      rotation[chunk.chunkIndex % Math.max(rotation.length, 1)];
     try {
+      if (!entry) {
+        throw new Error(
+          "summarizer rotation is empty — enable at least one arm"
+        );
+      }
       await this.prisma.updateMemoryChunkSummaryStateTyped(
         chunk.id,
         "SUMMARIZING",
         null
       );
 
-      // 2×2 cell: variant bit is floor(chunkIndex/2) % 2 so it never
-      // confounds with the arm parity bit (chunkIndex % 4 = the cell)
+      // A/B variant bit strides by the rotation length so it never
+      // confounds with arm identity (cell = chunkIndex % (2·N))
       const rawVariant =
-        cfg.rawTranscriptAb && Math.floor(chunk.chunkIndex / 2) % 2 === 1;
+        cfg.rawTranscriptAb &&
+        Math.floor(chunk.chunkIndex / rotation.length) % 2 === 1;
       this.logger.info(
         {
           chunkId: chunk.id,
           chunkIndex: chunk.chunkIndex,
-          arm: openaiArm ? cfg.openaiArm.model : cfg.model,
+          arm: entry.model,
           variant: rawVariant ? "raw" : "structured"
         },
         "summarizer content variant"
@@ -1148,28 +1334,13 @@ The System prompt given to all models in the source material being summarized is
           name,
           input
         );
-      const result = openaiArm
-        ? await openaiArm.streamSummaryMessage({
-            model: cfg.openaiArm.model,
-            maxOutputTokens: cfg.openaiArm.maxOutputTokens,
-            effort: cfg.openaiArm.effort,
-            system: this.summarySystemPrompt,
-            content: this.toOpenAISummaryContent(content),
-            executeToolCall,
-            maxToolUseRounds: cfg.maxToolUseRounds,
-            callDeadlineMs: cfg.callDeadlineMs
-          })
-        : await this.summarizer.streamSummaryMessage({
-            model: cfg.model,
-            maxOutputTokens: cfg.maxOutputTokens,
-            effort: cfg.effort,
-            system: this.summarySystemPrompt,
-            content,
-            tools: [this.summarizerFileSearchTool],
-            executeToolCall,
-            maxToolUseRounds: cfg.maxToolUseRounds,
-            callDeadlineMs: cfg.callDeadlineMs
-          });
+      const result = await this.invokeSummarizerArm(
+        entry,
+        this.summarySystemPrompt,
+        content,
+        executeToolCall,
+        [this.summarizerFileSearchTool]
+      );
       const sectionSummary = this.sanitizeSummaryOutput(result.text);
       if (!sectionSummary) throw new Error("summarizer returned empty output");
 
@@ -1184,7 +1355,7 @@ The System prompt given to all models in the source material being summarized is
         this.logger.info(
           {
             chunkId: chunk.id,
-            model: cfg.openaiArm.model,
+            model: entry.model,
             rounds: result.usage.length,
             usage: result.usage
           },
@@ -1201,8 +1372,8 @@ The System prompt given to all models in the source material being summarized is
       await this.prisma.updateMemoryChunkSummaryTyped(
         chunk.id,
         sectionSummary,
-        openaiArm ? cfg.openaiArm.model : cfg.model,
-        openaiArm ? cfg.openaiArm.provider : cfg.provider,
+        entry.model,
+        entry.provider,
         cfg.promptVersion,
         counted.counts[0] ?? 0,
         result.reasoningDuration,
@@ -1396,6 +1567,17 @@ The System prompt given to all models in the source material being summarized is
       if (sections.length === 0) return;
       const userId = context.memoryStore.userId;
 
+      // the digest editor (§6.2): folds pin to one arm — Sol per the
+      // dev-probe verdict ("Sol remembers, sonnet logs")
+      const foldArm = cfg.arms.find(arm => arm.key === cfg.foldArmKey);
+      if (!foldArm) {
+        this.logger.error(
+          { contextId, foldArmKey: cfg.foldArmKey },
+          "fold arm missing from the roster — config invariant violated"
+        );
+        return;
+      }
+
       // the un-sectioned live tail — the fold's captured reasoning showed it
       // burning thinking tokens hunting for exactly this range; hand it over
       // firsthand instead (exclusively the rolling-summary model's input)
@@ -1487,27 +1669,23 @@ The System prompt given to all models in the source material being summarized is
         );
       }
 
-      const result = await this.summarizer.streamSummaryMessage({
-        model: cfg.model,
-        maxOutputTokens: cfg.maxOutputTokens,
-        effort: cfg.effort,
-        system: this.foldSystemPrompt,
-        content: [{ type: "text", text: parts.join("\n") }],
-        tools: [
-          this.summarizerFileSearchTool,
-          this.summarizerMemorySearchTool,
-          this.summarizerMemoryGetChunkTool
-        ],
-        executeToolCall: (name, input) =>
+      const result = await this.invokeSummarizerArm(
+        foldArm,
+        this.foldSystemPrompt,
+        [{ type: "text", text: parts.join("\n") }],
+        (name, input) =>
           this.executeSummarizerToolCall(
             userId,
             context.conversationId,
             name,
             input
           ),
-        maxToolUseRounds: cfg.maxToolUseRounds,
-        callDeadlineMs: cfg.callDeadlineMs
-      });
+        [
+          this.summarizerFileSearchTool,
+          this.summarizerMemorySearchTool,
+          this.summarizerMemoryGetChunkTool
+        ]
+      );
       const folded = this.sanitizeSummaryOutput(result.text);
       if (!folded) throw new Error("fold call returned empty output");
 
@@ -1531,8 +1709,8 @@ The System prompt given to all models in the source material being summarized is
         contextId,
         expectedRollingSummaryUpdatedAt: context.rollingSummaryUpdatedAt,
         rollingSummary: folded,
-        rollingSummaryModel: cfg.model,
-        rollingSummaryProvider: cfg.provider,
+        rollingSummaryModel: foldArm.model,
+        rollingSummaryProvider: foldArm.provider,
         rollingSummaryTokens: counted.counts[0] ?? 0,
         rollingSummaryReasoningDuration: result.reasoningDuration,
         rollingSummaryReasoningText: result.reasoningText,

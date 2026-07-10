@@ -2,10 +2,20 @@ import type { PrismaConversationMemoryService } from "@/prisma/convo-memory-serv
 import type { Voyage } from "@/voyage/types.ts";
 import type { ReasoningEffort } from "openai/resources/shared.mjs";
 import type { $Enums } from "@slipstream/db/node/generated/client";
+import type { AlibabaSummarizerService } from "@/alibaba/summarizer.ts";
+import type { DeepSeekSummarizerService } from "@/deepseek/summarizer.ts";
+import type { KimiSummarizerService } from "@/kimi/summarizer.ts";
+import type { MiniMaxSummarizerService } from "@/minimax/summarizer.ts";
+import type { ZaiSummarizerService } from "@/zai/summarizer.ts";
 import type {
+  AlibabaModelIdUnion,
   AnthropicModelIdUnion,
+  DeepSeekModelIdUnion,
+  KimiModelIdUnion,
+  MiniMaxModelIdUnion,
   OpenAiModelIdUnion,
-  Unenumerate
+  Unenumerate,
+  ZaiModelIdUnion
 } from "@slipstream/types";
 
 /** conversationId → immutable ids only — the watermark is NEVER cached in-process */
@@ -183,41 +193,91 @@ export type ConversationMemoryGetChunkTarget =
       readonly direction?: "previous" | "next";
     };
 
+/** roster keys — stable identifiers for rotation membership + fold pinning */
+export type SummarizerArmKey =
+  | "sonnet"
+  | "sol"
+  | "deepseek"
+  | "minimax"
+  | "qwen"
+  | "kimi"
+  | "glm";
+
+interface SummarizerArmBase {
+  key: SummarizerArmKey;
+  /** rotation membership — disabled arms stay constructed so re-enabling is a config flip, not a rebuild */
+  enabled: boolean;
+  maxOutputTokens: number;
+}
+
+/**
+ * §6.2 MoE roster entry — discriminated on provider so each entry's model is
+ * typed against its registry union (the compiler rejects nonexistent ids).
+ * ANTHROPIC/OPENAI carry effort knobs (first-party reasoning APIs); the
+ * gateway arms reason by default and take no effort parameter.
+ */
+export type SummarizerArmEntry =
+  | (SummarizerArmBase & {
+      provider: "ANTHROPIC";
+      model: AnthropicModelIdUnion;
+      /** adaptive-thinking effort — a background job pays no latency tax, think hard */
+      effort: "high" | "xhigh" | "max";
+    })
+  | (SummarizerArmBase & {
+      provider: "OPENAI";
+      model: OpenAiModelIdUnion;
+      effort: ReasoningEffort;
+    })
+  | (SummarizerArmBase & { provider: "DEEPSEEK"; model: DeepSeekModelIdUnion })
+  | (SummarizerArmBase & { provider: "MOONSHOTAI"; model: KimiModelIdUnion })
+  | (SummarizerArmBase & { provider: "MINIMAX"; model: MiniMaxModelIdUnion })
+  | (SummarizerArmBase & { provider: "ZAI"; model: ZaiModelIdUnion })
+  | (SummarizerArmBase & { provider: "ALIBABA"; model: AlibabaModelIdUnion });
+
+/**
+ * the five gateway arm instances — memory-free workup children, ctor-injected
+ * into the memory service (the repartition killed the construction cycles)
+ */
+export interface GatewaySummarizerArms {
+  deepseek: DeepSeekSummarizerService;
+  kimi: KimiSummarizerService;
+  minimax: MiniMaxSummarizerService;
+  zai: ZaiSummarizerService;
+  alibaba: AlibabaSummarizerService;
+}
+
 export interface MemorySummarizerConfig {
-  /** recorded per-chunk in summaryProvider — the v1 call path is Anthropic-pinned */
-  provider: $Enums.Provider;
-  /** typed against the registry — the compiler rejects nonexistent model ids */
-  model: AnthropicModelIdUnion;
   /** section-summary prompt era — the DB enum is the single source of truth */
   promptVersion: $Enums.MemoryChunkSummaryPromptVersion;
   /** fold prompt era — versioned independently of the section prompt */
   foldPromptVersion: $Enums.MemoryRollingSummaryReasoningVersion;
-  /** adaptive-thinking effort — a background job pays no latency tax, think hard */
-  effort: "high" | "xhigh" | "max";
-  maxOutputTokens: number;
   /** image url blocks attached to the summarizer call, capped — documents stay in the user store (index once, retrieve everywhere) */
   maxAttachmentBlocks: number;
   /**
-   * the GPT-5.6 Sol arm's posture (§6.2 — per-arm knobs are config, not
-   * hardcode); shared maxToolUseRounds/callDeadlineMs govern both arms so
-   * the wave failsafe stays a single computation
+   * §6.2 MoE roster — rotation = arms.filter(enabled) in declaration order;
+   * per-chunk arm = chunkIndex % rotation.length (deterministic, stable
+   * across retries, every row carries its arm's receipts). Shared
+   * maxToolUseRounds/callDeadlineMs govern every arm so the wave failsafe
+   * stays a single computation.
    */
-  openaiArm: {
-    provider: $Enums.Provider;
-    model: OpenAiModelIdUnion;
-    effort: ReasoningEffort;
-    maxOutputTokens: number;
-  };
+  arms: readonly SummarizerArmEntry[];
+  /**
+   * the digest editor — folds route to this arm (Sol per the 2026-07-09
+   * dev-probe verdict: "Sol remembers, sonnet logs"; sections are parallel
+   * workers, the fold is an editor)
+   */
+  foldArmKey: SummarizerArmKey;
   /**
    * content-delivery A/B (Andrew, 2026-07-07): when true, summarizers
    * alternate between the structured preamble build and the RAW
    * transcriptMarkdown (system prompt + transcript, nothing else —
-   * flexibility/diversity of delivery). 2×2 factorial against the arm
-   * rotation: arm = chunkIndex % 2, variant = floor(chunkIndex / 2) % 2 —
-   * parity-on-parity would perfectly confound arm×variant. Variant is
-   * derivable from chunkIndex (cell = chunkIndex % 4), so no migration:
-   * 0 sonnet/structured · 1 gpt/structured · 2 sonnet/raw · 3 gpt/raw.
-   * Fold unaffected; attachments ride both variants (content, not structure).
+   * flexibility/diversity of delivery). Factorial against the arm rotation:
+   * arm = chunkIndex % N, variant = floor(chunkIndex / N) % 2 (N = enabled
+   * rotation length) — the variant bit strides by N so it never confounds
+   * with arm identity; cell = chunkIndex % (2·N), derivable from chunkIndex,
+   * so no migration. Analysis splits on the recorded summaryModel, which
+   * stays authoritative across roster changes. Fold unaffected; attachments
+   * ride both variants (content, not structure).
    */
   rawTranscriptAb: boolean;
   /** hard cap on file_search round-trips per summary/fold call */

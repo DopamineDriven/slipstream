@@ -121,6 +121,58 @@ async function exe() {
       s3
     );
 
+    // the five gateway summarizer arms (HMEM §6.2 roster) — memory-free
+    // workup children riding the Vercel AI Gateway (ZDR-flagged), so they
+    // construct BEFORE memory as first-class deps
+    const { DeepSeekSummarizerService } = await import(
+      "@/deepseek/summarizer.ts"
+    );
+    const { KimiSummarizerService } = await import("@/kimi/summarizer.ts");
+    const { MiniMaxSummarizerService } = await import(
+      "@/minimax/summarizer.ts"
+    );
+    const { ZaiSummarizerService } = await import("@/zai/summarizer.ts");
+    const { AlibabaSummarizerService } = await import(
+      "@/alibaba/summarizer.ts"
+    );
+    const gatewayArms = {
+      deepseek: new DeepSeekSummarizerService(
+        logger,
+        prisma,
+        redisInstance,
+        userStore,
+        cfg.AI_GATEWAY_API_KEY
+      ),
+      kimi: new KimiSummarizerService(
+        logger,
+        prisma,
+        redisInstance,
+        userStore,
+        cfg.AI_GATEWAY_API_KEY
+      ),
+      minimax: new MiniMaxSummarizerService(
+        logger,
+        prisma,
+        redisInstance,
+        userStore,
+        cfg.AI_GATEWAY_API_KEY
+      ),
+      zai: new ZaiSummarizerService(
+        logger,
+        prisma,
+        redisInstance,
+        userStore,
+        cfg.AI_GATEWAY_API_KEY
+      ),
+      alibaba: new AlibabaSummarizerService(
+        logger,
+        prisma,
+        redisInstance,
+        userStore,
+        cfg.AI_GATEWAY_API_KEY
+      )
+    };
+
     const { ConversationMemoryVectorService } =
       await import("@/memory/vector-store.ts");
 
@@ -130,7 +182,8 @@ async function exe() {
       prisma,
       anthropicSummarizer,
       openaiSummarizerArm,
-      userStore
+      userStore,
+      gatewayArms
     );
 
     // boot-time backlog kick — queued summaries stranded by a restart or the
