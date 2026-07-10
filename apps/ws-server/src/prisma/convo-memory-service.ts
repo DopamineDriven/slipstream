@@ -350,6 +350,40 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
     });
   }
 
+  /**
+   * the delta fold's input: only summaries generated since the fold
+   * watermark, ordered by GENERATION time — selection and the watermark
+   * (foldedThroughGeneratedAt) share one ordering, so the watermark advances
+   * monotonically with no skipped sections. Chunk order would interleave
+   * under concurrent waves and strand late-generated early chunks behind an
+   * already-advanced watermark.
+   */
+  public async findUnfoldedSummariesForDeltaFold(
+    contextId: string,
+    since: Date | null
+  ) {
+    return await this.prismaClient.conversationMemoryChunk.findMany({
+      where: {
+        contextId,
+        chunkingState: "INDEXED",
+        deletedAt: null,
+        summaryState: "READY",
+        ...(since ? { summaryGeneratedAt: { gt: since } } : {})
+      },
+      select: {
+        id: true,
+        chunkIndex: true,
+        ordinalStart: true,
+        ordinalEndExclusive: true,
+        summary: true,
+        summaryGeneratedAt: true,
+        // exact stored counts power the delta prefix-fit
+        summaryTokens: true
+      },
+      orderBy: { summaryGeneratedAt: "asc" }
+    });
+  }
+
   /** boot-resume scan: contexts holding INDEXED chunks with pending (or stranded) summaries */
   public async findContextsWithPendingSummaries(maxSummaryRetries: number) {
     return await this.prismaClient.conversationMemoryChunk.findMany({

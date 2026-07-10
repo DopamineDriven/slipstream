@@ -280,6 +280,12 @@ export interface MemorySummarizerConfig {
    * ride both variants (content, not structure).
    */
   rawTranscriptAb: boolean;
+  /**
+   * §8.5 global cap — concurrent summarizer LLM calls (sections + folds)
+   * across ALL conversations, per instance. Bounds the boot-resume fan-out
+   * (contexts × sweepBatchSize) that would otherwise blow provider OTPM
+   */
+  maxConcurrentSummaryJobs: number;
   /** hard cap on file_search round-trips per summary/fold call */
   maxToolUseRounds: number;
   /** per-round wall-clock deadline — an immortal stream aborts into the ERROR/retry path instead of wedging its wave */

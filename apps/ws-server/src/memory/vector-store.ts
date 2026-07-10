@@ -22,6 +22,7 @@ import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
+import { SummaryJobSemaphore } from "@/memory/semaphore.ts";
 import { ConversationMemoryWorkupService } from "@/memory/workup.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 
@@ -50,6 +51,11 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
 
   /** contextId → wave dispatch epoch ms — the age check that guarantees a wedged wave is eventually replaced */
   protected summaryWaveBornAt = new Map<string, number>();
+
+  /** §8.5 global cap — one slot per summarizer LLM call (sections + folds) across ALL contexts */
+  protected readonly summaryJobSemaphore = new SummaryJobSemaphore(
+    this.memorySummarizerConfig.maxConcurrentSummaryJobs
+  );
 
   constructor(
     logger: LoggerService,
@@ -835,6 +841,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
         }
       ],
       foldArmKey: "sol",
+      maxConcurrentSummaryJobs: 12,
       rawTranscriptAb: true,
       // fleet default is 10 (deepseek gets 15) — if 8 rounds of foraging
       // produces a higher-fidelity summary then by all means; knowledge is king
@@ -862,6 +869,15 @@ The System prompt given to all models in the source material being summarized is
     return `Write the updated whole-conversation digest — a high-fidelity synopsis of the conversation so far that preserves the integrity and character of the source material. Output only the digest — plain markdown, no preamble. Prefer message ordinals for citations. Let the digest grow in proportion to the conversation — completeness outranks brevity.
 
 You receive the complete set of section summaries in conversation order (secondary sources) plus the prior digest for continuity. When the conversation extends beyond the last summarized section, the un-sectioned live tail follows as a firsthand transcript — cover it in the digest too; it is primary source already in hand, and nothing exists beyond it. The firsthand transcripts behind the summaries are one call away: conversation_memory_get_chunk retrieves any section's full transcript (conversation_id + ordinal), conversation_memory_search searches them, and file_search reaches the user's uploaded archive — if a model searched for terms with success in the conversation, you can too. Prefer primary sources for anything you quote or that carries weight.
+
+The System prompt given to all models in the source material being summarized is as follows: "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.\nOlder messages are made searchable via tooling to keep things light."` as const;
+  }
+
+  private get foldDeltaSystemPrompt() {
+    // prettier-ignore
+    return `Update the whole-conversation digest by integrating the new section summaries into the prior digest — the section corpus has outgrown a single window, so the prior digest is the canonical account and the new sections extend it. Output only the updated digest — plain markdown, no preamble. Prefer message ordinals for citations. Densify rather than expand: as the conversation grows, fold earlier material tighter so the digest stays a small fraction of the corpus it summarizes — completeness of coverage outranks verbatim retention.
+
+You receive the prior digest plus only the section summaries generated since the last fold (secondary sources). When the conversation extends beyond the last summarized section, the un-sectioned live tail follows as a firsthand transcript — cover it in the digest too; it is primary source already in hand, and nothing exists beyond it. Everything older is one call away: conversation_memory_get_chunk retrieves any section's full transcript (conversation_id + ordinal), conversation_memory_search searches them, and file_search reaches the user's uploaded archive. Prefer primary sources for anything you quote or that carries weight.
 
 The System prompt given to all models in the source material being summarized is as follows: "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.\nOlder messages are made searchable via tooling to keep things light."` as const;
   }
@@ -1296,6 +1312,10 @@ The System prompt given to all models in the source material being summarized is
     const rotation = this.summarizerRotation;
     const entry =
       rotation[chunk.chunkIndex % Math.max(rotation.length, 1)];
+    // §8.5 global cap: acquire BEFORE the SUMMARIZING transition so a
+    // slot-starved chunk holds QUEUED — stale-reclaim never false-fires on
+    // a job that is merely waiting its turn
+    await this.summaryJobSemaphore.acquire();
     try {
       if (!entry) {
         throw new Error(
@@ -1404,6 +1424,8 @@ The System prompt given to all models in the source material being summarized is
         this.prisma.safeErrMsg(err)
       );
       return false;
+    } finally {
+      this.summaryJobSemaphore.release();
     }
   }
 
@@ -1555,6 +1577,7 @@ The System prompt given to all models in the source material being summarized is
    */
   private async foldRollingSummaryForContext(contextId: string) {
     const cfg = this.memorySummarizerConfig;
+    let slotAcquired = false;
     try {
       const context = await this.prisma.getMemoryContextById(contextId);
       if (!context) return;
@@ -1601,13 +1624,65 @@ The System prompt given to all models in the source material being summarized is
 
       // exact-count budget gate — a fold overflow is non-self-healing (the
       // identical corpus re-folds into the identical 400 every dry tick), so
-      // the input is measured BEFORE any state transition: over budget drops
-      // the tail first, then defers the fold entirely
+      // the input is measured BEFORE any state transition
       const sectionsTokens = sections.reduce(
         (acc, s) => acc + s.summaryTokens,
         0
       );
       const digestTokens = context.rollingSummaryTokens;
+
+      // delta fold (the ~600-message wedge): once the READY corpus outgrows
+      // the editor's window, a full re-mint is impossible forever — so
+      // integrate only the unfolded summaries into the canonical prior
+      // digest instead. Selection is generation-time ordered with a prefix
+      // fit, so foldedThroughGeneratedAt advances monotonically and a cut
+      // remainder folds next cycle; everything older stays one
+      // conversation_memory_get_chunk away for the editor.
+      let foldSections = sections;
+      let deltaMode = false;
+      if (sectionsTokens + digestTokens > cfg.foldInputBudgetTokens) {
+        deltaMode = true;
+        const unfolded = await this.prisma.findUnfoldedSummariesForDeltaFold(
+          contextId,
+          context.rollingSummaryUpdatedAt
+        );
+        const prefix = Array.of<(typeof unfolded)[number]>();
+        let running = digestTokens;
+        for (const section of unfolded) {
+          if (running + section.summaryTokens > cfg.foldInputBudgetTokens) {
+            break;
+          }
+          running += section.summaryTokens;
+          prefix.push(section);
+        }
+        if (prefix.length === 0) {
+          this.logger.warn(
+            {
+              contextId,
+              digestTokens,
+              unfoldedCount: unfolded.length,
+              budget: cfg.foldInputBudgetTokens
+            },
+            "delta fold: digest alone crowds out every unfolded section — deferring"
+          );
+          return;
+        }
+        if (prefix.length < unfolded.length) {
+          this.logger.info(
+            {
+              contextId,
+              included: prefix.length,
+              unfolded: unfolded.length
+            },
+            "delta fold: prefix-fit — the remainder folds next cycle"
+          );
+        }
+        foldSections = prefix;
+      }
+      const foldSectionsTokens = deltaMode
+        ? foldSections.reduce((acc, s) => acc + s.summaryTokens, 0)
+        : sectionsTokens;
+
       let tailTokens = 0;
       if (tailBlock) {
         const counted = await this.voyage.countTokens(
@@ -1619,36 +1694,33 @@ The System prompt given to all models in the source material being summarized is
       let tailOmitted = false;
       if (
         tailBlock &&
-        sectionsTokens + digestTokens + tailTokens > cfg.foldInputBudgetTokens
+        foldSectionsTokens + digestTokens + tailTokens >
+          cfg.foldInputBudgetTokens
       ) {
         tailBlock = null;
         tailOmitted = true;
       }
-      if (sectionsTokens + digestTokens > cfg.foldInputBudgetTokens) {
-        this.logger.warn(
-          {
-            contextId,
-            sectionsTokens,
-            digestTokens,
-            budget: cfg.foldInputBudgetTokens
-          },
-          "fold input exceeds budget even without the tail — deferring"
-        );
-        return;
-      }
 
+      // §8.5 global cap — the fold is one more summarizer LLM call; acquire
+      // BEFORE the SUMMARIZING transition, same discipline as sections
+      await this.summaryJobSemaphore.acquire();
+      slotAcquired = true;
       await this.prisma.setRollingSummaryState(contextId, "SUMMARIZING");
 
       const parts = Array.of<string>();
       parts.push(
         `Conversation: ${context.conversationTitle ?? "Untitled Conversation"} (conversation_id: ${context.conversationId})`,
         ``,
-        `Prior digest (continuity reference — you are re-minting the whole digest, not appending):`,
+        deltaMode
+          ? `Prior digest (canonical — integrate the new sections below into it):`
+          : `Prior digest (continuity reference — you are re-minting the whole digest, not appending):`,
         context.rollingSummary ?? "(none yet — this is the first digest)",
         ``,
-        `Section summaries, in conversation order:`
+        deltaMode
+          ? `New section summaries since the last fold (each labeled with its message-ordinal range; earlier sections are one conversation_memory_get_chunk call away):`
+          : `Section summaries, in conversation order:`
       );
-      for (const section of sections) {
+      for (const section of foldSections) {
         if (section.summary == null || section.summary.length === 0) continue;
         parts.push(
           ``,
@@ -1671,7 +1743,7 @@ The System prompt given to all models in the source material being summarized is
 
       const result = await this.invokeSummarizerArm(
         foldArm,
-        this.foldSystemPrompt,
+        deltaMode ? this.foldDeltaSystemPrompt : this.foldSystemPrompt,
         [{ type: "text", text: parts.join("\n") }],
         (name, input) =>
           this.executeSummarizerToolCall(
@@ -1693,9 +1765,11 @@ The System prompt given to all models in the source material being summarized is
         [folded],
         this.memoryIndexingConfig.embeddingModel
       );
-      // fold watermark: the newest summaryGeneratedAt this digest covers
+      // fold watermark: the newest summaryGeneratedAt this digest covers —
+      // over the FOLDED set (delta prefix in delta mode), never the full
+      // corpus, so a prefix cut leaves the remainder unfolded by watermark
       let foldedThrough = new Date(0);
-      for (const section of sections) {
+      for (const section of foldSections) {
         if (
           section.summaryGeneratedAt &&
           section.summaryGeneratedAt > foldedThrough
@@ -1740,6 +1814,10 @@ The System prompt given to all models in the source material being summarized is
             "rolling summary ERROR state write failed"
           );
         });
+    } finally {
+      if (slotAcquired) {
+        this.summaryJobSemaphore.release();
+      }
     }
   }
 
