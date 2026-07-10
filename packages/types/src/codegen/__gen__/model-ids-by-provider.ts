@@ -1,5 +1,8 @@
 export const modelIdsByProvider = {
   openai: [
+    "gpt-5.6-sol",
+    "gpt-5.6-terra",
+    "gpt-5.6-luna",
     "gpt-5.5",
     "gpt-5.4",
     "gpt-5.4-mini",
@@ -67,6 +70,7 @@ export const modelIdsByProvider = {
     "veo-3.1-lite-generate-preview"
   ],
   grok: [
+    "grok-4.5",
     "grok-4.3",
     "grok-4.20-multi-agent-0309",
     "grok-4.20-0309-reasoning",
@@ -107,7 +111,7 @@ export const modelIdsByProvider = {
     "command-a-reasoning-08-2025",
     "command-a-03-2025"
   ],
-  moonshotai: ["kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
+  moonshotai: ["kimi-k2.7-code", "kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
   deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
   zai: ["glm-5.2", "glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
   alibaba: [

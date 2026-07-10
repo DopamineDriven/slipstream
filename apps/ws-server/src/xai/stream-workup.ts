@@ -447,7 +447,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         max_output_tokens,
         user: userId
       } as const;
-    } else if (this.isGrok4Point3(model)) {
+    } else if (this.isGrok4Point3(model) || this.isGrok4Point5(model)) {
       return {
         input: history,
         model,
@@ -532,13 +532,13 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
           instructions: this.prisma.formatSysNote(systemPrompt),
           reasoning: undefined,
           max_output_tokens: max_tokens,
-          model: (m ?? "grok-4.20-0309-reasoning") as GrokModelIdUnion,
+          model: (m ?? "grok-4.5") as GrokModelIdUnion,
           parallel_tool_calls: parallel_tool_calling,
           tool_choice: tool_choice_input,
           store: false,
           stream,
           tools: this.handleTooling({
-            model: (m ?? "grok-4.20-0309-reasoning") as GrokModelIdUnion,
+            model: (m ?? "grok-4.5") as GrokModelIdUnion,
             collectionId: cId,
             enableFileSearch,
             enableUserStoreSearch: hasUserStoreDocs,
@@ -554,7 +554,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         }
       : await this.getResponsesApiInputWorkup({
           isNewChat,
-          model: (m ?? "grok-4.20-0309-reasoning") as GrokModelIdUnion,
+          model: (m ?? "grok-4.5") as GrokModelIdUnion,
           userId,
           msgs,
           keyFingerprint: keyId ?? "server",

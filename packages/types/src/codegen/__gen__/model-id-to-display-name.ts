@@ -1,5 +1,8 @@
 export const modelIdToDisplayName = {
   openai: {
+    "gpt-5.6-sol": "GPT-5.6 Sol",
+    "gpt-5.6-terra": "GPT-5.6 Terra",
+    "gpt-5.6-luna": "GPT-5.6 Luna",
     "gpt-5.5": "GPT-5.5",
     "gpt-5.4": "GPT-5.4",
     "gpt-5.4-mini": "GPT-5.4 mini",
@@ -68,6 +71,7 @@ export const modelIdToDisplayName = {
     "veo-3.1-lite-generate-preview": "Veo 3.1 lite"
   },
   grok: {
+    "grok-4.5": "Grok 4.5",
     "grok-4.3": "Grok 4.3",
     "grok-4.20-multi-agent-0309": "Grok 4.20 Multi-Agent",
     "grok-4.20-0309-reasoning": "Grok 4.20 Reasoning",
@@ -114,6 +118,7 @@ export const modelIdToDisplayName = {
     "command-a-03-2025": "Command A"
   },
   moonshotai: {
+    "kimi-k2.7-code": "Kimi K2.7 Code",
     "kimi-k2.6": "Kimi K2.6",
     "kimi-k2.5": "Kimi K2.5",
     "kimi-k2-thinking": "Kimi K2 Thinking"

@@ -25,7 +25,7 @@ export interface OpenAIStreamSummaryParams {
 }
 
 /**
- * The GPT-5.5 summarizer arm (HMEM Part II §6): extends the memory-free
+ * The GPT-5.6 Sol summarizer arm (HMEM Part II §6): extends the memory-free
  * OpenAIServiceWorkup for the battle-tested call posture — client, reasoning
  * knobs, verbosity, the fleet function-tool defs, and the malformed-args
  * parsers — while tool EXECUTION arrives as a closure from the memory

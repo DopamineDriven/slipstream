@@ -243,13 +243,7 @@ export function instanceFunc<const Type>(c: new (...args: Type[]) => Type) {
 }
 
 export type CommonDiscriminants =
-  | "type"
-  | "kind"
-  | "event"
-  | "tag"
-  | "provider"
-  | "_tag"
-  | "__typename";
+  "type" | "kind" | "event" | "tag" | "provider" | "_tag" | "__typename";
 
 export type LiteralUnion<TKnown extends string> = TKnown | string;
 

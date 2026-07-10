@@ -1,5 +1,8 @@
 export const displayNameModelsByProviderImgGen = {
   openai: [
+    "GPT-5.6 Sol",
+    "GPT-5.6 Terra",
+    "GPT-5.6 Luna",
     "GPT-5.5",
     "GPT-5.5 pro",
     "GPT-5.4",

@@ -11,6 +11,9 @@ export class ModelService extends ModelServiceWorkup {
   }
   public isOpenAIImgGenFacilitating(m: string) {
     return (
+      m === "gpt-5.6-sol" ||
+      m === "gpt-5.6-terra" ||
+      m === "gpt-5.6-luna" ||
       m === "gpt-5.5" ||
       m === "gpt-5.5-pro" ||
       m === "gpt-5.4-mini" ||
@@ -157,6 +160,7 @@ export class ModelService extends ModelServiceWorkup {
     return (
       this.isGrokVideoModel(m) ||
       this.isGrokImgModel(m) ||
+      m === "grok-4.5" ||
       m === "grok-4.3" ||
       m === "grok-4.20-multi-agent-0309" ||
       m === "grok-4.20-0309-reasoning" ||
@@ -223,7 +227,12 @@ export class ModelService extends ModelServiceWorkup {
   }
 
   public isKimiModel(m: string) {
-    return m === "kimi-k2.6" || m === "kimi-k2.5" || m === "kimi-k2-thinking";
+    return (
+      m === "kimi-k2.7-code" ||
+      m === "kimi-k2.6" ||
+      m === "kimi-k2.5" ||
+      m === "kimi-k2-thinking"
+    );
   }
 
   public isDeepSeekModel(m: string) {
@@ -491,7 +500,7 @@ export class ModelService extends ModelServiceWorkup {
           )
         ) {
           return model;
-        } else return "grok-4.3" as const as NonNullable<K>;
+        } else return "grok-4.5" as const as NonNullable<K>;
       }
       case "anthropic": {
         if (
@@ -579,7 +588,7 @@ export class ModelService extends ModelServiceWorkup {
           )
         ) {
           return model;
-        } else return "qwen3.7-max" as const as NonNullable<K>;
+        } else return "qwen3.7-plus" as const as NonNullable<K>;
       }
       case "minimax": {
         if (
@@ -610,7 +619,7 @@ export class ModelService extends ModelServiceWorkup {
           )
         ) {
           return model;
-        } else return "gpt-5.5" as const as NonNullable<K>;
+        } else return "gpt-5.6-sol" as const as NonNullable<K>;
       }
     }
   };

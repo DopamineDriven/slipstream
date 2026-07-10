@@ -198,7 +198,7 @@ export interface MemorySummarizerConfig {
   /** image url blocks attached to the summarizer call, capped — documents stay in the user store (index once, retrieve everywhere) */
   maxAttachmentBlocks: number;
   /**
-   * the GPT-5.5 arm's posture (§6.2 — per-arm knobs are config, not
+   * the GPT-5.6 Sol arm's posture (§6.2 — per-arm knobs are config, not
    * hardcode); shared maxToolUseRounds/callDeadlineMs govern both arms so
    * the wave failsafe stays a single computation
    */

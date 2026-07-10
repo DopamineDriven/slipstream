@@ -19,9 +19,9 @@ export const CLI_MODELS = [
   { alias: "mistral", model: "mistral-medium-3.5", provider: "mistral" },
   { alias: "qwen", model: "qwen3.7-plus", provider: "alibaba" },
   { alias: "deepseek", model: "deepseek-v4-pro", provider: "deepseek" },
-  { alias: "gpt", model: "gpt-5.5", provider: "openai" },
+  { alias: "gpt", model: "gpt-5.6-sol", provider: "openai" },
   { alias: "minimax", model: "minimax-m3", provider: "minimax" },
-  { alias: "grok", model: "grok-4.20-0309-reasoning", provider: "grok" },
+  { alias: "grok", model: "grok-4.5", provider: "grok" },
   { alias: "gemini", model: "gemini-3.1-pro-preview", provider: "gemini" },
   { alias: "cohere", model: "command-a-plus-05-2026", provider: "cohere" }
 ] as const satisfies readonly CliModelEntry[];

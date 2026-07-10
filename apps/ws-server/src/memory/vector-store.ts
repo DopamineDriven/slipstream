@@ -53,7 +53,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
     prisma: PrismaService,
     /** rides AnthropicBaseService's battle-tested call shape — betas, adaptive thinking, ceiling clamps */
     protected summarizer: AnthropicSummarizerService,
-    /** the GPT-5.5 arm (§6.2) — first-class dep since the memory-free workup repartition killed the ctor cycle */
+    /** the GPT-5.6 Sol arm (§6.2) — first-class dep since the memory-free workup repartition killed the ctor cycle */
     protected openaiSummarizerArm: OpenAISummarizerService,
     /** the user vector store — the summarizer forages it via file_search during summary/fold calls */
     protected userStore: UserStoreVectorService
@@ -773,9 +773,9 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
       // produces a higher-fidelity summary then by all means; knowledge is king
       openaiArm: {
         provider: "OPENAI",
-        model: "gpt-5.5",
+        model: "gpt-5.6-sol",
         effort: "xhigh",
-        maxOutputTokens: 120_000
+        maxOutputTokens: 128_000
       },
       rawTranscriptAb: true,
       maxToolUseRounds: 10,
@@ -1112,7 +1112,7 @@ The System prompt given to all models in the source material being summarized is
   ) {
     const cfg = this.memorySummarizerConfig;
     // per-chunk deterministic alternation (§6.2): odd chunkIndex → the
-    // GPT-5.5 arm when wired, even → the sonnet-5 anchor. Stable across
+    // GPT-5.6 Sol arm when wired, even → the sonnet-5 anchor. Stable across
     // retries (unlike LRU), and every row carries its arm's receipts.
     const openaiArm =
       chunk.chunkIndex % 2 === 1 ? this.openaiSummarizerArm : undefined;

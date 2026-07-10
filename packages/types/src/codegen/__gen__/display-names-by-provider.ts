@@ -1,5 +1,8 @@
 export const displayNameModelsByProvider = {
   openai: [
+    "GPT-5.6 Sol",
+    "GPT-5.6 Terra",
+    "GPT-5.6 Luna",
     "GPT-5.5",
     "GPT-5.4",
     "GPT-5.4 mini",
@@ -67,6 +70,7 @@ export const displayNameModelsByProvider = {
     "Veo 3.1 lite"
   ],
   grok: [
+    "Grok 4.5",
     "Grok 4.3",
     "Grok 4.20 Multi-Agent",
     "Grok 4.20 Reasoning",
@@ -103,7 +107,7 @@ export const displayNameModelsByProvider = {
     "Mistral Large Latest"
   ],
   cohere: ["Command A Plus", "Command A Reasoning", "Command A"],
-  moonshotai: ["Kimi K2.6", "Kimi K2.5", "Kimi K2 Thinking"],
+  moonshotai: ["Kimi K2.7 Code", "Kimi K2.6", "Kimi K2.5", "Kimi K2 Thinking"],
   deepseek: ["DeepSeek V4 Pro", "DeepSeek V4 Flash", "DeepSeek R1"],
   zai: ["GLM 5.2", "GLM 5.1", "GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"],
   alibaba: [

@@ -433,6 +433,9 @@ export class OpenAIBaseService {
           }
         }
       }
+      case "gpt-5.6-luna":
+      case "gpt-5.6-sol":
+      case "gpt-5.6-terra":
       case "gpt-5.5-pro":
       case "gpt-5.4-pro":
       case "gpt-5.2-pro": {
@@ -468,6 +471,9 @@ export class OpenAIBaseService {
     imgGenEnabled = false
   ) {
     switch (model) {
+      case "gpt-5.6-luna":
+      case "gpt=5.6-sol":
+      case "gpt-5.6-terra":
       case "gpt-5.5":
       case "gpt-5.5-pro":
       case "gpt-5.4-mini":

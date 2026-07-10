@@ -110,7 +110,7 @@ async function exe() {
       cfg.ANTHROPIC_API_KEY
     );
 
-    // the GPT-5.5 summarizer arm (HMEM §6.2) — extends the memory-free
+    // the GPT-5.6 Sol summarizer arm (HMEM §6.2) — extends the memory-free
     // workup, so it constructs BEFORE memory as a first-class dep
     const { OpenAISummarizerService } = await import("@/openai/summarizer.ts");
     const openaiSummarizerArm = new OpenAISummarizerService(
