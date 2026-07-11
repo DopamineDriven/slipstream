@@ -926,7 +926,8 @@ export class LlamaService {
       ...this.buildToolContinuationBase(initialMessages)
     );
 
-    const MAX_TOOL_ROUNDS = 8;
+    // backstop only, not a working budget — memory tools dual-wield across rounds
+    const MAX_TOOL_ROUNDS = 100;
     const maxFileSearchCalls = 4;
     const toolCallSignatureRegistry = new Map<string, number>();
     let fileSearchCallsTotal = 0;

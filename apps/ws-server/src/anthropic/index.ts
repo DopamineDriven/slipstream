@@ -312,7 +312,11 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       );
     }
 
-    const MAX_TOOL_ROUNDS = 8;
+    // backstop only, not a working budget — memory tools dual-wield
+    // (search → get_chunk → search) so real turns burn many rounds, and
+    // pause_turn continuations consume ticks too; wall-clock deadlines
+    // are the sanctioned bound on runaway loops, never round rationing
+    const MAX_TOOL_ROUNDS = 100;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
       if (round > 0) {

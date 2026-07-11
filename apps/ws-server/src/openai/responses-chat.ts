@@ -213,7 +213,8 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       hasUserStoreDocs
     );
     const instructions = this.prisma.formatSysNote(systemPrompt);
-    const MAX_TOOL_ROUNDS = 10;
+    // backstop only, not a working budget — memory tools dual-wield across rounds
+    const MAX_TOOL_ROUNDS = 100;
     let roundInput = Array.of<OpenAI.Responses.ResponseInputItem>(...formatted);
     let forcedLoopStopReason: "MAX_ROUNDS" | undefined = undefined;
 

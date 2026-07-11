@@ -39,7 +39,8 @@ export class AlibabaWorkupService {
         minResults: 5,
         maxResults: 15
       },
-      maxToolRounds: 15
+      // backstop only, not a working budget — memory tools dual-wield across rounds
+      maxToolRounds: 100
     } as const satisfies {
       fileSearch: {
         defaultResults: number;
