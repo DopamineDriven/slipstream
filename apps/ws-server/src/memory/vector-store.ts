@@ -801,33 +801,36 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
           effort: "xhigh",
           maxOutputTokens: 128_000
         },
+        // gateway arms run UNCAPPED (Andrew: "no caps period") — reasoning
+        // shares max_tokens in the completions dialect, so any cap starves
+        // thinking first; the callDeadlineMs abort is the only bound
         {
           key: "deepseek",
           enabled: true,
           provider: "DEEPSEEK",
           model: "deepseek-v4-pro",
-          maxOutputTokens: 16_000
+          maxOutputTokens: undefined
         },
         {
           key: "minimax",
           enabled: true,
           provider: "MINIMAX",
           model: "minimax-m3",
-          maxOutputTokens: 16_000
+          maxOutputTokens: undefined
         },
         {
           key: "qwen",
           enabled: true,
           provider: "ALIBABA",
           model: "qwen3.7-plus",
-          maxOutputTokens: 16_000
+          maxOutputTokens: undefined
         },
         {
           key: "kimi",
           enabled: true,
           provider: "MOONSHOTAI",
           model: "kimi-k2.7-code",
-          maxOutputTokens: 16_000
+          maxOutputTokens: undefined
         },
         // gateway probe 2026-07-10: zai/glm-5.2 401'd once then hung 300s+ —
         // flip when the gateway's zai routing behaves (glm-5v-turbo is
@@ -837,7 +840,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
           enabled: false,
           provider: "ZAI",
           model: "glm-5.2",
-          maxOutputTokens: 16_000
+          maxOutputTokens: undefined
         }
       ],
       foldArmKey: "sol",

@@ -207,7 +207,12 @@ interface SummarizerArmBase {
   key: SummarizerArmKey;
   /** rotation membership — disabled arms stay constructed so re-enabling is a config flip, not a rebuild */
   enabled: boolean;
-  maxOutputTokens: number;
+  /**
+   * undefined = NO cap (Andrew: "no caps period") — the request omits the
+   * param and the provider's own ceiling applies. First-party arms keep an
+   * explicit value because their APIs require one; set it AT the ceiling.
+   */
+  maxOutputTokens: number | undefined;
 }
 
 /**
@@ -222,11 +227,15 @@ export type SummarizerArmEntry =
       model: AnthropicModelIdUnion;
       /** adaptive-thinking effort — a background job pays no latency tax, think hard */
       effort: "high" | "xhigh" | "max";
+      /** anthropic requires max_tokens — pin it at the model ceiling */
+      maxOutputTokens: number;
     })
   | (SummarizerArmBase & {
       provider: "OPENAI";
       model: OpenAiModelIdUnion;
       effort: ReasoningEffort;
+      /** the Responses arm passes an explicit value — pin it at the model ceiling */
+      maxOutputTokens: number;
     })
   | (SummarizerArmBase & { provider: "DEEPSEEK"; model: DeepSeekModelIdUnion })
   | (SummarizerArmBase & { provider: "MOONSHOTAI"; model: KimiModelIdUnion })

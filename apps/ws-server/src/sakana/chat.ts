@@ -52,7 +52,6 @@ export class SakanaChatService extends SakanaWorkupService {
     ws,
     userMsgId,
     apiKey,
-    max_tokens,
     jobId,
     requestMessageId,
     model = "fugu" satisfies SakanaModelIdUnion,
@@ -171,7 +170,10 @@ export class SakanaChatService extends SakanaWorkupService {
             store: false,
             instructions,
             model,
-            max_output_tokens: max_tokens,
+            // max_output_tokens deliberately OMITTED: the Responses dialect
+            // pools reasoning + visible output under one cap, so honoring the
+            // per-chat max_tokens slider starves fugu-ultra's (encrypted)
+            // reasoning and 200s into response.incomplete with zero text
             reasoning: this.handleReasoning(model),
             parallel_tool_calls: true,
             tools
@@ -237,6 +239,22 @@ export class SakanaChatService extends SakanaWorkupService {
             }
           }
           roundCompleted = true;
+        }
+
+        // terminal non-completion events — previously fell through every
+        // branch and surfaced as the opaque "ended without completion"
+        if (s.type === "response.incomplete") {
+          finalizeActiveBlock();
+          throw new Error(
+            `Sakana response ended incomplete (${s.response.incomplete_details?.reason ?? "unknown reason"})`
+          );
+        }
+
+        if (s.type === "response.failed") {
+          finalizeActiveBlock();
+          throw new Error(
+            `Sakana response failed: ${s.response.error?.message ?? "unknown failure"}`
+          );
         }
 
         if (thinkingText) {
