@@ -47,7 +47,6 @@ export class AlibabaService extends AlibabaMemoryService {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    max_tokens,
     model,
     systemPrompt,
     temperature,
@@ -174,7 +173,6 @@ export class AlibabaService extends AlibabaMemoryService {
       let sawToolCallFinish = false;
 
       const streamer = this.stream(model, roundMessages, apiKey ?? undefined, {
-        max_completion_tokens: max_tokens,
         top_p: topP,
         temperature,
         tools

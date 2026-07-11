@@ -85,7 +85,6 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     ws,
     userMsgId,
     apiKey,
-    max_tokens,
     jobId,
     requestMessageId,
     model,
@@ -236,7 +235,6 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
               "web_search_call.action.sources",
               "message.input_image.image_url"
             ],
-            max_output_tokens: max_tokens,
             safety_identifier: userId,
             truncation: "auto",
             reasoning: this.openaiReasoning(

@@ -47,7 +47,6 @@ export class DeepSeekService extends DeepSeekMemoryService {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    max_tokens,
     model,
     systemPrompt,
     temperature,
@@ -173,7 +172,6 @@ export class DeepSeekService extends DeepSeekMemoryService {
       let sawToolCallFinish = false;
 
       const streamer = this.stream(model, roundMessages, apiKey ?? undefined, {
-        max_completion_tokens: max_tokens,
         top_p: topP,
         temperature,
         tools

@@ -361,7 +361,6 @@ export class MistralService extends MistralStreamContentService {
     options?: {
       temperature?: number;
       topP?: number;
-      maxTokens?: number;
       tools?: ToolTypes;
     }
   ) {
@@ -937,7 +936,6 @@ export class MistralService extends MistralStreamContentService {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    max_tokens,
     model,
     systemPrompt,
     temperature,
@@ -1252,7 +1250,6 @@ export class MistralService extends MistralStreamContentService {
         roundMessages,
         apiKey ?? undefined,
         {
-          maxTokens: max_tokens,
           topP,
           temperature,
           tools
