@@ -126,9 +126,10 @@ export class CliRendererService extends CliProviderContextService {
       }
     }
     process.stdout.write("\n");
+    // ordinals and counts are different units — "85-92 of 48" reads as a bug
     const window =
       tail.shownFromOrdinal !== null
-        ? ` · showing messages ${tail.shownFromOrdinal}-${tail.shownToOrdinal} of ${tail.totalHydrated} hydrated`
+        ? ` · showing messages ${tail.shownFromOrdinal}-${tail.shownToOrdinal} · ${tail.totalHydrated} hydrated`
         : ` · ${tail.totalHydrated} message(s) hydrated`;
     this.renderNotice(`attached · ${tail.title ?? "untitled"}${window}`);
     return tail.title;
