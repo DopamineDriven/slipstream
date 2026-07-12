@@ -1,4 +1,5 @@
 import pc from "picocolors";
+import { formatHydratedTail } from "@/hydrated-history.ts";
 import { CliProviderContextService } from "@/provider-context.ts";
 import type { EventTypeMap } from "@slipstream/types";
 
@@ -93,26 +94,43 @@ export class CliRendererService extends CliProviderContextService {
     process.stdout.write(`\n${this.speakerTag(msg)}\n${msg.content}\n\n`);
   }
 
-  /** compact tail of a hydrated conversation — context on /convo attach */
+  /**
+   * pathological-message safeguard for the resume window — generous enough
+   * that ordinary long answers render whole; a capped message prints an
+   * explicit marker with the exact /expand recovery, never a silent collapse
+   */
+  protected hydratedMessageCharCap = 10_000;
+
+  /**
+   * readable resume — the tail of a hydrated conversation renders with full
+   * bodies, normal speaker headers, and preserved whitespace on /convo
+   * attach. Recovering working context is the point of resuming; the window
+   * must be lossless for the selected message count (Phase 2.0).
+   */
   protected renderHydratedTail(
     data: EventTypeMap["hydrate_conversation_ack"],
     tailCount = 8
   ) {
-    const messages = data.pages
-      .flatMap(page => page.convo.messages)
-      .sort((a, b) => a.ordinal - b.ordinal);
-    const title = data.pages[0]?.convo.title ?? null;
-    const tail = messages.slice(-tailCount);
-    process.stdout.write("\n");
-    for (const msg of tail) {
-      const oneLine = msg.content.replace(/\s+/g, " ").trim();
-      const preview =
-        oneLine.length > 160 ? `${oneLine.slice(0, 160)}…` : oneLine;
-      process.stdout.write(`${this.speakerTag(msg)} ${pc.dim(preview)}\n`);
+    const tail = formatHydratedTail(data.pages, {
+      tailCount,
+      perMessageCharCap: this.hydratedMessageCharCap
+    });
+    for (const msg of tail.messages) {
+      process.stdout.write(`\n${this.speakerTag(msg)}\n${msg.body}\n`);
+      if (msg.truncated) {
+        process.stdout.write(
+          `${pc.yellow("…")} ${pc.dim(
+            `truncated for display — ${msg.totalChars.toLocaleString()} chars total · /expand ${msg.ordinal} for the full message`
+          )}\n`
+        );
+      }
     }
-    this.renderNotice(
-      `attached · ${title ?? "untitled"} · ${messages.length} message(s) hydrated (showing last ${tail.length})`
-    );
-    return title;
+    process.stdout.write("\n");
+    const window =
+      tail.shownFromOrdinal !== null
+        ? ` · showing messages ${tail.shownFromOrdinal}-${tail.shownToOrdinal} of ${tail.totalHydrated} hydrated`
+        : ` · ${tail.totalHydrated} message(s) hydrated`;
+    this.renderNotice(`attached · ${tail.title ?? "untitled"}${window}`);
+    return tail.title;
   }
 }

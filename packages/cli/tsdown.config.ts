@@ -10,6 +10,7 @@ export default defineConfig(
         "src/index.ts",
         "src/client.ts",
         "src/config.ts",
+        "src/hydrated-history.ts",
         "src/render.ts",
         "src/repl.ts",
         "src/types.ts",
