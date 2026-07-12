@@ -214,7 +214,7 @@ catalogs:
   tiktoken:
     tiktoken: ^1.0.22
   ts:
-    typescript: ^7.0.2
+    typescript: ^6.0.3
   tsdown:
     tsdown: ^0.22.5
     "@tsdown/css": ^0.22.5
