@@ -57,3 +57,4 @@ infra/*.md
 \.codex
 docs/*
 infra/dkim.sh
+result.md

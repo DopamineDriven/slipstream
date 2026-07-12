@@ -8,7 +8,6 @@
     "exactOptionalPropertyTypes": true,
     "declarationMap": true,
     "outDir": "dist",
-            "ignoreDeprecations":"6.0",
     "types": ["*"]
   },
   "exclude": ["dist"],

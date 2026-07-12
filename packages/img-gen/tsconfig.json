@@ -5,7 +5,6 @@
       "@/*": ["./src/*"]
     },
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-            "ignoreDeprecations":"6.0",
     "types": ["*"]
   },
   "include": [

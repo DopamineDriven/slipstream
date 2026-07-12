@@ -15,20 +15,20 @@ dangerouslyAllowAllBuilds: true
 
 catalogs:
   anthropic:
-    "@anthropic-ai/sdk": ^0.110.0
+    "@anthropic-ai/sdk": ^0.111.0
   auth:
     better-auth: ^1.6.23
   aws:
-    "@aws-sdk/client-s3": ^3.1080.0
-    "@aws-sdk/client-secrets-manager": ^3.1080.0
-    "@aws-sdk/credential-providers": ^3.1080.0
-    "@aws-sdk/lib-storage": ^3.1080.0
-    "@aws-sdk/s3-request-presigner": ^3.1080.0
-    "@aws-sdk/types": ^3.973.15
+    "@aws-sdk/client-s3": ^3.1085.0
+    "@aws-sdk/client-secrets-manager": ^3.1085.0
+    "@aws-sdk/credential-providers": ^3.1085.0
+    "@aws-sdk/lib-storage": ^3.1085.0
+    "@aws-sdk/s3-request-presigner": ^3.1085.0
+    "@aws-sdk/types": ^3.974.0
   babel:
     babel-plugin-react-compiler: ^1.0.0
   biome:
-    "@biomejs/biome": ^2.5.2
+    "@biomejs/biome": ^2.5.3
   bui:
     "@base-ui/react": ^1.6.0
   clsx:
@@ -36,7 +36,7 @@ catalogs:
   cohere:
     cohere-ai: ^8.0.0
   colorjs:
-    "colorjs.io": ^0.6.1
+    "colorjs.io": ^0.7.0
   cookies:
     "@types/js-cookie": ^3.0.6
     js-cookie: ^3.0.8
@@ -60,7 +60,7 @@ catalogs:
     "@eslint/compat": ^2.1.0
     "@eslint/config-helpers": ^0.6.0
     "@eslint/js": ^10.0.1
-    eslint: ^10.6.0
+    eslint: ^10.7.0
     eslint-plugin-import: ^2.32.0
     eslint-plugin-import-x: ^4.17.1
     eslint-plugin-jsx-a11y: ^6.10.2
@@ -73,7 +73,7 @@ catalogs:
   glob:
     glob: ^13.0.6
   google:
-    "@google/genai": ^2.10.0
+    "@google/genai": ^2.11.0
   gtag:
     "@types/gtag.js": ^0.0.20
   jiti:
@@ -109,13 +109,13 @@ catalogs:
     next: ^16.2.10
     next-themes: ^0.4.6
   node:
-    "@types/node": ^26.1.0
+    "@types/node": ^26.1.1
     node-html-parser: ^9.0.0
     nodemon: ^3.1.14
   nyc:
     nyc: ^18.0.0
   openai:
-    openai: ^6.45.0
+    openai: ^6.46.0
   p-limit:
     p-limit: ^7.3.0
   pg:
@@ -131,7 +131,7 @@ catalogs:
     urlpattern-polyfill: ^10.1.0
   prettier:
     "@ianvs/prettier-plugin-sort-imports": ^4.7.1
-    prettier: ^3.9.4
+    prettier: ^3.9.5
     prettier-plugin-tailwindcss: ^0.8.0
   prisma:
     "@prisma/adapter-pg": ^7.8.0
@@ -188,8 +188,8 @@ catalogs:
     remark-parse: ^11.0.0
     remark-rehype: ^11.1.2
   rolldown:
-    rolldown: ^1.1.4
-    rolldown-plugin-dts: ^0.27.1
+    rolldown: ^1.1.5
+    rolldown-plugin-dts: ^0.27.6
     rolldown-plugin-wasm: ^0.3.2
   sharp:
     sharp: ^0.35.3
@@ -197,13 +197,14 @@ catalogs:
     "@shikijs/transformers": ^4.3.1
     shiki: ^4.3.1
   smithy:
-    "@smithy/node-http-handler": ^4.9.3
+    "@smithy/node-http-handler": ^4.9.5
   store:
     use-sync-external-store: ^1.6.0
     "@types/use-sync-external-store": ^1.5.0
   styles:
     autoprefixer: ^10.5.2
-    postcss: ^8.5.16
+    postcss: ^8.5.17
+    postcss-import: ^16.1.1
   swr:
     swr: ^2.4.2
   tanstack:
@@ -213,19 +214,16 @@ catalogs:
   tiktoken:
     tiktoken: ^1.0.22
   ts:
-    typescript: ^6.0.3
+    typescript: ^7.0.2
   tsdown:
-    tsdown: ^0.22.3
+    tsdown: ^0.22.5
+    "@tsdown/css": ^0.22.5
   tseslint:
     typescript-eslint: ^8.63.0
   tsgo:
     "@typescript/native-preview": ^7.0.0-dev.20260707.2
   tslib:
     tslib: ^2.8.1
-  tsup:
-    "@microsoft/api-extractor": ^7.58.9
-    terser: ^5.48.0
-    tsup: ^8.5.1
   tsx:
     tsx: ^4.23.0
   turbo:
@@ -257,7 +255,7 @@ catalogs:
     vfile: ^6.0.3
   vite:
     "@vitejs/plugin-react": ^6.0.3
-    vite: ^8.1.3
+    vite: ^8.1.4
   vitest:
     "@vitest/coverage-istanbul": ^4.1.10
     "@vitest/ui": ^4.1.10
@@ -294,4 +292,4 @@ allowBuilds:
   unrs-resolver: true
 
 patchedDependencies:
-  '@anthropic-ai/sdk@0.110.0': patches/@anthropic-ai__sdk@0.101.0.patch
+  '@anthropic-ai/sdk@0.111.0': patches/@anthropic-ai__sdk@0.101.0.patch
