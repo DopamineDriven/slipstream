@@ -9,8 +9,8 @@
         "*": [
           "dist/index.d.ts"
         ],
-        "slipstream": [
-          "dist/bin/slipstream.d.ts"
+        "aic": [
+          "dist/bin/aic.d.ts"
         ]
       }
     }
@@ -34,8 +34,8 @@
       "repl": [
         "dist/repl.d.ts"
       ],
-      "slipstream": [
-        "dist/bin/slipstream.d.ts"
+      "aic": [
+        "dist/bin/aic.d.ts"
       ],
       "types": [
         "dist/types.d.ts"
@@ -43,7 +43,8 @@
     }
   },
   "bin": {
-    "slipstream": "dist/bin/slipstream.js"
+    "aic": "dist/bin/aic.js",
+    "aicoalesce": "dist/bin/aic.js"
   },
   "type": "module",
   "module": "./dist/index.js",
@@ -54,7 +55,7 @@
   ],
   "exports": {
     ".": "./dist/index.js",
-    "./bin/slipstream": "./dist/bin/slipstream.js",
+    "./bin/aic": "./dist/bin/aic.js",
     "./client": "./dist/client.js",
     "./config": "./dist/config.js",
     "./renderer": "./dist/renderer.js",

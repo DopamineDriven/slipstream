@@ -19,7 +19,7 @@ export default defineConfig(
         "src/render.ts",
         "src/repl.ts",
         "src/types.ts",
-        "src/bin/slipstream.ts",
+        "src/bin/aic.ts",
         "!src/__out__/**/*",
         "!src/scripts/**/*",
         "!src/tests/**/*"

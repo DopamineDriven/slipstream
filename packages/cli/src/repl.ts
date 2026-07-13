@@ -464,7 +464,7 @@ export class SlipstreamReplService extends CliRendererService {
   }
 
   public async start() {
-    this.renderNotice(`slipstream · ${this.wsUrl}`);
+    this.renderNotice(`aic · ${this.wsUrl}`);
     // handlers register BEFORE connect — connection_established lands
     // milliseconds post-handshake and must not race the registration
     this.wireEvents();
