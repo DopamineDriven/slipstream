@@ -1,3 +1,4 @@
+import { emitKeypressEvents } from "node:readline";
 import { createInterface } from "node:readline/promises";
 import pc from "picocolors";
 import { wsDebug } from "@/chat-ws-client.ts";
@@ -72,6 +73,17 @@ export class SlipstreamReplService extends CliRendererService {
 
   private turn?: PromiseWithResolvers<void>;
 
+  /** popup re-entrancy guard — one picker owns stdin at a time */
+  private pickerOpen = false;
+  /** true only while the prompt is awaiting a line — popups trigger nowhere else */
+  private awaitingLine = false;
+  /**
+   * seed set by the keypress watcher when the buffer becomes "/convo …" —
+   * the pending question is force-submitted and the loop opens the picker
+   * with this filter (Claude-Code @-mention UX: live, not Enter-gated)
+   */
+  private pickerRequest?: string;
+
   /**
    * transactional attach — the active session stays intact until the
    * hydration ack for THIS id arrives; mismatched/late acks are discarded and
@@ -139,13 +151,22 @@ export class SlipstreamReplService extends CliRendererService {
       this.renderNotice("index warming — try again in a moment");
       return;
     }
+    // burst/paste race: when "/convo Expan" arrives as one stdin chunk, the
+    // watcher fires at the space and force-submits, and the trailing chars
+    // land in readline's FRESH buffer before this continuation runs —
+    // harvest them into the seed instead of losing them to the ctrl+u
+    const strays = this.rl.line.trim();
+    const seed = `${initialFilter}${initialFilter.length === 0 ? strays : ""}`;
+    this.rl.write(null, { ctrl: true, name: "u" });
     this.rl.pause();
+    this.pickerOpen = true;
     const picker = new CliConvoPicker(
       { stdin: process.stdin, stdout: process.stdout },
       snapshot,
-      initialFilter
+      seed
     );
     const picked = await picker.run();
+    this.pickerOpen = false;
     this.rl.write(null, { ctrl: true, name: "u" });
     this.rl.resume();
     if (!picked) {
@@ -457,8 +478,43 @@ export class SlipstreamReplService extends CliRendererService {
       process.stdout.write("\n");
       process.exit(0);
     });
+    // live popup trigger — the moment the prompt buffer reads "/convo " (or
+    // /convos), take over: clear + auto-submit the pending question and open
+    // the picker seeded with whatever followed the command. Claude-Code-style
+    // @-mention UX: the list appears and filters BY KEYSTROKE, Enter never
+    // opens it. readline applies the keypress to rl.line before we run (its
+    // internal listener registered first), so the buffer read is current.
+    if (process.stdin.isTTY) {
+      emitKeypressEvents(process.stdin);
+      process.stdin.on("keypress", () => {
+        // fire ONLY while the prompt is genuinely awaiting a line — never
+        // over a command handler, a streaming turn, or an open picker
+        if (
+          !this.awaitingLine ||
+          this.pickerOpen ||
+          this.pickerRequest !== undefined
+        ) {
+          return;
+        }
+        const trigger = /^\/convos?\s(.*)$/.exec(this.rl.line);
+        if (!trigger) return;
+        this.pickerRequest = trigger[1] ?? "";
+        // force-submit the pending question: clear the buffer, newline ends
+        // the await; the loop reads pickerRequest and opens the picker
+        this.rl.write(null, { ctrl: true, name: "u" });
+        this.rl.write("\n");
+      });
+    }
     for (;;) {
+      this.awaitingLine = true;
       const line = (await this.rl.question(pc.green("❯ "))).trim();
+      this.awaitingLine = false;
+      if (this.pickerRequest !== undefined) {
+        const seed = this.pickerRequest;
+        this.pickerRequest = undefined;
+        await this.pickConversation(seed);
+        continue;
+      }
       if (line.length === 0) continue;
       if (line.startsWith("/")) {
         const [cmd = "", ...rest] = line.slice(1).split(" ");
