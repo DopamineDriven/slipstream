@@ -63,6 +63,8 @@
   },
   "scripts": {
     "build": "tsdown",
+    "prebuild": "pnpm gen:tsdown && prettier --write tsdown.config.ts --ignore-unknown --cache",
+    "gen:tsdown": "tsx src/scripts/automate-tsdown.ts --target gen --ignore !src/__out__/**/*,!src/scripts/**/*,!src/tests/**/*",
     "test": "node --test --import tsx --test-reporter spec \"src/tests/*.tests.ts\"",
     "dev": "pnpm build",
     "lint": "eslint",

@@ -1,5 +1,5 @@
 import { relative } from "node:path";
-import type { InlineConfig } from "tsdown";
+import type { UserConfig } from "tsdown";
 import { defineConfig } from "tsdown";
 
 export default defineConfig(
@@ -7,14 +7,21 @@ export default defineConfig(
     ({
       ...options,
       entry: [
-        "src/index.ts",
+        "src/chat-ws-client.ts",
+        "src/chat-ws.ts",
         "src/client.ts",
         "src/config.ts",
+        "src/convo-picker.ts",
         "src/hydrated-history.ts",
+        "src/index.ts",
+        "src/provider-context.ts",
         "src/render.ts",
         "src/repl.ts",
         "src/types.ts",
-        "src/bin/slipstream.ts"
+        "src/bin/slipstream.ts",
+        "!src/__out__/**/*",
+        "!src/scripts/**/*",
+        "!src/tests/**/*"
       ],
       cwd: process.cwd(),
       target: ["node26"],
@@ -27,5 +34,5 @@ export default defineConfig(
       clean: true,
       outDir: "dist",
       unbundle: true
-    }) satisfies InlineConfig
+    }) satisfies UserConfig
 );
