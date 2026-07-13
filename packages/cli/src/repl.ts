@@ -344,6 +344,13 @@ export class SlipstreamReplService extends CliRendererService {
 
   private wireEvents() {
     this.on("ai_chat_chunk", data => {
+      if (wsDebug.enabled) {
+        process.stdout.write(
+          pc.dim(
+            `[chunk c:${data.chunk?.length ?? 0} t:${data.thinkingText?.length ?? 0} isT:${String(data.isThinking)} done:${String(data.done)} cv:…${data.conversationId.slice(-6)}]\n`
+          )
+        );
+      }
       // first chunk carries the real conversationId + title — the
       // deterministic rekey contract. No router to deceive here: the CLI
       // adopts the real id immediately (the easy half of the web's dance)
@@ -364,6 +371,13 @@ export class SlipstreamReplService extends CliRendererService {
       this.renderChunk(data);
     });
     this.on("ai_chat_response", data => {
+      if (wsDebug.enabled) {
+        process.stdout.write(
+          pc.dim(
+            `[response chunk:${data.chunk.length} msgs:${data.convo.messages.length} cv:…${data.conversationId.slice(-6)}]\n`
+          )
+        );
+      }
       if (!this.isActiveTurnFrame(data.conversationId)) return;
       if (data.conversationId) {
         this.state.conversationId = data.conversationId;

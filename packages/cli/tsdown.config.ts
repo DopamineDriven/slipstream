@@ -14,6 +14,7 @@ export default defineConfig(
         "src/convo-picker.ts",
         "src/hydrated-history.ts",
         "src/index.ts",
+        "src/message-blocks.ts",
         "src/provider-context.ts",
         "src/render.ts",
         "src/repl.ts",

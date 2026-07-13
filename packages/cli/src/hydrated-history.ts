@@ -1,12 +1,17 @@
+import { messageAnswerText } from "@/message-blocks.ts";
+import type { BlockBearingMessage } from "@/message-blocks.ts";
+
 /**
  * Pure formatting decisions for the hydrated-history window rendered on
  * /convo attach (Phase 2.0 — readable resume). No terminal, color, or
  * transport concerns live here: the renderer owns speaker tags, ANSI, and
  * stdout; this module owns selection, ordering, and the pathological-message
  * safety cap. Structural message type so the module needs no service imports.
+ * The resume body is block-authoritative (TEXT blocks, ordinal-joined) with
+ * the flat `content` column as legacy fallback — see message-blocks.ts.
  */
 
-export interface HydratedTailMessage {
+export interface HydratedTailMessage extends BlockBearingMessage {
   ordinal: number;
   senderType: string;
   provider: string;
@@ -68,16 +73,17 @@ export function formatHydratedTail(
   const tail = options.tailCount > 0 ? all.slice(-options.tailCount) : [];
 
   const messages = tail.map(msg => {
-    const totalChars = msg.content.length;
+    // block-authoritative body — the TEXT blocks (the model's answer),
+    // ordinal-joined, falling back to the flat column for legacy rows
+    const full = messageAnswerText(msg);
+    const totalChars = full.length;
     const truncated = totalChars > options.perMessageCharCap;
     return {
       ordinal: msg.ordinal,
       senderType: msg.senderType,
       provider: msg.provider,
       model: msg.model,
-      body: truncated
-        ? msg.content.slice(0, options.perMessageCharCap)
-        : msg.content,
+      body: truncated ? full.slice(0, options.perMessageCharCap) : full,
       truncated,
       totalChars
     } satisfies FormattedTailMessage;
