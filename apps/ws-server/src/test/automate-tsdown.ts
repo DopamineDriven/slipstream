@@ -55,12 +55,3 @@ if (process.argv[3] === "gen") {
   const ts = new TsDownAuto(fs);
   ts.exe(process.argv[5]);
 }
-
-const s = [
-  "!src/__out__/**/*",
-  "!src/test/**/*",
-  "!src/tests/**/*",
-  "!public/**/*"
-].join(",");
-
-console.log(s);
