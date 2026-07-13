@@ -312,11 +312,13 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       );
     }
 
-    // backstop only, not a working budget — memory tools dual-wield
-    // (search → get_chunk → search) so real turns burn many rounds, and
-    // pause_turn continuations consume ticks too; wall-clock deadlines
-    // are the sanctioned bound on runaway loops, never round rationing
-    const MAX_TOOL_ROUNDS = 100;
+    // effectively unbounded — the per-round callDeadlineMs wall-clock
+    // deadline is the real bound on a runaway loop (CLAUDE.md: bound time,
+    // never tokens); memory tools dual-wield (search → get_chunk → search)
+    // and pause_turn continuations burn ticks, so a low round cap only
+    // risks starving a legitimate forage. At 10M the exhaustion tail is
+    // unreachable by any real turn.
+    const MAX_TOOL_ROUNDS = 10_000_000;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
       if (round > 0) {
