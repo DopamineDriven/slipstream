@@ -361,7 +361,6 @@ export class MistralService extends MistralStreamContentService {
     options?: {
       temperature?: number;
       topP?: number;
-      maxTokens?: number;
       tools?: ToolTypes;
     }
   ) {
@@ -937,7 +936,6 @@ export class MistralService extends MistralStreamContentService {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    max_tokens,
     model,
     systemPrompt,
     temperature,
@@ -1239,7 +1237,8 @@ export class MistralService extends MistralStreamContentService {
       ...(await this.formatHistory(msgs))
     );
 
-    const MAX_TOOL_ROUNDS = 10;
+    // backstop only, not a working budget — memory tools dual-wield across rounds
+    const MAX_TOOL_ROUNDS = 100;
     let forcedLoopStopReason: MistralForcedLoopStopReason = null;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
@@ -1252,7 +1251,6 @@ export class MistralService extends MistralStreamContentService {
         roundMessages,
         apiKey ?? undefined,
         {
-          maxTokens: max_tokens,
           topP,
           temperature,
           tools

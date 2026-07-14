@@ -9,7 +9,6 @@
         "name": "next"
       }
     ],
-        "ignoreDeprecations":"6.0",
     "types": ["*"],
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "outDir": "dist"

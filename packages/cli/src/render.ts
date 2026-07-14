@@ -1,62 +1,103 @@
 import pc from "picocolors";
+import { formatHydratedTail } from "@/hydrated-history.ts";
+import { isReasoningBlock, renderableBlocks } from "@/message-blocks.ts";
+import type { BlockBearingMessage } from "@/message-blocks.ts";
 import { CliProviderContextService } from "@/provider-context.ts";
-import type { EventTypeMap } from "@slipstream/types";
+import type { ChatChunkAndResMsgBlock, EventTypeMap } from "@slipstream/types";
 
 /**
- * Streaming renderer — raw passthrough for text deltas (minimal processing
- * between upstream and terminal, the house doctrine), dim thinking blocks,
- * provider-tinted name tags, a finalize line on ai_chat_response.
+ * Streaming renderer — block-authoritative, mirroring the web store's
+ * ordinal-keyed fold (store-types.ts §blocks) adapted to append-only stdout.
+ * The block's `type` — not which delta field is populated — decides
+ * reasoning vs answer, so interleaved thinking/text/tool switches render
+ * seamlessly across every provider. Each block's `content` accumulates and
+ * streams piece-by-piece within its ordinal; a per-ordinal printed-length
+ * watermark yields exactly the unseen suffix (correct for anthropic deltas
+ * AND gemini full-aggregate re-sends alike).
  */
 export class CliRendererService extends CliProviderContextService {
-  private wasThinking = false;
-  private thinkingAgg = "";
   protected showThinking = true;
+
+  /** ordinal → chars already written for that block (the stream watermark) */
+  private printedByOrdinal = new Map<number, number>();
+  /** last block class rendered — drives the ∴ header and the reasoning→answer gap */
+  private lastRenderedClass?: "reasoning" | "text";
 
   /** reset per-turn render state — call at send time */
   protected beginTurnRender() {
-    this.wasThinking = false;
-    this.thinkingAgg = "";
+    this.printedByOrdinal.clear();
+    this.lastRenderedClass = undefined;
   }
 
   protected nameTag(provider: string, model: string | undefined) {
     return pc.cyan(`[${provider.toLowerCase()}/${model ?? "unknown"}]`);
   }
 
-  protected renderChunk(data: EventTypeMap["ai_chat_chunk"]) {
-    if (data.thinkingText) {
-      // providers MIX thinking semantics — anthropic streams deltas, gemini
-      // interleaves deltas with full-aggregate frames (thinkingAgg re-sent
-      // per text chunk). Print only the unseen suffix: correct for both.
-      const incoming = data.thinkingText;
-      let printable: string;
-      if (incoming.startsWith(this.thinkingAgg)) {
-        printable = incoming.slice(this.thinkingAgg.length);
-        this.thinkingAgg = incoming;
-      } else if (this.thinkingAgg.endsWith(incoming)) {
-        printable = ""; // stale re-send of a suffix we already printed
-      } else {
-        printable = incoming;
-        this.thinkingAgg += incoming;
-      }
-      if (!this.showThinking || printable.length === 0) return;
-      if (!this.wasThinking) {
+  /**
+   * emit the unseen tail of a block, styled by its type. Reasoning blocks
+   * (THINKING / ENCRYPTED_THINKING) render dim under a single ∴ header;
+   * TEXT renders raw. Re-entering reasoning after text re-shows the header —
+   * interleaving is handled by the type switch, never guessed.
+   */
+  private emitBlockPiece(type: ChatChunkAndResMsgBlock["type"], piece: string) {
+    if (piece.length === 0) return;
+    if (isReasoningBlock(type)) {
+      if (!this.showThinking) return;
+      if (this.lastRenderedClass !== "reasoning") {
         process.stdout.write(pc.dim("\n∴ thinking…\n"));
-        this.wasThinking = true;
+        this.lastRenderedClass = "reasoning";
       }
-      process.stdout.write(pc.dim(printable));
+      process.stdout.write(pc.dim(piece));
       return;
     }
+    if (this.lastRenderedClass === "reasoning") {
+      process.stdout.write("\n\n");
+    }
+    this.lastRenderedClass = "text";
+    process.stdout.write(piece);
+  }
+
+  /** advance the watermark and emit only the growth for a block's ordinal */
+  private renderBlock(block: ChatChunkAndResMsgBlock) {
+    const already = this.printedByOrdinal.get(block.ordinal) ?? 0;
+    const piece = block.content.slice(already);
+    this.printedByOrdinal.set(
+      block.ordinal,
+      Math.max(already, block.content.length)
+    );
+    this.emitBlockPiece(block.type, piece);
+  }
+
+  protected renderChunk(data: EventTypeMap["ai_chat_chunk"]) {
+    // ai_chat_chunk carries ONE block — the authoritative unit. Type drives
+    // the switch; the watermark drives the delta.
+    if (data.messageBlocks) {
+      this.renderBlock(data.messageBlocks);
+      return;
+    }
+    // fallback for the rare block-less frame (e.g. a resume replay with no
+    // block): raw text passthrough, thinking dropped (unclassifiable here)
     if (data.chunk) {
-      if (this.wasThinking) {
+      if (this.lastRenderedClass === "reasoning") {
         process.stdout.write("\n\n");
-        this.wasThinking = false;
       }
+      this.lastRenderedClass = "text";
       process.stdout.write(data.chunk);
     }
   }
 
   protected renderResponse(data: EventTypeMap["ai_chat_response"]) {
-    this.wasThinking = false;
+    // reconcile: print any authoritative block content the live stream never
+    // showed. The shared watermark makes this zero-duplication — a fully
+    // streamed block slices to empty; a dropped block prints in full.
+    if (data.messageBlocks) {
+      for (const block of [...data.messageBlocks].sort(
+        (a, b) => a.ordinal - b.ordinal
+      )) {
+        this.renderBlock(block);
+      }
+    }
+    this.lastRenderedClass = undefined;
     const meta = Array.of<string>();
     if (data.title) meta.push(data.title);
     if (typeof data.usage === "number") meta.push(`${data.usage} tokens`);
@@ -82,37 +123,63 @@ export class CliRendererService extends CliProviderContextService {
       : `${pc.dim(`[${msg.ordinal}]`)} ${this.nameTag(msg.provider, msg.model ?? undefined)}`;
   }
 
-  /** full message body — /expand <ordinal> from the local index */
-  protected renderExpanded(msg: {
-    ordinal: number;
-    senderType: string;
-    provider: string;
-    model: string | null;
-    content: string;
-  }) {
-    process.stdout.write(`\n${this.speakerTag(msg)}\n${msg.content}\n\n`);
+  /**
+   * full message body — /expand <ordinal> from the local index. Reasoning
+   * blocks render dim above the answer (TEXT), mirroring the live stream;
+   * block-authoritative with the flat column as legacy fallback.
+   */
+  protected renderExpanded(
+    msg: {
+      ordinal: number;
+      senderType: string;
+      provider: string;
+      model: string | null;
+    } & BlockBearingMessage
+  ) {
+    const body = renderableBlocks(msg)
+      .map(b => (isReasoningBlock(b.type) ? pc.dim(b.content) : b.content))
+      .join("\n\n");
+    process.stdout.write(`\n${this.speakerTag(msg)}\n${body}\n\n`);
   }
 
-  /** compact tail of a hydrated conversation — context on /convo attach */
+  /**
+   * pathological-message safeguard for the resume window — generous enough
+   * that ordinary long answers render whole; a capped message prints an
+   * explicit marker with the exact /expand recovery, never a silent collapse
+   */
+  protected hydratedMessageCharCap = 10_000;
+
+  /**
+   * readable resume — the tail of a hydrated conversation renders with full
+   * bodies, normal speaker headers, and preserved whitespace on /convo
+   * attach. Recovering working context is the point of resuming; the window
+   * must be lossless for the selected message count (Phase 2.0).
+   */
   protected renderHydratedTail(
     data: EventTypeMap["hydrate_conversation_ack"],
     tailCount = 8
   ) {
-    const messages = data.pages
-      .flatMap(page => page.convo.messages)
-      .sort((a, b) => a.ordinal - b.ordinal);
-    const title = data.pages[0]?.convo.title ?? null;
-    const tail = messages.slice(-tailCount);
-    process.stdout.write("\n");
-    for (const msg of tail) {
-      const oneLine = msg.content.replace(/\s+/g, " ").trim();
-      const preview =
-        oneLine.length > 160 ? `${oneLine.slice(0, 160)}…` : oneLine;
-      process.stdout.write(`${this.speakerTag(msg)} ${pc.dim(preview)}\n`);
+    const tail = formatHydratedTail(data.pages, {
+      tailCount,
+      perMessageCharCap: this.hydratedMessageCharCap
+    });
+    for (const msg of tail.messages) {
+      process.stdout.write(`\n${this.speakerTag(msg)}\n${msg.body}\n`);
+      if (msg.truncated) {
+        process.stdout.write(
+          `${pc.yellow("…")} ${pc.dim(
+            `truncated for display — ${msg.totalChars.toLocaleString()} chars total · /expand ${msg.ordinal} for the full message`
+          )}\n`
+        );
+      }
     }
-    this.renderNotice(
-      `attached · ${title ?? "untitled"} · ${messages.length} message(s) hydrated (showing last ${tail.length})`
-    );
-    return title;
+    process.stdout.write("\n");
+    // ordinals and counts are different units — "85-92 of 48" reads as a bug
+    const window =
+      tail.shownFromOrdinal !== null
+        ? ` · showing messages ${tail.shownFromOrdinal}-${tail.shownToOrdinal} · ${tail.totalHydrated} hydrated`
+        : ` · ${tail.totalHydrated} message(s) hydrated`;
+    this.renderNotice(`attached · ${tail.title ?? "untitled"}${window}`);
+    return tail.title;
   }
 }

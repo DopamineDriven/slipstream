@@ -85,7 +85,6 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     ws,
     userMsgId,
     apiKey,
-    max_tokens,
     jobId,
     requestMessageId,
     model,
@@ -214,7 +213,8 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       hasUserStoreDocs
     );
     const instructions = this.prisma.formatSysNote(systemPrompt);
-    const MAX_TOOL_ROUNDS = 10;
+    // backstop only, not a working budget — memory tools dual-wield across rounds
+    const MAX_TOOL_ROUNDS = 100;
     let roundInput = Array.of<OpenAI.Responses.ResponseInputItem>(...formatted);
     let forcedLoopStopReason: "MAX_ROUNDS" | undefined = undefined;
 
@@ -236,7 +236,6 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
               "web_search_call.action.sources",
               "message.input_image.image_url"
             ],
-            max_output_tokens: max_tokens,
             safety_identifier: userId,
             truncation: "auto",
             reasoning: this.openaiReasoning(

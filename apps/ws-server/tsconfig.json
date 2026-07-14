@@ -7,7 +7,6 @@
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "outDir": "dist",
     "emitDeclarationOnly": true,
-    "ignoreDeprecations": "6.0",
     "types": ["*"]
   },
   "include": ["**/*.ts", "**/*.d.ts"],

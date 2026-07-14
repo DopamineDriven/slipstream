@@ -9,32 +9,31 @@ export default defineConfig(
       entry: [
         "src/globals.css",
         "src/index.ts",
-        "src/icons/*.tsx",
+        "src/icons/index.tsx",
+        "src/base/*.tsx",
+        "src/hooks/*.ts",
         "src/lib/*.ts",
         "src/ui/*.tsx",
-        "src/ui/base/progress.tsx",
+        "!src/services/icon-workup.ts",
         "!src/services/postbuild.ts"
       ],
-      dts: true,
+      dts: { tsgo: true },
       external: ["react"],
       platform: "neutral",
       fixedExtension: false,
       target: ["esnext"],
       format: ["esm"],
-      sourcemap: true,
       tsconfig: relative(process.cwd(), "tsconfig.json"),
       cwd: process.cwd(),
       clean: true,
       outDir: "dist",
       unbundle: true,
-      outputOptions: out => ({
-        ...out,
-        chunkFileNames: chunk =>
-          chunk.isEntry && chunk.name.startsWith("globals")
-            ? "globals.css"
-            : "chunk-[hash].js",
-        entryFileNames: chunk =>
-          chunk.name === "index" ? "index.js" : "[name].js"
-      })
+      css: {
+        fileName: "globals.css",
+        inject: false,
+        minify: false,
+        transformer: "postcss",
+        splitting: false
+      }
     }) satisfies Options
 );

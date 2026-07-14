@@ -1153,7 +1153,8 @@ export class CohereService {
       ...(await this.formatHistory(msgs))
     );
 
-    const MAX_TOOL_ROUNDS = 10;
+    // backstop only, not a working budget — memory tools dual-wield across rounds
+    const MAX_TOOL_ROUNDS = 100;
     let forcedLoopStopReason: CohereForcedLoopStopReason = null;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {

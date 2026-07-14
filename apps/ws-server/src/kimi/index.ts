@@ -47,7 +47,6 @@ export class KimiService extends KimiMemoryService {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    max_tokens,
     model,
     systemPrompt,
     temperature,
@@ -164,7 +163,8 @@ export class KimiService extends KimiMemoryService {
       ...(await this.formatHistory(msgs))
     );
 
-    const MAX_TOOL_ROUNDS = 10;
+    // backstop only, not a working budget — memory tools dual-wield across rounds
+    const MAX_TOOL_ROUNDS = 100;
     let forcedLoopStopReason: KimiForcedLoopStopReason = null;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
@@ -173,7 +173,6 @@ export class KimiService extends KimiMemoryService {
       let sawToolCallFinish = false;
 
       const streamer = this.stream(model, roundMessages, apiKey ?? undefined, {
-        max_completion_tokens: max_tokens,
         top_p: topP,
         temperature,
         tools

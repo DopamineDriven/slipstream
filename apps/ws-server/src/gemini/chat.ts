@@ -238,7 +238,9 @@ export class GeminiChatService extends GeminiWorkupService {
       requestMessageId
     });
 
-    const MAX_ROUNDS = 10;
+    // backstop only, not a working budget — memory tools dual-wield across
+    // rounds; the MAX_ROUNDS forced-stop fallback stays as the safety net
+    const MAX_ROUNDS = 100;
     const maxUserStoreSearchCalls = 10;
 
     let geminiThinkingDuration = 0,

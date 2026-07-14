@@ -43,6 +43,7 @@ export default defineConfig(
         "src/kimi/types.ts",
         "src/kimi/workup.ts",
         "src/logger/index.ts",
+        "src/memory/semaphore.ts",
         "src/memory/summarizer-loop.ts",
         "src/memory/types.ts",
         "src/memory/vector-store.ts",

@@ -46,7 +46,6 @@ export class MiniMaxService extends MiniMaxMemoryService {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    max_tokens,
     model,
     systemPrompt,
     temperature,
@@ -172,7 +171,6 @@ export class MiniMaxService extends MiniMaxMemoryService {
       let sawToolCallFinish = false;
 
       const streamer = this.stream(model, roundMessages, apiKey ?? undefined, {
-        max_completion_tokens: max_tokens,
         top_p: topP,
         temperature,
         tools

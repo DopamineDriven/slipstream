@@ -63,7 +63,8 @@ export interface GatewaySummaryMessageParams<
   TModel extends AllModelsUnion = AllModelsUnion
 > {
   model: TModel;
-  maxOutputTokens: number;
+  /** undefined = no cap — the request omits max_tokens and the provider ceiling applies */
+  maxOutputTokens: number | undefined;
   system: string;
   content: string | GatewayRequestContentPart[];
   /** the memory service's summarizer executor closure — same one the anthropic + Sol arms ride */
@@ -143,7 +144,9 @@ export class GatewaySummaryLoopService {
             model: slug,
             messages,
             stream: false,
-            max_tokens: params.maxOutputTokens,
+            ...(params.maxOutputTokens != null
+              ? { max_tokens: params.maxOutputTokens }
+              : {}),
             ...(executeToolCall && this.tools.length > 0
               ? { tools: this.tools, tool_choice: "auto" as const }
               : {}),
@@ -172,6 +175,14 @@ export class GatewaySummaryLoopService {
       const message = data.choices?.[0]?.message;
       if (!message) {
         throw new Error(`gateway summarizer ${slug} returned no choices`);
+      }
+      // arms run uncapped — if a provider applies its own small default when
+      // max_tokens is omitted, this is the receipt that exposes it
+      if (data.choices?.[0]?.finish_reason === "length") {
+        this.logger.warn(
+          { slug, round },
+          "gateway summarizer output truncated by provider ceiling (finish_reason=length)"
+        );
       }
 
       const reasoning = message.reasoning_content ?? message.reasoning;

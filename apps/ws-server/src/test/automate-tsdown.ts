@@ -3,7 +3,8 @@ import { Fs } from "@d0paminedriven/fs";
 export class TsDownAuto {
   constructor(protected fs: Fs) {}
 
-  public readTopDir() {
+  private readTopDir(argv5?: string) {
+    const argToArr = argv5?.split(",");
     const o = this.fs
       .readDir("src", { recursive: true })
       .filter(
@@ -14,20 +15,14 @@ export class TsDownAuto {
           t.lastIndexOf(".") !== -1
       )
       .map(v => `src/${v}`);
-    return [
-      ...o,
-      "!src/__out__/**/*",
-      "!src/test/**/*",
-      "!src/tests/**/*",
-      "!public/**/*"
-    ];
+    return argToArr ? [...o, ...argToArr] : [...o];
   }
 
-  public t() {
-    this.fs.withWs("tsdown.config.ts", this.config(this.readTopDir()));
+  public exe(argv5?: string) {
+    this.fs.withWs("tsdown.config.ts", this.config(this.readTopDir(argv5)));
   }
 
-  public config(arr: string[]) {
+  private config(arr: string[]) {
     const toStr = JSON.stringify(arr, null, 2);
     return `import { relative } from "node:path";
 import type { UserConfig } from "tsdown";
@@ -58,5 +53,5 @@ export default defineConfig(
 if (process.argv[3] === "gen") {
   const fs = new Fs(process.cwd());
   const ts = new TsDownAuto(fs);
-  ts.t();
+  ts.exe(process.argv[5]);
 }

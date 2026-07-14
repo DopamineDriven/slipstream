@@ -321,7 +321,8 @@ export class GrokResponsesApiService extends GrokImgGenService {
         include: ["reasoning.encrypted_content"]
       });
 
-      const MAX_TOOL_ROUNDS = 10;
+      // backstop only, not a working budget — memory tools dual-wield across rounds
+      const MAX_TOOL_ROUNDS = 100;
       let roundInput = Array.of<ResponsesComprehensive>(
         ...initialRequest.input
       );

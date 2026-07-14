@@ -64,7 +64,6 @@ export class v0Service {
     options?: {
       temperature?: number;
       top_p?: number;
-      max_completion_tokens?: number;
       tools?: readonly V0FunctionTool[];
     }
   ): AsyncGenerator<v0ChatCompletionsRes, void, unknown> {
@@ -84,9 +83,6 @@ export class v0Service {
           ? { temperature: options.temperature }
           : {}),
         ...(typeof options?.top_p === "number" ? { top_p: options.top_p } : {}),
-        ...(typeof options?.max_completion_tokens === "number"
-          ? { max_completion_tokens: options.max_completion_tokens }
-          : {}),
         ...(options?.tools && options.tools.length > 0
           ? { tools: options.tools }
           : {})
@@ -772,7 +768,6 @@ export class v0Service {
     userMsgId,
     userId,
     hasUserStoreDocs,
-    max_tokens,
     model,
     systemPrompt,
     temperature,
@@ -919,7 +914,8 @@ export class v0Service {
       ...(await this.formatHistory(msgs))
     );
 
-    const MAX_TOOL_ROUNDS = 10;
+    // backstop only, not a working budget — memory tools dual-wield across rounds
+    const MAX_TOOL_ROUNDS = 100;
     let forcedLoopStopReason: V0ForcedLoopStopReason = null;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
@@ -928,7 +924,6 @@ export class v0Service {
       let sawToolCallFinish = false;
 
       const streamer = this.stream(model, roundMessages, apiKey ?? undefined, {
-        max_completion_tokens: max_tokens,
         top_p: topP,
         temperature,
         tools

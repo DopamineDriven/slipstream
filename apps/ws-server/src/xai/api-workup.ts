@@ -21,10 +21,6 @@ import type { AttachmentSingleton } from "@slipstream/types";
 
 export class GrokApiWorkupService extends GrokBaseService {
   protected logger: Logger;
-  protected readonly baseUrl = "https://api.x.ai/v1/responses";
-  protected readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
-  protected readonly baseImgEditsUrl = "https://api.x.ai/v1/images/edits";
-
   protected storeDbDocRegistry = new Map<string, xAIDocDbRegistryProps>();
   protected fileDbRegistry = new Map<string, FilesDbRegistryProps>();
   protected fileCache = new Map<string, UploadFileRT>();
@@ -131,7 +127,8 @@ export class GrokApiWorkupService extends GrokBaseService {
         }
       });
 
-      const page = (await response.json()) as ListCollectionsResponse;
+      const page =
+        (await response.json<ListCollectionsResponse>()) as ListCollectionsResponse;
 
       has_more = typeof page.pagination_token !== "undefined";
       pagination_token = page.pagination_token;
@@ -160,8 +157,8 @@ export class GrokApiWorkupService extends GrokBaseService {
 
     while (has_more) {
       const url = pagination_token
-        ? `https://management-api.x.ai/v1/collections/${collection_id}/documents?limit=${limit}&pagination_token=${pagination_token}`
-        : `https://management-api.x.ai/v1/collections/${collection_id}/documents?limit=${limit}`;
+        ? `${this.managementUrl}/${collection_id}/documents?limit=${limit}&pagination_token=${pagination_token}`
+        : `${this.managementUrl}/${collection_id}/documents?limit=${limit}`;
 
       const response = await fetch(url as string, {
         method: "GET",
@@ -261,7 +258,7 @@ export class GrokApiWorkupService extends GrokBaseService {
     managementKey = this.xaiManagementKey
   ) {
     return await fetch(
-      `https://management-api.x.ai/v1/collections/${collectionId}/documents/${file_id}`,
+      `${this.managementUrl}/${collectionId}/documents/${file_id}`,
       {
         method: "GET",
         headers: {
@@ -278,7 +275,7 @@ export class GrokApiWorkupService extends GrokBaseService {
     managementApiKey = this.xaiManagementKey
   ) {
     const res = await fetch(
-      `https://management-api.x.ai/v1/collections/${collection_id}/documents/${file_id}`,
+      `${this.managementUrl}/${collection_id}/documents/${file_id}`,
       {
         method: "PATCH",
         headers: {
@@ -324,7 +321,7 @@ export class GrokApiWorkupService extends GrokBaseService {
     managementKey = this.xaiManagementKey
   ) {
     const softDelete = await fetch(
-      `https://management-api.x.ai/v1/collections/${collection_id}/documents/${file_id}`,
+      `${this.managementUrl}/${collection_id}/documents/${file_id}`,
       {
         method: "DELETE",
         headers: {
@@ -386,7 +383,7 @@ export class GrokApiWorkupService extends GrokBaseService {
     const { attachmentId, conversationId, fileName, extension, messageId } =
       this.prisma.parseDocname(provenanceId);
     return await fetch(
-      `https://management-api.x.ai/v1/collections/${collectionId}/documents/${documentId}`,
+      `${this.managementUrl}/${collectionId}/documents/${documentId}`,
       {
         method: "POST",
         headers: {
@@ -462,7 +459,7 @@ export class GrokApiWorkupService extends GrokBaseService {
     userId: string,
     mgmtKey = this.xaiManagementKey
   ) {
-    const res = await fetch("https://management-api.x.ai/v1/collections", {
+    const res = await fetch(this.managementUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -528,7 +525,7 @@ export class GrokApiWorkupService extends GrokBaseService {
   ) {
     const name = this.prisma.toVectorStoreFilename(att);
     return await fetch(
-      `https://management-api.x.ai/v1/collections/${collectionId}/documents?filter=name:${name}`,
+      `${this.managementUrl}/${collectionId}/documents?filter=name:${name}`,
       {
         method: "GET",
         headers: {
@@ -548,31 +545,5 @@ export class GrokApiWorkupService extends GrokBaseService {
 
   protected pollingDelay(pollIntervalMs: number, attempts: number) {
     return Math.min(pollIntervalMs * Math.pow(1.5, attempts), 30000);
-  }
-}
-declare global {
-  interface JSON {
-    parse<T = unknown>(
-      text: string,
-      reviver?: (this: any, key: string, value: any) => any
-    ): T;
-  }
-  interface Body {
-    json<T = unknown>(): Promise<T>;
-  }
-  interface Response {
-    json<T = unknown>(): Promise<T>;
-  }
-  interface ObjectConstructor {
-    // PropertyKey -> string and number allowed, symbol disallowed (symbol can't be enumerable)
-    keys<T = object>(
-      o: T
-    ): (keyof T extends infer K
-      ? K extends string
-        ? K
-        : K extends number
-          ? `${K}`
-          : never
-      : never)[];
   }
 }

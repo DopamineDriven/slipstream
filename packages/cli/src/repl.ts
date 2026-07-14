@@ -1,6 +1,8 @@
+import { emitKeypressEvents } from "node:readline";
 import { createInterface } from "node:readline/promises";
 import pc from "picocolors";
 import { wsDebug } from "@/chat-ws-client.ts";
+import { CliConvoPicker } from "@/convo-picker.ts";
 import { CliRendererService } from "@/render.ts";
 import { CLI_MODELS } from "@/types.ts";
 import type { ChatSessionState } from "@/types.ts";
@@ -26,12 +28,10 @@ export class SlipstreamReplService extends CliRendererService {
   /**
    * id → conversation metadata, warmed by the post-handshake push (one ack
    * per generator page, newest first) and kept fresh by rekey upserts +
-   * /convos refresh. Powers Tab-completion and title-based /convo attach.
+   * /convos refresh. Powers Tab-completion and the picker snapshot — every
+   * attachable id comes from here (server-fed), never from typed text.
    */
   private convoIndex = new Map<string, ConversationListEntry>();
-
-  /** the order /convos last printed — powers the `/convo <number>` shortcut */
-  private lastListing = Array.of<ConversationListEntry>();
 
   /**
    * readline Tab-completion — commands, roster aliases, conversation titles.
@@ -72,8 +72,28 @@ export class SlipstreamReplService extends CliRendererService {
   }
 
   private turn?: PromiseWithResolvers<void>;
-  /** a trailing message from `/convo <id> <msg>` — sent once the attach acks */
-  private pendingPrompt?: string;
+
+  /** popup re-entrancy guard — one picker owns stdin at a time */
+  private pickerOpen = false;
+  /** true only while the prompt is awaiting a line — popups trigger nowhere else */
+  private awaitingLine = false;
+  /**
+   * seed set by the keypress watcher when the buffer becomes "/convo …" —
+   * the pending question is force-submitted and the loop opens the picker
+   * with this filter (Claude-Code @-mention UX: live, not Enter-gated)
+   */
+  private pickerRequest?: string;
+
+  /**
+   * transactional attach — the active session stays intact until the
+   * hydration ack for THIS id arrives; mismatched/late acks are discarded and
+   * a quiet server means a timeout notice, not a corrupted session
+   */
+  private pendingAttach?: {
+    id: string;
+    label: string;
+    timeout: NodeJS.Timeout;
+  };
 
   /**
    * ordinal → full message, fed by hydration acks AND live response commits
@@ -90,20 +110,92 @@ export class SlipstreamReplService extends CliRendererService {
     showThinking: true
   };
 
-  /** shared attach: repoint state, clear the index, hydrate the tail */
-  private attachTo(id: string, followUp?: string) {
-    if (followUp) this.pendingPrompt = followUp;
-    this.state.conversationId = id;
-    this.state.title = null;
-    this.messageIndex.clear();
+  /**
+   * transactional attach — entry objects come from the server-fed index only
+   * (picker selection or exact-match resolution), so nothing unvalidated ever
+   * crosses the wire. State commits in the ack handler, not here.
+   */
+  private attachTo(entry: ConversationListEntry) {
+    if (this.pendingAttach) clearTimeout(this.pendingAttach.timeout);
+    const label = entry.title ?? entry.id;
+    this.pendingAttach = {
+      id: entry.id,
+      label,
+      timeout: setTimeout(() => {
+        this.pendingAttach = undefined;
+        this.renderNotice(
+          `hydration for "${label}" never arrived — still on ${this.state.title ?? this.state.conversationId}`
+        );
+      }, 10_000)
+    };
     // hydrate the tail over the wire (ordinal < cursor server-side).
     // int4 max — MAX_SAFE_INTEGER overflows Postgres integer (22003)
     this.send({
       type: "hydrate_conversation",
-      conversationId: id,
+      conversationId: entry.id,
       lowestLoadedOrdinal: 2_147_483_647
     });
-    this.renderNotice(`attaching to ${id}…`);
+    this.renderNotice(`attaching to ${label}…`);
+  }
+
+  /**
+   * the picker owns raw stdin while open — pause readline around it and
+   * flush any line noise it buffered before handing the prompt back
+   */
+  private async pickConversation(initialFilter: string) {
+    // background refresh — pages warm the index for NEXT open; this open
+    // renders a frozen snapshot so rows never reshuffle mid-navigation
+    this.send({ type: "conversation_list" });
+    const snapshot = [...this.convoIndex.values()];
+    if (snapshot.length === 0) {
+      this.renderNotice("index warming — try again in a moment");
+      return;
+    }
+    // burst/paste race: when "/convo Expan" arrives as one stdin chunk, the
+    // watcher fires at the space and force-submits, and the trailing chars
+    // land in readline's FRESH buffer before this continuation runs —
+    // harvest them into the seed instead of losing them to the ctrl+u
+    const strays = this.rl.line.trim();
+    const seed = `${initialFilter}${initialFilter.length === 0 ? strays : ""}`;
+    this.rl.write(null, { ctrl: true, name: "u" });
+    this.rl.pause();
+    this.pickerOpen = true;
+    const picker = new CliConvoPicker(
+      { stdin: process.stdin, stdout: process.stdout },
+      snapshot,
+      seed
+    );
+    const picked = await picker.run();
+    this.pickerOpen = false;
+    this.rl.write(null, { ctrl: true, name: "u" });
+    this.rl.resume();
+    if (!picked) {
+      if (!process.stdin.isTTY) {
+        this.renderNotice(
+          "picker needs a TTY — non-interactive attach takes an exact id or exact title"
+        );
+        return;
+      }
+      this.renderNotice("attach cancelled");
+      return;
+    }
+    this.attachTo(picked);
+  }
+
+  /**
+   * non-interactive escape hatch: exact id or unique exact title from the
+   * server-fed index — anything else is rejected HERE, never sent (invalid
+   * conversation input is impossible on web via routing; this is the CLI's
+   * equivalent gate)
+   */
+  private resolveExact(text: string) {
+    const byId = this.convoIndex.get(text);
+    if (byId) return byId;
+    const q = text.toLowerCase();
+    const byTitle = [...this.convoIndex.values()].filter(
+      c => c.title !== null && c.title.toLowerCase() === q
+    );
+    return byTitle.length === 1 ? byTitle[0] : undefined;
   }
 
   private freshConversationId() {
@@ -112,12 +204,12 @@ export class SlipstreamReplService extends CliRendererService {
     return "new-chat" as const;
   }
 
-  private commands = new Map<string, (args: string) => void>([
+  private commands = new Map<string, (args: string) => void | Promise<void>>([
     [
       "help",
       () =>
         this.renderNotice(
-          "/model <alias|fuzzy> · /new · /convos · /convo <id|title> [msg] · /expand <ordinal> · /system <text|clear> · /think · /debug · /quit — Tab completes"
+          "/model <alias|fuzzy> · /new · /convos [filter] · /convo [filter] — picker: type filters, ↑↓ move, Enter attaches, Esc cancels · /expand <ordinal> · /system <text|clear> · /think · /debug · /quit"
         )
     ],
     [
@@ -139,36 +231,24 @@ export class SlipstreamReplService extends CliRendererService {
     ],
     [
       "convo",
-      args => {
+      async args => {
         const raw = args.trim();
-        if (!raw) {
-          this.renderNotice("usage: /convo <id|title> [first message]");
+        // TTY: typed text is only ever a filter seeding the picker — the
+        // number/title/id parsing ambiguity class is gone by construction
+        if (process.stdin.isTTY) {
+          await this.pickConversation(raw);
           return;
         }
-        // resolution order: /convos listing number → title prefix → raw id.
-        // Remainder after the resolved portion is a prompt to send post-attach
-        const numbered = /^(\d{1,2})(?:\s+(.*))?$/.exec(raw);
-        const nth = numbered
-          ? this.lastListing[Number.parseInt(numbered[1] ?? "", 10) - 1]
-          : undefined;
-        if (numbered && nth) {
-          this.attachTo(nth.id, numbered[2]?.trim() ?? undefined);
+        const hit = raw ? this.resolveExact(raw) : undefined;
+        if (!hit) {
+          this.renderNotice(
+            raw
+              ? `"${raw}" is not an exact id or unique exact title in your index — rejected locally, nothing sent`
+              : "usage (non-TTY): /convo <exact-id|exact-title>"
+          );
           return;
         }
-        const byTitle = [...this.convoIndex.values()].find(
-          c => c.title && raw.toLowerCase().startsWith(c.title.toLowerCase())
-        );
-        let id: string;
-        let followUp: string;
-        if (byTitle?.title) {
-          id = byTitle.id;
-          followUp = raw.slice(byTitle.title.length).trim();
-        } else {
-          const [first = "", ...rest] = raw.split(/\s+/);
-          id = first;
-          followUp = rest.join(" ");
-        }
-        this.attachTo(id, followUp || undefined);
+        this.attachTo(hit);
       }
     ],
     [
@@ -191,8 +271,12 @@ export class SlipstreamReplService extends CliRendererService {
     ],
     [
       "convos",
-      () => {
-        this.send({ type: "conversation_list" });
+      async args => {
+        if (process.stdin.isTTY) {
+          await this.pickConversation(args.trim());
+          return;
+        }
+        // non-TTY: static newest-first listing for scripts/glancing
         const entries = [...this.convoIndex.values()].sort(
           (a, b) => b.updatedAt - a.updatedAt
         );
@@ -200,15 +284,12 @@ export class SlipstreamReplService extends CliRendererService {
           this.renderNotice("index warming — try again in a moment");
           return;
         }
-        this.lastListing = entries.slice(0, 25);
-        for (const [i, c] of this.lastListing.entries()) {
+        for (const c of entries.slice(0, 25)) {
           this.renderNotice(
-            `${i + 1}. ${c.title ?? "(untitled)"} · ${c.messageCount} msgs`
+            `${c.title ?? "(untitled)"} · ${c.messageCount} msgs · ${c.id}`
           );
         }
-        this.renderNotice(
-          `${entries.length} conversation(s) indexed — /convo <number|title|id> attaches`
-        );
+        this.renderNotice(`${entries.length} conversation(s) indexed`);
       }
     ],
     [
@@ -263,6 +344,13 @@ export class SlipstreamReplService extends CliRendererService {
 
   private wireEvents() {
     this.on("ai_chat_chunk", data => {
+      if (wsDebug.enabled) {
+        process.stdout.write(
+          pc.dim(
+            `[chunk c:${data.chunk?.length ?? 0} t:${data.thinkingText?.length ?? 0} isT:${String(data.isThinking)} done:${String(data.done)} cv:…${data.conversationId.slice(-6)}]\n`
+          )
+        );
+      }
       // first chunk carries the real conversationId + title — the
       // deterministic rekey contract. No router to deceive here: the CLI
       // adopts the real id immediately (the easy half of the web's dance)
@@ -283,6 +371,14 @@ export class SlipstreamReplService extends CliRendererService {
       this.renderChunk(data);
     });
     this.on("ai_chat_response", data => {
+      if (wsDebug.enabled) {
+        process.stdout.write(
+          pc.dim(
+            `[response chunk:${data.chunk.length} msgs:${data.convo.messages.length} cv:…${data.conversationId.slice(-6)}]\n`
+          )
+        );
+      }
+      if (!this.isActiveTurnFrame(data.conversationId)) return;
       if (data.conversationId) {
         this.state.conversationId = data.conversationId;
       }
@@ -293,11 +389,14 @@ export class SlipstreamReplService extends CliRendererService {
         this.messageIndex.set(msg.ordinal, msg);
       }
       this.renderResponse(data);
-      this.turn?.resolve();
+      this.settleTurn();
     });
     this.on("ai_chat_error", data => {
-      this.renderNotice(`error frame: ${JSON.stringify(data)}`);
-      this.turn?.resolve();
+      if (!this.isActiveTurnFrame(data.conversationId)) return;
+      this.renderNotice(
+        `${data.provider ?? "provider"} error: ${data.message}`
+      );
+      this.settleTurn();
     });
     this.on("conversation_list_ack", data => {
       for (const entry of data.conversations) {
@@ -305,7 +404,17 @@ export class SlipstreamReplService extends CliRendererService {
       }
     });
     this.on("hydrate_conversation_ack", data => {
-      if (data.conversationId !== this.state.conversationId) return;
+      // transactional commit: only the ack for the PENDING attach mutates
+      // session state; mismatched/late acks are discarded (two rapid
+      // attaches: the loser's ack arrives after the pending id moved on)
+      const pending = this.pendingAttach;
+      if (!pending) return;
+      if (data.conversationId !== pending.id) return;
+      clearTimeout(pending.timeout);
+      this.pendingAttach = undefined;
+      this.state.conversationId = data.conversationId;
+      this.state.title = null;
+      this.messageIndex.clear();
       for (const page of data.pages) {
         for (const msg of page.convo.messages) {
           this.messageIndex.set(msg.ordinal, msg);
@@ -313,13 +422,28 @@ export class SlipstreamReplService extends CliRendererService {
       }
       const title = this.renderHydratedTail(data);
       if (title) this.state.title = title;
-      if (this.pendingPrompt) {
-        const prompt = this.pendingPrompt;
-        this.pendingPrompt = undefined;
-        process.stdout.write("\n");
-        void this.sendPrompt(prompt);
-      }
     });
+  }
+
+  /**
+   * one settle path — clear the record so a later idle disconnect can never
+   * misreport as a mid-turn interruption
+   */
+  private settleTurn() {
+    this.turn?.resolve();
+    this.turn = undefined;
+  }
+
+  /**
+   * a frame settles the turn only when it targets the active conversation;
+   * "new-chat" means the rekey is still in flight, so the first real id is
+   * accepted (and adopted by the chunk/response handlers)
+   */
+  private isActiveTurnFrame(conversationId: string) {
+    return (
+      this.state.conversationId === "new-chat" ||
+      conversationId === this.state.conversationId
+    );
   }
 
   private async sendPrompt(prompt: string) {
@@ -340,7 +464,7 @@ export class SlipstreamReplService extends CliRendererService {
   }
 
   public async start() {
-    this.renderNotice(`slipstream · ${this.wsUrl}`);
+    this.renderNotice(`aic · ${this.wsUrl}`);
     // handlers register BEFORE connect — connection_established lands
     // milliseconds post-handshake and must not race the registration
     this.wireEvents();
@@ -354,7 +478,7 @@ export class SlipstreamReplService extends CliRendererService {
           this.renderNotice(
             `connection lost mid-turn (code ${code}) — partial response above; reconnect + resend to continue`
           );
-          this.turn.resolve();
+          this.settleTurn();
         }
       };
     }
@@ -368,14 +492,49 @@ export class SlipstreamReplService extends CliRendererService {
       process.stdout.write("\n");
       process.exit(0);
     });
+    // live popup trigger — the moment the prompt buffer reads "/convo " (or
+    // /convos), take over: clear + auto-submit the pending question and open
+    // the picker seeded with whatever followed the command. Claude-Code-style
+    // @-mention UX: the list appears and filters BY KEYSTROKE, Enter never
+    // opens it. readline applies the keypress to rl.line before we run (its
+    // internal listener registered first), so the buffer read is current.
+    if (process.stdin.isTTY) {
+      emitKeypressEvents(process.stdin);
+      process.stdin.on("keypress", () => {
+        // fire ONLY while the prompt is genuinely awaiting a line — never
+        // over a command handler, a streaming turn, or an open picker
+        if (
+          !this.awaitingLine ||
+          this.pickerOpen ||
+          this.pickerRequest !== undefined
+        ) {
+          return;
+        }
+        const trigger = /^\/convos?\s(.*)$/.exec(this.rl.line);
+        if (!trigger) return;
+        this.pickerRequest = trigger[1] ?? "";
+        // force-submit the pending question: clear the buffer, newline ends
+        // the await; the loop reads pickerRequest and opens the picker
+        this.rl.write(null, { ctrl: true, name: "u" });
+        this.rl.write("\n");
+      });
+    }
     for (;;) {
+      this.awaitingLine = true;
       const line = (await this.rl.question(pc.green("❯ "))).trim();
+      this.awaitingLine = false;
+      if (this.pickerRequest !== undefined) {
+        const seed = this.pickerRequest;
+        this.pickerRequest = undefined;
+        await this.pickConversation(seed);
+        continue;
+      }
       if (line.length === 0) continue;
       if (line.startsWith("/")) {
         const [cmd = "", ...rest] = line.slice(1).split(" ");
         const handler = this.commands.get(cmd);
         if (handler) {
-          handler(rest.join(" "));
+          await handler(rest.join(" "));
         } else {
           this.renderNotice(`unknown command /${cmd} — /help`);
         }

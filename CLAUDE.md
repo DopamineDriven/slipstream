@@ -242,6 +242,14 @@ function parseNonCompat(url): { compatStatus: "ALIASED"; timestamp: string; file
 - Prefer `import type` for type-only imports.
 - Use path aliases (`@/`, `@slipstream/`) — never relative paths beyond `./` or `../`.
 
+### Model Call Budgets — NO OUTPUT CAPS, NO REASONING CAPS, EVER
+
+- **NEVER introduce token caps on model calls.** No `max_tokens`, `max_output_tokens`, `max_completion_tokens`, `maxTokens`, reasoning budgets, or thinking budgets — on chat paths, summarizer arms, background jobs, anywhere. Agents are not to be muzzled.
+- Omit optional max-token params entirely and let the provider's own ceiling rule. In completions/Responses dialects, reasoning pays out of the same pot as visible output — any cap starves thinking FIRST and surfaces as truncated or `incomplete` responses with zero text (the fugu-ultra failure mode, probe-verified 2026-07-11).
+- Where an API **requires** the param (e.g. Anthropic's `max_tokens`), pin it at the model's documented ceiling — never below it.
+- Wall-clock deadlines (`callDeadlineMs`-style aborts) are the sanctioned bound on runaway calls. Bound time, never tokens.
+- If a truncation guard is needed, detect it after the fact (`finish_reason === "length"` warnings), don't prevent it with a cap.
+
 ---
 
 ## Architecture Patterns

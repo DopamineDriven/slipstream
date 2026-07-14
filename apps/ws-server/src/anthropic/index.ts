@@ -312,7 +312,13 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       );
     }
 
-    const MAX_TOOL_ROUNDS = 8;
+    // effectively unbounded — the per-round callDeadlineMs wall-clock
+    // deadline is the real bound on a runaway loop (CLAUDE.md: bound time,
+    // never tokens); memory tools dual-wield (search → get_chunk → search)
+    // and pause_turn continuations burn ticks, so a low round cap only
+    // risks starving a legitimate forage. At 10M the exhaustion tail is
+    // unreachable by any real turn.
+    const MAX_TOOL_ROUNDS = 10_000_000;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
       if (round > 0) {
