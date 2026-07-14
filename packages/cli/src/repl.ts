@@ -161,6 +161,7 @@ export class SlipstreamReplService extends CliRendererService {
     this.rl.pause();
     this.pickerOpen = true;
     const picker = new CliConvoPicker(
+      this,
       { stdin: process.stdin, stdout: process.stdout },
       snapshot,
       seed

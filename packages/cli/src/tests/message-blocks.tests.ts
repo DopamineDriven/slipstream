@@ -1,10 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import {
-  isReasoningBlock,
-  messageAnswerText,
-  renderableBlocks
-} from "@/message-blocks.ts";
+import { MessageBlocksService } from "@/message-blocks.ts";
+
+const m = new MessageBlocksService();
 
 function block(type: string | null, content: string | null, ordinal: number) {
   return { type, content, ordinal } as {
@@ -16,10 +14,10 @@ function block(type: string | null, content: string | null, ordinal: number) {
 
 describe("isReasoningBlock — type is the switch", () => {
   it("THINKING and ENCRYPTED_THINKING are reasoning; TEXT is not", () => {
-    assert.equal(isReasoningBlock("THINKING"), true);
-    assert.equal(isReasoningBlock("ENCRYPTED_THINKING"), true);
-    assert.equal(isReasoningBlock("TEXT"), false);
-    assert.equal(isReasoningBlock(null), false);
+    assert.equal(m.isReasoningBlock("THINKING"), true);
+    assert.equal(m.isReasoningBlock("ENCRYPTED_THINKING"), true);
+    assert.equal(m.isReasoningBlock("TEXT"), false);
+    assert.equal(m.isReasoningBlock(null), false);
   });
 });
 
@@ -32,7 +30,7 @@ describe("renderableBlocks — ordinal order, encrypted dropped, empty skipped",
         block("THINKING", "let me reason", 0)
       ]
     };
-    const out = renderableBlocks(msg);
+    const out = m.renderableBlocks(msg);
     assert.deepEqual(
       out.map(b => [b.type, b.content]),
       [
@@ -53,20 +51,21 @@ describe("renderableBlocks — ordinal order, encrypted dropped, empty skipped",
       ]
     };
     assert.deepEqual(
-      renderableBlocks(msg).map(b => b.content),
+      m.renderableBlocks(msg).map(b => b.content),
       ["real answer"]
     );
   });
 
   it("falls back to the flat content column when no blocks", () => {
     const msg = { content: "legacy body", messageBlocks: undefined };
-    assert.deepEqual(renderableBlocks(msg).map(b => [b.type, b.content]), [
-      ["TEXT", "legacy body"]
-    ]);
+    assert.deepEqual(
+      m.renderableBlocks(msg).map(b => [b.type, b.content]),
+      [["TEXT", "legacy body"]]
+    );
   });
 
   it("empty flat content with no blocks yields nothing", () => {
-    assert.deepEqual(renderableBlocks({ content: "" }), []);
+    assert.deepEqual(m.renderableBlocks({ content: "" }), []);
   });
 });
 
@@ -80,7 +79,7 @@ describe("messageAnswerText — TEXT blocks only, ordinal-joined", () => {
         block("TEXT", "part two", 2)
       ]
     };
-    assert.equal(messageAnswerText(msg), "part one part two");
+    assert.equal(m.messageAnswerText(msg), "part one part two");
   });
 
   it("falls back to flat content when a message has only thinking blocks", () => {
@@ -88,10 +87,10 @@ describe("messageAnswerText — TEXT blocks only, ordinal-joined", () => {
       content: "flat body",
       messageBlocks: [block("THINKING", "only reasoning", 0)]
     };
-    assert.equal(messageAnswerText(msg), "flat body");
+    assert.equal(m.messageAnswerText(msg), "flat body");
   });
 
   it("falls back to flat content when there are no blocks", () => {
-    assert.equal(messageAnswerText({ content: "legacy" }), "legacy");
+    assert.equal(m.messageAnswerText({ content: "legacy" }), "legacy");
   });
 });

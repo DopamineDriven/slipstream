@@ -1,4 +1,6 @@
 import pc from "picocolors";
+import type { PickerIo, PickerView } from "@/types.ts";
+import { FormatHydratedTailService } from "@/hydrated-history.ts";
 import type { ConversationListEntry } from "@slipstream/types";
 
 /**
@@ -9,124 +11,115 @@ import type { ConversationListEntry } from "@slipstream/types";
  * unvalidated ever crosses the wire (web achieves the same impossibility via
  * routing; this is the terminal's equivalent).
  *
- * Pure decisions (ranking, windowing, selection clamping) live in exported
- * functions under test; the raw-mode keypress shell below is deliberately
- * thin. Framework-free per the CLI charter — keypress bytes + ANSI repaint.
+ * Pure decisions (ranking, windowing, selection clamping) live on
+ * ConvoPickerService in the chain, under test; the raw-mode keypress shell
+ * (CliConvoPicker) is deliberately thin and receives the service by
+ * constructor injection. Framework-free per the CLI charter — keypress bytes
+ * + ANSI repaint.
  */
+export class ConvoPickerService extends FormatHydratedTailService {
+  /** match-quality tiers — lower is better; updatedAt desc breaks ties */
+  protected get pickerRanks() {
+    return {
+      exact: 0,
+      titlePrefix: 1,
+      wordPrefix: 2,
+      titleSubstring: 3,
+      idSubstring: 4
+    } as const;
+  }
 
-const RANK_EXACT = 0;
-const RANK_TITLE_PREFIX = 1;
-const RANK_WORD_PREFIX = 2;
-const RANK_TITLE_SUBSTRING = 3;
-const RANK_ID_SUBSTRING = 4;
-
-function rankEntry(entry: ConversationListEntry, query: string) {
-  const title = entry.title?.toLowerCase() ?? null;
-  if (title !== null) {
-    if (title === query) return RANK_EXACT;
-    if (title.startsWith(query)) return RANK_TITLE_PREFIX;
-    if (title.split(/\s+/).some(word => word.startsWith(query))) {
-      return RANK_WORD_PREFIX;
+  private rankEntry(entry: ConversationListEntry, query: string) {
+    const ranks = this.pickerRanks;
+    const title = entry.title?.toLowerCase() ?? null;
+    if (title !== null) {
+      if (title === query) return ranks.exact;
+      if (title.startsWith(query)) return ranks.titlePrefix;
+      if (title.split(/\s+/).some(word => word.startsWith(query))) {
+        return ranks.wordPrefix;
+      }
+      if (title.includes(query)) return ranks.titleSubstring;
     }
-    if (title.includes(query)) return RANK_TITLE_SUBSTRING;
+    if (entry.id.toLowerCase().includes(query)) return ranks.idSubstring;
+    return null;
   }
-  if (entry.id.toLowerCase().includes(query)) return RANK_ID_SUBSTRING;
-  return null;
-}
 
-/**
- * ranked filter over the frozen snapshot — exact > title-prefix > word-prefix
- * > substring > id-substring, updatedAt desc within a rank. Empty query =
- * everything, newest first.
- */
-export function rankConversationEntries(
-  entries: ConversationListEntry[],
-  query: string
-) {
-  const q = query.trim().toLowerCase();
-  if (q.length === 0) {
-    return [...entries].sort((a, b) => b.updatedAt - a.updatedAt);
+  /**
+   * ranked filter over the frozen snapshot — exact > title-prefix >
+   * word-prefix > substring > id-substring, updatedAt desc within a rank.
+   * Empty query = everything, newest first.
+   */
+  public rankConversationEntries(
+    entries: ConversationListEntry[],
+    query: string
+  ) {
+    const q = query.trim().toLowerCase();
+    if (q.length === 0) {
+      return [...entries].sort((a, b) => b.updatedAt - a.updatedAt);
+    }
+    const ranked = Array.of<{ entry: ConversationListEntry; rank: number }>();
+    for (const entry of entries) {
+      const rank = this.rankEntry(entry, q);
+      if (rank !== null) ranked.push({ entry, rank });
+    }
+    return ranked
+      .sort((a, b) => a.rank - b.rank || b.entry.updatedAt - a.entry.updatedAt)
+      .map(r => r.entry);
   }
-  const ranked = Array.of<{ entry: ConversationListEntry; rank: number }>();
-  for (const entry of entries) {
-    const rank = rankEntry(entry, q);
-    if (rank !== null) ranked.push({ entry, rank });
+
+  /**
+   * pure view-model: filter against the frozen snapshot, clamp the selection
+   * into range, and window maxRows rows around it (selection stays visible).
+   */
+  public buildPickerView(
+    snapshot: ConversationListEntry[],
+    query: string,
+    requestedIndex: number,
+    maxRows: number
+  ) {
+    const matches = this.rankConversationEntries(snapshot, query);
+    if (matches.length === 0) {
+      return { matches, rows: [], selectedIndex: null } satisfies PickerView;
+    }
+    const selectedIndex = Math.min(
+      Math.max(requestedIndex, 0),
+      matches.length - 1
+    );
+    const windowStart = Math.min(
+      Math.max(selectedIndex - Math.floor(maxRows / 2), 0),
+      Math.max(matches.length - maxRows, 0)
+    );
+    const rows = matches
+      .slice(windowStart, windowStart + maxRows)
+      .map((entry, i) => ({
+        entry,
+        selected: windowStart + i === selectedIndex
+      }));
+    return { matches, rows, selectedIndex } satisfies PickerView;
   }
-  return ranked
-    .sort(
-      (a, b) => a.rank - b.rank || b.entry.updatedAt - a.entry.updatedAt
-    )
-    .map(r => r.entry);
-}
 
-export interface PickerRow {
-  entry: ConversationListEntry;
-  selected: boolean;
-}
-
-export interface PickerView {
-  matches: ConversationListEntry[];
-  rows: PickerRow[];
-  /** clamped into the match list; null when there are no matches */
-  selectedIndex: number | null;
-}
-
-/**
- * pure view-model: filter against the frozen snapshot, clamp the selection
- * into range, and window maxRows rows around it (selection stays visible).
- */
-export function buildPickerView(
-  snapshot: ConversationListEntry[],
-  query: string,
-  requestedIndex: number,
-  maxRows: number
-) {
-  const matches = rankConversationEntries(snapshot, query);
-  if (matches.length === 0) {
-    return { matches, rows: [], selectedIndex: null } satisfies PickerView;
+  /**
+   * titles are untrusted display text — some carry embedded newlines or run
+   * to paragraph length (old title-gen artifacts). A picker row must be
+   * exactly one physical terminal line or the repaint arithmetic
+   * (renderedLines vs wrapped lines) corrupts the erase — collapse
+   * whitespace and truncate.
+   */
+  public sanitizePickerTitle(title: string | null, budget: number) {
+    const oneLine = (title ?? "(untitled)").replace(/\s+/g, " ").trim();
+    const safeBudget = Math.max(4, budget);
+    return oneLine.length > safeBudget
+      ? `${oneLine.slice(0, safeBudget - 1)}…`
+      : oneLine;
   }
-  const selectedIndex = Math.min(
-    Math.max(requestedIndex, 0),
-    matches.length - 1
-  );
-  const windowStart = Math.min(
-    Math.max(selectedIndex - Math.floor(maxRows / 2), 0),
-    Math.max(matches.length - maxRows, 0)
-  );
-  const rows = matches
-    .slice(windowStart, windowStart + maxRows)
-    .map((entry, i) => ({
-      entry,
-      selected: windowStart + i === selectedIndex
-    }));
-  return { matches, rows, selectedIndex } satisfies PickerView;
-}
 
-/**
- * titles are untrusted display text — some carry embedded newlines or run to
- * paragraph length (old title-gen artifacts). A picker row must be exactly
- * one physical terminal line or the repaint arithmetic (renderedLines vs
- * wrapped lines) corrupts the erase — collapse whitespace and truncate.
- */
-export function sanitizePickerTitle(title: string | null, budget: number) {
-  const oneLine = (title ?? "(untitled)").replace(/\s+/g, " ").trim();
-  const safeBudget = Math.max(4, budget);
-  return oneLine.length > safeBudget
-    ? `${oneLine.slice(0, safeBudget - 1)}…`
-    : oneLine;
-}
-
-export function relativeTime(updatedAt: number, now: number) {
-  const deltaSec = Math.max(0, Math.round((now - updatedAt) / 1000));
-  if (deltaSec < 60) return `${deltaSec}s ago`;
-  if (deltaSec < 3600) return `${Math.round(deltaSec / 60)}m ago`;
-  if (deltaSec < 86_400) return `${Math.round(deltaSec / 3600)}h ago`;
-  return `${Math.round(deltaSec / 86_400)}d ago`;
-}
-
-interface PickerIo {
-  stdin: NodeJS.ReadStream;
-  stdout: NodeJS.WriteStream;
+  public relativeTime(updatedAt: number, now: number) {
+    const deltaSec = Math.max(0, Math.round((now - updatedAt) / 1000));
+    if (deltaSec < 60) return `${deltaSec}s ago`;
+    if (deltaSec < 3600) return `${Math.round(deltaSec / 60)}m ago`;
+    if (deltaSec < 86_400) return `${Math.round(deltaSec / 3600)}h ago`;
+    return `${Math.round(deltaSec / 86_400)}d ago`;
+  }
 }
 
 /**
@@ -134,6 +127,9 @@ interface PickerIo {
  * the highlighted entry, Esc (or Ctrl+C) cancels, printable characters and
  * backspace edit the filter. Resolves the selected entry object — or null on
  * cancel/no-match — so the caller never touches user-typed text as identity.
+ *
+ * Ephemeral per invocation; the pure picker decisions come from the injected
+ * ConvoPickerService (the repl passes itself — it sits down-chain).
  */
 export class CliConvoPicker {
   private query: string;
@@ -141,6 +137,7 @@ export class CliConvoPicker {
   private renderedLines = 0;
 
   constructor(
+    private readonly svc: ConvoPickerService,
     private readonly io: PickerIo,
     /** frozen at open — incoming list pages never reshuffle mid-navigation */
     private readonly snapshot: ConversationListEntry[],
@@ -169,7 +166,7 @@ export class CliConvoPicker {
     };
 
     const onData = (chunk: Buffer) => {
-      const view = buildPickerView(
+      const view = this.svc.buildPickerView(
         this.snapshot,
         this.query,
         this.index,
@@ -220,7 +217,7 @@ export class CliConvoPicker {
   }
 
   private render() {
-    const view = buildPickerView(
+    const view = this.svc.buildPickerView(
       this.snapshot,
       this.query,
       this.index,
@@ -233,8 +230,8 @@ export class CliConvoPicker {
     );
     const columns = this.io.stdout.columns ?? 120;
     for (const row of view.rows) {
-      const metaText = `${row.entry.messageCount} msgs · ${relativeTime(row.entry.updatedAt, now)}`;
-      const title = sanitizePickerTitle(
+      const metaText = `${row.entry.messageCount} msgs · ${this.svc.relativeTime(row.entry.updatedAt, now)}`;
+      const title = this.svc.sanitizePickerTitle(
         row.entry.title,
         columns - metaText.length - 5
       );

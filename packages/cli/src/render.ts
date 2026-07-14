@@ -1,8 +1,6 @@
+import type { BlockBearingMessage } from "@/types.ts";
+import { ConvoPickerService } from "@/convo-picker.ts";
 import pc from "picocolors";
-import { formatHydratedTail } from "@/hydrated-history.ts";
-import { isReasoningBlock, renderableBlocks } from "@/message-blocks.ts";
-import type { BlockBearingMessage } from "@/message-blocks.ts";
-import { CliProviderContextService } from "@/provider-context.ts";
 import type { ChatChunkAndResMsgBlock, EventTypeMap } from "@slipstream/types";
 
 /**
@@ -15,7 +13,7 @@ import type { ChatChunkAndResMsgBlock, EventTypeMap } from "@slipstream/types";
  * watermark yields exactly the unseen suffix (correct for anthropic deltas
  * AND gemini full-aggregate re-sends alike).
  */
-export class CliRendererService extends CliProviderContextService {
+export class CliRendererService extends ConvoPickerService {
   protected showThinking = true;
 
   /** ordinal → chars already written for that block (the stream watermark) */
@@ -41,7 +39,7 @@ export class CliRendererService extends CliProviderContextService {
    */
   private emitBlockPiece(type: ChatChunkAndResMsgBlock["type"], piece: string) {
     if (piece.length === 0) return;
-    if (isReasoningBlock(type)) {
+    if (this.isReasoningBlock(type)) {
       if (!this.showThinking) return;
       if (this.lastRenderedClass !== "reasoning") {
         process.stdout.write(pc.dim("\n∴ thinking…\n"));
@@ -136,8 +134,8 @@ export class CliRendererService extends CliProviderContextService {
       model: string | null;
     } & BlockBearingMessage
   ) {
-    const body = renderableBlocks(msg)
-      .map(b => (isReasoningBlock(b.type) ? pc.dim(b.content) : b.content))
+    const body = this.renderableBlocks(msg)
+      .map(b => (this.isReasoningBlock(b.type) ? pc.dim(b.content) : b.content))
       .join("\n\n");
     process.stdout.write(`\n${this.speakerTag(msg)}\n${body}\n\n`);
   }
@@ -159,7 +157,7 @@ export class CliRendererService extends CliProviderContextService {
     data: EventTypeMap["hydrate_conversation_ack"],
     tailCount = 8
   ) {
-    const tail = formatHydratedTail(data.pages, {
+    const tail = this.formatHydratedTail(data.pages, {
       tailCount,
       perMessageCharCap: this.hydratedMessageCharCap
     });
