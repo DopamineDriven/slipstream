@@ -33,6 +33,13 @@ export class SlipstreamClientService extends ClientContext {
     this.wsClient.send(data.type, data);
   }
 
+  /** volatile counterpart — false instead of queueing when not OPEN */
+  public sendVolatile<const K extends keyof EventTypeMap>(
+    data: EventTypeMap[K]
+  ) {
+    return this.wsClient?.sendVolatile(data.type, data) ?? false;
+  }
+
   private dispatch(event: ChatWsEvent) {
     const handler = this.handlers[event.type];
     if (handler) {

@@ -69,6 +69,8 @@ class EventHandlerRegistry {
     "image_gen_progress",
     "image_gen_request",
     "image_gen_response",
+    "local_tool_request",
+    "local_tool_result",
     "ping",
     "provider_context_ping",
     "provider_context_pong",
@@ -348,6 +350,18 @@ class EventHandlerRegistry {
           handler(event, socket);
         }
       },
+      local_tool_request: () => {
+        const handler = this.handlers.local_tool_request;
+        if (handler && event.type === "local_tool_request") {
+          handler(event, socket);
+        }
+      },
+      local_tool_result: () => {
+        const handler = this.handlers.local_tool_result;
+        if (handler && event.type === "local_tool_result") {
+          handler(event, socket);
+        }
+      },
       image_gen_error: () => {
         const handler = this.handlers.image_gen_error;
         if (handler && event.type === "image_gen_error") {
@@ -573,6 +587,25 @@ export class ChatWebSocketClient {
         this.connect();
       }
     }
+  }
+
+  /**
+   * Volatile send — returns false instead of queueing when the socket is
+   * not OPEN. For replies bound to a pending server-side promise on THIS
+   * socket (local_tool_result): if disconnected, the server broker
+   * synthesizes the error, and replaying a queued stale reply after
+   * reconnect would be actively wrong.
+   */
+  public sendVolatile<const T extends keyof EventTypeMap>(
+    event: T,
+    data: EventTypeMap[T]
+  ) {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      dlog(`[WebSocketClient] Volatile ${event} dropped (socket not OPEN)`);
+      return false;
+    }
+    this.socket.send(JSON.stringify({ ...data, type: event }));
+    return true;
   }
 
   public addListener(listener: ChatEventListener) {

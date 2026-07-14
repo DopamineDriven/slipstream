@@ -195,3 +195,14 @@ export interface PickerIo {
   stdin: NodeJS.ReadStream;
   stdout: NodeJS.WriteStream;
 }
+
+/**
+ * Output ceilings for the local read-only tool executors — every
+ * dimension bounded, constructor-injectable so tests can shrink them.
+ */
+export interface WorkspaceReadToolCaps {
+  maxFileBytes: number;
+  maxReadLines: number;
+  maxToolOutputBytes: number;
+  maxDirectoryEntries: number;
+}
