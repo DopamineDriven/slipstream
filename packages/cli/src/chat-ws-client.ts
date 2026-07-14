@@ -1,4 +1,7 @@
 import type { WithImplicitCoercion } from "buffer";
+// the workspace ws client, not the undici global — the WHATWG constructor
+// spec-forbids the Cookie header the handshake needs (phase 2B)
+import { WebSocket } from "ws";
 import type {
   AnyEventTypeUnion,
   ChatWsEvent,
@@ -454,7 +457,11 @@ export class ChatWebSocketClient {
   /** CLI addition — invoked on every socket close (before reconnect scheduling) */
   public onDisconnect?: (code: number) => void;
 
-  constructor(private readonly url: string) {}
+  constructor(
+    private readonly url: string,
+    /** serialized handshake Cookie header — reconnects reuse it (phase 2B) */
+    private readonly cookieHeader?: string
+  ) {}
 
   // Expose handlers for backward compatibility
   public get handlers() {
@@ -464,7 +471,10 @@ export class ChatWebSocketClient {
   public connect() {
     if (this.socket && this.socket?.readyState === WebSocket.OPEN) return;
 
-    this.socket = new WebSocket(this.url);
+    this.socket = new WebSocket(
+      this.url,
+      this.cookieHeader ? { headers: { cookie: this.cookieHeader } } : {}
+    );
 
     this.socket.onopen = () => {
       this._isConnected = true;
@@ -480,11 +490,22 @@ export class ChatWebSocketClient {
       }
     };
 
-    this.socket.onmessage = (event: MessageEvent<string>) => {
+    this.socket.onmessage = event => {
       if (!this.socket) return;
 
+      // ws delivers string for text frames; coerce the binary shapes so
+      // parseEvent always receives a string
+      const raw =
+        typeof event.data === "string"
+          ? event.data
+          : Array.isArray(event.data)
+            ? Buffer.concat(event.data).toString("utf-8")
+            : Buffer.isBuffer(event.data)
+              ? event.data.toString("utf-8")
+              : Buffer.from(event.data).toString("utf-8");
+
       // Parse and validate the event
-      const data = this.registry.parseEvent(event.data);
+      const data = this.registry.parseEvent(raw);
       if (!data) return;
 
       // Notify all listeners first

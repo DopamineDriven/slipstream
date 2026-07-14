@@ -9,6 +9,7 @@ export default defineConfig(
       entry: [
         "src/chat-ws-client.ts",
         "src/chat-ws.ts",
+        "src/client-context.ts",
         "src/client.ts",
         "src/config.ts",
         "src/convo-picker.ts",

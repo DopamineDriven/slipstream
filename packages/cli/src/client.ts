@@ -1,5 +1,5 @@
 import { ChatWebSocketClient } from "@/chat-ws-client.ts";
-import { CliConfigService } from "@/config.ts";
+import { ClientContext } from "@/client-context.ts";
 import type { ChatWsEvent, EventTypeMap } from "@slipstream/types";
 
 type CliHandlerMap = {
@@ -13,7 +13,7 @@ type CliHandlerMap = {
  * handshake, so stashUserData gets real UserData. ?id= carries the userId;
  * the server validates the session on file.
  */
-export class SlipstreamClientService extends CliConfigService {
+export class SlipstreamClientService extends ClientContext {
   protected wsClient?: ChatWebSocketClient;
   private handlers: CliHandlerMap = {};
 
@@ -43,10 +43,14 @@ export class SlipstreamClientService extends CliConfigService {
   }
 
   public async connect(timeoutMs = 10_000) {
-    // ?id= is all the handshake needs — the server validates the session on
-    // file and falls back to Andrew's values for absent cookies anyway
+    // real edge-derived context first (phase 2B) — stashUserData gets honest
+    // geo instead of the Barrington fallback; fetch failure degrades to the
+    // static cookie defaults so an edge blip never blocks a session
+    await this.primeEdgeContext();
+    // ?id= carries the userId — the server validates the session on file;
+    // the Cookie header carries the client context parsedCookies() reads
     const url = `${this.wsUrl}/?id=${encodeURIComponent(this.userId)}`;
-    const client = new ChatWebSocketClient(url);
+    const client = new ChatWebSocketClient(url, this.cookieHeader);
     this.wsClient = client;
     client.addListener(event => this.dispatch(event));
     client.connect();
