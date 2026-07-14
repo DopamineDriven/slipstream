@@ -192,6 +192,29 @@ export type {
   UserTTSResponsePreexisting
 } from "@/events.ts";
 
+export type {
+  CanonicalSchemaProperty,
+  CanonicalToolDefinition,
+  ListDirectoryEntry,
+  ListDirectoryOutput,
+  LocalToolCapabilities,
+  LocalToolErrorCode,
+  LocalToolFailure,
+  LocalToolName,
+  LocalToolOutput,
+  LocalToolRequest,
+  LocalToolResult,
+  LocalToolSuccess,
+  ReadFileOutput,
+  RepoSearchOutput
+} from "@/local-tools.ts";
+
+export {
+  LOCAL_TOOL_DEFINITIONS,
+  LOCAL_TOOL_NAMES,
+  isLocalToolName
+} from "@/local-tools.ts";
+
 /**
  * model/provider types
  */

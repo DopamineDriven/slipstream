@@ -23,6 +23,11 @@ import type {
   WithExpiry
 } from "@/events-workup.ts";
 import type {
+  LocalToolCapabilities,
+  LocalToolRequest,
+  LocalToolResult
+} from "@/local-tools.ts";
+import type {
   AllImgGenFacilitatingModelsUnion,
   AllImgGenModelsUnion,
   AllModelsUnion,
@@ -136,6 +141,7 @@ export type AIChatRequest = {
   // enableVideoGen?: boolean
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatRequestImgGenFields;
+  localTools?: LocalToolCapabilities;
 };
 
 export type AIChatInlineData = DX<
@@ -885,6 +891,8 @@ export type AnyEvent =
   | ImageGenProgress
   | ImageGenRequest
   | ImageGenResponse
+  | LocalToolRequest
+  | LocalToolResult
   | PingMessage
   | ProviderContextPing
   | ProviderContextPong

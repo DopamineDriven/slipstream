@@ -108,6 +108,9 @@ export class ResolverDispatchService extends ResolverConnectionService {
       case "conversation_list":
         await this.conversationList(event, ws, userId, userData);
         break;
+      case "local_tool_result":
+        await this.localToolResult(event, ws, userId, userData);
+        break;
       default:
         await this.wsServer.redis.publish(
           this.wsServer.channel,
@@ -150,6 +153,8 @@ export class ResolverDispatchService extends ResolverConnectionService {
     "image_gen_progress",
     "image_gen_request",
     "image_gen_response",
+    "local_tool_request",
+    "local_tool_result",
     "ping",
     "provider_context_ping",
     "provider_context_pong",
@@ -287,5 +292,6 @@ export class ResolverDispatchService extends ResolverConnectionService {
       this.hydrateConversationAck.bind(this)
     );
     this.wsServer.on("conversation_list", this.conversationList.bind(this));
+    this.wsServer.on("local_tool_result", this.localToolResult.bind(this));
   }
 }
