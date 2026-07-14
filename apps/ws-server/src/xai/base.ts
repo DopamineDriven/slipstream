@@ -3,6 +3,10 @@ import type { ProviderDocState } from "@slipstream/db/enums-node";
 import type { GrokModelIdUnion } from "@slipstream/types";
 
 export class GrokBaseService {
+  protected readonly baseUrl = "https://api.x.ai/v1/responses";
+  protected readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
+  protected readonly baseImgEditsUrl = "https://api.x.ai/v1/images/edits";
+  protected readonly managementUrl = "https://management-api.x.ai/v1/collections";
   protected xaiURI(collection_id: string, file_id: string) {
     return `collections://${collection_id}/files/${file_id}` as const;
   }
@@ -26,7 +30,7 @@ export class GrokBaseService {
   }
 
   protected isGrok4Point5(m: string) {
-    return m ==="grok-4.5";
+    return m === "grok-4.5";
   }
 
   protected isGrok4Point3(m: string) {
@@ -53,7 +57,7 @@ export class GrokBaseService {
   }
 
   protected isNativeVideoModel(m: string) {
-    return m === "grok-imagine-video";
+    return m === "grok-imagine-video" || m === "grok-imagine-video-1.5";
   }
 
   protected canViewImgs(model: string) {

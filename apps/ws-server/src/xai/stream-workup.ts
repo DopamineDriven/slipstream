@@ -161,7 +161,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
                     const imgBlock = {
                       type: "input_image",
                       image_url: url,
-                      detail: imgDetail ?? "auto"
+                      detail: imgDetail ?? "high"
                     } satisfies ImageContentBlock;
                     content.push(imgBlock);
                   } else {
@@ -360,7 +360,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
   }
 
   protected async getResponsesApiInputWorkup({
-    model = "grok-4.20-0309-reasoning",
+    model = "grok-4.5",
     userId,
     msgs,
     keyFingerprint = "server",
