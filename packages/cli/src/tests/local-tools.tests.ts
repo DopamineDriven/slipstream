@@ -311,6 +311,10 @@ class TestLocalToolsService extends CliLocalToolsService {
   public workspace(argv: readonly string[]) {
     return this.parseWorkspaceArg(argv);
   }
+
+  public detectRoot(from?: string) {
+    return from ? this.detectWorkspaceRoot(from) : this.detectWorkspaceRoot();
+  }
 }
 
 function request(overrides?: Partial<LocalToolRequest>) {
@@ -393,12 +397,33 @@ describe("CliLocalToolsService — turn gating and exactly-one-result", () => {
     if (r && !r.ok) assert.equal(r.error.code, "PATH_OUTSIDE_WORKSPACE");
   });
 
-  it("parseWorkspaceArg — flag forms and dormant default", () => {
+  it("parseWorkspaceArg — flag forms, dormant default, bare-flag autodetect", () => {
     const svc = new TestLocalToolsService();
     assert.equal(svc.workspace(["node", "aic"]), undefined);
-    assert.equal(svc.workspace(["node", "aic", "--workspace"]), ".");
+    // bare flag autodetects the git root; explicit values stay literal
+    assert.equal(svc.workspace(["node", "aic", "--workspace"]), svc.detectRoot());
     assert.equal(svc.workspace(["node", "aic", "--workspace", "pkg"]), "pkg");
     assert.equal(svc.workspace(["node", "aic", "--workspace=apps"]), "apps");
-    assert.equal(svc.workspace(["node", "aic", "--workspace", "--debug"]), ".");
+    assert.equal(
+      svc.workspace(["node", "aic", "--workspace", "--debug"]),
+      svc.detectRoot()
+    );
+  });
+
+  it("detectWorkspaceRoot — nearest .git ancestor wins (dir or file)", () => {
+    const svc = new TestLocalToolsService();
+
+    // .git as a directory (normal checkout)
+    const gitRoot = mkdtempSync(join(tmpdir(), "aic-git-root-"));
+    mkdirSync(join(gitRoot, ".git"));
+    mkdirSync(join(gitRoot, "packages", "deep"), { recursive: true });
+    assert.equal(svc.detectRoot(join(gitRoot, "packages", "deep")), gitRoot);
+    assert.equal(svc.detectRoot(gitRoot), gitRoot);
+
+    // .git as a FILE (worktree/submodule) — existence, not dir-ness, is the test
+    const worktree = mkdtempSync(join(tmpdir(), "aic-worktree-"));
+    writeFileSync(join(worktree, ".git"), "gitdir: /elsewhere\n");
+    mkdirSync(join(worktree, "nested"));
+    assert.equal(svc.detectRoot(join(worktree, "nested")), worktree);
   });
 });

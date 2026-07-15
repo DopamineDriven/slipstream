@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { wsDebug } from "@/chat-ws-client.ts";
 import { CliRendererService } from "@/render.ts";
 import { ToolFault, WorkspaceReadTools } from "@/workspace-read-tools.ts";
@@ -32,12 +34,34 @@ export class CliLocalToolsService extends CliRendererService {
     readonly controller: AbortController;
   } = undefined;
 
-  /** --workspace [root] opt-in — flag absent means the bridge stays dormant */
+  /**
+   * nearest ancestor containing .git (a directory in a normal checkout, a
+   * FILE in worktrees/submodules — existence is the test), falling back to
+   * the starting directory when none is found (non-git dirs are still
+   * legitimate workspaces)
+   */
+  protected detectWorkspaceRoot(from = process.cwd()) {
+    let dir = resolve(from);
+    for (;;) {
+      if (existsSync(join(dir, ".git"))) return dir;
+      const parent = dirname(dir);
+      if (parent === dir) return resolve(from);
+      dir = parent;
+    }
+  }
+
+  /**
+   * --workspace [root] opt-in — flag absent means the bridge stays
+   * dormant. Bare flag autodetects the git root from cwd; an explicit
+   * value is taken literally so a deliberately narrow boundary holds.
+   */
   protected parseWorkspaceArg(argv: readonly string[]) {
     const idx = argv.indexOf("--workspace");
     if (idx !== -1) {
       const next = argv[idx + 1];
-      return next !== undefined && !next.startsWith("-") ? next : ".";
+      return next !== undefined && !next.startsWith("-")
+        ? next
+        : this.detectWorkspaceRoot();
     }
     const eq = argv.find(a => a.startsWith("--workspace="));
     return eq?.slice("--workspace=".length) || undefined;
