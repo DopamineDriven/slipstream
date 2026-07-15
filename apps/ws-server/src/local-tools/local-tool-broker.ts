@@ -1,6 +1,7 @@
 import type { BrokerSocket, PendingLocalTool } from "@/local-tools/types.ts";
 import type {
   LocalToolErrorCode,
+  LocalToolName,
   LocalToolRequest,
   LocalToolResult
 } from "@slipstream/types";
@@ -48,6 +49,15 @@ export class LocalToolBroker {
   public async generateTurnId() {
     const nanoid = await this.nanoid;
     return `turn_${nanoid()}` as const;
+  }
+
+  /**
+   * Per-call wall-clock budgets — generous for search, snappy for reads.
+   * These bound a hung rg or a dead CLI, never the model's curiosity;
+   * rounds are unbounded (wall-clock only, per the house rule).
+   */
+  public timeoutMsFor(name: LocalToolName) {
+    return name === "repo_search" ? 15_000 : 7_500;
   }
 
   private key(event: Pick<LocalToolRequest, "turnId" | "toolCallId">) {

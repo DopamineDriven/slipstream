@@ -124,17 +124,14 @@ async function exe() {
     // the five gateway summarizer arms (HMEM §6.2 roster) — memory-free
     // workup children riding the Vercel AI Gateway (ZDR-flagged), so they
     // construct BEFORE memory as first-class deps
-    const { DeepSeekSummarizerService } = await import(
-      "@/deepseek/summarizer.ts"
-    );
+    const { DeepSeekSummarizerService } =
+      await import("@/deepseek/summarizer.ts");
     const { KimiSummarizerService } = await import("@/kimi/summarizer.ts");
-    const { MiniMaxSummarizerService } = await import(
-      "@/minimax/summarizer.ts"
-    );
+    const { MiniMaxSummarizerService } =
+      await import("@/minimax/summarizer.ts");
     const { ZaiSummarizerService } = await import("@/zai/summarizer.ts");
-    const { AlibabaSummarizerService } = await import(
-      "@/alibaba/summarizer.ts"
-    );
+    const { AlibabaSummarizerService } =
+      await import("@/alibaba/summarizer.ts");
     const gatewayArms = {
       deepseek: new DeepSeekSummarizerService(
         logger,
@@ -234,11 +231,10 @@ async function exe() {
       prisma
     );
 
-    const { LocalToolBroker } = await import(
-      "@/local-tools/local-tool-broker.ts"
-    );
+    const { LocalToolBroker } =
+      await import("@/local-tools/local-tool-broker.ts");
 
-    const localToolBroker = new LocalToolBroker();
+    const localTool = new LocalToolBroker();
 
     const { WSServer } = await import("@/ws-server/index.ts");
 
@@ -247,7 +243,7 @@ async function exe() {
       redisInstance,
       prisma,
       pdfService,
-      localToolBroker,
+      localTool,
       logger
     );
 
@@ -263,6 +259,7 @@ async function exe() {
       memory,
       toolCatalog,
       redisInstance,
+      localTool,
       cfg.ANTHROPIC_API_KEY
     );
 
@@ -408,7 +405,8 @@ async function exe() {
         s3,
         isProd,
         memory,
-        toolCatalog
+        toolCatalog,
+        localTool
       },
       anthropic,
       gemini,

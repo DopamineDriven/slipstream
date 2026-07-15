@@ -9,8 +9,10 @@ import type { Anthropic } from "@anthropic-ai/sdk";
 import { AnthropicWorkup } from "@/anthropic/workup.ts";
 import type {
   AnthropicModelIdUnion,
+  LocalToolName,
   MessageSingleton
 } from "@slipstream/types";
+import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
 export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   protected userStoreVector: UserStoreVectorService;
@@ -341,6 +343,35 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       this.webFetchTool(),
       this.codeExecutionTool()
     ] satisfies Anthropic.Beta.BetaToolUnion[];
+  }
+
+  /**
+   * Local read-only tool bridge (slice 4) — the canonical definitions
+   * mapped into the anthropic dialect at the attach point. The contract's
+   * CanonicalSchemaProperty is the portable intersection, so this walk is
+   * total by construction. allowed_callers is deliberately ["direct"]:
+   * local filesystem tools are model-direct ONLY — a PTC python loop
+   * programmatically firing filesystem reads is a capability escalation
+   * the alpha's one-call-at-a-time audit story does not cover.
+   */
+  protected localToolDefinitions(names: readonly LocalToolName[]) {
+    const advertised = new Set<string>(names);
+    return LOCAL_TOOL_DEFINITIONS.filter(d => advertised.has(d.name)).map(
+      d =>
+        ({
+          name: d.name,
+          allowed_callers: ["direct"],
+          description: d.description,
+          input_schema: {
+            type: "object" as const,
+            properties: d.inputSchema.properties,
+            required:"required" in d.inputSchema
+              ? [...d.inputSchema.required]
+              : undefined,
+            additionalProperties: false
+          }
+        }) satisfies Anthropic.Beta.BetaToolUnion
+    );
   }
 
   protected async formatAnthropicHistoryWithFiles(
