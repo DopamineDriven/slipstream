@@ -1193,6 +1193,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
           // socket-scoped broker and park — the broker ALWAYS resolves
           // (deadline, disconnect, and cancellation become typed is_error
           // results), so this await can never wedge the loop.
+          // eslint-disable-next-line
           if (!localToolTurn || !localToolTurn.advertised.has(acc.name)) {
             toolResults.push({
               type: "tool_result",
