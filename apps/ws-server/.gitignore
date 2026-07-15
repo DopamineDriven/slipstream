@@ -9,7 +9,8 @@ src/test/openai/*
 src/test/xai/*.txt
 src/test/xai/**/*.sse
 src/test/xai/*.ts
-
+src/test/minimax/*
+src/test/deepseek/*
 src/test/v0/*
 src/test/sanity/*
 src/test/consts/*
