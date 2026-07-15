@@ -35,10 +35,24 @@ export class ResolverLocalToolResultService extends ResolverConvoListService {
     );
   }
 
+  /**
+   * Inbound half of the local tool bridge — hands the CLI's reply to the
+   * socket-scoped broker, which settles the provider loop's pending
+   * promise. Unmatched results (stale turn, expired deadline, foreign
+   * socket) are logged and dropped: the broker already synthesized the
+   * terminal for whatever was pending, so there is nothing to answer.
+   */
   protected async localToolResult(
     event: EventTypeMap["local_tool_result"],
     ws: WebSocket,
     userId: string,
     _userData?: UserData
-  ) {}
+  ) {
+    const accepted = this.wsServer.localToolBroker.acceptResult(ws, event);
+    if (!accepted) {
+      console.warn(
+        `unmatched local_tool_result ${event.turnId}:${event.toolCallId} (${event.name}) from ${userId} — dropped`
+      );
+    }
+  }
 }

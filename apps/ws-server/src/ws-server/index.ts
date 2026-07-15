@@ -1,5 +1,6 @@
 import { createServer } from "node:http";
 import { TLSSocket } from "node:tls";
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { PdfService } from "@/pdf/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -67,6 +68,13 @@ export class WSServer {
     public redis: EnhancedRedisPubSub,
     public prisma: PrismaService,
     public pdfService: PdfService,
+    /**
+     * Local tool bridge correlation (slice 3) — injected from the
+     * composition root like every other service; owned here because
+     * pending calls are keyed BY socket, and this class is where sockets
+     * live and die (close → dropSocket).
+     */
+    public localToolBroker: LocalToolBroker,
     logger: LoggerService
   ) {
     this.logger = logger
@@ -358,6 +366,9 @@ export class WSServer {
         obj,
         `ws close event with code ${s} — in-flight server work continues`
       );
+      // synthesize CLIENT_DISCONNECTED for any tool call parked on this
+      // socket — a vanished CLI must never wedge a provider loop
+      this.localToolBroker.dropSocket(ws);
       this.userMap.delete(ws);
       this.userDataMap.delete(userId);
       this.logger.info(`User ${userId} disconnected`);

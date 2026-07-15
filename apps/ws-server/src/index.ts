@@ -234,6 +234,12 @@ async function exe() {
       prisma
     );
 
+    const { LocalToolBroker } = await import(
+      "@/local-tools/local-tool-broker.ts"
+    );
+
+    const localToolBroker = new LocalToolBroker();
+
     const { WSServer } = await import("@/ws-server/index.ts");
 
     const wsServer = new WSServer(
@@ -241,6 +247,7 @@ async function exe() {
       redisInstance,
       prisma,
       pdfService,
+      localToolBroker,
       logger
     );
 
