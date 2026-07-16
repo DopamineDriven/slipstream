@@ -276,7 +276,8 @@ export function GeminiMixin<
               deps.redis,
               deps.s3,
               deps.memory,
-              this.gemApiKey ?? ""
+              this.gemApiKey ?? "",
+              deps.localTool
             );
         }
       }

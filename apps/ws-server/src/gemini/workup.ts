@@ -12,6 +12,7 @@ import type {
   ImageConfig,
   Part,
   PartMediaResolution,
+  Schema,
   ToolConfig
 } from "@google/genai";
 import { FileSearchStoreService } from "@/gemini/fss.ts";
@@ -19,10 +20,13 @@ import { PartMediaResolutionLevel, ThinkingLevel, Type } from "@google/genai";
 import type {
   AIChatRequestImgGenFields,
   AttachmentSingleton,
+  CanonicalSchemaProperty,
   GeminiModelIdUnion,
+  LocalToolName,
   MessageSingleton,
   NanoBanana2OutputAR
 } from "@slipstream/types";
+import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
 export class GeminiWorkupService extends FileSearchStoreService {
   protected nanoid: Promise<<Type extends string>(size?: number) => Type>;
@@ -893,7 +897,68 @@ export class GeminiWorkupService extends FileSearchStoreService {
     }
   }
 
-  private getTools(m: GeminiModelIdUnion = "gemini-3.1-pro-preview") {
+  /**
+   * Local read-only tool bridge (Sovereign CLI) — one canonical leaf into
+   * Google's Type-enum Schema dialect. The contract's
+   * CanonicalSchemaProperty is the portable intersection, so the walk is
+   * total: primitive types map to their Type enums, minimum/maximum pass
+   * through as numbers, minLength/maxLength coerce to Google's int64
+   * strings, and additionalProperties drops (Schema cannot express it).
+   */
+  private localToolSchemaProperty(p: CanonicalSchemaProperty) {
+    const type =
+      p.type === "string"
+        ? Type.STRING
+        : p.type === "integer"
+          ? Type.INTEGER
+          : Type.BOOLEAN;
+    return {
+      type,
+      ...(p.description !== undefined ? { description: p.description } : {}),
+      ...(p.minimum !== undefined ? { minimum: p.minimum } : {}),
+      ...(p.maximum !== undefined ? { maximum: p.maximum } : {}),
+      ...(p.minLength !== undefined ? { minLength: String(p.minLength) } : {}),
+      ...(p.maxLength !== undefined ? { maxLength: String(p.maxLength) } : {})
+    } satisfies Schema;
+  }
+
+  /**
+   * canonical definitions mapped into Gemini FunctionDeclarations —
+   * empty when the CLI advertises nothing
+   */
+  protected localToolFunctionDeclarations(names: readonly LocalToolName[]) {
+    const advertised = new Set<string>(names);
+    return LOCAL_TOOL_DEFINITIONS.filter(d => advertised.has(d.name)).map(d => {
+      const properties: Record<string, Schema> = {};
+      for (const [key, prop] of Object.entries(d.inputSchema.properties)) {
+        properties[key] = this.localToolSchemaProperty(prop);
+      }
+      return {
+        name: d.name,
+        description: d.description,
+        parameters: {
+          type: Type.OBJECT,
+          properties,
+          required:
+            "required" in d.inputSchema && d.inputSchema.required
+              ? [...d.inputSchema.required]
+              : []
+        }
+      } satisfies FunctionDeclaration;
+    });
+  }
+
+  private getTools(
+    m: GeminiModelIdUnion = "gemini-3.1-pro-preview",
+    /**
+     * local read-only bridge tools (repo_search/read_file/list_directory) —
+     * appended to whichever functionDeclarations set the branch selects;
+     * the nano-banana branch deliberately stays googleSearch-only (image
+     * models never advertise them from the CLI chat path anyway)
+     */
+    localToolNames: readonly LocalToolName[] = []
+  ) {
+    const localDeclarations = this.localToolFunctionDeclarations(localToolNames);
     if (
       this.isGemini3ChatModel(m) ||
       this.isDeepResearch(m) ||
@@ -906,7 +971,8 @@ export class GeminiWorkupService extends FileSearchStoreService {
           functionDeclarations: [
             this.userStoreSearchTool(),
             this.memorySearchTool(),
-            this.memoryGetChunkTool()
+            this.memoryGetChunkTool(),
+            ...localDeclarations
           ]
         }
       ] satisfies GenerateContentConfig["tools"];
@@ -920,9 +986,15 @@ export class GeminiWorkupService extends FileSearchStoreService {
           functionDeclarations: [
             this.userStoreSearchTool(),
             this.memorySearchTool(),
-            this.memoryGetChunkTool()
+            this.memoryGetChunkTool(),
+            ...localDeclarations
           ]
         }
+      ] satisfies GenerateContentConfig["tools"];
+    }
+    if (localDeclarations.length > 0) {
+      return [
+        { functionDeclarations: localDeclarations }
       ] satisfies GenerateContentConfig["tools"];
     } else {
       return [] satisfies GenerateContentConfig["tools"];
@@ -1049,14 +1121,15 @@ export class GeminiWorkupService extends FileSearchStoreService {
     temperature,
     max_tokens,
     systemPrompt,
-    imgGenFields
+    imgGenFields,
+    localToolNames
   }: GenerateContentResponseProps) {
     if (!model || !this.prisma.isGeminiModel(model))
       throw new Error(`non-gemini model passed to gemini ${model}`);
     const m = model;
     const keyFingerprint = keyId ?? "server";
     const toolConfig = this.getToolConfig(latlng, m);
-    const tools = this.getTools(m);
+    const tools = this.getTools(m, localToolNames);
     const thinkingConfig = this.getThinkingConfig(m);
     const maxOutputTokens = max_tokens;
     const { history: contents, systemInstruction } =

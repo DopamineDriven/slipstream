@@ -11,6 +11,7 @@ import type {
   AIChatRequestImgGenFields,
   Equal,
   ImgMetadataEntity,
+  LocalToolName,
   MessageSingleton,
   S3Checksum,
   S3StorageClass
@@ -206,6 +207,7 @@ export type GenerateContentResponseProps = {
   systemPrompt?: string;
   imgGenFields?: AIChatRequestImgGenFields;
   requestMessageId?: string;
+  localToolNames?: readonly LocalToolName[];
 };
 
 export type ImageGenArr = [

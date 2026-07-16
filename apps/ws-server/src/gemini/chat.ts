@@ -1,4 +1,5 @@
 import type { ProviderGeminiChatRequestEntity } from "@/gemini/types.ts";
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -21,6 +22,7 @@ import type {
   EventTypeMap,
   GeminiModelIdUnion
 } from "@slipstream/types";
+import { isLocalToolName } from "@slipstream/types";
 
 interface GeminiActiveMessageBlock {
   content: string;
@@ -43,7 +45,10 @@ export class GeminiChatService extends GeminiWorkupService {
     protected redis: EnhancedRedisPubSub,
     protected s3: S3Storage,
     memoryService: ConversationMemoryVectorService,
-    apiKey: string
+    apiKey: string,
+    // local tool bridge ownership STARTS here — the workup/fss ancestors
+    // never see it, mirroring the openai responses-chat pattern
+    protected localToolBroker: LocalToolBroker
   ) {
     super(logger, prisma, store, memoryService, apiKey);
   }
@@ -218,10 +223,26 @@ export class GeminiChatService extends GeminiWorkupService {
     jobId,
     requestMessageId,
     topP,
-    userData
+    userData,
+    localTools
   }: ProviderGeminiChatRequestEntity) {
     const provider = "gemini" as const;
     const model = m as GeminiModelIdUnion;
+
+    // Local read-only tool bridge — capability advertised by the CLI on
+    // this exact turn; absent means zero local declarations attached.
+    // turnId mints once per ATTEMPT; the controller is the future
+    // cancellation hook (calls await sequentially, so nothing is pending
+    // when this throws).
+    const localToolTurn =
+      localTools?.protocolVersion === 1
+        ? {
+            turnId: await this.localToolBroker.generateTurnId(),
+            advertised: new Set<string>(localTools.names),
+            controller: new AbortController()
+          }
+        : undefined;
+
     const params = await this.contentGen({
       userId,
       isNewChat,
@@ -235,8 +256,21 @@ export class GeminiChatService extends GeminiWorkupService {
       systemPrompt,
       temperature,
       topP,
-      requestMessageId
+      requestMessageId,
+      localToolNames: localToolTurn
+        ? [...localToolTurn.advertised].filter(isLocalToolName)
+        : []
     });
+    if (localToolTurn) {
+      this.logger.info(
+        {
+          turnId: localToolTurn.turnId,
+          advertised: [...localToolTurn.advertised],
+          conversationId
+        },
+        "local tool bridge armed for gemini turn"
+      );
+    }
 
     // backstop only, not a working budget — memory tools dual-wield across
     // rounds; the MAX_ROUNDS forced-stop fallback stays as the safety net
@@ -667,7 +701,61 @@ export class GeminiChatService extends GeminiWorkupService {
 
       const toolResponseParts = Array.of<Part>();
 
-      for (const functionCall of roundFunctionCalls) {
+      for (const [callIndex, functionCall] of roundFunctionCalls.entries()) {
+        // Local read-only bridge: relay to the CLI via the socket-scoped
+        // broker (which ALWAYS resolves — deadline/disconnect/cancel become
+        // typed is_error results, so the await can never wedge the loop);
+        // every other tool takes the existing server-side path untouched.
+        const toolName = functionCall.name;
+        if (
+          toolName &&
+          isLocalToolName(toolName) &&
+          localToolTurn &&
+          localToolTurn.advertised.has(toolName)
+        ) {
+          // gemini function-call ids are optional — synthesize a
+          // turn-scoped correlation id for the broker when absent; the
+          // functionResponse echo below still mirrors google's own
+          // present-or-absent id contract
+          const toolCallId =
+            functionCall.id ??
+            `${localToolTurn.turnId}_r${round + 1}_c${callIndex}`;
+          const localResult = await this.localToolBroker.request(
+            ws,
+            {
+              type: "local_tool_request",
+              conversationId,
+              turnId: localToolTurn.turnId,
+              round: round + 1,
+              toolCallId,
+              name: toolName,
+              input: functionCall.args ?? {},
+              timeoutMs: this.localToolBroker.timeoutMsFor(toolName)
+            },
+            localToolTurn.controller.signal
+          );
+          const r = localResult.result;
+          this.logger.info(
+            {
+              turnId: localToolTurn.turnId,
+              toolCallId,
+              name: toolName,
+              round: round + 1,
+              ok: r.ok,
+              durationMs: r.durationMs,
+              ...(r.ok ? {} : { errorCode: r.error.code })
+            },
+            "local tool round trip (gemini)"
+          );
+          toolResponseParts.push({
+            functionResponse: {
+              ...(functionCall.id ? { id: functionCall.id } : {}),
+              name: toolName,
+              response: r.ok ? { output: r.value } : { error: r.error }
+            }
+          } satisfies Part);
+          continue;
+        }
         toolResponseParts.push(
           await this.executeGeminiFunctionCall(
             userId,

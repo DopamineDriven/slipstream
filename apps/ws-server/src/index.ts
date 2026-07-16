@@ -285,7 +285,8 @@ async function exe() {
       redisInstance,
       s3,
       memory,
-      cfg.GOOGLE_API_KEY
+      cfg.GOOGLE_API_KEY,
+      localTool
     );
 
     const { MistralService } = await import("@/mistral/index.ts");
