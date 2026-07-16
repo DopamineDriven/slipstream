@@ -16,6 +16,7 @@ export default defineConfig(
         "src/hydrated-history.ts",
         "src/index.ts",
         "src/local-tools.ts",
+        "src/markdown-ansi.ts",
         "src/message-blocks.ts",
         "src/provider-context.ts",
         "src/render.ts",

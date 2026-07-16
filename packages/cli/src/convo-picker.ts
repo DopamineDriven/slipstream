@@ -1,6 +1,6 @@
 import pc from "picocolors";
 import type { PickerIo, PickerView } from "@/types.ts";
-import { FormatHydratedTailService } from "@/hydrated-history.ts";
+import { MarkdownAnsiService } from "@/markdown-ansi.ts";
 import type { ConversationListEntry } from "@slipstream/types";
 
 /**
@@ -17,7 +17,7 @@ import type { ConversationListEntry } from "@slipstream/types";
  * constructor injection. Framework-free per the CLI charter — keypress bytes
  * + ANSI repaint.
  */
-export class ConvoPickerService extends FormatHydratedTailService {
+export class ConvoPickerService extends MarkdownAnsiService {
   /** match-quality tiers — lower is better; updatedAt desc breaks ties */
   protected get pickerRanks() {
     return {
