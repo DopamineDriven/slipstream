@@ -272,7 +272,8 @@ async function exe() {
       s3,
       redisInstance,
       cfg.OPENAI_API_KEY,
-      memory
+      memory,
+      localTool
     );
 
     const { GeminiService } = await import("@/gemini/index.ts");

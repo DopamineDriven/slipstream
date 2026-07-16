@@ -10,9 +10,11 @@ import { OpenAIBaseService } from "@/openai/base.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AttachmentSingleton,
+  LocalToolName,
   MessageSingleton,
   OpenAiModelIdUnion
 } from "@slipstream/types";
+import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
 export class OpenAIServiceWorkup extends OpenAIBaseService {
   constructor(
@@ -582,6 +584,35 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     );
   }
 
+  /**
+   * Local read-only tool bridge (Sovereign CLI) — canonical definitions
+   * mapped into the OpenAI Responses function-tool dialect. The contract's
+   * CanonicalSchemaProperty is the portable intersection, so this is a
+   * near-identity map (parameters === inputSchema, strict:false to allow
+   * the optional fields). Empty when the CLI advertises nothing.
+   */
+  protected localToolFunctionTools(names: readonly LocalToolName[]) {
+    const advertised = new Set<string>(names);
+    return LOCAL_TOOL_DEFINITIONS.filter(d => advertised.has(d.name)).map(
+      d =>
+        ({
+          type: "function",
+          name: d.name,
+          description: d.description,
+          strict: false,
+          parameters: {
+            type: "object",
+            properties: d.inputSchema.properties,
+            required:
+              "required" in d.inputSchema && d.inputSchema.required
+                ? [...d.inputSchema.required]
+                : [],
+            additionalProperties: false
+          }
+        }) satisfies OpenAI.Responses.FunctionTool
+    );
+  }
+
   protected handleTooling(
     model: OpenAiModelIdUnion,
     fileSearchEnabled: boolean,
@@ -589,13 +620,22 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     vector_store_ids?: string[],
     imgGenEnabled = false,
     imgGen?: OpenAI.Responses.Tool.ImageGeneration,
-    localFileSearchEnabled = false
+    localFileSearchEnabled = false,
+    /**
+     * local read-only bridge tools (repo_search/read_file/list_directory) —
+     * orthogonal to every branch below, appended last so they compose with
+     * whatever tool set the branch selects
+     */
+    localToolNames: readonly LocalToolName[] = []
   ) {
+    const localTools = this.localToolFunctionTools(localToolNames);
+    const withLocal = (tools: OpenAI.Responses.Tool[]) =>
+      localTools.length > 0 ? [...tools, ...localTools] : tools;
     const pureImgModel = this.canCallImageApi(model);
     // memory tools attach unconditionally — conversation memory exists
     // independently of uploaded documents
     if (localFileSearchEnabled) {
-      return [
+      return withLocal([
         this.userStoreSearchFunctionTool(),
         this.memorySearchFunctionTool(),
         this.memoryGetChunkFunctionTool(),
@@ -603,13 +643,13 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
           type: "web_search",
           user_location
         }
-      ] satisfies OpenAI.Responses.Tool[];
+      ] satisfies OpenAI.Responses.Tool[]);
     }
     if (fileSearchEnabled && vector_store_ids && vector_store_ids.length >= 1) {
       if (imgGenEnabled === true && imgGen && pureImgModel === false) {
         // memory rides the img-gen flow too — facilitators (gpt-5.5 et al.)
         // think + write + recall while recruiting gpt-image-2
-        return [
+        return withLocal([
           imgGen,
           this.memorySearchFunctionTool(),
           this.memoryGetChunkFunctionTool(),
@@ -617,9 +657,9 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
             type: "web_search",
             user_location
           }
-        ] satisfies OpenAI.Responses.Tool[];
+        ] satisfies OpenAI.Responses.Tool[]);
       }
-      return [
+      return withLocal([
         { type: "file_search", vector_store_ids, max_num_results: 10 },
         this.memorySearchFunctionTool(),
         this.memoryGetChunkFunctionTool(),
@@ -627,23 +667,23 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
           type: "web_search",
           user_location
         }
-      ] satisfies OpenAI.Responses.Tool[];
+      ] satisfies OpenAI.Responses.Tool[]);
     } else {
       if (imgGenEnabled === true && imgGen && pureImgModel === false) {
-        return [
+        return withLocal([
           imgGen,
           this.memorySearchFunctionTool(),
           this.memoryGetChunkFunctionTool()
-        ] satisfies OpenAI.Responses.Tool[];
+        ] satisfies OpenAI.Responses.Tool[]);
       }
-      return [
+      return withLocal([
         this.memorySearchFunctionTool(),
         this.memoryGetChunkFunctionTool(),
         {
           type: "web_search",
           user_location
         }
-      ] satisfies OpenAI.Responses.Tool[];
+      ] satisfies OpenAI.Responses.Tool[]);
     }
   }
 }

@@ -885,7 +885,8 @@ export function OpenAIMixin<
               deps.s3,
               deps.redis,
               this.oaiApiKey ?? "",
-              deps.memory
+              deps.memory,
+              deps.localTool
             );
         }
       }
