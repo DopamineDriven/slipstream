@@ -187,6 +187,11 @@ async function exe() {
     // sweepBatchSize cap regenerate without waiting for a conversation tick
     void memory.resumeSummaryBacklog();
 
+    const { LocalToolBroker } =
+      await import("@/local-tools/local-tool-broker.ts");
+
+    const localTool = new LocalToolBroker();
+
     const { xAIService } = await import("@/xai/index.ts");
 
     const xai = new xAIService(
@@ -197,7 +202,8 @@ async function exe() {
       userStore,
       memory,
       cfg.X_AI_KEY,
-      process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
+      process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY,
+      localTool
     );
     const { LlamaService } = await import("@/meta/index.ts");
 
@@ -230,11 +236,6 @@ async function exe() {
       s3,
       prisma
     );
-
-    const { LocalToolBroker } =
-      await import("@/local-tools/local-tool-broker.ts");
-
-    const localTool = new LocalToolBroker();
 
     const { WSServer } = await import("@/ws-server/index.ts");
 

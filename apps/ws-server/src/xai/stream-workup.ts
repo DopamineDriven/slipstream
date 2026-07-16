@@ -9,6 +9,7 @@ import type {
   FileContentBlock,
   HandleToolUsageParams,
   ImageContentBlock,
+  LocalToolFunctionTool,
   ResponsesApiInputWorkupParams,
   ResponsesComprehensive,
   ResponsesContentInputSingleton,
@@ -21,7 +22,12 @@ import type {
 } from "@/xai/responses-types.ts";
 import { ResponsesStreamParser } from "@/xai/response-sse.ts";
 import { GrokUserStoreService } from "@/xai/user-store.ts";
-import type { GrokModelIdUnion, MessageSingleton } from "@slipstream/types";
+import type {
+  GrokModelIdUnion,
+  LocalToolName,
+  MessageSingleton
+} from "@slipstream/types";
+import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
 export class GrokStreamWorkupService extends GrokUserStoreService {
   constructor(
@@ -310,6 +316,27 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
   }
 
   /**
+   * Local read-only tool bridge (Sovereign CLI) — canonical definitions
+   * mapped into xAI's Responses function-tool dialect. OpenAI-compatible
+   * JSON Schema, so this is a near-identity map (parameters ===
+   * inputSchema, strict:false to allow the optional fields). Empty when
+   * the CLI advertises nothing.
+   */
+  protected localToolFunctionTools(names: readonly LocalToolName[]) {
+    const advertised = new Set<string>(names);
+    return LOCAL_TOOL_DEFINITIONS.filter(d => advertised.has(d.name)).map(
+      d =>
+        ({
+          type: "function",
+          name: d.name,
+          description: d.description,
+          parameters: d.inputSchema,
+          strict: false
+        }) satisfies LocalToolFunctionTool
+    );
+  }
+
+  /**
    * Model Compatibility
    * Supported Models: grok-4.20-0309-reasoning, grok-4.20-multi-agent-0309, grok-4.20-0309-non-reasoning, grok-4.3
    */
@@ -324,7 +351,8 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     enableXSearch = true,
     web_enable_image_understanding = true,
     x_enable_image_understanding = true,
-    x_enable_video_understanding = true
+    x_enable_video_understanding = true,
+    localToolNames = []
   }: HandleToolUsageParams) {
     const tools = Array.of<ToolUnion>();
     if (this.canUseServerTools(model)) {
@@ -348,11 +376,13 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     }
 
     // memory tools attach unconditionally — conversation memory exists
-    // independently of uploaded documents
+    // independently of uploaded documents; local bridge tools ride the
+    // same gate (the multi-agent model errors on any function tool)
     if (this.canUseFunctionTools(model)) {
       tools.push(
         this.memorySearchFunctionTool(),
-        this.memoryGetChunkFunctionTool()
+        this.memoryGetChunkFunctionTool(),
+        ...this.localToolFunctionTools(localToolNames)
       );
     }
 
@@ -384,7 +414,8 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     x_enable_image_understanding = true,
     x_enable_video_understanding = true,
     parallel_tool_calls = true,
-    include = ["reasoning.encrypted_content"]
+    include = ["reasoning.encrypted_content"],
+    localToolNames = []
   }: ResponsesApiInputWorkupParams) {
     const systemInstruction = this.prisma.formatSysNote(systemPrompt);
     let toolHandler: ToolUnion[] | undefined;
@@ -403,7 +434,8 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         enableXSearch,
         web_enable_image_understanding,
         x_enable_image_understanding,
-        x_enable_video_understanding
+        x_enable_video_understanding,
+        localToolNames
       });
     } else {
       toolHandler = this.handleTooling({
@@ -417,7 +449,8 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         enableXSearch,
         web_enable_image_understanding,
         x_enable_image_understanding,
-        x_enable_video_understanding
+        x_enable_video_understanding,
+        localToolNames
       });
     }
 
@@ -506,7 +539,8 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
       web_enable_image_understanding,
       x_enable_image_understanding,
       x_enable_video_understanding,
-      parallel_tool_calls: parallel_tool_calling = true
+      parallel_tool_calls: parallel_tool_calling = true,
+      localToolNames = []
     }
   }: CreateResponseStreamProps) {
     const key = apiKey ?? this.xaiKey;
@@ -548,7 +582,8 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
             enableXSearch,
             web_enable_image_understanding,
             x_enable_image_understanding,
-            x_enable_video_understanding
+            x_enable_video_understanding,
+            localToolNames
           }),
           user: userId
         }
@@ -578,7 +613,8 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
           x_enable_image_understanding,
           x_enable_video_understanding,
           parallel_tool_calls: parallel_tool_calling ?? undefined,
-          include: ["reasoning.encrypted_content"]
+          include: ["reasoning.encrypted_content"],
+          localToolNames
         });
 
     const requestBody = this.isMultiAgent(model)

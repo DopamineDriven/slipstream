@@ -2,8 +2,10 @@ import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
 import { xAIResponses } from "@/xai/event-types.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
+  CanonicalToolDefinition,
   DiscriminatedUnionToRecord,
   GrokModelIdUnion,
+  LocalToolName,
   MessageSingleton,
   XOR
 } from "@slipstream/types";
@@ -138,13 +140,28 @@ export type FileSearchTool = {
 
 export type CodeInterpreterTool = { type: "code_interpreter" };
 
+/**
+ * Local read-only tool bridge (Sovereign CLI) — xAI's Responses dialect is
+ * OpenAI-compatible JSON Schema, so the canonical inputSchema IS the wire
+ * payload (near-identity, like the openai mapper; strict stays false to
+ * allow the optional fields).
+ */
+export type LocalToolFunctionTool = {
+  type: "function";
+  name: LocalToolName;
+  description: string;
+  parameters: CanonicalToolDefinition["inputSchema"];
+  strict?: boolean | null;
+};
+
 export type ToolUnion =
   | WebSearchTool
   | XSearchTool
   | FileSearchTool
   | CodeInterpreterTool
   | SlatherUserStoreTool
-  | MemoryFunctionTool;
+  | MemoryFunctionTool
+  | LocalToolFunctionTool;
 
 /**
  * Controls which (if any) tool is called by the model
@@ -310,6 +327,7 @@ export interface Usage {
 export type CreateResponseStreamInputProps = {
   collectionId?: string;
   round_input?: ResponsesComprehensive[];
+  localToolNames?: readonly LocalToolName[];
   tool_choice_input?: ToolChoiceUnion;
   logprobs?: boolean;
   imgDetail?: ImageContentBlock["detail"];
@@ -421,6 +439,11 @@ export interface ResponsesToolsParams {
 
 export interface HandleToolUsageParams extends ResponsesToolsParams {
   model: GrokModelIdUnion;
+  /**
+   * local read-only bridge tools (repo_search/read_file/list_directory) —
+   * ride the same canUseFunctionTools gate as the memory tools
+   */
+  localToolNames?: readonly LocalToolName[];
 }
 
 export interface MultiAgentReasoningEffort {
@@ -454,6 +477,7 @@ export interface ResponsesApiInputWorkupParams {
   parallel_tool_calls?: boolean;
   reasoning?: MultiAgentReasoningEffort;
   hasUserStoreDocs: boolean;
+  localToolNames?: readonly LocalToolName[];
 }
 
 /**

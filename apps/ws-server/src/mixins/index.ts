@@ -958,7 +958,8 @@ export function GrokMixin<
               deps.userStore,
               deps.memory,
               this.xaiApiKey ?? "",
-              this.xaiManagementKey ?? ""
+              this.xaiManagementKey ?? "",
+              deps.localTool
             );
         }
       }

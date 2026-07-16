@@ -1,3 +1,4 @@
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -15,6 +16,7 @@ import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap, GrokModelIdUnion } from "@slipstream/types";
+import { isLocalToolName } from "@slipstream/types";
 
 export class GrokResponsesApiService extends GrokImgGenService {
   constructor(
@@ -25,7 +27,10 @@ export class GrokResponsesApiService extends GrokImgGenService {
     userStore: UserStoreVectorService,
     memoryService: ConversationMemoryVectorService,
     apiKey: string,
-    managementKey: string
+    managementKey: string,
+    // local tool bridge ownership STARTS here — the img-gen/workup
+    // ancestors never see it, mirroring the openai responses-chat pattern
+    protected localToolBroker: LocalToolBroker
   ) {
     super(
       redis,
@@ -76,7 +81,8 @@ export class GrokResponsesApiService extends GrokImgGenService {
     jobId,
     title,
     topP,
-    management_api_key
+    management_api_key,
+    localTools
   }: GrokProviderChatRequestEntity) {
     const provider = "grok" as const;
     const mgmtKey = management_api_key ?? this.xaiManagementKey;
@@ -286,6 +292,33 @@ export class GrokResponsesApiService extends GrokImgGenService {
       mgmtKey
     );
 
+    // Local read-only tool bridge — capability advertised by the CLI on
+    // this exact turn; absent means zero local definitions attached.
+    // turnId mints once per ATTEMPT; the controller is the future
+    // cancellation hook (calls await sequentially, so nothing is pending
+    // when this throws).
+    const localToolTurn =
+      localTools?.protocolVersion === 1 && supportsFunctionTools
+        ? {
+            turnId: await this.localToolBroker.generateTurnId(),
+            advertised: new Set<string>(localTools.names),
+            controller: new AbortController()
+          }
+        : undefined;
+    const localToolNames = localToolTurn
+      ? [...localToolTurn.advertised].filter(isLocalToolName)
+      : [];
+    if (localToolTurn) {
+      this.logger.info(
+        {
+          turnId: localToolTurn.turnId,
+          advertised: [...localToolTurn.advertised],
+          conversationId
+        },
+        "local tool bridge armed for grok turn"
+      );
+    }
+
     try {
       const initialRequest = await this.getResponsesApiInputWorkup({
         isNewChat,
@@ -318,7 +351,8 @@ export class GrokResponsesApiService extends GrokImgGenService {
         web_enable_image_understanding: true,
         x_enable_image_understanding: true,
         x_enable_video_understanding: true,
-        include: ["reasoning.encrypted_content"]
+        include: ["reasoning.encrypted_content"],
+        localToolNames
       });
 
       // backstop only, not a working budget — memory tools dual-wield across rounds
@@ -360,6 +394,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
           payload: {
             round_input: roundInput,
             collectionId,
+            localToolNames,
             enableCodeInterpreter: true,
             enableFileSearch: true,
             enableWebSearch: true,
@@ -802,6 +837,66 @@ export class GrokResponsesApiService extends GrokImgGenService {
 
         const toolOutputs = Array.of<FunctionCallOutput<string>>();
         for (const call of functionCalls) {
+          // Local read-only bridge: relay to the CLI via the socket-scoped
+          // broker (which ALWAYS resolves — deadline/disconnect/cancel
+          // become typed is_error results, so the await can never wedge the
+          // loop); every other tool takes the existing server-side path
+          // untouched. const-local (not property) so the narrowing survives
+          // the async IIFE
+          const toolName = call.name;
+          if (
+            isLocalToolName(toolName) &&
+            localToolTurn &&
+            localToolTurn.advertised.has(toolName)
+          ) {
+            let input: unknown = {};
+            let inputParseFailed = false;
+            try {
+              input = call.arguments
+                ? JSON.parse<unknown>(call.arguments)
+                : {};
+            } catch {
+              inputParseFailed = true;
+            }
+            const output = inputParseFailed
+              ? `Malformed ${call.name} input JSON`
+              : await (async () => {
+                  const localResult = await this.localToolBroker.request(
+                    ws,
+                    {
+                      type: "local_tool_request",
+                      conversationId,
+                      turnId: localToolTurn.turnId,
+                      round: round + 1,
+                      toolCallId: call.call_id,
+                      name: toolName,
+                      input,
+                      timeoutMs: this.localToolBroker.timeoutMsFor(toolName)
+                    },
+                    localToolTurn.controller.signal
+                  );
+                  const r = localResult.result;
+                  this.logger.info(
+                    {
+                      turnId: localToolTurn.turnId,
+                      toolCallId: call.call_id,
+                      name: call.name,
+                      round: round + 1,
+                      ok: r.ok,
+                      durationMs: r.durationMs,
+                      ...(r.ok ? {} : { errorCode: r.error.code })
+                    },
+                    "local tool round trip (grok)"
+                  );
+                  return JSON.stringify(r.ok ? r.value : { error: r.error });
+                })();
+            toolOutputs.push({
+              type: "function_call_output",
+              call_id: call.call_id,
+              output
+            } satisfies FunctionCallOutput<string>);
+            continue;
+          }
           toolOutputs.push(
             await this.executeFunctionToolCall(userId, conversationId, call)
           );
