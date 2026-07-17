@@ -298,7 +298,8 @@ async function exe() {
       redisInstance,
       userStore,
       memory,
-      cfg.MISTRAL_API_KEY
+      cfg.MISTRAL_API_KEY,
+      localTool
     );
 
     const { CohereService } = await import("@/cohere/index.ts");

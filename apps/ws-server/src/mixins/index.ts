@@ -345,7 +345,8 @@ export function MistralMixin<
               deps.redis,
               deps.userStore,
               deps.memory,
-              this.mistralApiKey ?? ""
+              this.mistralApiKey ?? "",
+              deps.localTool
             );
         }
       }

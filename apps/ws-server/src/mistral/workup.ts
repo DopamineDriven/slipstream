@@ -1,6 +1,7 @@
 import type { LoggerService } from "@/logger/index.ts";
 import type {
   MistralFunctionTool,
+  MistralLocalToolFunctionTool,
   MistralMessageReq,
   ToolTypes
 } from "@/mistral/types.ts";
@@ -10,7 +11,8 @@ import type { Logger as PinoLogger } from "pino";
 import { MistralStreamContentService } from "@/mistral/stream-content.ts";
 import { Mistral } from "@mistralai/mistralai";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import type { MistralModelIdUnion } from "@slipstream/types";
+import type { LocalToolName, MistralModelIdUnion } from "@slipstream/types";
+import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
 export class MistralWorkupService extends MistralStreamContentService {
   protected defaultClient: Mistral;
@@ -232,5 +234,26 @@ export class MistralWorkupService extends MistralStreamContentService {
         }
       }
     } as const satisfies MistralFunctionTool;
+  }
+
+  /**
+   * Local read-only tool bridge (Sovereign CLI) — canonical definitions
+   * mapped into mistral's completions function-tool dialect. Plain JSON
+   * Schema, so this is a near-identity map (parameters === inputSchema).
+   * Empty when the CLI advertises nothing.
+   */
+  protected localToolFunctionTools(names: readonly LocalToolName[]) {
+    const advertised = new Set<string>(names);
+    return LOCAL_TOOL_DEFINITIONS.filter(d => advertised.has(d.name)).map(
+      d =>
+        ({
+          type: "function",
+          function: {
+            name: d.name,
+            description: d.description,
+            parameters: d.inputSchema
+          }
+        }) satisfies MistralLocalToolFunctionTool
+    );
   }
 }

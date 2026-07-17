@@ -7,7 +7,12 @@ import type {
   UserMessage
 } from "@mistralai/mistralai/models/components";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { CTR, UTR } from "@slipstream/types";
+import type {
+  CanonicalToolDefinition,
+  CTR,
+  LocalToolName,
+  UTR
+} from "@slipstream/types";
 
 export type MistralMessageReq =
   CTR<AssistantMessage, "role"> | SystemMessage | ToolMessage | UserMessage;
@@ -35,6 +40,20 @@ export interface MistralFunctionTool {
       required: string[];
       additionalProperties: boolean;
     };
+  };
+}
+
+/**
+ * Local read-only tool bridge (Sovereign CLI) — mistral's completions
+ * dialect takes plain JSON Schema, so the canonical inputSchema IS the
+ * wire payload (near-identity, like the openai/xai mappers).
+ */
+export interface MistralLocalToolFunctionTool {
+  type: "function";
+  function: {
+    name: LocalToolName;
+    description: string;
+    parameters: CanonicalToolDefinition["inputSchema"];
   };
 }
 
