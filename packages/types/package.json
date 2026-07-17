@@ -18,6 +18,9 @@
         "events": [
           "dist/events.d.ts"
         ],
+        "local-tools": [
+          "dist/local-tools.d.ts"
+        ],
         "models": [
           "dist/models.d.ts"
         ],
@@ -52,6 +55,9 @@
       "events": [
         "dist/events.d.ts"
       ],
+      "local-tools": [
+        "dist/local-tools.d.ts"
+      ],
       "models": [
         "dist/models.d.ts"
       ],
@@ -85,6 +91,7 @@
     "./events-images": "./dist/events-images.js",
     "./events-workup": "./dist/events-workup.js",
     "./events": "./dist/events.js",
+    "./local-tools": "./dist/local-tools.js",
     "./codegen-types": "./dist/codegen-types.js",
     "./codegen/*": "./dist/codegen/__gen__/*.js"
   },

@@ -58,3 +58,4 @@ infra/*.md
 docs/*
 infra/dkim.sh
 result.md
+architectural-decisions/memory-store/dev-probe/direct/*

@@ -1,8 +1,6 @@
+import type { BlockBearingMessage } from "@/types.ts";
+import { ConvoPickerService } from "@/convo-picker.ts";
 import pc from "picocolors";
-import { formatHydratedTail } from "@/hydrated-history.ts";
-import { isReasoningBlock, renderableBlocks } from "@/message-blocks.ts";
-import type { BlockBearingMessage } from "@/message-blocks.ts";
-import { CliProviderContextService } from "@/provider-context.ts";
 import type { ChatChunkAndResMsgBlock, EventTypeMap } from "@slipstream/types";
 
 /**
@@ -15,18 +13,31 @@ import type { ChatChunkAndResMsgBlock, EventTypeMap } from "@slipstream/types";
  * watermark yields exactly the unseen suffix (correct for anthropic deltas
  * AND gemini full-aggregate re-sends alike).
  */
-export class CliRendererService extends CliProviderContextService {
+export class CliRendererService extends ConvoPickerService {
+  constructor(wsUrl?: string) {
+    super(wsUrl);
+  }
+
   protected showThinking = true;
 
   /** ordinal → chars already written for that block (the stream watermark) */
   private printedByOrdinal = new Map<number, number>();
   /** last block class rendered — drives the ∴ header and the reasoning→answer gap */
   private lastRenderedClass?: "reasoning" | "text";
+  /**
+   * per-turn markdown line buffer — transforms the emitted VIEW of TEXT
+   * pieces only; the watermark above keeps counting SOURCE characters, so
+   * the dedup/reconcile math is untouched. The pending partial line spans
+   * block ordinals safely (consecutive TEXT blocks concatenate exactly as
+   * the raw path did).
+   */
+  private mdStream = this.createMarkdownStream();
 
   /** reset per-turn render state — call at send time */
   protected beginTurnRender() {
     this.printedByOrdinal.clear();
     this.lastRenderedClass = undefined;
+    this.mdStream = this.createMarkdownStream();
   }
 
   protected nameTag(provider: string, model: string | undefined) {
@@ -41,9 +52,13 @@ export class CliRendererService extends CliProviderContextService {
    */
   private emitBlockPiece(type: ChatChunkAndResMsgBlock["type"], piece: string) {
     if (piece.length === 0) return;
-    if (isReasoningBlock(type)) {
+    if (this.isReasoningBlock(type)) {
       if (!this.showThinking) return;
       if (this.lastRenderedClass !== "reasoning") {
+        // entering reasoning mid-answer: the pending partial text line must
+        // land before the ∴ header or it visually attaches to the thinking
+        const pendingText = this.mdStream.flush();
+        if (pendingText.length > 0) process.stdout.write(pendingText);
         process.stdout.write(pc.dim("\n∴ thinking…\n"));
         this.lastRenderedClass = "reasoning";
       }
@@ -54,7 +69,7 @@ export class CliRendererService extends CliProviderContextService {
       process.stdout.write("\n\n");
     }
     this.lastRenderedClass = "text";
-    process.stdout.write(piece);
+    process.stdout.write(this.mdStream.push(piece));
   }
 
   /** advance the watermark and emit only the growth for a block's ordinal */
@@ -76,13 +91,14 @@ export class CliRendererService extends CliProviderContextService {
       return;
     }
     // fallback for the rare block-less frame (e.g. a resume replay with no
-    // block): raw text passthrough, thinking dropped (unclassifiable here)
+    // block): text passthrough via the same line buffer, thinking dropped
+    // (unclassifiable here)
     if (data.chunk) {
       if (this.lastRenderedClass === "reasoning") {
         process.stdout.write("\n\n");
       }
       this.lastRenderedClass = "text";
-      process.stdout.write(data.chunk);
+      process.stdout.write(this.mdStream.push(data.chunk));
     }
   }
 
@@ -97,6 +113,9 @@ export class CliRendererService extends CliProviderContextService {
         this.renderBlock(block);
       }
     }
+    // the final answer line rarely ends with \n — land it before the meta rule
+    const pendingText = this.mdStream.flush();
+    if (pendingText.length > 0) process.stdout.write(pendingText);
     this.lastRenderedClass = undefined;
     const meta = Array.of<string>();
     if (data.title) meta.push(data.title);
@@ -136,8 +155,14 @@ export class CliRendererService extends CliProviderContextService {
       model: string | null;
     } & BlockBearingMessage
   ) {
-    const body = renderableBlocks(msg)
-      .map(b => (isReasoningBlock(b.type) ? pc.dim(b.content) : b.content))
+    const body = this.renderableBlocks(msg)
+      .map(b =>
+        this.isReasoningBlock(b.type)
+          ? pc.dim(b.content)
+          : msg.senderType === "USER"
+            ? b.content
+            : this.styleMarkdown(b.content)
+      )
       .join("\n\n");
     process.stdout.write(`\n${this.speakerTag(msg)}\n${body}\n\n`);
   }
@@ -159,12 +184,16 @@ export class CliRendererService extends CliProviderContextService {
     data: EventTypeMap["hydrate_conversation_ack"],
     tailCount = 8
   ) {
-    const tail = formatHydratedTail(data.pages, {
+    const tail = this.formatHydratedTail(data.pages, {
       tailCount,
       perMessageCharCap: this.hydratedMessageCharCap
     });
     for (const msg of tail.messages) {
-      process.stdout.write(`\n${this.speakerTag(msg)}\n${msg.body}\n`);
+      // AI markdown styles; user-typed text stays byte-exact (the lossless
+      // resume contract applies to what the human actually wrote)
+      const body =
+        msg.senderType === "USER" ? msg.body : this.styleMarkdown(msg.body);
+      process.stdout.write(`\n${this.speakerTag(msg)}\n${body}\n`);
       if (msg.truncated) {
         process.stdout.write(
           `${pc.yellow("…")} ${pc.dim(

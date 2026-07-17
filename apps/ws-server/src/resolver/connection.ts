@@ -6,11 +6,11 @@ import type { TTSService } from "@/tts/index.ts";
 import type { UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
-import { ResolverConvoListService } from "@/resolver/convo-list.ts";
+import { ResolverLocalToolResultService } from "@/resolver/local-tool-result.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { ClientContextWorkupProps, EventTypeMap } from "@slipstream/types";
 
-export class ResolverConnectionService extends ResolverConvoListService {
+export class ResolverConnectionService extends ResolverLocalToolResultService {
   constructor(
     wsServer: WSServer,
     providers: ProviderService,
@@ -46,7 +46,13 @@ export class ResolverConnectionService extends ResolverConvoListService {
     // const grok = this.providers.getInstance("grok");
     void this.sendInitialConversationList(ws, userId);
     return await Promise.all([
-      this.userVectorStore.syncUserStoreByName(userId),
+      // ensure BEFORE sync: a brand-new user has no UserStore row until
+      // first upload — ensureUserStore is the check-first get-or-create the
+      // upload paths already ride (creation stays at the orchestration
+      // layer; sync-named methods never create)
+      this.userVectorStore
+        .ensureUserStore(userId)
+        .then(() => this.userVectorStore.syncUserStoreByName(userId)),
       anthropic.syncFileRegistry(userId, true),
       // gemini.syncFileRegistry(userId, true),
       // grok.syncGrokWithGuard(userId, this.xaiManagementApikey),
@@ -79,7 +85,16 @@ export class ResolverConnectionService extends ResolverConvoListService {
       } satisfies EventTypeMap["connection_established"];
 
       ws.send(JSON.stringify(payload));
-      void this.postHandleConnectionEstablishedJob(ws, userId);
+      // void marks fire-and-forget but does NOT absorb rejections — an
+      // uncaught throw in this job crashed the whole server when a new user
+      // connected with no UserStore row (P2025, 2026-07-17). The connection
+      // stays up regardless of what the background sync fleet does.
+      void this.postHandleConnectionEstablishedJob(ws, userId).catch(err => {
+        this.logger.warn(
+          { userId, err: this.wsServer.prisma.safeErrMsg(err) },
+          "post-connection sync job failed; connection unaffected"
+        );
+      });
     } catch (err) {
       this.wsServer.prisma.safeErrMsg(err);
     }

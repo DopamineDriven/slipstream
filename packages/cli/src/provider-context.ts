@@ -11,6 +11,10 @@ import type { ClientContextWorkupProps, Provider } from "@slipstream/types";
  * resolution.
  */
 export class CliProviderContextService extends SlipstreamClientService {
+  constructor(wsUrl?: string) {
+    super(wsUrl);
+  }
+
   protected providerContext: ClientContextWorkupProps | null = null;
 
   /** register BEFORE connect() — the frame lands milliseconds post-handshake */

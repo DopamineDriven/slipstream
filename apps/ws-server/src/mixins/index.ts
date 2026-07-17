@@ -20,7 +20,7 @@ import { ZaiService } from "@/zai/index.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { Provider } from "@slipstream/types";
-
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 export type ProviderNarrowing<P extends Provider> = P extends "openai"
   ? OpenAIService
   : P extends "grok"
@@ -108,6 +108,7 @@ export interface ProviderDependencies {
   s3: S3Storage;
   memory: ConversationMemoryVectorService;
   toolCatalog: ToolCatalogService;
+  localTool: LocalToolBroker;
 }
 export type ProviderFactory<T> = (
   deps: ProviderDependencies,
@@ -205,6 +206,7 @@ export function AnthropicMixin<
               deps.memory,
               deps.toolCatalog,
               deps.redis,
+              deps.localTool,
               this.claudeApiKey ?? ""
             );
         }
@@ -274,7 +276,8 @@ export function GeminiMixin<
               deps.redis,
               deps.s3,
               deps.memory,
-              this.gemApiKey ?? ""
+              this.gemApiKey ?? "",
+              deps.localTool
             );
         }
       }
@@ -342,7 +345,8 @@ export function MistralMixin<
               deps.redis,
               deps.userStore,
               deps.memory,
-              this.mistralApiKey ?? ""
+              this.mistralApiKey ?? "",
+              deps.localTool
             );
         }
       }
@@ -883,7 +887,8 @@ export function OpenAIMixin<
               deps.s3,
               deps.redis,
               this.oaiApiKey ?? "",
-              deps.memory
+              deps.memory,
+              deps.localTool
             );
         }
       }
@@ -954,7 +959,8 @@ export function GrokMixin<
               deps.userStore,
               deps.memory,
               this.xaiApiKey ?? "",
-              this.xaiManagementKey ?? ""
+              this.xaiManagementKey ?? "",
+              deps.localTool
             );
         }
       }

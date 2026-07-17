@@ -1,3 +1,4 @@
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -15,9 +16,19 @@ export class OpenAIService extends OpenAIResponsesChatService {
     s3: S3Storage,
     redis: EnhancedRedisPubSub,
     apiKey: string,
-    memoryService: ConversationMemoryVectorService
+    memoryService: ConversationMemoryVectorService,
+    localToolBroker: LocalToolBroker
   ) {
-    super(logger, prisma, userStoreVector, s3, redis, apiKey, memoryService);
+    super(
+      logger,
+      prisma,
+      userStoreVector,
+      s3,
+      redis,
+      apiKey,
+      memoryService,
+      localToolBroker
+    );
   }
   public async routeOpenAI({ model, ...rest }: ProviderOpenaiRequestEntity) {
     if (!model || !this.prisma.isOpenAIModel(model)) return;

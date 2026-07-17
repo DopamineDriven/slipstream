@@ -1,4 +1,5 @@
 import type { ProviderGeminiChatRequestEntity } from "@/gemini/types.ts";
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -16,9 +17,19 @@ export class GeminiService extends GeminiChatService {
     redis: EnhancedRedisPubSub,
     s3: S3Storage,
     memoryStore: ConversationMemoryVectorService,
-    apiKey: string
+    apiKey: string,
+    localToolBroker: LocalToolBroker
   ) {
-    super(logger, prisma, store, redis, s3, memoryStore, apiKey);
+    super(
+      logger,
+      prisma,
+      store,
+      redis,
+      s3,
+      memoryStore,
+      apiKey,
+      localToolBroker
+    );
   }
   public async routeGemini({
     model,

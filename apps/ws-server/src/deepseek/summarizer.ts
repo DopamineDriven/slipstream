@@ -35,7 +35,8 @@ export class DeepSeekSummarizerService extends DeepSeekWorkupService {
         this.memorySearchFunctionTool(),
         this.memoryGetChunkFunctionTool()
       ],
-      rawArguments => this.parseFileSearchArguments(rawArguments)
+      rawArguments =>
+        this.userStoreVector.parseUserStoreArgs(rawArguments, "file_search")
     );
   }
 

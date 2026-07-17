@@ -8,6 +8,7 @@ import type {
   CTR,
   EventTypeMap,
   GetModelUtilRT,
+  LocalToolCapabilities,
   MessageSingleton,
   Provider,
   RTC,
@@ -439,6 +440,12 @@ export interface ProviderChatRequestEntity {
   docCounts: number;
   imgCounts: number;
   hasUserStoreDocs: boolean;
+  /**
+   * Local read-only tool capability advertisement (Sovereign CLI) — rides
+   * through from ai_chat_request. Absent means the provider request
+   * carries zero local tool definitions; never inferred from user agent.
+   */
+  localTools?: LocalToolCapabilities;
 }
 
 export interface ImageGenReqDbRes<

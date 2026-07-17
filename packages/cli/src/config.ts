@@ -1,5 +1,4 @@
 import * as dotenv from "dotenv";
-import type { UserMetadata } from "@slipstream/types";
 
 dotenv.config({ quiet: true });
 
@@ -10,12 +9,22 @@ dotenv.config({ quiet: true });
  * the browser client. Expired session → redirect the human to the browser
  * (localhost:3030/auth/login or chat.aicoalesce.com/auth/login) — later.
  *
- * Dep-free base of the CLI service chain (config → client → renderer → repl).
+ * Dep-free base of the CLI service chain (config → context → client →
+ * renderer → repl). Client-context concerns (edge fetch, cookie header,
+ * userMetadata) live one layer up in ClientContext.
  */
 export class CliConfigService {
-  public get wsUrl() {
-    return process.env.SLIPSTREAM_WS_URL ?? "ws://localhost:4000";
-  }
+  /**
+   * Injected at the composition root (bin/aic.ts) from the --env flag —
+   * prod/dev addresses are hardcoded there. Precedence: explicit ctor arg
+   * (--env) → SLIPSTREAM_WS_URL → the dev default. Every class in the
+   * chain threads this through its own constructor so the injection point
+   * stays the top-level `new SlipstreamReplService(wsUrl)`.
+   */
+  constructor(
+    protected wsUrl: string = process.env.SLIPSTREAM_WS_URL ??
+      "ws://localhost:4000"
+  ) {}
 
   public get loginUrl() {
     return (
@@ -31,48 +40,6 @@ export class CliConfigService {
    */
   public get userId() {
     return process.env.SLIPSTREAM_USER_ID ?? "nrr6h4r4480f6kviycyo1zhf";
-  }
-
-  /**
-   * Andrew's real values (single-operator, plan §0.1) — the same metadata
-   * shape the browser client derives from the proxy cookies, reusable both
-   * for the handshake Cookie header and ai_chat_request.metadata
-   */
-  public get userMetadata() {
-    return {
-      city: "Barrington",
-      region: "Illinois",
-      country: "US",
-      tz: "America/Chicago",
-      postalCode: "60010",
-      lat: 41.8338486,
-      lng: -87.8966849,
-      locale: "en-US",
-      ua: "slipstream-cli/1.0.0 (wsl2; node)",
-      ip: "127.0.0.1"
-    } as const satisfies UserMetadata;
-  }
-
-  /** UserMetadata → the Cookie header parsedCookies() reads at the handshake */
-  public get cookieHeader() {
-    const m = this.userMetadata;
-    const pairs = {
-      city: m.city,
-      region: m.region,
-      country: m.country,
-      tz: m.tz,
-      postalCode: m.postalCode,
-      locale: m.locale,
-      ip: m.ip,
-      latlng: `${m.lat},${m.lng}`,
-      ua: encodeURIComponent(m.ua),
-      viewport: "desktop",
-      browserName: "SlipstreamCLI",
-      browserVersion: "1.0.0"
-    };
-    return Object.entries(pairs)
-      .map(([k, v]) => `${k}=${v}`)
-      .join("; ");
   }
 
   public safeErrMsg(err: unknown) {

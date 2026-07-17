@@ -14,6 +14,7 @@ export default defineConfig(
         "src/events-workup.ts",
         "src/events.ts",
         "src/utils.ts",
+        "src/local-tools.ts",
         "src/models.ts",
         "src/types.ts",
         "src/codegen/__gen__/display-name-to-model-id-img-gen.ts",

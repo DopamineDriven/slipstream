@@ -48,6 +48,8 @@ class EventHandlerRegistry {
     "image_gen_progress",
     "image_gen_request",
     "image_gen_response",
+    "local_tool_request",
+    "local_tool_result",
     "ping",
     "provider_context_ping",
     "provider_context_pong",
@@ -330,6 +332,18 @@ class EventHandlerRegistry {
       image_gen_error: () => {
         const handler = this.handlers.image_gen_error;
         if (handler && event.type === "image_gen_error") {
+          handler(event, socket);
+        }
+      },
+      local_tool_request: () => {
+        const handler = this.handlers.local_tool_request;
+        if (handler && event.type === "local_tool_request") {
+          handler(event, socket);
+        }
+      },
+      local_tool_result: () => {
+        const handler = this.handlers.local_tool_result;
+        if (handler && event.type === "local_tool_result") {
           handler(event, socket);
         }
       },

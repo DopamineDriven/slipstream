@@ -1,3 +1,4 @@
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -17,7 +18,8 @@ export class xAIService extends GrokResponsesApiService {
     userStore: UserStoreVectorService,
     memoryService: ConversationMemoryVectorService,
     apiKey: string,
-    managementKey: string
+    managementKey: string,
+    localToolBroker: LocalToolBroker
   ) {
     super(
       redis,
@@ -27,7 +29,8 @@ export class xAIService extends GrokResponsesApiService {
       userStore,
       memoryService,
       apiKey,
-      managementKey
+      managementKey,
+      localToolBroker
     );
   }
   public async routeXai({ model: m, ...rest }: ProviderChatRequestEntity) {

@@ -124,17 +124,14 @@ async function exe() {
     // the five gateway summarizer arms (HMEM §6.2 roster) — memory-free
     // workup children riding the Vercel AI Gateway (ZDR-flagged), so they
     // construct BEFORE memory as first-class deps
-    const { DeepSeekSummarizerService } = await import(
-      "@/deepseek/summarizer.ts"
-    );
+    const { DeepSeekSummarizerService } =
+      await import("@/deepseek/summarizer.ts");
     const { KimiSummarizerService } = await import("@/kimi/summarizer.ts");
-    const { MiniMaxSummarizerService } = await import(
-      "@/minimax/summarizer.ts"
-    );
+    const { MiniMaxSummarizerService } =
+      await import("@/minimax/summarizer.ts");
     const { ZaiSummarizerService } = await import("@/zai/summarizer.ts");
-    const { AlibabaSummarizerService } = await import(
-      "@/alibaba/summarizer.ts"
-    );
+    const { AlibabaSummarizerService } =
+      await import("@/alibaba/summarizer.ts");
     const gatewayArms = {
       deepseek: new DeepSeekSummarizerService(
         logger,
@@ -190,6 +187,11 @@ async function exe() {
     // sweepBatchSize cap regenerate without waiting for a conversation tick
     void memory.resumeSummaryBacklog();
 
+    const { LocalToolBroker } =
+      await import("@/local-tools/local-tool-broker.ts");
+
+    const localTool = new LocalToolBroker();
+
     const { xAIService } = await import("@/xai/index.ts");
 
     const xai = new xAIService(
@@ -200,7 +202,8 @@ async function exe() {
       userStore,
       memory,
       cfg.X_AI_KEY,
-      process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
+      process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY,
+      localTool
     );
     const { LlamaService } = await import("@/meta/index.ts");
 
@@ -241,6 +244,7 @@ async function exe() {
       redisInstance,
       prisma,
       pdfService,
+      localTool,
       logger
     );
 
@@ -256,6 +260,7 @@ async function exe() {
       memory,
       toolCatalog,
       redisInstance,
+      localTool,
       cfg.ANTHROPIC_API_KEY
     );
 
@@ -268,7 +273,8 @@ async function exe() {
       s3,
       redisInstance,
       cfg.OPENAI_API_KEY,
-      memory
+      memory,
+      localTool
     );
 
     const { GeminiService } = await import("@/gemini/index.ts");
@@ -280,7 +286,8 @@ async function exe() {
       redisInstance,
       s3,
       memory,
-      cfg.GOOGLE_API_KEY
+      cfg.GOOGLE_API_KEY,
+      localTool
     );
 
     const { MistralService } = await import("@/mistral/index.ts");
@@ -291,7 +298,8 @@ async function exe() {
       redisInstance,
       userStore,
       memory,
-      cfg.MISTRAL_API_KEY
+      cfg.MISTRAL_API_KEY,
+      localTool
     );
 
     const { CohereService } = await import("@/cohere/index.ts");
@@ -401,7 +409,8 @@ async function exe() {
         s3,
         isProd,
         memory,
-        toolCatalog
+        toolCatalog,
+        localTool
       },
       anthropic,
       gemini,

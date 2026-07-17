@@ -1,4 +1,7 @@
 import type { WithImplicitCoercion } from "buffer";
+// the workspace ws client, not the undici global — the WHATWG constructor
+// spec-forbids the Cookie header the handshake needs (phase 2B)
+import { WebSocket } from "ws";
 import type {
   AnyEventTypeUnion,
   ChatWsEvent,
@@ -66,6 +69,8 @@ class EventHandlerRegistry {
     "image_gen_progress",
     "image_gen_request",
     "image_gen_response",
+    "local_tool_request",
+    "local_tool_result",
     "ping",
     "provider_context_ping",
     "provider_context_pong",
@@ -345,6 +350,18 @@ class EventHandlerRegistry {
           handler(event, socket);
         }
       },
+      local_tool_request: () => {
+        const handler = this.handlers.local_tool_request;
+        if (handler && event.type === "local_tool_request") {
+          handler(event, socket);
+        }
+      },
+      local_tool_result: () => {
+        const handler = this.handlers.local_tool_result;
+        if (handler && event.type === "local_tool_result") {
+          handler(event, socket);
+        }
+      },
       image_gen_error: () => {
         const handler = this.handlers.image_gen_error;
         if (handler && event.type === "image_gen_error") {
@@ -454,7 +471,11 @@ export class ChatWebSocketClient {
   /** CLI addition — invoked on every socket close (before reconnect scheduling) */
   public onDisconnect?: (code: number) => void;
 
-  constructor(private readonly url: string) {}
+  constructor(
+    private readonly url: string,
+    /** serialized handshake Cookie header — reconnects reuse it (phase 2B) */
+    private readonly cookieHeader?: string
+  ) {}
 
   // Expose handlers for backward compatibility
   public get handlers() {
@@ -464,7 +485,10 @@ export class ChatWebSocketClient {
   public connect() {
     if (this.socket && this.socket?.readyState === WebSocket.OPEN) return;
 
-    this.socket = new WebSocket(this.url);
+    this.socket = new WebSocket(
+      this.url,
+      this.cookieHeader ? { headers: { cookie: this.cookieHeader } } : {}
+    );
 
     this.socket.onopen = () => {
       this._isConnected = true;
@@ -480,11 +504,22 @@ export class ChatWebSocketClient {
       }
     };
 
-    this.socket.onmessage = (event: MessageEvent<string>) => {
+    this.socket.onmessage = event => {
       if (!this.socket) return;
 
+      // ws delivers string for text frames; coerce the binary shapes so
+      // parseEvent always receives a string
+      const raw =
+        typeof event.data === "string"
+          ? event.data
+          : Array.isArray(event.data)
+            ? Buffer.concat(event.data).toString("utf-8")
+            : Buffer.isBuffer(event.data)
+              ? event.data.toString("utf-8")
+              : Buffer.from(event.data).toString("utf-8");
+
       // Parse and validate the event
-      const data = this.registry.parseEvent(event.data);
+      const data = this.registry.parseEvent(raw);
       if (!data) return;
 
       // Notify all listeners first
@@ -552,6 +587,25 @@ export class ChatWebSocketClient {
         this.connect();
       }
     }
+  }
+
+  /**
+   * Volatile send — returns false instead of queueing when the socket is
+   * not OPEN. For replies bound to a pending server-side promise on THIS
+   * socket (local_tool_result): if disconnected, the server broker
+   * synthesizes the error, and replaying a queued stale reply after
+   * reconnect would be actively wrong.
+   */
+  public sendVolatile<const T extends keyof EventTypeMap>(
+    event: T,
+    data: EventTypeMap[T]
+  ) {
+    if (this.socket?.readyState !== WebSocket.OPEN) {
+      dlog(`[WebSocketClient] Volatile ${event} dropped (socket not OPEN)`);
+      return false;
+    }
+    this.socket.send(JSON.stringify({ ...data, type: event }));
+    return true;
   }
 
   public addListener(listener: ChatEventListener) {

@@ -58,7 +58,7 @@
     "./bin/aic": "./dist/bin/aic.js",
     "./client": "./dist/client.js",
     "./config": "./dist/config.js",
-    "./renderer": "./dist/renderer.js",
+    "./render": "./dist/render.js",
     "./repl": "./dist/repl.js",
     "./types": "./dist/types.js"
   },

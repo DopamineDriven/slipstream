@@ -484,10 +484,13 @@ export class PrismaUserStoreService extends PrismaTTSService {
     storeName = this.defaultUserStoreName(userId)
   ) {
     return await this.prismaClient.$transaction(async t => {
-      const getUserStoreDocs = await t.userStore.findUniqueOrThrow({
+      const getUserStoreDocs = await t.userStore.findUnique({
         where: { userId_storeName: { storeName, userId } },
         select: { docs: { select: { size: true, chunkCount: true } } }
       });
+      // no store row yet (nothing uploaded, ensure not yet run) is a normal
+      // state for a new user — nothing to sync, not an error
+      if (!getUserStoreDocs) return null;
 
       let totalBytes = 0n;
       let totalChunks = 0;

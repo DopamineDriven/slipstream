@@ -1,57 +1,21 @@
 import type {
   AssistantMessage,
   ChatCompletionStreamRequest,
-  GuardrailConfig,
-  Prediction,
-  ResponseFormat,
+  ContentChunk,
   SystemMessage,
-  ToolChoice,
   ToolMessage,
   UserMessage
 } from "@mistralai/mistralai/models/components";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { CTR, MistralModelIdUnion } from "@slipstream/types";
-
-export type ChatCompletionRequest = {
-  model: MistralModelIdUnion;
-  temperature?: number | null | undefined;
-  top_p?: number | undefined;
-  max_tokens?: number | null | undefined;
-  stream: boolean;
-  stop?: string | string[] | undefined;
-  random_seed?: number | null | undefined;
-  metadata?: { [k: string]: unknown } | null | undefined;
-  messages: (
-    CTR<AssistantMessage, "role"> | SystemMessage | ToolMessage | UserMessage
-  )[];
-  response_format?: ResponseFormat | undefined;
-  tools?: ToolTypes;
-  tool_choice?: ToolChoice | string | undefined;
-  presence_penalty?: number | undefined;
-  frequency_penalty?: number | undefined;
-  n?: number | null | undefined;
-  prediction?: Prediction | undefined;
-  parallel_tool_calls?: boolean | undefined;
-  reasoning_effort?: string | null | undefined;
-  prompt_mode?: string | null | undefined;
-  guardrails?: GuardrailConfig[] | null | undefined;
-  safe_prompt?: boolean | undefined;
-};
+import type {
+  CanonicalToolDefinition,
+  CTR,
+  LocalToolName,
+  UTR
+} from "@slipstream/types";
 
 export type MistralMessageReq =
   CTR<AssistantMessage, "role"> | SystemMessage | ToolMessage | UserMessage;
-
-export type MistralReqMessage = (
-  | SystemMessage
-  | ToolMessage
-  | UserMessage
-  | (AssistantMessage & { role: "assistant" })
-)[];
-
-export type MistralMessageContentChunk = Exclude<
-  UserMessage["content"],
-  string | null
->[number];
 
 export type ToolTypes = ChatCompletionStreamRequest["tools"];
 
@@ -79,6 +43,20 @@ export interface MistralFunctionTool {
   };
 }
 
+/**
+ * Local read-only tool bridge (Sovereign CLI) — mistral's completions
+ * dialect takes plain JSON Schema, so the canonical inputSchema IS the
+ * wire payload (near-identity, like the openai/xai mappers).
+ */
+export interface MistralLocalToolFunctionTool {
+  type: "function";
+  function: {
+    name: LocalToolName;
+    description: string;
+    parameters: CanonicalToolDefinition["inputSchema"];
+  };
+}
+
 export type MistralFunctionToolCall = {
   id: string;
   type: "function";
@@ -88,9 +66,6 @@ export type MistralFunctionToolCall = {
   };
   index: number;
 };
-
-export type MistralBaseMessage =
-  UserMessage | (AssistantMessage & { role: "assistant" });
 
 export type MistralAssistantToolCallMessage = {
   role: "assistant";
@@ -130,38 +105,9 @@ export interface MistralFinalizedMessageBlock {
 
 export type MistralForcedLoopStopReason = "MAX_ROUNDS" | null;
 
-export type MistralTextChunk = {
-  type?: "text";
-  text: string;
-};
+export type MistralContentChunk = UTR<ContentChunk, "type">;
 
-export type MistralReferenceChunk = {
-  type?: "reference";
-  referenceIds: readonly (number | string)[];
-};
-
-export type MistralToolReferenceChunk = {
-  type?: "tool_reference";
-  tool: string;
-  title: string;
-  url?: string | null;
-  favicon?: string | null;
-  description?: string | null;
-};
-
-export type MistralThinkingChunk = {
-  type?: "thinking";
-  thinking: readonly (
-    MistralReferenceChunk | MistralTextChunk | MistralToolReferenceChunk
-  )[];
-  closed?: boolean;
-};
-
-export type MistralContentChunk =
-  | MistralTextChunk
-  | MistralThinkingChunk
-  | MistralReferenceChunk
-  | MistralToolReferenceChunk
-  | {
-      type?: string;
-    };
+export interface MistralDeltaContentHandlers {
+  emitTextChunk(text: string): void;
+  emitThinkingChunk(text: string): void;
+}

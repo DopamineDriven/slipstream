@@ -1,5 +1,6 @@
 import { createServer } from "node:http";
 import { TLSSocket } from "node:tls";
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { PdfService } from "@/pdf/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -67,6 +68,13 @@ export class WSServer {
     public redis: EnhancedRedisPubSub,
     public prisma: PrismaService,
     public pdfService: PdfService,
+    /**
+     * Local tool bridge correlation (slice 3) — injected from the
+     * composition root like every other service; owned here because
+     * pending calls are keyed BY socket, and this class is where sockets
+     * live and die (close → dropSocket).
+     */
+    public localToolBroker: LocalToolBroker,
     logger: LoggerService
   ) {
     this.logger = logger
@@ -358,9 +366,24 @@ export class WSServer {
         obj,
         `ws close event with code ${s} — in-flight server work continues`
       );
+      // synthesize CLIENT_DISCONNECTED for any tool call parked on this
+      // socket — a vanished CLI must never wedge a provider loop
+      this.localToolBroker.dropSocket(ws);
       this.userMap.delete(ws);
-      this.userDataMap.delete(userId);
-      this.logger.info(`User ${userId} disconnected`);
+      // userDataMap is keyed per-USER while sockets are per-CLIENT — with
+      // web + CLI connected as the same user, the first close used to evict
+      // the survivor's UserData (falling back to hardcoded defaults
+      // mid-conversation). Evict only when the last socket for this user
+      // is gone; userMap already holds the truth.
+      const stillConnected = Array.from(this.userMap.values()).includes(
+        userId
+      );
+      if (!stillConnected) {
+        this.userDataMap.delete(userId);
+      }
+      this.logger.info(
+        `User ${userId} disconnected${stillConnected ? " (other sockets remain, UserData retained)" : ""}`
+      );
     });
 
     if (this.resolver?.handleConnectionEstablished) {
@@ -556,6 +579,15 @@ export class WSServer {
     }
     await this.redis.quit();
     this.wss.close();
+    // the wss wraps this.httpServer — closing the wss alone never releases
+    // the listen handle, so the port lingered after every drain. Established
+    // sockets (including upgraded ws) would hold close() open past the
+    // Fargate stopTimeout ceiling; drain already finished above, so destroy
+    // them and let close() resolve.
+    const { promise, resolve } = Promise.withResolvers<void>();
+    this.httpServer.close(() => resolve());
+    this.httpServer.closeAllConnections();
+    await promise;
     this.logger.info("Server shut down");
   }
 }

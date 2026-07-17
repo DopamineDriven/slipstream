@@ -291,7 +291,8 @@ export class ResolverChatService extends ResolverTTSService {
       systemPrompt,
       temperature,
       title,
-      topP
+      topP,
+      localTools: event.localTools
     } satisfies ProviderChatRequestEntity;
     try {
       switch (provider) {

@@ -35,7 +35,8 @@ export class KimiSummarizerService extends KimiWorkupService {
         this.memorySearchFunctionTool(),
         this.memoryGetChunkFunctionTool()
       ],
-      rawArguments => this.parseFileSearchArguments(rawArguments)
+      rawArguments =>
+        this.userStoreVector.parseUserStoreArgs(rawArguments, "file_search")
     );
   }
 

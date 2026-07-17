@@ -6,6 +6,7 @@ import type {
   RoundRecord,
   ToolUseAccumulator
 } from "@/anthropic/types.ts";
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -16,6 +17,7 @@ import { AnthropicVectorStoreWorkup } from "@/anthropic/vector-store.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { AnthropicModelIdUnion, EventTypeMap } from "@slipstream/types";
+import { isLocalToolName } from "@slipstream/types";
 
 interface AnthropicActiveMessageBlock {
   blockIndex: number;
@@ -52,6 +54,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
     memoryService: ConversationMemoryVectorService,
     toolCatalog: ToolCatalogService,
     private redis: EnhancedRedisPubSub,
+    private localToolBroker: LocalToolBroker,
     apiKey: string
   ) {
     super(logger, prisma, userStoreVector, memoryService, toolCatalog, apiKey);
@@ -186,7 +189,8 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
     temperature,
     title,
     topP,
-    user_location
+    user_location,
+    localTools
   }: ProviderAnthropicChatRequestEntity) {
     // it's conditional but it's actually always defined
     // incomning user msg request
@@ -297,6 +301,40 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       topP,
       user_location
     });
+
+    // Local read-only tool bridge (slice 4): capability advertised by the
+    // CLI on this exact turn — absent means zero local definitions attached.
+    // turnId mints once per ATTEMPT; the controller is the future
+    // server-side cancellation hook (calls are awaited sequentially, so
+    // nothing can be pending when this handler throws — the per-call
+    // wall-clock budget is the operative bound).
+    const localToolTurn =
+      localTools?.protocolVersion === 1
+        ? {
+            turnId: await this.localToolBroker.generateTurnId(),
+            advertised: new Set<string>(localTools.names),
+            controller: new AbortController()
+          }
+        : undefined;
+    if (localToolTurn) {
+      params = {
+        ...params,
+        tools: [
+          ...(params.tools ?? []),
+          ...this.localToolDefinitions(
+            [...localToolTurn.advertised].filter(isLocalToolName)
+          )
+        ]
+      } satisfies typeof params;
+      this.logger.info(
+        {
+          turnId: localToolTurn.turnId,
+          advertised: [...localToolTurn.advertised],
+          conversationId
+        },
+        "local tool bridge armed for turn"
+      );
+    }
 
     // PTC state
     const toolAccumulators = new Map<number, ToolUseAccumulator>();
@@ -1054,7 +1092,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
                   : undefined
             } satisfies FileSearchToolInput;
 
-            const json = await this.executeFileSearch(userId, input);
+            const json = await this.userStoreVector.executeFileSearch(userId, input);
             this.logger.info(
               { resultLength: json.length },
               "PTC file_search result"
@@ -1149,6 +1187,71 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               content: `conversation_memory_get_chunk error: ${String(e)}`,
               is_error: true
             });
+          }
+        } else if (isLocalToolName(acc.name)) {
+          // Local read-only bridge (slice 4): relay to the CLI via the
+          // socket-scoped broker and park — the broker ALWAYS resolves
+          // (deadline, disconnect, and cancellation become typed is_error
+          // results), so this await can never wedge the loop.
+          // eslint-disable-next-line
+          if (!localToolTurn || !localToolTurn.advertised.has(acc.name)) {
+            toolResults.push({
+              type: "tool_result",
+              tool_use_id: acc.id,
+              content: `Local tool not available this turn: ${acc.name}`,
+              is_error: true
+            });
+          } else {
+            let input: unknown = {};
+            let inputParseFailed = false;
+            try {
+              input = acc.inputJson ? JSON.parse<unknown>(acc.inputJson) : {};
+            } catch {
+              inputParseFailed = true;
+            }
+            if (inputParseFailed) {
+              toolResults.push({
+                type: "tool_result",
+                tool_use_id: acc.id,
+                content: `Malformed ${acc.name} input JSON`,
+                is_error: true
+              });
+            } else {
+              const localRequest = {
+                type: "local_tool_request",
+                conversationId,
+                turnId: localToolTurn.turnId,
+                round: round + 1,
+                toolCallId: acc.id,
+                name: acc.name,
+                input,
+                timeoutMs: this.localToolBroker.timeoutMsFor(acc.name)
+              } satisfies EventTypeMap["local_tool_request"];
+              const localResult = await this.localToolBroker.request(
+                ws,
+                localRequest,
+                localToolTurn.controller.signal
+              );
+              const r = localResult.result;
+              this.logger.info(
+                {
+                  turnId: localToolTurn.turnId,
+                  toolCallId: acc.id,
+                  name: acc.name,
+                  round: round + 1,
+                  ok: r.ok,
+                  durationMs: r.durationMs,
+                  ...(r.ok ? {} : { errorCode: r.error.code })
+                },
+                "local tool round trip"
+              );
+              toolResults.push({
+                type: "tool_result",
+                tool_use_id: acc.id,
+                content: JSON.stringify(r.ok ? r.value : { error: r.error }),
+                ...(r.ok ? {} : { is_error: true })
+              });
+            }
           }
         } else {
           toolResults.push({

@@ -3,7 +3,7 @@ import { createInterface } from "node:readline/promises";
 import pc from "picocolors";
 import { wsDebug } from "@/chat-ws-client.ts";
 import { CliConvoPicker } from "@/convo-picker.ts";
-import { CliRendererService } from "@/render.ts";
+import { CliLocalToolsService } from "@/local-tools.ts";
 import { CLI_MODELS } from "@/types.ts";
 import type { ChatSessionState } from "@/types.ts";
 import type {
@@ -18,7 +18,11 @@ import type {
  * active conversation/model state. The prompt yields while a response
  * streams (Promise.withResolvers resolved by ai_chat_response).
  */
-export class SlipstreamReplService extends CliRendererService {
+export class SlipstreamReplService extends CliLocalToolsService {
+  constructor(wsUrl?: string) {
+    super(wsUrl);
+  }
+
   private rl = createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -161,6 +165,7 @@ export class SlipstreamReplService extends CliRendererService {
     this.rl.pause();
     this.pickerOpen = true;
     const picker = new CliConvoPicker(
+      this,
       { stdin: process.stdin, stdout: process.stdout },
       snapshot,
       seed
@@ -356,6 +361,9 @@ export class SlipstreamReplService extends CliRendererService {
       // adopts the real id immediately (the easy half of the web's dance)
       if (data.conversationId && this.state.conversationId === "new-chat") {
         this.state.conversationId = data.conversationId;
+        // the local-tool turn gate follows the rekey or every tool request
+        // in a fresh conversation would reject as TURN_MISMATCH
+        this.rekeyLocalToolTurn(data.conversationId);
         // own-session freshness: the rekey hands us id + title — the index
         // stays current without a push-on-create event
         this.convoIndex.set(data.conversationId, {
@@ -449,18 +457,27 @@ export class SlipstreamReplService extends CliRendererService {
   private async sendPrompt(prompt: string) {
     this.beginTurnRender();
     this.turn = Promise.withResolvers<void>();
-    this.send({
-      type: "ai_chat_request",
-      conversationId: this.state.conversationId,
-      prompt,
-      provider: this.state.entry.provider,
-      model: this.state.entry.model,
-      systemPrompt: this.state.systemPrompt,
-      metadata: this.userMetadata,
-      // web parity — BYOK-vs-server key resolution reads these
-      ...this.providerFlags(this.state.entry.provider)
-    });
-    await this.turn.promise;
+    // arm the local-tool gate for exactly this turn's lifetime — dormant
+    // sessions advertise nothing (localTools undefined) and reject any
+    // stray request as TURN_MISMATCH
+    this.beginLocalToolTurn(this.state.conversationId);
+    try {
+      this.send({
+        type: "ai_chat_request",
+        conversationId: this.state.conversationId,
+        prompt,
+        provider: this.state.entry.provider,
+        model: this.state.entry.model,
+        systemPrompt: this.state.systemPrompt,
+        metadata: this.userMetadata,
+        localTools: this.localToolCapabilities,
+        // web parity — BYOK-vs-server key resolution reads these
+        ...this.providerFlags(this.state.entry.provider)
+      });
+      await this.turn.promise;
+    } finally {
+      this.endLocalToolTurn();
+    }
   }
 
   public async start() {
@@ -469,6 +486,13 @@ export class SlipstreamReplService extends CliRendererService {
     // milliseconds post-handshake and must not race the registration
     this.wireEvents();
     this.wireProviderContext();
+    // --workspace opt-in: arm the read-only local tool bridge (handler
+    // registration must also precede connect)
+    const workspaceArg = this.parseWorkspaceArg(process.argv);
+    if (workspaceArg !== undefined) {
+      const root = await this.initializeLocalTools(workspaceArg);
+      this.renderNotice(`local read tools armed · ${root}`);
+    }
     await this.connect();
     // settle an in-flight turn if the socket dies mid-stream (the repl
     // otherwise awaits a response that can never arrive)

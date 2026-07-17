@@ -8,6 +8,7 @@ import type {
   AttScopedImg,
   ChunkBudgetAdjustReason,
   ChunkWithRecord,
+  FileSearchInput,
   HybridChunkHit,
   PartitionedSearchResult,
   UserStoreChunkDraft,
@@ -1453,8 +1454,76 @@ export class UserStoreVectorService extends UserStoreWorkupService {
       filename
     });
   }
+  public async searchStoreHybrid(
+    userId: string,
+    query: string,
+    searchTerms: string,
+    limit = 10,
+    threshold = 0,
+    filename?: string
+  ) {
+    return await this.searchUserStoreChunksHybrid({
+      userId,
+      query,
+      searchTerms,
+      limit,
+      threshold,
+      filename
+    });
+  }
 
-  protected extractFirstJsonObject(raw: string) {
+
+ public async executeFileSearch(userId: string, input: FileSearchInput) {
+    const maxResults = Math.max(1, Math.min(input.max_results ?? 5, 10));
+
+    if (input.search_terms) {
+      const query = "query" in input ? input.query : input.queries[0];
+      const partitioned = await this.searchStoreHybrid(
+        userId,
+        query,
+        input.search_terms,
+        maxResults,
+        0,
+        input.filename
+      );
+
+      return this.formatPartitionedResults(partitioned, query);
+    }
+
+    const results =
+      "query" in input
+        ? await this.searchStore(
+            userId,
+            input.query,
+            maxResults,
+            0,
+            input.filename
+          )
+        : (
+            await Promise.all(
+              input.queries.map(query =>
+                this.searchStore(userId, query, maxResults, 0, input.filename)
+              )
+            )
+          ).flat();
+
+    if (results.length === 0) {
+      return "[]";
+    }
+
+    return JSON.stringify(
+      results.map(result => ({
+        filename: result.filename,
+        score: result.score != null ? Number(result.score.toFixed(4)) : 0,
+        content: result.content,
+        startOffset: result.startOffset,
+        endOffset: result.endOffset,
+        chunkIndex: result.chunkIndex
+      }))
+    );
+  }
+
+  public extractFirstJsonObject(raw: string) {
     let start = -1;
     let depth = 0;
     let inString = false;
@@ -1594,5 +1663,103 @@ export class UserStoreVectorService extends UserStoreWorkupService {
       filename: filenameInput,
       search_terms: searchTermsInput
     } as const;
+  }
+
+  /**
+   * SUMMARIZER LANE — deliberately separate from the chat-lane methods
+   * above (parseUserStoreArgs/parseUserStoreInput/executeFileSearch stay
+   * frozen; summarizer needs evolve here without touching the proven
+   * hotpath). Parsed-record → FileSearchInput normalization: the memory
+   * executor receives already-parsed tool input (anthropic delivers parsed
+   * JSON natively; the gateway arms parse strings before dispatch).
+   */
+  public normalizeSummarizerFileSearchInput(
+    parsed: Record<string, unknown>,
+    toolName = "file_search"
+  ) {
+    if ("query" in parsed && typeof parsed.query === "string") {
+      const normalized = parsed.query.trim();
+      if (normalized.length > 0) {
+        const maxResults =
+          "max_results" in parsed && typeof parsed.max_results === "number"
+            ? parsed.max_results
+            : undefined;
+
+        const filenameInput =
+          "filename" in parsed && typeof parsed.filename === "string"
+            ? parsed.filename.trim() || undefined
+            : undefined;
+
+        const searchTermsInput =
+          "search_terms" in parsed && typeof parsed.search_terms === "string"
+            ? parsed.search_terms.trim() || undefined
+            : undefined;
+
+        return {
+          query: normalized,
+          max_results: maxResults,
+          filename: filenameInput,
+          search_terms: searchTermsInput
+        } as const;
+      }
+    }
+
+    const queryList = Array.of<string>();
+    if ("queries" in parsed && Array.isArray(parsed.queries)) {
+      for (const query of parsed.queries) {
+        if (typeof query !== "string") continue;
+        const normalized = query.trim();
+        if (normalized.length === 0) continue;
+        queryList.push(normalized);
+      }
+    }
+
+    const uniqueQueries = Array.from(new Set(queryList)).slice(0, 5);
+    const firstQuery = uniqueQueries[0];
+    if (!firstQuery) {
+      throw new Error(
+        `${toolName} input missing required "query": ${JSON.stringify(parsed)}`
+      );
+    }
+
+    const maxResults =
+      "max_results" in parsed && typeof parsed.max_results === "number"
+        ? parsed.max_results
+        : undefined;
+
+    const filenameInput =
+      "filename" in parsed && typeof parsed.filename === "string"
+        ? parsed.filename.trim() || undefined
+        : undefined;
+
+    const searchTermsInput =
+      "search_terms" in parsed && typeof parsed.search_terms === "string"
+        ? parsed.search_terms.trim() || undefined
+        : undefined;
+
+    return {
+      queries: [firstQuery, ...uniqueQueries.slice(1)] as const,
+      max_results: maxResults,
+      filename: filenameInput,
+      search_terms: searchTermsInput
+    } as const;
+  }
+
+  /**
+   * summarizer lane — one-shot normalize + search. Delegates to
+   * executeFileSearch (a new CALLER, not a modification): summarizers
+   * inherit the multi-query tolerance and max_results clamps, and a future
+   * summarizer-specific divergence has a named home that never touches the
+   * chat method.
+   */
+  public async executeSummarizerFileSearch(
+    userId: string,
+    parsed: Record<string, unknown>,
+    toolName = "file_search"
+  ) {
+    return await this.executeFileSearch(
+      userId,
+      this.normalizeSummarizerFileSearchInput(parsed, toolName)
+    );
   }
 }
