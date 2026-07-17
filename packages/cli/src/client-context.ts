@@ -13,6 +13,10 @@ import type { UserMetadata } from "@slipstream/types";
  * derives. Zero ws-server changes — parsedCookies() already reads this.
  */
 export class ClientContext extends CliConfigService {
+  constructor(wsUrl?: string) {
+    super(wsUrl);
+  }
+
   /**
    * Real edge-derived context, set by primeEdgeContext() before the
    * handshake. Undefined until then — or on fetch failure — in which case

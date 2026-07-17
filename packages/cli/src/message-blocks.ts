@@ -6,6 +6,10 @@ import type {
 import { CliProviderContextService } from "@/provider-context.ts";
 
 export class MessageBlocksService extends CliProviderContextService {
+  constructor(wsUrl?: string) {
+    super(wsUrl);
+  }
+
   public isReasoningBlock(type: BlockType | null) {
     return type === "THINKING" || type === "ENCRYPTED_THINKING";
   }

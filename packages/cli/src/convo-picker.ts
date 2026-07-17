@@ -18,6 +18,10 @@ import type { ConversationListEntry } from "@slipstream/types";
  * + ANSI repaint.
  */
 export class ConvoPickerService extends MarkdownAnsiService {
+  constructor(wsUrl?: string) {
+    super(wsUrl);
+  }
+
   /** match-quality tiers — lower is better; updatedAt desc breaks ties */
   protected get pickerRanks() {
     return {

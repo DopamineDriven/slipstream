@@ -17,6 +17,10 @@ import { FormatHydratedTailService } from "@/hydrated-history.ts";
  * the per-turn ephemeral buffer, the CliConvoPicker pattern.
  */
 export class MarkdownAnsiService extends FormatHydratedTailService {
+  constructor(wsUrl?: string) {
+    super(wsUrl);
+  }
+
   /** off switch — NO_COLOR convention or explicit --no-markdown flag */
   protected get markdownEnabled() {
     return (

@@ -14,6 +14,10 @@ type CliHandlerMap = {
  * the server validates the session on file.
  */
 export class SlipstreamClientService extends ClientContext {
+  constructor(wsUrl?: string) {
+    super(wsUrl);
+  }
+
   protected wsClient?: ChatWebSocketClient;
   private handlers: CliHandlerMap = {};
 

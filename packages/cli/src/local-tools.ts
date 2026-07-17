@@ -26,6 +26,10 @@ import { LOCAL_TOOL_NAMES } from "@slipstream/types";
  * and the server attaches zero tool definitions to the provider request.
  */
 export class CliLocalToolsService extends CliRendererService {
+  constructor(wsUrl?: string) {
+    super(wsUrl);
+  }
+
   private workspaceTools?: WorkspaceReadTools = undefined;
   /** conversationId of the in-flight turn — rekeyed when "new-chat" resolves */
   private activeLocalToolConversation?: string = undefined;

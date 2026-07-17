@@ -7,6 +7,10 @@ import type {
 import { MessageBlocksService } from "@/message-blocks.ts";
 
 export class FormatHydratedTailService extends MessageBlocksService {
+  constructor(wsUrl?: string) {
+    super(wsUrl);
+  }
+
   public formatHydratedTail(
     pages: HydratedTailPage[],
     options: FormatHydratedTailOptions

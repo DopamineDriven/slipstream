@@ -14,9 +14,17 @@ dotenv.config({ quiet: true });
  * userMetadata) live one layer up in ClientContext.
  */
 export class CliConfigService {
-  public get wsUrl() {
-    return process.env.SLIPSTREAM_WS_URL ?? "ws://localhost:4000";
-  }
+  /**
+   * Injected at the composition root (bin/aic.ts) from the --env flag —
+   * prod/dev addresses are hardcoded there. Precedence: explicit ctor arg
+   * (--env) → SLIPSTREAM_WS_URL → the dev default. Every class in the
+   * chain threads this through its own constructor so the injection point
+   * stays the top-level `new SlipstreamReplService(wsUrl)`.
+   */
+  constructor(
+    protected wsUrl: string = process.env.SLIPSTREAM_WS_URL ??
+      "ws://localhost:4000"
+  ) {}
 
   public get loginUrl() {
     return (

@@ -19,6 +19,10 @@ import type {
  * streams (Promise.withResolvers resolved by ai_chat_response).
  */
 export class SlipstreamReplService extends CliLocalToolsService {
+  constructor(wsUrl?: string) {
+    super(wsUrl);
+  }
+
   private rl = createInterface({
     input: process.stdin,
     output: process.stdout,

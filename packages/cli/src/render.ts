@@ -14,6 +14,10 @@ import type { ChatChunkAndResMsgBlock, EventTypeMap } from "@slipstream/types";
  * AND gemini full-aggregate re-sends alike).
  */
 export class CliRendererService extends ConvoPickerService {
+  constructor(wsUrl?: string) {
+    super(wsUrl);
+  }
+
   protected showThinking = true;
 
   /** ordinal → chars already written for that block (the stream watermark) */
