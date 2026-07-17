@@ -600,7 +600,7 @@ export class ChatWebSocketClient {
     event: T,
     data: EventTypeMap[T]
   ) {
-    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+    if (this.socket?.readyState !== WebSocket.OPEN) {
       dlog(`[WebSocketClient] Volatile ${event} dropped (socket not OPEN)`);
       return false;
     }
