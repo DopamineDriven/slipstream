@@ -1,57 +1,16 @@
 import type {
   AssistantMessage,
   ChatCompletionStreamRequest,
-  GuardrailConfig,
-  Prediction,
-  ResponseFormat,
+  ContentChunk,
   SystemMessage,
-  ToolChoice,
   ToolMessage,
   UserMessage
 } from "@mistralai/mistralai/models/components";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { CTR, MistralModelIdUnion } from "@slipstream/types";
-
-export type ChatCompletionRequest = {
-  model: MistralModelIdUnion;
-  temperature?: number | null | undefined;
-  top_p?: number | undefined;
-  max_tokens?: number | null | undefined;
-  stream: boolean;
-  stop?: string | string[] | undefined;
-  random_seed?: number | null | undefined;
-  metadata?: { [k: string]: unknown } | null | undefined;
-  messages: (
-    CTR<AssistantMessage, "role"> | SystemMessage | ToolMessage | UserMessage
-  )[];
-  response_format?: ResponseFormat | undefined;
-  tools?: ToolTypes;
-  tool_choice?: ToolChoice | string | undefined;
-  presence_penalty?: number | undefined;
-  frequency_penalty?: number | undefined;
-  n?: number | null | undefined;
-  prediction?: Prediction | undefined;
-  parallel_tool_calls?: boolean | undefined;
-  reasoning_effort?: string | null | undefined;
-  prompt_mode?: string | null | undefined;
-  guardrails?: GuardrailConfig[] | null | undefined;
-  safe_prompt?: boolean | undefined;
-};
+import type { CTR, UTR } from "@slipstream/types";
 
 export type MistralMessageReq =
   CTR<AssistantMessage, "role"> | SystemMessage | ToolMessage | UserMessage;
-
-export type MistralReqMessage = (
-  | SystemMessage
-  | ToolMessage
-  | UserMessage
-  | (AssistantMessage & { role: "assistant" })
-)[];
-
-export type MistralMessageContentChunk = Exclude<
-  UserMessage["content"],
-  string | null
->[number];
 
 export type ToolTypes = ChatCompletionStreamRequest["tools"];
 
@@ -88,9 +47,6 @@ export type MistralFunctionToolCall = {
   };
   index: number;
 };
-
-export type MistralBaseMessage =
-  UserMessage | (AssistantMessage & { role: "assistant" });
 
 export type MistralAssistantToolCallMessage = {
   role: "assistant";
@@ -149,19 +105,9 @@ export type MistralToolReferenceChunk = {
   description?: string | null;
 };
 
-export type MistralThinkingChunk = {
-  type?: "thinking";
-  thinking: readonly (
-    MistralReferenceChunk | MistralTextChunk | MistralToolReferenceChunk
-  )[];
-  closed?: boolean;
-};
+export type MistralContentChunk = UTR<ContentChunk, "type">;
 
-export type MistralContentChunk =
-  | MistralTextChunk
-  | MistralThinkingChunk
-  | MistralReferenceChunk
-  | MistralToolReferenceChunk
-  | {
-      type?: string;
-    };
+export interface MistralDeltaContentHandlers {
+  emitTextChunk(text: string): void;
+  emitThinkingChunk(text: string): void;
+}
