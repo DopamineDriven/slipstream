@@ -68,7 +68,12 @@ export class CliLocalToolsService extends CliRendererService {
         : this.detectWorkspaceRoot();
     }
     const eq = argv.find(a => a.startsWith("--workspace="));
-    return eq?.slice("--workspace=".length) || undefined;
+    const value = eq?.slice("--workspace=".length);
+    // empty value (--workspace=$UNSET_VAR) stays dormant — explicit check,
+    // no falsy collapse
+    return typeof value !== "undefined" && value.length > 0
+      ? value
+      : undefined;
   }
 
   protected async initializeLocalTools(workspaceRoot: string) {
