@@ -1092,7 +1092,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
                   : undefined
             } satisfies FileSearchToolInput;
 
-            const json = await this.executeFileSearch(userId, input);
+            const json = await this.userStoreVector.executeFileSearch(userId, input);
             this.logger.info(
               { resultLength: json.length },
               "PTC file_search result"

@@ -931,6 +931,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
     return LOCAL_TOOL_DEFINITIONS.filter(d => advertised.has(d.name)).map(d => {
       const properties: Record<string, Schema> = {};
       for (const [key, prop] of Object.entries(d.inputSchema.properties)) {
+        // eslint-disable-next-line
         properties[key] = this.localToolSchemaProperty(prop);
       }
       return {

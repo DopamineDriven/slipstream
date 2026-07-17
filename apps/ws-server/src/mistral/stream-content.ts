@@ -1,12 +1,8 @@
+import type { MistralDeltaContentHandlers } from "@/mistral/types.ts";
 import type {
   ContentChunk,
   ThinkChunk
 } from "@mistralai/mistralai/models/components";
-
-export interface MistralDeltaContentHandlers {
-  emitTextChunk(text: string): void;
-  emitThinkingChunk(text: string): void;
-}
 
 export class MistralStreamContentService {
   public thinkingChunkText(chunk: ThinkChunk) {

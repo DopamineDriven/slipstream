@@ -1,16 +1,19 @@
-import type { KimiChatCompletionsRes } from "@/kimi/sse.ts";
-import type { KimiFunctionTool, KimiRequestMessage } from "@/kimi/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
+import type {
+  MistralFunctionTool,
+  MistralMessageReq,
+  ToolTypes
+} from "@/mistral/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { Logger as PinoLogger } from "pino";
-import { createKimiSSEParser } from "@/kimi/sse.ts";
+import { MistralStreamContentService } from "@/mistral/stream-content.ts";
+import { Mistral } from "@mistralai/mistralai";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import type { KimiModelIdUnion } from "@slipstream/types";
+import type { MistralModelIdUnion } from "@slipstream/types";
 
-export class KimiWorkupService {
-  protected readonly baseUrl =
-    "https://ai-gateway.vercel.sh/v1/chat/completions";
+export class MistralWorkupService extends MistralStreamContentService {
+  protected defaultClient: Mistral;
   protected logger: PinoLogger;
 
   constructor(
@@ -18,60 +21,76 @@ export class KimiWorkupService {
     protected prisma: PrismaService,
     protected redis: EnhancedRedisPubSub,
     protected userStoreVector: UserStoreVectorService,
-    protected apiKey?: string
+    protected apiKey: string
   ) {
+    super();
     this.logger = logger
       .getPinoInstance()
       .child(
         { pid: process.pid, node_version: process.version },
-        { msgPrefix: "[Kimi] " }
+        { msgPrefix: "[mistral] " }
       );
+    this.defaultClient = new Mistral({
+      apiKey: this.apiKey
+    });
   }
 
-  protected async *stream(
-    model = "kimi-k2.6" satisfies KimiModelIdUnion,
-    messages: readonly KimiRequestMessage[],
+  protected getClient(overrideKey?: string) {
+    if (overrideKey) {
+      return new Mistral({
+        apiKey: overrideKey
+      });
+    }
+
+    return this.defaultClient;
+  }
+
+  protected isMistralModel(model = "mistral-medium-3.5") {
+    return (
+      model === "mistral-small-latest" ||
+      model === "mistral-medium-3" ||
+      model === "mistral-medium-3.5" ||
+      model === "mistral-large-latest"
+    );
+  }
+
+  protected resolveModel(model = "mistral-medium-3.5") {
+    if (this.isMistralModel(model)) {
+      return model;
+    }
+
+    return "mistral-medium-3.5" satisfies MistralModelIdUnion;
+  }
+
+  protected handleReasoning(m: MistralModelIdUnion) {
+    if (m === "mistral-small-latest") return "high";
+    if (m === "mistral-medium-3") return "high";
+    if (m === "mistral-medium-3.5") return "high";
+    else return;
+  }
+
+  protected async stream(
+    model: MistralModelIdUnion,
+    messages: MistralMessageReq[],
     apiKey?: string,
     options?: {
       temperature?: number;
-      top_p?: number;
-      max_completion_tokens?: number;
-      tools?: readonly KimiFunctionTool[];
+      topP?: number;
+      tools?: ToolTypes;
     }
-  ): AsyncGenerator<KimiChatCompletionsRes, void, unknown> {
-    const key = apiKey ?? this.apiKey;
+  ) {
+    const client = this.getClient(apiKey);
 
-    const response = await fetch(this.baseUrl, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: `moonshotai/${model}`,
-        messages,
-        stream: true,
-        tools: options?.tools,
-        providerOptions: {
-          gateway: {
-            zeroDataRetention: true
-          }
-        }
-      })
+    return await client.chat.stream({
+      model,
+      messages,
+      reasoningEffort: this.handleReasoning(model),
+      temperature: options?.temperature ?? 0.7,
+      tools: options?.tools,
+      parallelToolCalls: true,
+      stream: true,
+      safePrompt: false
     });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Kimi API error (${response.status}, ${response.statusText}): ${errorText}`
-      );
-    }
-
-    const parser = createKimiSSEParser(response);
-
-    for await (const event of parser) {
-      yield event.data;
-    }
   }
 
   protected fileSearchFunctionTool() {
@@ -116,7 +135,7 @@ export class KimiWorkupService {
           additionalProperties: false
         }
       }
-    } as const satisfies KimiFunctionTool;
+    } as const satisfies MistralFunctionTool;
   }
 
   protected memorySearchFunctionTool() {
@@ -172,7 +191,7 @@ export class KimiWorkupService {
           additionalProperties: false
         }
       }
-    } as const satisfies KimiFunctionTool;
+    } as const satisfies MistralFunctionTool;
   }
 
   protected memoryGetChunkFunctionTool() {
@@ -212,32 +231,6 @@ export class KimiWorkupService {
           additionalProperties: false
         }
       }
-    } as const satisfies KimiFunctionTool;
-  }
-
-  protected parseFileSearchArguments(rawArguments: string) {
-    const trimmed = rawArguments.trim();
-    if (trimmed.length === 0) {
-      return {} satisfies Record<string, unknown>;
-    }
-
-    try {
-      return JSON.parse<Record<string, unknown>>(trimmed);
-    } catch (error) {
-      const recovered = this.userStoreVector.extractFirstJsonObject(trimmed);
-      if (!recovered) {
-        throw error;
-      }
-
-      this.logger.warn(
-        {
-          rawArgumentsPreview: trimmed.slice(0, 300),
-          recoveredPreview: recovered.slice(0, 300),
-          error: this.prisma.safeErrMsg(error)
-        },
-        "Recovered malformed streamed Kimi file_search arguments"
-      );
-      return JSON.parse<Record<string, unknown>>(recovered);
-    }
+    } as const satisfies MistralFunctionTool;
   }
 }

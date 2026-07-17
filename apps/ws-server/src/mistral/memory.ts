@@ -226,8 +226,11 @@ export class MistralMemoryService extends MistralWorkupService {
     const toolName = toolCall.function.name;
     try {
       if (toolName === "file_search") {
-        const input = this.parseFileSearchInput(toolCall.function.arguments);
-        const output = await this.executeFileSearch(userId, input);
+        const input = this.userStoreVector.parseUserStoreInput(
+          toolCall.function.arguments,
+          toolName
+        );
+        const output = await this.userStoreVector.executeFileSearch(userId, input);
         return {
           role: "tool",
           toolCallId: toolCall.id,

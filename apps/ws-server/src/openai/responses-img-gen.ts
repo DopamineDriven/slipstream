@@ -50,8 +50,8 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     const toolName = toolCall.name;
     try {
       if (toolName === "user_store_search") {
-        const input = this.parseFileSearchInput(toolCall.arguments);
-        const output = await this.executeUserStoreSearch(userId, input);
+      const input = this.userStoreVector.parseUserStoreInput(toolCall.arguments, toolName);
+        const output = await this.userStoreVector.executeFileSearch(userId, input);
         return {
           type: "function_call_output",
           call_id: toolCall.call_id,

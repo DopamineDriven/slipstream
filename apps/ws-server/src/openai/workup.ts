@@ -1,6 +1,5 @@
 import { createReadStream } from "node:fs";
 import type { LoggerService } from "@/logger/index.ts";
-import type { OpenAIFileSearchToolInput } from "@/openai/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
@@ -355,110 +354,6 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     } as const satisfies OpenAI.Responses.FunctionTool;
   }
 
-  protected async searchStore(
-    userId: string,
-    query: string,
-    limit = 5,
-    threshold = 0,
-    filename?: string
-  ) {
-    return await this.userStoreVector.searchUserStoreChunks({
-      userId,
-      query,
-      limit,
-      threshold,
-      filename
-    });
-  }
-
-  protected async searchStoreHybrid(
-    userId: string,
-    query: string,
-    searchTerms: string,
-    limit = 10,
-    threshold = 0,
-    filename?: string
-  ) {
-    return await this.userStoreVector.searchUserStoreChunksHybrid({
-      userId,
-      query,
-      searchTerms,
-      limit,
-      threshold,
-      filename
-    });
-  }
-
-  protected parseFileSearchInput(rawArguments: string) {
-    const parsed = this.parseFileSearchArguments(rawArguments);
-
-    if ("query" in parsed && typeof parsed.query === "string") {
-      const normalized = parsed.query.trim();
-      if (normalized.length > 0) {
-        const maxResults =
-          "max_results" in parsed && typeof parsed.max_results === "number"
-            ? parsed.max_results
-            : undefined;
-
-        const filenameInput =
-          "filename" in parsed && typeof parsed.filename === "string"
-            ? parsed.filename.trim() || undefined
-            : undefined;
-
-        const searchTermsInput =
-          "search_terms" in parsed && typeof parsed.search_terms === "string"
-            ? parsed.search_terms.trim() || undefined
-            : undefined;
-
-        return {
-          query: normalized,
-          max_results: maxResults,
-          filename: filenameInput,
-          search_terms: searchTermsInput
-        } satisfies OpenAIFileSearchToolInput;
-      }
-    }
-
-    const queryList = Array.of<string>();
-    if ("queries" in parsed && Array.isArray(parsed.queries)) {
-      for (const q of parsed.queries) {
-        if (typeof q !== "string") continue;
-        const normalized = q.trim();
-        if (normalized.length === 0) continue;
-        queryList.push(normalized);
-      }
-    }
-    const uniqueQueries = Array.from(new Set(queryList)).slice(0, 5);
-    const firstQuery = uniqueQueries[0];
-    if (!firstQuery) {
-      throw new Error(
-        `user_store_search input missing required "query": ${rawArguments}`
-      );
-    }
-
-    const maxResults =
-      "max_results" in parsed && typeof parsed.max_results === "number"
-        ? parsed.max_results
-        : undefined;
-
-    const filenameInput =
-      "filename" in parsed && typeof parsed.filename === "string"
-        ? parsed.filename.trim() || undefined
-        : undefined;
-
-    const searchTermsInput =
-      "search_terms" in parsed && typeof parsed.search_terms === "string"
-        ? parsed.search_terms.trim() || undefined
-        : undefined;
-
-    return {
-      queries: [firstQuery, ...uniqueQueries.slice(1)] as const,
-      max_results: maxResults,
-      filename: filenameInput,
-      search_terms: searchTermsInput
-    } satisfies OpenAIFileSearchToolInput;
-  }
-
   protected parseFileSearchArguments(rawArguments: string) {
     const trimmed = rawArguments.trim();
     if (trimmed.length === 0) {
@@ -468,7 +363,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     try {
       return JSON.parse<Record<string, unknown>>(trimmed);
     } catch (error) {
-      const recovered = this.extractFirstJsonObject(trimmed);
+      const recovered = this.userStoreVector.extractFirstJsonObject(trimmed);
       if (!recovered) {
         throw error;
       }
@@ -485,104 +380,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     }
   }
 
-  protected extractFirstJsonObject(raw: string) {
-    let start = -1;
-    let depth = 0;
-    let inString = false;
-    let isEscaped = false;
 
-    for (const [index, char] of Array.from(raw).entries()) {
-      if (start === -1) {
-        if (char === "{") {
-          start = index;
-          depth = 1;
-        }
-        continue;
-      }
-
-      if (inString) {
-        if (isEscaped) {
-          isEscaped = false;
-        } else if (char === "\\") {
-          isEscaped = true;
-        } else if (char === '"') {
-          inString = false;
-        }
-        continue;
-      }
-
-      if (char === '"') {
-        inString = true;
-        continue;
-      }
-
-      if (char === "{") {
-        depth += 1;
-        continue;
-      }
-
-      if (char === "}") {
-        depth -= 1;
-        if (depth === 0) {
-          return raw.slice(start, index + 1);
-        }
-      }
-    }
-
-    return undefined;
-  }
-
-  protected async executeUserStoreSearch(
-    userId: string,
-    input: OpenAIFileSearchToolInput
-  ) {
-    const maxResults = Math.max(1, Math.min(input.max_results ?? 5, 10));
-
-    if (input.search_terms) {
-      const query = "query" in input ? input.query : input.queries[0];
-      const partitioned = await this.searchStoreHybrid(
-        userId,
-        query,
-        input.search_terms,
-        maxResults,
-        0,
-        input.filename
-      );
-      return this.userStoreVector.formatPartitionedResults(partitioned, query);
-    }
-
-    const results =
-      "query" in input
-        ? await this.searchStore(
-            userId,
-            input.query,
-            maxResults,
-            0,
-            input.filename
-          )
-        : (
-            await Promise.all(
-              input.queries.map(query =>
-                this.searchStore(userId, query, maxResults, 0, input.filename)
-              )
-            )
-          ).flat();
-
-    if (results.length === 0) {
-      return "[]";
-    }
-
-    return JSON.stringify(
-      results.map(r => ({
-        filename: r.filename,
-        score: r.score != null ? Number(r.score.toFixed(4)) : 0,
-        content: r.content,
-        startOffset: r.startOffset,
-        endOffset: r.endOffset,
-        chunkIndex: r.chunkIndex
-      }))
-    );
-  }
 
   /**
    * Local read-only tool bridge (Sovereign CLI) — canonical definitions

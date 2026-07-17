@@ -124,7 +124,7 @@ export class GeminiChatService extends GeminiWorkupService {
           "Gemini user_store_search query"
         );
 
-        const output = await this.executeUserStoreSearch(userId, input);
+        const output = await this. executeUserStoreSearch(userId, input);
 
         return {
           functionResponse: {
@@ -710,8 +710,7 @@ export class GeminiChatService extends GeminiWorkupService {
         if (
           toolName &&
           isLocalToolName(toolName) &&
-          localToolTurn &&
-          localToolTurn.advertised.has(toolName)
+          localToolTurn?.advertised.has(toolName)
         ) {
           // gemini function-call ids are optional — synthesize a
           // turn-scoped correlation id for the broker when absent; the

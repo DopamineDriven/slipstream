@@ -2,7 +2,6 @@ import type { MessageInputParams } from "@/anthropic/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
-import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ToolCatalogService } from "@/tool-catalog/index.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
@@ -109,51 +108,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
         required: ["query"]
       }
     } satisfies Anthropic.Beta.BetaToolUnion;
-  }
-
-  protected async executeFileSearch(
-    userId: string,
-    input: FileSearchToolInput
-  ) {
-    const limit = Math.min(input.max_results ?? 5, 10);
-
-    if (input.search_terms) {
-      const partitioned = await this.searchStoreHybrid(
-        userId,
-        input.query,
-        input.search_terms,
-        limit,
-        0,
-        input.filename
-      );
-      return this.userStoreVector.formatPartitionedResults(
-        partitioned,
-        input.query
-      );
-    }
-
-    const results = await this.searchStore(
-      userId,
-      input.query,
-      limit,
-      0,
-      input.filename
-    );
-
-    if (results.length === 0) {
-      return "[]";
-    }
-
-    return JSON.stringify(
-      results.map(r => ({
-        filename: r.filename,
-        score: r.score != null ? Number(r.score.toFixed(4)) : 0,
-        content: r.content,
-        startOffset: r.startOffset,
-        endOffset: r.endOffset,
-        chunkIndex: r.chunkIndex
-      }))
-    );
   }
 
   protected conversationMemorySearchTool(): Anthropic.Beta.BetaToolUnion {

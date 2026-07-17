@@ -8,6 +8,7 @@ import type {
   AttScopedImg,
   ChunkBudgetAdjustReason,
   ChunkWithRecord,
+  FileSearchInput,
   HybridChunkHit,
   PartitionedSearchResult,
   UserStoreChunkDraft,
@@ -1420,6 +1421,33 @@ export class UserStoreVectorService extends UserStoreWorkupService {
       tokenCount: totalTokenCount
     };
   }
+  public parseFileSearchArguments(rawArguments: string) {
+    const trimmed = rawArguments.trim();
+
+    if (trimmed.length === 0) {
+      return {} satisfies Record<string, unknown>;
+    }
+
+    try {
+      return JSON.parse<Record<string, unknown>>(trimmed);
+    } catch (error) {
+      const recovered = this.extractFirstJsonObject(trimmed);
+      if (!recovered) {
+        throw error;
+      }
+
+      this.logger.warn(
+        {
+          rawArgumentsPreview: trimmed.slice(0, 300),
+          recoveredPreview: recovered.slice(0, 300),
+          error: this.prisma.safeErrMsg(error)
+        },
+        "Recovered malformed streamed mistral file_search arguments"
+      );
+
+      return JSON.parse<Record<string, unknown>>(recovered);
+    }
+  }
 
   public async syncUserStoreByName(userId: string) {
     await this.syncRegistry(userId);
@@ -1453,8 +1481,76 @@ export class UserStoreVectorService extends UserStoreWorkupService {
       filename
     });
   }
+  public async searchStoreHybrid(
+    userId: string,
+    query: string,
+    searchTerms: string,
+    limit = 10,
+    threshold = 0,
+    filename?: string
+  ) {
+    return await this.searchUserStoreChunksHybrid({
+      userId,
+      query,
+      searchTerms,
+      limit,
+      threshold,
+      filename
+    });
+  }
 
-  protected extractFirstJsonObject(raw: string) {
+
+ public async executeFileSearch(userId: string, input: FileSearchInput) {
+    const maxResults = Math.max(1, Math.min(input.max_results ?? 5, 10));
+
+    if (input.search_terms) {
+      const query = "query" in input ? input.query : input.queries[0];
+      const partitioned = await this.searchStoreHybrid(
+        userId,
+        query,
+        input.search_terms,
+        maxResults,
+        0,
+        input.filename
+      );
+
+      return this.formatPartitionedResults(partitioned, query);
+    }
+
+    const results =
+      "query" in input
+        ? await this.searchStore(
+            userId,
+            input.query,
+            maxResults,
+            0,
+            input.filename
+          )
+        : (
+            await Promise.all(
+              input.queries.map(query =>
+                this.searchStore(userId, query, maxResults, 0, input.filename)
+              )
+            )
+          ).flat();
+
+    if (results.length === 0) {
+      return "[]";
+    }
+
+    return JSON.stringify(
+      results.map(result => ({
+        filename: result.filename,
+        score: result.score != null ? Number(result.score.toFixed(4)) : 0,
+        content: result.content,
+        startOffset: result.startOffset,
+        endOffset: result.endOffset,
+        chunkIndex: result.chunkIndex
+      }))
+    );
+  }
+
+  public extractFirstJsonObject(raw: string) {
     let start = -1;
     let depth = 0;
     let inString = false;

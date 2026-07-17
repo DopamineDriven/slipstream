@@ -86,25 +86,6 @@ export interface MistralFinalizedMessageBlock {
 
 export type MistralForcedLoopStopReason = "MAX_ROUNDS" | null;
 
-export type MistralTextChunk = {
-  type?: "text";
-  text: string;
-};
-
-export type MistralReferenceChunk = {
-  type?: "reference";
-  referenceIds: readonly (number | string)[];
-};
-
-export type MistralToolReferenceChunk = {
-  type?: "tool_reference";
-  tool: string;
-  title: string;
-  url?: string | null;
-  favicon?: string | null;
-  description?: string | null;
-};
-
 export type MistralContentChunk = UTR<ContentChunk, "type">;
 
 export interface MistralDeltaContentHandlers {
