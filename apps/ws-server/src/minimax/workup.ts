@@ -240,30 +240,4 @@ export class MiniMaxWorkupService {
   }
 
 
-  protected parseFileSearchArguments(rawArguments: string) {
-    const trimmed = rawArguments.trim();
-    if (trimmed.length === 0) {
-      return {} satisfies Record<string, unknown>;
-    }
-
-    try {
-      return JSON.parse<Record<string, unknown>>(trimmed);
-    } catch (error) {
-      const recovered = this.userStoreVector.extractFirstJsonObject(trimmed);
-      if (!recovered) {
-        throw error;
-      }
-
-      this.logger.warn(
-        {
-          rawArgumentsPreview: trimmed.slice(0, 300),
-          recoveredPreview: recovered.slice(0, 300),
-          error: this.prisma.safeErrMsg(error)
-        },
-        "Recovered malformed streamed MiniMax file_search arguments"
-      );
-      return JSON.parse<Record<string, unknown>>(recovered);
-    }
-  }
-
 }

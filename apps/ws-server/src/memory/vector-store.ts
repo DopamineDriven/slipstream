@@ -1252,55 +1252,16 @@ The System prompt given to all models in the source material being summarized is
     if (name !== "file_search") {
       throw new Error(`summarizer requested unknown tool: ${name}`);
     }
-    if (!this.isToolInputRecord(input) || typeof input.query !== "string") {
-      throw new Error(
-        `file_search input missing "query": ${JSON.stringify(input)}`
-      );
+    if (!this.isToolInputRecord(input)) {
+      throw new Error(`file_search input malformed: ${JSON.stringify(input)}`);
     }
-    const parsed = {
-      query: input.query,
-      max_results:
-        typeof input.max_results === "number" ? input.max_results : undefined,
-      filename:
-        typeof input.filename === "string"
-          ? input.filename.trim() || undefined
-          : undefined,
-      search_terms:
-        typeof input.search_terms === "string"
-          ? input.search_terms.trim() || undefined
-          : undefined
-    } satisfies FileSearchToolInput;
-    const limit = Math.min(parsed.max_results ?? 5, 10);
-
-    if (parsed.search_terms) {
-      const partitioned = await this.userStore.searchUserStoreChunksHybrid({
-        userId,
-        query: parsed.query,
-        searchTerms: parsed.search_terms,
-        limit,
-        threshold: 0,
-        filename: parsed.filename
-      });
-      return this.userStore.formatPartitionedResults(partitioned, parsed.query);
-    }
-
-    const results = await this.userStore.searchUserStoreChunks({
+    // summarizer lane on the store service — normalize + search with
+    // chat-path comprehensiveness (multi-query tolerance, both clamps)
+    // while the chat-lane methods themselves stay untouched
+    return await this.userStore.executeSummarizerFileSearch(
       userId,
-      query: parsed.query,
-      limit,
-      threshold: 0,
-      filename: parsed.filename
-    });
-    if (results.length === 0) return "[]";
-    return JSON.stringify(
-      results.map(r => ({
-        filename: r.filename,
-        score: r.score != null ? Number(r.score.toFixed(4)) : 0,
-        content: r.content,
-        startOffset: r.startOffset,
-        endOffset: r.endOffset,
-        chunkIndex: r.chunkIndex
-      }))
+      input,
+      name
     );
   }
 

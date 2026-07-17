@@ -156,7 +156,12 @@ export class OpenAISummarizerService extends OpenAIServiceWorkup {
       for (const call of functionCalls) {
         const name = this.canonicalToolName(call.name);
         try {
-          const parsed = this.parseFileSearchArguments(call.arguments);
+          // wire name (user_store_search) rides into the recovery log —
+          // canonicalToolName already mapped it for the executor above
+          const parsed = this.userStoreVector.parseUserStoreArgs(
+            call.arguments,
+            call.name
+          );
           const output = await executeToolCall(name, parsed);
           toolUse.push({
             round,
