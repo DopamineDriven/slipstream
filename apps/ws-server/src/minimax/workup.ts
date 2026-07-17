@@ -38,7 +38,7 @@ export class MiniMaxWorkupService {
         maxResults: 15
       },
       // backstop only, not a working budget — memory tools dual-wield across rounds
-      maxToolRounds: 100
+      maxToolRounds: 10_000_000
     } as const satisfies {
       fileSearch: {
         defaultResults: number;

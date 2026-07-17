@@ -687,7 +687,7 @@ export class v0Service {
     );
 
     // backstop only, not a working budget — memory tools dual-wield across rounds
-    const MAX_TOOL_ROUNDS = 100;
+    const MAX_TOOL_ROUNDS = 10_000_000;
     let forcedLoopStopReason: V0ForcedLoopStopReason = null;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {

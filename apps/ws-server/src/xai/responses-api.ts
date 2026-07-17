@@ -356,7 +356,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
       });
 
       // backstop only, not a working budget — memory tools dual-wield across rounds
-      const MAX_TOOL_ROUNDS = 100;
+      const MAX_TOOL_ROUNDS = 10_000_000;
       let roundInput = Array.of<ResponsesComprehensive>(
         ...initialRequest.input
       );
@@ -846,8 +846,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
           const toolName = call.name;
           if (
             isLocalToolName(toolName) &&
-            localToolTurn &&
-            localToolTurn.advertised.has(toolName)
+            localToolTurn?.advertised.has(toolName)
           ) {
             let input: unknown = {};
             let inputParseFailed = false;
