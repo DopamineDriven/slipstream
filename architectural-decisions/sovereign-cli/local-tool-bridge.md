@@ -2,9 +2,9 @@
 
 Date: 2026-07-17
 
-Status: implemented and live-verified across five providers (anthropic
+Status: implemented and live-verified across six providers (anthropic
 `7ab7c10`, openai `033d86b`, gemini `3c68f1a`, xai `7cd3a78`, mistral
-`44a47ac`); meta/llama deferred pending its rewrite
+`44a47ac`, kimi 2026-07-18); meta/llama deferred pending its rewrite
 
 ## Summary
 
@@ -81,6 +81,7 @@ flowchart TD
 | gemini    | `Type`-enum Schema walk; `minLength`/`maxLength` → int64 strings; `additionalProperties` dropped | round loop in chat.ts; synthesizes a correlation id when `functionCall.id` is absent |
 | xai       | `LocalToolFunctionTool` — canonical `inputSchema` IS the payload               | round loop; rides the `canUseFunctionTools` gate (multi-agent gets none) |
 | mistral   | completions dialect, near-identity                                             | materialized-tool-call loop; string-arguments parse guard |
+| kimi      | gateway completions dialect, near-identity (`KimiLocalToolFunctionTool`)       | materialized-tool-call loop; broker precedes the optional apiKey in the ctor |
 
 Each mapper lives beside that provider's existing native tool definitions.
 There is no general JSON-Schema transpiler — the canonical intersection

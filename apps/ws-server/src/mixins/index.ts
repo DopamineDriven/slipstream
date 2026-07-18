@@ -683,6 +683,7 @@ export function KimiMixin<
               deps.redis,
               deps.userStore,
               deps.memory,
+              deps.localTool,
               this.kimiApiKey ?? ""
             );
         }
