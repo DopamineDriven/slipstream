@@ -1,4 +1,22 @@
 import type { $Enums } from "@slipstream/db/node/generated/client";
+import type {
+  CanonicalToolDefinition,
+  LocalToolName
+} from "@slipstream/types";
+
+/**
+ * Local read-only tool bridge (Sovereign CLI) — alibaba rides the gateway's
+ * OpenAI-compatible completions dialect, so the canonical inputSchema IS
+ * the wire payload (near-identity, like the kimi/mistral/xai mappers).
+ */
+interface AlibabaLocalToolFunctionTool<T = string> {
+  type: "function";
+  function: {
+    name: LocalToolName | (T & {});
+    description: string;
+    parameters: CanonicalToolDefinition["inputSchema"];
+  };
+}
 
 interface AlibabaFunctionTool {
   type: "function";
@@ -124,6 +142,7 @@ export type {
   AlibabaFinalizedMessageBlock,
   AlibabaForcedLoopStopReason,
   AlibabaFunctionTool,
+  AlibabaLocalToolFunctionTool,
   AlibabaFunctionToolCall,
   AlibabaImageContentPart,
   AlibabaRequestMessage,

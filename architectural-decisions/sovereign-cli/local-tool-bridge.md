@@ -2,9 +2,10 @@
 
 Date: 2026-07-17
 
-Status: implemented and live-verified across six providers (anthropic
+Status: implemented and live-verified across ten providers (anthropic
 `7ab7c10`, openai `033d86b`, gemini `3c68f1a`, xai `7cd3a78`, mistral
-`44a47ac`, kimi 2026-07-18); meta/llama deferred pending its rewrite
+`44a47ac`, kimi + deepseek + zai + minimax + alibaba 2026-07-18);
+meta/llama deferred pending its rewrite
 
 ## Summary
 
@@ -82,6 +83,7 @@ flowchart TD
 | xai       | `LocalToolFunctionTool` — canonical `inputSchema` IS the payload               | round loop; rides the `canUseFunctionTools` gate (multi-agent gets none) |
 | mistral   | completions dialect, near-identity                                             | materialized-tool-call loop; string-arguments parse guard |
 | kimi      | gateway completions dialect, near-identity (`KimiLocalToolFunctionTool`)       | materialized-tool-call loop; broker precedes the optional apiKey in the ctor |
+| deepseek / zai / minimax / alibaba | gateway completions dialect, near-identity (per-provider `*LocalToolFunctionTool`) | kimi's exact stamp — materialized-tool-call loop, broker before optional apiKey |
 
 Each mapper lives beside that provider's existing native tool definitions.
 There is no general JSON-Schema transpiler — the canonical intersection
@@ -114,6 +116,13 @@ makes every mapping total and mechanical.
   request is rejected as `TURN_MISMATCH`. The new-chat→real-id rekey is
   followed by the CLI's turn gate, or every request in a fresh
   conversation would mismatch.
+- **Pre-rekey adoption.** A model may call tools before the first
+  `ai_chat_chunk` lands (glm-5.1 does — straight to tool calls, zero
+  preceding chunks), so a turn still keyed to `"new-chat"` adopts the
+  real conversationId from its first request. Same trust model as the
+  chunk-driven rekey: one armed turn per socket, server-minted id.
+  Without it the gate TURN_MISMATCH-looped an entire turn (observed
+  live: glm-5.1 retried the mismatch 290+ rounds before the fix).
 - **`allowed_callers: ["direct"]` on anthropic is a security boundary, not
   syntax** — local filesystem reads are model-direct only for the alpha; a
   PTC loop programmatically firing filesystem reads is a capability

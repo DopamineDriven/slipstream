@@ -333,6 +333,7 @@ async function exe() {
       redisInstance,
       userStore,
       memory,
+      localTool,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -344,6 +345,7 @@ async function exe() {
       redisInstance,
       userStore,
       memory,
+      localTool,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -355,6 +357,7 @@ async function exe() {
       redisInstance,
       userStore,
       memory,
+      localTool,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -366,6 +369,7 @@ async function exe() {
       redisInstance,
       userStore,
       memory,
+      localTool,
       cfg.AI_GATEWAY_API_KEY
     );
 

@@ -2,11 +2,16 @@ import type { LoggerService } from "@/logger/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ZaiChatCompletionsRes } from "@/zai/sse.ts";
-import type { ZaiFunctionTool, ZaiRequestMessage } from "@/zai/types.ts";
+import type {
+  ZaiFunctionTool,
+  ZaiLocalToolFunctionTool,
+  ZaiRequestMessage
+} from "@/zai/types.ts";
 import type { Logger as PinoLogger } from "pino";
 import { createZaiSSEParser } from "@/zai/sse.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import type { ZaiModelIdUnion } from "@slipstream/types";
+import type { LocalToolName, ZaiModelIdUnion } from "@slipstream/types";
+import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
 export class ZaiWorkupService {
   protected readonly baseUrl =
@@ -36,7 +41,7 @@ export class ZaiWorkupService {
       temperature?: number;
       top_p?: number;
       max_completion_tokens?: number;
-      tools?: readonly ZaiFunctionTool[];
+      tools?: readonly (ZaiFunctionTool | ZaiLocalToolFunctionTool)[];
     }
   ): AsyncGenerator<ZaiChatCompletionsRes, void, unknown> {
     const key = apiKey ?? this.apiKey;
@@ -73,6 +78,27 @@ export class ZaiWorkupService {
       yield event.data;
     }
   }
+  /**
+   * Local read-only tool bridge (Sovereign CLI) — canonical definitions
+   * mapped into the gateway's OpenAI-compatible completions dialect. Plain
+   * JSON Schema, so this is a near-identity map (parameters ===
+   * inputSchema). Empty when the CLI advertises nothing.
+   */
+  protected localToolFunctionTools(names: readonly LocalToolName[]) {
+    const advertised = new Set<string>(names);
+    return LOCAL_TOOL_DEFINITIONS.filter(d => advertised.has(d.name)).map(
+      d =>
+        ({
+          type: "function",
+          function: {
+            name: d.name,
+            description: d.description,
+            parameters: d.inputSchema
+          }
+        }) satisfies ZaiLocalToolFunctionTool
+    );
+  }
+
   protected fileSearchFunctionTool() {
     return {
       type: "function",
