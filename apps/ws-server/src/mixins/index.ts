@@ -413,7 +413,8 @@ export function CohereMixin<
               deps.redis,
               deps.userStore,
               this.coApiKey ?? "",
-              deps.memory
+              deps.memory,
+              deps.localTool
             );
         }
       }

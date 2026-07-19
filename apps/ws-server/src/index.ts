@@ -310,7 +310,8 @@ async function exe() {
       redisInstance,
       userStore,
       cfg.COHERE_API_KEY,
-      memory
+      memory,
+      localTool
     );
 
     const { KimiService } = await import("@/kimi/index.ts");
