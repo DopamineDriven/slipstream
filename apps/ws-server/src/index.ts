@@ -382,7 +382,8 @@ async function exe() {
       s3,
       memory,
       redisInstance,
-      cfg.SAKANA_API_KEY
+      cfg.SAKANA_API_KEY,
+      localTool
     );
 
     const { ProviderService } = await import("@/providers/index.ts");

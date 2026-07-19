@@ -2,10 +2,10 @@
 
 Date: 2026-07-17
 
-Status: implemented and live-verified across ten providers (anthropic
+Status: implemented and live-verified across eleven providers (anthropic
 `7ab7c10`, openai `033d86b`, gemini `3c68f1a`, xai `7cd3a78`, mistral
-`44a47ac`, kimi + deepseek + zai + minimax + alibaba 2026-07-18);
-meta/llama deferred pending its rewrite
+`44a47ac`, kimi + deepseek + zai + minimax + alibaba + sakana
+2026-07-18); meta/llama deferred pending its rewrite
 
 ## Summary
 
@@ -84,6 +84,7 @@ flowchart TD
 | mistral   | completions dialect, near-identity                                             | materialized-tool-call loop; string-arguments parse guard |
 | kimi      | gateway completions dialect, near-identity (`KimiLocalToolFunctionTool`)       | materialized-tool-call loop; broker precedes the optional apiKey in the ctor |
 | deepseek / zai / minimax / alibaba | gateway completions dialect, near-identity (per-provider `*LocalToolFunctionTool`) | kimi's exact stamp — materialized-tool-call loop, broker before optional apiKey |
+| sakana    | OpenAI Responses dialect — the openai mapper verbatim (`strict: false`, `"required" in` narrowing) | function-call loop in chat.ts; fugu calls tools before its first chunk (pre-rekey adoption exercised) |
 
 Each mapper lives beside that provider's existing native tool definitions.
 There is no general JSON-Schema transpiler — the canonical intersection

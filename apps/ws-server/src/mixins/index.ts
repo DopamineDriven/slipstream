@@ -481,6 +481,7 @@ export function DeepSeekMixin<
               deps.redis,
               deps.userStore,
               deps.memory,
+              deps.localTool,
               this.dsApiKey ?? ""
             );
         }
@@ -547,6 +548,7 @@ export function ZaiMixin<
               deps.redis,
               deps.userStore,
               deps.memory,
+              deps.localTool,
               this.zApiKey ?? ""
             );
         }
@@ -616,7 +618,8 @@ export function SakanaMixin<
               deps.s3,
               deps.memory,
               deps.redis,
-              this.fuguApiKey ?? ""
+              this.fuguApiKey ?? "",
+              deps.localTool
             );
         }
       }
@@ -752,6 +755,7 @@ export function AlibabaMixin<
               deps.redis,
               deps.userStore,
               deps.memory,
+              deps.localTool,
               this.qwenApiKey ?? ""
             );
         }
@@ -819,6 +823,7 @@ export function MiniMaxMixin<
               deps.redis,
               deps.userStore,
               deps.memory,
+              deps.localTool,
               this.mApiKey ?? ""
             );
         }

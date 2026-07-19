@@ -1,3 +1,4 @@
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -10,6 +11,7 @@ import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap, SakanaModelIdUnion } from "@slipstream/types";
+import { isLocalToolName } from "@slipstream/types";
 
 export interface SakanaProviderChatRequestEntity extends ProviderChatRequestEntity {
   model: SakanaModelIdUnion;
@@ -37,7 +39,10 @@ export class SakanaChatService extends SakanaWorkupService {
     s3: S3Storage,
     memoryService: ConversationMemoryVectorService,
     protected redis: EnhancedRedisPubSub,
-    apiKey: string
+    apiKey: string,
+    // local tool bridge ownership STARTS here — the workup/store ancestors
+    // never see it, mirroring the openai responses-chat pattern
+    protected localToolBroker: LocalToolBroker
   ) {
     super(logger, prisma, userStoreVector, apiKey, s3, memoryService);
   }
@@ -59,9 +64,37 @@ export class SakanaChatService extends SakanaWorkupService {
     temperature,
     title,
     topP,
-    user_location
+    user_location,
+    localTools
   }: SakanaProviderChatRequestEntity) {
     const provider = "sakana" as const;
+
+    // Local read-only tool bridge — capability advertised by the CLI on
+    // this exact turn; absent means zero local definitions attached.
+    // turnId mints once per ATTEMPT; the controller is the future
+    // cancellation hook (calls await sequentially, so nothing is pending
+    // when this throws).
+    const localToolTurn =
+      localTools?.protocolVersion === 1
+        ? {
+            turnId: await this.localToolBroker.generateTurnId(),
+            advertised: new Set<string>(localTools.names),
+            controller: new AbortController()
+          }
+        : undefined;
+    const localToolNames = localToolTurn
+      ? [...localToolTurn.advertised].filter(isLocalToolName)
+      : [];
+    if (localToolTurn) {
+      this.logger.info(
+        {
+          turnId: localToolTurn.turnId,
+          advertised: [...localToolTurn.advertised],
+          conversationId
+        },
+        "local tool bridge armed for sakana turn"
+      );
+    }
 
     let sakanaThinkingDuration = 0,
       sakanaThinkingAgg = "",
@@ -155,7 +188,7 @@ export class SakanaChatService extends SakanaWorkupService {
     const formatted = await this.formatSakanaInput(msgs);
     const instructions = this.prisma.formatSysNote(systemPrompt);
     const loc = this.normalizeLocation(user_location);
-    const tools = this.sakanaTools(hasUserStoreDocs, loc);
+    const tools = this.sakanaTools(hasUserStoreDocs, loc, localToolNames);
     // backstop only, not a working budget — memory tools dual-wield across rounds
     const MAX_TOOL_ROUNDS = 10_000_000;
     let roundInput = Array.of<OpenAI.Responses.ResponseInputItem>(...formatted);
@@ -401,6 +434,63 @@ export class SakanaChatService extends SakanaWorkupService {
       const toolOutputs =
         Array.of<OpenAI.Responses.ResponseInputItem.FunctionCallOutput>();
       for (const call of functionCalls) {
+        // Local read-only bridge: relay to the CLI via the socket-scoped
+        // broker (which ALWAYS resolves — deadline/disconnect/cancel become
+        // typed is_error results, so the await can never wedge the loop);
+        // every other tool takes the existing server-side path untouched.
+        // const-local (not property) so the narrowing survives the async IIFE
+        const toolName = call.name;
+        if (
+          isLocalToolName(toolName) &&
+          localToolTurn &&
+          localToolTurn.advertised.has(toolName)
+        ) {
+          let input: unknown = {};
+          let inputParseFailed = false;
+          try {
+            input = call.arguments ? JSON.parse<unknown>(call.arguments) : {};
+          } catch {
+            inputParseFailed = true;
+          }
+          const output = inputParseFailed
+            ? `Malformed ${call.name} input JSON`
+            : await (async () => {
+                const localResult = await this.localToolBroker.request(
+                  ws,
+                  {
+                    type: "local_tool_request",
+                    conversationId,
+                    turnId: localToolTurn.turnId,
+                    round: round + 1,
+                    toolCallId: call.call_id,
+                    name: toolName,
+                    input,
+                    timeoutMs: this.localToolBroker.timeoutMsFor(toolName)
+                  },
+                  localToolTurn.controller.signal
+                );
+                const r = localResult.result;
+                this.logger.info(
+                  {
+                    turnId: localToolTurn.turnId,
+                    toolCallId: call.call_id,
+                    name: call.name,
+                    round: round + 1,
+                    ok: r.ok,
+                    durationMs: r.durationMs,
+                    ...(r.ok ? {} : { errorCode: r.error.code })
+                  },
+                  "local tool round trip (sakana)"
+                );
+                return JSON.stringify(r.ok ? r.value : { error: r.error });
+              })();
+          toolOutputs.push({
+            type: "function_call_output",
+            call_id: call.call_id,
+            output
+          } satisfies OpenAI.Responses.ResponseInputItem.FunctionCallOutput);
+          continue;
+        }
         const output = await this.executeFunctionToolCall(
           userId,
           conversationId,

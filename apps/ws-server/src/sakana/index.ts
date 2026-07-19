@@ -1,3 +1,4 @@
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -21,9 +22,19 @@ export class SakanaService extends SakanaChatService {
     s3: S3Storage,
     memoryService: ConversationMemoryVectorService,
     redis: EnhancedRedisPubSub,
-    apiKey: string
+    apiKey: string,
+    localToolBroker: LocalToolBroker
   ) {
-    super(logger, prisma, userStoreVector, s3, memoryService, redis, apiKey);
+    super(
+      logger,
+      prisma,
+      userStoreVector,
+      s3,
+      memoryService,
+      redis,
+      apiKey,
+      localToolBroker
+    );
   }
 
   public async routeSakana({ model, ...rest }: SakanaRouteRequestEntity) {

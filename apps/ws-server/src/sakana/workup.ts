@@ -6,7 +6,12 @@ import type { OpenAI } from "openai";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import { SakanaStoreService } from "@/sakana/store.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type { AttachmentSingleton, MessageSingleton } from "@slipstream/types";
+import type {
+  AttachmentSingleton,
+  LocalToolName,
+  MessageSingleton
+} from "@slipstream/types";
+import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
 export interface SakanaUserLocation {
   readonly type: "approximate";
@@ -326,9 +331,44 @@ export class SakanaWorkupService extends SakanaStoreService {
     return input satisfies ResponseInput;
   }
 
+  /**
+   * Local read-only tool bridge (Sovereign CLI) — canonical definitions
+   * mapped into the OpenAI Responses function-tool dialect fugu rides
+   * (near-identity: parameters === inputSchema, strict:false to allow the
+   * optional fields). The `"required" in d.inputSchema` narrowing is
+   * mandatory — list_directory's as-const literal genuinely lacks the key.
+   * Empty when the CLI advertises nothing.
+   */
+  protected localToolFunctionTools(names: readonly LocalToolName[]) {
+    const advertised = new Set<string>(names);
+    return LOCAL_TOOL_DEFINITIONS.filter(d => advertised.has(d.name)).map(
+      d =>
+        ({
+          type: "function",
+          name: d.name,
+          description: d.description,
+          strict: false,
+          parameters: {
+            type: "object",
+            properties: d.inputSchema.properties,
+            required:
+              "required" in d.inputSchema && d.inputSchema.required
+                ? [...d.inputSchema.required]
+                : [],
+            additionalProperties: false
+          }
+        }) satisfies OpenAI.Responses.FunctionTool
+    );
+  }
+
   protected sakanaTools(
     hasUserStoreDocs: boolean,
-    user_location?: OpenAI.Responses.WebSearchTool.UserLocation
+    user_location?: OpenAI.Responses.WebSearchTool.UserLocation,
+    /**
+     * local read-only bridge tools (repo_search/read_file/list_directory) —
+     * appended last so they compose with whatever the branch selects
+     */
+    localToolNames: readonly LocalToolName[] = []
   ) {
     const tools = Array.of<OpenAI.Responses.Tool>({
       type: "web_search",
@@ -343,7 +383,8 @@ export class SakanaWorkupService extends SakanaStoreService {
     // independently of uploaded documents
     tools.push(
       this.memorySearchFunctionTool(),
-      this.memoryGetChunkFunctionTool()
+      this.memoryGetChunkFunctionTool(),
+      ...this.localToolFunctionTools(localToolNames)
     );
 
     return tools;
