@@ -177,6 +177,19 @@ export class CliLocalToolsService extends CliRendererService {
   protected async handleLocalToolRequest(request: LocalToolRequest) {
     let result: LocalToolResult;
 
+    // pre-rekey adoption: a model may call tools BEFORE the first
+    // ai_chat_chunk lands (glm-5.1 does — straight to tool calls, zero
+    // preceding chunks), so a turn still keyed to "new-chat" adopts the
+    // real conversationId from its first request. Same trust model as the
+    // chunk-driven rekey: one armed turn per socket, server-minted id;
+    // without this the gate TURN_MISMATCHes every request of the turn.
+    if (
+      this.activeLocalToolConversation === "new-chat" &&
+      request.conversationId
+    ) {
+      this.rekeyLocalToolTurn(request.conversationId);
+    }
+
     if (
       this.activeLocalToolConversation === undefined ||
       this.activeLocalToolConversation !== request.conversationId
@@ -184,7 +197,8 @@ export class CliLocalToolsService extends CliRendererService {
       result = this.localToolFailure(
         request,
         "TURN_MISMATCH",
-        "The request does not belong to the CLI's active turn."
+        "The request does not belong to the CLI's active turn. " +
+          "Non-retryable — stop calling local tools for this turn."
       );
       this.emitLocalToolResult(result);
       this.narrateLocalTool(request, result);

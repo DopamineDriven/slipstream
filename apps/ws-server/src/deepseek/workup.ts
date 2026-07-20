@@ -1,6 +1,7 @@
 import type { DeepSeekChatCompletionsRes } from "@/deepseek/sse.ts";
 import type {
   DeepSeekFunctionTool,
+  DeepSeekLocalToolFunctionTool,
   DeepSeekRequestMessage
 } from "@/deepseek/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
@@ -9,7 +10,8 @@ import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { Logger as PinoLogger } from "pino";
 import { createDeepSeekSSEParser } from "@/deepseek/sse.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import type { DeepSeekModelIdUnion } from "@slipstream/types";
+import type { LocalToolName, DeepSeekModelIdUnion } from "@slipstream/types";
+import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
 export class DeepSeekWorkupService {
   protected readonly baseUrl =
@@ -56,7 +58,7 @@ export class DeepSeekWorkupService {
       temperature?: number;
       top_p?: number;
       max_completion_tokens?: number;
-      tools?: readonly DeepSeekFunctionTool[];
+      tools?: readonly (DeepSeekFunctionTool | DeepSeekLocalToolFunctionTool)[];
     }
   ): AsyncGenerator<DeepSeekChatCompletionsRes, void, unknown> {
     const key = apiKey ?? this.apiKey;
@@ -92,6 +94,27 @@ export class DeepSeekWorkupService {
     for await (const event of parser) {
       yield event.data;
     }
+  }
+
+  /**
+   * Local read-only tool bridge (Sovereign CLI) — canonical definitions
+   * mapped into the gateway's OpenAI-compatible completions dialect. Plain
+   * JSON Schema, so this is a near-identity map (parameters ===
+   * inputSchema). Empty when the CLI advertises nothing.
+   */
+  protected localToolFunctionTools(names: readonly LocalToolName[]) {
+    const advertised = new Set<string>(names);
+    return LOCAL_TOOL_DEFINITIONS.filter(d => advertised.has(d.name)).map(
+      d =>
+        ({
+          type: "function",
+          function: {
+            name: d.name,
+            description: d.description,
+            parameters: d.inputSchema
+          }
+        }) satisfies DeepSeekLocalToolFunctionTool
+    );
   }
 
   protected fileSearchFunctionTool() {

@@ -2,6 +2,7 @@ import type { LoggerService } from "@/logger/index.ts";
 import type { MiniMaxChatCompletionsRes } from "@/minimax/sse.ts";
 import type {
   MiniMaxFunctionTool,
+  MiniMaxLocalToolFunctionTool,
   MiniMaxRequestMessage
 } from "@/minimax/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -9,7 +10,8 @@ import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { Logger as PinoLogger } from "pino";
 import { createMiniMaxSSEParser } from "@/minimax/sse.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import type { MiniMaxModelIdUnion } from "@slipstream/types";
+import type { LocalToolName, MiniMaxModelIdUnion } from "@slipstream/types";
+import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
 export class MiniMaxWorkupService {
   protected readonly baseUrl =
@@ -56,7 +58,7 @@ export class MiniMaxWorkupService {
       temperature?: number;
       top_p?: number;
       max_completion_tokens?: number;
-      tools?: readonly MiniMaxFunctionTool[];
+      tools?: readonly (MiniMaxFunctionTool | MiniMaxLocalToolFunctionTool)[];
     }
   ): AsyncGenerator<MiniMaxChatCompletionsRes, void, unknown> {
     const key = apiKey ?? this.apiKey;
@@ -92,6 +94,27 @@ export class MiniMaxWorkupService {
     for await (const event of parser) {
       yield event.data;
     }
+  }
+
+  /**
+   * Local read-only tool bridge (Sovereign CLI) — canonical definitions
+   * mapped into the gateway's OpenAI-compatible completions dialect. Plain
+   * JSON Schema, so this is a near-identity map (parameters ===
+   * inputSchema). Empty when the CLI advertises nothing.
+   */
+  protected localToolFunctionTools(names: readonly LocalToolName[]) {
+    const advertised = new Set<string>(names);
+    return LOCAL_TOOL_DEFINITIONS.filter(d => advertised.has(d.name)).map(
+      d =>
+        ({
+          type: "function",
+          function: {
+            name: d.name,
+            description: d.description,
+            parameters: d.inputSchema
+          }
+        }) satisfies MiniMaxLocalToolFunctionTool
+    );
   }
 
   protected fileSearchFunctionTool() {

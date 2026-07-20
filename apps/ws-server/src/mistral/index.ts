@@ -473,8 +473,7 @@ export class MistralService extends MistralMemoryService {
         const toolName = toolCall.function.name;
         if (
           isLocalToolName(toolName) &&
-          localToolTurn &&
-          localToolTurn.advertised.has(toolName)
+          localToolTurn?.advertised.has(toolName)
         ) {
           let input: unknown = {};
           let inputParseFailed = false;

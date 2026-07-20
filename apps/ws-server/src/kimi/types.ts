@@ -1,4 +1,22 @@
 import type { $Enums } from "@slipstream/db/node/generated/client";
+import type {
+  CanonicalToolDefinition,
+  LocalToolName
+} from "@slipstream/types";
+
+/**
+ * Local read-only tool bridge (Sovereign CLI) — kimi rides the gateway's
+ * OpenAI-compatible completions dialect, so the canonical inputSchema IS
+ * the wire payload (near-identity, like the mistral/xai mappers).
+ */
+interface KimiLocalToolFunctionTool {
+  type: "function";
+  function: {
+    name: LocalToolName;
+    description: string;
+    parameters: CanonicalToolDefinition["inputSchema"];
+  };
+}
 
 interface KimiFunctionTool {
   type: "function";
@@ -126,6 +144,7 @@ export type {
   KimiFunctionTool,
   KimiFunctionToolCall,
   KimiImageContentPart,
+  KimiLocalToolFunctionTool,
   KimiRequestMessage,
   KimiReasoningDelta,
   KimiReasoningDetail,

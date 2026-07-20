@@ -1,6 +1,7 @@
 import type { AlibabaChatCompletionsRes } from "@/alibaba/sse.ts";
 import type {
   AlibabaFunctionTool,
+  AlibabaLocalToolFunctionTool,
   AlibabaRequestMessage
 } from "@/alibaba/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
@@ -9,7 +10,8 @@ import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { Logger as PinoLogger } from "pino";
 import { createAlibabaSSEParser } from "@/alibaba/sse.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import type { AlibabaModelIdUnion } from "@slipstream/types";
+import type { LocalToolName, AlibabaModelIdUnion } from "@slipstream/types";
+import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
 export class AlibabaWorkupService {
   protected readonly baseUrl =
@@ -58,7 +60,7 @@ export class AlibabaWorkupService {
       temperature?: number;
       top_p?: number;
       max_completion_tokens?: number;
-      tools?: readonly AlibabaFunctionTool[];
+      tools?: readonly (AlibabaFunctionTool | AlibabaLocalToolFunctionTool)[];
     }
   ): AsyncGenerator<AlibabaChatCompletionsRes, void, unknown> {
     const key = apiKey ?? this.apiKey;
@@ -94,6 +96,27 @@ export class AlibabaWorkupService {
     for await (const event of parser) {
       yield event.data;
     }
+  }
+
+  /**
+   * Local read-only tool bridge (Sovereign CLI) — canonical definitions
+   * mapped into the gateway's OpenAI-compatible completions dialect. Plain
+   * JSON Schema, so this is a near-identity map (parameters ===
+   * inputSchema). Empty when the CLI advertises nothing.
+   */
+  protected localToolFunctionTools(names: readonly LocalToolName[]) {
+    const advertised = new Set<string>(names);
+    return LOCAL_TOOL_DEFINITIONS.filter(d => advertised.has(d.name)).map(
+      d =>
+        ({
+          type: "function",
+          function: {
+            name: d.name,
+            description: d.description,
+            parameters: d.inputSchema
+          }
+        }) satisfies AlibabaLocalToolFunctionTool
+    );
   }
 
   protected fileSearchFunctionTool() {

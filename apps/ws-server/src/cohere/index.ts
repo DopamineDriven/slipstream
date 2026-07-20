@@ -5,6 +5,7 @@ import type {
   CohereFinalizedMessageBlock,
   CohereForcedLoopStopReason
 } from "@/cohere/types.ts";
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -18,8 +19,10 @@ import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type {
   CohereModelIdUnion,
   EventTypeMap,
+  LocalToolName,
   MessageSingleton
 } from "@slipstream/types";
+import { isLocalToolName, LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
 export class CohereService {
   protected defaultClient: CohereClientV2;
@@ -31,7 +34,10 @@ export class CohereService {
     protected redis: EnhancedRedisPubSub,
     protected userStoreVector: UserStoreVectorService,
     protected apiKey: string,
-    protected memoryService: ConversationMemoryVectorService
+    protected memoryService: ConversationMemoryVectorService,
+    // local tool bridge — trailing dep, single-class service so ownership
+    // has exactly one home
+    protected localToolBroker: LocalToolBroker
   ) {
     this.logger = logger
       .getPinoInstance()
@@ -290,6 +296,27 @@ export class CohereService {
     }
 
     return formatted;
+  }
+
+  /**
+   * Local read-only tool bridge (Sovereign CLI) — canonical definitions
+   * mapped into cohere's v2 function-tool dialect. Plain JSON Schema, so
+   * this is a near-identity map (parameters === inputSchema). Empty when
+   * the CLI advertises nothing.
+   */
+  private localToolFunctionTools(names: readonly LocalToolName[]) {
+    const advertised = new Set<string>(names);
+    return LOCAL_TOOL_DEFINITIONS.filter(d => advertised.has(d.name)).map(
+      d =>
+        ({
+          type: "function",
+          function: {
+            name: d.name,
+            description: d.description,
+            parameters: d.inputSchema
+          }
+        }) satisfies Cohere.ToolV2
+    );
   }
 
   private fileSearchTool() {
@@ -640,10 +667,38 @@ export class CohereService {
     systemPrompt,
     temperature,
     title,
-    topP
+    topP,
+    localTools
   }: ProviderChatRequestEntity) {
     const provider = "cohere" as const;
     const resolvedModel = this.resolveModel(model);
+
+    // Local read-only tool bridge — capability advertised by the CLI on
+    // this exact turn; absent (or a tool-incapable model) means zero local
+    // definitions attached. turnId mints once per ATTEMPT; the controller
+    // is the future cancellation hook (calls await sequentially, so
+    // nothing is pending when this throws).
+    const localToolTurn =
+      localTools?.protocolVersion === 1 && this.isToolCapable(resolvedModel)
+        ? {
+            turnId: await this.localToolBroker.generateTurnId(),
+            advertised: new Set<string>(localTools.names),
+            controller: new AbortController()
+          }
+        : undefined;
+    const localToolNames = localToolTurn
+      ? [...localToolTurn.advertised].filter(isLocalToolName)
+      : [];
+    if (localToolTurn) {
+      this.logger.info(
+        {
+          turnId: localToolTurn.turnId,
+          advertised: [...localToolTurn.advertised],
+          conversationId
+        },
+        "local tool bridge armed for cohere turn"
+      );
+    }
 
     const cohereClient = this.getClient(apiKey ?? undefined);
     const allowThinking = this.isReasoningCapable(resolvedModel);
@@ -895,14 +950,16 @@ export class CohereService {
     };
 
     // memory tools attach whenever the model is tool-capable — conversation
-    // memory exists independently of uploaded documents
+    // memory exists independently of uploaded documents; local bridge
+    // tools append last and ride the same capability gate
     const tools = this.isToolCapable(resolvedModel)
       ? [
           ...(hasUserStoreDocs
             ? [this.fileSearchTool()]
             : Array.of<Cohere.ToolV2>()),
           this.memorySearchTool(),
-          this.memoryGetChunkTool()
+          this.memoryGetChunkTool(),
+          ...this.localToolFunctionTools(localToolNames)
         ]
       : undefined;
     const systemInstruction = this.formatSystemInstruction(
@@ -1021,6 +1078,66 @@ export class CohereService {
       const toolMessages = Array.of<Cohere.ChatMessageV2.Tool>();
 
       for (const toolCall of materializedToolCalls) {
+        // Local read-only bridge: relay to the CLI via the socket-scoped
+        // broker (which ALWAYS resolves — deadline/disconnect/cancel become
+        // typed is_error results, so the await can never wedge the loop);
+        // every other tool takes the existing server-side path untouched.
+        // const-local (not property) so the narrowing survives the async IIFE
+        const toolName = toolCall.function?.name;
+        if (
+          toolName !== undefined &&
+          isLocalToolName(toolName) &&
+          localToolTurn &&
+          localToolTurn.advertised.has(toolName)
+        ) {
+          let input: unknown = {};
+          let inputParseFailed = false;
+          try {
+            input = toolCall.function?.arguments
+              ? JSON.parse<unknown>(toolCall.function.arguments)
+              : {};
+          } catch {
+            inputParseFailed = true;
+          }
+          const content = inputParseFailed
+            ? `Malformed ${toolName} input JSON`
+            : await (async () => {
+                const localResult = await this.localToolBroker.request(
+                  ws,
+                  {
+                    type: "local_tool_request",
+                    conversationId,
+                    turnId: localToolTurn.turnId,
+                    round: round + 1,
+                    toolCallId: toolCall.id,
+                    name: toolName,
+                    input,
+                    timeoutMs: this.localToolBroker.timeoutMsFor(toolName)
+                  },
+                  localToolTurn.controller.signal
+                );
+                const r = localResult.result;
+                this.logger.info(
+                  {
+                    turnId: localToolTurn.turnId,
+                    toolCallId: toolCall.id,
+                    name: toolName,
+                    round: round + 1,
+                    ok: r.ok,
+                    durationMs: r.durationMs,
+                    ...(r.ok ? {} : { errorCode: r.error.code })
+                  },
+                  "local tool round trip (cohere)"
+                );
+                return JSON.stringify(r.ok ? r.value : { error: r.error });
+              })();
+          toolMessages.push({
+            role: "tool",
+            toolCallId: toolCall.id,
+            content
+          } as const satisfies Cohere.ChatMessageV2.Tool);
+          continue;
+        }
         toolMessages.push(
           await this.executeToolCall(userId, conversationId, toolCall)
         );

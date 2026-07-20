@@ -95,12 +95,7 @@ export const displayNameToModelId = {
     "Claude Opus 4.1": "claude-opus-4-1-20250805"
   },
   meta: {
-    "Llama 4 Maverick (17B/128E, Instruct, FP8)":
-      "Llama-4-Maverick-17B-128E-Instruct-FP8",
-    "Llama 4 Scout (17B/16E, Instruct, FP8)":
-      "Llama-4-Scout-17B-16E-Instruct-FP8",
-    "Llama 3.3 (70B, Instruct)": "Llama-3.3-70B-Instruct",
-    "Llama 3.3 (8B, Instruct)": "Llama-3.3-8B-Instruct"
+    "Muse Spark 1.1": "muse-spark-1.1"
   },
   vercel: {
     "v0 medium": "v0-1.5-md",

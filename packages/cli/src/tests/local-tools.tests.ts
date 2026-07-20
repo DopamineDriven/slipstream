@@ -353,18 +353,32 @@ describe("CliLocalToolsService — turn gating and exactly-one-result", () => {
     if (r && !r.ok) assert.equal(r.error.code, "TURN_MISMATCH");
   });
 
-  it("conversation mismatch → TURN_MISMATCH; rekey heals the new-chat case", async () => {
+  it("pre-rekey adoption — a new-chat turn adopts its first request's id; cross-conversation still rejects", async () => {
     const svc = new TestLocalToolsService();
     await svc.arm(WS);
     svc.begin("new-chat");
+    // glm-5.1 case: the model calls a tool BEFORE any chunk lands — the
+    // gate adopts the server-minted id instead of TURN_MISMATCH-looping
     await svc.handle(request({ conversationId: "cm_real" }));
     const first = svc.emitted[0]?.result;
-    assert.equal(first?.ok, false);
-    // the rekey (first chunk carrying the real id) heals the gate
-    svc.rekey("cm_real");
-    await svc.handle(request({ conversationId: "cm_real", toolCallId: "toolu_002" }));
+    assert.equal(first?.ok, true);
+    // the gate is now keyed to cm_real — a cross-conversation request
+    // still rejects
+    await svc.handle(
+      request({ conversationId: "cm_other", toolCallId: "toolu_002" })
+    );
     const second = svc.emitted[1]?.result;
-    assert.equal(second?.ok, true);
+    assert.equal(second?.ok, false);
+    if (second && !second.ok) {
+      assert.equal(second.error.code, "TURN_MISMATCH");
+    }
+    // the chunk-driven rekey remains idempotent with the adopted id
+    svc.rekey("cm_real");
+    await svc.handle(
+      request({ conversationId: "cm_real", toolCallId: "toolu_003" })
+    );
+    const third = svc.emitted[2]?.result;
+    assert.equal(third?.ok, true);
     svc.end();
   });
 

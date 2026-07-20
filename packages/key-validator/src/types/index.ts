@@ -16,7 +16,7 @@ export type FlexiProvider =
   | "cohere"
   | "minimax"
   | "alibaba"
- | "sakana"
+  | "sakana"
   | "OPENAI"
   | "ANTHROPIC"
   | "GEMINI"

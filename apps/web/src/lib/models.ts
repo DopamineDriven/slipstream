@@ -81,7 +81,7 @@ export const providerMetadata = {
     description: "Anthropic's helpful, harmless, and honest AI"
   },
   meta: {
-    name: "Meta Llama",
+    name: "Meta",
     icon: MetaIcon,
     description: "Industry Leading, Open-Source AI",
     color: "#0081FB"
@@ -487,7 +487,7 @@ export const getModel = <
         providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"meta">)
       ) {
         return model;
-      } else return "Llama-3.3-70B-Instruct" as const as NonNullable<K>;
+      } else return "muse-spark-1.1" as const as NonNullable<K>;
     }
     case "vercel": {
       if (

@@ -205,15 +205,17 @@ async function exe() {
       process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY,
       localTool
     );
-    const { LlamaService } = await import("@/meta/index.ts");
+    const { MetaService } = await import("@/meta/index.ts");
 
-    const meta = new LlamaService(
+    const meta = new MetaService(
       logger,
       prisma,
       redisInstance,
       userStore,
       memory,
-      cfg.LLAMA_API_KEY
+      process.env.LLAMA_API_KEY ?? cfg.LLAMA_API_KEY,
+      s3,
+      localTool
     );
 
     const { v0Service } = await import("@/vercel/index.ts");
@@ -310,7 +312,8 @@ async function exe() {
       redisInstance,
       userStore,
       cfg.COHERE_API_KEY,
-      memory
+      memory,
+      localTool
     );
 
     const { KimiService } = await import("@/kimi/index.ts");
@@ -321,6 +324,7 @@ async function exe() {
       redisInstance,
       userStore,
       memory,
+      localTool,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -332,6 +336,7 @@ async function exe() {
       redisInstance,
       userStore,
       memory,
+      localTool,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -343,6 +348,7 @@ async function exe() {
       redisInstance,
       userStore,
       memory,
+      localTool,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -354,6 +360,7 @@ async function exe() {
       redisInstance,
       userStore,
       memory,
+      localTool,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -365,6 +372,7 @@ async function exe() {
       redisInstance,
       userStore,
       memory,
+      localTool,
       cfg.AI_GATEWAY_API_KEY
     );
 
@@ -377,7 +385,8 @@ async function exe() {
       s3,
       memory,
       redisInstance,
-      cfg.SAKANA_API_KEY
+      cfg.SAKANA_API_KEY,
+      localTool
     );
 
     const { ProviderService } = await import("@/providers/index.ts");

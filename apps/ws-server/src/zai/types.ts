@@ -1,4 +1,22 @@
 import type { $Enums } from "@slipstream/db/node/generated/client";
+import type {
+  CanonicalToolDefinition,
+  LocalToolName
+} from "@slipstream/types";
+
+/**
+ * Local read-only tool bridge (Sovereign CLI) — zai rides the gateway's
+ * OpenAI-compatible completions dialect, so the canonical inputSchema IS
+ * the wire payload (near-identity, like the kimi/mistral/xai mappers).
+ */
+interface ZaiLocalToolFunctionTool<T = string> {
+  type: "function";
+  function: {
+    name: LocalToolName | (T & {});
+    description: string;
+    parameters: CanonicalToolDefinition["inputSchema"];
+  };
+}
 
 interface ZaiFunctionTool {
   type: "function";
@@ -123,6 +141,7 @@ export type {
   ZaiFinalizedMessageBlock,
   ZaiForcedLoopStopReason,
   ZaiFunctionTool,
+  ZaiLocalToolFunctionTool,
   ZaiFunctionToolCall,
   ZaiImageContentPart,
   ZaiRequestMessage,

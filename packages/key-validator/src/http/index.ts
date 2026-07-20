@@ -13,7 +13,7 @@ export class KeyValidator {
   private anthropic_url = "https://api.anthropic.com/v1/models";
   private gemini_url =
     "https://generativelanguage.googleapis.com/v1beta/models";
-  private llama_url = "https://api.llama.com/v1/models";
+  private llama_url = "https://api.meta.ai/v1/models";
   private v0_url = "https://ai-gateway.vercel.sh/v1/models";
   private kimi_url = "https://ai-gateway.vercel.sh/v1/models";
   private deepseek_url = "https://ai-gateway.vercel.sh/v1/models";
@@ -274,16 +274,27 @@ export class KeyValidator {
       };
     }
   }
-  private async llama() {
-    const _brokenGet = this.llama_url;
-    const workaround = /^LLM\|(\d{13,19})\|/;
-    const key = this.apiKey;
-    if (workaround.test(key)) {
-      return { isValid: true, message: `valid_api_key__meta__${200}` };
+  private async meta() {
+    // the old public-preview API 500'd on GET /models, so this used to
+    // regex-match the legacy "LLM|<digits>|" key format offline. The
+    // post-sunset api.meta.ai serves /models properly (and the new account
+    // keys are "LLM_..." — the pipe regex rejected every one of them), so
+    // meta validates over the network like every other provider.
+    const res = await this.callRest(this.apiKey, this.llama_url);
+    if (res.ok) {
+      return {
+        isValid: true,
+        message: `valid_api_key__meta__${res.status}`
+      };
+    } else if (res.status === 429) {
+      return {
+        isValid: true,
+        message: `valid_api_key__meta__${res.status}`
+      };
     } else {
       return {
         isValid: false,
-        message: `invalid_api_key__meta__${401}`
+        message: `invalid_api_key__meta__${res.status}`
       };
     }
   }
@@ -395,7 +406,7 @@ export class KeyValidator {
       }
       case "META":
       case "meta": {
-        return await this.llama();
+        return await this.meta();
       }
       case "VERCEL":
       case "vercel": {

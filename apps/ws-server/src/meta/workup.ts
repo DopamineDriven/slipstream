@@ -1,10 +1,15 @@
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
+import type {
+  MetaAttachmentRef,
+  MetaFreshAssetSelection,
+  MetaUserLocation
+} from "@/meta/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { OpenAI } from "openai";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
-import { SakanaStoreService } from "@/sakana/store.ts";
+import { MetaStoreService } from "@/meta/store.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   AttachmentSingleton,
@@ -13,27 +18,7 @@ import type {
 } from "@slipstream/types";
 import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
-export interface SakanaUserLocation {
-  readonly type: "approximate";
-  readonly city?: string;
-  readonly region?: string;
-  readonly country?: string;
-  readonly timezone?: string;
-  readonly tz?: string;
-}
-
-interface SakanaAttachmentRef {
-  readonly attachment: AttachmentSingleton<true>;
-  readonly filename: string;
-  readonly mime: string;
-  readonly url: string;
-}
-
-interface SakanaFreshAssetSelection {
-  readonly inlineAttachmentKeys: ReadonlySet<string>;
-}
-
-export class SakanaWorkupService extends SakanaStoreService {
+export class MetaWorkupService extends MetaStoreService {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
@@ -45,7 +30,7 @@ export class SakanaWorkupService extends SakanaStoreService {
     super(logger, prisma, userStoreVector, apiKey, s3, memoryService);
   }
 
-  protected normalizeLocation(user_location?: SakanaUserLocation) {
+  protected normalizeLocation(user_location?: MetaUserLocation) {
     return (
       user_location
         ? {
@@ -81,7 +66,7 @@ export class SakanaWorkupService extends SakanaStoreService {
     return msg.content;
   }
 
-  private sakanaAttachmentRef(attachment: AttachmentSingleton<true>) {
+  private MetaAttachmentRef(attachment: AttachmentSingleton<true>) {
     const activeCompat = attachment.compatStatus === "ACTIVE";
     const url =
       activeCompat && attachment.compatCdnUrl
@@ -101,16 +86,16 @@ export class SakanaWorkupService extends SakanaStoreService {
       filename: attachment.filename ?? "attachment",
       mime,
       url
-    } satisfies SakanaAttachmentRef;
+    } satisfies MetaAttachmentRef;
   }
 
-  private isSakanaDocument(ref: SakanaAttachmentRef) {
+  private isMetaDocument(ref: MetaAttachmentRef) {
     return (
       ref.attachment.assetType === "DOCUMENT" && ref.mime === "application/pdf"
     );
   }
 
-  private isSakanaImage(ref: SakanaAttachmentRef) {
+  private isMetaImage(ref: MetaAttachmentRef) {
     return (
       ref.attachment.assetType === "IMAGE" &&
       (ref.mime === "image/jpeg" ||
@@ -123,7 +108,7 @@ export class SakanaWorkupService extends SakanaStoreService {
     return filename.replaceAll("[", "\\[").replaceAll("]", "\\]");
   }
 
-  private attachmentMarkdown(ref: SakanaAttachmentRef) {
+  private attachmentMarkdown(ref: MetaAttachmentRef) {
     const label = this.markdownLabel(ref.filename);
     if (ref.attachment.assetType === "IMAGE") {
       return `![${label}](${ref.url})`;
@@ -141,14 +126,14 @@ export class SakanaWorkupService extends SakanaStoreService {
 
   private selectFreshAssets(
     msgs: MessageSingleton<true>[]
-  ): SakanaFreshAssetSelection {
-    const lastSakanaIndex = msgs.findLastIndex(
-      msg => msg.provider === "SAKANA" && msg.senderType === "AI"
+  ): MetaFreshAssetSelection {
+    const lastMetaIndex = msgs.findLastIndex(
+      msg => msg.provider === "META" && msg.senderType === "AI"
     );
     const previouslySeenAttachmentIds = new Set<string>();
 
-    if (lastSakanaIndex !== -1) {
-      for (const msg of msgs.slice(0, lastSakanaIndex + 1)) {
+    if (lastMetaIndex !== -1) {
+      for (const msg of msgs.slice(0, lastMetaIndex + 1)) {
         for (const attachment of msg.attachments) {
           previouslySeenAttachmentIds.add(attachment.id);
         }
@@ -160,11 +145,7 @@ export class SakanaWorkupService extends SakanaStoreService {
     let documentCount = 0;
     let imageCount = 0;
 
-    for (
-      let msgIndex = msgs.length - 1;
-      msgIndex > lastSakanaIndex;
-      msgIndex--
-    ) {
+    for (let msgIndex = msgs.length - 1; msgIndex > lastMetaIndex; msgIndex--) {
       const msg = msgs[msgIndex];
       if (!msg?.senderType || msg.senderType !== "USER") continue;
 
@@ -178,16 +159,16 @@ export class SakanaWorkupService extends SakanaStoreService {
         if (previouslySeenAttachmentIds.has(attachment.id)) continue;
         if (selectedAttachmentIds.has(attachment.id)) continue;
 
-        const ref = this.sakanaAttachmentRef(attachment);
+        const ref = this.MetaAttachmentRef(attachment);
         if (!ref) continue;
 
-        if (this.isSakanaDocument(ref) && documentCount < 1) {
+        if (this.isMetaDocument(ref) && documentCount < 1) {
           inlineAttachmentKeys.add(
             this.attachmentOccurrenceKey(msg, attachment)
           );
           selectedAttachmentIds.add(attachment.id);
           documentCount += 1;
-        } else if (this.isSakanaImage(ref) && imageCount < 3) {
+        } else if (this.isMetaImage(ref) && imageCount < 3) {
           inlineAttachmentKeys.add(
             this.attachmentOccurrenceKey(msg, attachment)
           );
@@ -196,18 +177,18 @@ export class SakanaWorkupService extends SakanaStoreService {
         }
 
         if (documentCount === 1 && imageCount === 3) {
-          return { inlineAttachmentKeys } satisfies SakanaFreshAssetSelection;
+          return { inlineAttachmentKeys } satisfies MetaFreshAssetSelection;
         }
       }
     }
 
-    return { inlineAttachmentKeys } satisfies SakanaFreshAssetSelection;
+    return { inlineAttachmentKeys } satisfies MetaFreshAssetSelection;
   }
 
   private shouldInlineAttachment(
     msg: MessageSingleton<true>,
     attachment: AttachmentSingleton<true>,
-    selection: SakanaFreshAssetSelection
+    selection: MetaFreshAssetSelection
   ) {
     return selection.inlineAttachmentKeys.has(
       this.attachmentOccurrenceKey(msg, attachment)
@@ -223,7 +204,7 @@ export class SakanaWorkupService extends SakanaStoreService {
     textParts.push(`[${provider}/${model}]\n${text}`);
 
     for (const attachment of msg.attachments) {
-      const ref = this.sakanaAttachmentRef(attachment);
+      const ref = this.MetaAttachmentRef(attachment);
       if (!ref) continue;
       textParts.push(this.attachmentMarkdown(ref));
     }
@@ -236,17 +217,17 @@ export class SakanaWorkupService extends SakanaStoreService {
 
   private formatUserMessage(
     msg: MessageSingleton<true>,
-    selection: SakanaFreshAssetSelection
+    selection: MetaFreshAssetSelection
   ) {
     const content = Array.of<OpenAI.Responses.ResponseInputContent>();
     const textParts = Array.of<string>();
 
     for (const attachment of msg.attachments) {
-      const ref = this.sakanaAttachmentRef(attachment);
+      const ref = this.MetaAttachmentRef(attachment);
       if (!ref) continue;
 
       if (this.shouldInlineAttachment(msg, attachment, selection)) {
-        if (this.isSakanaDocument(ref)) {
+        if (this.isMetaDocument(ref)) {
           content.push({
             type: "input_file",
             file_url: ref.url,
@@ -256,7 +237,7 @@ export class SakanaWorkupService extends SakanaStoreService {
           continue;
         }
 
-        if (this.isSakanaImage(ref)) {
+        if (this.isMetaImage(ref)) {
           content.push({
             type: "input_image",
             image_url: ref.url,
@@ -285,7 +266,7 @@ export class SakanaWorkupService extends SakanaStoreService {
     } satisfies OpenAI.Responses.EasyInputMessage;
   }
 
-  protected async formatSakanaInput(msgs: MessageSingleton<true>[]) {
+  protected async formatMetaInput(msgs: MessageSingleton<true>[]) {
     if (msgs.length === 0) {
       return [{ role: "user", content: "" }] as const satisfies ResponseInput;
     }
@@ -349,7 +330,7 @@ export class SakanaWorkupService extends SakanaStoreService {
     );
   }
 
-  protected sakanaTools(
+  protected MetaTools(
     hasUserStoreDocs: boolean,
     user_location?: OpenAI.Responses.WebSearchTool.UserLocation,
     /**
@@ -358,10 +339,14 @@ export class SakanaWorkupService extends SakanaStoreService {
      */
     localToolNames: readonly LocalToolName[] = []
   ) {
+    // tool_search deliberately absent: api.meta.ai 400s it unless at least
+    // one tool is marked deferred ("tools.tool_search requires at least one
+    // deferred tool") — re-add alongside a deferred-tool strategy
     const tools = Array.of<OpenAI.Responses.Tool>({
       type: "web_search",
+      search_context_size: "high",
       user_location
-    } satisfies OpenAI.Responses.WebSearchTool);
+    });
 
     if (hasUserStoreDocs) {
       tools.unshift(this.fileSearchFunctionTool());

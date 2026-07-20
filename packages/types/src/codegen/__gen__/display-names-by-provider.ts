@@ -93,12 +93,7 @@ export const displayNameModelsByProvider = {
     "Claude Haiku 4.5",
     "Claude Opus 4.1"
   ],
-  meta: [
-    "Llama 4 Maverick (17B/128E, Instruct, FP8)",
-    "Llama 4 Scout (17B/16E, Instruct, FP8)",
-    "Llama 3.3 (70B, Instruct)",
-    "Llama 3.3 (8B, Instruct)"
-  ],
+  meta: ["Muse Spark 1.1"],
   vercel: ["v0 medium", "v0 medium (legacy)"],
   mistral: [
     "Mistral Small 4",
