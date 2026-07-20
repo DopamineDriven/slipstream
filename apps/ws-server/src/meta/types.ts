@@ -1,6 +1,7 @@
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { AttachmentSingleton, MetaModelIdUnion } from "@slipstream/types";
+import type { AttachmentSingleton, MetaModelIdUnion, UTR } from "@slipstream/types";
+import { OpenAI } from "openai";
 
 export interface MetaReasoningEffort {
   effort: "none" | "minimal" | "low" | "medium" | "high" | "xhigh";
@@ -23,7 +24,7 @@ export interface MetaProviderChatRequestEntity extends ProviderChatRequestEntity
 export interface MetaActiveMessageBlock {
   content: string;
   startedAt: number;
-  type: "THINKING" | "TEXT";
+  type: "THINKING" | "ENCRYPTED_THINKING" | "TEXT";
 }
 
 export interface MetaFinalizedMessageBlock {
@@ -47,3 +48,6 @@ export interface MetaFreshAssetSelection {
 export interface MetaRouteRequestEntity extends ProviderChatRequestEntity {
   user_location?: MetaUserLocation;
 }
+
+export type MetaStreamEvents = UTR<OpenAI.Responses.ResponseStreamEvent, "type">;
+

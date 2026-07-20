@@ -32,6 +32,8 @@ export class MetaChatService extends MetaWorkupService {
     super(logger, prisma, userStoreVector, apiKey, s3, memoryService);
   }
 
+  protected encryptedTag = "*encrypted thinking...*" as const;
+
   protected async handleMetaResponsesApiRequest({
     chunks,
     conversationId,
@@ -105,9 +107,17 @@ export class MetaChatService extends MetaWorkupService {
         return;
       }
 
+      let emitEncryptedPlaceholder = false;
       if (activeBlock.content.length === 0) {
-        activeBlock = undefined;
-        return;
+        if (activeBlock.type !== "ENCRYPTED_THINKING") {
+          activeBlock = undefined;
+          return;
+        }
+        // encrypted reasoning emits no deltas — the placeholder slots in AS
+        // the delta, carrying the measured wall-clock. Duration doesn't care
+        // that the content is opaque.
+        activeBlock.content = this.encryptedTag;
+        emitEncryptedPlaceholder = true;
       }
 
       const durationMs = Math.max(
@@ -115,19 +125,77 @@ export class MetaChatService extends MetaWorkupService {
         Math.round(performance.now() - activeBlock.startedAt)
       );
 
-      trackedBlocks.push({
+      const finalized = {
         content: activeBlock.content,
         durationMs,
         ordinal: nextOrdinal,
         type: activeBlock.type
-      });
+      } satisfies MetaFinalizedMessageBlock;
+      trackedBlocks.push(finalized);
 
-      if (activeBlock.type === "THINKING") {
+      if (
+        activeBlock.type === "THINKING" ||
+        activeBlock.type === "ENCRYPTED_THINKING"
+      ) {
         metaThinkingDuration += durationMs;
       }
 
       nextOrdinal += 1;
       activeBlock = undefined;
+
+      if (emitEncryptedPlaceholder) {
+        metaThinkingAgg += this.encryptedTag;
+        thinkingChunks.push(this.encryptedTag);
+        const placeholderBlock = {
+          type: finalized.type,
+          content: finalized.content,
+          ordinal: finalized.ordinal,
+          conversationId,
+          durationMs: finalized.durationMs
+        } as const;
+        ws.send(
+          JSON.stringify({
+            type: "ai_chat_chunk",
+            conversationId,
+            done: false,
+            userId,
+            userMsgId,
+            model,
+            provider,
+            imgGenEnabled: false,
+            imgGenFields: undefined,
+            systemPrompt,
+            temperature,
+            title,
+            topP,
+            thinkingText: this.encryptedTag,
+            messageBlocks: placeholderBlock,
+            thinkingDuration:
+              metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
+            isThinking: true
+          } satisfies EventTypeMap["ai_chat_chunk"])
+        );
+        void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
+          type: "ai_chat_chunk",
+          conversationId,
+          userId,
+          model,
+          thinkingDuration:
+            metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
+          userMsgId,
+          title,
+          systemPrompt,
+          imgGenEnabled: false,
+          imgGenFields: undefined,
+          temperature,
+          topP,
+          provider,
+          thinkingText: this.encryptedTag,
+          messageBlocks: placeholderBlock,
+          isThinking: true,
+          done: false
+        });
+      }
     };
 
     const ensureActiveBlock = (type: MetaActiveMessageBlock["type"]) => {
@@ -144,9 +212,22 @@ export class MetaChatService extends MetaWorkupService {
       return activeBlock;
     };
 
+    // a visible delta arriving on an assumed-encrypted block converts it in
+    // place, clock intact (closure-scoped: the handler body's narrowing of
+    // activeBlock can't see closure mutations and collapses to never)
+    const morphEncryptedToVisible = () => {
+      if (
+        activeBlock?.type === "ENCRYPTED_THINKING" &&
+        activeBlock.content.length === 0
+      ) {
+        activeBlock.type = "THINKING";
+      }
+    };
+
     const currentThinkingDuration = () => {
       const activeThinkingDuration =
-        activeBlock?.type === "THINKING"
+        activeBlock?.type === "THINKING" ||
+        activeBlock?.type === "ENCRYPTED_THINKING"
           ? Math.round(performance.now() - activeBlock.startedAt)
           : 0;
 
@@ -194,7 +275,7 @@ export class MetaChatService extends MetaWorkupService {
             // pools reasoning + visible output under one cap — muse-spark's
             // reasoning is encrypted like fugu-ultra's, and any cap starves
             // thinking FIRST, surfacing as response.incomplete with zero text
-            reasoning: this.handleReasoning(model),
+            reasoning: this.handleReasoning(model, "high"),
             parallel_tool_calls: true,
             tools
           },
@@ -226,7 +307,9 @@ export class MetaChatService extends MetaWorkupService {
 
         if (s.type === "response.output_item.added") {
           if (s.item.type === "reasoning") {
-            ensureActiveBlock("THINKING");
+            // assume encrypted (muse-spark's default) — the first visible
+            // delta morphs the block to THINKING with the clock intact
+            ensureActiveBlock("ENCRYPTED_THINKING");
           } else {
             finalizeActiveBlock();
           }
@@ -236,6 +319,7 @@ export class MetaChatService extends MetaWorkupService {
           s.type === "response.reasoning_text.delta" ||
           s.type === "response.reasoning_summary_text.delta"
         ) {
+          morphEncryptedToVisible();
           const block = ensureActiveBlock("THINKING");
           block.content += s.delta;
           thinkingText = s.delta;
