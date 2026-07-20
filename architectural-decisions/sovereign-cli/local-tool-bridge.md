@@ -5,10 +5,13 @@ Date: 2026-07-17
 Status: implemented and live-verified across twelve providers (anthropic
 `7ab7c10`, openai `033d86b`, gemini `3c68f1a`, xai `7cd3a78`, mistral
 `44a47ac`, kimi + deepseek + zai + minimax + alibaba + sakana + cohere
-2026-07-18). Meta/llama deferred pending its rewrite; vercel/v0 is out
-of scope (the v0 API was dismantled upstream in March with no
-announcement — the integration is a lingering appendage, deliberately
-untouched).
+2026-07-18). Meta/llama is rewritten and bridge-wired (`634109c`, mistral-layout
+chain) but unverifiable — the Llama API currently serves an empty
+model roster on this key (models.list() returns [], every model id
+400s), so reinstatement waits on Meta or an AI Gateway re-route.
+Vercel/v0 is out of scope (the v0 API was dismantled upstream in March
+with no announcement — the integration is a lingering appendage,
+deliberately untouched).
 
 ## Summary
 
