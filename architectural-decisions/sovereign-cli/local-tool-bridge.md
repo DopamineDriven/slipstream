@@ -2,19 +2,16 @@
 
 Date: 2026-07-17
 
-Status: implemented and live-verified across twelve providers (anthropic
-`7ab7c10`, openai `033d86b`, gemini `3c68f1a`, xai `7cd3a78`, mistral
-`44a47ac`, kimi + deepseek + zai + minimax + alibaba + sakana + cohere
-2026-07-18). Meta/llama is rewritten and bridge-wired (`634109c`, mistral-layout
-chain) but the first-party Llama API was OFFICIALLY SHUT DOWN
-2026-07-06 (public preview sunset after 14 months; Meta's guidance is
-"migrate to a third-party provider") — the empty models.list() we
-observed is the sunset behavior. Reinstatement = the AI Gateway
-re-route (it serves meta/llama-4-maverick, llama-4-scout, llama-3.3/3.1
-et al.).
-Vercel/v0 is out of scope (the v0 API was dismantled upstream in March
-with no announcement — the integration is a lingering appendage,
-deliberately untouched).
+Status: implemented and live-verified across THIRTEEN providers — the
+complete roster (anthropic `7ab7c10`, openai `033d86b`, gemini
+`3c68f1a`, xai `7cd3a78`, mistral `44a47ac`, kimi + deepseek + zai +
+minimax + alibaba + sakana + cohere 2026-07-18, meta `82585eb`
+2026-07-20). Meta's arc: the first-party Llama API sunset 2026-07-06;
+the successor api.meta.ai speaks the OpenAI Responses dialect and
+serves muse-spark-1.1 (encrypted reasoning, fugu's profile), so meta is
+the sakana stamp on a new base URL. Vercel/v0 remains out of scope (the
+v0 API was dismantled upstream in March with no announcement — the
+integration is a lingering appendage, deliberately untouched).
 
 ## Summary
 
@@ -95,6 +92,7 @@ flowchart TD
 | deepseek / zai / minimax / alibaba | gateway completions dialect, near-identity (per-provider `*LocalToolFunctionTool`) | kimi's exact stamp — materialized-tool-call loop, broker before optional apiKey |
 | sakana    | OpenAI Responses dialect — the openai mapper verbatim (`strict: false`, `"required" in` narrowing) | function-call loop in chat.ts; fugu calls tools before its first chunk (pre-rekey adoption exercised) |
 | cohere    | `Cohere.ToolV2` (v2 SDK), near-identity                                        | single-class service; rides the `isToolCapable` gate; optional `function?.name` guard |
+| meta      | OpenAI Responses dialect on api.meta.ai — the sakana stamp verbatim            | function-call loop in chat.ts; `tool_search` deferred-tools feature parked (400s without `defer_loading` tools) |
 
 Each mapper lives beside that provider's existing native tool definitions.
 There is no general JSON-Schema transpiler — the canonical intersection
