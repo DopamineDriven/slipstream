@@ -15,20 +15,20 @@ dangerouslyAllowAllBuilds: true
 
 catalogs:
   anthropic:
-    "@anthropic-ai/sdk": ^0.111.0
+    "@anthropic-ai/sdk": ^0.112.3
   auth:
     better-auth: ^1.6.23
   aws:
-    "@aws-sdk/client-s3": ^3.1085.0
-    "@aws-sdk/client-secrets-manager": ^3.1085.0
-    "@aws-sdk/credential-providers": ^3.1085.0
-    "@aws-sdk/lib-storage": ^3.1085.0
-    "@aws-sdk/s3-request-presigner": ^3.1085.0
-    "@aws-sdk/types": ^3.974.0
+    "@aws-sdk/client-s3": ^3.1090.0
+    "@aws-sdk/client-secrets-manager": ^3.1090.0
+    "@aws-sdk/credential-providers": ^3.1090.0
+    "@aws-sdk/lib-storage": ^3.1090.0
+    "@aws-sdk/s3-request-presigner": ^3.1090.0
+    "@aws-sdk/types": ^3.974.2
   babel:
     babel-plugin-react-compiler: ^1.0.0
   biome:
-    "@biomejs/biome": ^2.5.3
+    "@biomejs/biome": ^2.5.4
   bui:
     "@base-ui/react": ^1.6.0
   clsx:
@@ -73,7 +73,7 @@ catalogs:
   glob:
     glob: ^13.0.6
   google:
-    "@google/genai": ^2.11.0
+    "@google/genai": ^2.12.0
   gtag:
     "@types/gtag.js": ^0.0.20
   jiti:
@@ -83,17 +83,15 @@ catalogs:
     jsdom: ^29.1.1
   katex:
     "@types/katex": ^0.16.8
-    katex: ^0.17.0
+    katex: ^0.18.1
   lightningcss:
     unplugin-lightningcss: ^0.4.5
-  llama:
-    llama-api-client: ^0.3.0
   mcp:
     "@modelcontextprotocol/sdk": ^1.29.0
   mdast:
     "@types/mdast": ^4.0.4
   mistral:
-    "@mistralai/mistralai": ^2.4.1
+    "@mistralai/mistralai": ^2.5.0
   motion:
     motion: ^12.42.2
     motion-dom: ^12.42.2
@@ -115,7 +113,7 @@ catalogs:
   nyc:
     nyc: ^18.0.0
   openai:
-    openai: ^6.46.0
+    openai: ^6.48.0
   p-limit:
     p-limit: ^7.3.0
   pg:
@@ -132,7 +130,7 @@ catalogs:
   prettier:
     "@ianvs/prettier-plugin-sort-imports": ^4.7.1
     prettier: ^3.9.5
-    prettier-plugin-tailwindcss: ^0.8.0
+    prettier-plugin-tailwindcss: ^0.8.1
   prisma:
     "@prisma/adapter-pg": ^7.8.0
     "@prisma/client": ^7.8.0
@@ -142,36 +140,36 @@ catalogs:
   py:
     pythonia: ^1.2.6
   radix:
-    "@radix-ui/react-accordion": ^1.2.16
-    "@radix-ui/react-alert-dialog": ^1.1.19
-    "@radix-ui/react-aspect-ratio": ^1.1.11
-    "@radix-ui/react-avatar": ^1.2.2
-    "@radix-ui/react-checkbox": ^1.3.7
-    "@radix-ui/react-dialog": ^1.1.19
-    "@radix-ui/react-dropdown-menu": ^2.1.20
-    "@radix-ui/react-label": ^2.1.11
-    "@radix-ui/react-menubar": ^1.1.20
-    "@radix-ui/react-popover": ^1.1.19
+    "@radix-ui/react-accordion": ^1.2.17
+    "@radix-ui/react-alert-dialog": ^1.1.20
+    "@radix-ui/react-aspect-ratio": ^1.1.12
+    "@radix-ui/react-avatar": ^1.2.3
+    "@radix-ui/react-checkbox": ^1.3.8
+    "@radix-ui/react-dialog": ^1.1.20
+    "@radix-ui/react-dropdown-menu": ^2.1.21
+    "@radix-ui/react-label": ^2.1.12
+    "@radix-ui/react-menubar": ^1.1.21
+    "@radix-ui/react-popover": ^1.1.20
     "@radix-ui/react-primitive": ^2.1.7
-    "@radix-ui/react-progress": ^1.1.12
-    "@radix-ui/react-radio-group": ^1.4.3
-    "@radix-ui/react-scroll-area": ^1.2.14
-    "@radix-ui/react-select": ^2.3.3
-    "@radix-ui/react-separator": ^1.1.11
-    "@radix-ui/react-slider": ^1.4.3
+    "@radix-ui/react-progress": ^1.1.13
+    "@radix-ui/react-radio-group": ^1.4.4
+    "@radix-ui/react-scroll-area": ^1.2.15
+    "@radix-ui/react-select": ^2.3.4
+    "@radix-ui/react-separator": ^1.1.12
+    "@radix-ui/react-slider": ^1.4.4
     "@radix-ui/react-slot": ^1.3.0
-    "@radix-ui/react-switch": ^1.3.3
-    "@radix-ui/react-tabs": ^1.1.17
-    "@radix-ui/react-toggle": ^1.1.14
-    "@radix-ui/react-toggle-group": ^1.1.15
-    "@radix-ui/react-tooltip": ^1.2.12
+    "@radix-ui/react-switch": ^1.3.4
+    "@radix-ui/react-tabs": ^1.1.18
+    "@radix-ui/react-toggle": ^1.1.15
+    "@radix-ui/react-toggle-group": ^1.1.16
+    "@radix-ui/react-tooltip": ^1.2.13
   react:
     "@testing-library/react": ^16.3.2
     "@types/react": ^19.2.17
     "@types/react-dom": ^19.2.3
     react: ^19.2.7
     react-dom: ^19.2.7
-    react-resizable-panels: ^4.12.1
+    react-resizable-panels: ^4.12.2
     vaul: ^1.1.2
   redis:
     redis: ^6.1.0
@@ -188,8 +186,8 @@ catalogs:
     remark-parse: ^11.0.0
     remark-rehype: ^11.1.2
   rolldown:
-    rolldown: ^1.1.5
-    rolldown-plugin-dts: ^0.27.6
+    rolldown: ^1.2.0
+    rolldown-plugin-dts: ^0.27.12
     rolldown-plugin-wasm: ^0.3.2
   sharp:
     sharp: ^0.35.3
@@ -197,18 +195,18 @@ catalogs:
     "@shikijs/transformers": ^4.3.1
     shiki: ^4.3.1
   smithy:
-    "@smithy/node-http-handler": ^4.9.5
+    "@smithy/node-http-handler": ^4.9.7
   store:
     use-sync-external-store: ^1.6.0
     "@types/use-sync-external-store": ^1.5.0
   styles:
-    autoprefixer: ^10.5.2
-    postcss: ^8.5.17
+    autoprefixer: ^10.5.4
+    postcss: ^8.5.20
     postcss-import: ^16.1.1
   swr:
     swr: ^2.4.2
   tanstack:
-    "@tanstack/react-virtual": ^3.14.5
+    "@tanstack/react-virtual": ^3.14.6
   test:
     "@playwright/test": ^1.61.1
   tiktoken:
@@ -216,26 +214,26 @@ catalogs:
   ts:
     typescript: ^6.0.3
   tsdown:
-    tsdown: ^0.22.5
-    "@tsdown/css": ^0.22.5
+    tsdown: ^0.22.12
+    "@tsdown/css": ^0.22.12
   tseslint:
-    typescript-eslint: ^8.63.0
+    typescript-eslint: ^8.64.0
   tsgo:
     "@typescript/native-preview": ^7.0.0-dev.20260707.2
   tslib:
     tslib: ^2.8.1
   tsx:
-    tsx: ^4.23.0
+    tsx: ^4.23.1
   turbo:
-    eslint-config-turbo: ^2.10.4
-    eslint-plugin-turbo: ^2.10.4
-    turbo: ^2.10.4
+    eslint-config-turbo: ^2.10.5
+    eslint-plugin-turbo: ^2.10.5
+    turbo: ^2.10.5
   tw:
     "@tailwindcss/forms": ^0.5.11
-    "@tailwindcss/postcss": ^4.3.2
+    "@tailwindcss/postcss": ^4.3.3
     "@tailwindcss/typography": ^0.5.20
     tailwind-merge: ^3.6.0
-    tailwindcss: ^4.3.2
+    tailwindcss: ^4.3.3
     tailwindcss-motion: ^1.1.1
     tw-animate-css: ^1.4.0
   unified:
@@ -245,7 +243,7 @@ catalogs:
     unist-util-remove: ^4.0.0
     unist-util-visit: ^5.1.0
   utils:
-    "@changesets/cli": ^2.31.0
+    "@changesets/cli": ^2.31.1
     husky: ^9.1.7
     wait-on: ^9.0.10
   vercel:
@@ -255,14 +253,14 @@ catalogs:
     vfile: ^6.0.3
   vite:
     "@vitejs/plugin-react": ^6.0.3
-    vite: ^8.1.4
+    vite: ^8.1.5
   vitest:
     "@vitest/coverage-istanbul": ^4.1.10
     "@vitest/ui": ^4.1.10
     vitest: ^4.1.10
   ws:
     "@types/ws": ^8.18.1
-    ws: ^8.21.0
+    ws: ^8.21.1
 
 onlyBuiltDependencies:
   - "@google/genai"
@@ -292,4 +290,4 @@ allowBuilds:
   unrs-resolver: true
 
 patchedDependencies:
-  '@anthropic-ai/sdk@0.111.0': patches/@anthropic-ai__sdk@0.101.0.patch
+  '@anthropic-ai/sdk@0.112.3': patches/@anthropic-ai__sdk@0.101.0.patch

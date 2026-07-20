@@ -15,8 +15,11 @@
       ],
       "alibaba": [
         "dist/alibaba/index.d.ts",
+        "dist/alibaba/memory.d.ts",
         "dist/alibaba/sse.d.ts",
-        "dist/alibaba/types.d.ts"
+        "dist/alibaba/summarizer.d.ts",
+        "dist/alibaba/types.d.ts",
+        "dist/alibaba/workup.d.ts"
       ],
       "anthropic": [
         "dist/anthropic/base.d.ts",
@@ -35,8 +38,11 @@
       ],
       "deepseek": [
         "dist/deepseek/index.d.ts",
+        "dist/deepseek/memory.d.ts",
         "dist/deepseek/sse.d.ts",
-        "dist/deepseek/types.d.ts"
+        "dist/deepseek/summarizer.d.ts",
+        "dist/deepseek/types.d.ts",
+        "dist/deepseek/workup.d.ts"
       ],
       "extract": [
         "dist/extract/index.d.ts"
@@ -53,30 +59,48 @@
       ],
       "kimi": [
         "dist/kimi/index.d.ts",
+        "dist/kimi/memory.d.ts",
         "dist/kimi/sse.d.ts",
-        "dist/kimi/types.d.ts"
+        "dist/kimi/summarizer.d.ts",
+        "dist/kimi/types.d.ts",
+        "dist/kimi/workup.d.ts"
+      ],
+      "local-tools": [
+        "dist/local-tools/local-tool-broker.d.ts",
+        "dist/local-tools/types.d.ts"
       ],
       "logger": [
         "dist/logger/index.d.ts"
       ],
       "memory": [
+        "dist/memory/semaphore.d.ts",
+        "dist/memory/summarizer-loop.d.ts",
         "dist/memory/types.d.ts",
         "dist/memory/vector-store.d.ts",
         "dist/memory/workup.d.ts"
       ],
       "meta": [
-        "dist/meta/index.d.ts"
+        "dist/meta/base.d.ts",
+        "dist/meta/chat.d.ts",
+        "dist/meta/index.d.ts",
+        "dist/meta/store.d.ts",
+        "dist/meta/types.d.ts",
+        "dist/meta/workup.d.ts"
       ],
       "minimax": [
         "dist/minimax/index.d.ts",
+        "dist/minimax/memory.d.ts",
         "dist/minimax/sse.d.ts",
-        "dist/minimax/types.d.ts"
+        "dist/minimax/summarizer.d.ts",
+        "dist/minimax/types.d.ts",
+        "dist/minimax/workup.d.ts"
       ],
       "mistral": [
-        "dist/mistral/base.d.ts",
         "dist/mistral/index.d.ts",
+        "dist/mistral/memory.d.ts",
         "dist/mistral/stream-content.d.ts",
-        "dist/mistral/types.d.ts"
+        "dist/mistral/types.d.ts",
+        "dist/mistral/workup.d.ts"
       ],
       "mixins": [
         "dist/mixins/index.d.ts"
@@ -130,6 +154,7 @@
         "dist/resolver/convo-list.d.ts",
         "dist/resolver/dispatch.d.ts",
         "dist/resolver/index.d.ts",
+        "dist/resolver/local-tool-result.d.ts",
         "dist/resolver/tts.d.ts",
         "dist/resolver/utils.d.ts"
       ],
@@ -189,8 +214,11 @@
       ],
       "zai": [
         "dist/zai/index.d.ts",
+        "dist/zai/memory.d.ts",
         "dist/zai/sse.d.ts",
-        "dist/zai/types.d.ts"
+        "dist/zai/summarizer.d.ts",
+        "dist/zai/types.d.ts",
+        "dist/zai/workup.d.ts"
       ]
     }
   },
@@ -245,7 +273,6 @@
     "dotenv": "catalog:dotenv",
     "dotenv-cli": "catalog:dotenv",
     "dotenv-expand": "catalog:dotenv",
-    "llama-api-client": "catalog:llama",
     "nanoid": "catalog:nanoid",
     "node-html-parser": "catalog:node",
     "openai": "catalog:openai",
