@@ -51,3 +51,4 @@ export interface MetaRouteRequestEntity extends ProviderChatRequestEntity {
 
 export type MetaStreamEvents = UTR<OpenAI.Responses.ResponseStreamEvent, "type">;
 
+export type MetaStreamEventTypeUnion = keyof MetaStreamEvents;
