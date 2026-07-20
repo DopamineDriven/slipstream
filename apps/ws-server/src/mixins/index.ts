@@ -1100,7 +1100,8 @@ export function MetaMixin<
               deps.redis,
               deps.userStore,
               deps.memory,
-              this.llamaApiKey ?? ""
+              this.llamaApiKey ?? "",
+              deps.localTool
             );
         }
       }

@@ -213,7 +213,8 @@ async function exe() {
       redisInstance,
       userStore,
       memory,
-      cfg.LLAMA_API_KEY
+      cfg.LLAMA_API_KEY,
+      localTool
     );
 
     const { v0Service } = await import("@/vercel/index.ts");
