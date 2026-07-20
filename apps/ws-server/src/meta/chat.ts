@@ -1,37 +1,22 @@
 import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
+import type {
+  MetaActiveMessageBlock,
+  MetaFinalizedMessageBlock,
+  MetaProviderChatRequestEntity
+} from "@/meta/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
-import type { SakanaUserLocation } from "@/sakana/workup.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
-import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { OpenAI } from "openai";
-import { SakanaWorkupService } from "@/sakana/workup.ts";
+import { MetaWorkupService } from "@/meta/workup.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type { EventTypeMap, SakanaModelIdUnion } from "@slipstream/types";
+import type { EventTypeMap, MetaModelIdUnion } from "@slipstream/types";
 import { isLocalToolName } from "@slipstream/types";
 
-export interface SakanaProviderChatRequestEntity extends ProviderChatRequestEntity {
-  model: SakanaModelIdUnion;
-  user_location?: SakanaUserLocation;
-}
-
-interface SakanaActiveMessageBlock {
-  content: string;
-  startedAt: number;
-  type: "THINKING" | "TEXT";
-}
-
-interface SakanaFinalizedMessageBlock {
-  content: string;
-  durationMs: number;
-  ordinal: number;
-  type: $Enums.MessageBlockType;
-}
-
-export class SakanaChatService extends SakanaWorkupService {
+export class MetaChatService extends MetaWorkupService {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
@@ -41,12 +26,13 @@ export class SakanaChatService extends SakanaWorkupService {
     protected redis: EnhancedRedisPubSub,
     apiKey: string,
     // local tool bridge ownership STARTS here — the workup/store ancestors
-    // never see it, mirroring the openai responses-chat pattern
+    // never see it, mirroring the sakana/openai responses pattern
     protected localToolBroker: LocalToolBroker
   ) {
     super(logger, prisma, userStoreVector, apiKey, s3, memoryService);
   }
-  protected async handleSakanaAiChatRequest({
+
+  protected async handleMetaResponsesApiRequest({
     chunks,
     conversationId,
     msgs,
@@ -59,15 +45,15 @@ export class SakanaChatService extends SakanaWorkupService {
     apiKey,
     jobId,
     requestMessageId,
-    model = "fugu" satisfies SakanaModelIdUnion,
+    model = "muse-spark-1.1" satisfies MetaModelIdUnion,
     systemPrompt,
     temperature,
     title,
     topP,
     user_location,
     localTools
-  }: SakanaProviderChatRequestEntity) {
-    const provider = "sakana" as const;
+  }: MetaProviderChatRequestEntity) {
+    const provider = "meta" as const;
 
     // Local read-only tool bridge — capability advertised by the CLI on
     // this exact turn; absent means zero local definitions attached.
@@ -92,18 +78,18 @@ export class SakanaChatService extends SakanaWorkupService {
           advertised: [...localToolTurn.advertised],
           conversationId
         },
-        "local tool bridge armed for sakana turn"
+        "local tool bridge armed for meta turn"
       );
     }
 
-    let sakanaThinkingDuration = 0,
-      sakanaThinkingAgg = "",
+    let metaThinkingDuration = 0,
+      metaThinkingAgg = "",
       tInitial = 0,
-      sakanaResId: string | undefined = undefined,
-      sakanaAgg = "",
+      metaResId: string | undefined = undefined,
+      metaAgg = "",
       usage = 0;
-    const trackedBlocks = Array.of<SakanaFinalizedMessageBlock>();
-    let activeBlock: SakanaActiveMessageBlock | undefined = undefined;
+    const trackedBlocks = Array.of<MetaFinalizedMessageBlock>();
+    let activeBlock: MetaActiveMessageBlock | undefined = undefined;
     let nextOrdinal = 0;
 
     const roundTrack = Array.of<{
@@ -137,14 +123,14 @@ export class SakanaChatService extends SakanaWorkupService {
       });
 
       if (activeBlock.type === "THINKING") {
-        sakanaThinkingDuration += durationMs;
+        metaThinkingDuration += durationMs;
       }
 
       nextOrdinal += 1;
       activeBlock = undefined;
     };
 
-    const ensureActiveBlock = (type: SakanaActiveMessageBlock["type"]) => {
+    const ensureActiveBlock = (type: MetaActiveMessageBlock["type"]) => {
       if (!activeBlock || activeBlock?.type !== type) {
         finalizeActiveBlock();
         activeBlock = {
@@ -164,7 +150,7 @@ export class SakanaChatService extends SakanaWorkupService {
           ? Math.round(performance.now() - activeBlock.startedAt)
           : 0;
 
-      return sakanaThinkingDuration + activeThinkingDuration;
+      return metaThinkingDuration + activeThinkingDuration;
     };
 
     const currentChunkMessageBlock = () => {
@@ -185,10 +171,10 @@ export class SakanaChatService extends SakanaWorkupService {
     };
 
     const client = this.getClient(apiKey ?? undefined);
-    const formatted = await this.formatSakanaInput(msgs);
+    const formatted = await this.formatMetaInput(msgs);
     const instructions = this.prisma.formatSysNote(systemPrompt);
     const loc = this.normalizeLocation(user_location);
-    const tools = this.sakanaTools(hasUserStoreDocs, loc, localToolNames);
+    const tools = this.MetaTools(hasUserStoreDocs, loc, localToolNames);
     // backstop only, not a working budget — memory tools dual-wield across rounds
     const MAX_TOOL_ROUNDS = 10_000_000;
     let roundInput = Array.of<OpenAI.Responses.ResponseInputItem>(...formatted);
@@ -205,9 +191,9 @@ export class SakanaChatService extends SakanaWorkupService {
             instructions,
             model,
             // max_output_tokens deliberately OMITTED: the Responses dialect
-            // pools reasoning + visible output under one cap, so honoring the
-            // per-chat max_tokens slider starves fugu-ultra's (encrypted)
-            // reasoning and 200s into response.incomplete with zero text
+            // pools reasoning + visible output under one cap — muse-spark's
+            // reasoning is encrypted like fugu-ultra's, and any cap starves
+            // thinking FIRST, surfacing as response.incomplete with zero text
             reasoning: this.handleReasoning(model),
             parallel_tool_calls: true,
             tools
@@ -221,7 +207,7 @@ export class SakanaChatService extends SakanaWorkupService {
             roundInputCount: roundInput.length,
             err: this.prisma.safeErrMsg(error)
           },
-          "Sakana stream request failed"
+          "Meta stream request failed"
         );
         throw new Error(this.prisma.safeErrMsg(error));
       }
@@ -263,7 +249,7 @@ export class SakanaChatService extends SakanaWorkupService {
 
         if (s.type === "response.completed") {
           finalizeActiveBlock();
-          sakanaResId = s.response.id;
+          metaResId = s.response.id;
           if (s.response.usage?.total_tokens) {
             usage = s.response.usage.total_tokens;
           }
@@ -275,24 +261,24 @@ export class SakanaChatService extends SakanaWorkupService {
           roundCompleted = true;
         }
 
-        // terminal non-completion events — previously fell through every
-        // branch and surfaced as the opaque "ended without completion"
+        // terminal non-completion events — surfaced explicitly rather than
+        // falling through to the opaque "ended without completion"
         if (s.type === "response.incomplete") {
           finalizeActiveBlock();
           throw new Error(
-            `Sakana response ended incomplete (${s.response.incomplete_details?.reason ?? "unknown reason"})`
+            `Meta response ended incomplete (${s.response.incomplete_details?.reason ?? "unknown reason"})`
           );
         }
 
         if (s.type === "response.failed") {
           finalizeActiveBlock();
           throw new Error(
-            `Sakana response failed: ${s.response.error?.message ?? "unknown failure"}`
+            `Meta response failed: ${s.response.error?.message ?? "unknown failure"}`
           );
         }
 
         if (thinkingText) {
-          sakanaThinkingAgg += thinkingText;
+          metaThinkingAgg += thinkingText;
           thinkingChunks.push(thinkingText);
 
           ws.send(
@@ -344,7 +330,7 @@ export class SakanaChatService extends SakanaWorkupService {
         }
 
         if (text) {
-          sakanaAgg += text;
+          metaAgg += text;
           chunks.push(text);
           ws.send(
             JSON.stringify({
@@ -364,7 +350,7 @@ export class SakanaChatService extends SakanaWorkupService {
               isThinking: false,
               messageBlocks: currentChunkMessageBlock(),
               thinkingDuration:
-                sakanaThinkingDuration > 0 ? sakanaThinkingDuration : undefined,
+                metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
               done: false
             } satisfies EventTypeMap["ai_chat_chunk"])
           );
@@ -383,10 +369,10 @@ export class SakanaChatService extends SakanaWorkupService {
             imgGenFields: undefined,
             provider,
             thinkingText:
-              sakanaThinkingAgg.length > 0 ? sakanaThinkingAgg : undefined,
+              metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
             messageBlocks: currentChunkMessageBlock(),
             thinkingDuration:
-              sakanaThinkingDuration > 0 ? sakanaThinkingDuration : undefined,
+              metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
             chunk: text,
             done: false
           });
@@ -410,8 +396,8 @@ export class SakanaChatService extends SakanaWorkupService {
         }
       }
 
-      if (!roundCompleted || !sakanaResId) {
-        throw new Error("Sakana response stream ended without completion");
+      if (!roundCompleted || !metaResId) {
+        throw new Error("Meta response stream ended without completion");
       }
 
       if (functionCalls.length === 0) {
@@ -424,9 +410,9 @@ export class SakanaChatService extends SakanaWorkupService {
           {
             round,
             functionCallCount: functionCalls.length,
-            responseId: sakanaResId
+            responseId: metaResId
           },
-          "Sakana tool loop reached max rounds"
+          "Meta tool loop reached max rounds"
         );
         break;
       }
@@ -479,7 +465,7 @@ export class SakanaChatService extends SakanaWorkupService {
                     durationMs: r.durationMs,
                     ...(r.ok ? {} : { errorCode: r.error.code })
                   },
-                  "local tool round trip (sakana)"
+                  "local tool round trip (meta)"
                 );
                 return JSON.stringify(r.ok ? r.value : { error: r.error });
               })();
@@ -502,24 +488,24 @@ export class SakanaChatService extends SakanaWorkupService {
       this.logger.info(
         {
           round,
-          responseId: sakanaResId,
+          responseId: metaResId,
           functionCallCount: functionCalls.length,
           toolOutputCount: toolOutputs.length
         },
-        "Sakana tool round complete, sending continuation"
+        "Meta tool round complete, sending continuation"
       );
     }
 
-    if (!sakanaResId) {
-      throw new Error("Sakana response id missing after tool rounds");
+    if (!metaResId) {
+      throw new Error("Meta response id missing after tool rounds");
     }
 
-    if (forcedLoopStopReason && sakanaAgg.trim().length === 0) {
-      sakanaAgg =
+    if (forcedLoopStopReason && metaAgg.trim().length === 0) {
+      metaAgg =
         "I ran document search multiple times but kept hitting a tool loop before a stable answer was produced. " +
         "Please rephrase with a narrower query, such as an exact filename or section title, and I will retry.";
       trackedBlocks.push({
-        content: sakanaAgg,
+        content: metaAgg,
         durationMs: 0,
         ordinal: nextOrdinal,
         type: "TEXT"
@@ -538,12 +524,12 @@ export class SakanaChatService extends SakanaWorkupService {
     }
 
     const d = await this.prisma.handleAiChatResponse({
-      chunk: sakanaAgg,
+      chunk: metaAgg,
       conversationId,
       done: true,
       title,
       temperature,
-      responseOutput: sakanaResId,
+      responseOutput: metaResId,
       userMsgId,
       jobId,
       requestMessageId,
@@ -556,10 +542,9 @@ export class SakanaChatService extends SakanaWorkupService {
       usage,
       imgGenFields: undefined,
       imgGenEnabled: false,
-      thinkingText:
-        sakanaThinkingAgg.length > 0 ? sakanaThinkingAgg : undefined,
+      thinkingText: metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
       thinkingDuration:
-        sakanaThinkingDuration > 0 ? sakanaThinkingDuration : undefined,
+        metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
       messageBlocks: roundTrack.length > 0 ? roundTrack : undefined
     });
     ws.send(
@@ -580,12 +565,11 @@ export class SakanaChatService extends SakanaWorkupService {
         userMsgId,
         temperature,
         topP,
-        chunk: sakanaAgg,
-        thinkingText:
-          sakanaThinkingAgg.length > 0 ? sakanaThinkingAgg : undefined,
+        chunk: metaAgg,
+        thinkingText: metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
         messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
         thinkingDuration:
-          sakanaThinkingDuration > 0 ? sakanaThinkingDuration : undefined,
+          metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
         done: true
       } satisfies EventTypeMap["ai_chat_response"])
     );
@@ -603,15 +587,14 @@ export class SakanaChatService extends SakanaWorkupService {
       aiMsgId: d.aiMsgId,
       imgGenAttachmentId: undefined,
       imgGenFields: undefined,
-      thinkingText:
-        sakanaThinkingAgg.length > 0 ? sakanaThinkingAgg : undefined,
+      thinkingText: metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
       messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
       thinkingDuration:
-        sakanaThinkingDuration > 0 ? sakanaThinkingDuration : undefined,
+        metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
       topP,
       provider,
       model,
-      chunk: sakanaAgg,
+      chunk: metaAgg,
       done: true
     });
     void this.redis.del(`stream:state:${conversationId}`);

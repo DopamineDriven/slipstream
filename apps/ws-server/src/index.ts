@@ -205,15 +205,16 @@ async function exe() {
       process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY,
       localTool
     );
-    const { LlamaService } = await import("@/meta/index.ts");
+    const { MetaService } = await import("@/meta/index.ts");
 
-    const meta = new LlamaService(
+    const meta = new MetaService(
       logger,
       prisma,
       redisInstance,
       userStore,
       memory,
-      cfg.LLAMA_API_KEY,
+      process.env.LLAMA_API_KEY ?? cfg.LLAMA_API_KEY,
+      s3,
       localTool
     );
 

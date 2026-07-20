@@ -45,18 +45,6 @@ export class SakanaWorkupService extends SakanaStoreService {
     super(logger, prisma, userStoreVector, apiKey, s3, memoryService);
   }
 
-  protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
-    if (isNewChat) {
-      return systemPrompt;
-    }
-
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation. " +
-      "Older messages of long conversations may be omitted from your view — use conversation_memory_search to recall them.";
-
-    return systemPrompt ? `${systemPrompt}\n\n${note}` : note;
-  }
-
   protected normalizeLocation(user_location?: SakanaUserLocation) {
     return (
       user_location
@@ -263,7 +251,7 @@ export class SakanaWorkupService extends SakanaStoreService {
             type: "input_file",
             file_url: ref.url,
             filename: ref.filename,
-            detail: "low"
+            detail: "high"
           } satisfies OpenAI.Responses.ResponseInputFile);
           continue;
         }
@@ -272,7 +260,7 @@ export class SakanaWorkupService extends SakanaStoreService {
           content.push({
             type: "input_image",
             image_url: ref.url,
-            detail: "auto"
+            detail: "high"
           } satisfies OpenAI.Responses.ResponseInputImage);
           continue;
         }

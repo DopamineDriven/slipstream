@@ -1,3 +1,4 @@
+import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
@@ -8,7 +9,7 @@ import { CohereService } from "@/cohere/index.ts";
 import { DeepSeekService } from "@/deepseek/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { KimiService } from "@/kimi/index.ts";
-import { LlamaService } from "@/meta/index.ts";
+import { MetaService } from "@/meta/index.ts";
 import { MiniMaxService } from "@/minimax/index.ts";
 import { MistralService } from "@/mistral/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
@@ -20,7 +21,7 @@ import { ZaiService } from "@/zai/index.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { Provider } from "@slipstream/types";
-import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
+
 export type ProviderNarrowing<P extends Provider> = P extends "openai"
   ? OpenAIService
   : P extends "grok"
@@ -32,7 +33,7 @@ export type ProviderNarrowing<P extends Provider> = P extends "openai"
         : P extends "vercel"
           ? v0Service
           : P extends "meta"
-            ? LlamaService
+            ? MetaService
             : P extends "mistral"
               ? MistralService
               : P extends "cohere"
@@ -55,7 +56,7 @@ export interface ProviderMap {
   anthropic: AnthropicService;
   gemini: GeminiService;
   openai: OpenAIService;
-  meta: LlamaService;
+  meta: MetaService;
   vercel: v0Service;
   grok: xAIService;
   mistral: MistralService;
@@ -1062,7 +1063,7 @@ export function VercelMixin<
 export function MetaMixin<
   TBase extends Constructor<any[], HasDependencies & HasOpts>
 >(Base: TBase) {
-  type S = LlamaService;
+  type S = MetaService;
   return class MetaServiceMixin extends Base {
     llama?: S;
     llamaApiKey?: string;
@@ -1094,13 +1095,14 @@ export function MetaMixin<
 
           this.llama =
             factory?.(deps, this.llamaApiKey) ??
-            new LlamaService(
+            new MetaService(
               deps.logger,
               deps.prisma,
               deps.redis,
               deps.userStore,
               deps.memory,
               this.llamaApiKey ?? "",
+              deps.s3,
               deps.localTool
             );
         }

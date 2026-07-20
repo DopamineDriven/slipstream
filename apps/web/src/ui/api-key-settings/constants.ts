@@ -51,9 +51,9 @@ export const providerObj = [
   },
   {
     provider: "meta",
-    text: "Llama",
+    text: "Meta",
     icon: MetaIcon,
-    value: "LLM|******************|*******************",
+    value: "LLM_******************|*******************",
     isSet: false,
     isDefault: false
   },

@@ -341,7 +341,7 @@ export class ResolverChatService extends ResolverTTSService {
         }
         case "meta": {
           const svc = this.providers.getRequiredInstance("meta");
-          await svc.handleMetaAiChatRequest(commonProps);
+          await svc.handleMetaAiChatRequest({ ...commonProps, user_location });
           break;
         }
         case "grok": {

@@ -24,7 +24,7 @@ const urlByProvider = {
     headers: { Authorization: `Bearer ` + (process.env.X_AI_KEY ?? "") }
   },
   llama: {
-    url: "https://api.llama.com/v1/models",
+    url: "https://api.meta.ai/v1/models",
     headers: {
       Authorization: `Bearer ` + (process.env.LLAMA_API_KEY ?? ""),
       "Content-Type": "application/json"

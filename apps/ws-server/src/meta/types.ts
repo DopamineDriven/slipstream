@@ -1,37 +1,29 @@
+import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type {
-  CanonicalToolDefinition,
-  LocalToolName
-} from "@slipstream/types";
+import type { AttachmentSingleton, MetaModelIdUnion } from "@slipstream/types";
 
-/**
- * Local read-only tool bridge (Sovereign CLI) — llama's completions
- * dialect takes plain JSON Schema, so the canonical inputSchema IS the
- * wire payload (near-identity, like the mistral/kimi mappers).
- */
-export interface MetaLocalToolFunctionTool<T = string> {
-  type: "function";
-  function: {
-    name: LocalToolName | (T & {});
-    description: string;
-    parameters: CanonicalToolDefinition["inputSchema"];
-  };
+export interface MetaReasoningEffort {
+  effort: "none" | "minimal" | "low" | "medium" | "high" | "xhigh";
 }
 
-export interface LlamaFunctionTool {
-  type: "function";
-  function: {
-    name: string;
-    description?: string;
-    parameters?: { [key: string]: unknown };
-    strict?: boolean;
-  };
+export interface MetaUserLocation {
+  readonly type: "approximate";
+  readonly city?: string;
+  readonly region?: string;
+  readonly country?: string;
+  readonly timezone?: string;
+  readonly tz?: string;
+}
+
+export interface MetaProviderChatRequestEntity extends ProviderChatRequestEntity {
+  model: MetaModelIdUnion;
+  user_location?: MetaUserLocation;
 }
 
 export interface MetaActiveMessageBlock {
   content: string;
   startedAt: number;
-  type: "TEXT";
+  type: "THINKING" | "TEXT";
 }
 
 export interface MetaFinalizedMessageBlock {
@@ -41,11 +33,17 @@ export interface MetaFinalizedMessageBlock {
   type: $Enums.MessageBlockType;
 }
 
-export type LlamaAccumulatedToolCall = {
-  id: string;
-  name: string;
-  arguments: string;
-  ordinal: number;
-};
+export interface MetaAttachmentRef {
+  readonly attachment: AttachmentSingleton<true>;
+  readonly filename: string;
+  readonly mime: string;
+  readonly url: string;
+}
 
-export type LlamaForcedLoopStopReason = "MAX_ROUNDS" | null;
+export interface MetaFreshAssetSelection {
+  readonly inlineAttachmentKeys: ReadonlySet<string>;
+}
+
+export interface MetaRouteRequestEntity extends ProviderChatRequestEntity {
+  user_location?: MetaUserLocation;
+}

@@ -195,10 +195,7 @@ export class ModelService extends ModelServiceWorkup {
 
   public isMetaModel(m: string) {
     return (
-      m === "Llama-4-Maverick-17B-128E-Instruct-FP8" ||
-      m === "Llama-4-Scout-17B-16E-Instruct-FP8" ||
-      m === "Llama-3.3-70B-Instruct" ||
-      m === "Llama-3.3-8B-Instruct"
+      m === "muse-spark-1.1"
     );
   }
 
@@ -520,7 +517,7 @@ export class ModelService extends ModelServiceWorkup {
           )
         ) {
           return model;
-        } else return "Llama-3.3-70B-Instruct" as const as NonNullable<K>;
+        } else return "muse-spark-1.1" as const as NonNullable<K>;
       }
       case "vercel": {
         if (

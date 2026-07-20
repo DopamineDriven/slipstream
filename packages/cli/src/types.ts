@@ -29,7 +29,8 @@ export const CLI_MODELS = [
   { alias: "minimax", model: "minimax-m3", provider: "minimax" },
   { alias: "grok", model: "grok-4.5", provider: "grok" },
   { alias: "gemini", model: "gemini-3.1-pro-preview", provider: "gemini" },
-  { alias: "cohere", model: "command-a-plus-05-2026", provider: "cohere" }
+  { alias: "cohere", model: "command-a-plus-05-2026", provider: "cohere" },
+  { alias: "meta", model: "muse-spark-1.1", provider: "meta" }
 ] as const satisfies readonly CliModelEntry[];
 
 export type CliRosterEntry = (typeof CLI_MODELS)[number];

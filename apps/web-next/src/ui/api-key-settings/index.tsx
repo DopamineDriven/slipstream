@@ -49,7 +49,7 @@ const getPlaceholder = (provider: Provider) => {
     case "grok":
       return "xai-*******************************************";
     case "meta":
-      return "LLM|******************|*******************";
+      return "LLM_*************************************";
     case "vercel":
       return "vck_********************************";
     case "gemini":

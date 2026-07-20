@@ -12,6 +12,7 @@ import type {
   GeminiDisplayNameUnion,
   GrokDisplayNameUnion,
   KimiDisplayNameUnion,
+  MetaDisplayNameUnion,
   MiniMaxDisplayNameUnion,
   MistralDisplayNameUnion,
   OpenAiDisplayNameUnion,
@@ -129,6 +130,12 @@ export function ProviderModelSelector({
         );
         break;
       }
+      case "meta": {
+        const displayName = defaultModelByProvider.meta;
+        updateProvider("meta");
+        updateModel(displayName, getModelIdByDisplayName("meta", displayName));
+        break;
+      }
       case "deepseek": {
         const displayName = defaultModelByProvider.deepseek;
         updateProvider("deepseek");
@@ -197,6 +204,11 @@ export function ProviderModelSelector({
       case "mistral": {
         const dn = name as MistralDisplayNameUnion;
         updateModel(dn, getModelIdByDisplayName("mistral", dn));
+        break;
+      }
+      case "meta": {
+        const dn = name as MetaDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("meta", dn));
         break;
       }
       case "cohere": {

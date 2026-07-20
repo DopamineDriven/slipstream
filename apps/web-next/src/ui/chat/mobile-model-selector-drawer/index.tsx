@@ -48,9 +48,10 @@ export function MobileModelSelectorDrawer() {
 
   const visibleProviders = useMemo(
     () =>
-      providers.filter(
-        provider => provider !== "vercel" && provider !== "meta"
-      ) satisfies Exclude<Provider, "vercel" | "meta">[],
+      providers.filter(provider => provider !== "vercel") satisfies Exclude<
+        Provider,
+        "vercel"
+      >[],
     [providers]
   );
 
@@ -95,7 +96,7 @@ export function MobileModelSelectorDrawer() {
               value={activeDraftProvider}
               onValueChange={prov => setDraftProvider(prov as Provider)}
               className="flex h-full flex-col">
-              <TabsList className="bg-brand-sidebar border-brand-border mb-3 grid h-auto w-full shrink-0 grid-cols-12 gap-y-0.5 border">
+              <TabsList className="bg-brand-sidebar border-brand-border mb-3 grid h-auto w-full shrink-0 grid-cols-14 gap-y-0.5 border">
                 {visibleProviders.map(provider => {
                   const Icon = providerMetadata[provider].icon;
                   return (
@@ -103,7 +104,7 @@ export function MobileModelSelectorDrawer() {
                     <TabsTrigger
                       key={provider}
                       value={provider}
-                      className="data-[state=active]:bg-brand-primary data-[state=active]:text-brand-primary-foreground col-span-2 flex h-10 items-center justify-center gap-2 text-xs sm:text-sm">
+                      className="data-[state=active]:bg-brand-primary data-[state=active]:text-brand-primary-foreground col-span-2 flex h-10 items-center justify-center gap-2 text-xs nth-8:col-start-2 sm:text-sm">
                       <Icon className="size-4 shrink-0" />
                       <span className="sr-only sm:not-sr-only sm:inline">
                         {providerMetadata[provider].name.split(" ")[0]}
@@ -137,6 +138,33 @@ export function MobileModelSelectorDrawer() {
                     <div className="-mr-2 flex-1 overflow-y-auto pr-2">
                       <div className="space-y-3 pb-6">
                         {provider === "anthropic" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  cxStyles.default,
+                                  isSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
+                                )}
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
+                        ) : provider === "meta" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =
                               activeSelectedProvider === provider &&

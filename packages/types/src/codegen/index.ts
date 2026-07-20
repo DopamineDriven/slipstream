@@ -159,12 +159,7 @@ const providerModelChatApi = {
     "claude-haiku-4-5-20251001",
     "claude-opus-4-1-20250805"
   ],
-  meta: [
-    "Llama-4-Maverick-17B-128E-Instruct-FP8",
-    "Llama-4-Scout-17B-16E-Instruct-FP8",
-    "Llama-3.3-70B-Instruct",
-    "Llama-3.3-8B-Instruct"
-  ],
+  meta: ["muse-spark-1.1"],
   vercel: ["v0-1.5-md", "v0-1.0-md"],
   mistral: [
     "mistral-small-latest",
@@ -214,13 +209,8 @@ async function geminiFetcher() {
   );
 }
 
-const LLAMA_NAME_OVERRIDES = {
-  "Llama-4-Maverick-17B-128E-Instruct-FP8":
-    "Llama 4 Maverick (17B/128E, Instruct, FP8)",
-  "Llama-4-Scout-17B-16E-Instruct-FP8":
-    "Llama 4 Scout (17B/16E, Instruct, FP8)",
-  "Llama-3.3-70B-Instruct": "Llama 3.3 (70B, Instruct)",
-  "Llama-3.3-8B-Instruct": "Llama 3.3 (8B, Instruct)"
+const META_NAME_OVERRIDES = {
+  "muse-spark-1.1": "Muse Spark 1.1"
 } as const;
 
 const GROK_NAME_OVERRIDES = {
@@ -357,13 +347,8 @@ function filterForZai(id: string) {
   );
 }
 
-function filterForLlama(id: string) {
-  return (
-    id === "Llama-4-Maverick-17B-128E-Instruct-FP8" ||
-    id === "Llama-4-Scout-17B-16E-Instruct-FP8" ||
-    id === "Llama-3.3-70B-Instruct" ||
-    id === "Llama-3.3-8B-Instruct"
-  );
+function filterForMeta(id: string) {
+  return id === "muse-spark-1.1";
 }
 
 function filterForMistral(id: string) {
@@ -395,9 +380,9 @@ function toMinimaxDisplayName(id: string) {
   } else return id;
 }
 
-function toLlamaDisplayName(id: string) {
-  if (filterForLlama(id)) {
-    return LLAMA_NAME_OVERRIDES[id];
+function toMetaDisplayName(id: string) {
+  if (filterForMeta(id)) {
+    return META_NAME_OVERRIDES[id];
   } else {
     return id;
   }
@@ -635,7 +620,7 @@ const modelMapper = async (modelKeys = true) => {
           let Helper = Array.of<[string, string]>();
 
           models.forEach(function (model) {
-            const name = toLlamaDisplayName(model);
+            const name = toMetaDisplayName(model);
             modelKeys === true
               ? Helper.push([model, name])
               : Helper.push([name, model]);
