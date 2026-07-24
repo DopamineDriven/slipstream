@@ -50,24 +50,27 @@ export const modelIdsByProvider = {
     "sora-2-pro"
   ],
   gemini: [
+    "gemini-3.6-flash",
+    "gemini-3.5-flash-lite",
     "gemini-3.5-flash",
     "gemini-3.1-pro-preview",
     "gemini-3.1-pro-preview-customtools",
     "gemini-3.1-flash-lite-preview",
     "gemini-3-flash-preview",
-    "gemini-2.5-pro",
-    "gemini-3-pro-image-preview",
     "gemini-3.1-flash-image-preview",
+    "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
+    "gemini-omni-flash-preview",
+    "veo-3.1-generate-preview",
+    "veo-3.1-fast-generate-preview",
+    "veo-3.1-lite-generate-preview",
+    "gemini-2.5-pro",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
     "deep-research-max-preview-04-2026",
     "deep-research-preview-04-2026",
     "gemini-2.0-flash",
-    "gemini-2.0-flash-lite",
-    "veo-3.1-generate-preview",
-    "veo-3.1-fast-generate-preview",
-    "veo-3.1-lite-generate-preview"
+    "gemini-2.0-flash-lite"
   ],
   grok: [
     "grok-4.5",
@@ -106,7 +109,13 @@ export const modelIdsByProvider = {
     "command-a-reasoning-08-2025",
     "command-a-03-2025"
   ],
-  moonshotai: ["kimi-k2.7-code", "kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking"],
+  moonshotai: [
+    "kimi-k3",
+    "kimi-k2.7-code",
+    "kimi-k2.6",
+    "kimi-k2.5",
+    "kimi-k2-thinking"
+  ],
   deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
   zai: ["glm-5.2", "glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
   alibaba: [
@@ -117,5 +126,5 @@ export const modelIdsByProvider = {
     "qwen3.5-flash"
   ],
   minimax: ["minimax-m3", "minimax-m2.7", "minimax-m2.5", "minimax-m2.1"],
-  sakana: ["fugu-ultra", "fugu"]
+  sakana: ["fugu-ultra", "fugu", "fugu-cyber"]
 } as const;

@@ -107,6 +107,7 @@
       ],
       "models": [
         "dist/models/index.d.ts",
+        "dist/models/tool-defs.d.ts",
         "dist/models/workup.d.ts"
       ],
       "openai": [

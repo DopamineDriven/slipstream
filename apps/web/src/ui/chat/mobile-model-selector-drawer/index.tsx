@@ -100,7 +100,6 @@ export function MobileModelSelectorDrawer() {
                 {visibleProviders.map(provider => {
                   const Icon = providerMetadata[provider].icon;
                   return (
-                    // removed nth-7:col-start-2 from className for stagger effect; re-add when n=odd again
                     <TabsTrigger
                       key={provider}
                       value={provider}
@@ -219,7 +218,9 @@ export function MobileModelSelectorDrawer() {
                             );
                           })
                         ) : provider === "sakana" ? (
-                          getDisplayNamesForProvider(provider).map(model => {
+                          getDisplayNamesForProvider(provider)
+                            .filter(model => model !== "Fugu Cyber")
+                            .map(model => {
                             const isSelected =
                               activeSelectedProvider === provider &&
                               activeSelectedDisplayName === model;

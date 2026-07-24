@@ -8,7 +8,7 @@ import tseslint from "typescript-eslint";
 
 export const baseConfig = (cwd=process.cwd()) => defineConfig(
   includeIgnoreFile(join(cwd, "../../.gitignore")),
-  { ignores: ["**/*.config.*", "**/__out__/**", "**/*.json"] },
+  { ignores: ["**/*.config.*"] },
   {
     files: ["**/*.js", "**/*.mjs", "**/*.ts", "**/*.tsx"],
     plugins: {

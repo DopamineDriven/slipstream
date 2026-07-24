@@ -10,6 +10,7 @@
       }
     ],
     "types": ["*"],
+    "rootDir": ".",
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "outDir": "dist"
   },

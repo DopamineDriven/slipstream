@@ -146,7 +146,9 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }
   protected isGemini3ChatModel(m: string) {
     return (
+      m === "gemini-3.6-flash" ||
       m === "gemini-3.5-flash" ||
+      m === "gemini-3.5-flash-lite" ||
       m === "gemini-3.1-pro-preview" ||
       m === "gemini-3.1-pro-preview-customtools" ||
       m === "gemini-3.1-flash-lite-preview" ||
@@ -959,7 +961,8 @@ export class GeminiWorkupService extends FileSearchStoreService {
      */
     localToolNames: readonly LocalToolName[] = []
   ) {
-    const localDeclarations = this.localToolFunctionDeclarations(localToolNames);
+    const localDeclarations =
+      this.localToolFunctionDeclarations(localToolNames);
     if (
       this.isGemini3ChatModel(m) ||
       this.isDeepResearch(m) ||

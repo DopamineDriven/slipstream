@@ -36,7 +36,7 @@ interface AlibabaFunctionTool {
           maxItems?: number;
         }
       >;
-      required: string[];
+      required: readonly ["query"] | readonly [];
       additionalProperties: boolean;
     };
   };

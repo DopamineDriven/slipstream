@@ -419,30 +419,6 @@ export function getModelDisplayName(
                                   model as OpenAiModelIdUnion
                                 );
 }
-export function isGeminiDisplayName(n: string) {
-  return (
-    n === "Gemini 3.5 Flash" ||
-    n === "Gemini 3.1 Flash Lite Preview" ||
-    n === "Gemini 3.1 Pro Preview" ||
-    n === "Gemini 3.1 Pro Preview Custom Tools" ||
-    n === "Gemini 3 Flash Preview" ||
-    n === "Gemini 2.5 Pro" ||
-    n === "Nano Banana Pro" ||
-    n === "Nano Banana" ||
-    n === "Nano Banana 2" ||
-    n === "Gemini 2.5 Flash" ||
-    n === "Gemini 2.5 Flash-Lite" ||
-    n === "Deep Research Max Preview (Apr-21-2026)" ||
-    n === "Deep Research Preview (Apr-21-2026)" ||
-    n === "Gemini 2.0 Flash" ||
-    n === "Gemini 2.0 Flash-Lite" ||
-    n === "Veo 3.1" ||
-    n === "Veo 3.1 fast" ||
-    n === "Veo 3" ||
-    n === "Veo 3 fast" ||
-    n === "Veo 2"
-  );
-}
 
 export const getModel = <
   const V extends Provider,

@@ -15,6 +15,7 @@ import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
+import { AlibabaMemoryService } from "@/alibaba/memory.ts";
 import {
   hasToolCallDelta,
   isContentDelta,
@@ -24,7 +25,6 @@ import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { EventTypeMap } from "@slipstream/types";
 import { isLocalToolName } from "@slipstream/types";
-import { AlibabaMemoryService } from "@/alibaba/memory.ts";
 
 export class AlibabaService extends AlibabaMemoryService {
   constructor(
@@ -435,8 +435,7 @@ export class AlibabaService extends AlibabaMemoryService {
         const toolName = toolCall.function.name;
         if (
           isLocalToolName(toolName) &&
-          localToolTurn &&
-          localToolTurn.advertised.has(toolName)
+          localToolTurn?.advertised.has(toolName)
         ) {
           let input: unknown = {};
           let inputParseFailed = false;

@@ -50,24 +50,27 @@ export const displayNameModelsByProvider = {
     "Sora 2 Pro"
   ],
   gemini: [
+    "Gemini 3.6 Flash",
+    "Gemini 3.5 Flash Lite",
     "Gemini 3.5 Flash",
     "Gemini 3.1 Pro Preview",
     "Gemini 3.1 Pro Preview Custom Tools",
     "Gemini 3.1 Flash Lite Preview",
     "Gemini 3 Flash Preview",
-    "Gemini 2.5 Pro",
-    "Nano Banana Pro",
     "Nano Banana 2",
+    "Nano Banana Pro",
     "Nano Banana",
+    "Gemini Omni Flash Preview",
+    "Veo 3.1",
+    "Veo 3.1 fast",
+    "Veo 3.1 lite",
+    "Gemini 2.5 Pro",
     "Gemini 2.5 Flash",
     "Gemini 2.5 Flash-Lite",
     "Deep Research Max Preview (Apr-21-2026)",
     "Deep Research Preview (Apr-21-2026)",
     "Gemini 2.0 Flash",
-    "Gemini 2.0 Flash-Lite",
-    "Veo 3.1",
-    "Veo 3.1 fast",
-    "Veo 3.1 lite"
+    "Gemini 2.0 Flash-Lite"
   ],
   grok: [
     "Grok 4.5",
@@ -102,7 +105,13 @@ export const displayNameModelsByProvider = {
     "Mistral Large Latest"
   ],
   cohere: ["Command A Plus", "Command A Reasoning", "Command A"],
-  moonshotai: ["Kimi K2.7 Code", "Kimi K2.6", "Kimi K2.5", "Kimi K2 Thinking"],
+  moonshotai: [
+    "Kimi K3",
+    "Kimi K2.7 Code",
+    "Kimi K2.6",
+    "Kimi K2.5",
+    "Kimi K2 Thinking"
+  ],
   deepseek: ["DeepSeek V4 Pro", "DeepSeek V4 Flash", "DeepSeek R1"],
   zai: ["GLM 5.2", "GLM 5.1", "GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"],
   alibaba: [
@@ -113,5 +122,5 @@ export const displayNameModelsByProvider = {
     "Qwen3.5-Flash"
   ],
   minimax: ["MiniMax-M3", "MiniMax-M2.7", "MiniMax-M2.5", "MiniMax-M2.1"],
-  sakana: ["Fugu Ultra", "Fugu"]
+  sakana: ["Fugu Ultra", "Fugu", "Fugu Cyber"]
 } as const;

@@ -1,11 +1,11 @@
 import type { InferTopLevelMime } from "@/types/index.ts";
 import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
-import { ModelServiceWorkup } from "@/models/workup.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { GetModelUtilRT, Provider } from "@slipstream/types";
 import { providerModelChatApi } from "@slipstream/types";
+import { ModelToolDefsService } from "@/models/tool-defs.ts";
 
-export class ModelService extends ModelServiceWorkup {
+export class ModelService extends ModelToolDefsService {
   constructor() {
     super();
   }
@@ -117,6 +117,7 @@ export class ModelService extends ModelServiceWorkup {
 
   public isGeminiVideoModel(m: string) {
     return (
+      m === "gemini-omni-flash-preview" ||
       m === "veo-3.1-lite-generate-preview" ||
       m === "veo-3.1-fast-generate-preview" ||
       m === "veo-3.1-generate-preview"
@@ -132,7 +133,9 @@ export class ModelService extends ModelServiceWorkup {
 
   public isGeminiModel(m: string) {
     return (
+      m === "gemini-3.6-flash" ||
       m === "gemini-3.5-flash" ||
+      m === "gemini-3.5-flash-lite" ||
       m === "gemini-3.1-pro-preview" ||
       m === "gemini-3.1-pro-preview-customtools" ||
       m === "gemini-3.1-flash-lite-preview" ||
@@ -194,9 +197,7 @@ export class ModelService extends ModelServiceWorkup {
   }
 
   public isMetaModel(m: string) {
-    return (
-      m === "muse-spark-1.1"
-    );
+    return m === "muse-spark-1.1";
   }
 
   public isV0Model(m: string) {
@@ -225,6 +226,7 @@ export class ModelService extends ModelServiceWorkup {
 
   public isKimiModel(m: string) {
     return (
+      m === "kimi-k3" ||
       m === "kimi-k2.7-code" ||
       m === "kimi-k2.6" ||
       m === "kimi-k2.5" ||
@@ -271,7 +273,7 @@ export class ModelService extends ModelServiceWorkup {
   }
 
   public isSakanaModel(m: string) {
-    return m === "fugu" || m === "fugu-ultra";
+    return m === "fugu" || m === "fugu-ultra" || m === "fugu-cyber";
   }
 
   public concatBytes(arrays: Uint8Array[]) {

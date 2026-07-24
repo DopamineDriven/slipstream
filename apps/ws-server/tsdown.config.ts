@@ -69,6 +69,7 @@ export default defineConfig(
         "src/mistral/workup.ts",
         "src/mixins/index.ts",
         "src/models/index.ts",
+        "src/models/tool-defs.ts",
         "src/models/workup.ts",
         "src/openai/base.ts",
         "src/openai/gpt-image.ts",

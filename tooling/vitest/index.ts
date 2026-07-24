@@ -5,7 +5,7 @@ import { defineConfig } from "vitest/config";
 
 export const sharedConfig = (cwd = process.cwd()) =>
   defineConfig({
-    plugins: [reactPlugin()],
+    plugins: [reactPlugin({ include: /\.spec\.tsx?$/ })],
     root: cwd,
     resolve: {
       alias: {
@@ -13,6 +13,7 @@ export const sharedConfig = (cwd = process.cwd()) =>
       }
     },
     test: {
+      globals: true,
       environment: "jsdom",
       coverage: {
         provider: "istanbul",
