@@ -50,25 +50,28 @@ export const displayNameToModelId = {
     "Sora 2 Pro": "sora-2-pro"
   },
   gemini: {
+    "Gemini 3.6 Flash": "gemini-3.6-flash",
+    "Gemini 3.5 Flash Lite": "gemini-3.5-flash-lite",
     "Gemini 3.5 Flash": "gemini-3.5-flash",
     "Gemini 3.1 Pro Preview": "gemini-3.1-pro-preview",
     "Gemini 3.1 Pro Preview Custom Tools": "gemini-3.1-pro-preview-customtools",
     "Gemini 3.1 Flash Lite Preview": "gemini-3.1-flash-lite-preview",
     "Gemini 3 Flash Preview": "gemini-3-flash-preview",
-    "Gemini 2.5 Pro": "gemini-2.5-pro",
-    "Nano Banana Pro": "gemini-3-pro-image-preview",
     "Nano Banana 2": "gemini-3.1-flash-image-preview",
+    "Nano Banana Pro": "gemini-3-pro-image-preview",
     "Nano Banana": "gemini-2.5-flash-image",
+    "Gemini Omni Flash Preview": "gemini-omni-flash-preview",
+    "Veo 3.1": "veo-3.1-generate-preview",
+    "Veo 3.1 fast": "veo-3.1-fast-generate-preview",
+    "Veo 3.1 lite": "veo-3.1-lite-generate-preview",
+    "Gemini 2.5 Pro": "gemini-2.5-pro",
     "Gemini 2.5 Flash": "gemini-2.5-flash",
     "Gemini 2.5 Flash-Lite": "gemini-2.5-flash-lite",
     "Deep Research Max Preview (Apr-21-2026)":
       "deep-research-max-preview-04-2026",
     "Deep Research Preview (Apr-21-2026)": "deep-research-preview-04-2026",
     "Gemini 2.0 Flash": "gemini-2.0-flash",
-    "Gemini 2.0 Flash-Lite": "gemini-2.0-flash-lite",
-    "Veo 3.1": "veo-3.1-generate-preview",
-    "Veo 3.1 fast": "veo-3.1-fast-generate-preview",
-    "Veo 3.1 lite": "veo-3.1-lite-generate-preview"
+    "Gemini 2.0 Flash-Lite": "gemini-2.0-flash-lite"
   },
   grok: {
     "Grok 4.5": "grok-4.5",
@@ -113,6 +116,7 @@ export const displayNameToModelId = {
     "Command A": "command-a-03-2025"
   },
   moonshotai: {
+    "Kimi K3": "kimi-k3",
     "Kimi K2.7 Code": "kimi-k2.7-code",
     "Kimi K2.6": "kimi-k2.6",
     "Kimi K2.5": "kimi-k2.5",
@@ -146,6 +150,7 @@ export const displayNameToModelId = {
   },
   sakana: {
     "Fugu Ultra": "fugu-ultra",
-    Fugu: "fugu"
+    Fugu: "fugu",
+    "Fugu Cyber": "fugu-cyber"
   }
 } as const;

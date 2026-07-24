@@ -36,7 +36,7 @@ interface KimiFunctionTool {
           maxItems?: number;
         }
       >;
-      required: string[];
+      required: readonly ["query"] | readonly [];
       additionalProperties: boolean;
     };
   };

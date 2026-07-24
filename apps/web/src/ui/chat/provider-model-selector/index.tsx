@@ -71,7 +71,9 @@ export function ProviderModelSelector({
       ? defaultModelByProvider.mistral
       : selectedModel.displayName;
 
-  const availableModels = getModelsForProvider(activeProvider);
+  const availableModels = getModelsForProvider(activeProvider).filter(
+    model => model !== "fugu-cyber"
+  );
   const currentMeta = providerMetadata[activeProvider];
 
   const handleProviderChange = (prov: Provider) => {

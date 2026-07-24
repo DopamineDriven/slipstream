@@ -38,7 +38,7 @@ export class SakanaService extends SakanaChatService {
   }
 
   public async routeSakana({ model, ...rest }: SakanaRouteRequestEntity) {
-    if (!model || !this.isSakanaModel(model)) return;
+    if (!model || !this.prisma.isSakanaModel(model)) return;
 
     return await this.handleSakanaAiChatRequest({
       ...rest,

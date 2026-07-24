@@ -4,6 +4,7 @@ export const modelIdToDisplayNameVideoGen = {
     "sora-2-pro": "Sora 2 Pro"
   },
   gemini: {
+    "gemini-omni-flash-preview": "Gemini Omni Flash Preview",
     "veo-3.1-generate-preview": "Veo 3.1",
     "veo-3.1-fast-generate-preview": "Veo 3.1 fast",
     "veo-3.1-lite-generate-preview": "Veo 3.1 lite"

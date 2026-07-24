@@ -44,12 +44,8 @@ export class SakanaBaseService {
     return client;
   }
 
-  public isSakanaModel(id: string) {
-    return id === "fugu" || id === "fugu-ultra";
-  }
-
   protected handleReasoning(model: string, effort?: "high" | "xhigh" | "max") {
-    if (!this.isSakanaModel(model)) return;
+    if (!this.prisma.isSakanaModel(model)) return;
     else {
       const normalizedEffort = effort === "max" ? "xhigh" : effort;
       if (model === "fugu") {

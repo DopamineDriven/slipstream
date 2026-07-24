@@ -100,7 +100,6 @@ export function MobileModelSelectorDrawer() {
                 {visibleProviders.map(provider => {
                   const Icon = providerMetadata[provider].icon;
                   return (
-                    // removed nth-7:col-start-2 from className for stagger effect; re-add when n=odd again
                     <TabsTrigger
                       key={provider}
                       value={provider}
@@ -219,32 +218,34 @@ export function MobileModelSelectorDrawer() {
                             );
                           })
                         ) : provider === "sakana" ? (
-                          getDisplayNamesForProvider(provider).map(model => {
-                            const isSelected =
-                              activeSelectedProvider === provider &&
-                              activeSelectedDisplayName === model;
-                            return (
-                              <Button
-                                key={displayNameToModelId[provider][model]}
-                                variant={isSelected ? "default" : "outline"}
-                                className={cn(
-                                  cxStyles.default,
-                                  isSelected
-                                    ? cxStyles.isSelected
-                                    : cxStyles.isNotSelected
-                                )}
-                                onClick={() => {
-                                  setDraftProvider(provider);
-                                  handleModelSelect(provider, model);
-                                }}>
-                                <ModelUI
-                                  model={model}
-                                  provider={provider}
-                                  isSelected={isSelected}
-                                />
-                              </Button>
-                            );
-                          })
+                          getDisplayNamesForProvider(provider)
+                            .filter(model => model !== "Fugu Cyber")
+                            .map(model => {
+                              const isSelected =
+                                activeSelectedProvider === provider &&
+                                activeSelectedDisplayName === model;
+                              return (
+                                <Button
+                                  key={displayNameToModelId[provider][model]}
+                                  variant={isSelected ? "default" : "outline"}
+                                  className={cn(
+                                    cxStyles.default,
+                                    isSelected
+                                      ? cxStyles.isSelected
+                                      : cxStyles.isNotSelected
+                                  )}
+                                  onClick={() => {
+                                    setDraftProvider(provider);
+                                    handleModelSelect(provider, model);
+                                  }}>
+                                  <ModelUI
+                                    model={model}
+                                    provider={provider}
+                                    isSelected={isSelected}
+                                  />
+                                </Button>
+                              );
+                            })
                         ) : provider === "alibaba" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =

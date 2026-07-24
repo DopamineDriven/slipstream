@@ -32,8 +32,6 @@ export default defineConfig(
         fileName: "globals.css",
         inject: false,
         minify: false,
-        transformer: "postcss",
-        splitting: false
-      }
+        transformer: "postcss"      }
     }) satisfies Options
 );
