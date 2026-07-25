@@ -10,17 +10,18 @@ once; commits since that push are local-only.
 
 ## 0. IMMEDIATE — one unverified change
 
-`7c646ae` (meta ENCRYPTED_THINKING) is typechecked + unit-green but NOT
-live-verified. Verify: boot server (`pnpm run:ws-server` from ROOT — it
-EACCESes from subdirs), run the muse-spark probe
-(provider `meta`, model `muse-spark-1.1` — a probe script pattern lives in
-scratchpads; rebuild one from `CliLocalToolsService` in
-`packages/cli/dist/local-tools.js`, see 07-16 doc §0 recipe), then grep the
-server log/response for an `ENCRYPTED_THINKING` block carrying
-`"*encrypted thinking...*"` with nonzero `durationMs`. muse-spark
-encrypted-only reasoning is the default (bare `/v1/responses` probe returns
-`output[0] = {type:"reasoning", encrypted_content}` with zero deltas), so
-any short turn should exercise it.
+**VERIFIED 2026-07-25.** `7c646ae` (meta ENCRYPTED_THINKING) passed the
+live probe: muse-spark turn with local tools produced FOUR
+`ENCRYPTED_THINKING` blocks (chunk + final), every one carrying
+`"*encrypted thinking...*"` with nonzero `durationMs` (153ms/14ms), plus
+"local tool bridge armed for meta turn" / "local tool round trip (meta)"
+in the server log. muse-spark interleaves encrypted reasoning between text
+and tool rounds exactly as designed — the placeholder slots in per block,
+ordinals sequential, morph-to-THINKING never needed (no visible deltas).
+Original recipe kept below for reruns: boot server (`pnpm run:ws-server`
+from ROOT — it EACCESes from subdirs), probe from `CliLocalToolsService`
+in `packages/cli/dist/local-tools.js` (provider `meta`, model
+`muse-spark-1.1`, see 07-16 doc §0 recipe), grep for the placeholder block.
 
 ## 1. THE BRIDGE IS COMPLETE — thirteen providers
 
