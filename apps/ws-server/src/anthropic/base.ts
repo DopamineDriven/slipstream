@@ -32,6 +32,7 @@ export class AnthropicBaseService {
   }
   protected supportsAdaptive(mod: string) {
     return (
+      mod === "claude-opus-5" ||
       mod === "claude-opus-4-8" ||
       mod === "claude-opus-4-7" ||
       mod === "claude-opus-4-6" ||
@@ -41,14 +42,8 @@ export class AnthropicBaseService {
     );
   }
 
-  protected isAnthropicModel(m: string) {
-    return (
-      this.supportsAdaptive(m) ||
-      m === "claude-opus-4-5-20251101" ||
-      m === "claude-sonnet-4-5-20250929" ||
-      m === "claude-haiku-4-5-20251001" ||
-      m === "claude-opus-4-1-20250805"
-    );
+  protected supportsEffort(mod: string) {
+    return this.supportsAdaptive(mod) || mod === "claude-opus-4-5-20251101";
   }
 
   protected handleBetaHeaders(
@@ -60,6 +55,7 @@ export class AnthropicBaseService {
        * Avoid paying the prompt-cache cost twice when you retry a refused Claude Fable 5 request on another model.
        * https://platform.claude.com/docs/en/build-with-claude/fallback-credit
        */
+      case "claude-opus-5":
       case "claude-fable-5":
       case "claude-sonnet-5":
       case "claude-opus-4-8":
@@ -134,6 +130,7 @@ export class AnthropicBaseService {
   }
 
   protected outputTokenCeilingByModel = {
+    "claude-opus-5": 128000,
     "claude-sonnet-5": 128000,
     "claude-fable-5": 128000,
     "claude-opus-4-8": 128000,
@@ -147,6 +144,7 @@ export class AnthropicBaseService {
   } as const;
 
   protected inputTokenCeilingByModel = {
+    "claude-opus-5": 1000000,
     "claude-sonnet-5": 1000000,
     "claude-fable-5": 1000000,
     "claude-opus-4-8": 1000000,
@@ -176,7 +174,7 @@ export class AnthropicBaseService {
 
   protected handleThinking(mod: AnthropicModelIdUnion, max_tokens?: number) {
     if (this.handleMaxTokens(mod, max_tokens) >= 1024) {
-      if (this.supportsAdaptive(mod)) {
+      if (this.prisma.isAnthropicAdaptiveModel(mod)) {
         return {
           type: "adaptive",
           display: "summarized"
@@ -187,7 +185,7 @@ export class AnthropicBaseService {
         budget_tokens: this.getMaxTokens(mod) - 1024
       } as const satisfies Anthropic.Beta.BetaThinkingConfigEnabled;
     } else {
-      if (this.supportsAdaptive(mod)) {
+      if (this.prisma.isAnthropicAdaptiveModel(mod)) {
         return {
           type: "adaptive",
           display: "summarized"
