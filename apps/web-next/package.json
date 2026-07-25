@@ -55,6 +55,7 @@
     "decimal.js": "catalog:decimal",
     "fflate": "catalog:fflate",
     "geist": "catalog:geist",
+    "jose": "catalog:jose",
     "js-cookie": "catalog:cookies",
     "katex": "catalog:katex",
     "motion": "catalog:motion",
