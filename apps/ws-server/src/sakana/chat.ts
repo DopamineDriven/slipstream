@@ -2,9 +2,13 @@ import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
-import type { SakanaUserLocation } from "@/sakana/workup.ts";
+import type {
+  SakanaActiveMessageBlock,
+  SakanaFinalizedMessageBlock,
+  SakanaProviderChatRequestEntity,
+  StreamEvents
+} from "@/sakana/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
-import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { OpenAI } from "openai";
 import { SakanaWorkupService } from "@/sakana/workup.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
@@ -12,24 +16,6 @@ import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap, SakanaModelIdUnion } from "@slipstream/types";
 import { isLocalToolName } from "@slipstream/types";
-
-export interface SakanaProviderChatRequestEntity extends ProviderChatRequestEntity {
-  model: SakanaModelIdUnion;
-  user_location?: SakanaUserLocation;
-}
-
-interface SakanaActiveMessageBlock {
-  content: string;
-  startedAt: number;
-  type: "THINKING" | "TEXT";
-}
-
-interface SakanaFinalizedMessageBlock {
-  content: string;
-  durationMs: number;
-  ordinal: number;
-  type: $Enums.MessageBlockType;
-}
 
 export class SakanaChatService extends SakanaWorkupService {
   constructor(
@@ -46,6 +32,9 @@ export class SakanaChatService extends SakanaWorkupService {
   ) {
     super(logger, prisma, userStoreVector, apiKey, s3, memoryService);
   }
+
+  protected encryptedTag = "*encrypted thinking...*" as const;
+
   protected async handleSakanaAiChatRequest({
     chunks,
     conversationId,
@@ -119,9 +108,17 @@ export class SakanaChatService extends SakanaWorkupService {
         return;
       }
 
+      let emitEncryptedPlaceholder = false;
       if (activeBlock.content.length === 0) {
-        activeBlock = undefined;
-        return;
+        if (activeBlock.type !== "ENCRYPTED_THINKING") {
+          activeBlock = undefined;
+          return;
+        }
+        // encrypted reasoning emits no deltas — the placeholder slots in AS
+        // the delta, carrying the measured wall-clock. Duration doesn't care
+        // that the content is opaque.
+        activeBlock.content = this.encryptedTag;
+        emitEncryptedPlaceholder = true;
       }
 
       const durationMs = Math.max(
@@ -129,19 +126,77 @@ export class SakanaChatService extends SakanaWorkupService {
         Math.round(performance.now() - activeBlock.startedAt)
       );
 
-      trackedBlocks.push({
+      const finalized = {
         content: activeBlock.content,
         durationMs,
         ordinal: nextOrdinal,
         type: activeBlock.type
-      });
+      } satisfies SakanaFinalizedMessageBlock;
+      trackedBlocks.push(finalized);
 
-      if (activeBlock.type === "THINKING") {
+      if (
+        activeBlock.type === "THINKING" ||
+        activeBlock.type === "ENCRYPTED_THINKING"
+      ) {
         sakanaThinkingDuration += durationMs;
       }
 
       nextOrdinal += 1;
       activeBlock = undefined;
+
+      if (emitEncryptedPlaceholder) {
+        sakanaThinkingAgg += this.encryptedTag;
+        thinkingChunks.push(this.encryptedTag);
+        const placeholderBlock = {
+          type: finalized.type,
+          content: finalized.content,
+          ordinal: finalized.ordinal,
+          conversationId,
+          durationMs: finalized.durationMs
+        } as const;
+        ws.send(
+          JSON.stringify({
+            type: "ai_chat_chunk",
+            conversationId,
+            done: false,
+            userId,
+            userMsgId,
+            model,
+            provider,
+            imgGenEnabled: false,
+            imgGenFields: undefined,
+            systemPrompt,
+            temperature,
+            title,
+            topP,
+            thinkingText: this.encryptedTag,
+            messageBlocks: placeholderBlock,
+            thinkingDuration:
+              sakanaThinkingDuration > 0 ? sakanaThinkingDuration : undefined,
+            isThinking: true
+          } satisfies EventTypeMap["ai_chat_chunk"])
+        );
+        void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
+          type: "ai_chat_chunk",
+          conversationId,
+          userId,
+          model,
+          thinkingDuration:
+            sakanaThinkingDuration > 0 ? sakanaThinkingDuration : undefined,
+          userMsgId,
+          title,
+          systemPrompt,
+          imgGenEnabled: false,
+          imgGenFields: undefined,
+          temperature,
+          topP,
+          provider,
+          thinkingText: this.encryptedTag,
+          messageBlocks: placeholderBlock,
+          isThinking: true,
+          done: false
+        });
+      }
     };
 
     const ensureActiveBlock = (type: SakanaActiveMessageBlock["type"]) => {
@@ -158,9 +213,22 @@ export class SakanaChatService extends SakanaWorkupService {
       return activeBlock;
     };
 
+    // a visible delta arriving on an assumed-encrypted block converts it in
+    // place, clock intact (closure-scoped: the handler body's narrowing of
+    // activeBlock can't see closure mutations and collapses to never)
+    const morphEncryptedToVisible = () => {
+      if (
+        activeBlock?.type === "ENCRYPTED_THINKING" &&
+        activeBlock.content.length === 0
+      ) {
+        activeBlock.type = "THINKING";
+      }
+    };
+
     const currentThinkingDuration = () => {
       const activeThinkingDuration =
-        activeBlock?.type === "THINKING"
+        activeBlock?.type === "THINKING" ||
+        activeBlock?.type === "ENCRYPTED_THINKING"
           ? Math.round(performance.now() - activeBlock.startedAt)
           : 0;
 
@@ -195,7 +263,7 @@ export class SakanaChatService extends SakanaWorkupService {
     let forcedLoopStopReason: "MAX_ROUNDS" | undefined = undefined;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
-      let streamRes: AsyncIterable<OpenAI.Responses.ResponseStreamEvent>;
+      let streamRes: AsyncIterable<StreamEvents[keyof StreamEvents]>;
       try {
         streamRes = await client.responses.create(
           {
@@ -240,16 +308,29 @@ export class SakanaChatService extends SakanaWorkupService {
 
         if (s.type === "response.output_item.added") {
           if (s.item.type === "reasoning") {
-            ensureActiveBlock("THINKING");
+            // assume encrypted (fugu-ultra's default) — the first visible
+            // delta morphs the block to THINKING with the clock intact
+            ensureActiveBlock("ENCRYPTED_THINKING");
           } else {
             finalizeActiveBlock();
           }
+        }
+
+        // the reasoning item's own lifecycle bounds its duration — the
+        // clock closes at ITS done event (rs_-prefixed item), not at the
+        // next item's added
+        if (
+          s.type === "response.output_item.done" &&
+          s.item.type === "reasoning"
+        ) {
+          finalizeActiveBlock();
         }
 
         if (
           s.type === "response.reasoning_text.delta" ||
           s.type === "response.reasoning_summary_text.delta"
         ) {
+          morphEncryptedToVisible();
           const block = ensureActiveBlock("THINKING");
           block.content += s.delta;
           thinkingText = s.delta;

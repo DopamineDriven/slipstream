@@ -1,6 +1,11 @@
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
+import type {
+  SakanaAttachmentRef,
+  SakanaFreshAssetSelection,
+  SakanaUserLocation
+} from "@/sakana/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { OpenAI } from "openai";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
@@ -12,26 +17,6 @@ import type {
   MessageSingleton
 } from "@slipstream/types";
 import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
-
-export interface SakanaUserLocation {
-  readonly type: "approximate";
-  readonly city?: string;
-  readonly region?: string;
-  readonly country?: string;
-  readonly timezone?: string;
-  readonly tz?: string;
-}
-
-interface SakanaAttachmentRef {
-  readonly attachment: AttachmentSingleton<true>;
-  readonly filename: string;
-  readonly mime: string;
-  readonly url: string;
-}
-
-interface SakanaFreshAssetSelection {
-  readonly inlineAttachmentKeys: ReadonlySet<string>;
-}
 
 export class SakanaWorkupService extends SakanaStoreService {
   constructor(

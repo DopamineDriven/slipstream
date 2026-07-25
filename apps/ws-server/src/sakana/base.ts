@@ -1,14 +1,11 @@
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
+import type { ReasoningProps } from "@/sakana/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { Logger as PinoLogger } from "pino";
 import { OpenAI } from "openai";
 import type { S3Storage } from "@slipstream/storage-s3";
-
-interface ReasoningProps {
-  effort: "high" | "xhigh";
-}
 
 export class SakanaBaseService {
   protected baseUrl = "https://api.sakana.ai/v1";

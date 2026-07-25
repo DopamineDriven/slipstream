@@ -315,6 +315,16 @@ export class MetaChatService extends MetaWorkupService {
           }
         }
 
+        // the reasoning item's own lifecycle bounds its duration — the
+        // clock closes at ITS done event (rs_-prefixed item), not at the
+        // next item's added
+        if (
+          s.type === "response.output_item.done" &&
+          s.item.type === "reasoning"
+        ) {
+          finalizeActiveBlock();
+        }
+
         if (
           s.type === "response.reasoning_text.delta" ||
           s.type === "response.reasoning_summary_text.delta"
