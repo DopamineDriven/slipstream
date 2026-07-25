@@ -5,7 +5,8 @@ import type { PrismaService } from "@/prisma/index.ts";
 import type {
   SakanaActiveMessageBlock,
   SakanaFinalizedMessageBlock,
-  SakanaProviderChatRequestEntity
+  SakanaProviderChatRequestEntity,
+  StreamEvents
 } from "@/sakana/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { OpenAI } from "openai";
@@ -262,7 +263,7 @@ export class SakanaChatService extends SakanaWorkupService {
     let forcedLoopStopReason: "MAX_ROUNDS" | undefined = undefined;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
-      let streamRes: AsyncIterable<OpenAI.Responses.ResponseStreamEvent>;
+      let streamRes: AsyncIterable<StreamEvents[keyof StreamEvents]>;
       try {
         streamRes = await client.responses.create(
           {
@@ -313,6 +314,16 @@ export class SakanaChatService extends SakanaWorkupService {
           } else {
             finalizeActiveBlock();
           }
+        }
+
+        // the reasoning item's own lifecycle bounds its duration — the
+        // clock closes at ITS done event (rs_-prefixed item), not at the
+        // next item's added
+        if (
+          s.type === "response.output_item.done" &&
+          s.item.type === "reasoning"
+        ) {
+          finalizeActiveBlock();
         }
 
         if (

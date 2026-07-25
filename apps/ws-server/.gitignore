@@ -28,3 +28,5 @@ claude-*
 codex-*
 no-over-abstractions.md
 src/tests/fixtures/*
+
+src/tests/sakana/stream

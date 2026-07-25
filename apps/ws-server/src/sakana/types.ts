@@ -2,9 +2,10 @@ import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AttachmentSingleton,
-  SakanaModelIdUnion
+  SakanaModelIdUnion,
+  UTR
 } from "@slipstream/types";
-
+import type {OpenAI} from "openai";
 export interface ReasoningProps {
   effort: "high" | "xhigh";
 }
@@ -50,3 +51,5 @@ export interface SakanaFinalizedMessageBlock {
   ordinal: number;
   type: $Enums.MessageBlockType;
 }
+
+export type StreamEvents = UTR<OpenAI.Responses.ResponseStreamEvent, "type">;
