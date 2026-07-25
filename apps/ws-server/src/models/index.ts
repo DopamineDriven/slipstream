@@ -1,9 +1,9 @@
 import type { InferTopLevelMime } from "@/types/index.ts";
 import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
+import { ModelToolDefsService } from "@/models/tool-defs.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { GetModelUtilRT, Provider } from "@slipstream/types";
 import { providerModelChatApi } from "@slipstream/types";
-import { ModelToolDefsService } from "@/models/tool-defs.ts";
 
 export class ModelService extends ModelToolDefsService {
   constructor() {
@@ -173,6 +173,7 @@ export class ModelService extends ModelToolDefsService {
   }
   public isAnthropicAdaptiveModel(mod: string) {
     return (
+      mod === "claude-opus-5" ||
       mod === "claude-opus-4-8" ||
       mod === "claude-opus-4-7" ||
       mod === "claude-opus-4-6" ||

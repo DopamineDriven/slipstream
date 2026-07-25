@@ -263,14 +263,17 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
   protected isAdvancedToolCapable(m: string) {
     return (
-      this.supportsAdaptive(m) ||
+      this.prisma.isAnthropicAdaptiveModel(m) ||
       m === "claude-opus-4-5-20251101" ||
       m === "claude-sonnet-4-5-20250929"
     );
   }
 
   protected isEffortCapable(model: string) {
-    return this.supportsAdaptive(model) || model === "claude-opus-4-5-20251101";
+    return (
+      this.prisma.isAnthropicAdaptiveModel(model) ||
+      model === "claude-opus-4-5-20251101"
+    );
   }
 
   protected tooling(
@@ -319,9 +322,10 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
           input_schema: {
             type: "object" as const,
             properties: d.inputSchema.properties,
-            required:"required" in d.inputSchema
-              ? [...d.inputSchema.required]
-              : undefined,
+            required:
+              "required" in d.inputSchema
+                ? [...d.inputSchema.required]
+                : undefined,
             additionalProperties: false
           }
         }) satisfies Anthropic.Beta.BetaToolUnion
@@ -538,8 +542,9 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
   private handleEffort(model: string | null) {
     if (!model) return;
-    if (!this.isAdaptiveCapable(model)) return;
+    if (!this.supportsEffort(model)) return;
     if (
+      model === "claude-opus-5" ||
       model === "claude-opus-4-8" ||
       model === "claude-opus-4-6" ||
       model === "claude-fable-5" ||
@@ -555,7 +560,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   }
 
   private handleModel(m: string | undefined) {
-    if (!m || !this.isAnthropicModel(m)) return "claude-sonnet-5" as const;
+    if (!m || !this.prisma.isAnthropicModel(m)) return "claude-opus-5" as const;
     else return m;
   }
 
