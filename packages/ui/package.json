@@ -124,6 +124,8 @@
     "@radix-ui/react-tooltip": "catalog:radix",
     "class-variance-authority": "catalog:cva",
     "clsx": "catalog:clsx",
+    "cmdk": "catalog:cmdk",
+    "csstype": "catalog:csstype",
     "motion": "catalog:motion",
     "motion-plus": "https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3",
     "motion-plus-dom": "catalog:motion",

@@ -1,4 +1,125 @@
 import "./globals.css";
+import type { Properties } from "csstype";
+
+export { BaseAspectRatio } from "@/base/aspect-ratio";
+export type { BaseAspectRatioProps } from "@/base/aspect-ratio";
+export { BaseBadge, baseBadgeVariants } from "@/base/badge";
+export { BaseButton, baseButtonVariants } from "@/base/button";
+export {
+  BaseCommand,
+  BaseCommandDialog,
+  BaseCommandInput,
+  BaseCommandList,
+  BaseCommandEmpty,
+  BaseCommandGroup,
+  BaseCommandItem,
+  BaseCommandShortcut,
+  BaseCommandSeparator
+} from "@/base/command";
+export {
+  BaseDialog,
+  BaseDialogClose,
+  BaseDialogContent,
+  BaseDialogDescription,
+  BaseDialogFooter,
+  BaseDialogHeader,
+  BaseDialogOverlay,
+  BaseDialogPortal,
+  BaseDialogTitle,
+  BaseDialogTrigger
+} from "@/base/dialog";
+export {
+  BaseDropdown,
+  BaseDropdownPortal,
+  BaseDropdownTrigger,
+  BaseDropdownContent,
+  BaseDropdownGroup,
+  BaseDropdownLabel,
+  BaseDropdownItem,
+  BaseDropdownCheckboxItem,
+  BaseDropdownRadioGroup,
+  BaseDropdownRadioItem,
+  BaseDropdownSeparator,
+  BaseDropdownShortcut,
+  BaseDropdownSub,
+  BaseDropdownSubTrigger,
+  BaseDropdownSubContent
+} from "@/base/dropdown";
+export { BaseInput } from "@/base/input";
+export {
+  BaseInputGroup,
+  BaseInputGroupAddon,
+  BaseInputGroupButton,
+  BaseInputGroupText,
+  BaseInputGroupInput,
+  BaseInputGroupTextarea,
+  baseInputGroupAddonVariants,
+  baseInputGroupButtonVariants
+} from "@/base/input-group";
+export { BaseKbd, BaseKbdGroup } from "@/base/kbd";
+export {
+  BasePopover,
+  BasePopoverContent,
+  BasePopoverDescription,
+  BasePopoverHeader,
+  BasePopoverTitle,
+  BasePopoverTrigger
+} from "@/base/popover";
+export {
+  BaseProgress,
+  BaseProgressTrack,
+  BaseProgressIndicator,
+  BaseProgressLabel,
+  BaseProgressValue
+} from "@/base/progress";
+export { BaseScrollArea, BaseScrollBar } from "@/base/scroll";
+export {
+  BaseSelect,
+  BaseSelectContent,
+  BaseSelectGroup,
+  BaseSelectItem,
+  BaseSelectLabel,
+  BaseSelectScrollDownButton,
+  BaseSelectScrollUpButton,
+  BaseSelectSeparator,
+  BaseSelectTrigger,
+  BaseSelectValue
+} from "@/base/select";
+export { BaseSeparator } from "@/base/separator";
+export {
+  BaseSheet,
+  BaseSheetTrigger,
+  BaseSheetClose,
+  BaseSheetContent,
+  BaseSheetHeader,
+  BaseSheetFooter,
+  BaseSheetTitle,
+  BaseSheetDescription
+} from "@/base/sheet";
+export {
+  BaseTable,
+  BaseTableHeader,
+  BaseTableBody,
+  BaseTableFooter,
+  BaseTableHead,
+  BaseTableRow,
+  BaseTableCell,
+  BaseTableCaption
+} from "@/base/table";
+export { BaseTextarea } from "@/base/textarea";
+export { BaseToggle, baseToggleVariants } from "@/base/toggle";
+export {
+  BaseToggleGroup,
+  BaseToggleGroupContext,
+  BaseToggleGroupItem
+} from "@/base/toggle-group";
+export {
+  BaseTooltip,
+  BaseTooltipTrigger,
+  BaseTooltipContent,
+  BaseTooltipProvider
+} from "@/base/tooltip";
+export { UploadProgress } from "@/base/upload-progress";
 
 export { useAspectCh } from "@/hooks/use-aspect-ch";
 export { useElementDimensions } from "@/hooks/use-element-dimensions";
@@ -160,8 +281,6 @@ export { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 export type { AvatarProps } from "@/ui/avatar";
 export { Badge, badgeVariants } from "@/ui/badge";
 export type { BadgeProps } from "@/ui/badge";
-export { BaseButton, baseButtonVariants } from "@/base/button";
-export { BaseScrollArea, BaseScrollBar } from "@/base/scroll";
 export { BreakoutWrapper } from "@/ui/breakout-wrapper";
 export { Button, buttonVariants } from "@/ui/button";
 export type { ButtonProps } from "@/ui/button";
@@ -268,7 +387,6 @@ export {
   TooltipProvider,
   TooltipTrigger
 } from "@/ui/tooltip";
-export { UploadProgress } from "@/base/progress";
 
 declare global {
   interface JSON {
@@ -279,5 +397,14 @@ declare global {
   }
   interface Body {
     json<T = unknown>(): Promise<T>;
+  }
+}
+declare module "react" {
+  export interface CSSProperties extends Properties<string | number> {
+    "--gap"?: number;
+    "--ratio"?: number;
+    "--skeleton-width"?: string;
+    "--sidebar-width"?: string;
+    "--sidebar-width-icon"?: string;
   }
 }

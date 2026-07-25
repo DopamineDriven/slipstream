@@ -1,104 +1,90 @@
 "use client";
 
-import type { ComponentPropsWithRef } from "react";
-import { useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { animate, motion, useMotionValue, useTransform } from "motion/react";
+import { Progress as ProgressPrimitive } from "@base-ui/react/progress";
 
-interface UploadProgressProps
-  extends ComponentPropsWithRef<typeof motion.circle> {
-  progress: number;
-  size?: "sm" | "md" | "lg";
-  showPercentage?: boolean;
-  withDefaultColor?: boolean;
-}
-
-export function UploadProgress({
-  ref,
-  progress,
-  size = "sm",
-  showPercentage = false,
+function BaseProgress({
   className,
-  withDefaultColor = true,
-  style,
+  children,
+  value,
   ...props
-}: UploadProgressProps) {
-  const motionProgress = useMotionValue(0);
-  const pathLength = useTransform(motionProgress, [0, 100], [0, 1]);
-  const opacity = useTransform(motionProgress, [0, 100], [0.3, 1]);
-  const scale = useTransform(motionProgress, [0, 100], [0.95, 1]);
-  const roundedProgress = useTransform(motionProgress, latest =>
-    Math.round(latest)
-  );
-
-  useEffect(() => {
-    animate(motionProgress, progress, {
-      duration: 0.5,
-      ease: "easeOut"
-    });
-  }, [progress, motionProgress]);
-
-  const dimensions = {
-    sm: { size: 24, strokeWidth: 3, fontSize: "8px" },
-    md: { size: 48, strokeWidth: 4, fontSize: "12px" },
-    lg: { size: 96, strokeWidth: 6, fontSize: "20px" }
-  }[size];
-
-  const radius = (dimensions.size - dimensions.strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const center = dimensions.size / 2;
-
-  const strokeDashoffset = useTransform(pathLength, [0, 1], [circumference, 0]);
-
+}: ProgressPrimitive.Root.Props) {
   return (
-    <motion.div
-      className="relative inline-flex items-center justify-center"
-      style={{ scale, opacity }}
-      initial={{ scale: 0.95, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0.95, opacity: 0 }}>
-      <svg
-        width={dimensions.size}
-        height={dimensions.size}
-        className="-rotate-90">
-        <circle
-          cx={center}
-          cy={center}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={dimensions.strokeWidth}
-          className="opacity-10"
-        />
-        {/* Progress circle */}
-        <motion.circle
-          cx={center}
-          ref={ref}
-          cy={center}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={dimensions.strokeWidth}
-          strokeDasharray={circumference}
-          strokeLinecap="round"
-          className={cn(withDefaultColor ? "text-primary" : "", className)}
-          style={{
-            ...style,
-            strokeDashoffset
-          }}
-          {...props}
-        />
-      </svg>
-      {showPercentage && (
-        <div
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ fontSize: dimensions.fontSize }}>
-          <motion.span className="font-medium tabular-nums">
-            {roundedProgress}
-          </motion.span>
-        </div>
-      )}
-      <span className="sr-only">Upload progress: {Math.round(progress)}%</span>
-    </motion.div>
+    <ProgressPrimitive.Root
+      value={value}
+      data-slot="progress"
+      className={cn("flex flex-wrap gap-3", className)}
+      {...props}>
+      {children}
+      <BaseProgressTrack>
+        <BaseProgressIndicator />
+      </BaseProgressTrack>
+    </ProgressPrimitive.Root>
   );
 }
+
+function BaseProgressTrack({
+  className,
+  ...props
+}: ProgressPrimitive.Track.Props) {
+  return (
+    <ProgressPrimitive.Track
+      className={cn(
+        "bg-muted relative flex h-1 w-full items-center overflow-x-hidden rounded-full",
+        className
+      )}
+      data-slot="progress-track"
+      {...props}
+    />
+  );
+}
+
+function BaseProgressIndicator({
+  className,
+  ...props
+}: ProgressPrimitive.Indicator.Props) {
+  return (
+    <ProgressPrimitive.Indicator
+      data-slot="progress-indicator"
+      className={cn("bg-primary h-full transition-all", className)}
+      {...props}
+    />
+  );
+}
+
+function BaseProgressLabel({
+  className,
+  ...props
+}: ProgressPrimitive.Label.Props) {
+  return (
+    <ProgressPrimitive.Label
+      className={cn("text-sm font-medium", className)}
+      data-slot="progress-label"
+      {...props}
+    />
+  );
+}
+
+function BaseProgressValue({
+  className,
+  ...props
+}: ProgressPrimitive.Value.Props) {
+  return (
+    <ProgressPrimitive.Value
+      className={cn(
+        "text-muted-foreground ml-auto text-sm tabular-nums",
+        className
+      )}
+      data-slot="progress-value"
+      {...props}
+    />
+  );
+}
+
+export {
+  BaseProgress,
+  BaseProgressTrack,
+  BaseProgressIndicator,
+  BaseProgressLabel,
+  BaseProgressValue
+};
