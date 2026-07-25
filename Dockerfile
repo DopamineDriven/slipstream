@@ -1,51 +1,21 @@
 # syntax=docker/dockerfile:1.4
-FROM node:26-bullseye-slim AS base
+FROM node:26-trixie-slim AS base
 
-# Install build dependencies
+# Python 3.13 via apt — pythonia spawns `python3` from PATH
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    software-properties-common \
-    wget \
+    python3 \
+    python3-pip \
     ca-certificates \
     openssl \
-    build-essential \
-    libssl-dev \
-    libffi-dev \
-    zlib1g-dev \
-    libbz2-dev \
-    libreadline-dev \
-    libsqlite3-dev \
-    libncurses5-dev \
-    libncursesw5-dev \
-    xz-utils \
-    tk-dev \
-    libxml2-dev \
-    libxmlsec1-dev \
-    liblzma-dev \
     && rm -rf /var/lib/apt/lists/*
-
-# Compile Python 3.10 with proper venv support
-RUN wget https://www.python.org/ftp/python/3.10.0/Python-3.10.0.tgz \
-    && tar -xzf Python-3.10.0.tgz \
-    && cd Python-3.10.0 \
-    && ./configure --enable-optimizations --with-ensurepip=install \
-    && make -j$(nproc) \
-    && make altinstall \
-    && cd .. \
-    && rm -rf Python-3.10.0 Python-3.10.0.tgz
-
-# Install pip properly
-RUN wget https://bootstrap.pypa.io/get-pip.py \
-    && python3.10 get-pip.py \
-    && rm get-pip.py
-
-# Update alternatives
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.10 1 \
-    && update-alternatives --install /usr/bin/pip3 pip3 /usr/local/bin/pip3.10 1
 
 WORKDIR /app
 
 # --- Builder ---
 FROM base AS builder
+# toolchain for node-gyp fallback if a native addon lacks a Node 26 prebuild
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
 RUN npm install -g turbo@2.10.6 pnpm@11.17.0
 COPY turbo.json pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
 COPY . .
@@ -75,14 +45,11 @@ FROM base AS runner
 RUN groupadd --system --gid 1001 wsserver && \
     useradd --system --uid 1001 --gid wsserver --create-home wsserver
 
-# install Python packages
-RUN python3.10 -m pip install --no-cache-dir --upgrade pip \
-    && python3.10 -m pip install --no-cache-dir xai-sdk==1.4.0 voyageai==0.3.7 # Note: == not =
+# install Python packages (--break-system-packages: trixie's apt Python is PEP 668 externally-managed)
+RUN python3 -m pip install --no-cache-dir --break-system-packages xai-sdk==1.4.0 voyageai==0.3.7
 
 WORKDIR /app
-COPY --from=installer /app .
-
-RUN chown -R wsserver:wsserver /app
+COPY --from=installer --chown=1001:1001 /app .
 
 USER wsserver
 EXPOSE 4000
