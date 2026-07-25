@@ -114,6 +114,7 @@ export default defineConfig(
         "src/sakana/chat.ts",
         "src/sakana/index.ts",
         "src/sakana/store.ts",
+        "src/sakana/types.ts",
         "src/sakana/workup.ts",
         "src/sharp/index.ts",
         "src/store/types.ts",

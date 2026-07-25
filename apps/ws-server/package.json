@@ -164,6 +164,7 @@
         "dist/sakana/chat.d.ts",
         "dist/sakana/index.d.ts",
         "dist/sakana/store.d.ts",
+        "dist/sakana/types.d.ts",
         "dist/sakana/workup.d.ts"
       ],
       "sharp": [
