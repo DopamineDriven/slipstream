@@ -16,7 +16,7 @@ FROM base AS builder
 # toolchain for node-gyp fallback if a native addon lacks a Node 26 prebuild
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
     && rm -rf /var/lib/apt/lists/*
-RUN npm install -g turbo@2.10.6 pnpm@11.17.0
+RUN npm install -g turbo@2.10.7 pnpm@11.17.0
 COPY turbo.json pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
 COPY . .
 ENV TURBO_TELEMETRY=0
