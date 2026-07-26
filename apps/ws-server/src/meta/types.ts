@@ -25,6 +25,8 @@ export interface MetaActiveMessageBlock {
   content: string;
   startedAt: number;
   type: "THINKING" | "ENCRYPTED_THINKING" | "TEXT";
+  /** rs_-prefixed reasoning item id — the matching output_item.done closes the clock */
+  itemId?: string;
 }
 
 export interface MetaFinalizedMessageBlock {

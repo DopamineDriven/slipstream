@@ -106,9 +106,9 @@ catalogs:
   napi:
     "@napi-rs/canvas": ^1.0.2
   next:
-    "@next/eslint-plugin-next": ^16.2.11
-    eslint-config-next: ^16.2.11
-    next: ^16.2.11
+    "@next/eslint-plugin-next": ^16.2.12
+    eslint-config-next: ^16.2.12
+    next: ^16.2.12
     next-themes: ^0.4.6
   node:
     "@types/node": ^26.1.1
@@ -179,7 +179,7 @@ catalogs:
     redis: ^6.1.0
   rehype:
     rehype-katex: ^7.0.1
-    rehype-pretty-code: ^0.14.4
+    rehype-pretty-code: ^0.14.5
     rehype-react: ^8.0.0
     rehype-sanitize: ^6.0.0
     rehype-stringify: ^10.0.1
@@ -229,9 +229,9 @@ catalogs:
   tsx:
     tsx: ^4.23.1
   turbo:
-    eslint-config-turbo: ^2.10.6
-    eslint-plugin-turbo: ^2.10.6
-    turbo: ^2.10.6
+    eslint-config-turbo: ^2.10.7
+    eslint-plugin-turbo: ^2.10.7
+    turbo: ^2.10.7
   tw:
     "@tailwindcss/forms": ^0.5.11
     "@tailwindcss/postcss": ^4.3.3

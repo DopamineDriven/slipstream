@@ -22,7 +22,7 @@ export class CliConfigService {
    * stays the top-level `new SlipstreamReplService(wsUrl)`.
    */
   constructor(
-    protected wsUrl: string = process.env.SLIPSTREAM_WS_URL ??
+    protected wsUrl = process.env.SLIPSTREAM_WS_URL ??
       "ws://localhost:4000"
   ) {}
 
