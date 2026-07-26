@@ -34,7 +34,7 @@
     "build": "tsdown",
     "clean": "git clean -xdf .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "catalog:prettier",
@@ -42,6 +42,7 @@
     "prettier-plugin-tailwindcss": "catalog:prettier"
   },
   "devDependencies": {
+    "@slipstream/eslint-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
     "@typescript/native-preview": "catalog:tsgo",
     "@types/node": "catalog:node",
@@ -50,6 +51,7 @@
     "tsdown": "catalog:tsdown",
     "tslib": "catalog:tslib",
     "tsx": "catalog:tsx",
+    "typescript-eslint": "catalog:tseslint",
     "typescript": "catalog:ts"
   },
   "prettier": "@slipstream/prettier-config"

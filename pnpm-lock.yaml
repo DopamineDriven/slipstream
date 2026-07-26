@@ -2302,6 +2302,9 @@ importers:
         specifier: catalog:prettier
         version: 0.8.1(@ianvs/prettier-plugin-sort-imports@4.7.1(prettier@3.9.6)(supports-color@7.2.0))(prettier@3.9.6)
     devDependencies:
+      '@slipstream/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint
       '@slipstream/tsconfig':
         specifier: workspace:*
         version: link:../typescript
@@ -2329,6 +2332,9 @@ importers:
       typescript:
         specifier: catalog:ts
         version: 6.0.3
+      typescript-eslint:
+        specifier: catalog:tseslint
+        version: 8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
 
   tooling/typescript: {}
 

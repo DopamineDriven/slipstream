@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,cts,mts,js,jsx,mjs,cjs,json,yaml,yml,css,html,md,mdx,graphql,gql}\" --ignore-unknown --cache",
     "start": "next start",
     "lint": "eslint",
+    "clean": "git clean -xdf .next node_modules",
     "typecheck": "tsgo --noEmit",
     "typegen": "next typegen",
     "test:vitest": "vitest",
