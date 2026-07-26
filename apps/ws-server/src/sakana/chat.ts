@@ -225,6 +225,15 @@ export class SakanaChatService extends SakanaWorkupService {
       }
     };
 
+    // the clock closes only against the done event carrying the SAME
+    // rs_ item id the added event opened with (closure-scoped for the
+    // same narrowing reason as morphEncryptedToVisible)
+    const finalizeReasoningItem = (itemId: string) => {
+      if (activeBlock?.itemId === itemId) {
+        finalizeActiveBlock();
+      }
+    };
+
     const currentThinkingDuration = () => {
       const activeThinkingDuration =
         activeBlock?.type === "THINKING" ||
@@ -261,9 +270,15 @@ export class SakanaChatService extends SakanaWorkupService {
     const MAX_TOOL_ROUNDS = 10_000_000;
     let roundInput = Array.of<OpenAI.Responses.ResponseInputItem>(...formatted);
     let forcedLoopStopReason: "MAX_ROUNDS" | undefined = undefined;
+    // the "model is not reasoning as of here" watermark — reset at each
+    // round's dispatch, advanced by every completed output item. Reasoning
+    // items flush fully-formed (added→done adjacent on the wire), so the
+    // think time is the silent gap between this anchor and the item's done.
+    let reasoningAnchor = performance.now();
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
       let streamRes: AsyncIterable<StreamEvents[keyof StreamEvents]>;
+      reasoningAnchor = performance.now();
       try {
         streamRes = await client.responses.create(
           {
@@ -309,21 +324,25 @@ export class SakanaChatService extends SakanaWorkupService {
         if (s.type === "response.output_item.added") {
           if (s.item.type === "reasoning") {
             // assume encrypted (fugu-ultra's default) — the first visible
-            // delta morphs the block to THINKING with the clock intact
-            ensureActiveBlock("ENCRYPTED_THINKING");
+            // delta morphs the block to THINKING with the clock intact.
+            // The clock backdates to the anchor: the item arrives
+            // fully-formed, so the think time already elapsed in the
+            // silent gap before this event landed
+            const block = ensureActiveBlock("ENCRYPTED_THINKING");
+            block.startedAt = reasoningAnchor;
+            block.itemId = s.item.id;
           } else {
             finalizeActiveBlock();
           }
         }
 
-        // the reasoning item's own lifecycle bounds its duration — the
-        // clock closes at ITS done event (rs_-prefixed item), not at the
-        // next item's added
-        if (
-          s.type === "response.output_item.done" &&
-          s.item.type === "reasoning"
-        ) {
-          finalizeActiveBlock();
+        if (s.type === "response.output_item.done") {
+          if (s.item.type === "reasoning") {
+            finalizeReasoningItem(s.item.id);
+          }
+          // any completed item proves the model was not reasoning until at
+          // least here — the next reasoning item's clock starts from it
+          reasoningAnchor = performance.now();
         }
 
         if (
