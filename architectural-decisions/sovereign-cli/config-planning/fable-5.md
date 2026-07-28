@@ -252,10 +252,15 @@ AES-256-GCM, key-scoped `providerContext`). So:
    grows a frame you own. Both?
 2. Which knobs make identity-plane v1? My cut after the ground rules:
    defaultProvider + defaultModel + showThinking, nothing else.
-   (Temperature/topP feel per-conversation, not per-user — they already
-   live on `ConversationSettings` web-side; HMEM scope stays
-   model-instructed unless it proves itself as a knob — if it ever does,
-   it becomes a prisma enum column, never a string.)
+   (Temperature/topP get no knob anywhere: `ConversationSettings` is
+   essentially a dead table (Andrew, 2026-07-28 — top_p etc. never
+   actually used or exposed), and its premise was wrong on its own terms —
+   if sampling params were ever active they'd be per-MODEL, not per-convo,
+   since a conversation cycles through many models and valid top_p ranges
+   vary by model. Don't cite it as precedent, don't replicate the mistake
+   CLI-side. HMEM scope stays model-instructed unless it proves itself as
+   a knob — if it ever does, it becomes a prisma enum column, never a
+   string.)
 3. Device flow lands on `apps/web` or proves out on `web-next` first?
 4. Machine file format: JSON (parse with the `JSON.parse<T>` augmentation)
    vs JSONC? Plain JSON is my lean — no comment-stripping dependency.
