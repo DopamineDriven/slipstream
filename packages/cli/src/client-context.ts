@@ -1,15 +1,15 @@
-import type { CliIdentity, CookieKey, EdgeClientContext } from "@/types.ts";
+import type { CliIdentity, CookieKey, ServerlessClientContext } from "@/types.ts";
 import { CliConfigService } from "@/config.ts";
 import { COOKIE_KEYS } from "@/types.ts";
 import type { UserMetadata } from "@slipstream/types";
 
 /**
- * Client-context service (phase 2B) — fetches real edge-derived values from
+ * Client-context service (phase 2B) — fetches real server-derived values from
  * GET /api/client/context (apps/web `detectDeviceWorkup`) and serializes
  * them into the handshake Cookie header, retiring the ws-server's Barrington
  * fallback coincidence. Sits between CliConfigService and
  * SlipstreamClientService in the service chain (config → context → client →
- * renderer → repl). primeEdgeContext() is the only effect; everything else
+ * renderer → repl). primeServerlessContext() is the only effect; everything else
  * derives. Zero ws-server changes — parsedCookies() already reads this.
  */
 export class ClientContext extends CliConfigService {
@@ -18,12 +18,12 @@ export class ClientContext extends CliConfigService {
   }
 
   /**
-   * Real edge-derived context, set by primeEdgeContext() before the
+   * Real server-derived context, set by primeServerlessContext() before the
    * handshake. Undefined until then — or on fetch failure — in which case
    * the static defaults below remain in effect. Both userMetadata and
    * cookieHeader consult this.
    */
-  protected edgeContext?: EdgeClientContext = undefined;
+  protected serverlessContext?: ServerlessClientContext = undefined;
 
   /**
    * The exact twelve keys the ws-server's parsedCookies() allowlist
@@ -33,15 +33,15 @@ export class ClientContext extends CliConfigService {
   protected readonly cookieKeys = COOKIE_KEYS;
 
   /**
-   * GET endpoint reflecting x-vercel-* edge-derived client context as JSON
+   * GET endpoint reflecting x-vercel-* derived client context as JSON
    * (apps/web detectDeviceWorkup). Prod returns real values even for a
-   * locally running CLI — the edge derives from the caller's request.
+   * locally running CLI — the serverless route (node runtime) derives from the caller's request.
    */
   public get clientContextUrl() {
     return "https://chat.aicoalesce.com/api/client/context" as const;
   }
 
-  /** CLI-authored identity — never taken from the edge payload */
+  /** CLI-authored identity — never taken from the server payload */
   public get cliIdentity() {
     return {
       ua: "slipstream-cli/1.0.0 (wsl2; node)",
@@ -57,7 +57,7 @@ export class ClientContext extends CliConfigService {
   }
 
   /**
-   * machine-truth locale — sent as accept-language so the edge derives
+   * machine-truth locale — sent as accept-language so the serverless route derives
    * locale the same way it does for browsers
    */
   protected localLocale() {
@@ -77,9 +77,9 @@ export class ClientContext extends CliConfigService {
     }
   }
 
-  protected isEdgeClientContext(v: unknown): v is EdgeClientContext {
+  protected isServerlessClientContext(v: unknown): v is ServerlessClientContext {
     if (typeof v !== "object" || v === null) return false;
-    const rec = v as Partial<Record<keyof EdgeClientContext, unknown>>;
+    const rec = v as Partial<Record<keyof ServerlessClientContext, unknown>>;
     return (
       typeof rec.city === "string" &&
       typeof rec.locale === "string" &&
@@ -96,32 +96,33 @@ export class ClientContext extends CliConfigService {
   /**
    * Vercel's x-vercel-ip-city header arrives URI-encoded ("Oak%20Ridge")
    * and detectDeviceWorkup passes it through raw — decode at this boundary
-   * so cookiePairs/edgeToUserMetadata deal in clean values.
+   * so cookiePairs/serverlessToUserMetadata deal in clean values.
    */
-  protected normalizeEdgeClientContext(edge: EdgeClientContext) {
+  protected normalizeServerlessClientContext(ctx: ServerlessClientContext) {
     return {
-      ...edge,
-      city: this.safeDecode(edge.city)
-    } satisfies EdgeClientContext;
+      ...ctx,
+      city: this.safeDecode(ctx.city)
+    } satisfies ServerlessClientContext;
   }
 
   /**
-   * edge geo + CLI identity + machine tz → the twelve-key record the
-   * ws-server allowlist accepts. Identity always wins over edge for
+   * server geo + CLI identity + machine tz → the twelve-key record the
+   * ws-server allowlist accepts. Identity always wins over server geo for
    * ua/browserName/browserVersion/viewport.
    */
-  protected cookiePairs(edge: EdgeClientContext, tz = this.localTimezone()) {
+  protected cookiePairs(ctx: ServerlessClientContext, tz = this.localTimezone()) {
     const identity = this.cliIdentity;
     return {
-      city: edge.city,
-      locale: edge.locale,
+      city: ctx.city,
+      locale: ctx.locale,
       ua: identity.ua,
-      ip: edge.ip,
-      country: edge.country,
-      latlng: edge.latlng,
+      ip: ctx.ip,
+      via: "cli",
+      country: ctx.country,
+      latlng: ctx.latlng,
       tz,
-      region: edge.region,
-      postalCode: edge.postalCode,
+      region: ctx.region,
+      postalCode: ctx.postalCode,
       browserName: identity.browserName,
       browserVersion: identity.browserVersion,
       viewport: identity.viewport
@@ -141,24 +142,25 @@ export class ClientContext extends CliConfigService {
   }
 
   /**
-   * edge geo → per-message ai_chat_request.metadata (identity fields
+   * server geo → per-message ai_chat_request.metadata (identity fields
    * excluded — ua stays CLI-authored)
    */
-  protected edgeToUserMetadata(
-    edge: EdgeClientContext,
+  protected serverlessToUserMetadata(
+    ctx: ServerlessClientContext,
     tz = this.localTimezone()
   ) {
     const [lat, lng] = [
-      Number.parseFloat(edge.latlng.slice(0, edge.latlng.lastIndexOf(","))),
-      Number.parseFloat(edge.latlng.slice(edge.latlng.lastIndexOf(",") + 1))
+      Number.parseFloat(ctx.latlng.slice(0, ctx.latlng.lastIndexOf(","))),
+      Number.parseFloat(ctx.latlng.slice(ctx.latlng.lastIndexOf(",") + 1))
     ];
     return {
-      city: edge.city,
-      region: edge.region,
-      country: edge.country,
-      postalCode: edge.postalCode,
-      locale: edge.locale,
-      ip: edge.ip,
+      city: ctx.city,
+      region: ctx.region,
+      country: ctx.country,
+      postalCode: ctx.postalCode,
+      via: "cli",
+      locale: ctx.locale,
+      ip: ctx.ip,
       lat,
       lng,
       tz
@@ -166,12 +168,12 @@ export class ClientContext extends CliConfigService {
   }
 
   /**
-   * One GET at startup — primes edgeContext for userMetadata/cookieHeader.
+   * One GET at startup — primes serverlessContext for userMetadata/cookieHeader.
    * Degrades to undefined on any failure (timeout, non-200, malformed
-   * payload) so an edge blip never blocks a session; the static defaults
+   * payload) so a server blip never blocks a session; the static defaults
    * stay in effect.
    */
-  public async primeEdgeContext(timeoutMs = 3500) {
+  public async primeServerlessContext(timeoutMs = 3500) {
     const identity = this.cliIdentity;
     try {
       const res = await fetch(this.clientContextUrl, {
@@ -184,10 +186,10 @@ export class ClientContext extends CliConfigService {
       });
       if (!res.ok) return undefined;
       const data: unknown = await res.json();
-      this.edgeContext = this.isEdgeClientContext(data)
-        ? this.normalizeEdgeClientContext(data)
+      this.serverlessContext = this.isServerlessClientContext(data)
+        ? this.normalizeServerlessClientContext(data)
         : undefined;
-      return this.edgeContext;
+      return this.serverlessContext;
     } catch {
       return undefined;
     }
@@ -195,7 +197,7 @@ export class ClientContext extends CliConfigService {
 
   /**
    * Static defaults (single-operator, plan §0.1) merged with real
-   * edge-derived values once primeEdgeContext() lands — the same metadata
+   * server-derived values once primeServerlessContext() lands — the same metadata
    * shape the browser client derives from the proxy cookies, reusable both
    * for the handshake Cookie header and ai_chat_request.metadata
    */
@@ -210,11 +212,12 @@ export class ClientContext extends CliConfigService {
       lng: -87.8966849,
       locale: "en-US",
       ua: this.cliIdentity.ua,
+      via: "cli",
       ip: "127.0.0.1"
     } as const satisfies UserMetadata;
-    const edge = this.edgeContext;
-    return edge
-      ? ({ ...base, ...this.edgeToUserMetadata(edge) } satisfies UserMetadata)
+    const ctx = this.serverlessContext;
+    return ctx
+      ? ({ ...base, ...this.serverlessToUserMetadata(ctx) } satisfies UserMetadata)
       : base;
   }
 
@@ -225,9 +228,9 @@ export class ClientContext extends CliConfigService {
    * serializeCookieHeader.
    */
   public get cookieHeader() {
-    const edge = this.edgeContext;
-    if (edge) {
-      return this.serializeCookieHeader(this.cookiePairs(edge));
+    const ctx = this.serverlessContext;
+    if (ctx) {
+      return this.serializeCookieHeader(this.cookiePairs(ctx));
     }
     const m = this.userMetadata;
     const identity = this.cliIdentity;
@@ -236,6 +239,7 @@ export class ClientContext extends CliConfigService {
       region: m.region,
       country: m.country,
       tz: m.tz,
+      via: "cli",
       postalCode: m.postalCode,
       locale: m.locale,
       ip: m.ip,

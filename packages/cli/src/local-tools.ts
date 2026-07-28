@@ -21,9 +21,11 @@ import { LOCAL_TOOL_NAMES } from "@slipstream/types";
  * exact socket, and replaying a stale one after reconnect is actively
  * wrong (the server broker synthesizes the error instead).
  *
- * Dormant unless initializeLocalTools() runs (--workspace opt-in):
- * localToolCapabilities is undefined, ai_chat_request omits the field,
- * and the server attaches zero tool definitions to the provider request.
+ * Armed by default (Claude Code / Codex parity): the enclosing git
+ * checkout's root auto-detected from cwd, cwd itself outside a checkout.
+ * --no-workspace is the dormant opt-out: localToolCapabilities is
+ * undefined, ai_chat_request omits the field, and the server attaches
+ * zero tool definitions to the provider request.
  */
 export class CliLocalToolsService extends CliRendererService {
   constructor(wsUrl?: string) {
@@ -40,40 +42,51 @@ export class CliLocalToolsService extends CliRendererService {
 
   /**
    * nearest ancestor containing .git (a directory in a normal checkout, a
-   * FILE in worktrees/submodules — existence is the test), falling back to
-   * the starting directory when none is found (non-git dirs are still
-   * legitimate workspaces)
+   * FILE in worktrees/submodules — existence is the test); undefined when
+   * no checkout encloses the starting directory
    */
-  protected detectWorkspaceRoot(from = process.cwd()) {
+  protected detectGitRoot(from = process.cwd()) {
     let dir = resolve(from);
     for (;;) {
       if (existsSync(join(dir, ".git"))) return dir;
       const parent = dirname(dir);
-      if (parent === dir) return resolve(from);
+      if (parent === dir) return undefined;
       dir = parent;
     }
   }
 
   /**
-   * --workspace [root] opt-in — flag absent means the bridge stays
-   * dormant. Bare flag autodetects the git root from cwd; an explicit
-   * value is taken literally so a deliberately narrow boundary holds.
+   * detectGitRoot with the starting directory as the fallback — non-git
+   * dirs are still legitimate workspaces when explicitly requested
    */
-  protected parseWorkspaceArg(argv: readonly string[]) {
+  protected detectWorkspaceRoot(from = process.cwd()) {
+    return this.detectGitRoot(from) ?? resolve(from);
+  }
+
+  /**
+   * Workspace resolution — Claude Code / Codex parity: armed by default at
+   * the enclosing git checkout's root (walking up from cwd), cwd itself
+   * outside a checkout. --workspace [root] narrows or forces the boundary
+   * (an explicit value is taken literally); --no-workspace is the only
+   * dormant path.
+   */
+  protected parseWorkspaceArg(argv: readonly string[], from?: string) {
+    if (argv.includes("--no-workspace")) return undefined;
     const idx = argv.indexOf("--workspace");
     if (idx !== -1) {
       const next = argv[idx + 1];
       return next !== undefined && !next.startsWith("-")
         ? next
-        : this.detectWorkspaceRoot();
+        : this.detectWorkspaceRoot(from);
     }
     const eq = argv.find(a => a.startsWith("--workspace="));
     const value = eq?.slice("--workspace=".length);
-    // empty value (--workspace=$UNSET_VAR) stays dormant — explicit check,
-    // no falsy collapse
-    return typeof value !== "undefined" && value.length > 0
-      ? value
-      : undefined;
+    // explicit check, no falsy collapse — an empty value
+    // (--workspace=$UNSET_VAR) behaves like flag-absent
+    if (typeof value !== "undefined" && value.length > 0) {
+      return value;
+    }
+    return this.detectWorkspaceRoot(from);
   }
 
   protected async initializeLocalTools(workspaceRoot: string) {

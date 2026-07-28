@@ -21,7 +21,7 @@ export const CLI_MODELS = [
   { alias: "fugu", model: "fugu", provider: "sakana" },
   { alias: "opus", model: "claude-opus-4-6", provider: "anthropic" },
   { alias: "opus-5", model: "claude-opus-5", provider: "anthropic" },
-  { alias: "kimi", model: "kimi-k2.7-code", provider: "moonshotai" },
+  { alias: "kimi", model: "kimi-k3", provider: "moonshotai" },
   { alias: "glm", model: "glm-5.2", provider: "zai" },
   { alias: "mistral", model: "mistral-medium-3.5", provider: "mistral" },
   { alias: "qwen", model: "qwen3.7-plus", provider: "alibaba" },
@@ -46,7 +46,7 @@ export interface ChatSessionState {
   showThinking: boolean;
 }
 
-export interface EdgeClientContext {
+export interface ServerlessClientContext {
   hostname: string;
   locale: string;
   viewport: string;
@@ -54,6 +54,7 @@ export interface EdgeClientContext {
   browserVersion: string;
   ios: string;
   latlng: string;
+  via: "cli" | "web" | (string & {});
   tz: string;
   ua: string;
   ip: string;
@@ -64,7 +65,7 @@ export interface EdgeClientContext {
   postalCode: string;
 }
 
-/** CLI-authored identity fields — never taken from the edge payload */
+/** CLI-authored identity fields — never taken from the server payload */
 export interface CliIdentity {
   ua: string;
   browserName: string;
@@ -82,6 +83,7 @@ export const COOKIE_KEYS = [
   "locale",
   "ua",
   "ip",
+  "via",
   "country",
   "latlng",
   "tz",
@@ -100,6 +102,7 @@ export type CookieKey =
   | "ip"
   | "latlng"
   | "locale"
+  | "via"
   | "postalCode"
   | "region"
   | "tz"

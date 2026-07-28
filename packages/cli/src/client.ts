@@ -54,10 +54,10 @@ export class SlipstreamClientService extends ClientContext {
   }
 
   public async connect(timeoutMs = 10_000) {
-    // real edge-derived context first (phase 2B) — stashUserData gets honest
+    // real server-derived context first (phase 2B) — stashUserData gets honest
     // geo instead of the Barrington fallback; fetch failure degrades to the
-    // static cookie defaults so an edge blip never blocks a session
-    await this.primeEdgeContext();
+    // static cookie defaults so a serverless-route blip never blocks a session
+    await this.primeServerlessContext();
     // ?id= carries the userId — the server validates the session on file;
     // the Cookie header carries the client context parsedCookies() reads
     const url = `${this.wsUrl}/?id=${encodeURIComponent(this.userId)}`;

@@ -2,7 +2,11 @@
 import { SlipstreamReplService } from "@/repl.ts";
 
 /**
- * aic [--workspace [root]] [--env dev|prod] [--no-markdown]
+ * aic [--workspace [root]] [--no-workspace] [--env dev|prod] [--no-markdown]
+ *
+ * Local read tools arm automatically at the enclosing git checkout's
+ * root (cwd outside one); --workspace narrows or forces the boundary,
+ * --no-workspace keeps the bridge dormant.
  *
  * --env is the composition-root injection point for the ws connection
  * string — the two addresses are deliberately hardcoded here (no secrets
