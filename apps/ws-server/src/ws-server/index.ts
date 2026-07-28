@@ -177,6 +177,10 @@ export class WSServer {
     );
   }
 
+  private isWebOrCli(s: string) {
+    return s === "web" || s === "cli";
+  }
+
   private async stashUserData(
     userId: string,
     cookieObj: Record<keyof UserData, string> | null,
@@ -196,13 +200,16 @@ export class WSServer {
       postalCode,
       ip,
       locale,
-      ua
+      ua,
+      via: v
     } = cookieObj;
+    const via = this.isWebOrCli(v) ? v : "web";
     void this.prisma.updateProfile({
       email: email ?? "",
       region,
       postalCode,
       browserName,
+      via,
       viewport,
       browserVersion,
       city,
@@ -223,6 +230,7 @@ export class WSServer {
       ip,
       locale,
       viewport,
+      via,
       ua,
       postalCode,
       city,
@@ -278,6 +286,7 @@ export class WSServer {
       ip,
       locale,
       viewport,
+      via,
       ua,
       browserName,
       browserVersion,
@@ -289,6 +298,7 @@ export class WSServer {
       email: userEmail = email
     } = this.userDataMap.get(userId) ?? {
       email: "anonymous@wow.com",
+      via: "web",
       browserName: "Chrome",
       browserVersion: "147.0.7727.49",
       city: "Barrington",
@@ -315,6 +325,7 @@ export class WSServer {
       locale,
       ua,
       viewport,
+      via,
       country,
       latlng,
       postalCode,
@@ -325,7 +336,7 @@ export class WSServer {
     } satisfies UserData;
 
     this.userMap.set(ws, userId);
-    const message = `User ${userId} (${email}) connected on a ${viewport} via ${browserName} version ${browserVersion} from ${city}, ${country} (${region} region) having postal code ${postalCode} in the ${tz} timezone with a locale of ${locale}, an approx location of ${latlng}, an ip of ${ip}, and a ua of ${ua}`;
+    const message = `User ${userId} (${email}) connected via ${via ?? "web"} on a ${viewport} via ${browserName} version ${browserVersion} from ${city}, ${country} (${region} region) having postal code ${postalCode} in the ${tz} timezone with a locale of ${locale}, an approx location of ${latlng}, an ip of ${ip}, and a ua of ${ua}`;
     this.logger.info(message);
     ws.on("message", raw => {
       // Shutdown admission gate — once `stop()` flips `isDraining`, reject
@@ -375,9 +386,7 @@ export class WSServer {
       // the survivor's UserData (falling back to hardcoded defaults
       // mid-conversation). Evict only when the last socket for this user
       // is gone; userMap already holds the truth.
-      const stillConnected = Array.from(this.userMap.values()).includes(
-        userId
-      );
+      const stillConnected = Array.from(this.userMap.values()).includes(userId);
       if (!stillConnected) {
         this.userDataMap.delete(userId);
       }
@@ -437,6 +446,7 @@ export class WSServer {
         cookieHeader.split(";").forEach(function (cookie) {
           function isUserDataKey(s: string) {
             return (
+              s === "via" ||
               s === "city" ||
               s === "locale" ||
               s === "ua" ||
@@ -459,6 +469,7 @@ export class WSServer {
             "country",
             "latlng",
             "tz",
+            "via",
             "region",
             "postalCode",
             "browserName",

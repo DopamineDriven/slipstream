@@ -16,11 +16,13 @@ export const COOKIES = {
   region: "region",
   postalCode: "postalCode",
   locale: "locale",
-  userId: "userId"
+  userId: "userId",
+  via: "via"
 } as const;
 
 export function isValidCookieKey(c: string) {
   return (
+    c === "via" ||
     c === "browserName" ||
     c === "browserVersion" ||
     c === "hostname" ||
@@ -59,6 +61,7 @@ export type CookieValue = {
   postalCode: string;
   country: string;
   city: string;
+  via: "web" | "cli" | (string & {});
   isMac: "true" | "false" | (string & {});
   locale: string;
   userId: string;
@@ -84,7 +87,9 @@ export interface CookieContextType {
   ) => void;
   remove: (key: CookieKey) => void;
   getAll: () => Partial<CookieValue>;
-  getTargeted: <const V extends keyof CookieValue>(k: readonly V[]) => FilterResults<V>
+  getTargeted: <const V extends keyof CookieValue>(
+    k: readonly V[]
+  ) => FilterResults<V>;
 }
 export type FilterBySelect<Q extends keyof CookieValue> = Exclude<
   Exclude<Q, CookieValue>,
@@ -106,7 +111,7 @@ export type CookieOpts<T extends keyof CookieValue = keyof CookieValue> = {
 
 export function handleSelect<
   const V extends keyof CookieValue = keyof CookieValue
->(select: CookieOpts<V>['select']) {
+>(select: CookieOpts<V>["select"]) {
   const a = Array.of<readonly [string, string | number | boolean]>();
 
   if (select && select.length > 0) {
@@ -116,7 +121,7 @@ export function handleSelect<
     a.push(tuple);
   }
 
-  return select
+  return select;
 }
 
-handleSelect(["browserVersion", "browserName"] )
+handleSelect(["browserVersion", "browserName"]);

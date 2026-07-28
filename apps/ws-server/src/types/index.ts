@@ -382,6 +382,7 @@ export interface UserData {
   browserName?: string;
   browserVersion?: string;
   viewport?: string;
+  via?: "web" | "cli";
 }
 
 export type MessageHandler<T extends keyof EventTypeMap> = (

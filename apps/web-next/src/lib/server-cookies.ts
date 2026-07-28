@@ -32,6 +32,8 @@ export function detectDeviceWorkup(request: NextRequest) {
 
   let locale = m?.[1] ?? "en-US";
 
+  const via = "web";
+
   if (!locale.includes("-")) {
     locale = `${locale.toLowerCase()}-${country}`;
   }
@@ -51,7 +53,8 @@ export function detectDeviceWorkup(request: NextRequest) {
     city,
     isMac: `${isMac}`,
     region,
-    postalCode
+    postalCode,
+    via
   } as const;
 
   return obj;
