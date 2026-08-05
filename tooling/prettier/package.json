@@ -33,6 +33,7 @@
   "scripts": {
     "build": "tsdown",
     "clean": "git clean -xdf .turbo node_modules",
+    "lint": "eslint",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsgo --noEmit"
   },

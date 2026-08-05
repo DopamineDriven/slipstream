@@ -10,7 +10,7 @@ dotenv.config({ quiet: true });
  * (localhost:3030/auth/login or chat.aicoalesce.com/auth/login) — later.
  *
  * Dep-free base of the CLI service chain (config → context → client →
- * renderer → repl). Client-context concerns (edge fetch, cookie header,
+ * renderer → repl). Client-context concerns (context fetch, cookie header,
  * userMetadata) live one layer up in ClientContext.
  */
 export class CliConfigService {

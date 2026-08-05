@@ -149,6 +149,7 @@ export type UserMetadata = {
   tz?: string;
   postalCode?: string;
   locale?: string;
+  via?: "web" | "cli" | (string & {})
   providerContext?: ClientContextWorkupProps;
 };
 

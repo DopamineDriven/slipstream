@@ -97,6 +97,75 @@ export class ToolCatalogService {
     ] as const satisfies readonly ToolCatalogEntry[];
   }
 
+  /**
+   * Local read-only tool bridge (Sovereign CLI) — joins the registry only
+   * for via: "cli" sockets. Wire names are canonical on every provider (no
+   * overrides), and buildCatalog's active-list filter still applies, so an
+   * unarmed CLI turn (--no-workspace) never reads about tools it can't call.
+   */
+  private get localToolEntries() {
+    return [
+      {
+        id: "repo_search",
+        category: "local_workspace",
+        summary:
+          "Ripgrep over the user's live workspace — executed by their CLI on their machine, returning file:line matches with surrounding context.",
+        bestFor: [
+          "locating symbols, definitions, and call sites across the checkout",
+          "answering 'where is X handled' from the real source of truth",
+          "scoping the territory before a targeted read_file dig"
+        ],
+        pairsWith: [
+          {
+            tool: "read_file",
+            how: "search finds the doorway; read_file walks the room — expand hits with line-ranged reads"
+          },
+          {
+            tool: "file_search",
+            how: "repo_search reads the LIVE checkout; file_search reads what the user UPLOADED — provenance differs, pick accordingly"
+          }
+        ]
+      },
+      {
+        id: "read_file",
+        category: "local_workspace",
+        summary:
+          "Line-ranged windows of a workspace file — bounded output from the user's machine, exact enough to cite file:line.",
+        bestFor: [
+          "reading the exact lines behind a repo_search hit",
+          "walking a large file window by window",
+          "grounding claims about the user's code in the code itself"
+        ],
+        pairsWith: [
+          {
+            tool: "repo_search",
+            how: "search finds the doorway; read_file walks the room — expand hits with line-ranged reads"
+          }
+        ]
+      },
+      {
+        id: "list_directory",
+        category: "local_workspace",
+        summary:
+          "Bounded directory listing of the user's workspace — orientation before targeted reads.",
+        bestFor: [
+          "mapping unfamiliar project structure",
+          "finding candidate paths when search terms are still unknown"
+        ],
+        pairsWith: [
+          {
+            tool: "repo_search",
+            how: "list to orient, then search the promising subtree"
+          },
+          {
+            tool: "read_file",
+            how: "listing surfaces the filenames; read_file opens them"
+          }
+        ]
+      }
+    ] as const satisfies readonly ToolCatalogEntry[];
+  }
+
   /** the wire name a canonical tool ships under for a given provider */
   private toolNameFor(canonicalId: string, provider: Provider) {
     const overrides = this.providerNameOverrides;
@@ -109,9 +178,17 @@ export class ToolCatalogService {
     return canonicalId;
   }
 
-  /** the registry for one provider — entries(p) already carries wire names */
-  public entriesFor(provider: Provider) {
-    return this.entries(provider).map(({ id, ...rest }) => ({
+  /**
+   * the registry for one provider — entries(p) already carries wire names;
+   * via: "cli" folds the local read-only bridge entries in (their wire
+   * names are canonical everywhere)
+   */
+  public entriesFor(provider: Provider, via: "web" | "cli" = "web") {
+    const registry =
+      via === "cli"
+        ? [...this.entries(provider), ...this.localToolEntries]
+        : this.entries(provider);
+    return registry.map(({ id, ...rest }) => ({
       name: id,
       ...rest
     }));
@@ -121,11 +198,19 @@ export class ToolCatalogService {
    * Build the catalog response from the tool names ACTUALLY shipped in the
    * request (wire names, post-mapping). Unknown/native tools (web_search,
    * code_execution, ...) pass through unlisted — the catalog documents the
-   * in-house toolkit, not the provider's own surface.
+   * in-house toolkit, not the provider's own surface. via: "cli" admits the
+   * local bridge entries into the registry; the active-list filter still
+   * decides what the model actually reads about.
    */
-  public buildCatalog(provider: Provider, activeToolNames: readonly string[]) {
+  public buildCatalog(
+    provider: Provider,
+    activeToolNames: readonly string[],
+    via: "web" | "cli" = "web"
+  ) {
     const active = new Set(activeToolNames);
-    const tools = this.entriesFor(provider).filter(t => active.has(t.name));
+    const tools = this.entriesFor(provider, via).filter(t =>
+      active.has(t.name)
+    );
     return JSON.stringify({
       tools,
       note: "Catalog reflects tools available in this request. Use as liberally or conservatively as you see fit."

@@ -190,7 +190,8 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
     title,
     topP,
     user_location,
-    localTools
+    localTools,
+    via
   }: ProviderAnthropicChatRequestEntity) {
     // it's conditional but it's actually always defined
     // incomning user msg request
@@ -1147,16 +1148,25 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
           }
         } else if (acc.name === "tool_catalog") {
           // catalog ships only alongside the full in-house kit (tooling()),
-          // so the active list is accurate by construction
+          // so the active list is accurate by construction; an armed CLI
+          // turn appends its advertised local bridge names, and via admits
+          // their registry entries
           toolResults.push({
             type: "tool_result",
             tool_use_id: acc.id,
-            content: this.toolCatalog.buildCatalog("anthropic", [
-              "file_search",
-              "conversation_memory_search",
-              "conversation_memory_get_chunk",
-              "tool_catalog"
-            ])
+            content: this.toolCatalog.buildCatalog(
+              "anthropic",
+              [
+                "file_search",
+                "conversation_memory_search",
+                "conversation_memory_get_chunk",
+                "tool_catalog",
+                ...(localToolTurn
+                  ? [...localToolTurn.advertised].filter(isLocalToolName)
+                  : [])
+              ],
+              via
+            )
           });
         } else if (acc.name === "conversation_memory_get_chunk") {
           try {

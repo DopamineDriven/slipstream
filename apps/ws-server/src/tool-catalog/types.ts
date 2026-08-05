@@ -1,5 +1,8 @@
 export type ToolCatalogCategory =
-  "document_retrieval" | "conversation_memory" | "meta";
+  | "document_retrieval"
+  | "conversation_memory"
+  | "local_workspace"
+  | "meta";
 
 export interface ToolCatalogEntry {
   /** canonical tool id — providers map to their wire names via toolNameFor */

@@ -382,6 +382,7 @@ export interface UserData {
   browserName?: string;
   browserVersion?: string;
   viewport?: string;
+  via?: "web" | "cli";
 }
 
 export type MessageHandler<T extends keyof EventTypeMap> = (
@@ -446,6 +447,11 @@ export interface ProviderChatRequestEntity {
    * carries zero local tool definitions; never inferred from user agent.
    */
   localTools?: LocalToolCapabilities;
+  /**
+   * client provenance from UserData (handshake cookie, server-narrowed) —
+   * "cli" admits the local bridge entries into the tool catalog registry
+   */
+  via?: "web" | "cli";
 }
 
 export interface ImageGenReqDbRes<

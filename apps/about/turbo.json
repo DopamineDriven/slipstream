@@ -1,0 +1,29 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build", "@slipstream/db#build"],
+      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "src/**/*.tsx",
+        "src/**/*.ts",
+        "src/**/*.css",
+        "tsconfig.json",
+        "package.json",
+        "index.d.ts",
+        "global.d.ts",
+        "aicoalesce-og-img.png",
+        "aicoalesce-twitter-img.png",
+        "next-env.d.ts",
+        "eslint.config.ts",
+        "postcss.config.ts",
+        "next.config.ts"
+      ]
+    },
+    "dev": {
+      "cache": false
+    }
+  }
+}

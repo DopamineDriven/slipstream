@@ -567,3 +567,11 @@ declare module "pythonia" {
     <T = unknown>(fileName: string): Promise<T>;
   }
 }
+enum DEGREES {
+  PhD,
+  MD,
+  MSW
+
+}
+
+Object.keys(DEGREES)
