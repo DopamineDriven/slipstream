@@ -9,13 +9,14 @@ import {
   useReducedMotion
 } from "motion/react";
 
-
 export function CursorDot() {
   const reduce = useReducedMotion();
-  const [finePointer, setFinePointer] = useState(true);
+  const [finePointer, setFinePointer] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(pointer: fine)");
+    // eslint-disable-next-line
+    setFinePointer(mq.matches);
     const onChange = (e: MediaQueryListEvent) => setFinePointer(e.matches);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
@@ -52,11 +53,11 @@ function MagneticReticule() {
       <Cursor
         magnetic={{ morph: false, snap: 0 }}
         spring={{ stiffness: 900, damping: 60 }}
+        className="bg-accent"
         style={{
           width: 5,
           height: 5,
-          borderRadius: 999,
-          backgroundColor: "var(--accent)"
+          borderRadius: 999
         }}
       />
       <Cursor
@@ -64,12 +65,12 @@ function MagneticReticule() {
         variants={{
           pressed: { scale: state.targetBoundingBox ? 0.9 : 0.7 }
         }}
+        className="bg-transparent"
         style={{
           rotate,
           width: 36,
           height: 36,
-          borderRadius: 0,
-          backgroundColor: "transparent"
+          borderRadius: 0
         }}>
         <>
           <Corner key="tl" top={0} left={0} />

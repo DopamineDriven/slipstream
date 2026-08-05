@@ -106,13 +106,13 @@
   --font-basis: BasisGrotesquePro, sans-serif;
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
-  --background: oklch(0.97 0 0);
-  --foreground: oklch(0.15 0 0);
-  --card: oklch(0.94 0 0);
-  --muted: oklch(0.9 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --border: oklch(0 0 0 / 10%);
-  --accent: oklch(0.55 0.13 10);
+  --color-background: oklch(0.97 0 0);
+  --color-foreground: oklch(0.15 0 0);
+  --color-card: oklch(0.94 0 0);
+  --color-muted: oklch(0.9 0 0);
+  --color-muted-foreground: oklch(0.45 0 0);
+  --color-border: oklch(0 0 0 / 10%);
+  --color-accent: oklch(0.55 0.13 10);
 
   --radius-sm: 0.25rem;
   --radius-radius: 0.65rem;
@@ -179,14 +179,14 @@
 
 @layer theme {
   .dark {
-    --background: oklch(0.13 0 0);
-    --foreground: oklch(0.97 0 0);
-    --card: oklch(0.17 0 0);
-    --muted: oklch(0.22 0 0);
-    --muted-foreground: oklch(0.65 0 0);
-    --border: oklch(1 0 0 / 10%);
+    --color-background: oklch(0.13 0 0);
+    --color-foreground: oklch(0.97 0 0);
+    --color-card: oklch(0.17 0 0);
+    --color-muted: oklch(0.22 0 0);
+    --color-muted-foreground: oklch(0.65 0 0);
+    --color-border: oklch(1 0 0 / 10%);
     /* the rose from the drip mark's smoke — used sparingly */
-    --accent: oklch(0.72 0.11 10);
+    --color-accent: oklch(0.72 0.11 10);
   }
 }
 

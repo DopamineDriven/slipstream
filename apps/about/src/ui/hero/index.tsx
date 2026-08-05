@@ -1,7 +1,14 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { StatNumber } from "@/ui/stat-number";
 import { motion, useReducedMotion } from "motion/react";
 import { AICoalesce } from "@slipstream/ui";
+
+const ThemeToggle = dynamic(
+  () => import("@/ui/theme").then(d => d.ThemeToggle),
+  { ssr: false }
+);
 
 export function Hero() {
   const reduce = useReducedMotion();
@@ -26,12 +33,14 @@ export function Hero() {
           />
           <span className="sr-only">AI Coalesce</span>
         </motion.div>
-        <motion.a
-          {...fadeUp(0.1)}
-          href="https://chat.aicoalesce.com"
-          className="border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground rounded-full border px-4 py-1.5 text-sm transition-colors">
-          Forge your journey
-        </motion.a>
+        <motion.div {...fadeUp(0.1)} className="flex items-center gap-2">
+          <ThemeToggle className="text-muted-foreground hover:text-foreground" />
+          <a
+            href="https://chat.aicoalesce.com"
+            className="border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground rounded-full border px-4 py-1.5 text-sm transition-colors">
+            Forge your journey
+          </a>
+        </motion.div>
       </nav>
 
       <div className="flex flex-1 flex-col items-start justify-center px-6 pb-24 md:px-10 lg:px-16">
@@ -61,7 +70,7 @@ export function Hero() {
             {...fadeUp(0.4)}
             className="text-muted-foreground mt-8 max-w-xl text-lg leading-relaxed text-pretty">
             A multi-provider, multi-model medium built for privacy and equipped
-            with horizon-mediated episodic memory.
+            with horizon-mediated episodic memory (HMEM).
           </motion.p>
           <motion.div
             {...fadeUp(0.55)}
@@ -82,19 +91,19 @@ export function Hero() {
             className="mt-14 flex items-start gap-12 md:gap-16">
             <div>
               <p className="text-3xl font-medium tracking-tight md:text-4xl">
-                126
+                <StatNumber value={126} delay={0.8} />
               </p>
               <p className="text-muted-foreground mt-1 text-sm">models</p>
             </div>
             <div>
               <p className="text-3xl font-medium tracking-tight md:text-4xl">
-                13
+                <StatNumber value={13} delay={0.95} />
               </p>
               <p className="text-muted-foreground mt-1 text-sm">providers</p>
             </div>
             <div>
               <p className="text-3xl font-medium tracking-tight md:text-4xl">
-                1
+                <StatNumber value={1} delay={1.1} />
               </p>
               <p className="mt-1 text-sm">
                 <a

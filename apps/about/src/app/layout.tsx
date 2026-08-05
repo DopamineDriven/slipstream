@@ -5,7 +5,7 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { CookieProvider } from "@/context/cookie-context";
 import { getAnalyticsMode, getSiteUrl } from "@/lib/site-url";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "@/ui/theme/provider";
 
 export const metadata = {
   metadataBase: new URL(getSiteUrl(process.env.VERCEL_ENV)),
@@ -93,8 +93,7 @@ export default function RootLayout({
       className={`bg-background ${GeistSans.variable} ${GeistMono.variable}`}>
       <body className="font-sans antialiased">
         <CookieProvider>
-          {" "}
-          <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
+          <ThemeProvider>
             {children}
           </ThemeProvider>
         </CookieProvider>
