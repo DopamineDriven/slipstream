@@ -127,7 +127,7 @@
     "cmdk": "catalog:cmdk",
     "csstype": "catalog:csstype",
     "motion": "catalog:motion",
-    "motion-plus": "https://api.motion.dev/registry.tgz?package=motion-plus&version=2.11.3",
+    "motion-plus": "https://api.motion.dev/registry.tgz?package=motion-plus&version=2.12.0",
     "motion-plus-dom": "catalog:motion",
     "tailwind-merge": "catalog:tw",
     "vaul": "catalog:react"

@@ -9,7 +9,7 @@ import type {
 } from "@/types/cookies";
 import type { ReactNode } from "react";
 import { createContext, useCallback, useContext } from "react";
-import { COOKIES, isValidCookieKey } from "@/types/cookies";
+import { COOKIES } from "@/types/cookies";
 import Cookies from "js-cookie";
 
 const CookieContext = createContext<CookieContextType | undefined>(undefined);
@@ -48,18 +48,8 @@ export function CookieProvider({
   }, []);
 
   const getAll = useCallback(() => {
-    const result = {} as Record<keyof CookieValue, string | undefined>;
-
-    Array.from(Object.entries(COOKIES)).forEach(([key, _]) => {
-      if (isValidCookieKey(key) && key in result) {
-        const value = get(key);
-        if (value) {
-          result[key] = value;
-        }
-      }
-    });
-    return result;
-  }, [get]);
+    return getTargeted(Object.keys(COOKIES));
+  }, [getTargeted]);
 
   const contextValue = {
     get,
