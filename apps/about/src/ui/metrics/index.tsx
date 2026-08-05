@@ -1,7 +1,7 @@
 import { Reveal } from "@/ui/reveal";
 import { StatNumber } from "@/ui/stat-number";
 
-export function Proof() {
+export function Metrics() {
   return (
     <section
       aria-labelledby="proof-heading"
