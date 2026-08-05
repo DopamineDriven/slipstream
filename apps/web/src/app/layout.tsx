@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl(process.env.VERCEL_ENV)),
   title: {
     default: "AI Coalesce",
-    template: "%s | aicoalesce"
+    template: "%s | AI Coalesce"
   },
   authors: [{ name: "Andrew Ross", url: "https://github.com/DopamineDriven" }],
   twitter: {
@@ -118,11 +118,12 @@ export default async function RootLayout({
       lang="en"
       data-scroll-behavior="smooth"
       className={`${GeistSans.variable} ${GeistPixelSquare.variable} ${GeistMono.variable} ${inter.variable}`}>
-      <Script
-        async={true}
-        id="prevent-flash-of-wrong-theme"
-        dangerouslySetInnerHTML={{
-          __html: `
+      <head>
+        <Script
+          async
+          id="prevent-flash-of-wrong-theme"
+          dangerouslySetInnerHTML={{
+            __html: `
               (function() {
                 try {
                   const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -132,8 +133,9 @@ export default async function RootLayout({
                 } catch (e) {}
               })();
             `
-        }}
-      />
+          }}
+        />
+      </head>
       <body
         className={
           "bg-background font-basis m-0 h-dvh w-screen overflow-hidden p-0 antialiased"

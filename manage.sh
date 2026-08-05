@@ -145,6 +145,7 @@ build_targeted() {
         "@slipstream/storage-s3"
         "@slipstream/ws-server"
         "@slipstream/web-next"
+        "@slipstream/about"
     )
 
     for package in "${build_order[@]}"; do
