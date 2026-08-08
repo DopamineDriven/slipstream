@@ -1,7 +1,9 @@
+import { cn } from "@/lib/utils";
 import { Reveal } from "@/ui/reveal";
 
 const surfaces = [
   {
+    id: "web",
     name: "Web",
     status: "Live",
     live: true,
@@ -11,20 +13,22 @@ const surfaces = [
     label: "chat.aicoalesce.com"
   },
   {
+    id: "cli",
     name: "CLI",
     status: "Coming Soon",
     live: false,
     description:
       "The same conversation fabric for the terminal, for people who live there.",
-    href: null,
+    href: "#cli",
     label: null
   },
   {
+    id: "mobile",
     name: "iOS & Android",
     status: "Coming Soon",
     live: false,
     description: "Native mobile clients via React Native.",
-    href: null,
+    href: "#mobile",
     label: null
   }
 ];
@@ -44,28 +48,45 @@ export function Surfaces() {
       <div className="mt-12 grid gap-6 md:grid-cols-3">
         {surfaces.map((surface, i) => (
           <Reveal key={surface.name} delay={i * 0.1}>
-            <article className="border-border bg-card flex h-full flex-col rounded-lg border p-6">
+            <article
+              id={surface.id}
+              className="group border-border bg-card hover:border-foreground/25 relative flex h-full flex-col rounded-lg border p-6 transition-colors">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium">{surface.name}</h3>
                 <span
-                  className={`rounded-full border px-2.5 py-0.5 font-mono text-xs ${
+                  className={cn(
+                    `rounded-full border px-2.5 py-0.5 font-mono text-xs`,
                     surface.live
                       ? "border-accent/40 text-accent"
                       : "border-border text-muted-foreground"
-                  }`}>
+                  )}>
                   {surface.status}
                 </span>
               </div>
               <p className="text-muted-foreground mt-4 flex-1 text-sm leading-relaxed text-pretty">
                 {surface.description}
               </p>
-              {surface.href && (
-                <a
-                  href={surface.href}
-                  className="text-foreground/80 hover:text-foreground mt-6 font-mono text-sm transition-colors">
-                  {surface.label} →
-                </a>
+              {surface.label && (
+                <p
+                  aria-hidden="true"
+                  className="text-foreground/80 group-hover:text-foreground mt-6 font-mono text-sm transition-colors">
+                  {surface.label}&nbps;
+                  <span className="inline-block transition-transform group-hover:translate-x-0.5">
+                    →
+                  </span>
+                </p>
               )}
+              {/* The anchor IS the full-card overlay so the magnetic
+                  cursor's target bounding box spans the entire card */}
+              <a
+                href={surface.href}
+                aria-label={
+                  surface.label
+                    ? `${surface.name} — ${surface.label}`
+                    : `${surface.name} — ${surface.status}`
+                }
+                className="absolute inset-0 rounded-lg"
+              />
             </article>
           </Reveal>
         ))}

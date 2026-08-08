@@ -70,7 +70,8 @@ function MagneticReticule() {
           rotate,
           width: 36,
           height: 36,
-          borderRadius: 0
+          borderRadius: 0,
+          backgroundColor: "transparent"
         }}>
         <>
           <Corner key="tl" top={0} left={0} />
