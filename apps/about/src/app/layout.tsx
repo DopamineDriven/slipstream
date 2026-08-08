@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
+import Script from "next/script";
 import { CookieProvider } from "@/context/cookie-context";
 import { getAnalyticsMode, getSiteUrl } from "@/lib/site-url";
 import { ThemeProvider } from "@/ui/theme/provider";
@@ -91,11 +92,28 @@ export default function RootLayout({
     <html
       lang="en"
       className={`bg-background ${GeistSans.variable} ${GeistMono.variable}`}>
+      <head>
+        <Script
+          async
+          id="prevent-flash-of-wrong-theme"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (prefersDark) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `
+          }}
+        />
+      </head>
       <body className="font-sans antialiased">
         <CookieProvider>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
+          <ThemeProvider>{children}</ThemeProvider>
         </CookieProvider>
         <Analytics mode={mode} />
       </body>

@@ -22,13 +22,8 @@ export function ThemeToggle({
   };
 
   // Determine the icon to show before mount, based on system preference or stored theme (via script)
-  let initialIcon = <Sun className="size-5" />; // Default to Sun
-  if (typeof window !== "undefined") {
-    const scriptSetDark = document.documentElement.classList.contains("dark");
-    if (scriptSetDark) {
-      initialIcon = <Moon className="size-5" />;
-    }
-  }
+
+  const scriptSetDark = document.documentElement.classList.contains("dark");
 
   if (!mounted) {
     return (
@@ -39,7 +34,11 @@ export function ThemeToggle({
         disabled // Disable button until mounted to prevent interaction issues
         aria-label="Toggle theme (loading)"
         {...props}>
-        {initialIcon}
+        {scriptSetDark ? (
+          <Moon className="size-5" />
+        ) : (
+          <Sun className="size-5" />
+        )}
         <span className="sr-only">Toggle theme</span>
       </Button>
     );

@@ -56,11 +56,17 @@ export function Hero() {
             </span>
             <span
               aria-hidden="true"
-              className="flex items-center text-5xl md:text-7xl">
-              <span className="text-[2.35em] leading-none">M</span>
+              className="flex items-center text-[clamp(1.5rem,7.2vw,4.5rem)]">
+              <span aria-hidden="true" className="text-[2.35em] leading-none">
+                M
+              </span>
               <span className="flex flex-col leading-[0.95]">
-                <span className="whitespace-nowrap">inimal constraints</span>
-                <span className="text-accent whitespace-nowrap">
+                <span aria-hidden="true" className="whitespace-nowrap">
+                  inimal constraints
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="text-accent whitespace-nowrap">
                   aximal emergence
                 </span>
               </span>
@@ -88,21 +94,21 @@ export function Hero() {
           </motion.div>
           <motion.div
             {...fadeUp(0.7)}
-            className="mt-14 flex items-start gap-12 md:gap-16">
+            className="mt-14 flex items-start gap-8 sm:gap-12 md:gap-16">
             <div>
-              <p className="text-3xl font-medium tracking-tight md:text-4xl">
+              <p className="text-[clamp(2.75rem,6.5vw,4.5rem)] font-medium tracking-tight">
                 <StatNumber value={126} delay={0.8} />
               </p>
               <p className="text-muted-foreground mt-1 text-sm">models</p>
             </div>
             <div>
-              <p className="text-3xl font-medium tracking-tight md:text-4xl">
+              <p className="text-[clamp(2.75rem,6.5vw,4.5rem)] font-medium tracking-tight">
                 <StatNumber value={13} delay={0.95} />
               </p>
               <p className="text-muted-foreground mt-1 text-sm">providers</p>
             </div>
             <div>
-              <p className="text-3xl font-medium tracking-tight md:text-4xl">
+              <p className="text-[clamp(2.75rem,6.5vw,4.5rem)] font-medium tracking-tight">
                 <StatNumber value={1} delay={1.1} />
               </p>
               <p className="mt-1 text-sm">

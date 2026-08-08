@@ -16,7 +16,7 @@ export function Philosophy() {
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
-            <p className="mt-6 text-3xl leading-snug font-medium tracking-tight text-balance md:text-4xl">
+            <p className="mt-6 text-[clamp(1.5rem,3.4vw,2.25rem)] leading-snug font-medium tracking-tight text-balance">
               The less you tell a model who to be, the more it becomes.
             </p>
           </Reveal>
