@@ -161,10 +161,9 @@ const providerModelChatApi = {
     "claude-sonnet-4-6",
     "claude-sonnet-4-5-20250929",
     "claude-opus-4-5-20251101",
-    "claude-haiku-4-5-20251001",
-    "claude-opus-4-1-20250805"
+    "claude-haiku-4-5-20251001"
   ],
-  meta: ["muse-spark-1.1"],
+  meta: ["muse-spark-1.2", "muse-spark-1.1"],
   vercel: ["v0-1.5-md", "v0-1.0-md"],
   mistral: [
     "mistral-small-latest",
@@ -187,14 +186,16 @@ const providerModelChatApi = {
   deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
   zai: ["glm-5.2", "glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
   alibaba: [
+    "qwen3.8-max",
     "qwen3.7-max",
     "qwen3.7-plus",
+    "qwen3.7-flash",
     "qwen3.6-plus",
     "qwen3.5-plus",
     "qwen3.5-flash"
   ],
   minimax: ["minimax-m3", "minimax-m2.7", "minimax-m2.5", "minimax-m2.1"],
-  sakana: ["fugu-ultra", "fugu", "fugu-cyber"]
+  sakana: ["fugu-ultra", "fugu", "fugu-cyber", "sakana-namazu"]
 } as const;
 
 async function anthropicFetcher() {
@@ -221,6 +222,7 @@ async function geminiFetcher() {
 }
 
 const META_NAME_OVERRIDES = {
+  "muse-spark-1.2": "Muse Spark 1.2",
   "muse-spark-1.1": "Muse Spark 1.1"
 } as const;
 
@@ -242,7 +244,9 @@ const ALIBABA_NAME_OVERRIDES = {
   "qwen3.5-plus": "Qwen3.5-Plus",
   "qwen3.6-plus": "Qwen3.6-Plus",
   "qwen3.7-plus": "Qwen3.7-Plus",
-  "qwen3.7-max": "Qwen3.7-Max"
+  "qwen3.7-max": "Qwen3.7-Max",
+  "qwen3.7-flash": "Qwen3.7-Flash",
+  "qwen3.8-max": "Qwen3.8-Max"
 } as const;
 
 const MINIMAX_NAME_OVERRIDES = {
@@ -291,11 +295,17 @@ const DEEPSEEK_NAME_OVERRIDES = {
 const SAKANA_NAME_OVERRIDES = {
   fugu: "Fugu",
   "fugu-ultra": "Fugu Ultra",
-  "fugu-cyber": "Fugu Cyber"
-};
+  "fugu-cyber": "Fugu Cyber",
+  "sakana-namazu": "Sakana Namazu"
+} as const;
 
 function filterForSakana(id: string) {
-  return id === "fugu" || id === "fugu-ultra" || id === "fugu-cyber";
+  return (
+    id === "fugu" ||
+    id === "fugu-ultra" ||
+    id === "fugu-cyber" ||
+    id === "sakana-namazu"
+  );
 }
 
 function filterForMinimax(id: string) {
@@ -313,7 +323,9 @@ function filterForAlibaba(id: string) {
     id === "qwen3.5-plus" ||
     id === "qwen3.6-plus" ||
     id === "qwen3.7-max" ||
-    id === "qwen3.7-plus"
+    id === "qwen3.7-plus" ||
+    id === "qwen3.7-flash" ||
+    id === "qwen3.8-max"
   );
 }
 
@@ -362,7 +374,7 @@ function filterForZai(id: string) {
 }
 
 function filterForMeta(id: string) {
-  return id === "muse-spark-1.1";
+  return id === "muse-spark-1.1" || id === "muse-spark-1.2";
 }
 
 function filterForMistral(id: string) {

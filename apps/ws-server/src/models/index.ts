@@ -187,8 +187,7 @@ export class ModelService extends ModelToolDefsService {
     return (
       m === "claude-opus-4-5-20251101" ||
       m === "claude-sonnet-4-5-20250929" ||
-      m === "claude-haiku-4-5-20251001" ||
-      m === "claude-opus-4-1-20250805"
+      m === "claude-haiku-4-5-20251001"
     );
   }
   public isAnthropicModel(m: string) {
@@ -198,7 +197,7 @@ export class ModelService extends ModelToolDefsService {
   }
 
   public isMetaModel(m: string) {
-    return m === "muse-spark-1.1";
+    return m === "muse-spark-1.1" || m === "muse-spark-1.2";
   }
 
   public isV0Model(m: string) {
@@ -256,8 +255,10 @@ export class ModelService extends ModelToolDefsService {
 
   public isQwenModel(m: string) {
     return (
+      m === "qwen3.8-max" ||
       m === "qwen3.7-max" ||
       m === "qwen3.7-plus" ||
+      m === "qwen3.7-flash" ||
       m === "qwen3.6-plus" ||
       m === "qwen3.5-plus" ||
       m === "qwen3.5-flash"
@@ -274,7 +275,12 @@ export class ModelService extends ModelToolDefsService {
   }
 
   public isSakanaModel(m: string) {
-    return m === "fugu" || m === "fugu-ultra" || m === "fugu-cyber";
+    return (
+      m === "fugu" ||
+      m === "fugu-ultra" ||
+      m === "fugu-cyber" ||
+      m === "sakana-namazu"
+    );
   }
 
   public concatBytes(arrays: Uint8Array[]) {

@@ -94,10 +94,9 @@ export const modelIdsByProvider = {
     "claude-sonnet-4-6",
     "claude-sonnet-4-5-20250929",
     "claude-opus-4-5-20251101",
-    "claude-haiku-4-5-20251001",
-    "claude-opus-4-1-20250805"
+    "claude-haiku-4-5-20251001"
   ],
-  meta: ["muse-spark-1.1"],
+  meta: ["muse-spark-1.2", "muse-spark-1.1"],
   vercel: ["v0-1.5-md", "v0-1.0-md"],
   mistral: [
     "mistral-small-latest",
@@ -120,12 +119,14 @@ export const modelIdsByProvider = {
   deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
   zai: ["glm-5.2", "glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
   alibaba: [
+    "qwen3.8-max",
     "qwen3.7-max",
     "qwen3.7-plus",
+    "qwen3.7-flash",
     "qwen3.6-plus",
     "qwen3.5-plus",
     "qwen3.5-flash"
   ],
   minimax: ["minimax-m3", "minimax-m2.7", "minimax-m2.5", "minimax-m2.1"],
-  sakana: ["fugu-ultra", "fugu", "fugu-cyber"]
+  sakana: ["fugu-ultra", "fugu", "fugu-cyber", "sakana-namazu"]
 } as const;

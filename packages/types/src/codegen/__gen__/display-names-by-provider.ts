@@ -94,10 +94,9 @@ export const displayNameModelsByProvider = {
     "Claude Sonnet 4.6",
     "Claude Sonnet 4.5",
     "Claude Opus 4.5",
-    "Claude Haiku 4.5",
-    "Claude Opus 4.1"
+    "Claude Haiku 4.5"
   ],
-  meta: ["Muse Spark 1.1"],
+  meta: ["Muse Spark 1.2", "Muse Spark 1.1"],
   vercel: ["v0 medium", "v0 medium (legacy)"],
   mistral: [
     "Mistral Small 4",
@@ -116,12 +115,14 @@ export const displayNameModelsByProvider = {
   deepseek: ["DeepSeek V4 Pro", "DeepSeek V4 Flash", "DeepSeek R1"],
   zai: ["GLM 5.2", "GLM 5.1", "GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"],
   alibaba: [
+    "Qwen3.8-Max",
     "Qwen3.7-Max",
     "Qwen3.7-Plus",
+    "Qwen3.7-Flash",
     "Qwen3.6-Plus",
     "Qwen3.5-Plus",
     "Qwen3.5-Flash"
   ],
   minimax: ["MiniMax-M3", "MiniMax-M2.7", "MiniMax-M2.5", "MiniMax-M2.1"],
-  sakana: ["Fugu Ultra", "Fugu", "Fugu Cyber"]
+  sakana: ["Fugu Ultra", "Fugu", "Fugu Cyber", "Sakana Namazu"]
 } as const;

@@ -49,6 +49,10 @@ export class SakanaBaseService {
         return {
           effort: normalizedEffort ?? "high"
         } as const satisfies ReasoningProps;
+      } else if (model === "sakana-namazu") {
+        return {
+          effort: normalizedEffort ?? "high"
+        };
       } else {
         return {
           effort: normalizedEffort ?? "xhigh"

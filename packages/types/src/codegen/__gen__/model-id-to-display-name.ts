@@ -95,10 +95,10 @@ export const modelIdToDisplayName = {
     "claude-sonnet-4-6": "Claude Sonnet 4.6",
     "claude-sonnet-4-5-20250929": "Claude Sonnet 4.5",
     "claude-opus-4-5-20251101": "Claude Opus 4.5",
-    "claude-haiku-4-5-20251001": "Claude Haiku 4.5",
-    "claude-opus-4-1-20250805": "Claude Opus 4.1"
+    "claude-haiku-4-5-20251001": "Claude Haiku 4.5"
   },
   meta: {
+    "muse-spark-1.2": "Muse Spark 1.2",
     "muse-spark-1.1": "Muse Spark 1.1"
   },
   vercel: {
@@ -137,8 +137,10 @@ export const modelIdToDisplayName = {
     "glm-4.5": "GLM 4.5"
   },
   alibaba: {
+    "qwen3.8-max": "Qwen3.8-Max",
     "qwen3.7-max": "Qwen3.7-Max",
     "qwen3.7-plus": "Qwen3.7-Plus",
+    "qwen3.7-flash": "Qwen3.7-Flash",
     "qwen3.6-plus": "Qwen3.6-Plus",
     "qwen3.5-plus": "Qwen3.5-Plus",
     "qwen3.5-flash": "Qwen3.5-Flash"
@@ -152,6 +154,7 @@ export const modelIdToDisplayName = {
   sakana: {
     "fugu-ultra": "Fugu Ultra",
     fugu: "Fugu",
-    "fugu-cyber": "Fugu Cyber"
+    "fugu-cyber": "Fugu Cyber",
+    "sakana-namazu": "Sakana Namazu"
   }
 } as const;
