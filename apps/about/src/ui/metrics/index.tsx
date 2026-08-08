@@ -40,7 +40,7 @@ export function Metrics() {
         </h2>
       </Reveal>
       <div className="mt-12 grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-4">
-        <Reveal>
+        <Reveal delay={0}>
           <p className="text-[clamp(2.75rem,6.5vw,4.5rem)] font-medium tracking-tight">
             <StatNumber value={stats.models} />
           </p>
