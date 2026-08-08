@@ -70,14 +70,12 @@ export function Surfaces() {
                 <p
                   aria-hidden="true"
                   className="text-foreground/80 group-hover:text-foreground mt-6 font-mono text-sm transition-colors">
-                  {surface.label}&nbps;
+                  {surface.label + " "}
                   <span className="inline-block transition-transform group-hover:translate-x-0.5">
                     →
                   </span>
                 </p>
               )}
-              {/* The anchor IS the full-card overlay so the magnetic
-                  cursor's target bounding box spans the entire card */}
               <a
                 href={surface.href}
                 aria-label={
