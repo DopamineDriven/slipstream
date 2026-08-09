@@ -1,5 +1,6 @@
 import type { CoherenceStats } from "@/types/api";
 import { NextResponse } from "next/server";
+import { safeErrMsg } from "@/lib/safe-err";
 import { Pool } from "pg";
 
 /**
@@ -37,7 +38,7 @@ where m."conversationId" = $1
 /** Lazily-created singleton pool, reused across invocations. */
 let pool: Pool | null = null;
 
-function getPool(): Pool | null {
+function getPool() {
   if (!process.env.DATABASE_URL) return null;
   // eslint-disable-next-line
   if (!pool) {
@@ -78,10 +79,7 @@ export async function GET() {
         });
       }
     } catch (error) {
-      console.error(
-        "[stats] query failed:",
-        error instanceof Error ? error.message : error
-      );
+      console.error("[stats] query failed:", safeErrMsg(error));
     }
   }
 
