@@ -15,22 +15,22 @@ dangerouslyAllowAllBuilds: true
 
 catalogs:
   anthropic:
-    "@anthropic-ai/sdk": ^0.115.0
+    "@anthropic-ai/sdk": ^0.116.0
   auth:
-    better-auth: ^1.6.25
+    better-auth: ^1.6.26
   aws:
-    "@aws-sdk/client-s3": ^3.1095.0
-    "@aws-sdk/client-secrets-manager": ^3.1095.0
-    "@aws-sdk/credential-providers": ^3.1095.0
-    "@aws-sdk/lib-storage": ^3.1095.0
-    "@aws-sdk/s3-request-presigner": ^3.1095.0
+    "@aws-sdk/client-s3": ^3.1106.0
+    "@aws-sdk/client-secrets-manager": ^3.1106.0
+    "@aws-sdk/credential-providers": ^3.1106.0
+    "@aws-sdk/lib-storage": ^3.1106.0
+    "@aws-sdk/s3-request-presigner": ^3.1106.0
     "@aws-sdk/types": ^3.974.2
   babel:
     babel-plugin-react-compiler: ^1.0.0
   biome:
-    "@biomejs/biome": ^2.5.5
+    "@biomejs/biome": ^2.5.7
   bui:
-    "@base-ui/react": ^1.6.0
+    "@base-ui/react": ^1.7.0
   clsx:
     clsx: ^2.1.1
   cmdk:
@@ -57,12 +57,12 @@ catalogs:
   dotenv:
     dotenv: ^17.4.2
     dotenv-cli: ^11.0.0
-    dotenv-expand: ^13.0.0
+    dotenv-expand: ^1000.0.0
   eslint:
     "@eslint/compat": ^2.1.0
     "@eslint/config-helpers": ^0.7.0
     "@eslint/js": ^10.0.1
-    eslint: ^10.8.0
+    eslint: ^10.8.1
     eslint-plugin-import: ^2.32.0
     eslint-plugin-import-x: ^4.17.1
     eslint-plugin-jsx-a11y: ^6.10.2
@@ -75,54 +75,54 @@ catalogs:
   glob:
     glob: ^13.0.6
   google:
-    "@google/genai": ^2.13.0
+    "@google/genai": ^2.16.0
   gtag:
     "@types/gtag.js": ^0.0.20
   jiti:
     jiti: ^2.7.0
   jose:
-    jose: ^6.2.4
+    jose: ^6.2.8
   jsdom:
-    "@types/jsdom": ^28.0.3
-    jsdom: ^29.1.1
+    "@types/jsdom": ^30.0.0
+    jsdom: ^30.0.1
   katex:
     "@types/katex": ^0.16.8
-    katex: ^0.18.1
+    katex: ^0.18.3
   lightningcss:
     unplugin-lightningcss: ^0.5.0
   mcp:
-    "@modelcontextprotocol/sdk": ^1.29.0
+    "@modelcontextprotocol/sdk": ^1.30.0
   mdast:
     "@types/mdast": ^4.0.4
   mistral:
-    "@mistralai/mistralai": ^2.5.0
+    "@mistralai/mistralai": ^2.6.1
   motion:
-    motion: ^12.42.2
-    motion-dom: ^12.42.2
+    motion: ^12.43.0
+    motion-dom: ^12.43.0
     motion-plus-dom: ^2.12.0
     motion-utils: ^12.39.0
   nanoid:
-    nanoid: ^6.0.0
+    nanoid: ^6.0.1
   napi:
-    "@napi-rs/canvas": ^1.0.2
+    "@napi-rs/canvas": ^1.0.5
   next:
-    "@next/eslint-plugin-next": ^16.2.12
-    eslint-config-next: ^16.2.12
-    next: ^16.2.12
+    "@next/eslint-plugin-next": ^16.3.0
+    eslint-config-next: ^16.3.0
+    next: ^16.3.0
     next-themes: ^0.4.6
   node:
-    "@types/node": ^26.1.1
-    node-html-parser: ^9.0.0
+    "@types/node": ^26.2.0
+    node-html-parser: ^9.0.1
     nodemon: ^3.1.14
   nyc:
     nyc: ^18.0.0
   openai:
-    openai: ^6.49.0
+    openai: ^7.4.0
   p-limit:
     p-limit: ^7.3.1
   pg:
-    "@types/pg": ^8.20.0
-    pg: ^8.22.0
+    "@types/pg": ^8.21.0
+    pg: ^8.23.0
   pico:
     picocolors: ^1.1.1
   pino:
@@ -136,11 +136,11 @@ catalogs:
     prettier: ^3.9.6
     prettier-plugin-tailwindcss: ^0.8.1
   prisma:
-    "@prisma/adapter-pg": ^7.9.0
-    "@prisma/client": ^7.9.0
-    "@prisma/client-runtime-utils": ^7.9.0
+    "@prisma/adapter-pg": ^7.9.1
+    "@prisma/client": ^7.9.1
+    "@prisma/client-runtime-utils": ^7.9.1
     "@prisma/extension-accelerate": ^3.0.1
-    prisma: ^7.9.0
+    prisma: ^7.9.1
   py:
     pythonia: ^1.2.6
   radix:
@@ -169,14 +169,14 @@ catalogs:
     "@radix-ui/react-tooltip": ^1.2.16
   react:
     "@testing-library/react": ^16.3.2
-    "@types/react": ^19.2.17
-    "@types/react-dom": ^19.2.3
+    "@types/react": ^19.2.18
+    "@types/react-dom": ^19.2.4
     react: ^19.2.8
     react-dom: ^19.2.8
     react-resizable-panels: ^4.12.2
     vaul: ^1.1.2
   redis:
-    redis: ^6.1.0
+    redis: ^6.2.0
   rehype:
     rehype-katex: ^7.0.1
     rehype-pretty-code: ^0.14.5
@@ -190,29 +190,29 @@ catalogs:
     remark-parse: ^11.0.0
     remark-rehype: ^11.1.2
   rolldown:
-    rolldown: ^1.2.0
-    rolldown-plugin-dts: ^0.27.14
+    rolldown: ^1.2.3
+    rolldown-plugin-dts: ^0.28.0
     rolldown-plugin-wasm: ^0.3.2
   sharp:
     sharp: ^0.35.3
   shiki:
-    "@shikijs/transformers": ^4.3.1
-    shiki: ^4.3.1
+    "@shikijs/transformers": ^4.4.2
+    shiki: ^4.4.2
   smithy:
-    "@smithy/node-http-handler": ^4.9.11
+    "@smithy/node-http-handler": ^4.9.13
   store:
     use-sync-external-store: ^1.6.0
     "@types/use-sync-external-store": ^1.5.0
   styles:
     autoprefixer: ^10.5.4
-    postcss: ^8.5.23
+    postcss: ^8.5.26
     postcss-import: ^16.1.1
   swr:
-    swr: ^2.4.2
+    swr: ^2.5.0
   tanstack:
-    "@tanstack/react-virtual": ^3.14.8
+    "@tanstack/react-virtual": ^3.14.9
   test:
-    "@playwright/test": ^1.62.0
+    "@playwright/test": ^1.62.1
   tiktoken:
     tiktoken: ^1.0.22
   ts:
@@ -221,17 +221,17 @@ catalogs:
     tsdown: ^0.22.14
     "@tsdown/css": ^0.22.14
   tseslint:
-    typescript-eslint: ^8.65.0
+    typescript-eslint: ^8.66.0
   tsgo:
     "@typescript/native-preview": ^7.0.0-dev.20260707.2
   tslib:
     tslib: ^2.8.1
   tsx:
-    tsx: ^4.23.1
+    tsx: ^4.23.11
   turbo:
-    eslint-config-turbo: ^2.10.7
-    eslint-plugin-turbo: ^2.10.7
-    turbo: ^2.10.7
+    eslint-config-turbo: ^2.10.9
+    eslint-plugin-turbo: ^2.10.9
+    turbo: ^2.10.9
   tw:
     "@tailwindcss/forms": ^0.5.11
     "@tailwindcss/postcss": ^4.3.3
@@ -252,19 +252,19 @@ catalogs:
     wait-on: ^9.1.0
   vercel:
     "@vercel/analytics": ^2.0.1
-    "@vercel/functions": ^3.7.6
+    "@vercel/functions": ^3.9.1
   vfile:
     vfile: ^6.0.3
   vite:
-    "@vitejs/plugin-react": ^6.0.4
-    vite: ^8.1.5
+    "@vitejs/plugin-react": ^6.0.5
+    vite: ^8.2.1
   vitest:
     "@vitest/coverage-istanbul": ^4.1.10
     "@vitest/ui": ^4.1.10
     vitest: ^4.1.10
   ws:
     "@types/ws": ^8.18.1
-    ws: ^8.21.1
+    ws: ^8.21.3
 
 onlyBuiltDependencies:
   - "@google/genai"
@@ -294,4 +294,4 @@ allowBuilds:
   unrs-resolver: true
 
 patchedDependencies:
-  '@anthropic-ai/sdk@0.115.0': patches/@anthropic-ai__sdk@0.101.0.patch
+  '@anthropic-ai/sdk@0.116.0': patches/@anthropic-ai__sdk@0.101.0.patch
