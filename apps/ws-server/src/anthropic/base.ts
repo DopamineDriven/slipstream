@@ -118,7 +118,6 @@ export class AnthropicBaseService {
           ] satisfies Anthropic.Beta.AnthropicBeta[];
         }
       }
-      case "claude-opus-4-1-20250805":
       case "claude-haiku-4-5-20251001": {
         return [
           "files-api-2025-04-14",
@@ -139,8 +138,7 @@ export class AnthropicBaseService {
     "claude-opus-4-6": 128000,
     "claude-opus-4-5-20251101": 64000,
     "claude-haiku-4-5-20251001": 64000,
-    "claude-sonnet-4-5-20250929": 64000,
-    "claude-opus-4-1-20250805": 32000
+    "claude-sonnet-4-5-20250929": 64000
   } as const;
 
   protected inputTokenCeilingByModel = {
@@ -153,8 +151,7 @@ export class AnthropicBaseService {
     "claude-opus-4-6": 1000000,
     "claude-sonnet-4-5-20250929": 200000,
     "claude-opus-4-5-20251101": 200000,
-    "claude-haiku-4-5-20251001": 200000,
-    "claude-opus-4-1-20250805": 200000
+    "claude-haiku-4-5-20251001": 200000
   } as const;
 
   protected getMaxTokens = <const T extends AnthropicModelIdUnion>(
