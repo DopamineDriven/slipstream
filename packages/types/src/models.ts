@@ -18,6 +18,7 @@ export type ImageGenModels =
   | "gpt-image-1.5"
   | "gpt-image-2"
   | "gpt-image-1-mini"
+  | "grok-imagine-image-2.0"
   | "grok-imagine-image"
   | "grok-imagine-image-quality"
   | "gemini-2.5-flash-image"
@@ -33,7 +34,11 @@ export const providerModelImageGenApi = {
     "deep-research-max-preview-04-2026",
     "deep-research-preview-04-2026"
   ],
-  grok: ["grok-imagine-image-quality", "grok-imagine-image"]
+  grok: [
+    "grok-imagine-image-2.0",
+    "grok-imagine-image-quality",
+    "grok-imagine-image"
+  ]
 } as const;
 
 export const allImgSupportingProviderModels = {
@@ -561,16 +566,16 @@ export const getDisplayNameByModelId = <
 export const defaultModelDisplayNameByProvider = {
   openai: "GPT-5.6 Sol" satisfies OpenAiDisplayNameUnion,
   gemini: "Gemini 3.1 Pro Preview" satisfies GeminiDisplayNameUnion,
-  grok: "Grok 4.5" satisfies GrokDisplayNameUnion,
+  grok: "Grok 4.6" satisfies GrokDisplayNameUnion,
   anthropic: "Claude Opus 5" satisfies AnthropicDisplayNameUnion,
-  meta: "Muse Spark 1.1" satisfies MetaDisplayNameUnion,
+  meta: "Muse Spark 1.2" satisfies MetaDisplayNameUnion,
   vercel: "v0 medium" satisfies VercelDisplayNameUnion,
   mistral: "Mistral Medium 3.5" satisfies MistralDisplayNameUnion,
   cohere: "Command A Plus" satisfies CohereDisplayNameUnion,
   deepseek: "DeepSeek V4 Pro" satisfies DeepSeekDisplayNameUnion,
-  moonshotai: "Kimi K2.6" satisfies KimiDisplayNameUnion,
-  zai: "GLM 5.1" satisfies ZaiDisplayNameUnion,
-  alibaba: "Qwen3.6-Plus" satisfies AlibabaDisplayNameUnion,
+  moonshotai: "Kimi K3" satisfies KimiDisplayNameUnion,
+  zai: "GLM 5.2" satisfies ZaiDisplayNameUnion,
+  alibaba: "Qwen3.7-Plus" satisfies AlibabaDisplayNameUnion,
   minimax: "MiniMax-M3" satisfies MiniMaxDisplayNameUnion,
   sakana: "Fugu" satisfies SakanaDisplayNameUnion
 } as const;
@@ -578,16 +583,16 @@ export const defaultModelDisplayNameByProvider = {
 export const defaultModelIdByProvider = {
   openai: "gpt-5.6-sol" satisfies OpenAiModelIdUnion,
   gemini: "gemini-3.1-pro-preview" satisfies GeminiModelIdUnion,
-  grok: "grok-4.5" satisfies GrokModelIdUnion,
+  grok: "grok-4.6" satisfies GrokModelIdUnion,
   anthropic: "claude-opus-5" satisfies AnthropicModelIdUnion,
-  meta: "muse-spark-1.1" satisfies MetaModelIdUnion,
+  meta: "muse-spark-1.2" satisfies MetaModelIdUnion,
   vercel: "v0-1.5-md" satisfies VercelModelIdUnion,
   mistral: "mistral-medium-3.5" satisfies MistralModelIdUnion,
   cohere: "command-a-plus-05-2026" satisfies CohereModelIdUnion,
-  deepseek: "deepseek-v4-pro" satisfies DeepSeekModelIdUnion,
-  moonshotai: "kimi-k2.6" satisfies KimiModelIdUnion,
-  zai: "glm-5.1" satisfies ZaiModelIdUnion,
-  alibaba: "qwen3.6-plus" satisfies AlibabaModelIdUnion,
+  deepseek: "deepseek-v4-pro-0813" satisfies DeepSeekModelIdUnion,
+  moonshotai: "kimi-k3" satisfies KimiModelIdUnion,
+  zai: "glm-5.2" satisfies ZaiModelIdUnion,
+  alibaba: "qwen3.7-plus" satisfies AlibabaModelIdUnion,
   minimax: "minimax-m3" satisfies MiniMaxModelIdUnion,
   sakana: "fugu" satisfies SakanaModelIdUnion
 } as const;

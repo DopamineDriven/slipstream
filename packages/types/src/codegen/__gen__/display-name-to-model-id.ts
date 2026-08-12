@@ -64,22 +64,26 @@ export const displayNameToModelId = {
     "Veo 3.1": "veo-3.1-generate-preview",
     "Veo 3.1 fast": "veo-3.1-fast-generate-preview",
     "Veo 3.1 lite": "veo-3.1-lite-generate-preview",
+    "Lyria 3 Pro Preview": "lyria-3-pro-preview",
+    "Lyria 3 Clip Preview": "lyria-3-clip-preview",
     "Gemini 2.5 Pro": "gemini-2.5-pro",
     "Gemini 2.5 Flash": "gemini-2.5-flash",
     "Gemini 2.5 Flash-Lite": "gemini-2.5-flash-lite",
     "Deep Research Max Preview (Apr-21-2026)":
       "deep-research-max-preview-04-2026",
     "Deep Research Preview (Apr-21-2026)": "deep-research-preview-04-2026",
-    "Gemini 2.0 Flash": "gemini-2.0-flash",
-    "Gemini 2.0 Flash-Lite": "gemini-2.0-flash-lite"
+    "gemini-2.0-flash": "gemini-2.0-flash",
+    "gemini-2.0-flash-lite": "gemini-2.0-flash-lite"
   },
   grok: {
+    "Grok 4.6": "grok-4.6",
     "Grok 4.5": "grok-4.5",
     "Grok 4.3": "grok-4.3",
     "Grok 4.20 Multi-Agent": "grok-4.20-multi-agent-0309",
     "Grok 4.20 Reasoning": "grok-4.20-0309-reasoning",
     "Grok 4.20 Non-Reasoning": "grok-4.20-0309-non-reasoning",
     "Grok Build 0.1": "grok-build-0.1",
+    "Grok Imagine Image 2.0": "grok-imagine-image-2.0",
     "Grok Imagine Image": "grok-imagine-image",
     "Grok Imagine Image Quality": "grok-imagine-image-quality",
     "Grok Imagine Video": "grok-imagine-video",
@@ -124,7 +128,8 @@ export const displayNameToModelId = {
     "Kimi K2 Thinking": "kimi-k2-thinking"
   },
   deepseek: {
-    "DeepSeek V4 Pro": "deepseek-v4-pro",
+    "DeepSeek V4 Pro": "deepseek-v4-pro-0813",
+    "DeepSeek V4 Pro Preview": "deepseek-v4-pro",
     "DeepSeek V4 Flash": "deepseek-v4-flash",
     "DeepSeek R1": "deepseek-r1"
   },

@@ -64,21 +64,25 @@ export const displayNameModelsByProvider = {
     "Veo 3.1",
     "Veo 3.1 fast",
     "Veo 3.1 lite",
+    "Lyria 3 Pro Preview",
+    "Lyria 3 Clip Preview",
     "Gemini 2.5 Pro",
     "Gemini 2.5 Flash",
     "Gemini 2.5 Flash-Lite",
     "Deep Research Max Preview (Apr-21-2026)",
     "Deep Research Preview (Apr-21-2026)",
-    "Gemini 2.0 Flash",
-    "Gemini 2.0 Flash-Lite"
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite"
   ],
   grok: [
+    "Grok 4.6",
     "Grok 4.5",
     "Grok 4.3",
     "Grok 4.20 Multi-Agent",
     "Grok 4.20 Reasoning",
     "Grok 4.20 Non-Reasoning",
     "Grok Build 0.1",
+    "Grok Imagine Image 2.0",
     "Grok Imagine Image",
     "Grok Imagine Image Quality",
     "Grok Imagine Video",
@@ -112,7 +116,12 @@ export const displayNameModelsByProvider = {
     "Kimi K2.5",
     "Kimi K2 Thinking"
   ],
-  deepseek: ["DeepSeek V4 Pro", "DeepSeek V4 Flash", "DeepSeek R1"],
+  deepseek: [
+    "DeepSeek V4 Pro",
+    "DeepSeek V4 Pro Preview",
+    "DeepSeek V4 Flash",
+    "DeepSeek R1"
+  ],
   zai: ["GLM 5.2", "GLM 5.1", "GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"],
   alibaba: [
     "Qwen3.8-Max",

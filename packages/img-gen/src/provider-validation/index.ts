@@ -94,7 +94,11 @@ export class ProviderValidation {
   }
 
   public grokImagineImgGenModel(m: string) {
-    return m === "grok-imagine-image" || m === "grok-imagine-image-quality";
+    return (
+      m === "grok-imagine-image" ||
+      m === "grok-imagine-image-quality" ||
+      m === "grok-imagine-image-2.0"
+    );
   }
 
   public baseOpenAIGptImgModel(m: string) {
