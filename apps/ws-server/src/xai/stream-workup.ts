@@ -162,7 +162,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
                   if (
                     isFreshContext &&
                     isCurrentUserMsg &&
-                    this.canViewImgs(model)
+                    this.prisma.isGrokModel(model)
                   ) {
                     const imgBlock = {
                       type: "input_image",
@@ -312,7 +312,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
   }
 
   protected canUseServerTools(m: GrokModelIdUnion) {
-    return this.is420BetaModel(m) || this.isGrok4Model(m);
+    return this.isGrok4Model(m) || this.isGrokBuild(m);
   }
 
   /**
@@ -422,7 +422,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     const hasDocs = enableUserStoreSearch && hasUserStoreDocs;
     // "grok-4.20-multi-agent-0309" doesn't support calling functional tools yet (2026-03-24)
     // and will error if they are presen
-    if (this.isMultiAgent(model)) {
+    if (this.prisma.isGrokMultiAgentModel(model)) {
       toolHandler = this.handleTooling({
         model,
         collectionId,
@@ -465,7 +465,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
       managementKey
     );
 
-    if (this.isMultiAgent(model)) {
+    if (this.prisma.isGrokMultiAgentModel(model)) {
       return {
         input: history,
         model,
@@ -480,7 +480,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         max_output_tokens,
         user: userId
       } as const;
-    } else if (this.isGrok4Point3(model) || this.isGrok4Point5(model)) {
+    } else if (this.prisma.isGrokReasoningEffortModel(model)) {
       return {
         input: history,
         model,
@@ -599,7 +599,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
           detail: imgDetail,
           keyId: keyId ?? undefined,
           hasUserStoreDocs,
-          reasoning: m && this.isMultiAgent(m) ? { effort: "low" } : undefined,
+          reasoning: m && this.prisma.isGrokMultiAgentModel(m) ? { effort: "low" } : undefined,
           apiKey: key,
           managementKey: mgmtApiKey,
           collectionId: cId,
@@ -617,7 +617,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
           localToolNames
         });
 
-    const requestBody = this.isMultiAgent(model)
+    const requestBody = this.prisma.isGrokMultiAgentModel(model)
       ? {
           reasoning: reasoning ?? { effort: "low" },
           model,

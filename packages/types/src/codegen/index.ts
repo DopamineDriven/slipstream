@@ -51,7 +51,11 @@ const providerModelImagesApi = {
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image"
   ],
-  grok: ["grok-imagine-image", "grok-imagine-image-quality"]
+  grok: [
+    "grok-imagine-image-2.0",
+    "grok-imagine-image",
+    "grok-imagine-image-quality"
+  ]
 } as const;
 
 const providerModelVideosApi = {
@@ -131,6 +135,8 @@ const providerModelChatApi = {
     "veo-3.1-generate-preview",
     "veo-3.1-fast-generate-preview",
     "veo-3.1-lite-generate-preview",
+    "lyria-3-pro-preview",
+    "lyria-3-clip-preview",
     "gemini-2.5-pro",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
@@ -140,12 +146,14 @@ const providerModelChatApi = {
     "gemini-2.0-flash-lite"
   ],
   grok: [
+    "grok-4.6",
     "grok-4.5",
     "grok-4.3",
     "grok-4.20-multi-agent-0309",
     "grok-4.20-0309-reasoning",
     "grok-4.20-0309-non-reasoning",
     "grok-build-0.1",
+    "grok-imagine-image-2.0",
     "grok-imagine-image",
     "grok-imagine-image-quality",
     "grok-imagine-video",
@@ -183,7 +191,12 @@ const providerModelChatApi = {
     "kimi-k2.5",
     "kimi-k2-thinking"
   ],
-  deepseek: ["deepseek-v4-pro", "deepseek-v4-flash", "deepseek-r1"],
+  deepseek: [
+    "deepseek-v4-pro-0813",
+    "deepseek-v4-pro",
+    "deepseek-v4-flash",
+    "deepseek-r1"
+  ],
   zai: ["glm-5.2", "glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
   alibaba: [
     "qwen3.8-max",
@@ -227,7 +240,9 @@ const META_NAME_OVERRIDES = {
 } as const;
 
 const GROK_NAME_OVERRIDES = {
+  "grok-4.6": "Grok 4.6",
   "grok-4.5": "Grok 4.5",
+  "grok-imagine-image-2.0": "Grok Imagine Image 2.0",
   "grok-imagine-image": "Grok Imagine Image",
   "grok-imagine-image-quality": "Grok Imagine Image Quality",
   "grok-imagine-video": "Grok Imagine Video",
@@ -288,7 +303,8 @@ const KIMI_NAME_OVERRIDES = {
 
 const DEEPSEEK_NAME_OVERRIDES = {
   "deepseek-r1": "DeepSeek R1",
-  "deepseek-v4-pro": "DeepSeek V4 Pro",
+  "deepseek-v4-pro": "DeepSeek V4 Pro Preview",
+  "deepseek-v4-pro-0813": "DeepSeek V4 Pro",
   "deepseek-v4-flash": "DeepSeek V4 Flash"
 } as const;
 
@@ -331,11 +347,13 @@ function filterForAlibaba(id: string) {
 
 function filterForGrok(id: string) {
   return (
+    id === "grok-4.6" ||
     id === "grok-4.5" ||
     id === "grok-4.3" ||
     id === "grok-4.20-multi-agent-0309" ||
     id === "grok-4.20-0309-reasoning" ||
     id === "grok-4.20-0309-non-reasoning" ||
+    id === "grok-imagine-image-2.0" ||
     id === "grok-imagine-image-quality" ||
     id === "grok-imagine-image" ||
     id === "grok-imagine-video" ||
@@ -358,6 +376,7 @@ function filterForDeepseek(id: string) {
   return (
     id === "deepseek-r1" ||
     id === "deepseek-v4-pro" ||
+    id === "deepseek-v4-pro-0813" ||
     id === "deepseek-v4-flash"
   );
 }

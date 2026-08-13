@@ -35,5 +35,9 @@ export const displayNameModelsByProviderImgGen = {
     "Nano Banana Pro",
     "Nano Banana"
   ],
-  grok: ["Grok Imagine Image", "Grok Imagine Image Quality"]
+  grok: [
+    "Grok Imagine Image 2.0",
+    "Grok Imagine Image",
+    "Grok Imagine Image Quality"
+  ]
 } as const;

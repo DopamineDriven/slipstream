@@ -131,6 +131,10 @@ export class ModelService extends ModelToolDefsService {
     );
   }
 
+  public isGeminiLyriaModel(m: string) {
+    return m === "lyria-3-clip-preview" || m === "lyria-3-pro-preview";
+  }
+
   public isGeminiModel(m: string) {
     return (
       m === "gemini-3.6-flash" ||
@@ -145,6 +149,7 @@ export class ModelService extends ModelToolDefsService {
       m === "gemini-2.5-flash" ||
       m === "gemini-2.0-flash" ||
       m === "gemini-2.0-flash-lite" ||
+      this.isGeminiLyriaModel(m) ||
       this.isGeminiDeepResearchModel(m) ||
       this.isGeminiImgModel(m) ||
       this.isGeminiVideoModel(m)
@@ -152,23 +157,36 @@ export class ModelService extends ModelToolDefsService {
   }
 
   public isGrokImgModel(m: string) {
-    return m === "grok-imagine-image-quality" || m === "grok-imagine-image";
+    return (
+      m === "grok-imagine-image-quality" ||
+      m === "grok-imagine-image" ||
+      m === "grok-imagine-image-2.0"
+    );
   }
 
   public isGrokVideoModel(m: string) {
     return m === "grok-imagine-video" || m === "grok-imagine-video-1.5";
   }
 
+  public isGrokMultiAgentModel(m: string) {
+    return m === "grok-4.20-multi-agent-0309";
+  }
+  public isGrokBuild(m: string) {
+    return m === "grok-build-0.1";
+  }
+
+  public isGrokReasoningEffortModel(m: string) {
+    return m === "grok-4.6" || m === "grok-4.5" || m === "grok-4.3";
+  }
   public isGrokModel(m: string) {
     return (
       this.isGrokVideoModel(m) ||
       this.isGrokImgModel(m) ||
-      m === "grok-4.5" ||
-      m === "grok-4.3" ||
-      m === "grok-4.20-multi-agent-0309" ||
+      this.isGrokMultiAgentModel(m) ||
+      this.isGrokBuild(m) ||
+      this.isGrokReasoningEffortModel(m) ||
       m === "grok-4.20-0309-reasoning" ||
-      m === "grok-4.20-0309-non-reasoning" ||
-      m === "grok-build-0.1"
+      m === "grok-4.20-0309-non-reasoning"
     );
   }
   public isAnthropicAdaptiveModel(mod: string) {
@@ -238,6 +256,7 @@ export class ModelService extends ModelToolDefsService {
     return (
       m === "deepseek-r1" ||
       m === "deepseek-v4-pro" ||
+      m === "deepseek-v4-pro-0813" ||
       m === "deepseek-v4-flash"
     );
   }

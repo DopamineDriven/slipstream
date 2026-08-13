@@ -35,5 +35,9 @@ export const modelIdsByProviderImgGen = {
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image"
   ],
-  grok: ["grok-imagine-image", "grok-imagine-image-quality"]
+  grok: [
+    "grok-imagine-image-2.0",
+    "grok-imagine-image",
+    "grok-imagine-image-quality"
+  ]
 } as const;

@@ -37,6 +37,7 @@ export const displayNameToModelIdImgGen = {
     "Nano Banana": "gemini-2.5-flash-image"
   },
   grok: {
+    "Grok Imagine Image 2.0": "grok-imagine-image-2.0",
     "Grok Imagine Image": "grok-imagine-image",
     "Grok Imagine Image Quality": "grok-imagine-image-quality"
   }

@@ -30,11 +30,11 @@ export class GrokApiWorkupService extends GrokBaseService {
   protected storeDbRegistry = new Map<string, string>();
   constructor(
     logger: LoggerService,
-    protected prisma: PrismaService,
+    prisma: PrismaService,
     protected xaiKey: string,
     protected xaiManagementKey: string
   ) {
-    super();
+    super(prisma);
     this.logger = logger
       .getPinoInstance()
       .child(
