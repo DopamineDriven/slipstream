@@ -9,6 +9,7 @@ import type {
 } from "@/types/cookies";
 import type { ReactNode } from "react";
 import { createContext, useCallback, useContext } from "react";
+import { useClientTz } from "@/hooks/use-client-tz";
 import { COOKIES } from "@/types/cookies";
 import Cookies from "js-cookie";
 
@@ -17,6 +18,7 @@ const CookieContext = createContext<CookieContextType | undefined>(undefined);
 export function CookieProvider({
   children
 }: Readonly<{ children: ReactNode }>) {
+  useClientTz();
   const get = useCallback(<const K extends CookieKey>(key: K) => {
     return Cookies.get(key) as GetCookie<K, true>;
   }, []);

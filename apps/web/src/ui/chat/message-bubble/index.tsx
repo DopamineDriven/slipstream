@@ -81,7 +81,11 @@ function MessageBubbleImpl({
   }, [liveImgGenFields]);
   const { getTargeted } = useCookiesCtx();
 
-  const { locale, tz, viewport } = getTargeted(["tz", "locale", "viewport"]);
+  const {
+    locale,
+    "client-tz": tz,
+    viewport
+  } = getTargeted(["client-tz", "locale", "viewport"]);
 
   const isMobile = viewport === "mobile";
 

@@ -383,6 +383,7 @@ export interface UserData {
   browserVersion?: string;
   viewport?: string;
   via?: "web" | "cli";
+  "client-tz"?: string;
 }
 
 export type MessageHandler<T extends keyof EventTypeMap> = (
