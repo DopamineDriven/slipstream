@@ -19,7 +19,6 @@ export namespace xAIResponses {
       output_index: number;
       summary_index: number;
     }
-
     export interface Done {
       sequence_number: number;
       type: "response.reasoning_summary_text.done";
