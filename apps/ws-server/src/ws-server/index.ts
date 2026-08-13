@@ -195,6 +195,7 @@ export class WSServer {
       country,
       latlng,
       viewport,
+      "client-tz": clientTz,
       tz,
       region,
       postalCode,
@@ -209,6 +210,7 @@ export class WSServer {
       region,
       postalCode,
       browserName,
+      "client-tz": clientTz,
       via,
       viewport,
       browserVersion,
@@ -290,6 +292,7 @@ export class WSServer {
       ua,
       browserName,
       browserVersion,
+      "client-tz": clientTz,
       providerContext = providers,
       latlng,
       tz,
@@ -304,6 +307,7 @@ export class WSServer {
       city: "Barrington",
       viewport: "desktop",
       country: "US",
+      "client-tz": "America/Chicago",
       latlng: "41.8338486,-87.8966849",
       tz: "America/Chicago",
       ip: "0.0.0.0",
@@ -323,6 +327,7 @@ export class WSServer {
       ip,
       providerContext,
       locale,
+      "client-tz": clientTz,
       ua,
       viewport,
       via,
@@ -336,7 +341,8 @@ export class WSServer {
     } satisfies UserData;
 
     this.userMap.set(ws, userId);
-    const message = `User ${userId} (${email}) connected via ${via ?? "web"} on a ${viewport} via ${browserName} version ${browserVersion} from ${city}, ${country} (${region} region) having postal code ${postalCode} in the ${tz} timezone with a locale of ${locale}, an approx location of ${latlng}, an ip of ${ip}, and a ua of ${ua}`;
+    const tzResolved = clientTz && clientTz.length > 1 ? clientTz : tz;
+    const message = `User ${userId} (${email}) connected via ${via ?? "web"} on a ${viewport} via ${browserName} version ${browserVersion} from ${city}, ${country} (${region} region) having postal code ${postalCode} in the ${tzResolved} timezone with a locale of ${locale}, an approx location of ${latlng}, an ip of ${ip}, and a ua of ${ua}`;
     this.logger.info(message);
     ws.on("message", raw => {
       // Shutdown admission gate — once `stop()` flips `isDraining`, reject
@@ -458,7 +464,8 @@ export class WSServer {
               s === "postalCode" ||
               s === "browserName" ||
               s === "browserVersion" ||
-              s === "viewport"
+              s === "viewport" ||
+              s === "client-tz"
             );
           }
           const cookieKeys = [
@@ -474,7 +481,8 @@ export class WSServer {
             "postalCode",
             "browserName",
             "browserVersion",
-            "viewport"
+            "viewport",
+            "client-tz"
           ] satisfies Exclude<keyof UserData, "providerContext">[];
           const parts = cookie.match(/(.*?)=(.*)/);
           if (parts) {

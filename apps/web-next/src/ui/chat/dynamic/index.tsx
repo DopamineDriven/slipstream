@@ -66,7 +66,7 @@ export function ChatInterface({
   const { selectedModel } = useModelSelection();
   const { isHome } = usePathnameContext();
   const { get } = useCookiesCtx();
-  const tz = get("tz");
+  const tz = get("client-tz");
 
   // The committed timeline (referentially stable across tokens — the perf invariant).
   const committed = useChatCommitted(store);

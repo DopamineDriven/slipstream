@@ -8,6 +8,7 @@ export const COOKIES = {
   ios: "ios",
   latlng: "latlng",
   tz: "tz",
+  "client-tz": "client-tz",
   ip: "ip",
   ua: "ua",
   country: "country",
@@ -38,7 +39,8 @@ export function isValidCookieKey(c: string) {
     c === "region" ||
     c === "postalCode" ||
     c === "locale" ||
-    c === "userId"
+    c === "userId" ||
+    c === "client-tz"
   );
 }
 
@@ -65,6 +67,7 @@ export type CookieValue = {
   isMac: "true" | "false" | (string & {});
   locale: string;
   userId: string;
+  "client-tz": string;
 };
 
 export type CookieKey = keyof typeof COOKIES;
@@ -123,5 +126,3 @@ export function handleSelect<
 
   return select;
 }
-
-handleSelect(["browserVersion", "browserName"]);
