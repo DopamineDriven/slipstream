@@ -157,6 +157,49 @@ on update (registry pattern).
   ephemeral `CliConfigEditor` injected at the repl — strict class
   encapsulation either way; no module-level functions.
 
+## 5.5 Resume — a recency LENS, never a partition (Andrew, 2026-08-14)
+
+The product differentiator is that CLI and web share one conversation
+pool seamlessly (unlike Claude Code / Codex, whose sessions are
+terminal-local) — resume must never wall that off. What's missing is
+provenance: nothing records that a conversation was touched FROM the
+CLI, so "most recent conversation" would almost always resume a web
+thread for a web-heavy user. `/resume` answers "where was I when I was
+HERE" — a high-value lens over the shared pool, not a separate pool.
+
+This is activity-derived state, NOT config — written as a side effect of
+every CLI turn, never user-edited — so it gets its own table (the
+separation ruling applies): 
+
+```prisma
+model CliConversationActivity {
+  id             String       @id @default(cuid(2))
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  lastActiveAt   DateTime     @updatedAt
+  turnCount      Int          @default(1)
+  @@unique([userId, conversationId])
+  @@index([userId, lastActiveAt(sort: Desc)])
+}
+```
+
+- **Write path**: one upsert per completed CLI turn, gated on
+  `via === "cli"` in the chat resolver — fire-and-forget (`void` WITH
+  `.catch`; void does not absorb rejections), zero chat-latency cost.
+  Web turns never write here; that asymmetry IS the provenance.
+- **Delivery**: `recentConversationIds: string[]` (top ~10, ordered)
+  rides the same `connection_established` piggyback as `cliConfig` —
+  ids only; the convo picker's index already warms with full metadata,
+  the resume list just selects from it.
+- **UX (Claude Code parity, continuity preserved)**: `aic --continue`
+  attaches to the top entry; `aic --resume` and in-REPL `/resume` open
+  the existing CliConvoPicker filtered to the recency list. `/convos`
+  keeps ranging the ENTIRE shared pool — resume narrows, never hides.
+- A conversation resumed in the CLI that was last touched on web is the
+  happy path, not an edge case.
+
 ## 6. Auth outlook (the road the config work paves)
 
 Phased so config never blocks on auth, but auth slots in without rework:
