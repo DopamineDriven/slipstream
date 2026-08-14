@@ -84,14 +84,19 @@ single-purpose (API key hydration) and stays that way; the house pattern
 is dedicated small types firing after it (the `conversation_list_ack`
 pages are the precedent). So:
 
-1. **Post-handshake pushes** (server → client, `via === "cli"` sockets
-   only, fired where `handleConnectionEstablished` already fans out):
-   - `cli_config_ack` — `{ cliConfig: CliConfigDTO }`
-   - `cli_recent_convos_ack` — `{ conversationIds: string[] }`
-     (lastActiveAt desc, top ~10; ids only — the convo index carries the
-     metadata). Two frames, not one: config changes only on explicit
-     update, recency is activity-shaped and may grow its own refresh
-     trigger later.
+1. **Client-initiated request/ack** (PULL, not push — Andrew 2026-08-14:
+   the CLI requests once `connection_established` lands, mirroring the
+   `provider_context_ping/pong` lifecycle):
+   - `cli_config_get` → `cli_config_ack` `{ cliConfig: CliConfigDTO }`
+   - `cli_recent_convos_get` → `cli_recent_convos_ack`
+     `{ conversationIds: string[] }` (lastActiveAt desc, top ~10; ids
+     only — the convo index carries the metadata).
+   The pull makes the via-gate STRUCTURAL — web clients never send the
+   request, so the server needs no conditional fan-out — and gives
+   recency its refresh trigger for free (/resume re-requests whenever it
+   wants fresh data; machine B sees machine A's turns). Two pairs, not
+   one: config changes only on explicit update, recency is
+   activity-shaped.
 2. **Event pair for writes** (RATIFIED 2026-08-14): `cli_config_update`
    (client → server, partial patch of typed knobs — provider and model
    travel together by convention; the pairing validation rejects a lone
@@ -204,10 +209,10 @@ model CliConversationActivity {
   `via === "cli"` in the chat resolver — fire-and-forget (`void` WITH
   `.catch`; void does not absorb rejections), zero chat-latency cost.
   Web turns never write here; that asymmetry IS the provenance.
-- **Delivery**: the dedicated `cli_recent_convos_ack` post-handshake push
-  (see §3 — the piggyback was rejected; connection_established stays
-  single-purpose) — ids only; the convo picker's index already warms with
-  full metadata, the resume list just selects from it.
+- **Delivery**: client-initiated `cli_recent_convos_get` →
+  `cli_recent_convos_ack` (see §3 — pull, not push; re-request IS the
+  refresh trigger) — ids only; the convo picker's index already warms
+  with full metadata, the resume list just selects from it.
 - **UX (Claude Code parity, continuity preserved)**: `aic --continue`
   attaches to the top entry; `aic --resume` and in-REPL `/resume` open
   the existing CliConvoPicker filtered to the recency list. `/convos`
