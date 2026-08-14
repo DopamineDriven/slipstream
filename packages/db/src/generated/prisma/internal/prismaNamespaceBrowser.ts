@@ -58,6 +58,7 @@ export const ModelName = {
   AudioMetadata: 'AudioMetadata',
   DocumentMetadata: 'DocumentMetadata',
   CliConfig: 'CliConfig',
+  CliConversationActivity: 'CliConversationActivity',
   Conversation: 'Conversation',
   ConversationSettings: 'ConversationSettings',
   ImageGenJob: 'ImageGenJob',
@@ -292,6 +293,16 @@ export const CliConfigScalarFieldEnum = {
 } as const
 
 export type CliConfigScalarFieldEnum = (typeof CliConfigScalarFieldEnum)[keyof typeof CliConfigScalarFieldEnum]
+
+
+export const CliConversationActivityScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  conversationId: 'conversationId',
+  lastActiveAt: 'lastActiveAt'
+} as const
+
+export type CliConversationActivityScalarFieldEnum = (typeof CliConversationActivityScalarFieldEnum)[keyof typeof CliConversationActivityScalarFieldEnum]
 
 
 export const ConversationScalarFieldEnum = {

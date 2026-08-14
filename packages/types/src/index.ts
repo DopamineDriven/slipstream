@@ -418,6 +418,7 @@ export type {
   AttachmentSingleton,
   AudioSingleton,
   CliConfigSingleton,
+  CliConversationActivitySingleton,
   ConversationMemoryChunkSingleton,
   ConversationMemoryContextSingleton,
   ConversationMemoryStoreSingleton,

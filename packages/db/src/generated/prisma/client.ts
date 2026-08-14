@@ -77,6 +77,11 @@ export type DocumentMetadata = Prisma.DocumentMetadataModel
  */
 export type CliConfig = Prisma.CliConfigModel
 /**
+ * Model CliConversationActivity
+ * 
+ */
+export type CliConversationActivity = Prisma.CliConversationActivityModel
+/**
  * Model Conversation
  * 
  */

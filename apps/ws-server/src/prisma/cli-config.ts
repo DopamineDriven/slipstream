@@ -103,4 +103,37 @@ export class PrismaCliConfigService extends PrismaConvoListService {
     this.cliConfigRegistry.set(userId, updated);
     return { ok: true, config: updated } as const;
   }
+
+  /**
+   * the resume lens's write lane (config-planning doc §5.5) — one upsert
+   * per completed CLI turn, via-gated at the call site. lastActiveAt is
+   * @updatedAt-managed but set EXPLICITLY here anyway: the touch IS the
+   * point of this method, so it never rides on prisma's invisible
+   * injection. Row existence itself is the CLI provenance.
+   */
+  public async touchCliConversationActivity(
+    userId: string,
+    conversationId: string
+  ) {
+    return this.prismaClient.cliConversationActivity.upsert({
+      where: { userId_conversationId: { userId, conversationId } },
+      create: { userId, conversationId },
+      update: { lastActiveAt: new Date() }
+    });
+  }
+
+  /**
+   * the resume lens's read lane — recency emerges from the ordering over
+   * the [userId, lastActiveAt desc] index (never stored as a list); ids
+   * only, the convo index already carries the metadata
+   */
+  public async recentCliConversationIds(userId: string, take = 10) {
+    const rows = await this.prismaClient.cliConversationActivity.findMany({
+      where: { userId },
+      orderBy: { lastActiveAt: "desc" },
+      take,
+      select: { conversationId: true }
+    });
+    return rows.map(r => r.conversationId);
+  }
 }

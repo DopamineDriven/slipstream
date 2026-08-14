@@ -376,6 +376,19 @@ export class ResolverChatService extends ResolverTTSService {
         }
       }
       this.scheduleConversationMemoryIndexing(conversationId, userId, title);
+      if (userData?.via === "cli") {
+        // resume-lens provenance touch (config-planning §5.5) — one upsert
+        // per completed CLI turn; void does NOT absorb rejections, hence
+        // the explicit catch
+        void this.wsServer.prisma
+          .touchCliConversationActivity(userId, conversationId)
+          .catch((err: unknown) => {
+            console.warn(
+              `cli conversation activity touch failed`,
+              this.wsServer.prisma.safeErrMsg(err)
+            );
+          });
+      }
     } catch (err) {
       console.error(`AI Stream Error`, this.wsServer.prisma.safeErrMsg(err));
       ws.send(

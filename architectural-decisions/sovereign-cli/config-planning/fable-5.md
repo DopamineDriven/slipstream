@@ -77,22 +77,38 @@ discriminators bolted onto web models.
 `argv flag → env var → machine file → identity config → shipped default`.
 Same shape the wsUrl already follows; config generalizes it.
 
-## 3. Wire contract sketch (Phase 2 — needs Andrew's events.ts sign-off)
+## 3. Wire contract (Phase 2 — DECIDED 2026-08-14, Andrew implementing)
 
-Two options, not mutually exclusive:
+**Piggybacking on `connection_established` is REJECTED** — that frame is
+single-purpose (API key hydration) and stays that way; the house pattern
+is dedicated small types firing after it (the `conversation_list_ack`
+pages are the precedent). So:
 
-1. **Piggyback**: `connection_established` gains `cliConfig?: CliConfigDTO`
-   — populated only when the socket's `via === "cli"` (the server already
-   narrows this in `stashUserData`). Zero extra round trips; the REPL has
-   its roaming defaults before the first prompt renders.
-2. **Event pair for writes**: `cli_config_update` (client → server, partial
-   patch of typed knobs) / `cli_config_update_ack` (server → client, full
-   canonical DTO back). Mirrors `provider_context_update/update_ack`
-   exactly — optimistic local echo, ack reconciles.
+1. **Post-handshake pushes** (server → client, `via === "cli"` sockets
+   only, fired where `handleConnectionEstablished` already fans out):
+   - `cli_config_ack` — `{ cliConfig: CliConfigDTO }`
+   - `cli_recent_convos_ack` — `{ conversationIds: string[] }`
+     (lastActiveAt desc, top ~10; ids only — the convo index carries the
+     metadata). Two frames, not one: config changes only on explicit
+     update, recency is activity-shaped and may grow its own refresh
+     trigger later.
+2. **Event pair for writes** (RATIFIED 2026-08-14): `cli_config_update`
+   (client → server, partial patch of typed knobs — provider and model
+   travel together by convention; the pairing validation rejects a lone
+   provider whose current model doesn't belong) /
+   `cli_config_update_ack` (server → client) with a **UNIFORM shape,
+   never a discriminated union on the wire** (Andrew): identical field
+   set on success and failure — `ok: boolean`, `reason?: string`
+   (undefined exactly when ok), `cliConfig` ALWAYS the canonical DTO so
+   a rejected patch snaps the client back to truth. No `"reason" in x`
+   narrowing dance client-side. Mirrors
+   `provider_context_update/update_ack` — optimistic local echo, ack
+   reconciles.
 
-`packages/types/src/events.ts` is Andrew's territory — these members land
-only with his explicit sign-off, and the runtime parsers stay
-satisfies-coupled to `EventTypeMap` per the standing convention.
+`packages/types/src/events.ts` is Andrew's territory — he is authoring
+these members himself; the runtime parsers stay satisfies-coupled to
+`EventTypeMap` per the standing convention. `CliConfigDTO` deals in the
+lowercase wire `Provider`, `schemaVersion` rides as the literal "v1_0".
 
 ## 4. Schema sketch (dedicated tables, per the separation decision)
 
@@ -188,10 +204,10 @@ model CliConversationActivity {
   `via === "cli"` in the chat resolver — fire-and-forget (`void` WITH
   `.catch`; void does not absorb rejections), zero chat-latency cost.
   Web turns never write here; that asymmetry IS the provenance.
-- **Delivery**: `recentConversationIds: string[]` (top ~10, ordered)
-  rides the same `connection_established` piggyback as `cliConfig` —
-  ids only; the convo picker's index already warms with full metadata,
-  the resume list just selects from it.
+- **Delivery**: the dedicated `cli_recent_convos_ack` post-handshake push
+  (see §3 — the piggyback was rejected; connection_established stays
+  single-purpose) — ids only; the convo picker's index already warms with
+  full metadata, the resume list just selects from it.
 - **UX (Claude Code parity, continuity preserved)**: `aic --continue`
   attaches to the top entry; `aic --resume` and in-REPL `/resume` open
   the existing CliConvoPicker filtered to the recency list. `/convos`
@@ -308,9 +324,9 @@ AES-256-GCM, key-scoped `providerContext`). So:
 
 ## 8. Open questions for Andrew
 
-1. Piggyback on `connection_established` vs a dedicated
-   `cli_config_get/ack` pair — piggyback is zero-RTT and my lean, but it
-   grows a frame you own. Both?
+1. ~~Piggyback vs dedicated~~ ANSWERED (2026-08-14): dedicated frames,
+   always — "each event does one incredibly specific thing in isolation"
+   (Andrew). connection_established stays api-key hydration; see §3.
 2. Which knobs make identity-plane v1? My cut after the ground rules:
    defaultProvider + defaultModel + showThinking, nothing else.
    (Temperature/topP get no knob anywhere: `ConversationSettings` is

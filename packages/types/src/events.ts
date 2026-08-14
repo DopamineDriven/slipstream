@@ -38,6 +38,13 @@ import type { ConversationSingleton } from "@/types.ts";
 import type { CTR, DX, Rm, UTR } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 
+export type CliConfigDTO = {
+  defaultProvider: Provider;
+  defaultModel: string;
+  showThinking: boolean;
+  schemaVersion: $Enums.CliConfigSchemaVersion;
+};
+
 export type ConversationListEntry = {
   id: string;
   title: string | null;
