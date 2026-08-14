@@ -87,10 +87,13 @@ pages are the precedent). So:
 1. **Client-initiated request/ack** (PULL, not push — Andrew 2026-08-14:
    the CLI requests once `connection_established` lands, mirroring the
    `provider_context_ping/pong` lifecycle):
-   - `cli_config_get` → `cli_config_ack` `{ cliConfig: CliConfigDTO }`
-   - `cli_recent_convos_get` → `cli_recent_convos_ack`
+   - `cli_config_hydrate` → `cli_config_hydrate_ack`
+     `{ cliConfig: CliConfigDTO }`
+   - `cli_recent_convos` → `cli_recent_convos_ack`
      `{ conversationIds: string[] }` (lastActiveAt desc, top ~10; ids
      only — the convo index carries the metadata).
+   Final naming (Andrew 2026-08-14): bare verb-request → `_ack` response,
+   three symmetric pairs (hydrate / recent_convos / update).
    The pull makes the via-gate STRUCTURAL — web clients never send the
    request, so the server needs no conditional fan-out — and gives
    recency its refresh trigger for free (/resume re-requests whenever it
@@ -209,7 +212,7 @@ model CliConversationActivity {
   `via === "cli"` in the chat resolver — fire-and-forget (`void` WITH
   `.catch`; void does not absorb rejections), zero chat-latency cost.
   Web turns never write here; that asymmetry IS the provenance.
-- **Delivery**: client-initiated `cli_recent_convos_get` →
+- **Delivery**: client-initiated `cli_recent_convos` →
   `cli_recent_convos_ack` (see §3 — pull, not push; re-request IS the
   refresh trigger) — ids only; the convo picker's index already warms
   with full metadata, the resume list just selects from it.
