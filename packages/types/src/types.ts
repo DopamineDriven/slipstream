@@ -4,6 +4,7 @@ import type {
   Attachment,
   AttachmentProvider,
   AudioMetadata,
+  CliConfig,
   Conversation,
   ConversationMemoryChunk,
   ConversationMemoryContext,
@@ -41,6 +42,13 @@ export interface UserSingleton<T extends boolean = false> extends User {
   settings?: SettingsSingleton<T>;
   conversationMemoryStore?: ConversationMemoryStoreSingleton<T>;
   userStores?: UserStoreSingleton<T>[];
+  cliConfig?: CliConfigSingleton<T>;
+}
+
+export interface CliConfigSingleton<
+  T extends boolean = false
+> extends CliConfig {
+  user?: UserSingleton<T>;
 }
 
 export interface SessionSingleton<T extends boolean = false> extends Session {

@@ -422,6 +422,40 @@ export type EnumColorModelNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumColorModelNullableFilter<$PrismaModel>
 }
 
+export type EnumProviderFilter<$PrismaModel = never> = {
+  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel>
+  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProviderFilter<$PrismaModel> | $Enums.Provider
+}
+
+export type EnumCliConfigSchemaVersionFilter<$PrismaModel = never> = {
+  equals?: $Enums.CliConfigSchemaVersion | Prisma.EnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCliConfigSchemaVersionFilter<$PrismaModel> | $Enums.CliConfigSchemaVersion
+}
+
+export type EnumProviderWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel>
+  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProviderWithAggregatesFilter<$PrismaModel> | $Enums.Provider
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProviderFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProviderFilter<$PrismaModel>
+}
+
+export type EnumCliConfigSchemaVersionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CliConfigSchemaVersion | Prisma.EnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCliConfigSchemaVersionWithAggregatesFilter<$PrismaModel> | $Enums.CliConfigSchemaVersion
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCliConfigSchemaVersionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCliConfigSchemaVersionFilter<$PrismaModel>
+}
+
 export type EnumReasoningEffortNullableFilter<$PrismaModel = never> = {
   equals?: $Enums.ReasoningEffort | Prisma.EnumReasoningEffortFieldRefInput<$PrismaModel> | null
   in?: $Enums.ReasoningEffort[] | Prisma.ListEnumReasoningEffortFieldRefInput<$PrismaModel> | null
@@ -456,28 +490,11 @@ export type EnumOutputVerbosityNullableWithAggregatesFilter<$PrismaModel = never
   _max?: Prisma.NestedEnumOutputVerbosityNullableFilter<$PrismaModel>
 }
 
-export type EnumProviderFilter<$PrismaModel = never> = {
-  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel>
-  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
-  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumProviderFilter<$PrismaModel> | $Enums.Provider
-}
-
 export type EnumImageGenStageFilter<$PrismaModel = never> = {
   equals?: $Enums.ImageGenStage | Prisma.EnumImageGenStageFieldRefInput<$PrismaModel>
   in?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
   notIn?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumImageGenStageFilter<$PrismaModel> | $Enums.ImageGenStage
-}
-
-export type EnumProviderWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel>
-  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
-  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumProviderWithAggregatesFilter<$PrismaModel> | $Enums.Provider
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumProviderFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumProviderFilter<$PrismaModel>
 }
 
 export type EnumImageGenStageWithAggregatesFilter<$PrismaModel = never> = {
@@ -1301,6 +1318,40 @@ export type NestedEnumColorModelNullableWithAggregatesFilter<$PrismaModel = neve
   _max?: Prisma.NestedEnumColorModelNullableFilter<$PrismaModel>
 }
 
+export type NestedEnumProviderFilter<$PrismaModel = never> = {
+  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel>
+  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProviderFilter<$PrismaModel> | $Enums.Provider
+}
+
+export type NestedEnumCliConfigSchemaVersionFilter<$PrismaModel = never> = {
+  equals?: $Enums.CliConfigSchemaVersion | Prisma.EnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCliConfigSchemaVersionFilter<$PrismaModel> | $Enums.CliConfigSchemaVersion
+}
+
+export type NestedEnumProviderWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel>
+  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProviderWithAggregatesFilter<$PrismaModel> | $Enums.Provider
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProviderFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProviderFilter<$PrismaModel>
+}
+
+export type NestedEnumCliConfigSchemaVersionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CliConfigSchemaVersion | Prisma.EnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCliConfigSchemaVersionWithAggregatesFilter<$PrismaModel> | $Enums.CliConfigSchemaVersion
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCliConfigSchemaVersionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCliConfigSchemaVersionFilter<$PrismaModel>
+}
+
 export type NestedEnumReasoningEffortNullableFilter<$PrismaModel = never> = {
   equals?: $Enums.ReasoningEffort | Prisma.EnumReasoningEffortFieldRefInput<$PrismaModel> | null
   in?: $Enums.ReasoningEffort[] | Prisma.ListEnumReasoningEffortFieldRefInput<$PrismaModel> | null
@@ -1335,28 +1386,11 @@ export type NestedEnumOutputVerbosityNullableWithAggregatesFilter<$PrismaModel =
   _max?: Prisma.NestedEnumOutputVerbosityNullableFilter<$PrismaModel>
 }
 
-export type NestedEnumProviderFilter<$PrismaModel = never> = {
-  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel>
-  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
-  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumProviderFilter<$PrismaModel> | $Enums.Provider
-}
-
 export type NestedEnumImageGenStageFilter<$PrismaModel = never> = {
   equals?: $Enums.ImageGenStage | Prisma.EnumImageGenStageFieldRefInput<$PrismaModel>
   in?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
   notIn?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumImageGenStageFilter<$PrismaModel> | $Enums.ImageGenStage
-}
-
-export type NestedEnumProviderWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel>
-  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
-  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumProviderWithAggregatesFilter<$PrismaModel> | $Enums.Provider
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumProviderFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumProviderFilter<$PrismaModel>
 }
 
 export type NestedEnumImageGenStageWithAggregatesFilter<$PrismaModel = never> = {

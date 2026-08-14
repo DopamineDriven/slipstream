@@ -57,6 +57,7 @@ export const ModelName = {
   VideoMetadata: 'VideoMetadata',
   AudioMetadata: 'AudioMetadata',
   DocumentMetadata: 'DocumentMetadata',
+  CliConfig: 'CliConfig',
   Conversation: 'Conversation',
   ConversationSettings: 'ConversationSettings',
   ImageGenJob: 'ImageGenJob',
@@ -277,6 +278,20 @@ export const DocumentMetadataScalarFieldEnum = {
 } as const
 
 export type DocumentMetadataScalarFieldEnum = (typeof DocumentMetadataScalarFieldEnum)[keyof typeof DocumentMetadataScalarFieldEnum]
+
+
+export const CliConfigScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  defaultProvider: 'defaultProvider',
+  defaultModel: 'defaultModel',
+  showThinking: 'showThinking',
+  schemaVersion: 'schemaVersion',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CliConfigScalarFieldEnum = (typeof CliConfigScalarFieldEnum)[keyof typeof CliConfigScalarFieldEnum]
 
 
 export const ConversationScalarFieldEnum = {

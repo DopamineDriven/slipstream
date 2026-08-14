@@ -48,6 +48,7 @@ model User {
   conversationMemoryStore ConversationMemoryStore?
   providerStores          ProviderStore[]
   settings                Settings?
+  cliConfig               CliConfig?
   userStores              UserStore[]
   createdAt               DateTime                 @default(now())
   updatedAt               DateTime                 @updatedAt

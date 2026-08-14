@@ -106,7 +106,7 @@ model CliConfig {
   userId          String            @unique
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   defaultProvider Provider          @default(ANTHROPIC)
-  defaultModel    String            @default("claude-opus-5")
+  defaultModel    String            @default("claude-fable-5")
   showThinking    Boolean           @default(true)
   schemaVersion   CliConfigSchemaVersion @default(v1_0)
   createdAt       DateTime               @default(now())

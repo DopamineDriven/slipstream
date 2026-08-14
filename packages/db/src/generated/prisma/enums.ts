@@ -146,6 +146,13 @@ export const ColorSpace = {
 export type ColorSpace = (typeof ColorSpace)[keyof typeof ColorSpace]
 
 
+export const CliConfigSchemaVersion = {
+  v1_0: 'v1_0'
+} as const
+
+export type CliConfigSchemaVersion = (typeof CliConfigSchemaVersion)[keyof typeof CliConfigSchemaVersion]
+
+
 export const ReasoningEffort = {
   none: 'none',
   minimal: 'minimal',

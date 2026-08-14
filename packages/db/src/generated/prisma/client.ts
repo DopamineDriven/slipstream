@@ -72,6 +72,11 @@ export type AudioMetadata = Prisma.AudioMetadataModel
  */
 export type DocumentMetadata = Prisma.DocumentMetadataModel
 /**
+ * Model CliConfig
+ * 
+ */
+export type CliConfig = Prisma.CliConfigModel
+/**
  * Model Conversation
  * 
  */
