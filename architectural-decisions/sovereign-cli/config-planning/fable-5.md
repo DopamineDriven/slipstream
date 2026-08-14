@@ -179,7 +179,6 @@ model CliConversationActivity {
   conversationId String
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   lastActiveAt   DateTime     @updatedAt
-  turnCount      Int          @default(1)
   @@unique([userId, conversationId])
   @@index([userId, lastActiveAt(sort: Desc)])
 }
@@ -199,6 +198,25 @@ model CliConversationActivity {
   keeps ranging the ENTIRE shared pool — resume narrows, never hides.
 - A conversation resumed in the CLI that was last touched on web is the
   happy path, not an edge case.
+
+Cardinality + shape rulings (2026-08-14):
+
+- Back-relations are LIST-typed on both parents
+  (`cliConversationActivity CliConversationActivity[]` on User AND
+  Conversation) — only the compound `[userId, conversationId]` is unique,
+  so prisma requires the list form; single-row-per-conversation stays an
+  observation, not a schema commitment. Point reads go through
+  `findUnique({ where: { userId_conversationId: {...} } })`.
+- NO turnCount (Andrew): ordinals already carry per-conversation message
+  counting as a first-class 0-based contract; a near-duplicate counter is
+  a confusable one-off. Recency needs exactly one column — lastActiveAt —
+  and row existence itself means "touched from the CLI."
+- NO `Cli` parent/aggregate-root table (2026-08-14): a root with no
+  attributes of its own is a join tax for namespace feel. The compartment
+  lives at the prefix (`Cli*`) and the schema-file level (consolidate CLI
+  models into one `cli.prisma`). Trigger to revisit: the moment a parent
+  row would carry REAL aggregate state (Phase B lastSeenAt / device
+  count / plan flags), root it then — never before.
 
 ## 6. Auth outlook (the road the config work paves)
 
