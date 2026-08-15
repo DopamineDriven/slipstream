@@ -101,9 +101,17 @@ pages are the precedent). So:
    one: config changes only on explicit update, recency is
    activity-shaped.
 2. **Event pair for writes** (RATIFIED 2026-08-14): `cli_config_update`
-   (client → server, partial patch of typed knobs — provider and model
-   travel together by convention; the pairing validation rejects a lone
-   provider whose current model doesn't belong) /
+   (client → server, partial patch of typed knobs). Pairing coherence is
+   CLIENT-GATED (Andrew 2026-08-15, over type-level both-or-neither
+   unions — overthinking): the picker always emits provider+model as a
+   pair, with confirmation dialogs when a selection crosses the pairing —
+   "this will change your default provider to meta — proceed?" (model
+   from another provider) and "this will change your default model to
+   fugu (sakana's default) — proceed?" (provider changed out from under
+   the model; defaultModel is non-nullable so it moves to the new
+   provider's registry default from models.ts, never to undefined). The
+   server's effective-pairing validation stays as the backstop for
+   hand-crafted frames. /
    `cli_config_update_ack` (server → client) with a **UNIFORM shape,
    never a discriminated union on the wire** (Andrew): identical field
    set on success and failure — `ok: boolean`, `reason?: string`
