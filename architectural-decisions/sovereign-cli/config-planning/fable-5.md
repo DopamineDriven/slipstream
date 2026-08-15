@@ -104,14 +104,16 @@ pages are the precedent). So:
    (client → server, partial patch of typed knobs). Pairing coherence is
    CLIENT-GATED (Andrew 2026-08-15, over type-level both-or-neither
    unions — overthinking): the picker always emits provider+model as a
-   pair, with confirmation dialogs when a selection crosses the pairing —
-   "this will change your default provider to meta — proceed?" (model
-   from another provider) and "this will change your default model to
-   fugu (sakana's default) — proceed?" (provider changed out from under
-   the model; defaultModel is non-nullable so it moves to the new
-   provider's registry default from models.ts, never to undefined). The
-   server's effective-pairing validation stays as the backstop for
-   hand-crafted frames. /
+   pair. Provider selection is NEVER terminal — it branches straight into
+   that provider's model list (registry default from models.ts
+   pre-highlighted), and the write fires only when a model is chosen;
+   cancel = no write. So the mismatch case dissolves into the flow, and
+   exactly ONE confirmation exists: picking a model from a DIFFERENT
+   provider (cross-provider list or /config set) — "this will change
+   your default provider to meta — proceed?". defaultModel is
+   non-nullable and never drops to undefined. The server's
+   effective-pairing validation stays as the backstop for hand-crafted
+   frames. /
    `cli_config_update_ack` (server → client) with a **UNIFORM shape,
    never a discriminated union on the wire** (Andrew): identical field
    set on success and failure — `ok: boolean`, `reason?: string`
