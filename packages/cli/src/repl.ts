@@ -66,6 +66,13 @@ export class SlipstreamReplService extends CliLocalToolsService {
       );
       return [hits, partial];
     }
+    if (line.startsWith("/config model ")) {
+      const partial = line.slice("/config model ".length);
+      const hits = CLI_MODELS.map(m => m.alias).filter(a =>
+        a.startsWith(partial.toLowerCase())
+      );
+      return [hits, partial];
+    }
     if (line.startsWith("/")) {
       const hits = [...this.commands.keys()]
         .map(cmd => `/${cmd}`)
@@ -115,6 +122,130 @@ export class SlipstreamReplService extends CliLocalToolsService {
   };
 
   /**
+   * identity-plane hooks (config-planning §5) — seeding happens ONCE at
+   * hydrate (startup); update acks narrate + reconcile (the DTO on every
+   * ack is canonical truth; the chain link already assigned it)
+   */
+  private wireIdentityHooks() {
+    this.onCliConfigHydrated = config => {
+      const entry =
+        CLI_MODELS.find(
+          m =>
+            m.provider === config.defaultProvider &&
+            m.model === config.defaultModel
+        ) ?? CLI_MODELS.find(m => m.provider === config.defaultProvider);
+      if (entry) {
+        if (entry !== this.state.entry) {
+          this.state.entry = entry;
+          this.renderNotice(`roaming default · ${entry.alias} (${entry.model})`);
+        }
+      } else {
+        this.renderNotice(
+          `default ${config.defaultProvider}/${config.defaultModel} has no CLI roster alias — keeping ${this.state.entry.alias}`
+        );
+      }
+      this.showThinking = config.showThinking;
+      this.state.showThinking = config.showThinking;
+    };
+    this.onCliConfigUpdateAck = ack => {
+      this.renderNotice(
+        ack.success
+          ? `default saved · ${ack.cliConfig.defaultProvider}/${ack.cliConfig.defaultModel} · thinking ${ack.cliConfig.showThinking ? "shown" : "hidden"}`
+          : `config update rejected · ${ack.reason ?? "unknown reason"} — server kept ${ack.cliConfig.defaultProvider}/${ack.cliConfig.defaultModel}`
+      );
+    };
+  }
+
+  /**
+   * resume lens helpers — recency ids land async (ack) and entries land
+   * async (conversation_list_ack pages), so both attach paths poll for the
+   * overlap with a bounded window (the awaitProviderContext pattern)
+   */
+  private async awaitRecentEntry(index: number, timeoutMs = 4_000) {
+    const startedAt = Date.now();
+    while (Date.now() - startedAt < timeoutMs) {
+      const id = this.recentConversationIds[index];
+      if (typeof id !== "undefined") {
+        const entry = this.convoIndex.get(id);
+        if (entry) return entry;
+      }
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+    return undefined;
+  }
+
+  /** --continue: attach straight to the most recent CLI conversation */
+  private async continueMostRecent() {
+    const entry = await this.awaitRecentEntry(0);
+    if (!entry) {
+      this.renderNotice(
+        "no CLI-recent conversation to continue — fresh session"
+      );
+      return;
+    }
+    this.attachTo(entry);
+  }
+
+  /** /resume + --resume: the picker narrowed to the recency lens */
+  private async resumeFromRecent() {
+    this.refreshRecentConvos();
+    await this.awaitRecentEntry(0, 2_500);
+    if (this.recentConversationIds.length === 0) {
+      this.renderNotice(
+        "no CLI activity recorded yet — /convos ranges the whole archive"
+      );
+      return;
+    }
+    if (!process.stdin.isTTY) {
+      for (const id of this.recentConversationIds) {
+        const c = this.convoIndex.get(id);
+        this.renderNotice(c ? `${c.title ?? "(untitled)"} · ${c.id}` : id);
+      }
+      return;
+    }
+    await this.pickConversation("", this.recentConversationIds);
+  }
+
+  /**
+   * /config model <alias> — persists the roaming default; the pair always
+   * travels together (config-planning §3). Crossing providers surfaces the
+   * ONE confirmation, repeat-to-confirm style — terminal-safe, no nested
+   * readline question while the loop owns stdin.
+   */
+  private pendingDefaultConfirm?: { alias: string; expiresAt: number };
+
+  private setDefaultModel(raw: string) {
+    const alias = raw.trim().toLowerCase();
+    const entry = CLI_MODELS.find(m => m.alias === alias);
+    if (!entry) {
+      this.renderNotice(
+        `unknown alias "${raw.trim()}" — /config model <${CLI_MODELS.map(m => m.alias).join("|")}>`
+      );
+      return;
+    }
+    const current = this.cliConfig;
+    if (current !== undefined && current.defaultProvider !== entry.provider) {
+      const pending = this.pendingDefaultConfirm;
+      this.pendingDefaultConfirm = undefined;
+      if (
+        pending === undefined ||
+        pending.alias !== alias ||
+        Date.now() > pending.expiresAt
+      ) {
+        this.pendingDefaultConfirm = { alias, expiresAt: Date.now() + 30_000 };
+        this.renderNotice(
+          `this will change your default provider ${current.defaultProvider} → ${entry.provider} — repeat "/config model ${alias}" within 30s to confirm`
+        );
+        return;
+      }
+    }
+    this.sendCliConfigUpdate({
+      defaultProvider: entry.provider,
+      defaultModel: entry.model
+    });
+  }
+
+  /**
    * transactional attach — entry objects come from the server-fed index only
    * (picker selection or exact-match resolution), so nothing unvalidated ever
    * crosses the wire. State commits in the ack handler, not here.
@@ -146,11 +277,22 @@ export class SlipstreamReplService extends CliLocalToolsService {
    * the picker owns raw stdin while open — pause readline around it and
    * flush any line noise it buffered before handing the prompt back
    */
-  private async pickConversation(initialFilter: string) {
+  private async pickConversation(
+    initialFilter: string,
+    filterIds?: readonly string[]
+  ) {
     // background refresh — pages warm the index for NEXT open; this open
     // renders a frozen snapshot so rows never reshuffle mid-navigation
     this.send({ type: "conversation_list" });
-    const snapshot = [...this.convoIndex.values()];
+    let snapshot = [...this.convoIndex.values()];
+    // resume lens (config-planning §5.5): narrow to the recency ids in
+    // their served order — narrows, never hides (/convos stays unfiltered)
+    if (filterIds) {
+      const order = new Map(filterIds.map((id, i) => [id, i] as const));
+      snapshot = snapshot
+        .filter(c => order.has(c.id))
+        .sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+    }
     if (snapshot.length === 0) {
       this.renderNotice("index warming — try again in a moment");
       return;
@@ -214,7 +356,7 @@ export class SlipstreamReplService extends CliLocalToolsService {
       "help",
       () =>
         this.renderNotice(
-          "/model <alias|fuzzy> · /new · /convos [filter] · /convo [filter] — picker: type filters, ↑↓ move, Enter attaches, Esc cancels · /expand <ordinal> · /system <text|clear> · /think · /debug · /quit"
+          "/model <alias|fuzzy> · /new · /convos [filter] · /convo [filter] — picker: type filters, ↑↓ move, Enter attaches, Esc cancels · /resume — recent CLI convos · /config [model <alias>|think on|off] — roaming defaults · /expand <ordinal> · /system <text|clear> · /think · /debug · /quit"
         )
     ],
     [
@@ -225,6 +367,38 @@ export class SlipstreamReplService extends CliLocalToolsService {
       }
     ],
     ["model", args => this.setModel(args)],
+    ["resume", async () => this.resumeFromRecent()],
+    [
+      "config",
+      args => {
+        const [sub = "", ...restArr] = args.trim().split(/\s+/);
+        const rest = restArr.join(" ");
+        if (sub.length === 0) {
+          const c = this.cliConfig;
+          this.renderNotice(
+            c
+              ? `roaming defaults · ${c.defaultProvider}/${c.defaultModel} · thinking ${c.showThinking ? "shown" : "hidden"} · ${c.schemaVersion}`
+              : "config not hydrated yet — try again in a moment"
+          );
+          this.renderNotice("usage: /config model <alias> · /config think on|off");
+          return;
+        }
+        if (sub === "model") {
+          this.setDefaultModel(rest);
+          return;
+        }
+        if (sub === "think") {
+          const v = rest === "on" ? true : rest === "off" ? false : undefined;
+          if (typeof v === "undefined") {
+            this.renderNotice("usage: /config think on|off");
+            return;
+          }
+          this.sendCliConfigUpdate({ showThinking: v });
+          return;
+        }
+        this.renderNotice(`unknown /config subcommand "${sub}" — model | think`);
+      }
+    ],
     [
       "new",
       () => {
@@ -486,6 +660,8 @@ export class SlipstreamReplService extends CliLocalToolsService {
     // milliseconds post-handshake and must not race the registration
     this.wireEvents();
     this.wireProviderContext();
+    this.wireIdentityConfig();
+    this.wireIdentityHooks();
     // --workspace opt-in: arm the read-only local tool bridge (handler
     // registration must also precede connect)
     const workspaceArg = this.parseWorkspaceArg(process.argv);
@@ -506,12 +682,20 @@ export class SlipstreamReplService extends CliLocalToolsService {
         }
       };
     }
+    // pull the identity plane (config-planning §3) — the acks seed session
+    // defaults asynchronously via wireIdentityHooks
+    this.hydrateIdentity();
     const gotContext = await this.awaitProviderContext();
     this.renderNotice(
       gotContext
         ? `connected · ${this.state.entry.alias} (${this.state.entry.model}) · /help`
         : `connected (no provider context yet) · ${this.state.entry.alias} (${this.state.entry.model}) · /help`
     );
+    if (process.argv.includes("--continue")) {
+      await this.continueMostRecent();
+    } else if (process.argv.includes("--resume")) {
+      await this.resumeFromRecent();
+    }
     this.rl.on("SIGINT", () => {
       process.stdout.write("\n");
       process.exit(0);

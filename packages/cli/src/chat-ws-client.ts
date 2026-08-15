@@ -60,6 +60,12 @@ class EventHandlerRegistry {
     "asset_upload_request",
     "asset_upload_response",
     "asset_uploaded",
+    "cli_config_hydrate",
+    "cli_config_hydrate_ack",
+    "cli_config_update",
+    "cli_config_update_ack",
+    "cli_recent_convos",
+    "cli_recent_convos_ack",
     "connection_established",
     "conversation_list",
     "conversation_list_ack",
@@ -299,6 +305,42 @@ class EventHandlerRegistry {
       asset_uploaded: () => {
         const handler = this.handlers.asset_uploaded;
         if (handler && event.type === "asset_uploaded") {
+          handler(event, socket);
+        }
+      },
+      cli_config_hydrate: () => {
+        const handler = this.handlers.cli_config_hydrate;
+        if (handler && event.type === "cli_config_hydrate") {
+          handler(event, socket);
+        }
+      },
+      cli_config_hydrate_ack: () => {
+        const handler = this.handlers.cli_config_hydrate_ack;
+        if (handler && event.type === "cli_config_hydrate_ack") {
+          handler(event, socket);
+        }
+      },
+      cli_config_update: () => {
+        const handler = this.handlers.cli_config_update;
+        if (handler && event.type === "cli_config_update") {
+          handler(event, socket);
+        }
+      },
+      cli_config_update_ack: () => {
+        const handler = this.handlers.cli_config_update_ack;
+        if (handler && event.type === "cli_config_update_ack") {
+          handler(event, socket);
+        }
+      },
+      cli_recent_convos: () => {
+        const handler = this.handlers.cli_recent_convos;
+        if (handler && event.type === "cli_recent_convos") {
+          handler(event, socket);
+        }
+      },
+      cli_recent_convos_ack: () => {
+        const handler = this.handlers.cli_recent_convos_ack;
+        if (handler && event.type === "cli_recent_convos_ack") {
           handler(event, socket);
         }
       },

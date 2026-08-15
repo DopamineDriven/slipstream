@@ -6,11 +6,11 @@ import type { TTSService } from "@/tts/index.ts";
 import type { UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
-import { ResolverLocalToolResultService } from "@/resolver/local-tool-result.ts";
+import { ResolverCliRecentConvos } from "@/resolver/cli-recent-convos.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { ClientContextWorkupProps, EventTypeMap } from "@slipstream/types";
 
-export class ResolverConnectionService extends ResolverLocalToolResultService {
+export class ResolverConnectionService extends ResolverCliRecentConvos {
   constructor(
     wsServer: WSServer,
     providers: ProviderService,

@@ -3,9 +3,9 @@ import type {
   BlockType,
   RenderableBlock
 } from "@/types.ts";
-import { CliProviderContextService } from "@/provider-context.ts";
+import { CliIdentityConfigService } from "@/identity-config.ts";
 
-export class MessageBlocksService extends CliProviderContextService {
+export class MessageBlocksService extends CliIdentityConfigService {
   constructor(wsUrl?: string) {
     super(wsUrl);
   }

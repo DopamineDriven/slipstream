@@ -2,7 +2,11 @@ import type { ExtractService } from "@/extract/index.ts";
 import { PrismaConvoListService } from "@/prisma/convo-list.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { CliConfigSingleton, Provider } from "@slipstream/types";
+import type {
+  CliConfigDTO,
+  CliConfigSingleton,
+  Provider
+} from "@slipstream/types";
 import { modelIdsByProvider } from "@slipstream/types";
 
 /**
@@ -102,6 +106,21 @@ export class PrismaCliConfigService extends PrismaConvoListService {
     });
     this.cliConfigRegistry.set(userId, updated);
     return { ok: true, config: updated } as const;
+  }
+
+  /**
+   * row → wire DTO (events.ts CliConfigDTO) — the provider drops to the
+   * lowercase wire format (the user-meta reverse precedent); everything
+   * server-internal (id, userId, timestamps) stays off the wire
+   */
+  public cliConfigToDTO(config: CliConfigSingleton) {
+    return {
+      defaultProvider:
+        config.defaultProvider.toLowerCase() as Lowercase<$Enums.Provider>,
+      defaultModel: config.defaultModel,
+      showThinking: config.showThinking,
+      schemaVersion: config.schemaVersion
+    } satisfies CliConfigDTO;
   }
 
   /**

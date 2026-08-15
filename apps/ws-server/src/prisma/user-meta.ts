@@ -173,7 +173,8 @@ export class PrismaUserMetaService extends PrismaUtilsService {
         city,
         country,
         userId: userId,
-        timezone: clientTz.length > 1 ? clientTz : tz,
+        timezone:
+          typeof clientTz === "string" && clientTz.length > 1 ? clientTz : tz,
         region,
         postalCode,
         lat,
@@ -185,7 +186,8 @@ export class PrismaUserMetaService extends PrismaUtilsService {
         region,
         userId,
         postalCode,
-        timezone: clientTz.length > 1 ? clientTz : tz,
+        timezone:
+          typeof clientTz === "string" && clientTz.length > 1 ? clientTz : tz,
         lat,
         lng
       }

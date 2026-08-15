@@ -14,6 +14,7 @@ export default defineConfig(
         "src/config.ts",
         "src/convo-picker.ts",
         "src/hydrated-history.ts",
+        "src/identity-config.ts",
         "src/index.ts",
         "src/local-tools.ts",
         "src/markdown-ansi.ts",
