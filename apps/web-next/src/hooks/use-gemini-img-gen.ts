@@ -12,12 +12,16 @@ export type GeminiImgModelId = GeminiImgGenModels;
 
 export type NanoBananaAR = GeminiImageSize["gemini-3-pro-image-preview"];
 
-export type NanoBanana2AR = GeminiImageSize["gemini-3.1-flash-image-preview"];
+export type NanoBanana2AR = GeminiImageSize[
+  "gemini-3.1-flash-image-preview" | "gemini-3.1-flash-lite-image"];
 
 export type GoogleAspectRatio = NanoBanana2AR;
 
 export type NanoBananaQuality =
   GeminiImageQuality["gemini-3-pro-image-preview"];
+
+export type NanoBanana2LiteQuality =
+  GeminiImageQuality["gemini-3.1-flash-lite-image"];
 
 export type NanoBanana2Quality =
   GeminiImageQuality["gemini-3.1-flash-image-preview"];
@@ -59,6 +63,7 @@ const NANO_BANANA_2_ASPECT_RATIOS = [
 ] satisfies NanoBanana2AR[];
 
 const MODEL_ASPECT_RATIOS = new Map<GeminiImgModelId, GoogleAspectRatio[]>([
+  ["gemini-3.1-flash-lite-image", NANO_BANANA_2_ASPECT_RATIOS],
   ["gemini-3.1-flash-image-preview", NANO_BANANA_2_ASPECT_RATIOS],
   ["gemini-3-pro-image-preview", NANO_BANANA_ASPECT_RATIOS],
   ["gemini-2.5-flash-image", NANO_BANANA_ASPECT_RATIOS],
@@ -67,6 +72,10 @@ const MODEL_ASPECT_RATIOS = new Map<GeminiImgModelId, GoogleAspectRatio[]>([
 ]);
 
 const NANO_BANANA_QUALITIES = ["1K", "2K", "4K"] satisfies NanoBananaQuality[];
+const NANO_BANANA_2_LITE_QUALITIES = [
+  "0.5K",
+  "1K"
+] satisfies NanoBanana2LiteQuality[];
 const NANO_BANANA_2_QUALITIES = [
   "0.5K",
   "1K",
@@ -75,6 +84,7 @@ const NANO_BANANA_2_QUALITIES = [
 ] satisfies NanoBanana2Quality[];
 
 const MODEL_QUALITIES = new Map<GeminiImgModelId, GoogleQuality[]>([
+  ["gemini-3.1-flash-lite-image", NANO_BANANA_2_LITE_QUALITIES],
   ["gemini-3.1-flash-image-preview", NANO_BANANA_2_QUALITIES],
   ["gemini-3-pro-image-preview", NANO_BANANA_QUALITIES],
   ["gemini-2.5-flash-image", NANO_BANANA_QUALITIES],
@@ -86,12 +96,18 @@ const IMAGEN_DEFAULTS = {
   aspectRatio: "1:1",
   quality: "1K"
 } satisfies GoogleImageSettings;
+
+const NANO_BANANA_2_LITE_DEFAULTS = {
+  aspectRatio: "16:9",
+  quality: "1K"
+} satisfies GoogleImageSettings;
 const NANO_BANANA_DEFAULTS = {
   aspectRatio: "16:9",
   quality: "2K"
 } satisfies GoogleImageSettings;
 
 const MODEL_DEFAULTS = new Map<GeminiImgModelId, GoogleImageSettings>([
+  ["gemini-3.1-flash-lite-image", NANO_BANANA_2_LITE_DEFAULTS],
   ["gemini-3.1-flash-image-preview", NANO_BANANA_DEFAULTS],
   ["gemini-3-pro-image-preview", NANO_BANANA_DEFAULTS],
   ["gemini-2.5-flash-image", NANO_BANANA_DEFAULTS],

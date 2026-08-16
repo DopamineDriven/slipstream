@@ -258,14 +258,13 @@ Phased so config never blocks on auth, but auth slots in without rework:
 
 - **Phase A (today, unchanged)**: single-operator constant. `?id=` +
   browser-minted session. `SLIPSTREAM_USER_ID` override for a second user.
-- **Phase B — device-code login**: `aic login` prints a short code + opens
-  `loginUrl?flow=device`. The web app (already owns better-auth) completes
-  the grant and mints a **`CliSession`** row — a NEW table (separation
-  decision applies to auth artifacts too; web `Session` stays web's):
-  long-lived, revocable, `deviceLabel`, `lastSeenAt`, hashed token. Token
-  lands in the machine file with `0600`. The handshake gains
-  token-validation for `via: "cli"` sockets; `?id=` derives from the token
-  instead of env. Kills the hardcoded cuid.
+- **Phase B — `aic login` (DESIGNED 2026-08-15, see §6-B below)**: the
+  loopback authorization-code flow Claude Code / gh / Codex all use, riding
+  ON TOP of the web session — the CLI never touches Google (or any IdP)
+  itself. Mints a **`CliSession`** row — a NEW table (separation decision
+  applies to auth artifacts too; web `Session` stays web's). Token lands
+  in the machine plane at `0600`; the handshake gains token validation for
+  `via: "cli"` sockets; the hardcoded cuid dies.
 - **Phase C — entitlements (PARKED, Andrew 2026-07-28)**: not until
   payment rails exist — "that's a whole other can of worms." When the day
   comes: `CliEntitlement` (or plan flags on `CliConfig`) gating roster
@@ -278,6 +277,91 @@ The monetization-shaped observation: the thing users would pay for —
 one terminal, thirteen providers, persistent cross-conversation memory,
 local repo tools — is exactly the surface this config/auth pair unlocks
 for someone who isn't Andrew.
+
+## 6-B. `aic login` — the loopback flow (DESIGNED 2026-08-15, not built)
+
+**How the incumbents do it** (Claude Code, gh, Codex): OAuth-shaped
+authorization-code with a **loopback redirect**. The CLI binds an
+ephemeral `127.0.0.1` HTTP listener, opens the browser to an authorize
+URL carrying `state` (+ PKCE), the user approves in the browser, the
+server 302s the browser to the loopback URL with a one-time code — that
+HTTP request arriving at the CLI's listener IS how the CLI "knows" you
+succeeded — the CLI exchanges the code for a token over HTTPS and serves
+the "you may close this window" page itself. Device-code (short code +
+polling) is the fallback for SSH/containers where the browser can't
+reach the CLI's localhost.
+
+**Decisions (Andrew, 2026-08-15):**
+
+- **The authorize page lives in `apps/web`, directly** — not proven on
+  web-next first, because the session it piggybacks IS the prod one.
+- **The CLI is IdP-agnostic by construction.** Users reach the authorize
+  page through whatever better-auth sign-in they have — Google today
+  (encouraged: refresh tokens, "just works"; GitHub is being removed
+  outright since every active user is on Google), email+password someday.
+  None of that touches the CLI design: `aic login` opens the browser; a
+  signed-in user lands straight on "Authorize aic on `<device>`? [Approve]",
+  a signed-out user goes through login first and then lands there. Google's
+  long-lived web session is exactly why the CLI step is one click.
+- **Loopback for v1, device-code as the follow-on** — the server side is
+  nearly identical (a short-TTL code table), the CLI side is a print +
+  poll loop.
+
+**Pieces:**
+
+1. **web** — `/cli/authorize?state=…&redirect_uri=http://127.0.0.1:<port>/callback&device=<label>`
+   (behind normal auth). On Approve: mint `CliSession`, 302 to the
+   loopback with `?code=<one-time>&state=…`. A `/api/cli/token` route
+   exchanges the code (once, short TTL) for the opaque session token.
+   Web also grows a **devices list** (label · lastSeenAt · Revoke) — the
+   revocation UI.
+2. **CLI** — **`/login` in-REPL** (Andrew 2026-08-15: a REPL command, not
+   an `aic login` subcommand — Claude Code parity, and aic IS a REPL):
+   bind loopback, open browser (`xdg-open`/`open`/`start`; print the URL
+   too for copy-paste), await the callback, verify `state`, exchange,
+   write `~/.config/aic/credentials.json` (0600), serve the "signed in as
+   andrew@… — you may close this window and return to the terminal" page,
+   then **reconnect the socket with the new token in place** — no process
+   restart. `/logout` revokes server-side + deletes the file + reconnects
+   anonymous; `/identity` reads it back (Andrew: `/identity`, not `/whoami` — it names the identity plane, and can grow into the full readback: email, device label, session age, roaming defaults). The cold-start case (no credential
+   file, handshake refused) is the SAME flow auto-invoked before the first
+   prompt renders — one class, two entry points, no separate bin command.
+3. **ws-server** — handshake accepts the token (query `?token=` for v1;
+   `Sec-WebSocket-Protocol` bearer is the eventual clean home) for
+   `via: "cli"` sockets, validates against `CliSession` (hash compare),
+   derives userId from the row, bumps `lastSeenAt`. `?id=` +
+   `SLIPSTREAM_USER_ID` survive only as the dev-mode single-operator lane
+   until Phase B ships, then die.
+
+**Schema sketch (dedicated, per the separation ruling):**
+
+```prisma
+model CliSession {
+  id          String    @id @default(cuid(2))
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash   String    @unique      // sha-256 of the opaque token; raw never stored
+  deviceLabel String                  // "LAPTOP-2IH011V4 · wsl2" — user-facing in the devices list
+  lastSeenAt  DateTime  @updatedAt
+  expiresAt   DateTime                // sliding: extended on each validated handshake
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  @@index([userId, lastSeenAt(sort: Desc)])
+}
+```
+
+**Token decisions:** opaque random (32 bytes, base64url) with a stored
+hash — simple, per-device revocable, no denylist dance (JWT rejected for
+this reason); long-lived (90d) with a **sliding window** renewed on each
+validated handshake — "stays signed in while you use it," no refresh-token
+choreography (gh's posture). The one-time authorize code: 60s TTL,
+single use, bound to `state`.
+
+**Open questions:** (1) `CliSession` back-relation on `User` as
+`cliSessions CliSession[]`; (2) should a revoked session's live sockets
+be closed immediately (server iterates userMap) or die on next handshake
+(simpler; v1 lean); (3) `deviceLabel` — hostname + platform auto, user-
+editable later in the devices list?
 
 ## 6.5 API keys on local devices (answer: they aren't)
 

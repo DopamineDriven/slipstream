@@ -4,11 +4,14 @@ import pc from "picocolors";
 import { wsDebug } from "@/chat-ws-client.ts";
 import { CliConvoPicker } from "@/convo-picker.ts";
 import { CliLocalToolsService } from "@/local-tools.ts";
+import { CliModelPicker } from "@/model-picker.ts";
 import { CLI_MODELS } from "@/types.ts";
-import type { ChatSessionState } from "@/types.ts";
+import type { ChatSessionState, CliActiveModel } from "@/types.ts";
 import type {
+  AllModelsUnion,
   ConversationListEntry,
-  MessageSingleton
+  MessageSingleton,
+  Provider
 } from "@slipstream/types";
 
 /**
@@ -59,19 +62,17 @@ export class SlipstreamReplService extends CliLocalToolsService {
           : titles.filter(t => t.toLowerCase().includes(q));
       return [hits, partial];
     }
-    if (line.startsWith("/model ")) {
-      const partial = line.slice("/model ".length);
-      const hits = CLI_MODELS.map(m => m.alias).filter(a =>
-        a.startsWith(partial.toLowerCase())
-      );
-      return [hits, partial];
-    }
-    if (line.startsWith("/config model ")) {
-      const partial = line.slice("/config model ".length);
-      const hits = CLI_MODELS.map(m => m.alias).filter(a =>
-        a.startsWith(partial.toLowerCase())
-      );
-      return [hits, partial];
+    if (line.startsWith("/model ") || line.startsWith("/config model ")) {
+      const prefix = line.startsWith("/model ") ? "/model " : "/config model ";
+      const partial = line.slice(prefix.length);
+      const q = partial.toLowerCase();
+      // aliases first (fast lane), then every registry id — the picker's
+      // universe, so anything selectable is also completable
+      const aliases = CLI_MODELS.map(m => m.alias).filter(a => a.startsWith(q));
+      const ids = this.pickerProviders
+        .flatMap(p => this.buildModelRows(p, undefined, "").map(r => r.modelId))
+        .filter(id => id.toLowerCase().startsWith(q));
+      return [[...aliases, ...ids], partial];
     }
     if (line.startsWith("/")) {
       const hits = [...this.commands.keys()]
@@ -89,11 +90,12 @@ export class SlipstreamReplService extends CliLocalToolsService {
   /** true only while the prompt is awaiting a line — popups trigger nowhere else */
   private awaitingLine = false;
   /**
-   * seed set by the keypress watcher when the buffer becomes "/convo …" —
-   * the pending question is force-submitted and the loop opens the picker
-   * with this filter (Claude-Code @-mention UX: live, not Enter-gated)
+   * set by the keypress watcher the moment the buffer becomes "/convo …"
+   * or "/model …" (the SPACE is the trigger, not Enter) — the pending
+   * question is force-submitted and the loop opens the matching picker
+   * seeded with whatever followed (Claude-Code @-mention UX: live)
    */
-  private pickerRequest?: string;
+  private pickerRequest?: { kind: "convo" | "model"; seed: string };
 
   /**
    * transactional attach — the active session stays intact until the
@@ -128,21 +130,22 @@ export class SlipstreamReplService extends CliLocalToolsService {
    */
   private wireIdentityHooks() {
     this.onCliConfigHydrated = config => {
-      const entry =
-        CLI_MODELS.find(
-          m =>
-            m.provider === config.defaultProvider &&
-            m.model === config.defaultModel
-        ) ?? CLI_MODELS.find(m => m.provider === config.defaultProvider);
-      if (entry) {
-        if (entry !== this.state.entry) {
-          this.state.entry = entry;
-          this.renderNotice(`roaming default · ${entry.alias} (${entry.model})`);
-        }
-      } else {
+      // the wire DTO carries the model as a plain string (a registry regen
+      // may retire an id) — resolve it against THIS build's registry before
+      // adopting; an unknown id keeps the shipped default and says so
+      const target = this.resolveTypedModel(config.defaultModel);
+      if (!target) {
         this.renderNotice(
-          `default ${config.defaultProvider}/${config.defaultModel} has no CLI roster alias — keeping ${this.state.entry.alias}`
+          `roaming default ${config.defaultProvider}/${config.defaultModel} is not in this build's registry — keeping ${this.describeEntry(this.state.entry)}`
         );
+      } else {
+        const changed =
+          this.state.entry.provider !== target.provider ||
+          this.state.entry.model !== target.modelId;
+        this.state.entry = this.activeModelFor(target.provider, target.modelId);
+        if (changed) {
+          this.renderNotice(`roaming default · ${this.describeEntry(this.state.entry)}`);
+        }
       }
       this.showThinking = config.showThinking;
       this.state.showThinking = config.showThinking;
@@ -206,43 +209,16 @@ export class SlipstreamReplService extends CliLocalToolsService {
     await this.pickConversation("", this.recentConversationIds);
   }
 
-  /**
-   * /config model <alias> — persists the roaming default; the pair always
-   * travels together (config-planning §3). Crossing providers surfaces the
-   * ONE confirmation, repeat-to-confirm style — terminal-safe, no nested
-   * readline question while the loop owns stdin.
-   */
-  private pendingDefaultConfirm?: { alias: string; expiresAt: number };
-
-  private setDefaultModel(raw: string) {
-    const alias = raw.trim().toLowerCase();
-    const entry = CLI_MODELS.find(m => m.alias === alias);
-    if (!entry) {
+  /** /config model <alias|model-id|display-name> — the persistent lane */
+  private async setDefaultModel(raw: string) {
+    const target = this.resolveModelTarget(raw);
+    if (!target) {
       this.renderNotice(
-        `unknown alias "${raw.trim()}" — /config model <${CLI_MODELS.map(m => m.alias).join("|")}>`
+        `"${raw.trim()}" is not a roster alias, model id, or display name — /model opens the picker`
       );
       return;
     }
-    const current = this.cliConfig;
-    if (current !== undefined && current.defaultProvider !== entry.provider) {
-      const pending = this.pendingDefaultConfirm;
-      this.pendingDefaultConfirm = undefined;
-      if (
-        pending === undefined ||
-        pending.alias !== alias ||
-        Date.now() > pending.expiresAt
-      ) {
-        this.pendingDefaultConfirm = { alias, expiresAt: Date.now() + 30_000 };
-        this.renderNotice(
-          `this will change your default provider ${current.defaultProvider} → ${entry.provider} — repeat "/config model ${alias}" within 30s to confirm`
-        );
-        return;
-      }
-    }
-    this.sendCliConfigUpdate({
-      defaultProvider: entry.provider,
-      defaultModel: entry.model
-    });
+    await this.persistDefaultModel(target.provider, target.modelId);
   }
 
   /**
@@ -356,7 +332,7 @@ export class SlipstreamReplService extends CliLocalToolsService {
       "help",
       () =>
         this.renderNotice(
-          "/model <alias|fuzzy> · /new · /convos [filter] · /convo [filter] — picker: type filters, ↑↓ move, Enter attaches, Esc cancels · /resume — recent CLI convos · /config [model <alias>|think on|off] — roaming defaults · /expand <ordinal> · /system <text|clear> · /think · /debug · /quit"
+          "/model ⎵ — provider → model picker (Enter sets default, Tab this session, type to filter) · /model <alias|id> session fast lane · /new · /convos [filter] · /convo [filter] — picker: type filters, ↑↓ move, Enter attaches, Esc cancels · /resume — recent CLI convos · /config [model <alias|id>|think on|off] — roaming defaults · /expand <ordinal> · /system <text|clear> · /think · /debug · /quit"
         )
     ],
     [
@@ -370,7 +346,7 @@ export class SlipstreamReplService extends CliLocalToolsService {
     ["resume", async () => this.resumeFromRecent()],
     [
       "config",
-      args => {
+      async args => {
         const [sub = "", ...restArr] = args.trim().split(/\s+/);
         const rest = restArr.join(" ");
         if (sub.length === 0) {
@@ -384,7 +360,7 @@ export class SlipstreamReplService extends CliLocalToolsService {
           return;
         }
         if (sub === "model") {
-          this.setDefaultModel(rest);
+          await this.setDefaultModel(rest);
           return;
         }
         if (sub === "think") {
@@ -500,25 +476,126 @@ export class SlipstreamReplService extends CliLocalToolsService {
     ]
   ]);
 
-  private setModel(query: string) {
-    const q = query.trim().toLowerCase();
-    if (!q) {
+  /** registry pair → session-state shape (alias attached when the roster has one) */
+  private activeModelFor(provider: Provider, model: AllModelsUnion) {
+    const alias = CLI_MODELS.find(
+      m => m.provider === provider && m.model === model
+    )?.alias;
+    return { provider, model, alias } satisfies CliActiveModel;
+  }
+
+  private describeEntry(entry: CliActiveModel) {
+    const name = this.modelDisplayName(entry.provider, entry.model);
+    return entry.alias
+      ? `${entry.alias} · ${name} (${entry.provider}/${entry.model})`
+      : `${name} (${entry.provider}/${entry.model})`;
+  }
+
+  /**
+   * a roster alias, registry model id, or display name → its (provider,
+   * model) pair — the registry is the authority; aliases are a fast lane
+   */
+  private resolveModelTarget(raw: string) {
+    const text = raw.trim();
+    const alias = CLI_MODELS.find(m => m.alias === text.toLowerCase());
+    if (alias) return { provider: alias.provider, modelId: alias.model } as const;
+    return this.resolveTypedModel(text);
+  }
+
+  /**
+   * /model — bare opens the two-stage provider → model picker; with an
+   * argument it is the SESSION fast lane (no persistence, mirrors `s` in
+   * the picker). Persisting is Enter in the picker or /config model.
+   */
+  private async setModel(query: string) {
+    const text = query.trim();
+    if (text.length === 0) {
+      await this.pickModel();
+      return;
+    }
+    const target = this.resolveModelTarget(text);
+    if (!target) {
       this.renderNotice(
-        `roster: ${CLI_MODELS.map(m => `${m.alias} (${m.model})`).join(" · ")}`
+        `"${text}" is not a roster alias, model id, or display name — /model opens the picker`
       );
       return;
     }
-    const hit =
-      CLI_MODELS.find(m => m.alias === q) ??
-      CLI_MODELS.find(
-        m => m.alias.includes(q) || m.model.toLowerCase().includes(q)
-      );
-    if (!hit) {
-      this.renderNotice(`no roster match for "${q}" — /model to list`);
+    this.state.entry = this.activeModelFor(target.provider, target.modelId);
+    this.renderNotice(`→ ${this.describeEntry(this.state.entry)} (this session)`);
+  }
+
+  /** the picker owns raw stdin — same pause/resume dance as the convo picker */
+  private async pickModel(initialFilter = "") {
+    if (!process.stdin.isTTY) {
+      this.renderNotice("the model picker needs a TTY — /model <alias|model-id> instead");
       return;
     }
-    this.state.entry = hit;
-    this.renderNotice(`→ ${hit.provider}/${hit.model}`);
+    this.rl.write(null, { ctrl: true, name: "u" });
+    this.rl.pause();
+    this.pickerOpen = true;
+    // burst/paste race (same as the convo picker): trailing chars after
+    // the trigger land in readline's FRESH buffer — harvest them into the seed
+    const strays = this.rl.line.trim();
+    const seed = `${initialFilter}${initialFilter.length === 0 ? strays : ""}`;
+    const picker = new CliModelPicker(
+      this,
+      { stdin: process.stdin, stdout: process.stdout },
+      {
+        defaultProvider: this.cliConfig?.defaultProvider,
+        defaultModelId: this.cliConfig?.defaultModel,
+        sessionProvider: this.state.entry.provider,
+        sessionModelId: this.state.entry.model
+      },
+      seed
+    );
+    const outcome = await picker.run();
+    this.pickerOpen = false;
+    this.rl.write(null, { ctrl: true, name: "u" });
+    this.rl.resume();
+    if (outcome.kind === "cancel") {
+      this.renderNotice("model unchanged");
+      return;
+    }
+    if (outcome.kind === "session") {
+      this.state.entry = this.activeModelFor(outcome.provider, outcome.modelId);
+      this.renderNotice(`→ ${this.describeEntry(this.state.entry)} (this session)`);
+      return;
+    }
+    await this.persistDefaultModel(outcome.provider, outcome.modelId);
+  }
+
+  /**
+   * the ONE confirmation (config-planning §3): crossing providers asks
+   * "updating to X will change your default provider to Y — proceed?".
+   * Nested rl.question is safe here — command handlers run after the
+   * loop's await settles, so awaitingLine is false and the keypress
+   * watcher sleeps. Also adopts the pair for the session on success.
+   */
+  private async persistDefaultModel(provider: Provider, modelId: AllModelsUnion) {
+    const current = this.cliConfig;
+    if (current !== undefined && current.defaultProvider !== provider) {
+      if (!process.stdin.isTTY) {
+        this.renderNotice(
+          `updating to ${modelId} would change your default provider ${current.defaultProvider} → ${provider} — confirmation needs a TTY, nothing sent`
+        );
+        return;
+      }
+      const answer = (
+        await this.rl.question(
+          pc.yellow(
+            `updating to ${this.modelDisplayName(provider, modelId)} will change your default provider to ${provider} — proceed? [y/N] `
+          )
+        )
+      )
+        .trim()
+        .toLowerCase();
+      if (answer !== "y" && answer !== "yes") {
+        this.renderNotice("default unchanged");
+        return;
+      }
+    }
+    this.state.entry = this.activeModelFor(provider, modelId);
+    this.sendCliConfigUpdate({ defaultProvider: provider, defaultModel: modelId });
   }
 
   private wireEvents() {
@@ -682,14 +759,13 @@ export class SlipstreamReplService extends CliLocalToolsService {
         }
       };
     }
-    // pull the identity plane (config-planning §3) — the acks seed session
-    // defaults asynchronously via wireIdentityHooks
-    this.hydrateIdentity();
+    // the identity plane pulls itself on connection_established
+    // (wireIdentityConfig) — the acks seed session defaults via the hooks
     const gotContext = await this.awaitProviderContext();
     this.renderNotice(
       gotContext
-        ? `connected · ${this.state.entry.alias} (${this.state.entry.model}) · /help`
-        : `connected (no provider context yet) · ${this.state.entry.alias} (${this.state.entry.model}) · /help`
+        ? `connected · ${this.describeEntry(this.state.entry)} · /help`
+        : `connected (no provider context yet) · ${this.describeEntry(this.state.entry)} · /help`
     );
     if (process.argv.includes("--continue")) {
       await this.continueMostRecent();
@@ -718,9 +794,12 @@ export class SlipstreamReplService extends CliLocalToolsService {
         ) {
           return;
         }
-        const trigger = /^\/convos?\s(.*)$/.exec(this.rl.line);
+        const trigger = /^\/(convos?|model)\s(.*)$/.exec(this.rl.line);
         if (!trigger) return;
-        this.pickerRequest = trigger[1] ?? "";
+        this.pickerRequest = {
+          kind: trigger[1] === "model" ? "model" : "convo",
+          seed: trigger[2] ?? ""
+        };
         // force-submit the pending question: clear the buffer, newline ends
         // the await; the loop reads pickerRequest and opens the picker
         this.rl.write(null, { ctrl: true, name: "u" });
@@ -732,9 +811,10 @@ export class SlipstreamReplService extends CliLocalToolsService {
       const line = (await this.rl.question(pc.green("❯ "))).trim();
       this.awaitingLine = false;
       if (this.pickerRequest !== undefined) {
-        const seed = this.pickerRequest;
+        const { kind, seed } = this.pickerRequest;
         this.pickerRequest = undefined;
-        await this.pickConversation(seed);
+        if (kind === "model") await this.pickModel(seed);
+        else await this.pickConversation(seed);
         continue;
       }
       if (line.length === 0) continue;

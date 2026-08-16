@@ -1,5 +1,5 @@
 import type { BlockBearingMessage } from "@/types.ts";
-import { ConvoPickerService } from "@/convo-picker.ts";
+import { ModelPickerService } from "@/model-picker.ts";
 import pc from "picocolors";
 import type { ChatChunkAndResMsgBlock, EventTypeMap } from "@slipstream/types";
 
@@ -13,7 +13,7 @@ import type { ChatChunkAndResMsgBlock, EventTypeMap } from "@slipstream/types";
  * watermark yields exactly the unseen suffix (correct for anthropic deltas
  * AND gemini full-aggregate re-sends alike).
  */
-export class CliRendererService extends ConvoPickerService {
+export class CliRendererService extends ModelPickerService {
   constructor(wsUrl?: string) {
     super(wsUrl);
   }

@@ -31,6 +31,7 @@ export const modelIdsByProviderImgGen = {
   gemini: [
     "deep-research-max-preview-04-2026",
     "deep-research-preview-04-2026",
+    "gemini-3.1-flash-lite-image",
     "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image"

@@ -50,6 +50,7 @@ export const displayNameModelsByProvider = {
     "Sora 2 Pro"
   ],
   gemini: [
+    "Gemini 3.7 Flash",
     "Gemini 3.6 Flash",
     "Gemini 3.5 Flash Lite",
     "Gemini 3.5 Flash",
@@ -58,6 +59,7 @@ export const displayNameModelsByProvider = {
     "Gemini 3.1 Flash Lite Preview",
     "Gemini 3 Flash Preview",
     "Nano Banana 2",
+    "Nano Banana 2 Lite",
     "Nano Banana Pro",
     "Nano Banana",
     "Gemini Omni Flash Preview",

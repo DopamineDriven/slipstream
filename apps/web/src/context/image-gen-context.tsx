@@ -137,13 +137,11 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
   }, [supported]);
 
   const settings = useMemo(() => {
-    if (
-      !(
-        currentProvider === "openai" ||
-        currentProvider === "gemini" ||
-        currentProvider === "grok"
-      )
-    ) {
+    if (!(
+      currentProvider === "openai" ||
+      currentProvider === "gemini" ||
+      currentProvider === "grok"
+    )) {
       return null;
     }
 

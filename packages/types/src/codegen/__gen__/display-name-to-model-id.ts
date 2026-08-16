@@ -50,6 +50,7 @@ export const displayNameToModelId = {
     "Sora 2 Pro": "sora-2-pro"
   },
   gemini: {
+    "Gemini 3.7 Flash": "gemini-3.7-flash",
     "Gemini 3.6 Flash": "gemini-3.6-flash",
     "Gemini 3.5 Flash Lite": "gemini-3.5-flash-lite",
     "Gemini 3.5 Flash": "gemini-3.5-flash",
@@ -58,6 +59,7 @@ export const displayNameToModelId = {
     "Gemini 3.1 Flash Lite Preview": "gemini-3.1-flash-lite-preview",
     "Gemini 3 Flash Preview": "gemini-3-flash-preview",
     "Nano Banana 2": "gemini-3.1-flash-image-preview",
+    "Nano Banana 2 Lite": "gemini-3.1-flash-lite-image",
     "Nano Banana Pro": "gemini-3-pro-image-preview",
     "Nano Banana": "gemini-2.5-flash-image",
     "Gemini Omni Flash Preview": "gemini-omni-flash-preview",

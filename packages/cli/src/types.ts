@@ -39,10 +39,22 @@ export type CliRosterEntry = (typeof CLI_MODELS)[number];
 
 export type CliRosterRecord = UTR<CliRosterEntry, "alias">;
 
+/**
+ * the active session's (provider, model) pair — registry-shaped, not
+ * roster-shaped: the picker can select ANY registry model, aliases are
+ * merely a fast lane that produces one of these
+ */
+export interface CliActiveModel {
+  provider: Provider;
+  model: AllModelsUnion;
+  /** roster alias when the pair came from one — banner sugar only */
+  alias?: string;
+}
+
 export interface ChatSessionState {
   conversationId: string;
   title: string | null;
-  entry: CliRosterEntry;
+  entry: CliActiveModel;
   systemPrompt: string | undefined;
   showThinking: boolean;
 }
@@ -201,6 +213,35 @@ export interface PickerIo {
   stdin: NodeJS.ReadStream;
   stdout: NodeJS.WriteStream;
 }
+
+/**
+ * Model picker (config-planning §5) — the two-stage provider → model
+ * selector. Provider selection is never terminal; the write happens only
+ * when a model is chosen, always as the pair.
+ */
+export interface ModelPickerProviderRow {
+  provider: Provider;
+  modelCount: number;
+  /** holds the roaming default (✔ marker) */
+  isDefault: boolean;
+  /** holds the active session model */
+  isSession: boolean;
+}
+
+export interface ModelPickerModelRow {
+  provider: Provider;
+  modelId: AllModelsUnion;
+  /** registry display name (modelIdToDisplayName) — the row's label */
+  displayName: string;
+  isDefault: boolean;
+  isSession: boolean;
+}
+
+/** how the picker resolved — Enter persists, `s` is session-only */
+export type ModelPickerOutcome =
+  | { kind: "default"; provider: Provider; modelId: AllModelsUnion }
+  | { kind: "session"; provider: Provider; modelId: AllModelsUnion }
+  | { kind: "cancel" };
 
 /**
  * Output ceilings for the local read-only tool executors — every

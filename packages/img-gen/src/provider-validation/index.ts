@@ -53,13 +53,16 @@ export type ModelToQualityOpts<T extends AllModelsUnion> =
   T extends AllImgGenCapableModelUnion
     ? T extends GeminiImgGenModels
       ? T extends
+          | "gemini-3.1-flash-lite-image"
           | "gemini-3-pro-image-preview"
           | "gemini-3.1-flash-image-preview"
           | "deep-research-max-preview-04-2026"
           | "deep-research-preview-04-2026"
         ? T extends "gemini-3.1-flash-image-preview"
           ? GeminiImageQuality["gemini-3.1-flash-image-preview"]
-          : GeminiImageQuality[GeminiImgGenModels]
+          : T extends "gemini-3.1-flash-lite-image"
+            ? GeminiImageQuality["gemini-3.1-flash-lite-image"]
+            : GeminiImageQuality[GeminiImgGenModels]
         : undefined
       : T extends GrokImagineImgModelUnion
         ? "1k" | "2k" | "4k" | "auto"
@@ -147,7 +150,9 @@ export class ProviderValidation {
       this.openAIFacilitatingImgGenModel(model) || this.openAIGptImgModel(model)
     );
   }
-
+  public geminiNanoBananaTwoLite(m: string) {
+    return m === "gemini-3.1-flash-lite-image";
+  }
   public geminiNanoBananaTwo(m: string) {
     return m === "gemini-3.1-flash-image-preview";
   }
@@ -160,6 +165,7 @@ export class ProviderValidation {
 
   public geminiNanoBananasModel(m: string) {
     return (
+      this.geminiNanoBananaTwoLite(m) ||
       this.geminiDeepResearchModel(m) ||
       this.geminiNanoBananaTwo(m) ||
       m === "gemini-2.5-flash-image" ||
@@ -432,6 +438,7 @@ export class ProviderValidation {
 
   public geminiAspectRatio(
     m:
+      | "gemini-3.1-flash-lite-image"
       | "gemini-3-pro-image-preview"
       | "gemini-2.5-flash-image"
       | "deep-research-preview-04-2026"
@@ -448,7 +455,8 @@ export class ProviderValidation {
     if (!data?.output_size) return;
     if (this.geminiNanoBananasModel(m)) {
       if (
-        m === "gemini-3.1-flash-image-preview" &&
+        (m === "gemini-3.1-flash-image-preview" ||
+          m === "gemini-3.1-flash-lite-image") &&
         this.isValidNanoBananaGenTwoAR(data.output_size)
       ) {
         return data.output_size;
@@ -471,6 +479,10 @@ export class ProviderValidation {
     return this.isValidNanoBananaProAndTwoOutputQuality(q) || q === "0.5K";
   }
 
+  public isValidNanoBananaTwoLiteOutputQuality(q: string) {
+    return q === "0.5K" || q === "1K";
+  }
+
   public handleImgGenOutputQuality(
     model: AllModelsUnion = "gpt-5.6-sol",
     data?: { output_quality: ModelToQualityOpts<typeof model> }
@@ -480,6 +492,13 @@ export class ProviderValidation {
     const m = model;
 
     if (this.geminiNanoBananasModel(m) && m !== "gemini-2.5-flash-image") {
+      if (
+        m === "gemini-3.1-flash-lite-image" &&
+        q &&
+        this.isValidNanoBananaTwoLiteOutputQuality(q)
+      ) {
+        return q;
+      }
       if (
         m === "gemini-3.1-flash-image-preview" &&
         q &&
@@ -692,7 +711,10 @@ export class ProviderValidation {
 
     if (this.geminiImgGenCapable(m)) {
       const ar = data?.output_size;
-      if (m === "gemini-3.1-flash-image-preview") {
+      if (
+        m === "gemini-3.1-flash-image-preview" ||
+        m === "gemini-3.1-flash-lite-image"
+      ) {
         if (ar && this.isValidNanoBananaGenTwoAR(ar)) {
           return ar;
         } else return "1:1";

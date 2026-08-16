@@ -109,6 +109,7 @@ export class ModelService extends ModelToolDefsService {
    */
   public isGeminiImgModel(m: string) {
     return (
+      m === "gemini-3.1-flash-lite-image" ||
       m === "gemini-3-pro-image-preview" ||
       m === "gemini-3.1-flash-image-preview" ||
       m === "gemini-2.5-flash-image"
@@ -137,6 +138,7 @@ export class ModelService extends ModelToolDefsService {
 
   public isGeminiModel(m: string) {
     return (
+      m === "gemini-3.7-flash" ||
       m === "gemini-3.6-flash" ||
       m === "gemini-3.5-flash" ||
       m === "gemini-3.5-flash-lite" ||

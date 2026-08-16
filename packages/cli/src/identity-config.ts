@@ -27,8 +27,19 @@ export class CliIdentityConfigService extends CliProviderContextService {
   ) => void;
   protected onRecentConvosAck?: (conversationIds: string[]) => void;
 
-  /** register BEFORE connect() — same discipline as wireProviderContext */
+  /**
+   * register BEFORE connect() — same discipline as wireProviderContext.
+   * The pull fires on connection_established (the contract's own trigger,
+   * config-planning §3): the server's message listener is provably wired
+   * by then, and every reconnect re-hydrates for free. Composes with the
+   * provider-context handler on the same frame — both are additive.
+   */
   protected wireIdentityConfig() {
+    const prior = this.handlerFor("connection_established");
+    this.on("connection_established", d => {
+      prior?.(d);
+      this.hydrateIdentity();
+    });
     this.on("cli_config_hydrate_ack", d => {
       this.cliConfig = d.cliConfig;
       this.onCliConfigHydrated?.(d.cliConfig);
