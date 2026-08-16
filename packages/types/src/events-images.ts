@@ -249,6 +249,7 @@ export type GeminiModelAspectRatioWorkup = DX<
     "deep-research-max-preview-04-2026": BaseNanoBananaOutputAR;
     "deep-research-preview-04-2026": BaseNanoBananaOutputAR;
     "gemini-3.1-flash-image-preview": NanoBanana2OutputAR;
+    "gemini-3.1-flash-lite-image": NanoBanana2OutputAR;
   } & Record<Exclude<GeminiModelIdUnion, GeminiImgGenModels>, undefined>
 >;
 
@@ -367,11 +368,13 @@ export type GeminiImageSize = {
   "gemini-3-pro-image-preview": BaseNanoBananaOutputAR;
   "gemini-2.5-flash-image": BaseNanoBananaOutputAR;
   "gemini-3.1-flash-image-preview": NanoBanana2OutputAR;
+  "gemini-3.1-flash-lite-image": NanoBanana2OutputAR;
   "deep-research-max-preview-04-2026": BaseNanoBananaOutputAR;
   "deep-research-preview-04-2026": BaseNanoBananaOutputAR;
 };
 
 export type GeminiImageQuality = {
+  "gemini-3.1-flash-lite-image": "0.5K" | "1K";
   "gemini-3.1-flash-image-preview": "0.5K" | "1K" | "2K" | "4K";
   "gemini-3-pro-image-preview": "1K" | "2K" | "4K";
   "gemini-2.5-flash-image": "1K";
@@ -691,6 +694,7 @@ export type OpenAIImageGenOpts = GptImage1Opts;
 export type NanoBananaImageGenOpts<
   T extends GeminiModelIdUnion = GeminiModelIdUnion
 > = T extends
+  | "gemini-3.1-flash-lite-image"
   | "gemini-3-pro-image-preview"
   | "gemini-2.5-flash-image"
   | "gemini-3.1-flash-image-preview"

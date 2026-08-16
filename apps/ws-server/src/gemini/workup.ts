@@ -75,6 +75,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
 
   protected isGemini3ChatModel(m: string) {
     return (
+      m === "gemini-3.7-flash" ||
       m === "gemini-3.6-flash" ||
       m === "gemini-3.5-flash" ||
       m === "gemini-3.5-flash-lite" ||
@@ -120,6 +121,10 @@ export class GeminiWorkupService extends FileSearchStoreService {
     );
   }
 
+  protected isNanoBanana2Lite(m: string) {
+    return m === "gemini-3.1-flash-lite-image";
+  }
+
   protected isNanoBanana2(m: string) {
     return m === "gemini-3.1-flash-image-preview";
   }
@@ -134,10 +139,13 @@ export class GeminiWorkupService extends FileSearchStoreService {
 
   protected isNanoBananaFam(m: string) {
     return (
-      this.isNanoBanana2(m) || this.isNanoBananaPro(m) || this.isNanoBanana1(m)
+      this.isNanoBanana2(m) ||
+      this.isNanoBananaPro(m) ||
+      this.isNanoBanana1(m) ||
+      this.isNanoBanana2Lite(m)
     );
   }
-  
+
   protected async formatHistoryForSession(
     msgs: MessageSingleton<true>[],
     keyFingerprint: string,
@@ -830,7 +838,8 @@ export class GeminiWorkupService extends FileSearchStoreService {
     if (
       this.isGemini3ChatModel(m) ||
       this.isDeepResearch(m) ||
-      this.isNanoBanana2(m)
+      this.isNanoBanana2(m) ||
+      this.isNanoBanana2Lite(m)
     ) {
       return {
         includeThoughts: true,
@@ -996,13 +1005,27 @@ export class GeminiWorkupService extends FileSearchStoreService {
     let a: NanoBanana2OutputAR | undefined = undefined;
     let qual: "0.5K" | "1K" | "2K" | "4K" | undefined = undefined;
     if (!this.isNanoBananaFam(model)) return;
-    if (model === "gemini-3.1-flash-image-preview") {
+    if (
+      model === "gemini-3.1-flash-image-preview" ||
+      model === "gemini-3.1-flash-lite-image"
+    ) {
       if (ar && this.prisma.isValidNanoBananaGenTwoAR(ar)) {
         a = ar;
       } else {
         a = "16:9";
       }
-      if (q && this.prisma.isValidNanoBananaTwoOutputQuality(q)) {
+      if (
+        model === "gemini-3.1-flash-image-preview" &&
+        q &&
+        this.prisma.isValidNanoBananaTwoOutputQuality(q)
+      ) {
+        qual = q;
+      }
+      if (
+        model === "gemini-3.1-flash-lite-image" &&
+        q &&
+        this.prisma.isValidNanoBananaTwoLiteOutputQuality(q)
+      ) {
         qual = q;
       } else {
         qual = "1K";

@@ -50,6 +50,7 @@ export const modelIdsByProvider = {
     "sora-2-pro"
   ],
   gemini: [
+    "gemini-3.7-flash",
     "gemini-3.6-flash",
     "gemini-3.5-flash-lite",
     "gemini-3.5-flash",
@@ -58,6 +59,7 @@ export const modelIdsByProvider = {
     "gemini-3.1-flash-lite-preview",
     "gemini-3-flash-preview",
     "gemini-3.1-flash-image-preview",
+    "gemini-3.1-flash-lite-image",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
     "gemini-omni-flash-preview",

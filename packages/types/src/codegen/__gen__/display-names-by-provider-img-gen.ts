@@ -31,6 +31,7 @@ export const displayNameModelsByProviderImgGen = {
   gemini: [
     "Deep Research Max Preview (Apr-21-2026)",
     "Deep Research Preview (Apr-21-2026)",
+    "Nano Banana 2 Lite",
     "Nano Banana 2",
     "Nano Banana Pro",
     "Nano Banana"
