@@ -90,11 +90,12 @@ export class SlipstreamReplService extends CliLocalToolsService {
   /** true only while the prompt is awaiting a line — popups trigger nowhere else */
   private awaitingLine = false;
   /**
-   * seed set by the keypress watcher when the buffer becomes "/convo …" —
-   * the pending question is force-submitted and the loop opens the picker
-   * with this filter (Claude-Code @-mention UX: live, not Enter-gated)
+   * set by the keypress watcher the moment the buffer becomes "/convo …"
+   * or "/model …" (the SPACE is the trigger, not Enter) — the pending
+   * question is force-submitted and the loop opens the matching picker
+   * seeded with whatever followed (Claude-Code @-mention UX: live)
    */
-  private pickerRequest?: string;
+  private pickerRequest?: { kind: "convo" | "model"; seed: string };
 
   /**
    * transactional attach — the active session stays intact until the
@@ -331,7 +332,7 @@ export class SlipstreamReplService extends CliLocalToolsService {
       "help",
       () =>
         this.renderNotice(
-          "/model <alias|fuzzy> · /new · /convos [filter] · /convo [filter] — picker: type filters, ↑↓ move, Enter attaches, Esc cancels · /resume — recent CLI convos · /config [model <alias>|think on|off] — roaming defaults · /expand <ordinal> · /system <text|clear> · /think · /debug · /quit"
+          "/model ⎵ — provider → model picker (Enter sets default, Tab this session, type to filter) · /model <alias|id> session fast lane · /new · /convos [filter] · /convo [filter] — picker: type filters, ↑↓ move, Enter attaches, Esc cancels · /resume — recent CLI convos · /config [model <alias|id>|think on|off] — roaming defaults · /expand <ordinal> · /system <text|clear> · /think · /debug · /quit"
         )
     ],
     [
@@ -524,7 +525,7 @@ export class SlipstreamReplService extends CliLocalToolsService {
   }
 
   /** the picker owns raw stdin — same pause/resume dance as the convo picker */
-  private async pickModel() {
+  private async pickModel(initialFilter = "") {
     if (!process.stdin.isTTY) {
       this.renderNotice("the model picker needs a TTY — /model <alias|model-id> instead");
       return;
@@ -532,6 +533,10 @@ export class SlipstreamReplService extends CliLocalToolsService {
     this.rl.write(null, { ctrl: true, name: "u" });
     this.rl.pause();
     this.pickerOpen = true;
+    // burst/paste race (same as the convo picker): trailing chars after
+    // the trigger land in readline's FRESH buffer — harvest them into the seed
+    const strays = this.rl.line.trim();
+    const seed = `${initialFilter}${initialFilter.length === 0 ? strays : ""}`;
     const picker = new CliModelPicker(
       this,
       { stdin: process.stdin, stdout: process.stdout },
@@ -540,7 +545,8 @@ export class SlipstreamReplService extends CliLocalToolsService {
         defaultModelId: this.cliConfig?.defaultModel,
         sessionProvider: this.state.entry.provider,
         sessionModelId: this.state.entry.model
-      }
+      },
+      seed
     );
     const outcome = await picker.run();
     this.pickerOpen = false;
@@ -788,9 +794,12 @@ export class SlipstreamReplService extends CliLocalToolsService {
         ) {
           return;
         }
-        const trigger = /^\/convos?\s(.*)$/.exec(this.rl.line);
+        const trigger = /^\/(convos?|model)\s(.*)$/.exec(this.rl.line);
         if (!trigger) return;
-        this.pickerRequest = trigger[1] ?? "";
+        this.pickerRequest = {
+          kind: trigger[1] === "model" ? "model" : "convo",
+          seed: trigger[2] ?? ""
+        };
         // force-submit the pending question: clear the buffer, newline ends
         // the await; the loop reads pickerRequest and opens the picker
         this.rl.write(null, { ctrl: true, name: "u" });
@@ -802,9 +811,10 @@ export class SlipstreamReplService extends CliLocalToolsService {
       const line = (await this.rl.question(pc.green("❯ "))).trim();
       this.awaitingLine = false;
       if (this.pickerRequest !== undefined) {
-        const seed = this.pickerRequest;
+        const { kind, seed } = this.pickerRequest;
         this.pickerRequest = undefined;
-        await this.pickConversation(seed);
+        if (kind === "model") await this.pickModel(seed);
+        else await this.pickConversation(seed);
         continue;
       }
       if (line.length === 0) continue;

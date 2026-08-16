@@ -121,8 +121,8 @@ export class ModelPickerService extends ConvoPickerService {
  * One interactive selection: stage 1 lists providers, Enter/→ descends into
  * that provider's models, ←/Backspace-on-empty ascends. In the model stage,
  * Enter resolves { kind: "default" } (the caller persists via
- * cli_config_update), `s` resolves { kind: "session" } (ChatSessionState
- * only), Esc/Ctrl+C cancels. Typing filters the model list. Ephemeral per
+ * cli_config_update), Tab resolves { kind: "session" } (ChatSessionState
+ * only — Tab because letters filter), Esc/Ctrl+C cancels. Typing filters the model list. Ephemeral per
  * invocation, framework-free — keypress bytes + ANSI repaint, mirroring
  * CliConvoPicker.
  */
@@ -143,12 +143,26 @@ export class CliModelPicker {
       sessionProvider: Provider;
       sessionModelId: string;
     },
+    initialFilter = "",
     private readonly maxRows = 12
   ) {
     // open on the provider holding the roaming default (else the session's)
     const anchor: Provider = current.defaultProvider ?? current.sessionProvider;
     const idx = this.svc.pickerProviders.findIndex(p => p === anchor);
     this.providerIndex = idx === -1 ? 0 : idx;
+    // a live-trigger seed ("/model fab" — the space opened us) is a MODEL
+    // filter: skip the umbrella and land in the anchor provider's list
+    // pre-filtered; ← still backs out to providers if it isn't there
+    const seed = initialFilter.trim();
+    if (seed.length > 0) {
+      const anchorProvider = this.svc.pickerProviders[this.providerIndex];
+      if (anchorProvider) {
+        this.provider = anchorProvider;
+        this.stage = "model";
+        this.query = seed;
+        this.modelIndex = 0;
+      }
+    }
   }
 
   public run() {
@@ -210,6 +224,20 @@ export class CliModelPicker {
     );
   }
 
+  /** descend into the highlighted provider, landing on its default/session model */
+  private descend(seedFilter = "") {
+    const row = this.providerRows()[this.providerIndex];
+    if (!row) return;
+    this.provider = row.provider;
+    this.stage = "model";
+    this.query = seedFilter;
+    const models = this.modelRows();
+    const anchor = seedFilter.length === 0
+      ? models.findIndex(m => m.isDefault || m.isSession)
+      : -1;
+    this.modelIndex = anchor === -1 ? 0 : anchor;
+  }
+
   private handleProviderKey(bytes: string) {
     const rows = this.providerRows();
     if (bytes === "\x1b[A") {
@@ -217,16 +245,15 @@ export class CliModelPicker {
     } else if (bytes === "\x1b[B") {
       this.providerIndex = Math.min(this.providerIndex + 1, rows.length - 1);
     } else if (bytes === "\r" || bytes === "\n" || bytes === "\x1b[C") {
-      const row = rows[this.providerIndex];
-      if (row) {
-        this.provider = row.provider;
-        this.stage = "model";
-        this.query = "";
-        // land on the default/session model within this provider when present
-        const models = this.modelRows();
-        const anchor = models.findIndex(m => m.isDefault || m.isSession);
-        this.modelIndex = anchor === -1 ? 0 : anchor;
-      }
+      this.descend();
+    } else if (!bytes.startsWith("\x1b")) {
+      // typing on the umbrella stage means "I know the model" — auto-descend
+      // into the highlighted provider with the keystroke as the filter, so
+      // "/model" ⎵ "fab" behaves exactly like "/model fab" ⎵
+      const printable = [...bytes]
+        .filter(ch => ch >= " " && ch !== "\x7f")
+        .join("");
+      if (printable.length > 0) this.descend(printable);
     }
   }
 
@@ -270,7 +297,10 @@ export class CliModelPicker {
         ? { kind: "default", provider: selected.provider, modelId: selected.modelId }
         : undefined;
     }
-    if (bytes === "s" && this.query.length === 0) {
+    // Tab = this session only — a key that can never collide with the
+    // filter (letters filter; `s` would be unreachable once you'd typed
+    // to narrow, exactly when you want it)
+    if (bytes === "\t") {
       return selected
         ? { kind: "session", provider: selected.provider, modelId: selected.modelId }
         : undefined;
@@ -330,7 +360,7 @@ export class CliModelPicker {
       const rows = this.modelRows();
       lines.push(pc.bold(pc.cyan(`Select model · ${this.provider ?? ""}`)));
       lines.push(
-        pc.dim("Enter sets your roaming default (persists across machines). s uses it this session only.")
+        pc.dim("Enter sets your roaming default (persists across machines). Tab uses it this session only.")
       );
       lines.push(`${pc.green("❯")} ${pc.dim("filter:")} ${this.query}${pc.dim("▌")}`);
       const clamped = Math.min(this.modelIndex, Math.max(rows.length - 1, 0));
@@ -353,7 +383,7 @@ export class CliModelPicker {
       if (rows.length === 0) lines.push(pc.dim("  no matches — Backspace to clear"));
       lines.push("");
       lines.push(
-        pc.dim("Enter set as default · s this session only · ← back to providers · Esc cancel")
+        pc.dim("Enter set as default · Tab this session only · type to filter · ← providers · Esc cancel")
       );
     }
     this.clear();
