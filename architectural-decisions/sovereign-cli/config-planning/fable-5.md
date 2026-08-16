@@ -315,12 +315,17 @@ reach the CLI's localhost.
    exchanges the code (once, short TTL) for the opaque session token.
    Web also grows a **devices list** (label · lastSeenAt · Revoke) — the
    revocation UI.
-2. **CLI** — `aic login`: bind loopback, open browser (`xdg-open`/`open`/
-   `start`; print the URL too for copy-paste), await the callback, verify
-   `state`, exchange, write `~/.config/aic/credentials.json` (0600), serve
-   the "signed in as andrew@… — you may close this window and return to
-   the terminal" page. `aic logout` revokes server-side + deletes the
-   file. `aic whoami` reads it back.
+2. **CLI** — **`/login` in-REPL** (Andrew 2026-08-15: a REPL command, not
+   an `aic login` subcommand — Claude Code parity, and aic IS a REPL):
+   bind loopback, open browser (`xdg-open`/`open`/`start`; print the URL
+   too for copy-paste), await the callback, verify `state`, exchange,
+   write `~/.config/aic/credentials.json` (0600), serve the "signed in as
+   andrew@… — you may close this window and return to the terminal" page,
+   then **reconnect the socket with the new token in place** — no process
+   restart. `/logout` revokes server-side + deletes the file + reconnects
+   anonymous; `/whoami` reads it back. The cold-start case (no credential
+   file, handshake refused) is the SAME flow auto-invoked before the first
+   prompt renders — one class, two entry points, no separate bin command.
 3. **ws-server** — handshake accepts the token (query `?token=` for v1;
    `Sec-WebSocket-Protocol` bearer is the eventual clean home) for
    `via: "cli"` sockets, validates against `CliSession` (hash compare),
