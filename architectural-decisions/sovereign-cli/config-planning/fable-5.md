@@ -77,22 +77,56 @@ discriminators bolted onto web models.
 `argv flag → env var → machine file → identity config → shipped default`.
 Same shape the wsUrl already follows; config generalizes it.
 
-## 3. Wire contract sketch (Phase 2 — needs Andrew's events.ts sign-off)
+## 3. Wire contract (Phase 2 — DECIDED 2026-08-14, Andrew implementing)
 
-Two options, not mutually exclusive:
+**Piggybacking on `connection_established` is REJECTED** — that frame is
+single-purpose (API key hydration) and stays that way; the house pattern
+is dedicated small types firing after it (the `conversation_list_ack`
+pages are the precedent). So:
 
-1. **Piggyback**: `connection_established` gains `cliConfig?: CliConfigDTO`
-   — populated only when the socket's `via === "cli"` (the server already
-   narrows this in `stashUserData`). Zero extra round trips; the REPL has
-   its roaming defaults before the first prompt renders.
-2. **Event pair for writes**: `cli_config_update` (client → server, partial
-   patch of typed knobs) / `cli_config_update_ack` (server → client, full
-   canonical DTO back). Mirrors `provider_context_update/update_ack`
-   exactly — optimistic local echo, ack reconciles.
+1. **Client-initiated request/ack** (PULL, not push — Andrew 2026-08-14:
+   the CLI requests once `connection_established` lands, mirroring the
+   `provider_context_ping/pong` lifecycle):
+   - `cli_config_hydrate` → `cli_config_hydrate_ack`
+     `{ cliConfig: CliConfigDTO }`
+   - `cli_recent_convos` → `cli_recent_convos_ack`
+     `{ conversationIds: string[] }` (lastActiveAt desc, top ~10; ids
+     only — the convo index carries the metadata).
+   Final naming (Andrew 2026-08-14): bare verb-request → `_ack` response,
+   three symmetric pairs (hydrate / recent_convos / update).
+   The pull makes the via-gate STRUCTURAL — web clients never send the
+   request, so the server needs no conditional fan-out — and gives
+   recency its refresh trigger for free (/resume re-requests whenever it
+   wants fresh data; machine B sees machine A's turns). Two pairs, not
+   one: config changes only on explicit update, recency is
+   activity-shaped.
+2. **Event pair for writes** (RATIFIED 2026-08-14): `cli_config_update`
+   (client → server, partial patch of typed knobs). Pairing coherence is
+   CLIENT-GATED (Andrew 2026-08-15, over type-level both-or-neither
+   unions — overthinking): the picker always emits provider+model as a
+   pair. Provider selection is NEVER terminal — it branches straight into
+   that provider's model list (registry default from models.ts
+   pre-highlighted), and the write fires only when a model is chosen;
+   cancel = no write. So the mismatch case dissolves into the flow, and
+   exactly ONE confirmation exists: picking a model from a DIFFERENT
+   provider (cross-provider list or /config set) — "this will change
+   your default provider to meta — proceed?". defaultModel is
+   non-nullable and never drops to undefined. The server's
+   effective-pairing validation stays as the backstop for hand-crafted
+   frames. /
+   `cli_config_update_ack` (server → client) with a **UNIFORM shape,
+   never a discriminated union on the wire** (Andrew): identical field
+   set on success and failure — `ok: boolean`, `reason?: string`
+   (undefined exactly when ok), `cliConfig` ALWAYS the canonical DTO so
+   a rejected patch snaps the client back to truth. No `"reason" in x`
+   narrowing dance client-side. Mirrors
+   `provider_context_update/update_ack` — optimistic local echo, ack
+   reconciles.
 
-`packages/types/src/events.ts` is Andrew's territory — these members land
-only with his explicit sign-off, and the runtime parsers stay
-satisfies-coupled to `EventTypeMap` per the standing convention.
+`packages/types/src/events.ts` is Andrew's territory — he is authoring
+these members himself; the runtime parsers stay satisfies-coupled to
+`EventTypeMap` per the standing convention. `CliConfigDTO` deals in the
+lowercase wire `Provider`, `schemaVersion` rides as the literal "v1_0".
 
 ## 4. Schema sketch (dedicated tables, per the separation decision)
 
@@ -106,7 +140,7 @@ model CliConfig {
   userId          String            @unique
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   defaultProvider Provider          @default(ANTHROPIC)
-  defaultModel    String            @default("claude-opus-5")
+  defaultModel    String            @default("claude-fable-5")
   showThinking    Boolean           @default(true)
   schemaVersion   CliConfigSchemaVersion @default(v1_0)
   createdAt       DateTime               @default(now())
@@ -156,6 +190,67 @@ on update (registry pattern).
 - New chain link: `CliSettingsService` between config and context, or an
   ephemeral `CliConfigEditor` injected at the repl — strict class
   encapsulation either way; no module-level functions.
+
+## 5.5 Resume — a recency LENS, never a partition (Andrew, 2026-08-14)
+
+The product differentiator is that CLI and web share one conversation
+pool seamlessly (unlike Claude Code / Codex, whose sessions are
+terminal-local) — resume must never wall that off. What's missing is
+provenance: nothing records that a conversation was touched FROM the
+CLI, so "most recent conversation" would almost always resume a web
+thread for a web-heavy user. `/resume` answers "where was I when I was
+HERE" — a high-value lens over the shared pool, not a separate pool.
+
+This is activity-derived state, NOT config — written as a side effect of
+every CLI turn, never user-edited — so it gets its own table (the
+separation ruling applies): 
+
+```prisma
+model CliConversationActivity {
+  id             String       @id @default(cuid(2))
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  lastActiveAt   DateTime     @updatedAt
+  @@unique([userId, conversationId])
+  @@index([userId, lastActiveAt(sort: Desc)])
+}
+```
+
+- **Write path**: one upsert per completed CLI turn, gated on
+  `via === "cli"` in the chat resolver — fire-and-forget (`void` WITH
+  `.catch`; void does not absorb rejections), zero chat-latency cost.
+  Web turns never write here; that asymmetry IS the provenance.
+- **Delivery**: client-initiated `cli_recent_convos` →
+  `cli_recent_convos_ack` (see §3 — pull, not push; re-request IS the
+  refresh trigger) — ids only; the convo picker's index already warms
+  with full metadata, the resume list just selects from it.
+- **UX (Claude Code parity, continuity preserved)**: `aic --continue`
+  attaches to the top entry; `aic --resume` and in-REPL `/resume` open
+  the existing CliConvoPicker filtered to the recency list. `/convos`
+  keeps ranging the ENTIRE shared pool — resume narrows, never hides.
+- A conversation resumed in the CLI that was last touched on web is the
+  happy path, not an edge case.
+
+Cardinality + shape rulings (2026-08-14):
+
+- Back-relations are LIST-typed on both parents
+  (`cliConversationActivity CliConversationActivity[]` on User AND
+  Conversation) — only the compound `[userId, conversationId]` is unique,
+  so prisma requires the list form; single-row-per-conversation stays an
+  observation, not a schema commitment. Point reads go through
+  `findUnique({ where: { userId_conversationId: {...} } })`.
+- NO turnCount (Andrew): ordinals already carry per-conversation message
+  counting as a first-class 0-based contract; a near-duplicate counter is
+  a confusable one-off. Recency needs exactly one column — lastActiveAt —
+  and row existence itself means "touched from the CLI."
+- NO `Cli` parent/aggregate-root table (2026-08-14): a root with no
+  attributes of its own is a join tax for namespace feel. The compartment
+  lives at the prefix (`Cli*`) and the schema-file level (consolidate CLI
+  models into one `cli.prisma`). Trigger to revisit: the moment a parent
+  row would carry REAL aggregate state (Phase B lastSeenAt / device
+  count / plan flags), root it then — never before.
 
 ## 6. Auth outlook (the road the config work paves)
 
@@ -247,9 +342,9 @@ AES-256-GCM, key-scoped `providerContext`). So:
 
 ## 8. Open questions for Andrew
 
-1. Piggyback on `connection_established` vs a dedicated
-   `cli_config_get/ack` pair — piggyback is zero-RTT and my lean, but it
-   grows a frame you own. Both?
+1. ~~Piggyback vs dedicated~~ ANSWERED (2026-08-14): dedicated frames,
+   always — "each event does one incredibly specific thing in isolation"
+   (Andrew). connection_established stays api-key hydration; see §3.
 2. Which knobs make identity-plane v1? My cut after the ground rules:
    defaultProvider + defaultModel + showThinking, nothing else.
    (Temperature/topP get no knob anywhere: `ConversationSettings` is

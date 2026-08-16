@@ -1056,10 +1056,6 @@ export type ImageGenJobOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type EnumProviderFieldUpdateOperationsInput = {
-  set?: $Enums.Provider
-}
-
 export type EnumImageGenStageFieldUpdateOperationsInput = {
   set?: $Enums.ImageGenStage
 }

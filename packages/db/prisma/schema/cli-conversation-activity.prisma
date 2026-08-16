@@ -1,0 +1,10 @@
+model CliConversationActivity {
+  id             String       @id @default(cuid(2))
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  lastActiveAt   DateTime     @updatedAt
+  @@unique([userId, conversationId])
+  @@index([userId, lastActiveAt(sort: Desc)])
+}

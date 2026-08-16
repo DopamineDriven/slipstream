@@ -1051,6 +1051,8 @@ export type S3StorageClass =
   | "SNOW"
   | "STANDARD"
   | "STANDARD_IA"
+  | "AWS_BACKUP_LOW_COST_WARM"
+  | "AWS_BACKUP_WARM"
   | undefined;
 export type ImgMetadataEntity = {
   animated: boolean;

@@ -16,8 +16,7 @@ import type {
   GrokImagineImgModelUnion,
   GrokImgGenModels,
   GrokModelIdUnion,
-  MessageSingleton,
-  S3StorageClass
+  MessageSingleton
 } from "@slipstream/types";
 
 type xAIImageEditsInput = {
@@ -521,7 +520,7 @@ export class GrokImgGenService extends GrokStreamWorkupService {
             .concat(`.${getIt.format}`);
 
           tInitial = performance.now();
-          const rt = await this.s3.uploadGenerated(b64, this.prisma.isProd, {
+          const rtHelper = await this.s3.uploadGenerated(b64, this.prisma.isProd, {
             contentType: getIt.contentType ?? "image/jpeg",
             filename,
             origin: "GENERATED",
@@ -529,19 +528,10 @@ export class GrokImgGenService extends GrokStreamWorkupService {
             size: getIt.byteSize,
             conversationId
           });
-          a = rt;
+          a = rtHelper
           tDelta = performance.now() - tInitial;
           const uploadTime = tDelta;
-          const { storageClass, ...rest } = rt;
-          const s = (
-            storageClass === "AWS_BACKUP_LOW_COST_WARM"
-              ? undefined
-              : storageClass === "AWS_BACKUP_WARM"
-                ? undefined
-                : storageClass
-          ) as S3StorageClass;
 
-          const rtHelper = { storageClass: s, ...rest };
           partialImgArr.push([
             0,
             rtHelper.cdnUrl ?? "",

@@ -205,25 +205,36 @@ export class WSServer {
       via: v
     } = cookieObj;
     const via = this.isWebOrCli(v) ? v : "web";
-    void this.prisma.updateProfile({
-      email: email ?? "",
-      region,
-      postalCode,
-      browserName,
-      "client-tz": clientTz,
-      via,
-      viewport,
-      browserVersion,
-      city,
-      ip,
-      locale,
-      ua,
-      country,
-      latlng,
-      tz,
-      userId,
-      providerContext
-    });
+    // void does NOT absorb rejections — an uncaught profile failure here
+    // killed the whole process on a CLI connect (client-tz absent from the
+    // CLI cookie; parsedCookies' Record<keyof UserData, string> return
+    // claims presence the runtime can't guarantee)
+    void this.prisma
+      .updateProfile({
+        email: email ?? "",
+        region,
+        postalCode,
+        browserName,
+        "client-tz": clientTz,
+        via,
+        viewport,
+        browserVersion,
+        city,
+        ip,
+        locale,
+        ua,
+        country,
+        latlng,
+        tz,
+        userId,
+        providerContext
+      })
+      .catch((err: unknown) => {
+        this.logger.warn(
+          { err: this.prisma.safeErrMsg(err) },
+          "profile upsert failed post-connect — connection continues"
+        );
+      });
     return this.userDataMap.set(userId, {
       email,
       region,

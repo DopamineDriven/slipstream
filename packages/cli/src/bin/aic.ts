@@ -3,6 +3,11 @@ import { SlipstreamReplService } from "@/repl.ts";
 
 /**
  * aic [--workspace [root]] [--no-workspace] [--env dev|prod] [--no-markdown]
+ *     [--continue] [--resume]
+ *
+ * --continue attaches straight to the most recent CLI conversation;
+ * --resume opens the picker narrowed to the recency lens (both scan in
+ * repl.start() — the resume lens is server-fed, config-planning §5.5).
  *
  * Local read tools arm automatically at the enclosing git checkout's
  * root (cwd outside one); --workspace narrows or forces the boundary,

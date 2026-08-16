@@ -13,6 +13,7 @@ export interface $DbEnums {
   ImageFormat: "jpeg" | "png" | "gif" | "webp" | "avif" | "heic" | "apng" | "bmp" | "tiff" | "ico" | "jxl" | "jp2" | "jpx" | "jxr" | "jls" | "svg" | "raw" | "dng" | "cr2" | "nef" | "arw" | "hdr" | "pic" | "rgbe" | "xyze" | "unknown"
   ColorModel: "rgb" | "rgba" | "grayscale" | "grayscale_alpha" | "indexed" | "cmyk" | "ycbcr" | "ycck" | "vector" | "lab" | "unknown"
   ColorSpace: "srgb" | "display_p3" | "adobe_rgb" | "prophoto_rgb" | "rec2020" | "rec709" | "cmyk" | "lab" | "xyz" | "gray" | "unknown"
+  CliConfigSchemaVersion: "v1_0"
   ReasoningEffort: "none" | "minimal" | "low" | "medium" | "high" | "xhigh"
   OutputVerbosity: "low" | "medium" | "high"
   ImageGenOutputKind: "PARTIAL" | "FINAL"

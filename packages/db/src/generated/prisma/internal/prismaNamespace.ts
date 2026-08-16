@@ -403,6 +403,8 @@ export const ModelName = {
   VideoMetadata: 'VideoMetadata',
   AudioMetadata: 'AudioMetadata',
   DocumentMetadata: 'DocumentMetadata',
+  CliConfig: 'CliConfig',
+  CliConversationActivity: 'CliConversationActivity',
   Conversation: 'Conversation',
   ConversationSettings: 'ConversationSettings',
   ImageGenJob: 'ImageGenJob',
@@ -441,7 +443,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "messageBlock" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
+    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "cliConfig" | "cliConversationActivity" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "messageBlock" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -886,6 +888,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.DocumentMetadataCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.DocumentMetadataCountAggregateOutputType> | number
+        }
+      }
+    }
+    CliConfig: {
+      payload: Prisma.$CliConfigPayload<ExtArgs>
+      fields: Prisma.CliConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CliConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CliConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.CliConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CliConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConfigPayload>
+        }
+        findMany: {
+          args: Prisma.CliConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConfigPayload>[]
+        }
+        create: {
+          args: Prisma.CliConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConfigPayload>
+        }
+        createMany: {
+          args: Prisma.CliConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CliConfigCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConfigPayload>[]
+        }
+        delete: {
+          args: Prisma.CliConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConfigPayload>
+        }
+        update: {
+          args: Prisma.CliConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.CliConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CliConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CliConfigUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConfigPayload>[]
+        }
+        upsert: {
+          args: Prisma.CliConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.CliConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCliConfig>
+        }
+        groupBy: {
+          args: Prisma.CliConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CliConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CliConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CliConfigCountAggregateOutputType> | number
+        }
+      }
+    }
+    CliConversationActivity: {
+      payload: Prisma.$CliConversationActivityPayload<ExtArgs>
+      fields: Prisma.CliConversationActivityFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CliConversationActivityFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConversationActivityPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CliConversationActivityFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConversationActivityPayload>
+        }
+        findFirst: {
+          args: Prisma.CliConversationActivityFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConversationActivityPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CliConversationActivityFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConversationActivityPayload>
+        }
+        findMany: {
+          args: Prisma.CliConversationActivityFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConversationActivityPayload>[]
+        }
+        create: {
+          args: Prisma.CliConversationActivityCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConversationActivityPayload>
+        }
+        createMany: {
+          args: Prisma.CliConversationActivityCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CliConversationActivityCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConversationActivityPayload>[]
+        }
+        delete: {
+          args: Prisma.CliConversationActivityDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConversationActivityPayload>
+        }
+        update: {
+          args: Prisma.CliConversationActivityUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConversationActivityPayload>
+        }
+        deleteMany: {
+          args: Prisma.CliConversationActivityDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CliConversationActivityUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CliConversationActivityUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConversationActivityPayload>[]
+        }
+        upsert: {
+          args: Prisma.CliConversationActivityUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CliConversationActivityPayload>
+        }
+        aggregate: {
+          args: Prisma.CliConversationActivityAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCliConversationActivity>
+        }
+        groupBy: {
+          args: Prisma.CliConversationActivityGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CliConversationActivityGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CliConversationActivityCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CliConversationActivityCountAggregateOutputType> | number
         }
       }
     }
@@ -2815,6 +2965,30 @@ export const DocumentMetadataScalarFieldEnum = {
 export type DocumentMetadataScalarFieldEnum = (typeof DocumentMetadataScalarFieldEnum)[keyof typeof DocumentMetadataScalarFieldEnum]
 
 
+export const CliConfigScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  defaultProvider: 'defaultProvider',
+  defaultModel: 'defaultModel',
+  showThinking: 'showThinking',
+  schemaVersion: 'schemaVersion',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CliConfigScalarFieldEnum = (typeof CliConfigScalarFieldEnum)[keyof typeof CliConfigScalarFieldEnum]
+
+
+export const CliConversationActivityScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  conversationId: 'conversationId',
+  lastActiveAt: 'lastActiveAt'
+} as const
+
+export type CliConversationActivityScalarFieldEnum = (typeof CliConversationActivityScalarFieldEnum)[keyof typeof CliConversationActivityScalarFieldEnum]
+
+
 export const ConversationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -3569,6 +3743,34 @@ export type ListEnumColorModelFieldRefInput<$PrismaModel> = FieldRefInputType<$P
 
 
 /**
+ * Reference to a field of type 'Provider'
+ */
+export type EnumProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Provider'>
+    
+
+
+/**
+ * Reference to a field of type 'Provider[]'
+ */
+export type ListEnumProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Provider[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CliConfigSchemaVersion'
+ */
+export type EnumCliConfigSchemaVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CliConfigSchemaVersion'>
+    
+
+
+/**
+ * Reference to a field of type 'CliConfigSchemaVersion[]'
+ */
+export type ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CliConfigSchemaVersion[]'>
+    
+
+
+/**
  * Reference to a field of type 'ReasoningEffort'
  */
 export type EnumReasoningEffortFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReasoningEffort'>
@@ -3593,20 +3795,6 @@ export type EnumOutputVerbosityFieldRefInput<$PrismaModel> = FieldRefInputType<$
  * Reference to a field of type 'OutputVerbosity[]'
  */
 export type ListEnumOutputVerbosityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OutputVerbosity[]'>
-    
-
-
-/**
- * Reference to a field of type 'Provider'
- */
-export type EnumProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Provider'>
-    
-
-
-/**
- * Reference to a field of type 'Provider[]'
- */
-export type ListEnumProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Provider[]'>
     
 
 
@@ -4074,6 +4262,8 @@ export type GlobalOmitConfig = {
   videoMetadata?: Prisma.VideoMetadataOmit
   audioMetadata?: Prisma.AudioMetadataOmit
   documentMetadata?: Prisma.DocumentMetadataOmit
+  cliConfig?: Prisma.CliConfigOmit
+  cliConversationActivity?: Prisma.CliConversationActivityOmit
   conversation?: Prisma.ConversationOmit
   conversationSettings?: Prisma.ConversationSettingsOmit
   imageGenJob?: Prisma.ImageGenJobOmit

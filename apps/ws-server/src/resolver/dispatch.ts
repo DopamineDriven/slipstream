@@ -93,6 +93,15 @@ export class ResolverDispatchService extends ResolverConnectionService {
       case "asset_attached":
         await this.handleAssetAttached(event, ws, userId, userData);
         break;
+      case "cli_config_hydrate":
+        await this.cliConfigHydrate(event, ws, userId, userData);
+        break;
+      case "cli_config_update":
+        await this.cliConfigUpdate(event, ws, userId, userData);
+        break;
+      case "cli_recent_convos":
+        await this.cliRecentConvos(event, ws, userId, userData);
+        break;
       case "provider_context_ping":
         await this.handleProviderContextPing(event, ws, userId, userData);
         break;
@@ -144,6 +153,12 @@ export class ResolverDispatchService extends ResolverConnectionService {
     "asset_upload_request",
     "asset_upload_response",
     "asset_uploaded",
+    "cli_config_hydrate",
+    "cli_config_hydrate_ack",
+    "cli_config_update",
+    "cli_config_update_ack",
+    "cli_recent_convos",
+    "cli_recent_convos_ack",
     "connection_established",
     "conversation_list",
     "conversation_list_ack",
@@ -268,6 +283,9 @@ export class ResolverDispatchService extends ResolverConnectionService {
       "asset_fetch_request",
       this.handleAssetFetchRequest.bind(this)
     );
+    this.wsServer.on("cli_config_hydrate", this.cliConfigHydrate.bind(this));
+    this.wsServer.on("cli_config_update", this.cliConfigUpdate.bind(this));
+    this.wsServer.on("cli_recent_convos", this.cliRecentConvos.bind(this));
     this.wsServer.on("ai_chat_request", this.handleAIChat.bind(this));
     this.wsServer.on(
       "asset_upload_complete",
