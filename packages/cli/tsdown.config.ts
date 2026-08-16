@@ -19,6 +19,7 @@ export default defineConfig(
         "src/local-tools.ts",
         "src/markdown-ansi.ts",
         "src/message-blocks.ts",
+        "src/model-picker.ts",
         "src/provider-context.ts",
         "src/render.ts",
         "src/repl.ts",

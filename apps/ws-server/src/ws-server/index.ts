@@ -284,11 +284,25 @@ export class WSServer {
     const cookies = req.headers.cookie;
     const cookieObj = this.parsedCookies(cookies);
 
+    // pre-auth inbox: `ws` DROPS frames that arrive before a message
+    // listener exists, and the auth + provider-key awaits below open a
+    // window of tens of ms. A client that sends immediately post-open
+    // (the CLI's cli_config_hydrate pull) lost its frames silently — buffer
+    // synchronously here, replay once the real handler is wired
+    const preAuthInbox = Array.of<RawData>();
+    const bufferPreAuth = (raw: RawData) => {
+      preAuthInbox.push(raw);
+    };
+    ws.on("message", bufferPreAuth);
+
     const { userId, email } = (await this.authenticateConnection(ws, req)) ?? {
       userId: null,
       email: undefined
     };
-    if (!userId) return;
+    if (!userId) {
+      ws.off("message", bufferPreAuth);
+      return;
+    }
     const providers = await this.prisma.injectClientApiKeyProps(userId);
 
     await this.stashUserData(userId, cookieObj, providers, email);
@@ -355,7 +369,7 @@ export class WSServer {
     const tzResolved = clientTz && clientTz.length > 1 ? clientTz : tz;
     const message = `User ${userId} (${email}) connected via ${via ?? "web"} on a ${viewport} via ${browserName} version ${browserVersion} from ${city}, ${country} (${region} region) having postal code ${postalCode} in the ${tzResolved} timezone with a locale of ${locale}, an approx location of ${latlng}, an ip of ${ip}, and a ua of ${ua}`;
     this.logger.info(message);
-    ws.on("message", raw => {
+    const onMessage = (raw: RawData) => {
       // Shutdown admission gate — once `stop()` flips `isDraining`, reject
       // new long-running work so connected clients cannot create fresh
       // in-flight jobs during the drain window. The drain primitive's
@@ -377,7 +391,13 @@ export class WSServer {
       } else {
         ws.send(JSON.stringify({ error: "No resolver configured" }));
       }
-    });
+    };
+    // swap the pre-auth inbox for the real handler, then replay anything
+    // that arrived during the auth window — in order, through the same path
+    ws.off("message", bufferPreAuth);
+    ws.on("message", onMessage);
+    for (const raw of preAuthInbox) onMessage(raw);
+    preAuthInbox.length = 0;
     ws.on("close", (s, f) => {
       // In-flight server-side work continues after socket close — drain
       // responsibility lives in `stop()`, not the per-socket handler.

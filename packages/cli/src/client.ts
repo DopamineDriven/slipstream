@@ -29,6 +29,18 @@ export class SlipstreamClientService extends ClientContext {
     this.handlers[event] = handler as CliHandlerMap[K];
   }
 
+  /**
+   * the registry is single-handler-per-event (on() replaces) — a chain
+   * link that needs to ADD behavior to a frame another link already owns
+   * reads the prior handler and composes it (connection_established: the
+   * provider-context assignment AND the identity-plane pull both ride it)
+   */
+  protected handlerFor<const K extends keyof EventTypeMap>(event: K) {
+    return this.handlers[event] as
+      | ((data: EventTypeMap[K]) => void)
+      | undefined;
+  }
+
   public send<const K extends keyof EventTypeMap>(data: EventTypeMap[K]) {
     if (!this.wsClient) {
       throw new Error("not connected — call connect() first");

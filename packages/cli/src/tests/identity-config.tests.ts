@@ -25,6 +25,12 @@ class TestIdentityConfig extends CliIdentityConfigService {
     this.captured[event] = handler as CapturedHandlerMap[K];
   }
 
+  protected handlerFor<const K extends keyof EventTypeMap>(event: K) {
+    return this.captured[event] as
+      | ((data: EventTypeMap[K]) => void)
+      | undefined;
+  }
+
   public send<const K extends keyof EventTypeMap>(data: EventTypeMap[K]) {
     this.sent.push(data);
   }
@@ -82,6 +88,25 @@ describe("CliIdentityConfigService — pull-based identity plane", () => {
   it("hydrateIdentity sends exactly the two request frames, in order", () => {
     const svc = new TestIdentityConfig();
     svc.hydrate();
+    assert.deepEqual(
+      svc.sent.map(s => s.type),
+      ["cli_config_hydrate", "cli_recent_convos"]
+    );
+  });
+
+  it("the pull rides connection_established and composes with a prior handler", () => {
+    const svc = new TestIdentityConfig();
+    let priorRan = false;
+    // a link that already owns the frame (the provider-context assignment)
+    svc.on("connection_established", () => {
+      priorRan = true;
+    });
+    svc.wire();
+    svc.fire("connection_established", {
+      type: "connection_established",
+      providerContext: { isSet: {}, isDefault: {} } as never
+    });
+    assert.equal(priorRan, true);
     assert.deepEqual(
       svc.sent.map(s => s.type),
       ["cli_config_hydrate", "cli_recent_convos"]
