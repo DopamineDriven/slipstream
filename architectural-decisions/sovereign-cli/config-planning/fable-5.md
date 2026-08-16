@@ -323,7 +323,7 @@ reach the CLI's localhost.
    andrew@… — you may close this window and return to the terminal" page,
    then **reconnect the socket with the new token in place** — no process
    restart. `/logout` revokes server-side + deletes the file + reconnects
-   anonymous; `/whoami` reads it back. The cold-start case (no credential
+   anonymous; `/identity` reads it back (Andrew: `/identity`, not `/whoami` — it names the identity plane, and can grow into the full readback: email, device label, session age, roaming defaults). The cold-start case (no credential
    file, handshake refused) is the SAME flow auto-invoked before the first
    prompt renders — one class, two entry points, no separate bin command.
 3. **ws-server** — handshake accepts the token (query `?token=` for v1;
