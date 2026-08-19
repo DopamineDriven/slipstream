@@ -360,6 +360,7 @@ export {
   imgMimeSupportByProvider,
   imageModelFacilitatorSets,
   imageModelSets,
+  isProvider,
   modelIdsByProvider,
   modelIdToDisplayName,
   modelIdToDisplayNameImgGen,

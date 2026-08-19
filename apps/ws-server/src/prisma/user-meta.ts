@@ -14,10 +14,6 @@ dotenv.config({ quiet: true });
 
 export class PrismaUserMetaService extends PrismaUtilsService {
   protected encryption: EncryptionService;
-  protected userProviderKeyMap = new Map<
-    Lowercase<$Enums.Provider>,
-    string | undefined
-  >();
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
@@ -34,7 +30,7 @@ export class PrismaUserMetaService extends PrismaUtilsService {
   public async countFallbackUserMessages(
     userId: string,
     windowMs = 24 * 60 * 60 * 1000
-  ): Promise<number> {
+  ) {
     const since = new Date(Date.now() - windowMs);
     return this.prismaClient.message.count({
       where: {
@@ -69,19 +65,23 @@ export class PrismaUserMetaService extends PrismaUtilsService {
   }
   protected formatClientContextProps(props: RecordCountsProps) {
     const isDefault = Object.fromEntries(
-      Object.entries(props.isDefault).map(([t, o]) => {
-        return [t, o === 0 ? false : true] as const;
-      })
-    );
+      Array.from(
+        Object.entries(props.isDefault).map(([t, o]) => {
+          return [t, o === 0 ? false : true] as const;
+        })
+      )
+    ) as Record<Lowercase<$Enums.Provider>, boolean>;
     const isSet = Object.fromEntries(
-      Object.entries(props.isSet).map(([t, o]) => {
-        return [
-          t as Lowercase<$Enums.Provider>,
-          o === 0 ? false : true
-        ] as const;
-      })
-    );
-    return { isSet, isDefault } as ClientContextWorkupProps;
+      Array.from(
+        Object.entries(props.isSet).map(([t, o]) => {
+          return [
+            t as Lowercase<$Enums.Provider>,
+            o === 0 ? false : true
+          ] as const;
+        })
+      )
+    ) as Record<Lowercase<$Enums.Provider>, boolean>;
+    return { isSet, isDefault } as const satisfies ClientContextWorkupProps;
   }
 
   protected handleExistingKeysForClient(props: UserKey[]) {
@@ -205,7 +205,6 @@ export class PrismaUserMetaService extends PrismaUtilsService {
     userId?: string
   ) {
     if (!userId) {
-      this.userProviderKeyMap.clear();
       throw new Error("unauthorized");
     }
     const rec = await this.prismaClient.userKey.findUnique({
@@ -221,25 +220,20 @@ export class PrismaUserMetaService extends PrismaUtilsService {
       return { apiKey: null, keyId: null };
     }
     try {
-      const hasKey = this.userProviderKeyMap.get(provider);
-      if (typeof hasKey !== "undefined") {
-        return { apiKey: hasKey, keyId: rec.id };
-      }
-
       const decrypted = await this.encryption.decryptText({
         authTag: rec.authTag,
         data: rec.apiKey,
         iv: rec.iv
       });
-
-      this.userProviderKeyMap.set(provider, decrypted);
-
       return { apiKey: decrypted, keyId: rec.id };
     } catch (err) {
       if (err instanceof Error) {
         console.error(`Decryption failed for: ${provider}, ` + err.message);
         return { apiKey: null, keyId: null };
-      } else return { apiKey: null, keyId: null };
+      } else {
+        console.error(this.safeErrMsg(err));
+        return { apiKey: null, keyId: null };
+      }
     }
   }
 }

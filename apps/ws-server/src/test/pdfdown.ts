@@ -655,7 +655,7 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
 
 const perf = performance.now();
 
-const x = "две-головы.pdf" as const satisfies Unenumerate<typeof pdfChoiceArr>;
+const x = "The-Path-to-Hell-is-Paved-with-Good-Intentions.pdf" as const satisfies Unenumerate<typeof pdfChoiceArr>;
 
 readAndExtract(x).then(v => {
   console.log(`ts script finished in: ${performance.now() - perf} ms`);
