@@ -121,7 +121,6 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     streamChannel,
     thinkingChunks,
     userId,
-    imgCounts,
     ws,
     userMsgId,
     apiKey,
@@ -141,7 +140,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     const mod =
       model && this.prisma.isOpenAIImgGenFacilitating(model)
         ? model
-        : "gpt-5.5";
+        : "gpt-5.6-sol";
 
     const provider = "openai" as const;
 
@@ -312,8 +311,10 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       {
         action: "auto",
         type: "image_generation",
-        background: r.output_background,
-        input_fidelity: imgCounts > 0 ? "high" : r.input_fidelity,
+        // gpt-image-2 doesn't support background transparency
+        // background: r.output_background,
+        // gpt-image-2 does not support input fidelity, causes an error to be thrown
+        // input_fidelity: imgCounts > 0 ? "high" : r.input_fidelity,
         model: "gpt-image-2",
         moderation: "low",
         output_compression: r.output_compression,

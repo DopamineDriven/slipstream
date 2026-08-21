@@ -10,6 +10,7 @@ import type {
   GenerateContentConfig,
   GenerateContentParameters,
   ImageConfig,
+  Interactions,
   Part,
   Schema,
   ToolConfig
@@ -23,11 +24,14 @@ import type {
   GeminiModelIdUnion,
   LocalToolName,
   MessageSingleton,
-  NanoBanana2OutputAR
+  NanoBanana2OutputAR,
+  UTR
 } from "@slipstream/types";
 import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
-export class GeminiWorkupService extends FileSearchStoreService {
+export type InteractionStepMap = UTR<Interactions.Step, "type">;
+
+export class GeminiInteractionsService extends FileSearchStoreService {
   protected nanoid: Promise<<Type extends string>(size?: number) => Type>;
   constructor(
     logger: LoggerService,
@@ -39,6 +43,9 @@ export class GeminiWorkupService extends FileSearchStoreService {
     super(logger, prisma, apiKey);
     this.nanoid = import("nanoid").then(d => d.nanoid);
   }
+  /**
+   * TODO need to migrate to interaction api shape. need to thoroughly understand the interactions api config and the many nested config pieces
+   */
 
   protected async formatHistoryForSession(
     msgs: MessageSingleton<true>[],
@@ -281,6 +288,15 @@ export class GeminiWorkupService extends FileSearchStoreService {
     };
   }
 
+  protected async formatInteractionSteps(
+    msgs: MessageSingleton<true>[],
+    keyFingerprint: string,
+    systemPrompt?: string,
+    keyId?: string,
+    apiKey?: string,
+    model?: GeminiModelIdUnion
+  ) {}
+
   private async ensureAssetUploaded(
     attachment: AttachmentSingleton<true>,
     keyFingerprint: string,
@@ -501,17 +517,11 @@ export class GeminiWorkupService extends FileSearchStoreService {
           : Type.BOOLEAN;
     return {
       type,
-      ...(typeof p.description !== "undefined"
-        ? { description: p.description }
-        : {}),
-      ...(typeof p.minimum !== "undefined" ? { minimum: p.minimum } : {}),
-      ...(typeof p.maximum !== "undefined" ? { maximum: p.maximum } : {}),
-      ...(typeof p.minLength !== "undefined"
-        ? { minLength: String(p.minLength) }
-        : {}),
-      ...(typeof p.maxLength !== "undefined"
-        ? { maxLength: String(p.maxLength) }
-        : {})
+      ...(p.description !== undefined ? { description: p.description } : {}),
+      ...(p.minimum !== undefined ? { minimum: p.minimum } : {}),
+      ...(p.maximum !== undefined ? { maximum: p.maximum } : {}),
+      ...(p.minLength !== undefined ? { minLength: String(p.minLength) } : {}),
+      ...(p.maxLength !== undefined ? { maxLength: String(p.maxLength) } : {})
     } satisfies Schema;
   }
 
