@@ -275,6 +275,7 @@
     "dotenv": "catalog:dotenv",
     "dotenv-cli": "catalog:dotenv",
     "dotenv-expand": "catalog:dotenv",
+    "fflate": "catalog:fflate",
     "nanoid": "catalog:nanoid",
     "node-html-parser": "catalog:node",
     "openai": "catalog:openai",

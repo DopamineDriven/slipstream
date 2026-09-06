@@ -1,4 +1,5 @@
 import type {
+  AIChatResponseAudioGenFields,
   GrokLanguageTTS,
   GrokVoiceTTS,
   TTSCodec
@@ -161,6 +162,8 @@ export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   imgGenAttachmentId?: string;
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatResponseImgGenFieldsFinal;
+  audioGenEnabled?: boolean;
+  audioGenFields?: AIChatResponseAudioGenFields;
 }
 
 export type AIChatRequest = {
@@ -180,6 +183,7 @@ export type AIChatRequest = {
   // TODO
   // enableVideoGen?: boolean
   imgGenEnabled?: boolean;
+  audioGenEnabled?: boolean;
   imgGenFields?: AIChatRequestImgGenFields;
   localTools?: LocalToolCapabilities;
 };
@@ -215,6 +219,7 @@ export type AIChatResponseDb = DX<
     thinkingText?: string;
     responseOutput?: string;
     imgGenFields?: AIChatResponseImgGenFieldsFinal;
+    audioGenFields?: AIChatResponseAudioGenFields;
   }
 >;
 

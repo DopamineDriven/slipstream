@@ -345,6 +345,7 @@ export type MessageWhereInput = {
   userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
   attachments?: Prisma.AttachmentListRelationFilter
   imageGenJob?: Prisma.XOR<Prisma.ImageGenJobNullableScalarRelationFilter, Prisma.ImageGenJobWhereInput> | null
+  audioGenJob?: Prisma.XOR<Prisma.AudioGenJobNullableScalarRelationFilter, Prisma.AudioGenJobWhereInput> | null
   conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
   conversationMemoryChunk?: Prisma.XOR<Prisma.ConversationMemoryChunkNullableScalarRelationFilter, Prisma.ConversationMemoryChunkWhereInput> | null
 }
@@ -375,6 +376,7 @@ export type MessageOrderByWithRelationInput = {
   userKey?: Prisma.UserKeyOrderByWithRelationInput
   attachments?: Prisma.AttachmentOrderByRelationAggregateInput
   imageGenJob?: Prisma.ImageGenJobOrderByWithRelationInput
+  audioGenJob?: Prisma.AudioGenJobOrderByWithRelationInput
   conversation?: Prisma.ConversationOrderByWithRelationInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkOrderByWithRelationInput
 }
@@ -409,6 +411,7 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
   attachments?: Prisma.AttachmentListRelationFilter
   imageGenJob?: Prisma.XOR<Prisma.ImageGenJobNullableScalarRelationFilter, Prisma.ImageGenJobWhereInput> | null
+  audioGenJob?: Prisma.XOR<Prisma.AudioGenJobNullableScalarRelationFilter, Prisma.AudioGenJobWhereInput> | null
   conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
   conversationMemoryChunk?: Prisma.XOR<Prisma.ConversationMemoryChunkNullableScalarRelationFilter, Prisma.ConversationMemoryChunkWhereInput> | null
 }, "id" | "conversationId_ordinal">
@@ -490,6 +493,7 @@ export type MessageCreateInput = {
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobCreateNestedOneWithoutRequestMessageInput
   conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
 }
@@ -519,6 +523,7 @@ export type MessageUncheckedCreateInput = {
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
 }
 
 export type MessageUpdateInput = {
@@ -544,6 +549,7 @@ export type MessageUpdateInput = {
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUpdateOneWithoutRequestMessageNestedInput
   conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
 }
@@ -573,6 +579,7 @@ export type MessageUncheckedUpdateInput = {
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
 }
 
 export type MessageCreateManyInput = {
@@ -646,6 +653,11 @@ export type MessageNullableScalarRelationFilter = {
   isNot?: Prisma.MessageWhereInput | null
 }
 
+export type MessageScalarRelationFilter = {
+  is?: Prisma.MessageWhereInput
+  isNot?: Prisma.MessageWhereInput
+}
+
 export type MessageListRelationFilter = {
   every?: Prisma.MessageWhereInput
   some?: Prisma.MessageWhereInput
@@ -654,11 +666,6 @@ export type MessageListRelationFilter = {
 
 export type MessageOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type MessageScalarRelationFilter = {
-  is?: Prisma.MessageWhereInput
-  isNot?: Prisma.MessageWhereInput
 }
 
 export type MessageConversationIdOrdinalCompoundUniqueInput = {
@@ -759,6 +766,20 @@ export type MessageUpdateOneWithoutAttachmentsNestedInput = {
   delete?: Prisma.MessageWhereInput | boolean
   connect?: Prisma.MessageWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.MessageUpdateWithoutAttachmentsInput>, Prisma.MessageUncheckedUpdateWithoutAttachmentsInput>
+}
+
+export type MessageCreateNestedOneWithoutAudioGenJobInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutAudioGenJobInput, Prisma.MessageUncheckedCreateWithoutAudioGenJobInput>
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutAudioGenJobInput
+  connect?: Prisma.MessageWhereUniqueInput
+}
+
+export type MessageUpdateOneRequiredWithoutAudioGenJobNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutAudioGenJobInput, Prisma.MessageUncheckedCreateWithoutAudioGenJobInput>
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutAudioGenJobInput
+  upsert?: Prisma.MessageUpsertWithoutAudioGenJobInput
+  connect?: Prisma.MessageWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutAudioGenJobInput, Prisma.MessageUpdateWithoutAudioGenJobInput>, Prisma.MessageUncheckedUpdateWithoutAudioGenJobInput>
 }
 
 export type MessageCreateNestedManyWithoutConversationInput = {
@@ -959,6 +980,7 @@ export type MessageCreateWithoutAttachmentsInput = {
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutSourceMessageInput
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobCreateNestedOneWithoutRequestMessageInput
   conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
 }
@@ -987,6 +1009,7 @@ export type MessageUncheckedCreateWithoutAttachmentsInput = {
   messageBlocks?: Prisma.MessageBlockUncheckedCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
 }
 
 export type MessageCreateOrConnectWithoutAttachmentsInput = {
@@ -1027,6 +1050,7 @@ export type MessageUpdateWithoutAttachmentsInput = {
   ttsJob?: Prisma.TTSJobUpdateOneWithoutSourceMessageNestedInput
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUpdateOneWithoutRequestMessageNestedInput
   conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
 }
@@ -1055,6 +1079,131 @@ export type MessageUncheckedUpdateWithoutAttachmentsInput = {
   messageBlocks?: Prisma.MessageBlockUncheckedUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+}
+
+export type MessageCreateWithoutAudioGenJobInput = {
+  id?: string
+  ordinal: number
+  userId?: string | null
+  senderType?: $Enums.SenderType
+  provider: $Enums.Provider
+  model?: string | null
+  content: string
+  thinkingText?: string | null
+  thinkingDuration?: number | null
+  responseOutput?: string | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockCreateNestedManyWithoutMessageInput
+  ttsJob?: Prisma.TTSJobCreateNestedOneWithoutSourceMessageInput
+  userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
+  imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
+}
+
+export type MessageUncheckedCreateWithoutAudioGenJobInput = {
+  id?: string
+  ordinal: number
+  conversationId: string
+  userId?: string | null
+  senderType?: $Enums.SenderType
+  provider: $Enums.Provider
+  model?: string | null
+  userKeyId?: string | null
+  content: string
+  conversationMemoryChunkId?: string | null
+  thinkingText?: string | null
+  thinkingDuration?: number | null
+  responseOutput?: string | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedCreateNestedManyWithoutMessageInput
+  ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
+  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+}
+
+export type MessageCreateOrConnectWithoutAudioGenJobInput = {
+  where: Prisma.MessageWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessageCreateWithoutAudioGenJobInput, Prisma.MessageUncheckedCreateWithoutAudioGenJobInput>
+}
+
+export type MessageUpsertWithoutAudioGenJobInput = {
+  update: Prisma.XOR<Prisma.MessageUpdateWithoutAudioGenJobInput, Prisma.MessageUncheckedUpdateWithoutAudioGenJobInput>
+  create: Prisma.XOR<Prisma.MessageCreateWithoutAudioGenJobInput, Prisma.MessageUncheckedCreateWithoutAudioGenJobInput>
+  where?: Prisma.MessageWhereInput
+}
+
+export type MessageUpdateToOneWithWhereWithoutAudioGenJobInput = {
+  where?: Prisma.MessageWhereInput
+  data: Prisma.XOR<Prisma.MessageUpdateWithoutAudioGenJobInput, Prisma.MessageUncheckedUpdateWithoutAudioGenJobInput>
+}
+
+export type MessageUpdateWithoutAudioGenJobInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUpdateManyWithoutMessageNestedInput
+  ttsJob?: Prisma.TTSJobUpdateOneWithoutSourceMessageNestedInput
+  userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
+  imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
+}
+
+export type MessageUncheckedUpdateWithoutAudioGenJobInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageBlocks?: Prisma.MessageBlockUncheckedUpdateManyWithoutMessageNestedInput
+  ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
+  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
 }
 
 export type MessageCreateWithoutConversationInput = {
@@ -1080,6 +1229,7 @@ export type MessageCreateWithoutConversationInput = {
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobCreateNestedOneWithoutRequestMessageInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
 }
 
@@ -1107,6 +1257,7 @@ export type MessageUncheckedCreateWithoutConversationInput = {
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
 }
 
 export type MessageCreateOrConnectWithoutConversationInput = {
@@ -1183,6 +1334,7 @@ export type MessageCreateWithoutImageGenJobInput = {
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutSourceMessageInput
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
+  audioGenJob?: Prisma.AudioGenJobCreateNestedOneWithoutRequestMessageInput
   conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
 }
@@ -1211,6 +1363,7 @@ export type MessageUncheckedCreateWithoutImageGenJobInput = {
   messageBlocks?: Prisma.MessageBlockUncheckedCreateNestedManyWithoutMessageInput
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
 }
 
 export type MessageCreateOrConnectWithoutImageGenJobInput = {
@@ -1251,6 +1404,7 @@ export type MessageUpdateWithoutImageGenJobInput = {
   ttsJob?: Prisma.TTSJobUpdateOneWithoutSourceMessageNestedInput
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUpdateOneWithoutRequestMessageNestedInput
   conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
 }
@@ -1279,6 +1433,7 @@ export type MessageUncheckedUpdateWithoutImageGenJobInput = {
   messageBlocks?: Prisma.MessageBlockUncheckedUpdateManyWithoutMessageNestedInput
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
 }
 
 export type MessageCreateWithoutConversationMemoryChunkInput = {
@@ -1304,6 +1459,7 @@ export type MessageCreateWithoutConversationMemoryChunkInput = {
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobCreateNestedOneWithoutRequestMessageInput
   conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
 }
 
@@ -1331,6 +1487,7 @@ export type MessageUncheckedCreateWithoutConversationMemoryChunkInput = {
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
 }
 
 export type MessageCreateOrConnectWithoutConversationMemoryChunkInput = {
@@ -1381,6 +1538,7 @@ export type MessageCreateWithoutMessageBlocksInput = {
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobCreateNestedOneWithoutRequestMessageInput
   conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
 }
@@ -1409,6 +1567,7 @@ export type MessageUncheckedCreateWithoutMessageBlocksInput = {
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
 }
 
 export type MessageCreateOrConnectWithoutMessageBlocksInput = {
@@ -1449,6 +1608,7 @@ export type MessageUpdateWithoutMessageBlocksInput = {
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUpdateOneWithoutRequestMessageNestedInput
   conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
 }
@@ -1477,6 +1637,7 @@ export type MessageUncheckedUpdateWithoutMessageBlocksInput = {
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
 }
 
 export type MessageCreateWithoutTtsJobInput = {
@@ -1501,6 +1662,7 @@ export type MessageCreateWithoutTtsJobInput = {
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobCreateNestedOneWithoutRequestMessageInput
   conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
 }
@@ -1529,6 +1691,7 @@ export type MessageUncheckedCreateWithoutTtsJobInput = {
   messageBlocks?: Prisma.MessageBlockUncheckedCreateNestedManyWithoutMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
 }
 
 export type MessageCreateOrConnectWithoutTtsJobInput = {
@@ -1569,6 +1732,7 @@ export type MessageUpdateWithoutTtsJobInput = {
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUpdateOneWithoutRequestMessageNestedInput
   conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
 }
@@ -1597,6 +1761,7 @@ export type MessageUncheckedUpdateWithoutTtsJobInput = {
   messageBlocks?: Prisma.MessageBlockUncheckedUpdateManyWithoutMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
 }
 
 export type MessageCreateWithoutUserKeyInput = {
@@ -1621,6 +1786,7 @@ export type MessageCreateWithoutUserKeyInput = {
   ttsJob?: Prisma.TTSJobCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobCreateNestedOneWithoutRequestMessageInput
   conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
 }
@@ -1649,6 +1815,7 @@ export type MessageUncheckedCreateWithoutUserKeyInput = {
   ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutSourceMessageInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
   imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
 }
 
 export type MessageCreateOrConnectWithoutUserKeyInput = {
@@ -1722,6 +1889,7 @@ export type MessageUpdateWithoutConversationInput = {
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUpdateOneWithoutRequestMessageNestedInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
 }
 
@@ -1749,6 +1917,7 @@ export type MessageUncheckedUpdateWithoutConversationInput = {
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
 }
 
 export type MessageUncheckedUpdateManyWithoutConversationInput = {
@@ -1818,6 +1987,7 @@ export type MessageUpdateWithoutConversationMemoryChunkInput = {
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUpdateOneWithoutRequestMessageNestedInput
   conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
 }
 
@@ -1845,6 +2015,7 @@ export type MessageUncheckedUpdateWithoutConversationMemoryChunkInput = {
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
 }
 
 export type MessageUncheckedUpdateManyWithoutConversationMemoryChunkInput = {
@@ -1913,6 +2084,7 @@ export type MessageUpdateWithoutUserKeyInput = {
   ttsJob?: Prisma.TTSJobUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUpdateOneWithoutRequestMessageNestedInput
   conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
 }
@@ -1941,6 +2113,7 @@ export type MessageUncheckedUpdateWithoutUserKeyInput = {
   ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutSourceMessageNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
   imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+  audioGenJob?: Prisma.AudioGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
 }
 
 export type MessageUncheckedUpdateManyWithoutUserKeyInput = {
@@ -2031,6 +2204,7 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
   attachments?: boolean | Prisma.Message$attachmentsArgs<ExtArgs>
   imageGenJob?: boolean | Prisma.Message$imageGenJobArgs<ExtArgs>
+  audioGenJob?: boolean | Prisma.Message$audioGenJobArgs<ExtArgs>
   conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
   conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs>
   _count?: boolean | Prisma.MessageCountOutputTypeDefaultArgs<ExtArgs>
@@ -2118,6 +2292,7 @@ export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
   attachments?: boolean | Prisma.Message$attachmentsArgs<ExtArgs>
   imageGenJob?: boolean | Prisma.Message$imageGenJobArgs<ExtArgs>
+  audioGenJob?: boolean | Prisma.Message$audioGenJobArgs<ExtArgs>
   conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
   conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs>
   _count?: boolean | Prisma.MessageCountOutputTypeDefaultArgs<ExtArgs>
@@ -2141,6 +2316,7 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     userKey: Prisma.$UserKeyPayload<ExtArgs> | null
     attachments: Prisma.$AttachmentPayload<ExtArgs>[]
     imageGenJob: Prisma.$ImageGenJobPayload<ExtArgs> | null
+    audioGenJob: Prisma.$AudioGenJobPayload<ExtArgs> | null
     conversation: Prisma.$ConversationPayload<ExtArgs>
     conversationMemoryChunk: Prisma.$ConversationMemoryChunkPayload<ExtArgs> | null
   }
@@ -2573,6 +2749,7 @@ export interface Prisma__MessageClient<T, Null = never, ExtArgs extends runtime.
   userKey<T extends Prisma.Message$userKeyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$userKeyArgs<ExtArgs>>): Prisma.Prisma__UserKeyClient<runtime.Types.Result.GetResult<Prisma.$UserKeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   attachments<T extends Prisma.Message$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   imageGenJob<T extends Prisma.Message$imageGenJobArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$imageGenJobArgs<ExtArgs>>): Prisma.Prisma__ImageGenJobClient<runtime.Types.Result.GetResult<Prisma.$ImageGenJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  audioGenJob<T extends Prisma.Message$audioGenJobArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$audioGenJobArgs<ExtArgs>>): Prisma.Prisma__AudioGenJobClient<runtime.Types.Result.GetResult<Prisma.$AudioGenJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   conversation<T extends Prisma.ConversationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ConversationDefaultArgs<ExtArgs>>): Prisma.Prisma__ConversationClient<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   conversationMemoryChunk<T extends Prisma.Message$conversationMemoryChunkArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$conversationMemoryChunkArgs<ExtArgs>>): Prisma.Prisma__ConversationMemoryChunkClient<runtime.Types.Result.GetResult<Prisma.$ConversationMemoryChunkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
@@ -3136,6 +3313,25 @@ export type Message$imageGenJobArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   include?: Prisma.ImageGenJobInclude<ExtArgs> | null
   where?: Prisma.ImageGenJobWhereInput
+}
+
+/**
+ * Message.audioGenJob
+ */
+export type Message$audioGenJobArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AudioGenJob
+   */
+  select?: Prisma.AudioGenJobSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AudioGenJob
+   */
+  omit?: Prisma.AudioGenJobOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AudioGenJobInclude<ExtArgs> | null
+  where?: Prisma.AudioGenJobWhereInput
 }
 
 /**

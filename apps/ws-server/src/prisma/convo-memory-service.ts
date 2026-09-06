@@ -552,7 +552,8 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
             image: true,
             document: true,
             audio: true,
-            imageGenOutput: true
+            imageGenOutput: true,
+            audioGenOutput: true
           }
         }
       }

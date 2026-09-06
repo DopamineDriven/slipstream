@@ -6,38 +6,60 @@ import type { PrismaService } from "@/prisma/index.ts";
 import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
-import type {
-  Blob,
-  Content,
-  FunctionCall,
-  GenerateContentResponse,
-  Part
-} from "@google/genai";
-import { GeminiWorkupService } from "@/gemini/workup.ts";
+import type { Interactions } from "@google/genai";
+import { GeminiInteractionsService } from "@/gemini/interactions.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
+  AIChatResponseAudioGenFields,
+  AIChatResponseAudioGenSubFields,
   AIChatResponseImgGenSubFields,
   EventTypeMap,
   GeminiModelIdUnion
 } from "@slipstream/types";
 import { isLocalToolName } from "@slipstream/types";
 
-interface GeminiActiveMessageBlock {
+interface InteractionsActiveMessageBlock {
   content: string;
   startedAt: number;
   type: "THINKING" | "TEXT";
 }
 
-interface GeminiFinalizedMessageBlock {
+interface InteractionsFinalizedMessageBlock {
   content: string;
   durationMs: number;
   ordinal: number;
   type: $Enums.MessageBlockType;
 }
 
-export class GeminiChatService extends GeminiWorkupService {
+/**
+ * inline image payload lifted off an ImageDelta — the interactions twin of
+ * generateContent's inlineData Blob
+ */
+interface InteractionsInlineImage {
+  data: string;
+  mimeType: string;
+}
+
+/**
+ * per-step accumulator keyed by the SSE step index — thought steps collect
+ * their summary text + signature, model_output steps collect text,
+ * function_call steps collect their streamed arguments; the round replay
+ * (client-managed history, store:false) is rebuilt from these
+ */
+interface InteractionsStepTrack {
+  type: Interactions.Step["type"];
+  text: string;
+  thoughtSummary: string;
+  signature?: string;
+  functionCallId?: string;
+  functionCallName?: string;
+  functionCallArgsText: string;
+  functionCallArgs?: Record<string, unknown>;
+}
+
+export class GeminiInteractionsSseService extends GeminiInteractionsService {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
@@ -46,8 +68,8 @@ export class GeminiChatService extends GeminiWorkupService {
     protected s3: S3Storage,
     memoryService: ConversationMemoryVectorService,
     apiKey: string,
-    // local tool bridge ownership STARTS here — the workup/fss ancestors
-    // never see it, mirroring the openai responses-chat pattern
+    // local tool bridge ownership STARTS here — the interactions/fss
+    // ancestors never see it, mirroring chat.ts over workup.ts
     protected localToolBroker: LocalToolBroker
   ) {
     super(logger, prisma, store, memoryService, apiKey);
@@ -90,121 +112,108 @@ export class GeminiChatService extends GeminiWorkupService {
     );
   }
 
-  private normalizeFunctionResponseOutput(rawOutput: string) {
-    const trimmed = rawOutput.trim();
-    if (trimmed.length === 0) {
-      return "";
-    }
-
-    try {
-      return JSON.parse<unknown>(trimmed);
-    } catch {
-      return rawOutput;
-    }
-  }
-
-  protected async executeGeminiFunctionCall(
+  /**
+   * server-side function tools (user store + memory) executed into the
+   * interactions function_result step shape; local bridge tools never reach
+   * here — the round loop relays those to the CLI via the broker first
+   */
+  protected async executeInteractionFunctionCall(
     userId: string,
     conversationId: string,
-    functionCall: FunctionCall
+    functionCall: Interactions.FunctionCallStep
   ) {
-    const toolName = functionCall.name ?? "unknown_tool";
+    const toolName = functionCall.name;
 
     try {
       if (toolName === "user_store_search") {
-        const input = this.parseUserStoreSearchInput(functionCall.args);
+        const input = this.parseUserStoreSearchInput(functionCall.arguments);
         this.logger.info(
           {
             toolName,
-            toolCallId: functionCall.id ?? null,
+            toolCallId: functionCall.id,
             query: input.query,
             max_results: input.max_results,
             filename: input.filename
           },
-          "Gemini user_store_search query"
+          "Gemini interactions user_store_search query"
         );
 
         const output = await this.store.executeFileSearch(userId, input);
 
         return {
-          functionResponse: {
-            ...(functionCall.id ? { id: functionCall.id } : {}),
-            name: toolName,
-            response: {
-              output: this.normalizeFunctionResponseOutput(output)
-            }
-          }
-        } satisfies Part;
+          type: "function_result",
+          call_id: functionCall.id,
+          name: toolName,
+          result: output
+        } satisfies Interactions.FunctionResultStep;
       }
 
       if (toolName === "conversation_memory_search") {
         const output = await this.memoryService.searchMemoryFromToolInput(
           userId,
           conversationId,
-          functionCall.args ?? {}
+          functionCall.arguments
         );
         return {
-          functionResponse: {
-            ...(functionCall.id ? { id: functionCall.id } : {}),
-            name: toolName,
-            response: {
-              output: this.normalizeFunctionResponseOutput(output)
-            }
-          }
-        } satisfies Part;
+          type: "function_result",
+          call_id: functionCall.id,
+          name: toolName,
+          result: output
+        } satisfies Interactions.FunctionResultStep;
       }
 
       if (toolName === "conversation_memory_get_chunk") {
         const output = await this.memoryService.getMemoryChunkFromToolInput(
           userId,
-          functionCall.args ?? {}
+          functionCall.arguments
         );
         return {
-          functionResponse: {
-            ...(functionCall.id ? { id: functionCall.id } : {}),
-            name: toolName,
-            response: {
-              output: this.normalizeFunctionResponseOutput(output)
-            }
-          }
-        } satisfies Part;
+          type: "function_result",
+          call_id: functionCall.id,
+          name: toolName,
+          result: output
+        } satisfies Interactions.FunctionResultStep;
       }
 
       return {
-        functionResponse: {
-          ...(functionCall.id ? { id: functionCall.id } : {}),
-          name: toolName,
-          response: {
-            error: `Unknown tool: ${toolName}`
-          }
-        }
-      } satisfies Part;
+        type: "function_result",
+        call_id: functionCall.id,
+        name: toolName,
+        is_error: true,
+        result: `Unknown tool: ${toolName}`
+      } satisfies Interactions.FunctionResultStep;
     } catch (error) {
       this.logger.error(
         {
           toolName,
-          toolCallId: functionCall.id ?? null,
+          toolCallId: functionCall.id,
           error: this.prisma.safeErrMsg(error)
         },
-        "Gemini function tool execution failed"
+        "Gemini interactions function tool execution failed"
       );
 
       return {
-        functionResponse: {
-          ...(functionCall.id ? { id: functionCall.id } : {}),
-          name: toolName,
-          response: {
-            error: this.prisma.safeErrMsg(error)
-          }
-        }
-      } satisfies Part;
+        type: "function_result",
+        call_id: functionCall.id,
+        name: toolName,
+        is_error: true,
+        result: this.prisma.safeErrMsg(error)
+      } satisfies Interactions.FunctionResultStep;
     }
   }
 
-  protected async handleGeminiAiChatRequest({
+  /**
+   * Interactions-API twin of chat.ts's handleGeminiAiChatRequest — same wire
+   * events, same block tracking, same tool-round safety rails, same image
+   * persistence, consuming the interactions SSE stream instead of
+   * generateContentStream. Conversation state is client-managed: every
+   * round resends the full Step[] history (store:false), so a tool round
+   * replays the model's thought (signature), any model_output text, and the
+   * function_call steps ahead of our function_result steps.
+   */
+  protected async handleGeminiInteractionsRequest({
     chunks,
     conversationId,
-    isNewChat,
     msgs,
     userMsgId,
     streamChannel,
@@ -218,13 +227,15 @@ export class GeminiChatService extends GeminiWorkupService {
     systemPrompt,
     temperature,
     title,
+    audioGenEnabled,
     imgGenFields,
     imgGenEnabled,
     jobId,
     requestMessageId,
     topP,
     userData,
-    localTools
+    localTools,
+    via
   }: ProviderGeminiChatRequestEntity) {
     const provider = "gemini" as const;
     const model = m as GeminiModelIdUnion;
@@ -243,23 +254,16 @@ export class GeminiChatService extends GeminiWorkupService {
           }
         : undefined;
 
-    const params = await this.contentGen({
-      userId,
-      isNewChat,
-      keyId,
-      model,
+    const params = await this.interactionCreate({
       msgs,
       apiKey,
-      imgGenFields,
+      keyId,
       latlng: userData?.latlng,
+      model,
       max_tokens,
-      systemPrompt,
-      temperature,
-      topP,
-      requestMessageId,
-      localToolNames: localToolTurn
-        ? [...localToolTurn.advertised].filter(isLocalToolName)
-        : []
+      imgGenFields,
+      via,
+      systemPrompt
     });
     if (localToolTurn) {
       this.logger.info(
@@ -268,7 +272,7 @@ export class GeminiChatService extends GeminiWorkupService {
           advertised: [...localToolTurn.advertised],
           conversationId
         },
-        "local tool bridge armed for gemini turn"
+        "local tool bridge armed for gemini interactions turn"
       );
     }
 
@@ -280,14 +284,13 @@ export class GeminiChatService extends GeminiWorkupService {
     let geminiThinkingDuration = 0,
       geminiThinkingAgg = "",
       usage = 0,
-      resId: string | undefined = undefined,
+      interactionId: string | undefined = undefined,
       uploadtInitial = 0,
       tInitial = 0,
       uploadtDelta = 0,
-      geminiAgg = "",
-      geminiDataPart: Blob | undefined = undefined;
-    const trackedBlocks = Array.of<GeminiFinalizedMessageBlock>();
-    let activeBlock: GeminiActiveMessageBlock | undefined = undefined;
+      geminiAgg = "";
+    const trackedBlocks = Array.of<InteractionsFinalizedMessageBlock>();
+    let activeBlock: InteractionsActiveMessageBlock | undefined = undefined;
     let nextOrdinal = 0;
 
     const roundTrack = Array.of<{
@@ -298,14 +301,18 @@ export class GeminiChatService extends GeminiWorkupService {
       conversationId: string;
     }>();
 
-    let roundContents = Array.of<Content>(...params.contents);
+    let roundInput = Array.of<Interactions.Step>(...params.input);
     let forcedLoopStopReason:
       | "MAX_ROUNDS"
       | "MAX_USER_STORE_SEARCH_CALLS"
       | "REPEATED_TOOL_CALLS"
       | null = null;
 
-    const geminiDataArr = Array.of<Blob>();
+    const geminiDataArr = Array.of<InteractionsInlineImage>();
+    // lyria audio fragments — decoded then Buffer.concat'd AFTER the stream
+    // (never concatenate base64 strings; padded fragments corrupt)
+    const audioFragments = Array.of<string>();
+    let audioMime: string | undefined = undefined;
     const toolCallSignatureRegistry = new Map<string, number>();
     let userStoreSearchCallsTotal = 0;
 
@@ -337,7 +344,9 @@ export class GeminiChatService extends GeminiWorkupService {
       activeBlock = undefined;
     };
 
-    const ensureActiveBlock = (type: GeminiActiveMessageBlock["type"]) => {
+    const ensureActiveBlock = (
+      type: InteractionsActiveMessageBlock["type"]
+    ) => {
       if (activeBlock?.type !== type) {
         finalizeActiveBlock();
         activeBlock = {
@@ -510,127 +519,258 @@ export class GeminiChatService extends GeminiWorkupService {
       }
     };
 
-    for (let round = 0; round <= MAX_ROUNDS; round++) {
-      const roundFunctionCalls = Array.of<FunctionCall>();
-      const roundFunctionCallKeys = new Set<string>();
-      const roundModelToolParts = Array.of<Part>();
-      const roundFunctionCallPartIndexes = new Map<string, number>();
-      const roundSignatureOnlyPartKeys = new Set<string>();
-      const stream = (await gemini.models.generateContentStream({
-        ...params,
-        contents: roundContents
-      })) satisfies AsyncGenerator<GenerateContentResponse>;
+    // nano banana images can and will arrive INSIDE the thought step — as a
+    // thought_summary whose content is an ImageContent — not only as an
+    // ImageDelta on model_output (probe-verified 2026-08-22); both paths
+    // collect here so the final-image persistence below sees them alike
+    const collectInlineImage = (data: string, mimeType: string) => {
+      finalizeActiveBlock();
+      const inline = { data, mimeType } satisfies InteractionsInlineImage;
+      geminiDataArr.push(inline);
+      const _dataUrl =
+        `data:${inline.mimeType};base64,${inline.data.length}` as const;
+      ws.send(
+        JSON.stringify({
+          type: "ai_chat_inline_data",
+          conversationId,
+          userMsgId,
+          data: _dataUrl,
+          userId,
+          done: false,
+          model,
+          chunk: geminiAgg,
+          systemPrompt,
+          temperature,
+          title,
+          topP,
+          provider,
+          imgGenEnabled
+        } satisfies EventTypeMap["ai_chat_inline_data"])
+      );
+    };
 
-      for await (const chunk of stream) {
+    for (let round = 0; round <= MAX_ROUNDS; round++) {
+      const stepTracks = new Map<number, InteractionsStepTrack>();
+      const roundFunctionCalls = Array.of<Interactions.FunctionCallStep>();
+
+      const stream = await gemini.interactions.create({
+        ...params,
+        input: roundInput
+      });
+
+      for await (const event of stream) {
         if (tInitial === 0) {
           tInitial = performance.now();
         }
-        if (chunk.responseId) {
-          resId = chunk.responseId;
-        }
-        if (chunk.usageMetadata?.totalTokenCount) {
-          usage = chunk.usageMetadata.totalTokenCount;
-        }
-
-        if (chunk.candidates) {
-          for (const candidate of chunk.candidates) {
-            if (candidate.tokenCount) {
-              usage = candidate.tokenCount;
+        switch (event.event_type) {
+          case "interaction.created": {
+            if (event.interaction.id) {
+              interactionId = event.interaction.id;
             }
-
-            if (candidate.content?.parts) {
-              for (const part of candidate.content.parts) {
-                if (part.functionCall) {
-                  finalizeActiveBlock();
-                  const functionCallKey = JSON.stringify({
-                    id: part.functionCall.id ?? null,
-                    name: part.functionCall.name ?? null,
-                    args: part.functionCall.args ?? {}
-                  });
-                  const partIndex =
-                    roundFunctionCallPartIndexes.get(functionCallKey);
-
-                  if (typeof partIndex === "number") {
-                    const currentPart = roundModelToolParts[partIndex];
-
-                    if (
-                      currentPart &&
-                      !currentPart.thoughtSignature &&
-                      part.thoughtSignature
-                    ) {
-                      roundModelToolParts[partIndex] = part;
-                    }
-                  } else {
-                    roundFunctionCallPartIndexes.set(
-                      functionCallKey,
-                      roundModelToolParts.length
-                    );
-                    roundModelToolParts.push(part);
-                  }
-
-                  if (!roundFunctionCallKeys.has(functionCallKey)) {
-                    roundFunctionCallKeys.add(functionCallKey);
-                    roundFunctionCalls.push(part.functionCall);
-                  }
-                } else if (part.thoughtSignature) {
-                  const signatureOnlyKey = JSON.stringify({
-                    thought: part.thought ?? false,
-                    text: part.text ?? null,
-                    thoughtSignature: part.thoughtSignature
-                  });
-
-                  if (!roundSignatureOnlyPartKeys.has(signatureOnlyKey)) {
-                    roundSignatureOnlyPartKeys.add(signatureOnlyKey);
-                    roundModelToolParts.push(part);
-                  }
-                }
-
-                if (part.text) {
-                  if (part.thought) {
-                    const block = ensureActiveBlock("THINKING");
-                    block.content += part.text;
-                    emitThinkingChunk(part.text);
-                  } else {
-                    const block = ensureActiveBlock("TEXT");
-                    block.content += part.text;
-                    emitTextChunk(part.text);
-                  }
-                }
-                if (part.fileData) {
-                  finalizeActiveBlock();
-                  this.logger.debug(part.fileData, "part.fileData");
-                }
-                if (part.inlineData) {
-                  finalizeActiveBlock();
+            break;
+          }
+          case "interaction.status_update": {
+            this.logger.debug(
+              { status: event.status, round },
+              "gemini interaction status update"
+            );
+            break;
+          }
+          case "step.start": {
+            const step = event.step;
+            const track: InteractionsStepTrack = {
+              type: step.type,
+              text: "",
+              thoughtSummary: "",
+              functionCallArgsText: ""
+            };
+            if (step.type === "function_call") {
+              finalizeActiveBlock();
+              track.functionCallId = step.id;
+              track.functionCallName = step.name;
+              track.functionCallArgs = step.arguments;
+            } else if (step.type === "thought") {
+              track.signature = step.signature;
+            } else if (step.type === "model_output" && step.error) {
+              this.logger.warn(
+                { index: event.index, error: step.error, round },
+                "gemini interaction model_output step opened with an error"
+              );
+            }
+            stepTracks.set(event.index, track);
+            break;
+          }
+          case "step.delta": {
+            const delta = event.delta;
+            if (event.metadata?.total_usage?.total_tokens) {
+              usage = event.metadata.total_usage.total_tokens;
+            }
+            let track = stepTracks.get(event.index);
+            if (!track) {
+              track = {
+                type:
+                  delta.type === "thought_summary" ||
+                  delta.type === "thought_signature"
+                    ? "thought"
+                    : delta.type === "arguments_delta"
+                      ? "function_call"
+                      : "model_output",
+                text: "",
+                thoughtSummary: "",
+                functionCallArgsText: ""
+              };
+              stepTracks.set(event.index, track);
+            }
+            switch (delta.type) {
+              case "thought_summary": {
+                const content = delta.content;
+                if (content?.type === "text" && content.text) {
+                  track.thoughtSummary += content.text;
+                  const block = ensureActiveBlock("THINKING");
+                  block.content += content.text;
+                  emitThinkingChunk(content.text);
+                } else if (
+                  content?.type === "image" &&
+                  content.data &&
+                  content.mime_type
+                ) {
+                  collectInlineImage(content.data, content.mime_type);
+                } else if (content?.type === "image" && content.uri) {
                   this.logger.debug(
-                    part.inlineData.displayName,
-                    "part.inlineData"
+                    { uri: content.uri, mime: content.mime_type, round },
+                    "gemini interaction thought_summary image delivered by uri"
                   );
-                  geminiDataArr.push(part.inlineData);
-                  geminiDataPart = part.inlineData;
-                  const _dataUrl =
-                    `data:${part.inlineData.mimeType};base64,${part.inlineData.data?.length}` as const;
-                  ws.send(
-                    JSON.stringify({
-                      type: "ai_chat_inline_data",
-                      conversationId,
-                      userMsgId,
-                      data: _dataUrl,
-                      userId,
-                      done: false,
-                      model,
-                      chunk: geminiAgg,
-                      systemPrompt,
-                      temperature,
-                      title,
-                      topP,
-                      provider,
-                      imgGenEnabled
-                    } satisfies EventTypeMap["ai_chat_inline_data"])
+                }
+                break;
+              }
+              case "thought_signature": {
+                if (delta.signature) {
+                  track.signature = delta.signature;
+                }
+                break;
+              }
+              case "text": {
+                if (track.type === "thought") {
+                  track.thoughtSummary += delta.text;
+                  const block = ensureActiveBlock("THINKING");
+                  block.content += delta.text;
+                  emitThinkingChunk(delta.text);
+                } else {
+                  track.text += delta.text;
+                  const block = ensureActiveBlock("TEXT");
+                  block.content += delta.text;
+                  emitTextChunk(delta.text);
+                }
+                break;
+              }
+              case "arguments_delta": {
+                if (delta.arguments) {
+                  track.functionCallArgsText += delta.arguments;
+                }
+                break;
+              }
+              case "image": {
+                if (delta.data && delta.mime_type) {
+                  collectInlineImage(delta.data, delta.mime_type);
+                } else if (delta.uri) {
+                  this.logger.debug(
+                    { uri: delta.uri, mime: delta.mime_type, round },
+                    "gemini interaction image delta delivered by uri"
+                  );
+                }
+                break;
+              }
+              case "audio": {
+                if (delta.data) {
+                  finalizeActiveBlock();
+                  audioFragments.push(delta.data);
+                  if (delta.mime_type) {
+                    audioMime = delta.mime_type;
+                  }
+                } else if (delta.uri) {
+                  this.logger.debug(
+                    { uri: delta.uri, mime: delta.mime_type, round },
+                    "gemini interaction audio delta delivered by uri"
+                  );
+                }
+                break;
+              }
+              case "video":
+              case "document": {
+                finalizeActiveBlock();
+                this.logger.debug(
+                  { index: event.index, type: delta.type, round },
+                  "gemini interaction media delta — lane not wired yet"
+                );
+                break;
+              }
+              default: {
+                this.logger.debug(
+                  { index: event.index, type: delta.type, round },
+                  "gemini interaction server-side tool delta"
+                );
+                break;
+              }
+            }
+            break;
+          }
+          case "step.stop": {
+            if (event.usage?.total_tokens) {
+              usage = event.usage.total_tokens;
+            }
+            const track = stepTracks.get(event.index);
+            if (
+              track?.type === "function_call" &&
+              track.functionCallId &&
+              track.functionCallName
+            ) {
+              let args = track.functionCallArgs ?? {};
+              if (track.functionCallArgsText.length > 0) {
+                try {
+                  args = JSON.parse<Record<string, unknown>>(
+                    track.functionCallArgsText
+                  );
+                } catch (err) {
+                  this.logger.warn(
+                    {
+                      index: event.index,
+                      name: track.functionCallName,
+                      err: this.prisma.safeErrMsg(err)
+                    },
+                    "gemini interaction arguments_delta did not parse as JSON; falling back to step.start arguments"
                   );
                 }
               }
+              track.functionCallArgs = args;
+              roundFunctionCalls.push({
+                type: "function_call",
+                id: track.functionCallId,
+                name: track.functionCallName,
+                arguments: args
+              });
             }
+            break;
+          }
+          case "interaction.completed": {
+            if (event.interaction.id) {
+              interactionId = event.interaction.id;
+            }
+            if (event.interaction.usage?.total_tokens) {
+              usage = event.interaction.usage.total_tokens;
+            }
+            if (event.interaction.status !== "completed") {
+              this.logger.warn(
+                { status: event.interaction.status, round },
+                "gemini interaction finished in a non-completed status"
+              );
+            }
+            break;
+          }
+          case "error": {
+            throw new Error(
+              event.error?.message ??
+                `gemini interactions stream error${event.error?.code ? ` (${event.error.code})` : ""}`
+            );
           }
         }
       }
@@ -647,7 +787,7 @@ export class GeminiChatService extends GeminiWorkupService {
           userStoreSearchCallsTotal += 1;
         }
 
-        const signature = `${functionCall.name ?? "unknown"}:${JSON.stringify(functionCall.args ?? {})}`;
+        const signature = `${functionCall.name}:${JSON.stringify(functionCall.arguments)}`;
         const seenCount = toolCallSignatureRegistry.get(signature) ?? 0;
 
         if (seenCount > 0) {
@@ -665,7 +805,7 @@ export class GeminiChatService extends GeminiWorkupService {
             userStoreSearchCallsTotal,
             maxUserStoreSearchCalls
           },
-          "Gemini tool loop stopped after user_store_search call cap"
+          "Gemini interactions tool loop stopped after user_store_search call cap"
         );
         break;
       }
@@ -681,7 +821,7 @@ export class GeminiChatService extends GeminiWorkupService {
             repeatedSignatures,
             toolCallCount: roundFunctionCalls.length
           },
-          "Gemini tool loop stopped due to repeated tool calls"
+          "Gemini interactions tool loop stopped due to repeated tool calls"
         );
         break;
       }
@@ -692,33 +832,25 @@ export class GeminiChatService extends GeminiWorkupService {
           {
             round,
             functionCallCount: roundFunctionCalls.length,
-            responseId: resId
+            interactionId
           },
-          "Gemini tool loop reached max rounds"
+          "Gemini interactions tool loop reached max rounds"
         );
         break;
       }
 
-      const toolResponseParts = Array.of<Part>();
+      const functionResultSteps = Array.of<Interactions.FunctionResultStep>();
 
-      for (const [callIndex, functionCall] of roundFunctionCalls.entries()) {
+      for (const functionCall of roundFunctionCalls) {
         // Local read-only bridge: relay to the CLI via the socket-scoped
         // broker (which ALWAYS resolves — deadline/disconnect/cancel become
         // typed is_error results, so the await can never wedge the loop);
-        // every other tool takes the existing server-side path untouched.
+        // every other tool takes the server-side path untouched.
         const toolName = functionCall.name;
         if (
-          toolName &&
           isLocalToolName(toolName) &&
           localToolTurn?.advertised.has(toolName)
         ) {
-          // gemini function-call ids are optional — synthesize a
-          // turn-scoped correlation id for the broker when absent; the
-          // functionResponse echo below still mirrors google's own
-          // present-or-absent id contract
-          const toolCallId =
-            functionCall.id ??
-            `${localToolTurn.turnId}_r${round + 1}_c${callIndex}`;
           const localResult = await this.localToolBroker.request(
             ws,
             {
@@ -726,9 +858,9 @@ export class GeminiChatService extends GeminiWorkupService {
               conversationId,
               turnId: localToolTurn.turnId,
               round: round + 1,
-              toolCallId,
+              toolCallId: functionCall.id,
               name: toolName,
-              input: functionCall.args ?? {},
+              input: functionCall.arguments,
               timeoutMs: this.localToolBroker.timeoutMsFor(toolName)
             },
             localToolTurn.controller.signal
@@ -737,26 +869,35 @@ export class GeminiChatService extends GeminiWorkupService {
           this.logger.info(
             {
               turnId: localToolTurn.turnId,
-              toolCallId,
+              toolCallId: functionCall.id,
               name: toolName,
               round: round + 1,
               ok: r.ok,
               durationMs: r.durationMs,
               ...(r.ok ? {} : { errorCode: r.error.code })
             },
-            "local tool round trip (gemini)"
+            "local tool round trip (gemini interactions)"
           );
-          toolResponseParts.push({
-            functionResponse: {
-              ...(functionCall.id ? { id: functionCall.id } : {}),
+          if (r.ok) {
+            functionResultSteps.push({
+              type: "function_result",
+              call_id: functionCall.id,
               name: toolName,
-              response: r.ok ? { output: r.value } : { error: r.error }
-            }
-          } satisfies Part);
+              result: r.value
+            });
+          } else {
+            functionResultSteps.push({
+              type: "function_result",
+              call_id: functionCall.id,
+              name: toolName,
+              is_error: true,
+              result: r.error
+            });
+          }
           continue;
         }
-        toolResponseParts.push(
-          await this.executeGeminiFunctionCall(
+        functionResultSteps.push(
+          await this.executeInteractionFunctionCall(
             userId,
             conversationId,
             functionCall
@@ -764,26 +905,60 @@ export class GeminiChatService extends GeminiWorkupService {
         );
       }
 
-      roundContents = Array.of<Content>(
-        ...roundContents,
-        {
-          role: "model",
-          parts: roundModelToolParts
-        },
-        {
-          role: "user",
-          parts: toolResponseParts
+      // replay the model's side of this round in step order ahead of our
+      // results — thought (signature is what Gemini 3 needs echoed back),
+      // any model_output text, the function_call steps; server-side
+      // grounding steps are not replayed, mirroring chat.ts which only
+      // echoes function-call + signature parts
+      const modelRoundSteps = Array.of<Interactions.Step>();
+      for (const [, track] of [...stepTracks.entries()].sort(
+        ([a], [b]) => a - b
+      )) {
+        if (track.type === "thought") {
+          if (track.signature || track.thoughtSummary.length > 0) {
+            modelRoundSteps.push({
+              type: "thought",
+              ...(track.signature ? { signature: track.signature } : {}),
+              ...(track.thoughtSummary.length > 0
+                ? { summary: [{ type: "text", text: track.thoughtSummary }] }
+                : {})
+            });
+          }
+        } else if (track.type === "model_output") {
+          if (track.text.length > 0) {
+            modelRoundSteps.push({
+              type: "model_output",
+              content: [{ type: "text", text: track.text }]
+            });
+          }
+        } else if (
+          track.type === "function_call" &&
+          track.functionCallId &&
+          track.functionCallName
+        ) {
+          modelRoundSteps.push({
+            type: "function_call",
+            id: track.functionCallId,
+            name: track.functionCallName,
+            arguments: track.functionCallArgs ?? {}
+          });
         }
+      }
+
+      roundInput = Array.of<Interactions.Step>(
+        ...roundInput,
+        ...modelRoundSteps,
+        ...functionResultSteps
       );
 
       this.logger.info(
         {
           round,
-          responseId: resId,
+          interactionId,
           functionCallCount: roundFunctionCalls.length,
-          toolResponseCount: toolResponseParts.length
+          toolResponseCount: functionResultSteps.length
         },
-        "Gemini tool round complete, sending continuation"
+        "Gemini interactions tool round complete, sending continuation"
       );
     }
 
@@ -810,14 +985,244 @@ export class GeminiChatService extends GeminiWorkupService {
       });
     }
 
-    const finalImg = geminiDataArr.at(-1);
+    // lyria audio — persisted (S3 → attachment envelope) BEFORE the final
+    // payload so the cdnUrl rides both an audioGenFields-bearing chunk frame
+    // and the ai_chat_response; the attachment row itself is created inside
+    // handleAiChatResponse's transaction from the envelope, imgGen-parity
+    if (audioGenEnabled && audioFragments.length > 0) {
+      const audioBuffer = Buffer.concat(
+        audioFragments.map(f => Buffer.from(f, "base64"))
+      );
+      const specs = this.prisma.extractor.mp3Specs(audioBuffer);
+      // store:false interactions report an empty id, so || (not ??) is the
+      // fallback that actually mints a series id
+      const seriesId =
+        interactionId ?? (await this.generateId("generationGroupId"));
+      const duration = performance.now() - tInitial;
+      const mime = specs?.mime ?? audioMime ?? "audio/mpeg";
+      const ext = specs?.ext ?? "mp3";
+      const filename = `${jobId ?? seriesId}.${ext}`;
+
+      uploadtInitial = performance.now();
+      const rt = await this.s3.uploadGenerated(
+        audioBuffer,
+        this.prisma.isProd,
+        {
+          contentType: mime,
+          filename,
+          userId,
+          size: audioBuffer.byteLength,
+          conversationId,
+          origin: "GENERATED"
+        }
+      );
+      uploadtDelta = performance.now() - uploadtInitial;
+
+      const audioFinal = {
+        itemId: seriesId,
+        draftId: null,
+        batchId: null,
+        s3ObjectId: rt.s3ObjectId,
+        userId,
+        origin: "GENERATED",
+        status: "COMPLETED",
+        size: audioBuffer.byteLength,
+        compatKey: rt.key,
+        compatStatus: "ALIASED",
+        compatCdnUrl: rt.cdnUrl,
+        compatReadyAt: new Date(Date.now()),
+        compatVersionId: rt.versionId,
+        compatS3ObjectId: rt.s3ObjectId,
+        compatMime: mime,
+        compatExt: ext,
+        uploadDuration: uploadtDelta,
+        cdnUrl: rt.cdnUrl,
+        publicUrl: rt.publicUrl,
+        sourceUrl: "buffer",
+        thumbnailKey: null,
+        bucket: rt.bucket,
+        key: rt.key,
+        versionId: rt.versionId,
+        region: "us-east-1",
+        cacheControl: rt.cacheControl ?? null,
+        contentDisposition: rt.contentDisposition ?? null,
+        contentEncoding: null,
+        expiresAt: rt.expires,
+        filename,
+        ext,
+        mime,
+        etag: rt.etag ?? null,
+        checksumAlgo: rt.checksum?.algo ?? "CRC32",
+        checksumSha256: rt.checksum?.value ?? null,
+        storageClass: rt.storageClass ?? null,
+        sseAlgorithm: null,
+        sseKmsKeyId: null,
+        s3LastModified: rt?.lastModified ? new Date(rt.lastModified) : null,
+        deletedAt: null,
+        audio: specs
+          ? {
+              format: mime,
+              duration: specs.durationMs,
+              bitrate: specs.bitrate,
+              sampleRate: specs.sampleRate,
+              channels: specs.channels,
+              codec: specs.codec,
+              title: null,
+              artist: null,
+              album: null,
+              year: null,
+              genre: null,
+              waveformPeaks: []
+            }
+          : null,
+        audioGenOutput: jobId ? { jobId, mime, ext } : null,
+        generationGroupId: seriesId,
+        requestMessageId,
+        createdAt: new Date(Date.now()),
+        updatedAt: new Date(Date.now()),
+        jobId: jobId ?? ""
+      } as const satisfies AIChatResponseAudioGenSubFields;
+
+      const audioGenFields = {
+        outputMime: mime,
+        duration,
+        size: audioBuffer.byteLength,
+        audio: audioFinal
+      } as const satisfies AIChatResponseAudioGenFields;
+
+      ws.send(
+        JSON.stringify({
+          type: "ai_chat_chunk",
+          conversationId,
+          userId,
+          userMsgId,
+          model,
+          title,
+          systemPrompt,
+          isThinking: false,
+          temperature,
+          topP,
+          provider,
+          messageBlocks: currentChunkMessageBlock(),
+          done: false,
+          imgGenEnabled: false,
+          audioGenEnabled: true,
+          audioGenFields
+        } satisfies EventTypeMap["ai_chat_chunk"])
+      );
+      void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
+        type: "ai_chat_chunk",
+        conversationId,
+        userId,
+        userMsgId,
+        model,
+        title,
+        systemPrompt,
+        isThinking: false,
+        temperature,
+        topP,
+        provider,
+        messageBlocks: currentChunkMessageBlock(),
+        done: false,
+        imgGenEnabled: false,
+        audioGenEnabled: true,
+        audioGenFields
+      });
+
+      const d = await this.prisma.handleAiChatResponse({
+        chunk: geminiAgg,
+        conversationId,
+        done: true,
+        mime,
+        jobId,
+        uploadDuration: duration,
+        usage,
+        requestMessageId,
+        audioGenFields,
+        audioGenEnabled: true,
+        title,
+        provider,
+        userId,
+        systemPrompt,
+        temperature,
+        userMsgId,
+        topP,
+        model,
+        thinkingText: geminiThinkingAgg,
+        thinkingDuration:
+          geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
+        imgGenEnabled: false,
+        messageBlocks: roundTrack.length > 0 ? roundTrack : undefined
+      });
+      ws.send(
+        JSON.stringify({
+          type: "ai_chat_response",
+          chunk: geminiAgg,
+          conversationId,
+          done: true,
+          aiMsgId: d.aiMsgId,
+          convo: d.convo,
+          usage,
+          audioGenEnabled: true,
+          audioGenFields,
+          title,
+          provider,
+          userId,
+          systemPrompt,
+          temperature,
+          userMsgId,
+          topP,
+          model,
+          thinkingText: geminiThinkingAgg,
+          thinkingDuration:
+            geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
+          imgGenEnabled: false,
+          messageBlocks: roundTrack.length > 0 ? roundTrack : undefined
+        } satisfies EventTypeMap["ai_chat_response"])
+      );
+      void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
+        type: "ai_chat_response",
+        chunk: geminiAgg,
+        conversationId,
+        done: true,
+        aiMsgId: d.aiMsgId,
+        convo: d.convo,
+        usage,
+        audioGenEnabled: true,
+        audioGenFields,
+        title,
+        provider,
+        userId,
+        systemPrompt,
+        temperature,
+        userMsgId,
+        topP,
+        model,
+        thinkingText: geminiThinkingAgg,
+        thinkingDuration:
+          geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
+        imgGenEnabled: false,
+        messageBlocks: roundTrack.length > 0 ? roundTrack : undefined
+      });
+      void this.redis.del(`stream:state:${conversationId}`);
+      return;
+    }
+
+    // last inline image wins — derived after the loop rather than mutated
+    // from inside collectInlineImage, so control-flow narrowing keeps the
+    // union at the use sites below
+    const geminiDataPart = geminiDataArr.at(-1);
+    const finalImg = geminiDataPart;
     if (
       imgGenEnabled &&
       geminiDataArr.length > 0 &&
       finalImg?.data &&
       finalImg?.mimeType
     ) {
-      const seriesId = resId ?? (await this.generateId("generationGroupId"));
+      // store:false interactions report an empty id, so || (not ??) is the
+      // fallback that actually mints a series id
+      const seriesId =
+        interactionId ?? (await this.generateId("generationGroupId"));
       const duration = performance.now() - tInitial;
 
       const b64 = Buffer.from(finalImg.data, "base64");

@@ -11,6 +11,7 @@ model UserKey {
   user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages            Message[]            @relation("MessageToUserKey")
   imageGenJobs        ImageGenJob[]        @relation("ImageGenJobToUserKey")
+  audioGenJobs        AudioGenJob[]        @relation("AudioGenJobToUserKey")
   attachmentProviders AttachmentProvider[]
   isDefault           Boolean              @default(false)
 

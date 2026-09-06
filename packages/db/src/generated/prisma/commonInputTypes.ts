@@ -429,11 +429,11 @@ export type EnumProviderFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumProviderFilter<$PrismaModel> | $Enums.Provider
 }
 
-export type EnumCliConfigSchemaVersionFilter<$PrismaModel = never> = {
-  equals?: $Enums.CliConfigSchemaVersion | Prisma.EnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
-  in?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
-  notIn?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCliConfigSchemaVersionFilter<$PrismaModel> | $Enums.CliConfigSchemaVersion
+export type EnumAudioGenStageFilter<$PrismaModel = never> = {
+  equals?: $Enums.AudioGenStage | Prisma.EnumAudioGenStageFieldRefInput<$PrismaModel>
+  in?: $Enums.AudioGenStage[] | Prisma.ListEnumAudioGenStageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AudioGenStage[] | Prisma.ListEnumAudioGenStageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAudioGenStageFilter<$PrismaModel> | $Enums.AudioGenStage
 }
 
 export type EnumProviderWithAggregatesFilter<$PrismaModel = never> = {
@@ -444,6 +444,23 @@ export type EnumProviderWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumProviderFilter<$PrismaModel>
   _max?: Prisma.NestedEnumProviderFilter<$PrismaModel>
+}
+
+export type EnumAudioGenStageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AudioGenStage | Prisma.EnumAudioGenStageFieldRefInput<$PrismaModel>
+  in?: $Enums.AudioGenStage[] | Prisma.ListEnumAudioGenStageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AudioGenStage[] | Prisma.ListEnumAudioGenStageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAudioGenStageWithAggregatesFilter<$PrismaModel> | $Enums.AudioGenStage
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAudioGenStageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAudioGenStageFilter<$PrismaModel>
+}
+
+export type EnumCliConfigSchemaVersionFilter<$PrismaModel = never> = {
+  equals?: $Enums.CliConfigSchemaVersion | Prisma.EnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCliConfigSchemaVersionFilter<$PrismaModel> | $Enums.CliConfigSchemaVersion
 }
 
 export type EnumCliConfigSchemaVersionWithAggregatesFilter<$PrismaModel = never> = {
@@ -1325,11 +1342,11 @@ export type NestedEnumProviderFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumProviderFilter<$PrismaModel> | $Enums.Provider
 }
 
-export type NestedEnumCliConfigSchemaVersionFilter<$PrismaModel = never> = {
-  equals?: $Enums.CliConfigSchemaVersion | Prisma.EnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
-  in?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
-  notIn?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCliConfigSchemaVersionFilter<$PrismaModel> | $Enums.CliConfigSchemaVersion
+export type NestedEnumAudioGenStageFilter<$PrismaModel = never> = {
+  equals?: $Enums.AudioGenStage | Prisma.EnumAudioGenStageFieldRefInput<$PrismaModel>
+  in?: $Enums.AudioGenStage[] | Prisma.ListEnumAudioGenStageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AudioGenStage[] | Prisma.ListEnumAudioGenStageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAudioGenStageFilter<$PrismaModel> | $Enums.AudioGenStage
 }
 
 export type NestedEnumProviderWithAggregatesFilter<$PrismaModel = never> = {
@@ -1340,6 +1357,23 @@ export type NestedEnumProviderWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumProviderFilter<$PrismaModel>
   _max?: Prisma.NestedEnumProviderFilter<$PrismaModel>
+}
+
+export type NestedEnumAudioGenStageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AudioGenStage | Prisma.EnumAudioGenStageFieldRefInput<$PrismaModel>
+  in?: $Enums.AudioGenStage[] | Prisma.ListEnumAudioGenStageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AudioGenStage[] | Prisma.ListEnumAudioGenStageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAudioGenStageWithAggregatesFilter<$PrismaModel> | $Enums.AudioGenStage
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAudioGenStageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAudioGenStageFilter<$PrismaModel>
+}
+
+export type NestedEnumCliConfigSchemaVersionFilter<$PrismaModel = never> = {
+  equals?: $Enums.CliConfigSchemaVersion | Prisma.EnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CliConfigSchemaVersion[] | Prisma.ListEnumCliConfigSchemaVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCliConfigSchemaVersionFilter<$PrismaModel> | $Enums.CliConfigSchemaVersion
 }
 
 export type NestedEnumCliConfigSchemaVersionWithAggregatesFilter<$PrismaModel = never> = {

@@ -225,6 +225,7 @@ export type UserKeyWhereInput = {
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   messages?: Prisma.MessageListRelationFilter
   imageGenJobs?: Prisma.ImageGenJobListRelationFilter
+  audioGenJobs?: Prisma.AudioGenJobListRelationFilter
   attachmentProviders?: Prisma.AttachmentProviderListRelationFilter
 }
 
@@ -242,6 +243,7 @@ export type UserKeyOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   messages?: Prisma.MessageOrderByRelationAggregateInput
   imageGenJobs?: Prisma.ImageGenJobOrderByRelationAggregateInput
+  audioGenJobs?: Prisma.AudioGenJobOrderByRelationAggregateInput
   attachmentProviders?: Prisma.AttachmentProviderOrderByRelationAggregateInput
 }
 
@@ -263,6 +265,7 @@ export type UserKeyWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   messages?: Prisma.MessageListRelationFilter
   imageGenJobs?: Prisma.ImageGenJobListRelationFilter
+  audioGenJobs?: Prisma.AudioGenJobListRelationFilter
   attachmentProviders?: Prisma.AttachmentProviderListRelationFilter
 }, "id" | "userId_provider">
 
@@ -311,6 +314,7 @@ export type UserKeyCreateInput = {
   user: Prisma.UserCreateNestedOneWithoutKeysInput
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
   imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
+  audioGenJobs?: Prisma.AudioGenJobCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
@@ -327,6 +331,7 @@ export type UserKeyUncheckedCreateInput = {
   isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
   imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
+  audioGenJobs?: Prisma.AudioGenJobUncheckedCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
@@ -343,6 +348,7 @@ export type UserKeyUpdateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
   messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
   imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
+  audioGenJobs?: Prisma.AudioGenJobUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -359,6 +365,7 @@ export type UserKeyUncheckedUpdateInput = {
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
   imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
+  audioGenJobs?: Prisma.AudioGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -459,6 +466,22 @@ export type UserKeyMinOrderByAggregateInput = {
   isDefault?: Prisma.SortOrder
 }
 
+export type UserKeyCreateNestedOneWithoutAudioGenJobsInput = {
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutAudioGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutAudioGenJobsInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutAudioGenJobsInput
+  connect?: Prisma.UserKeyWhereUniqueInput
+}
+
+export type UserKeyUpdateOneWithoutAudioGenJobsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutAudioGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutAudioGenJobsInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutAudioGenJobsInput
+  upsert?: Prisma.UserKeyUpsertWithoutAudioGenJobsInput
+  disconnect?: Prisma.UserKeyWhereInput | boolean
+  delete?: Prisma.UserKeyWhereInput | boolean
+  connect?: Prisma.UserKeyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutAudioGenJobsInput, Prisma.UserKeyUpdateWithoutAudioGenJobsInput>, Prisma.UserKeyUncheckedUpdateWithoutAudioGenJobsInput>
+}
+
 export type UserKeyCreateNestedOneWithoutImageGenJobsInput = {
   create?: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
   connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutImageGenJobsInput
@@ -549,6 +572,86 @@ export type UserKeyUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[]
 }
 
+export type UserKeyCreateWithoutAudioGenJobsInput = {
+  id?: string
+  provider: $Enums.Provider
+  apiKey: string
+  iv: string
+  authTag: string
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
+  user: Prisma.UserCreateNestedOneWithoutKeysInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
+}
+
+export type UserKeyUncheckedCreateWithoutAudioGenJobsInput = {
+  id?: string
+  userId: string
+  provider: $Enums.Provider
+  apiKey: string
+  iv: string
+  authTag: string
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
+}
+
+export type UserKeyCreateOrConnectWithoutAudioGenJobsInput = {
+  where: Prisma.UserKeyWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserKeyCreateWithoutAudioGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutAudioGenJobsInput>
+}
+
+export type UserKeyUpsertWithoutAudioGenJobsInput = {
+  update: Prisma.XOR<Prisma.UserKeyUpdateWithoutAudioGenJobsInput, Prisma.UserKeyUncheckedUpdateWithoutAudioGenJobsInput>
+  create: Prisma.XOR<Prisma.UserKeyCreateWithoutAudioGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutAudioGenJobsInput>
+  where?: Prisma.UserKeyWhereInput
+}
+
+export type UserKeyUpdateToOneWithWhereWithoutAudioGenJobsInput = {
+  where?: Prisma.UserKeyWhereInput
+  data: Prisma.XOR<Prisma.UserKeyUpdateWithoutAudioGenJobsInput, Prisma.UserKeyUncheckedUpdateWithoutAudioGenJobsInput>
+}
+
+export type UserKeyUpdateWithoutAudioGenJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
+}
+
+export type UserKeyUncheckedUpdateWithoutAudioGenJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
+}
+
 export type UserKeyCreateWithoutImageGenJobsInput = {
   id?: string
   provider: $Enums.Provider
@@ -561,6 +664,7 @@ export type UserKeyCreateWithoutImageGenJobsInput = {
   isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  audioGenJobs?: Prisma.AudioGenJobCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
@@ -576,6 +680,7 @@ export type UserKeyUncheckedCreateWithoutImageGenJobsInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  audioGenJobs?: Prisma.AudioGenJobUncheckedCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
@@ -607,6 +712,7 @@ export type UserKeyUpdateWithoutImageGenJobsInput = {
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
   messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  audioGenJobs?: Prisma.AudioGenJobUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -622,6 +728,7 @@ export type UserKeyUncheckedUpdateWithoutImageGenJobsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  audioGenJobs?: Prisma.AudioGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -637,6 +744,7 @@ export type UserKeyCreateWithoutMessagesInput = {
   isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
   imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
+  audioGenJobs?: Prisma.AudioGenJobCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
@@ -652,6 +760,7 @@ export type UserKeyUncheckedCreateWithoutMessagesInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
+  audioGenJobs?: Prisma.AudioGenJobUncheckedCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
@@ -683,6 +792,7 @@ export type UserKeyUpdateWithoutMessagesInput = {
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
   imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
+  audioGenJobs?: Prisma.AudioGenJobUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -698,6 +808,7 @@ export type UserKeyUncheckedUpdateWithoutMessagesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
+  audioGenJobs?: Prisma.AudioGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -714,6 +825,7 @@ export type UserKeyCreateWithoutAttachmentProvidersInput = {
   user: Prisma.UserCreateNestedOneWithoutKeysInput
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
   imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
+  audioGenJobs?: Prisma.AudioGenJobCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyUncheckedCreateWithoutAttachmentProvidersInput = {
@@ -729,6 +841,7 @@ export type UserKeyUncheckedCreateWithoutAttachmentProvidersInput = {
   isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
   imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
+  audioGenJobs?: Prisma.AudioGenJobUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyCreateOrConnectWithoutAttachmentProvidersInput = {
@@ -760,6 +873,7 @@ export type UserKeyUpdateWithoutAttachmentProvidersInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
   messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
   imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
+  audioGenJobs?: Prisma.AudioGenJobUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyUncheckedUpdateWithoutAttachmentProvidersInput = {
@@ -775,6 +889,7 @@ export type UserKeyUncheckedUpdateWithoutAttachmentProvidersInput = {
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
   imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
+  audioGenJobs?: Prisma.AudioGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyCreateWithoutUserInput = {
@@ -789,6 +904,7 @@ export type UserKeyCreateWithoutUserInput = {
   isDefault?: boolean
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
   imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
+  audioGenJobs?: Prisma.AudioGenJobCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
@@ -804,6 +920,7 @@ export type UserKeyUncheckedCreateWithoutUserInput = {
   isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
   imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
+  audioGenJobs?: Prisma.AudioGenJobUncheckedCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
@@ -873,6 +990,7 @@ export type UserKeyUpdateWithoutUserInput = {
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
   imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
+  audioGenJobs?: Prisma.AudioGenJobUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -888,6 +1006,7 @@ export type UserKeyUncheckedUpdateWithoutUserInput = {
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
   imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
+  audioGenJobs?: Prisma.AudioGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -911,12 +1030,14 @@ export type UserKeyUncheckedUpdateManyWithoutUserInput = {
 export type UserKeyCountOutputType = {
   messages: number
   imageGenJobs: number
+  audioGenJobs: number
   attachmentProviders: number
 }
 
 export type UserKeyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   messages?: boolean | UserKeyCountOutputTypeCountMessagesArgs
   imageGenJobs?: boolean | UserKeyCountOutputTypeCountImageGenJobsArgs
+  audioGenJobs?: boolean | UserKeyCountOutputTypeCountAudioGenJobsArgs
   attachmentProviders?: boolean | UserKeyCountOutputTypeCountAttachmentProvidersArgs
 }
 
@@ -947,6 +1068,13 @@ export type UserKeyCountOutputTypeCountImageGenJobsArgs<ExtArgs extends runtime.
 /**
  * UserKeyCountOutputType without action
  */
+export type UserKeyCountOutputTypeCountAudioGenJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AudioGenJobWhereInput
+}
+
+/**
+ * UserKeyCountOutputType without action
+ */
 export type UserKeyCountOutputTypeCountAttachmentProvidersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AttachmentProviderWhereInput
 }
@@ -966,6 +1094,7 @@ export type UserKeySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   messages?: boolean | Prisma.UserKey$messagesArgs<ExtArgs>
   imageGenJobs?: boolean | Prisma.UserKey$imageGenJobsArgs<ExtArgs>
+  audioGenJobs?: boolean | Prisma.UserKey$audioGenJobsArgs<ExtArgs>
   attachmentProviders?: boolean | Prisma.UserKey$attachmentProvidersArgs<ExtArgs>
   _count?: boolean | Prisma.UserKeyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userKey"]>
@@ -1016,6 +1145,7 @@ export type UserKeyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   messages?: boolean | Prisma.UserKey$messagesArgs<ExtArgs>
   imageGenJobs?: boolean | Prisma.UserKey$imageGenJobsArgs<ExtArgs>
+  audioGenJobs?: boolean | Prisma.UserKey$audioGenJobsArgs<ExtArgs>
   attachmentProviders?: boolean | Prisma.UserKey$attachmentProvidersArgs<ExtArgs>
   _count?: boolean | Prisma.UserKeyCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1032,6 +1162,7 @@ export type $UserKeyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     user: Prisma.$UserPayload<ExtArgs>
     messages: Prisma.$MessagePayload<ExtArgs>[]
     imageGenJobs: Prisma.$ImageGenJobPayload<ExtArgs>[]
+    audioGenJobs: Prisma.$AudioGenJobPayload<ExtArgs>[]
     attachmentProviders: Prisma.$AttachmentProviderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1442,6 +1573,7 @@ export interface Prisma__UserKeyClient<T, Null = never, ExtArgs extends runtime.
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   messages<T extends Prisma.UserKey$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserKey$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   imageGenJobs<T extends Prisma.UserKey$imageGenJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserKey$imageGenJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ImageGenJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  audioGenJobs<T extends Prisma.UserKey$audioGenJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserKey$audioGenJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AudioGenJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   attachmentProviders<T extends Prisma.UserKey$attachmentProvidersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserKey$attachmentProvidersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentProviderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1937,6 +2069,30 @@ export type UserKey$imageGenJobsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.ImageGenJobScalarFieldEnum | Prisma.ImageGenJobScalarFieldEnum[]
+}
+
+/**
+ * UserKey.audioGenJobs
+ */
+export type UserKey$audioGenJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AudioGenJob
+   */
+  select?: Prisma.AudioGenJobSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AudioGenJob
+   */
+  omit?: Prisma.AudioGenJobOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AudioGenJobInclude<ExtArgs> | null
+  where?: Prisma.AudioGenJobWhereInput
+  orderBy?: Prisma.AudioGenJobOrderByWithRelationInput | Prisma.AudioGenJobOrderByWithRelationInput[]
+  cursor?: Prisma.AudioGenJobWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AudioGenJobScalarFieldEnum | Prisma.AudioGenJobScalarFieldEnum[]
 }
 
 /**

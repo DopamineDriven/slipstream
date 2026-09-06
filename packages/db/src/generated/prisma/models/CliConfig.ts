@@ -378,10 +378,6 @@ export type CliConfigNullableScalarRelationFilter = {
   isNot?: Prisma.CliConfigWhereInput | null
 }
 
-export type EnumProviderFieldUpdateOperationsInput = {
-  set?: $Enums.Provider
-}
-
 export type EnumCliConfigSchemaVersionFieldUpdateOperationsInput = {
   set?: $Enums.CliConfigSchemaVersion
 }

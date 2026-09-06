@@ -176,6 +176,68 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
           user: { connect: { id: userId } }
         };
       });
+
+    // lyria audio — n=1, no partials: one envelope, one nested create; the
+    // audio + audioGenOutput relations ride the same transaction the message
+    // is born in (imgGen parity, singular)
+    const a = data.audioGenFields?.audio;
+    const mapAudio = a
+      ? ({
+          bucket: a.bucket,
+          key: a.key,
+          versionId: a.versionId,
+          s3ObjectId: a.s3ObjectId,
+          cdnUrl: a.cdnUrl,
+          assetType: "AUDIO",
+          storageClass: a.storageClass ?? undefined,
+          origin: "GENERATED",
+          etag: a.etag,
+          compatMime: a.compatMime ?? a.mime,
+          compatCdnUrl: a.compatCdnUrl ?? a.cdnUrl,
+          compatStatus: "ALIASED",
+          uploadDuration: a.uploadDuration,
+          compatS3ObjectId: a.compatS3ObjectId ?? a.s3ObjectId,
+          compatVersionId: a.compatVersionId ?? a.versionId,
+          compatKey: a.compatKey ?? a.key,
+          compatExt: a.compatExt ?? a.ext,
+          contentDisposition: a.contentDisposition,
+          cacheControl: a.cacheControl,
+          ext: a.ext,
+          mime: a.mime,
+          seriesId: a.itemId,
+          region: a.region,
+          status: "READY",
+          uploadMethod: "GENERATED",
+          generationGroupId: a.generationGroupId,
+          size: a.size ? BigInt(a.size) : undefined,
+          s3LastModified: a.s3LastModified
+            ? new Date(a.s3LastModified)
+            : new Date(Date.now()),
+          filename: a.filename,
+          compatReadyAt: new Date(Date.now()),
+          checksumAlgo: a.checksumAlgo,
+          checksumSha256: a.checksumSha256,
+          audio: a.audio ? { create: a.audio } : undefined,
+          audioGenOutput: a.audioGenOutput
+            ? {
+                create: {
+                  mime: a.audioGenOutput.mime,
+                  ext: a.audioGenOutput.ext,
+                  jobId: a.audioGenOutput.jobId
+                }
+              }
+            : jobId
+              ? {
+                  create: {
+                    mime: a.mime,
+                    ext: a.ext,
+                    jobId
+                  }
+                }
+              : undefined,
+          user: { connect: { id: userId } }
+        } as const)
+      : undefined;
     const ordinal = await this.convoCount(data.conversationId);
     const transaction = await this.prismaClient.$transaction(async t => {
       const persist = await t.conversation.update({
@@ -190,6 +252,7 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
               attachments: {
                 include: {
                   imageGenOutput: true,
+                  audioGenOutput: true,
                   image: true,
                   document: true,
                   audio: true
@@ -203,8 +266,17 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
         data: {
           messages: {
             create: {
-              messageType: data?.imgGenEnabled === true ? "IMAGE_GEN" : "TEXT",
-              attachments: mapImgs ? { create: mapImgs } : undefined,
+              messageType:
+                data?.imgGenEnabled === true
+                  ? "IMAGE_GEN"
+                  : data?.audioGenEnabled === true
+                    ? "AUDIO_GEN"
+                    : "TEXT",
+              attachments: mapImgs
+                ? { create: mapImgs }
+                : mapAudio
+                  ? { create: [mapAudio] }
+                  : undefined,
               ordinal,
               messageBlocks:
                 persistedMessageBlocks && persistedMessageBlocks.length > 0
@@ -245,6 +317,47 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
       const msg = persist.messages[0];
       if (!msg) throw new Error("AIChatResponse Message was not created");
       const aiMsgId = msg?.id;
+
+      if (
+        data.audioGenEnabled === true &&
+        typeof data.audioGenFields !== "undefined"
+      ) {
+        const audioGenAttachmentId = msg?.attachments.find(
+          t => t.audioGenOutput != null
+        )?.id;
+        if (jobId) {
+          await t.audioGenJob.update({
+            where: { id: jobId },
+            data: {
+              stage: "COMPLETED",
+              durationMs: data.audioGenFields.duration
+                ? Math.round(data.audioGenFields.duration)
+                : undefined,
+              usage: data.usage,
+              progress: 100
+            }
+          });
+        }
+        const { messages, ...e } = persist;
+        const msgs = messages.map(t => {
+          return {
+            ...t,
+            ttsJob: {
+              ...t.ttsJob,
+              sizeBytes: t.ttsJob?.sizeBytes ? Number(t.ttsJob.sizeBytes) : null
+            }
+          };
+        });
+
+        const cleaned = { messages: msgs, ...e };
+        return {
+          aiMsgId,
+          persist: cleaned,
+          imgGenAttachmentId: undefined,
+          audioGenAttachmentId,
+          convo: convo satisfies AIChatResponse["convo"]
+        };
+      }
 
       if (
         data.imgGenEnabled === true &&
@@ -308,6 +421,7 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
           aiMsgId,
           persist: cleaned,
           imgGenAttachmentId,
+          audioGenAttachmentId: undefined,
           convo: convo satisfies AIChatResponse["convo"]
         };
       } else {
@@ -328,6 +442,7 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
           aiMsgId,
           persist: cleaned,
           imgGenAttachmentId: undefined,
+          audioGenAttachmentId: undefined,
           convo: convo satisfies AIChatResponse["convo"]
         };
       }

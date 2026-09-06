@@ -425,7 +425,8 @@ const data = async () => {
         document: true,
         image: true,
         audio: true,
-        imageGenOutput: true
+        imageGenOutput: true,
+        audioGenOutput: true
       }
     });
     return data.map(t => {

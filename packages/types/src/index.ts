@@ -19,6 +19,8 @@ export type {
 } from "@/codegen-types.ts";
 
 export type {
+  AIChatResponseAudioGenFields,
+  AIChatResponseAudioGenSubFields,
   GeminiCodecTTS,
   GrokAudioCodecTTS,
   GrokBitRateTTS,
@@ -422,6 +424,8 @@ export { createDraftId, instanceFunc, parseDraftId } from "@/utils.ts";
  */
 export type {
   AccountSingleton,
+  AudioGenJobSinglton,
+  AudioGenOutputSingleton,
   AttachmentProviderSingleton,
   AttachmentSingleton,
   AudioSingleton,

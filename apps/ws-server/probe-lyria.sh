@@ -13,30 +13,119 @@ if [ -z "${GOOGLE_API_KEY:-}" ]; then
 fi
 
 MODEL="${1:-lyria-3-pro-preview}"
-FILE_URI="${2:-https://generativelanguage.googleapis.com/v1beta/files/lljo61nbn89qcel72bekv3ty}"
+FILE_URI="${2:-https://generativelanguage.googleapis.com/v1beta/files/pol1b24jsy9blvg7xghbm0av}"
+if [[ -z "${PROMPT:-}" ]]; then
+    PROMPT="$(
+        cat <<'EOF'
+Read the attached document closely as source material and compose a roughly 100–120 second emotionally explosive alternative pop-punk / post-hardcore song grounded unmistakably in the document.
 
+Do not imitate any specific existing artist or song. Instead, synthesize the strongest musical characteristics of early-2000s through early-2020s melodic pop-punk, emo, post-hardcore, and electronic alternative rock.
+
+The song should feel urgent, youthful, melodic, wounded, funny, self-aware, and enormous when the chorus arrives. It should sound like a real band arrangement rather than generic pop with distorted guitars layered on top.
+
+MUSICAL DIRECTION
+
+Use energetic live-sounding drums, punchy bass, bright overdriven rhythm guitars, melodic octave-guitar lines, palm-muted verse sections, ringing open chords, and occasional atmospheric or electronic textures.
+
+The verses should feel relatively restrained and conversational, with tight palm-muted guitars and a nervous forward pulse.
+
+Build substantial tension through a distinct pre-chorus. Let the drums and harmony open progressively so the chorus feels earned rather than merely louder.
+
+The chorus should explode into wide guitars, strong melodic vocal harmonies, a memorable lead-guitar counterline, and an immediately singable hook. Make it emotionally cathartic enough that a crowd could shout it back.
+
+Include occasional gang vocals or layered backing vocals on particularly important phrases.
+
+After the second chorus or verse, introduce a short post-hardcore / halftime breakdown or emotionally stripped bridge. The bridge should materially change the energy: either pull almost everything away before rebuilding, or drop into a heavier half-time section with a shouted secondary vocal.
+
+Then return with a final chorus that is larger than the first: additional harmonies, counter-melodies, doubled vocals, or altered lyrics that resolve or deepen the central idea.
+
+LYRICAL DIRECTION
+
+Use the attached document as actual narrative source material. Pull concrete motifs, characters, terminology, locations, jokes, contradictions, and emotional beats from multiple different sections.
+
+Do not merely list references from the document.
+
+Transform the source material into emotionally coherent lyrics about identity, creation, dependence, family roles, contradiction, and realizing that every supposedly broken edge of the system is load-bearing.
+
+The absurd corporate and technical imagery should coexist naturally with genuine emotional stakes.
+
+Favor memorable, conversational lines over ornate poetry. Use selective internal rhyme and clever wordplay, but prioritize hooks and emotional immediacy.
+
+Avoid generic pop-punk filler such as empty references to hometowns, teenage bedrooms, faded photographs, driving away, or "getting out of this town" unless the source material itself meaningfully motivates them.
+
+Use recurring phrases from the document as lyrical anchors where appropriate. Particularly strong source concepts may become hooks, backing-vocal responses, or callbacks rather than being explained literally.
+
+STRUCTURE
+
+[Intro]
+Very short instrumental or vocal pickup. Establish a recognizable guitar motif that can return later.
+
+[Verse 1]
+Restrained, tightly rhythmic, narrative-driven. Establish the central contradiction and source-material setting.
+
+[Pre-Chorus]
+Increase melodic range and harmonic tension. Make it feel like something is about to break open.
+
+[Chorus]
+Huge, concise, emotionally direct, and instantly memorable. Build the hook around one central idea from the document rather than summarizing the story.
+
+[Verse 2]
+More urgent than Verse 1. Introduce additional characters or complications from elsewhere in the document. Allow more active drums, guitar fills, and backing vocals.
+
+[Pre-Chorus]
+Return with variation.
+
+[Chorus]
+Repeat the core hook but allow a small lyrical or arrangement evolution.
+
+[Bridge / Breakdown]
+Strong contrast. Halftime or stripped-down. Use one of the document's most emotionally revealing ideas as the pivot. A shouted or rough secondary vocal is welcome if musically appropriate.
+
+[Final Chorus]
+Largest moment of the track. Layer harmonies and gang vocals, bring back the intro guitar motif, and alter at least one important lyric so the chorus now reflects what has been learned.
+
+[Outro]
+Short, memorable final callback. Do not fade generically; end with intention.
+
+VOCALS
+
+Use an expressive melodic lead vocal capable of moving between conversational verses, strained emotional high notes, and a strong anthemic chorus.
+
+Keep the words intelligible.
+
+Allow tasteful vocal cracks, doubles, harmonies, gang vocals, or occasional shouted/screamed accents where they increase emotional impact.
+
+Do not over-polish the vocal performance into sterile pop.
+
+The final result should make the bizarre source mythology feel unexpectedly sincere and emotionally believable while still preserving its humor and irreverence.
+
+Do not explain the arrangement or summarize the document. Demonstrate all of this in the finished song.
+EOF
+    )"
+fi
 OUT_DIR="src/test/google/interactions/lyria"
-RAW="$OUT_DIR/response-${MODEL}-pdf.json"
-LYRICS="$OUT_DIR/lyrics-${MODEL}-pdf.txt"
+RAW="$OUT_DIR/response-${MODEL}-pdf-2.json"
+LYRICS="$OUT_DIR/lyrics-${MODEL}-pdf-2.txt"
 
 mkdir -p "$OUT_DIR"
 
 PAYLOAD="$(
   jq -n \
     --arg model "$MODEL" \
-    --arg file_uri "$FILE_URI" \
+    --arg prompt "$PROMPT" \
     '{
       model: $model,
       store: false,
+      response_format: [
+        {
+          type: "audio"
+        },
+        { type: "text", mime_type: "text/plain" }
+      ],
       input: [
         {
           type: "text",
-          text: "Read the attached document as source material and compose a roughly 90-second theatrical dark electro-cabaret song inspired by it. Use distinct verses, a chorus, and a bridge. The lyrics should be unmistakably grounded in the source document: incorporate several concrete motifs and details drawn from different parts of the document rather than merely responding to its overall mood. Do not simply summarize the document."
-        },
-        {
-          type: "document",
-          uri: $file_uri,
-          mime_type: "application/pdf"
+          text: $prompt
         }
       ]
     }'

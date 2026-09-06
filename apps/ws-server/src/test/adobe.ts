@@ -94,7 +94,12 @@ const _asset = () =>
       prisma.$connect();
       asset = await prisma.attachment.findUnique({
         where: { id: "niggfu0z0og5g4rvof330g84" },
-        include: { document: true, imageGenOutput: true, audio: true }
+        include: {
+          document: true,
+          imageGenOutput: true,
+          audioGenOutput: true,
+          audio: true
+        }
       });
     } catch (err) {
       console.log(err);

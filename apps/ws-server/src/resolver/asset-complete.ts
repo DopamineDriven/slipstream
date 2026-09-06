@@ -232,13 +232,14 @@ export class ResolverAssetCompleteService extends ResolverAssetFetchService {
                 audio: undefined,
                 type: "IMAGE",
                 img: {
+                  attachmentId,
                   animated: specs.animated,
                   aspectRatio: specs.width / specs.height,
                   cameraMake: null,
                   cameraModel: null,
                   colorSpace: specs.colorSpace,
-                  createdAt: undefined,
-                  updatedAt: undefined,
+                  createdAt: new Date(Date.now()),
+                  updatedAt: new Date(Date.now()),
                   lensModel: null,
                   colorModel:
                     specs.colorModel === "grayscale-alpha"
@@ -266,27 +267,28 @@ export class ResolverAssetCompleteService extends ResolverAssetFetchService {
                   img: undefined,
                   audio: undefined,
                   doc: {
-                    author: specs.author ?? undefined,
+                    attachmentId,
+                    author: specs.author ?? null,
                     createdAt: specs.createdDate
                       ? new Date(specs.createdDate)
-                      : undefined,
+                      : new Date(Date.now()),
                     updatedAt: specs.modifiedDate
                       ? new Date(specs.modifiedDate)
-                      : undefined,
-                    encoding: specs.encoding ?? undefined,
+                      : new Date(Date.now()),
+                    encoding: specs.encoding ?? null,
                     format: specs.format ?? ext,
-                    isEncrypted: specs.isEncrypted ?? undefined,
+                    isEncrypted: specs.isEncrypted ?? false,
                     isLinearized: specs.isLinearized ?? false,
-                    language: specs.language ?? undefined,
-                    subject: specs.subject ?? undefined,
-                    textPreview: specs.textPreview ?? undefined,
-                    title: undefined,
+                    language: specs.language ?? null,
+                    subject: specs.subject ?? null,
+                    textPreview: specs.textPreview ?? null,
+                    title: null,
                     isSearchable: specs.isSearchable ?? true,
-                    wordCount: specs.wordCount ?? undefined,
-                    lineCount: specs.lineCount ?? undefined,
-                    keywords: specs.keywords ?? undefined,
-                    pageCount: specs.pageCount ?? undefined,
-                    pdfVersion: specs.pdfVersion ?? undefined
+                    wordCount: specs.wordCount ?? null,
+                    lineCount: specs.lineCount ?? null,
+                    keywords: specs.keywords ? [...specs.keywords] : [],
+                    pageCount: specs.pageCount ?? null,
+                    pdfVersion: specs.pdfVersion ?? null
                   }
                 }
               : {

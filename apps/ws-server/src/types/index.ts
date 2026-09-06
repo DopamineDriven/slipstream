@@ -3,11 +3,14 @@ import type { $Enums, Attachment } from "@slipstream/db/node/generated/client";
 import type {
   AIChatRequestImgGenFields,
   AllModelsUnion,
+  AudioSingleton,
   ClientContextWorkupProps,
   ConversationSingletonOneOff as ConversationSingleton,
   CTR,
+  DocumentSingleton,
   EventTypeMap,
   GetModelUtilRT,
+  ImageSingleton,
   LocalToolCapabilities,
   MessageSingleton,
   Provider,
@@ -77,7 +80,7 @@ export type HandleAiChatRequestRT = (
   }[];
 };
 
-export type IncludeCreateConvoWithImgGenProps = {
+export type IncludeCreateConvoWithImgGenOrAudioGenProps = {
   conversationSettings: true;
   messages: {
     orderBy: {
@@ -85,6 +88,7 @@ export type IncludeCreateConvoWithImgGenProps = {
       ordinal: "asc";
     };
     include: {
+      audioGenJob: true;
       imageGenJob: true;
       messageBlocks: { orderBy: { ordinal: "asc" } };
       attachments: {
@@ -95,6 +99,7 @@ export type IncludeCreateConvoWithImgGenProps = {
           image: true;
           document: true;
           audio: true;
+          audioGenOutput: true;
           imageGenOutput: true;
         };
       };
@@ -102,7 +107,34 @@ export type IncludeCreateConvoWithImgGenProps = {
   };
 };
 
-export type MessageDataWorkupProps = {
+export type MessageDataWithAudioGenProps = {
+  content: string;
+  provider: $Enums.Provider;
+  senderType: "USER";
+  model?: AllModelsUnion;
+  userId: string;
+  userKeyId: string | null;
+  audioGenJob: {
+    create: {
+      provider: $Enums.Provider;
+      model: string;
+      userId: string;
+      keyFingerprint?: string | null;
+      prompt: string;
+      systemPrompt?: string | null;
+      stage?: $Enums.AudioGenStage;
+      progress?: number;
+      etaSeconds?: number | null;
+      durationMs?: number | null;
+      usage?: number | null;
+      error?: string | null;
+      createdAt?: Date | string;
+      updatedAt?: Date | string;
+    };
+  };
+};
+
+export type MessageDataWithImgGenProps = {
   content: string;
   provider: $Enums.Provider;
   senderType: "USER";
@@ -137,7 +169,7 @@ export type MessageDataWorkupProps = {
   };
 };
 
-export type ConversationSettingsCreateProps = {
+export type ConversationSettingsCreatePropsWithAssetGen = {
   maxTokens: number | undefined;
   topP: number | undefined;
   enableAssetGen: boolean;
@@ -145,7 +177,7 @@ export type ConversationSettingsCreateProps = {
   temperature: number | undefined;
 };
 
-export type HandleAiChatReqCreateSansImgGenAndAttachmentsProps = {
+export type HandleAiChatReqCreateSansAssetGenWithAttachmentsProps = {
   batchId: string;
   prompt: string;
   provider: Provider;
@@ -153,10 +185,10 @@ export type HandleAiChatReqCreateSansImgGenAndAttachmentsProps = {
   userId: string;
   apiKey: string | null;
   keyId: string | null;
-  create: ConversationSettingsCreatePropsSansImgGen;
+  create: ConversationSettingsCreatePropsSansAssetGen;
 };
 
-export type HandleAiChatReqUpdateSansImgGenAndAttachmentsProps = {
+export type HandleAiChatReqUpdateSansAssetGenWithAttachmentsProps = {
   batchId: string;
   prompt: string;
   conversationId: string;
@@ -165,20 +197,20 @@ export type HandleAiChatReqUpdateSansImgGenAndAttachmentsProps = {
   userId: string;
   apiKey: string | null;
   keyId: string | null;
-  update: ConversationSettingsCreatePropsSansImgGen;
+  update: ConversationSettingsCreatePropsSansAssetGen;
 };
 
-export type HandleAiChatReqCreateSansImgGenSansAttachmentsProps = {
+export type HandleAiChatReqCreateSansAssetGenSansAttachmentsProps = {
   prompt: string;
   provider: Provider;
   model?: AllModelsUnion;
   userId: string;
   apiKey: string | null;
   keyId: string | null;
-  create: ConversationSettingsCreatePropsSansImgGen;
+  create: ConversationSettingsCreatePropsSansAssetGen;
 };
 
-export type HandleAiChatReqUpdateSansImgGenSansAttachmentsProps = {
+export type HandleAiChatReqUpdateSansAssetGenSansAttachmentsProps = {
   prompt: string;
   provider: Provider;
   model?: AllModelsUnion;
@@ -186,43 +218,72 @@ export type HandleAiChatReqUpdateSansImgGenSansAttachmentsProps = {
   userId: string;
   apiKey: string | null;
   keyId: string | null;
-  update: ConversationSettingsCreatePropsSansImgGen;
+  update: ConversationSettingsCreatePropsSansAssetGen;
 };
-export type ConversationSettingsCreatePropsSansImgGen = {
+export type ConversationSettingsCreatePropsSansAssetGen = {
   maxTokens: number | undefined;
   topP: number | undefined;
   systemPrompt: string | undefined;
   temperature: number | undefined;
 };
 
-export type HandleAiChatReqCreateWithImgGenAndAttachmentsProps = {
+export type HandleAiChatReqCreateWithImgGenWithAttachmentsProps = {
   batchId: string;
   userId: string;
   apiKey: string | null;
   keyId: string | null;
-  create: ConversationSettingsCreateProps;
-  includeWithAttachments: IncludeCreateConvoWithImgGenProps;
-  messageData: MessageDataWorkupProps;
+  create: ConversationSettingsCreatePropsWithAssetGen;
+  includeWithAttachments: IncludeCreateConvoWithImgGenOrAudioGenProps;
+  messageData: MessageDataWithImgGenProps;
 };
 
-export type HandleAiChatReqUpdateWithImgGenAndAttachmentsProps = {
+export type HandleAiChatReqCreateWithAudioGenWithAttachmentsProps = {
+  batchId: string;
+  userId: string;
+  apiKey: string | null;
+  keyId: string | null;
+  create: ConversationSettingsCreatePropsWithAssetGen;
+  includeWithAttachments: IncludeCreateConvoWithImgGenOrAudioGenProps;
+  messageData: MessageDataWithAudioGenProps;
+};
+
+export type HandleAiChatReqUpdateWithImgGenWithAttachmentsProps = {
   batchId: string;
   userId: string;
   conversationId: string;
   apiKey: string | null;
   keyId: string | null;
-  update: ConversationSettingsCreateProps;
-  includeWithAttachments: IncludeCreateConvoWithImgGenProps;
-  messageData: MessageDataWorkupProps;
+  update: ConversationSettingsCreatePropsWithAssetGen;
+  includeWithAttachments: IncludeCreateConvoWithImgGenOrAudioGenProps;
+  messageData: MessageDataWithImgGenProps;
+};
+
+export type HandleAiChatReqUpdateWithAudioGenWithAttachmentsProps = {
+  batchId: string;
+  userId: string;
+  conversationId: string;
+  apiKey: string | null;
+  keyId: string | null;
+  update: ConversationSettingsCreatePropsWithAssetGen;
+  messageData: MessageDataWithAudioGenProps;
+};
+
+export type HandleAiChatReqCreateWithAudioGenSansAttachmentsProps = {
+  userId: string;
+  apiKey: string | null;
+  keyId: string | null;
+  create: ConversationSettingsCreatePropsWithAssetGen;
+  includeSansAttachments: IncludeCreateConvoWithImgGenOrAudioGenProps;
+  messageData: MessageDataWithAudioGenProps;
 };
 
 export type HandleAiChatReqCreateWithImgGenSansAttachmentsProps = {
   userId: string;
   apiKey: string | null;
   keyId: string | null;
-  create: ConversationSettingsCreateProps;
-  includeSansAttachments: IncludeCreateConvoWithImgGenProps;
-  messageData: MessageDataWorkupProps;
+  create: ConversationSettingsCreatePropsWithAssetGen;
+  includeSansAttachments: IncludeCreateConvoWithImgGenOrAudioGenProps;
+  messageData: MessageDataWithImgGenProps;
 };
 
 export type HandleAiChatReqUpdateWithImgGenSansAttachmentsProps = {
@@ -230,9 +291,18 @@ export type HandleAiChatReqUpdateWithImgGenSansAttachmentsProps = {
   apiKey: string | null;
   keyId: string | null;
   conversationId: string;
-  update: ConversationSettingsCreateProps;
-  includeSansAttachments: IncludeCreateConvoWithImgGenProps;
-  messageData: MessageDataWorkupProps;
+  update: ConversationSettingsCreatePropsWithAssetGen;
+  includeSansAttachments: IncludeCreateConvoWithImgGenOrAudioGenProps;
+  messageData: MessageDataWithImgGenProps;
+};
+
+export type HandleAiChatReqUpdateWithAudioGenSansAttachmentsProps = {
+  userId: string;
+  apiKey: string | null;
+  keyId: string | null;
+  conversationId: string;
+  update: ConversationSettingsCreatePropsWithAssetGen;
+  messageData: MessageDataWithAudioGenProps;
 };
 
 // new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
@@ -244,111 +314,50 @@ export type UpdateAttachment = CTR<
   RTC<Attachment>,
   "id" | "userId" | "conversationId" | "bucket" | "key" | "versionId"
 >;
-
-export type BigIntToCompatProps<
-  T extends "image_gen_request" | "ai_chat_request"
-> = T extends "image_gen_request"
-  ? {
-      props: ImageGenReqDbRes<false>;
-      rt: ImageGenReqDbRes<true>;
-      rtExtended: ImageGenReqDbRes<true> & {
-        /**
-         * count of assets bound to the current user messsage
-         */
-        assetCounts: number;
-        assets?: {
-          type: $Enums.AssetType;
-          compatStatus: $Enums.CompatStatus;
-          url: string;
-          mime: string;
-          ext: string;
-        }[];
+export type AiChatRequestType =
+  "image_gen_request" | "ai_chat_request" | "audio_gen_request";
+export type BigIntToCompatProps<T extends AiChatRequestType> =
+  T extends "image_gen_request"
+    ? {
+        props: ImageGenReqDbRes<false>;
+        rt: ImageGenReqDbRes<true>;
+        rtExtended: ImageGenReqDbRes<true> & {
+          /**
+           * count of assets bound to the current user messsage
+           */
+          assetCounts: number;
+          assets?: {
+            type: $Enums.AssetType;
+            compatStatus: $Enums.CompatStatus;
+            url: string;
+            mime: string;
+            ext: string;
+          }[];
+        };
+      }
+    : {
+        props: ConversationSingleton<false>;
+        rt: ConversationSingleton<true>;
+        rtExtended: ConversationSingleton<true> & {
+          /**
+           * count of assets bound to the current user messsage
+           */
+          assetCounts: number;
+          assets?: {
+            type: $Enums.AssetType;
+            compatStatus: $Enums.CompatStatus;
+            url: string;
+            mime: string;
+            ext: string;
+          }[];
+        };
       };
-    }
-  : {
-      props: ConversationSingleton<false>;
-      rt: ConversationSingleton<true>;
-      rtExtended: ConversationSingleton<true> & {
-        /**
-         * count of assets bound to the current user messsage
-         */
-        assetCounts: number;
-        assets?: {
-          type: $Enums.AssetType;
-          compatStatus: $Enums.CompatStatus;
-          url: string;
-          mime: string;
-          ext: string;
-        }[];
-      };
-    };
 
 export type UpdateAttachmentMetadata = {
-  img?:
-    | {
-        animated: boolean;
-        aspectRatio: number;
-        cameraMake: null;
-        cameraModel: null;
-        colorSpace: $Enums.ColorSpace | null;
-        colorModel: $Enums.ColorModel | null;
-        dominantColorHex: null;
-        exifDateTimeOriginal: Date | null;
-        format: $Enums.ImageFormat | undefined;
-        frames: number;
-        gpsLat: null;
-        gpsLon: null;
-        hasAlpha: boolean;
-        height: number;
-        width: number;
-        iccProfile: string | null;
-        lensModel: null;
-        orientation: number | null;
-        createdAt: undefined;
-        updatedAt: undefined;
-      }
-    | undefined;
-  doc?:
-    | {
-        author: string | undefined;
-        createdAt: Date | undefined;
-        updatedAt: Date | undefined;
-        encoding: string | undefined;
-        format: string;
-        isEncrypted: boolean | undefined;
-        isSearchable: boolean | undefined;
-        keywords: string[] | undefined;
-        language: string | undefined;
-        lineCount: number | undefined;
-        isLinearized: boolean | undefined;
-        pageCount: number | undefined;
-        pdfVersion: string | undefined;
-        subject: string | undefined;
-        textPreview: string | undefined;
-        title: undefined;
-        wordCount: number | undefined;
-      }
-    | undefined;
-  audio:
-    | {
-        createdAt: Date;
-        updatedAt: Date;
-        attachmentId: string;
-        codec: string | null;
-        sampleRate: number | null;
-        bitrate: number | null;
-        format: string;
-        title: string | null;
-        duration: number;
-        channels: number | null;
-        artist: string | null;
-        album: string | null;
-        year: number | null;
-        genre: string | null;
-        waveformPeaks: number[];
-      }
-    | undefined;
-  type: "IMAGE" | "DOCUMENT" | "AUDIO";
+  img?: ImageSingleton | undefined;
+  doc?: DocumentSingleton | undefined;
+  audio: AudioSingleton | undefined;
+  type: "IMAGE" | "DOCUMENT" | "AUDIO" | "VIDEO";
 };
 
 export type UpdateAttachmentCompatProps = {
@@ -435,10 +444,12 @@ export interface ProviderChatRequestEntity {
   chunks: string[];
   thinkingChunks: string[];
   imgGenEnabled?: boolean;
+  audioGenEnabled?: boolean;
   jobId?: string;
   requestMessageId?: string;
   partialImgArr?: { b64image_url: string }[];
   imgGenFields?: AIChatRequestImgGenFields;
+
   docCounts: number;
   imgCounts: number;
   hasUserStoreDocs: boolean;

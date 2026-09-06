@@ -21,7 +21,6 @@ import * as $Enums from "@slipstream/db/enums-node";
 import { GeminiBaseService } from "./base.ts";
 
 export class FileSearchStoreService extends GeminiBaseService {
-  protected apiVersion = "v1alpha" as const;
   /**
    * uses attachmentId as a key->maps to googles 40-char max [a-z0-9] filename requirements
    * all attachmentIds (and all database generated ids for that matter) are 24-char CUID2 ids

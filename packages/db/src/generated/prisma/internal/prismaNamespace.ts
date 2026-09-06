@@ -403,6 +403,8 @@ export const ModelName = {
   VideoMetadata: 'VideoMetadata',
   AudioMetadata: 'AudioMetadata',
   DocumentMetadata: 'DocumentMetadata',
+  AudioGenJob: 'AudioGenJob',
+  AudioGenOutput: 'AudioGenOutput',
   CliConfig: 'CliConfig',
   CliConversationActivity: 'CliConversationActivity',
   Conversation: 'Conversation',
@@ -443,7 +445,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "cliConfig" | "cliConversationActivity" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "messageBlock" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
+    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "audioGenJob" | "audioGenOutput" | "cliConfig" | "cliConversationActivity" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "messageBlock" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -888,6 +890,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.DocumentMetadataCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.DocumentMetadataCountAggregateOutputType> | number
+        }
+      }
+    }
+    AudioGenJob: {
+      payload: Prisma.$AudioGenJobPayload<ExtArgs>
+      fields: Prisma.AudioGenJobFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AudioGenJobFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenJobPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AudioGenJobFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenJobPayload>
+        }
+        findFirst: {
+          args: Prisma.AudioGenJobFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenJobPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AudioGenJobFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenJobPayload>
+        }
+        findMany: {
+          args: Prisma.AudioGenJobFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenJobPayload>[]
+        }
+        create: {
+          args: Prisma.AudioGenJobCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenJobPayload>
+        }
+        createMany: {
+          args: Prisma.AudioGenJobCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AudioGenJobCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenJobPayload>[]
+        }
+        delete: {
+          args: Prisma.AudioGenJobDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenJobPayload>
+        }
+        update: {
+          args: Prisma.AudioGenJobUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenJobPayload>
+        }
+        deleteMany: {
+          args: Prisma.AudioGenJobDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AudioGenJobUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AudioGenJobUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenJobPayload>[]
+        }
+        upsert: {
+          args: Prisma.AudioGenJobUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenJobPayload>
+        }
+        aggregate: {
+          args: Prisma.AudioGenJobAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAudioGenJob>
+        }
+        groupBy: {
+          args: Prisma.AudioGenJobGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AudioGenJobGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AudioGenJobCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AudioGenJobCountAggregateOutputType> | number
+        }
+      }
+    }
+    AudioGenOutput: {
+      payload: Prisma.$AudioGenOutputPayload<ExtArgs>
+      fields: Prisma.AudioGenOutputFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AudioGenOutputFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenOutputPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AudioGenOutputFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenOutputPayload>
+        }
+        findFirst: {
+          args: Prisma.AudioGenOutputFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenOutputPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AudioGenOutputFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenOutputPayload>
+        }
+        findMany: {
+          args: Prisma.AudioGenOutputFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenOutputPayload>[]
+        }
+        create: {
+          args: Prisma.AudioGenOutputCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenOutputPayload>
+        }
+        createMany: {
+          args: Prisma.AudioGenOutputCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AudioGenOutputCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenOutputPayload>[]
+        }
+        delete: {
+          args: Prisma.AudioGenOutputDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenOutputPayload>
+        }
+        update: {
+          args: Prisma.AudioGenOutputUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenOutputPayload>
+        }
+        deleteMany: {
+          args: Prisma.AudioGenOutputDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AudioGenOutputUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AudioGenOutputUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenOutputPayload>[]
+        }
+        upsert: {
+          args: Prisma.AudioGenOutputUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioGenOutputPayload>
+        }
+        aggregate: {
+          args: Prisma.AudioGenOutputAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAudioGenOutput>
+        }
+        groupBy: {
+          args: Prisma.AudioGenOutputGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AudioGenOutputGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AudioGenOutputCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AudioGenOutputCountAggregateOutputType> | number
         }
       }
     }
@@ -2965,6 +3115,42 @@ export const DocumentMetadataScalarFieldEnum = {
 export type DocumentMetadataScalarFieldEnum = (typeof DocumentMetadataScalarFieldEnum)[keyof typeof DocumentMetadataScalarFieldEnum]
 
 
+export const AudioGenJobScalarFieldEnum = {
+  id: 'id',
+  requestMessageId: 'requestMessageId',
+  provider: 'provider',
+  model: 'model',
+  userId: 'userId',
+  userKeyId: 'userKeyId',
+  keyFingerprint: 'keyFingerprint',
+  prompt: 'prompt',
+  systemPrompt: 'systemPrompt',
+  stage: 'stage',
+  progress: 'progress',
+  etaSeconds: 'etaSeconds',
+  durationMs: 'durationMs',
+  usage: 'usage',
+  error: 'error',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AudioGenJobScalarFieldEnum = (typeof AudioGenJobScalarFieldEnum)[keyof typeof AudioGenJobScalarFieldEnum]
+
+
+export const AudioGenOutputScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  attachmentId: 'attachmentId',
+  mime: 'mime',
+  ext: 'ext',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AudioGenOutputScalarFieldEnum = (typeof AudioGenOutputScalarFieldEnum)[keyof typeof AudioGenOutputScalarFieldEnum]
+
+
 export const CliConfigScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -3757,6 +3943,20 @@ export type ListEnumProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
 
 
 /**
+ * Reference to a field of type 'AudioGenStage'
+ */
+export type EnumAudioGenStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AudioGenStage'>
+    
+
+
+/**
+ * Reference to a field of type 'AudioGenStage[]'
+ */
+export type ListEnumAudioGenStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AudioGenStage[]'>
+    
+
+
+/**
  * Reference to a field of type 'CliConfigSchemaVersion'
  */
 export type EnumCliConfigSchemaVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CliConfigSchemaVersion'>
@@ -4262,6 +4462,8 @@ export type GlobalOmitConfig = {
   videoMetadata?: Prisma.VideoMetadataOmit
   audioMetadata?: Prisma.AudioMetadataOmit
   documentMetadata?: Prisma.DocumentMetadataOmit
+  audioGenJob?: Prisma.AudioGenJobOmit
+  audioGenOutput?: Prisma.AudioGenOutputOmit
   cliConfig?: Prisma.CliConfigOmit
   cliConversationActivity?: Prisma.CliConversationActivityOmit
   conversation?: Prisma.ConversationOmit

@@ -470,6 +470,8 @@ export class PrismaAttachmentProviderService extends PrismaUserMetaService {
         image: true,
         document: true,
         imageGenOutput: true,
+        video: true,
+        audioGenOutput: true,
         audio: true
       }
     });
@@ -487,7 +489,9 @@ export class PrismaAttachmentProviderService extends PrismaUserMetaService {
         image: true,
         document: true,
         audio: true,
-        imageGenOutput: true
+        imageGenOutput: true,
+        video: true,
+        audioGenOutput: true
       }
     });
 

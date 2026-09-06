@@ -15,11 +15,12 @@ function devDb() {
 }
 function getInclude(assetType: "DOCUMENT" | "IMAGE" | "BOTH") {
   return assetType === "DOCUMENT"
-    ? ({ imageGenOutput: true, document: true } as const)
+    ? ({ imageGenOutput: true, audioGenOutput: true, document: true } as const)
     : assetType === "IMAGE"
-      ? ({ imageGenOutput: true, image: true } as const)
+      ? ({ imageGenOutput: true, audioGenOutput: true, image: true } as const)
       : ({
           imageGenOutput: true,
+          audioGenOutput: true,
           document: true,
           image: true,
           audio: true

@@ -576,6 +576,7 @@ export type AttachmentWhereInput = {
   document?: Prisma.XOR<Prisma.DocumentMetadataNullableScalarRelationFilter, Prisma.DocumentMetadataWhereInput> | null
   audio?: Prisma.XOR<Prisma.AudioMetadataNullableScalarRelationFilter, Prisma.AudioMetadataWhereInput> | null
   imageGenOutput?: Prisma.XOR<Prisma.ImageGenOutputNullableScalarRelationFilter, Prisma.ImageGenOutputWhereInput> | null
+  audioGenOutput?: Prisma.XOR<Prisma.AudioGenOutputNullableScalarRelationFilter, Prisma.AudioGenOutputWhereInput> | null
 }
 
 export type AttachmentOrderByWithRelationInput = {
@@ -639,6 +640,7 @@ export type AttachmentOrderByWithRelationInput = {
   document?: Prisma.DocumentMetadataOrderByWithRelationInput
   audio?: Prisma.AudioMetadataOrderByWithRelationInput
   imageGenOutput?: Prisma.ImageGenOutputOrderByWithRelationInput
+  audioGenOutput?: Prisma.AudioGenOutputOrderByWithRelationInput
 }
 
 export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
@@ -705,6 +707,7 @@ export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
   document?: Prisma.XOR<Prisma.DocumentMetadataNullableScalarRelationFilter, Prisma.DocumentMetadataWhereInput> | null
   audio?: Prisma.XOR<Prisma.AudioMetadataNullableScalarRelationFilter, Prisma.AudioMetadataWhereInput> | null
   imageGenOutput?: Prisma.XOR<Prisma.ImageGenOutputNullableScalarRelationFilter, Prisma.ImageGenOutputWhereInput> | null
+  audioGenOutput?: Prisma.XOR<Prisma.AudioGenOutputNullableScalarRelationFilter, Prisma.AudioGenOutputWhereInput> | null
 }, "id" | "s3ObjectId">
 
 export type AttachmentOrderByWithAggregationInput = {
@@ -875,6 +878,7 @@ export type AttachmentCreateInput = {
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateInput = {
@@ -935,6 +939,7 @@ export type AttachmentUncheckedCreateInput = {
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUpdateInput = {
@@ -995,6 +1000,7 @@ export type AttachmentUpdateInput = {
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateInput = {
@@ -1055,6 +1061,7 @@ export type AttachmentUncheckedUpdateInput = {
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentCreateManyInput = {
@@ -1478,6 +1485,20 @@ export type AttachmentUpdateOneRequiredWithoutDocumentNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutDocumentInput, Prisma.AttachmentUpdateWithoutDocumentInput>, Prisma.AttachmentUncheckedUpdateWithoutDocumentInput>
 }
 
+export type AttachmentCreateNestedOneWithoutAudioGenOutputInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutAudioGenOutputInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutAudioGenOutputInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+}
+
+export type AttachmentUpdateOneRequiredWithoutAudioGenOutputNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutAudioGenOutputInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutAudioGenOutputInput
+  upsert?: Prisma.AttachmentUpsertWithoutAudioGenOutputInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutAudioGenOutputInput, Prisma.AttachmentUpdateWithoutAudioGenOutputInput>, Prisma.AttachmentUncheckedUpdateWithoutAudioGenOutputInput>
+}
+
 export type AttachmentCreateNestedManyWithoutConversationInput = {
   create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
   connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
@@ -1733,6 +1754,7 @@ export type AttachmentCreateWithoutImageInput = {
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutImageInput = {
@@ -1792,6 +1814,7 @@ export type AttachmentUncheckedCreateWithoutImageInput = {
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutImageInput = {
@@ -1867,6 +1890,7 @@ export type AttachmentUpdateWithoutImageInput = {
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutImageInput = {
@@ -1926,6 +1950,7 @@ export type AttachmentUncheckedUpdateWithoutImageInput = {
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentCreateWithoutVideoInput = {
@@ -1985,6 +2010,7 @@ export type AttachmentCreateWithoutVideoInput = {
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutVideoInput = {
@@ -2044,6 +2070,7 @@ export type AttachmentUncheckedCreateWithoutVideoInput = {
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutVideoInput = {
@@ -2119,6 +2146,7 @@ export type AttachmentUpdateWithoutVideoInput = {
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutVideoInput = {
@@ -2178,6 +2206,7 @@ export type AttachmentUncheckedUpdateWithoutVideoInput = {
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentCreateWithoutAudioInput = {
@@ -2237,6 +2266,7 @@ export type AttachmentCreateWithoutAudioInput = {
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutAudioInput = {
@@ -2296,6 +2326,7 @@ export type AttachmentUncheckedCreateWithoutAudioInput = {
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutAudioInput = {
@@ -2371,6 +2402,7 @@ export type AttachmentUpdateWithoutAudioInput = {
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutAudioInput = {
@@ -2430,6 +2462,7 @@ export type AttachmentUncheckedUpdateWithoutAudioInput = {
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentCreateWithoutDocumentInput = {
@@ -2489,6 +2522,7 @@ export type AttachmentCreateWithoutDocumentInput = {
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutDocumentInput = {
@@ -2548,6 +2582,7 @@ export type AttachmentUncheckedCreateWithoutDocumentInput = {
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutDocumentInput = {
@@ -2623,6 +2658,7 @@ export type AttachmentUpdateWithoutDocumentInput = {
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutDocumentInput = {
@@ -2680,6 +2716,263 @@ export type AttachmentUncheckedUpdateWithoutDocumentInput = {
   userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentCreateWithoutAudioGenOutputInput = {
+  id?: string
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ttsJob?: Prisma.TTSJobCreateNestedOneWithoutAttachmentInput
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocCreateNestedOneWithoutAttachmentInput
+  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentUncheckedCreateWithoutAudioGenOutputInput = {
+  id?: string
+  conversationId?: string | null
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  userId: string
+  messageId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ttsJob?: Prisma.TTSJobUncheckedCreateNestedOneWithoutAttachmentInput
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentCreateOrConnectWithoutAudioGenOutputInput = {
+  where: Prisma.AttachmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutAudioGenOutputInput>
+}
+
+export type AttachmentUpsertWithoutAudioGenOutputInput = {
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutAudioGenOutputInput, Prisma.AttachmentUncheckedUpdateWithoutAudioGenOutputInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutAudioGenOutputInput>
+  where?: Prisma.AttachmentWhereInput
+}
+
+export type AttachmentUpdateToOneWithWhereWithoutAudioGenOutputInput = {
+  where?: Prisma.AttachmentWhereInput
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutAudioGenOutputInput, Prisma.AttachmentUncheckedUpdateWithoutAudioGenOutputInput>
+}
+
+export type AttachmentUpdateWithoutAudioGenOutputInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ttsJob?: Prisma.TTSJobUpdateOneWithoutAttachmentNestedInput
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUpdateOneWithoutAttachmentNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentUncheckedUpdateWithoutAudioGenOutputInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ttsJob?: Prisma.TTSJobUncheckedUpdateOneWithoutAttachmentNestedInput
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
+  userStoreDoc?: Prisma.UserStoreDocUncheckedUpdateOneWithoutAttachmentNestedInput
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
@@ -2741,6 +3034,7 @@ export type AttachmentCreateWithoutConversationInput = {
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutConversationInput = {
@@ -2800,6 +3094,7 @@ export type AttachmentUncheckedCreateWithoutConversationInput = {
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutConversationInput = {
@@ -2939,6 +3234,7 @@ export type AttachmentCreateWithoutImageGenOutputInput = {
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutImageGenOutputInput = {
@@ -2998,6 +3294,7 @@ export type AttachmentUncheckedCreateWithoutImageGenOutputInput = {
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutImageGenOutputInput = {
@@ -3073,6 +3370,7 @@ export type AttachmentUpdateWithoutImageGenOutputInput = {
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutImageGenOutputInput = {
@@ -3132,6 +3430,7 @@ export type AttachmentUncheckedUpdateWithoutImageGenOutputInput = {
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentCreateWithoutMessageInput = {
@@ -3191,6 +3490,7 @@ export type AttachmentCreateWithoutMessageInput = {
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutMessageInput = {
@@ -3250,6 +3550,7 @@ export type AttachmentUncheckedCreateWithoutMessageInput = {
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutMessageInput = {
@@ -3335,6 +3636,7 @@ export type AttachmentCreateWithoutProviderLinksInput = {
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutProviderLinksInput = {
@@ -3394,6 +3696,7 @@ export type AttachmentUncheckedCreateWithoutProviderLinksInput = {
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutProviderLinksInput = {
@@ -3469,6 +3772,7 @@ export type AttachmentUpdateWithoutProviderLinksInput = {
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutProviderLinksInput = {
@@ -3528,6 +3832,7 @@ export type AttachmentUncheckedUpdateWithoutProviderLinksInput = {
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentCreateWithoutProviderStoreDocsInput = {
@@ -3587,6 +3892,7 @@ export type AttachmentCreateWithoutProviderStoreDocsInput = {
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutProviderStoreDocsInput = {
@@ -3646,6 +3952,7 @@ export type AttachmentUncheckedCreateWithoutProviderStoreDocsInput = {
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutProviderStoreDocsInput = {
@@ -3721,6 +4028,7 @@ export type AttachmentUpdateWithoutProviderStoreDocsInput = {
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutProviderStoreDocsInput = {
@@ -3780,6 +4088,7 @@ export type AttachmentUncheckedUpdateWithoutProviderStoreDocsInput = {
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentCreateWithoutUserInput = {
@@ -3839,6 +4148,7 @@ export type AttachmentCreateWithoutUserInput = {
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutUserInput = {
@@ -3898,6 +4208,7 @@ export type AttachmentUncheckedCreateWithoutUserInput = {
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutUserInput = {
@@ -3983,6 +4294,7 @@ export type AttachmentCreateWithoutTtsJobInput = {
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutTtsJobInput = {
@@ -4042,6 +4354,7 @@ export type AttachmentUncheckedCreateWithoutTtsJobInput = {
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutTtsJobInput = {
@@ -4117,6 +4430,7 @@ export type AttachmentUpdateWithoutTtsJobInput = {
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutTtsJobInput = {
@@ -4176,6 +4490,7 @@ export type AttachmentUncheckedUpdateWithoutTtsJobInput = {
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentCreateWithoutUserStoreDocInput = {
@@ -4235,6 +4550,7 @@ export type AttachmentCreateWithoutUserStoreDocInput = {
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutUserStoreDocInput = {
@@ -4294,6 +4610,7 @@ export type AttachmentUncheckedCreateWithoutUserStoreDocInput = {
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutUserStoreDocInput = {
@@ -4369,6 +4686,7 @@ export type AttachmentUpdateWithoutUserStoreDocInput = {
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutUserStoreDocInput = {
@@ -4428,6 +4746,7 @@ export type AttachmentUncheckedUpdateWithoutUserStoreDocInput = {
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentCreateManyConversationInput = {
@@ -4537,6 +4856,7 @@ export type AttachmentUpdateWithoutConversationInput = {
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutConversationInput = {
@@ -4596,6 +4916,7 @@ export type AttachmentUncheckedUpdateWithoutConversationInput = {
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateManyWithoutConversationInput = {
@@ -4755,6 +5076,7 @@ export type AttachmentUpdateWithoutMessageInput = {
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutMessageInput = {
@@ -4814,6 +5136,7 @@ export type AttachmentUncheckedUpdateWithoutMessageInput = {
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
@@ -4973,6 +5296,7 @@ export type AttachmentUpdateWithoutUserInput = {
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutUserInput = {
@@ -5032,6 +5356,7 @@ export type AttachmentUncheckedUpdateWithoutUserInput = {
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  audioGenOutput?: Prisma.AudioGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateManyWithoutUserInput = {
@@ -5185,6 +5510,7 @@ export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   document?: boolean | Prisma.Attachment$documentArgs<ExtArgs>
   audio?: boolean | Prisma.Attachment$audioArgs<ExtArgs>
   imageGenOutput?: boolean | Prisma.Attachment$imageGenOutputArgs<ExtArgs>
+  audioGenOutput?: boolean | Prisma.Attachment$audioGenOutputArgs<ExtArgs>
   _count?: boolean | Prisma.AttachmentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["attachment"]>
 
@@ -5361,6 +5687,7 @@ export type AttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   document?: boolean | Prisma.Attachment$documentArgs<ExtArgs>
   audio?: boolean | Prisma.Attachment$audioArgs<ExtArgs>
   imageGenOutput?: boolean | Prisma.Attachment$imageGenOutputArgs<ExtArgs>
+  audioGenOutput?: boolean | Prisma.Attachment$audioGenOutputArgs<ExtArgs>
   _count?: boolean | Prisma.AttachmentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AttachmentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5389,6 +5716,7 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     document: Prisma.$DocumentMetadataPayload<ExtArgs> | null
     audio: Prisma.$AudioMetadataPayload<ExtArgs> | null
     imageGenOutput: Prisma.$ImageGenOutputPayload<ExtArgs> | null
+    audioGenOutput: Prisma.$AudioGenOutputPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -5845,6 +6173,7 @@ export interface Prisma__AttachmentClient<T, Null = never, ExtArgs extends runti
   document<T extends Prisma.Attachment$documentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$documentArgs<ExtArgs>>): Prisma.Prisma__DocumentMetadataClient<runtime.Types.Result.GetResult<Prisma.$DocumentMetadataPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   audio<T extends Prisma.Attachment$audioArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$audioArgs<ExtArgs>>): Prisma.Prisma__AudioMetadataClient<runtime.Types.Result.GetResult<Prisma.$AudioMetadataPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   imageGenOutput<T extends Prisma.Attachment$imageGenOutputArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$imageGenOutputArgs<ExtArgs>>): Prisma.Prisma__ImageGenOutputClient<runtime.Types.Result.GetResult<Prisma.$ImageGenOutputPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  audioGenOutput<T extends Prisma.Attachment$audioGenOutputArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$audioGenOutputArgs<ExtArgs>>): Prisma.Prisma__AudioGenOutputClient<runtime.Types.Result.GetResult<Prisma.$AudioGenOutputPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6548,6 +6877,25 @@ export type Attachment$imageGenOutputArgs<ExtArgs extends runtime.Types.Extensio
    */
   include?: Prisma.ImageGenOutputInclude<ExtArgs> | null
   where?: Prisma.ImageGenOutputWhereInput
+}
+
+/**
+ * Attachment.audioGenOutput
+ */
+export type Attachment$audioGenOutputArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AudioGenOutput
+   */
+  select?: Prisma.AudioGenOutputSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AudioGenOutput
+   */
+  omit?: Prisma.AudioGenOutputOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AudioGenOutputInclude<ExtArgs> | null
+  where?: Prisma.AudioGenOutputWhereInput
 }
 
 /**

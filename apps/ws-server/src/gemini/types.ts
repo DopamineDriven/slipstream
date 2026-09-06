@@ -4,7 +4,7 @@ import type {
   UserData
 } from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
-import type { File as GeminiFile } from "@google/genai";
+import type { File as GeminiFile, Interactions } from "@google/genai";
 import type { CompatStatus } from "@slipstream/db/enums-node";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
@@ -13,8 +13,10 @@ import type {
   ImgMetadataEntity,
   LocalToolName,
   MessageSingleton,
+  Rm,
   S3Checksum,
-  S3StorageClass
+  S3StorageClass,
+  UTR
 } from "@slipstream/types";
 
 export type UnionToRecord<
@@ -300,3 +302,27 @@ export type ImageGenObj = {
   s3FinalizePayload: S3FinalizePayload;
   expandedImgSpecs: ExpandedImgSpecs;
 };
+
+export type InteractionConfigProps = {
+  max_tokens?: number;
+  apiKey?: string;
+  model?: string;
+  latlng?: string;
+  keyId: string | null;
+  imgGenFields?: AIChatRequestImgGenFields;
+  msgs: MessageSingleton<true>[];
+  via?: "web" | "cli";
+  systemPrompt?: string;
+};
+
+export type InteractionsStepDeltaMap = UTR<
+  Rm<Interactions.StepDelta, "metadata">["delta"],
+  "type"
+>;
+
+export type InteractionsInputProps = Exclude<
+  Interactions.CreateModelInteractionParamsStreaming["input"],
+  string
+>;
+
+export type InteractionStepMap = UTR<Interactions.Step, "type">;
