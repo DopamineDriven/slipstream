@@ -432,11 +432,11 @@ describe("isPureImgGenModel", () => {
     assert.equal(p.isPureImgGenModel("v0-1.5-md"), false);
   });
   it(
-    "should return false for Llama-4-Maverick-17B-128E-Instruct-FP8",
+    "should return false for Meta's muse-spark-1.2",
     {},
     () => {
       assert.equal(
-        p.isPureImgGenModel("Llama-4-Maverick-17B-128E-Instruct-FP8"),
+        p.isPureImgGenModel("muse-spark-1.2"),
         false
       );
     }

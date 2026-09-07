@@ -17,6 +17,7 @@ import { useImageGen } from "@/context/image-gen-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { usePathnameContext } from "@/context/pathname-context";
 import { useAssets } from "@/hooks/use-assets";
+import { isPureImageModel } from "@/lib/helpers";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
@@ -221,15 +222,21 @@ export function ChatInput({
     setIsImageSettingsOpen(prev => !prev);
   }, [imgGen]);
 
+  // pure image-gen models are auto-enabled (derived in ImageGenProvider) and
+  // can't be toggled off — the server routes on imgGenEnabled, so for these
+  // models it must stay true; the stored toggle is left untouched so a
+  // facilitator model's manual preference survives pure-model detours
+  const pureImageModel = isPureImageModel(selectedModel.modelId);
+
   const handleToggleImageMode = useCallback(() => {
-    if (!imgGen.supported) return;
+    if (!imgGen.supported || pureImageModel) return;
     if (imgGen.enabled) {
       imgGen.setEnabled(false);
       setIsImageSettingsOpen(false);
       return;
     }
     imgGen.setEnabled(true);
-  }, [imgGen]);
+  }, [imgGen, pureImageModel]);
 
   // Consume an initial prompt passed from parent (or recovered from sessionStorage)
   useEffect(() => {
@@ -713,17 +720,24 @@ export function ChatInput({
                       variant={imgGen.enabled ? "default" : "ghost"}
                       size="icon"
                       title={
-                        imgGen.supported
-                          ? imgGen.enabled
-                            ? "Disable image generation"
-                            : "Enable image generation"
-                          : "Selected model does not support image generation"
+                        !imgGen.supported
+                          ? "Selected model does not support image generation"
+                          : pureImageModel
+                            ? "Pure image gen model, auto-enabled"
+                            : imgGen.enabled
+                              ? "Disable image generation"
+                              : "Enable image generation"
                       }
+                      // NOT the `disabled` attr for pure models — the base
+                      // Button's disabled:pointer-events-none would suppress
+                      // the hover title; the click no-ops in the handler
                       disabled={!imgGen.supported}
+                      aria-disabled={!imgGen.supported || pureImageModel}
                       className={cn(
                         imgGen.enabled
                           ? "hover:bg-accent text-foreground h-8"
-                          : "hover:bg-accent text-muted-foreground hover:text-foreground h-8"
+                          : "hover:bg-accent text-muted-foreground hover:text-foreground h-8",
+                        pureImageModel && "cursor-default"
                       )}
                       onClick={handleToggleImageMode}>
                       <ImageGen className="size-4" />

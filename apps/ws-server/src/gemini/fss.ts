@@ -15,15 +15,12 @@ import type {
   FileSearchStore,
   UploadToFileSearchStoreParameters
 } from "@google/genai";
-import type { Logger } from "pino";
 import { GoogleGenAI } from "@google/genai";
 import type { AttachmentSingleton } from "@slipstream/types";
 import * as $Enums from "@slipstream/db/enums-node";
+import { GeminiBaseService } from "./base.ts";
 
-export class FileSearchStoreService {
-  private defaultClient: GoogleGenAI;
-  protected logger: Logger;
-  protected apiVersion = "v1alpha" as const;
+export class FileSearchStoreService extends GeminiBaseService {
   /**
    * uses attachmentId as a key->maps to googles 40-char max [a-z0-9] filename requirements
    * all attachmentIds (and all database generated ids for that matter) are 24-char CUID2 ids
@@ -60,26 +57,7 @@ export class FileSearchStoreService {
     protected prisma: PrismaService,
     protected apiKey: string
   ) {
-    this.logger = logger
-      .getPinoInstance()
-      .child(
-        { pid: process.pid, node_version: process.version },
-        { msgPrefix: "[gemini] " }
-      );
-    this.defaultClient = new GoogleGenAI({
-      apiKey: this.apiKey,
-      apiVersion: this.apiVersion
-    });
-  }
-
-  protected getClient(overrideKey?: string) {
-    if (overrideKey) {
-      return new GoogleGenAI({
-        apiKey: overrideKey,
-        apiVersion: this.apiVersion
-      });
-    }
-    return this.defaultClient;
+    super(logger, apiKey);
   }
 
   protected fssToDbState = {

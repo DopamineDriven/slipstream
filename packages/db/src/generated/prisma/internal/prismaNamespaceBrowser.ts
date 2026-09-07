@@ -57,6 +57,8 @@ export const ModelName = {
   VideoMetadata: 'VideoMetadata',
   AudioMetadata: 'AudioMetadata',
   DocumentMetadata: 'DocumentMetadata',
+  AudioGenJob: 'AudioGenJob',
+  AudioGenOutput: 'AudioGenOutput',
   CliConfig: 'CliConfig',
   CliConversationActivity: 'CliConversationActivity',
   Conversation: 'Conversation',
@@ -279,6 +281,42 @@ export const DocumentMetadataScalarFieldEnum = {
 } as const
 
 export type DocumentMetadataScalarFieldEnum = (typeof DocumentMetadataScalarFieldEnum)[keyof typeof DocumentMetadataScalarFieldEnum]
+
+
+export const AudioGenJobScalarFieldEnum = {
+  id: 'id',
+  requestMessageId: 'requestMessageId',
+  provider: 'provider',
+  model: 'model',
+  userId: 'userId',
+  userKeyId: 'userKeyId',
+  keyFingerprint: 'keyFingerprint',
+  prompt: 'prompt',
+  systemPrompt: 'systemPrompt',
+  stage: 'stage',
+  progress: 'progress',
+  etaSeconds: 'etaSeconds',
+  durationMs: 'durationMs',
+  usage: 'usage',
+  error: 'error',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AudioGenJobScalarFieldEnum = (typeof AudioGenJobScalarFieldEnum)[keyof typeof AudioGenJobScalarFieldEnum]
+
+
+export const AudioGenOutputScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  attachmentId: 'attachmentId',
+  mime: 'mime',
+  ext: 'ext',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AudioGenOutputScalarFieldEnum = (typeof AudioGenOutputScalarFieldEnum)[keyof typeof AudioGenOutputScalarFieldEnum]
 
 
 export const CliConfigScalarFieldEnum = {

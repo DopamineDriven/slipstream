@@ -72,6 +72,16 @@ export type AudioMetadata = Prisma.AudioMetadataModel
  */
 export type DocumentMetadata = Prisma.DocumentMetadataModel
 /**
+ * Model AudioGenJob
+ * 
+ */
+export type AudioGenJob = Prisma.AudioGenJobModel
+/**
+ * Model AudioGenOutput
+ * 
+ */
+export type AudioGenOutput = Prisma.AudioGenOutputModel
+/**
  * Model CliConfig
  * 
  */

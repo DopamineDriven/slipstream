@@ -4,12 +4,15 @@ import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
-import { GeminiChatService } from "@/gemini/chat.ts";
+// import { GeminiChatService } from "@/gemini/chat.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { GeminiModelIdUnion } from "@slipstream/types";
+import { GeminiInteractionsSseService } from "@/gemini/interactions-sse.ts";
 
-export class GeminiService extends GeminiChatService {
+
+
+export class GeminiService extends GeminiInteractionsSseService {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
@@ -36,6 +39,6 @@ export class GeminiService extends GeminiChatService {
     ...rest
   }: ProviderGeminiChatRequestEntity) {
     const m = model as GeminiModelIdUnion;
-    return this.handleGeminiAiChatRequest({ model: m, ...rest });
+    return this.handleGeminiInteractionsRequest({ model: m, ...rest });
   }
 }

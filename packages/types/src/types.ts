@@ -3,6 +3,8 @@ import type {
   Account,
   Attachment,
   AttachmentProvider,
+  AudioGenJob,
+  AudioGenOutput,
   AudioMetadata,
   CliConfig,
   CliConversationActivity,
@@ -177,6 +179,20 @@ export interface ImageGenJobSingleton<
   requestMessage?: MessageSingleton<T>;
 }
 
+export interface AudioGenOutputSingleton<
+  T extends boolean = false
+> extends AudioGenOutput {
+  job?: AudioGenJobSinglton<T>;
+}
+
+export interface AudioGenJobSinglton<
+  T extends boolean = false
+> extends AudioGenJob {
+  output?: AudioGenOutputSingleton<T>;
+  userKey?: UserKeySingleton<T>;
+  requestMessage?: MessageSingleton<T>;
+}
+
 export interface ImageGenOutputSingleton<
   T extends boolean = false
 > extends ImageGenOutput {
@@ -192,6 +208,7 @@ export interface AttachmentSingleton<
   document: DocumentSingleton | null;
   audio: AudioSingleton | null;
   imageGenOutput: ImageGenOutputSingleton<T> | null;
+  audioGenOutput: AudioGenOutputSingleton<T> | null;
   userStoreDoc?: UserStoreDocSingleton<T>;
   ttsJob?: TTSJobSingleton<T>;
 }
@@ -200,11 +217,13 @@ export interface UserKeySingleton<T extends boolean = false> extends UserKey {
   user?: UserSingleton<T>;
   messages?: MessageSingleton<T>[];
   imageGenJobs?: ImageGenJobSingleton<T>[];
+  audioGenJobs?: AudioGenJobSinglton<T>[];
   attachmentProviders?: AttachmentProviderSingleton<T>[];
 }
 
 export interface MessageSingleton<T extends boolean = false> extends Message {
   imageGenJob?: ImageGenJobSingleton<T> | null;
+  audioGenJob?: AudioGenJobSinglton<T> | null;
   userKey?: UserKeySingleton<T> | null;
   attachments: AttachmentSingleton<T>[];
   conversationMemoryChunk?: ConversationMemoryChunkSingleton<T>;

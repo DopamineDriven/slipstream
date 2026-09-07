@@ -17,6 +17,7 @@ import {
   OPENAI_OUTPUT_FORMATS,
   useOpenAIImageSettings
 } from "@/hooks/use-openai-img-gen";
+import { isPureImageModel } from "@/lib/helpers";
 import { imgCtx } from "@/lib/img-ctx";
 import type {
   AIChatRequestImgGenFields,
@@ -108,6 +109,15 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
       return true;
     } else return false;
   }, [currentModelId]);
+
+  // pure image-gen models auto-enable — targeting them IS the intent, no user
+  // toggle required (mirrors AudioGenProvider's lyria derivation; see
+  // isPureImageModel's jsdoc in lib/helpers). The stored toggle keeps serving
+  // the facilitator models (gpt-5.6-sol etc. invoking gpt-image-2 via internal
+  // image_generation tooling) and takes back over as soon as a non-pure model
+  // is targeted. Every pure model is inside imgGenCapableModels, so this never
+  // fights the !supported reset below.
+  const effectiveEnabled = isPureImageModel(currentModelId) || enabled;
 
   const openai = useOpenAIImageSettings(currentModelId);
   const google = useGoogleImageSettings(currentModelId);
@@ -386,7 +396,7 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
       selectedModel: currentModelId,
       selectedProvider: currentProvider,
       supported,
-      enabled,
+      enabled: effectiveEnabled,
       fields,
       settings,
       aspectRatios,
@@ -406,7 +416,7 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
       backgrounds,
       currentModelId,
       currentProvider,
-      enabled,
+      effectiveEnabled,
       fields,
       outputFormats,
       qualities,

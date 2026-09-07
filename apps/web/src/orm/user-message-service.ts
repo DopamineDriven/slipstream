@@ -118,12 +118,14 @@ export class PrismaUserMessageService extends ErrorHelperService {
       orderBy: { createdAt: "desc" },
       include: {
         ttsJob: true,
+        audioGenJob: true,
         imageGenJob: true,
         messageBlocks: { orderBy: { ordinal: "asc" } },
         attachments: {
           orderBy: { createdAt: "asc" },
           include: {
             image: true,
+            audioGenOutput: true,
             document: true,
             imageGenOutput: true,
             audio: true
@@ -161,7 +163,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
       include: {
         messages: {
           where:
-           typeof cursorOrdinal !== "undefined"
+            typeof cursorOrdinal !== "undefined"
               ? { ordinal: { lt: cursorOrdinal } }
               : undefined,
           take,
@@ -169,11 +171,14 @@ export class PrismaUserMessageService extends ErrorHelperService {
           include: {
             ttsJob: true,
             imageGenJob: true,
+            audioGenJob: true,
             messageBlocks: { orderBy: { ordinal: "asc" } },
             attachments: {
               orderBy: { createdAt: "asc" },
               include: {
+                audioGenOutput: true,
                 image: true,
+                video: true,
                 document: true,
                 imageGenOutput: true,
                 audio: true
@@ -237,12 +242,14 @@ export class PrismaUserMessageService extends ErrorHelperService {
           include: {
             ttsJob: true,
             imageGenJob: true,
+            audioGenJob: true,
             messageBlocks: { orderBy: { ordinal: "asc" } },
             attachments: {
               orderBy: { createdAt: "asc" },
               include: {
                 image: true,
                 document: true,
+                audioGenOutput: true,
                 imageGenOutput: true,
                 audio: true
               }

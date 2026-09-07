@@ -124,7 +124,7 @@ export class GeminiChatService extends GeminiWorkupService {
           "Gemini user_store_search query"
         );
 
-        const output = await this. executeUserStoreSearch(userId, input);
+        const output = await this.store.executeFileSearch(userId, input);
 
         return {
           functionResponse: {

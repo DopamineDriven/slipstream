@@ -146,6 +146,20 @@ export const ColorSpace = {
 export type ColorSpace = (typeof ColorSpace)[keyof typeof ColorSpace]
 
 
+export const AudioGenStage = {
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  PERSISTING: 'PERSISTING',
+  FINALIZING: 'FINALIZING',
+  COMPLETED: 'COMPLETED',
+  REFUSAL: 'REFUSAL',
+  FAILED: 'FAILED',
+  ABORTED: 'ABORTED'
+} as const
+
+export type AudioGenStage = (typeof AudioGenStage)[keyof typeof AudioGenStage]
+
+
 export const CliConfigSchemaVersion = {
   v1_0: 'v1_0'
 } as const

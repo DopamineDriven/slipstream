@@ -49,6 +49,25 @@ export const allImgSupportingProviderModels = {
   grok: modelIdsByProviderImgGen.grok
 } as const;
 
+export function isProvider(s: string) {
+  return (
+    s === "alibaba" ||
+    s === "anthropic" ||
+    s === "cohere" ||
+    s === "deepseek" ||
+    s === "gemini" ||
+    s === "grok" ||
+    s === "meta" ||
+    s === "minimax" ||
+    s === "mistral" ||
+    s === "moonshotai" ||
+    s === "openai" ||
+    s === "sakana" ||
+    s === "vercel" ||
+    s === "zai"
+  );
+}
+
 export const providerModelImageGenFacilitatingApi = {
   openai: [
     "gpt-5.6-sol",

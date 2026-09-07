@@ -15,6 +15,7 @@ import type { ChatDraft } from "@/state/chat/store-types";
 import { normalizeImgGenFields } from "@/lib/img-gen-to-attachment";
 import { createAIMessage, toMessageBlocks } from "@/lib/ui-message-helpers";
 import type {
+  AIChatResponseAudioGenFields,
   AIChatResponseImgGenFieldsFinal,
   AttachmentSingleton,
   ChatChunkAndResMsgBlock,
@@ -22,6 +23,7 @@ import type {
   Provider
 } from "@slipstream/types";
 import { toPrismaFormat } from "@slipstream/types";
+import { isAudioGenModel } from "./helpers";
 
 // ── block folding (ported from ai-chat-context.tsx:94-135) ──────────────────
 
@@ -81,6 +83,8 @@ export interface DraftDerivation {
   readonly blocks: readonly ChatChunkAndResMsgBlock[];
   readonly imgGenEnabled: boolean;
   readonly imgGenFields: AIChatResponseImgGenFieldsFinal | undefined;
+  readonly audioGenEnabled: boolean;
+  readonly audioGenFields: AIChatResponseAudioGenFields | undefined;
   readonly userMsgId: string | undefined;
   readonly aiMsgId: string | undefined;
   readonly imgGenAttachmentId: string | undefined;
@@ -95,6 +99,8 @@ export function deriveDraft(draft: ChatDraft): DraftDerivation {
   let thinkingDuration: number | null = null;
   let imgGenEnabled = false;
   let imgGenFields: AIChatResponseImgGenFieldsFinal | undefined = undefined;
+  let audioGenEnabled = false;
+  let audioGenFields: AIChatResponseAudioGenFields | undefined = undefined;
   let userMsgId: string | undefined;
   let aiMsgId: string | undefined;
   let imgGenAttachmentId: string | undefined;
@@ -110,6 +116,13 @@ export function deriveDraft(draft: ChatDraft): DraftDerivation {
       imgGenFields = mergeImgGen(imgGenFields, evt.imgGenFields);
     }
 
+    if (evt.audioGenEnabled) audioGenEnabled = true;
+    if (evt.audioGenFields) {
+      audioGenEnabled = true;
+      // n=1, no partials — the latest frame wins wholesale
+      audioGenFields = evt.audioGenFields;
+    }
+
     if (evt.messageBlocks) {
       blocks = mergeBlock(blocks, evt.messageBlocks);
       text = textFromBlocks(blocks);
@@ -117,9 +130,11 @@ export function deriveDraft(draft: ChatDraft): DraftDerivation {
       thinkingDuration = thinkingDurationFromBlocks(blocks);
       const latest = blocks.at(-1);
       isThinking =
-        typeof evt.isThinking === "boolean" ? evt.isThinking
-        : latest ? isThinkingBlock(latest)
-        : false;
+        typeof evt.isThinking === "boolean"
+          ? evt.isThinking
+          : latest
+            ? isThinkingBlock(latest)
+            : false;
       continue;
     }
 
@@ -146,6 +161,8 @@ export function deriveDraft(draft: ChatDraft): DraftDerivation {
     blocks,
     imgGenEnabled,
     imgGenFields,
+    audioGenEnabled,
+    audioGenFields,
     userMsgId,
     aiMsgId,
     imgGenAttachmentId
@@ -195,7 +212,11 @@ export function streamingMessageFromDerived(
     ordinal: 0,
     content: derived.text,
     userId: ctx.userId,
-    messageType: derived.imgGenEnabled ? "IMAGE_GEN" : "TEXT",
+    messageType: isAudioGenModel(ctx.model)
+      ? "AUDIO_GEN"
+      : derived.imgGenEnabled
+        ? "IMAGE_GEN"
+        : "TEXT",
     provider: toPrismaFormat(ctx.provider),
     model: ctx.model,
     conversationId: ctx.conversationId,
@@ -203,9 +224,9 @@ export function streamingMessageFromDerived(
     responseOutput: null,
     conversationMemoryChunkId: null,
     thinkingText:
-      derived.isThinking || derived.thinkingDuration ?
-        derived.thinkingText
-      : null,
+      derived.isThinking || derived.thinkingDuration
+        ? derived.thinkingText
+        : null,
     thinkingDuration: derived.thinkingDuration,
     createdAt: now,
     disliked: null,

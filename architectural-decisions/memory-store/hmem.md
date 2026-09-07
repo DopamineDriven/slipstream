@@ -28,7 +28,7 @@ one write path and three read paths, all owned by
    arm deterministically across Sol (GPT-5.6) and five gateway arms
    (deepseek/kimi/minimax/zai/alibaba), each running the shared uncapped,
    deadline-bounded tool loop. When a wave of section summaries drains, the
-   **fold** routes to Sol (the digest editor — "Sol remembers, sonnet logs")
+   **fold** routes to Sol (the digest editor — "Sol remembers")
    and merges new READY sections into the context's rolling digest under its
    own CAS and generation-time watermark.
 2. **Read path A — substitution assembly (Part II §2).** Every provider

@@ -1,3 +1,7 @@
+import type { AudioGenOutputSingleton, AudioSingleton } from "@/types.ts";
+import type { Rm } from "@/utils.ts";
+import type { $Enums } from "@slipstream/db/node/generated/client";
+
 export type OpenAICodecTTS = "wav" | "mp3" | "pcm" | "aac" | "opus" | "flac";
 
 export type GeminiCodecTTS = "wav" | "mp3";
@@ -110,3 +114,63 @@ export interface GrokTTSReqShape {
    */
   output_format?: GrokOutputFormatTTS;
 }
+
+export type AIChatResponseAudioGenSubFields = {
+  itemId?: string;
+  draftId: string | null;
+  batchId: string | null;
+  s3ObjectId: string | null;
+  userId: string;
+  origin: "GENERATED";
+  status: $Enums.AudioGenStage;
+  size: number | null;
+  compatKey: string | null;
+  compatStatus: $Enums.CompatStatus | null;
+  compatCdnUrl: string | null;
+  compatReadyAt: Date | null;
+  compatVersionId: string | null;
+  compatS3ObjectId: string | null;
+  compatMime: string | null;
+  compatExt: string | null;
+  uploadDuration: number | null;
+  cdnUrl: string | null;
+  publicUrl: string | null;
+  sourceUrl: string | null;
+  thumbnailKey: string | null;
+  bucket: string;
+  key: string;
+  versionId: string | null;
+  region: string;
+  cacheControl: string | null;
+  contentDisposition: string | null;
+  contentEncoding: string | null;
+  expiresAt: Date | null;
+  filename: string | null;
+  ext: string | null;
+  mime: string | null;
+  etag: string | null;
+  checksumAlgo: $Enums.ChecksumAlgo;
+  checksumSha256: string | null;
+  storageClass: string | null;
+  sseAlgorithm: string | null;
+  sseKmsKeyId: string | null;
+  s3LastModified: Date | null;
+  deletedAt: Date | null;
+  audio: Rm<AudioSingleton, "attachmentId" | "createdAt" | "updatedAt"> | null;
+  audioGenOutput: Rm<
+    AudioGenOutputSingleton,
+    "id" | "attachmentId" | "createdAt" | "updatedAt"
+  > | null;
+  generationGroupId: string;
+  requestMessageId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  jobId: string;
+};
+
+export type AIChatResponseAudioGenFields = {
+  outputMime?: string; // "audio/mpeg" — delivered truth
+  duration?: number; // generation wall-clock, imgGen parity
+  size?: number;
+  audio?: AIChatResponseAudioGenSubFields; // n=1: a single slot — no images[]/partialImages[]/activeImage triad
+};

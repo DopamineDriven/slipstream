@@ -16,7 +16,7 @@
  * (single-derived here, consumed by `dynamic`); the active `store` is exposed so `dynamic` reads the committed
  * timeline via `useChatCommitted(store)`.
  */
-
+import type { SendChatPayload } from "@/hooks/use-send-chat";
 import type { ReactNode } from "react";
 import {
   createContext,
@@ -34,7 +34,6 @@ import {
   useChatError,
   useChatStatus
 } from "@/hooks/use-chat-store-selector";
-import type { SendChatPayload } from "@/hooks/use-send-chat";
 import { useSendChat } from "@/hooks/use-send-chat";
 import {
   deriveDraft,
@@ -44,6 +43,7 @@ import { pathParser } from "@/lib/path-parser";
 import { ChatStore } from "@/state/chat/store";
 import { chatStoreRegistry } from "@/state/chat/store-registry";
 import type {
+  AIChatResponseAudioGenFields,
   AIChatResponseImgGenFieldsFinal,
   ChatChunkAndResMsgBlock,
   MessageSingleton
@@ -85,6 +85,11 @@ interface AIChatContextValue {
   imgGenEnabled: boolean;
   imgGenFields: AIChatResponseImgGenFieldsFinal | undefined;
 
+  // Live audio generation (lyria) state — the envelope arrives on the one
+  // audioGenFields-bearing chunk once the in-flight persist completes.
+  audioGenEnabled: boolean;
+  audioGenFields: AIChatResponseAudioGenFields | undefined;
+
   /** The active per-conversation store — `dynamic` reads the committed timeline via `useChatCommitted(store)`. */
   store: ChatStore;
 }
@@ -125,9 +130,9 @@ export function AIChatProvider({
   // re-resolves when the active id changes — a no-op when the registry hands back the same (incl. migrated)
   // instance, so subscribers never miss a chunk across the new-chat rekey.
   const [store, setStore] = useState<ChatStore>(() =>
-    typeof window === "undefined" ?
-      ssrPlaceholderStore
-    : chatStoreRegistry.getOrCreate(resolvedId)
+    typeof window === "undefined"
+      ? ssrPlaceholderStore
+      : chatStoreRegistry.getOrCreate(resolvedId)
   );
   useEffect(() => {
     const next = chatStoreRegistry.getOrCreate(resolvedId);
@@ -233,6 +238,8 @@ export function AIChatProvider({
         isConnected,
         imgGenEnabled: derived?.imgGenEnabled ?? false,
         imgGenFields: derived?.imgGenFields,
+        audioGenEnabled: derived?.audioGenEnabled ?? false,
+        audioGenFields: derived?.audioGenFields,
         store
       }}>
       {children}

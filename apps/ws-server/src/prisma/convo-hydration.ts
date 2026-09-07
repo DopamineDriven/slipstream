@@ -64,6 +64,7 @@ export class PrismaConvoHydrationService extends PrismaChatResponseService {
                 orderBy: { createdAt: "asc" },
                 include: {
                   imageGenOutput: true,
+                  audioGenOutput: true,
                   image: true,
                   document: true,
                   audio: true

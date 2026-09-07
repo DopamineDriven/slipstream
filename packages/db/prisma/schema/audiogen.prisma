@@ -1,0 +1,59 @@
+enum AudioGenStage {
+  QUEUED
+  PROCESSING
+  PERSISTING
+  FINALIZING
+  COMPLETED
+  REFUSAL
+  FAILED
+  ABORTED
+}
+
+model AudioGenJob {
+  id               String   @id @default(cuid(2))
+  requestMessageId String   @unique
+  provider         Provider
+  model            String
+  userId           String
+  userKeyId        String?
+  keyFingerprint   String?
+
+  // Core request fields — no output controls: Google 400s everything
+  // beyond type:"audio", n is always 1, nothing user-facing to expose
+  prompt       String
+  systemPrompt String?
+
+  // Runtime status / progress
+  stage      AudioGenStage @default(QUEUED)
+  progress   Int           @default(0) // synthetic 0..100 for the ~60-120s generation window
+  etaSeconds Int?
+  durationMs Int? // wall clock, filled on completion
+  usage      Int?
+  error      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  requestMessage Message         @relation("AudioGenJobToMessage", fields: [requestMessageId], references: [id], onDelete: Cascade)
+  userKey        UserKey?        @relation("AudioGenJobToUserKey", fields: [userKeyId], references: [id], onDelete: SetNull)
+  output         AudioGenOutput?
+
+  @@index([requestMessageId, createdAt])
+  @@index([provider, model, createdAt])
+  @@index([stage, createdAt])
+  @@index([userId, createdAt])
+  @@index([userKeyId])
+}
+
+model AudioGenOutput {
+  id           String   @id @default(cuid(2))
+  jobId        String   @unique // n=1, no partials — output:job is strictly 1:1
+  attachmentId String   @unique
+  mime         String? // "audio/mpeg" — what actually came back, not what was asked for
+  ext          String? // "mp3"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  job        AudioGenJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  attachment Attachment  @relation("AudioGenOutputToAttachment", fields: [attachmentId], references: [id], onDelete: Cascade)
+}

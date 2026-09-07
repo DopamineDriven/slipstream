@@ -868,6 +868,7 @@ export class ProviderValidation {
           orderBy: { ordinal: "asc" },
           include: {
             imageGenJob: true,
+            audioGenJob: true,
             messageBlocks: { orderBy: { ordinal: "asc" } },
             attachments: {
               where: {
@@ -886,7 +887,8 @@ export class ProviderValidation {
                 image: true,
                 document: true,
                 audio: true,
-                imageGenOutput: true
+                imageGenOutput: true,
+                audioGenOutput: true
               }
             }
           }
@@ -899,6 +901,7 @@ export class ProviderValidation {
           orderBy: { ordinal: "asc" },
           include: {
             imageGenJob: true,
+            audioGenJob: true,
             messageBlocks: { orderBy: { ordinal: "asc" } },
             attachments: {
               where: {
@@ -917,7 +920,8 @@ export class ProviderValidation {
                 image: true,
                 document: true,
                 audio: true,
-                imageGenOutput: true
+                imageGenOutput: true,
+                audioGenOutput: true
               }
             }
           }

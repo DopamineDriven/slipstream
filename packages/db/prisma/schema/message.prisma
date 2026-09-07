@@ -43,6 +43,7 @@ model Message {
   userKey                   UserKey?                 @relation("MessageToUserKey", fields: [userKeyId], references: [id], onDelete: SetNull)
   attachments               Attachment[]
   imageGenJob               ImageGenJob?             @relation("ImageGenJobToMessage")
+  audioGenJob               AudioGenJob?             @relation("AudioGenJobToMessage")
   conversation              Conversation             @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   conversationMemoryChunk   ConversationMemoryChunk? @relation(fields: [conversationMemoryChunkId], references: [id], onDelete: SetNull)
 

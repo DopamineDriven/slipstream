@@ -1,7 +1,7 @@
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import type { ExtractService } from "@/extract/index.ts";
-import type { BigIntToCompatProps } from "@/types/index.ts";
+import type { AiChatRequestType, BigIntToCompatProps } from "@/types/index.ts";
 import { ModelService } from "@/models/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { AttachmentSingleton } from "@slipstream/types";
@@ -47,27 +47,8 @@ export class PrismaUtilsService extends ModelService {
     return counts?._count.messages ?? 0;
   }
 
-  public localVectorStoreDisplayName(
-    userId: string,
-    provider: $Enums.Provider
-  ) {
-    const env = this.getEnv();
-    return `${env}-${userId}-${provider.toLowerCase()}`;
-  }
-  protected parseDraftId(draftId: string) {
-    if (/^(?:[A-Za-z0-9_-]+~){3}(?:0|[1-9][0-9]*)$/.test(draftId) === false) {
-      throw new Error(`invalid draftId ${draftId}`);
-    }
-    const toArr = draftId.split("~");
-
-    return toArr.map((v, o) =>
-      o !== toArr.length - 1 ? v : Number.parseInt(v, 10)
-    ) as [string, string, string, number];
-  }
-
   protected bigintToNumber<
-    const T extends "image_gen_request" | "ai_chat_request" =
-      "image_gen_request" | "ai_chat_request"
+    const T extends AiChatRequestType = AiChatRequestType
   >(
     _target: T,
     props: BigIntToCompatProps<T>["props"]
@@ -103,8 +84,7 @@ export class PrismaUtilsService extends ModelService {
   }
 
   protected toCompatPropsExtened<
-    const T extends "image_gen_request" | "ai_chat_request" =
-      "image_gen_request" | "ai_chat_request"
+    const T extends AiChatRequestType = AiChatRequestType
   >(
     _target: T,
     rt: BigIntToCompatProps<T>["rt"],
@@ -526,22 +506,6 @@ export class PrismaUtilsService extends ModelService {
     } as const;
   }
 
-  public toUserStoreProvenanceId(att: AttachmentSingleton<true>) {
-    if (!att.cdnUrl)
-      throw new Error("attachment should not exist if cdnUrl is null.");
-    let url: string;
-    if (att.compatStatus === "ACTIVE" && att.compatCdnUrl) {
-      url = att.compatCdnUrl;
-    } else {
-      url = att.cdnUrl;
-    }
-    const [filename, ext] = this.filenameToHexExtTuple(url, att.compatStatus);
-    if (att.conversationId && att.messageId) {
-      return `${att.conversationId}-${att.messageId}-${att.id}-${filename}.${ext}`;
-    } else {
-      throw new Error(`no conversationId or messageId set for ${att.id}`);
-    }
-  }
   public toVectorStoreFilename(att: AttachmentSingleton<true>) {
     if (!att.cdnUrl)
       throw new Error("attachment should not exist if cdnUrl is null.");
@@ -558,6 +522,7 @@ export class PrismaUtilsService extends ModelService {
       throw new Error(`no conversationId or messageId set for ${att.id}`);
     }
   }
+
   public toVectorStoreDocChunkProvenanceId(a: string, chunk: number): string;
   public toVectorStoreDocChunkProvenanceId(
     a: AttachmentSingleton<true>,
