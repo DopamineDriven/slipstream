@@ -221,31 +221,31 @@ export function MobileModelSelectorDrawer() {
                           getDisplayNamesForProvider(provider)
                             .filter(model => model !== "Fugu Cyber")
                             .map(model => {
-                              const isSelected =
-                                activeSelectedProvider === provider &&
-                                activeSelectedDisplayName === model;
-                              return (
-                                <Button
-                                  key={displayNameToModelId[provider][model]}
-                                  variant={isSelected ? "default" : "outline"}
-                                  className={cn(
-                                    cxStyles.default,
-                                    isSelected
-                                      ? cxStyles.isSelected
-                                      : cxStyles.isNotSelected
-                                  )}
-                                  onClick={() => {
-                                    setDraftProvider(provider);
-                                    handleModelSelect(provider, model);
-                                  }}>
-                                  <ModelUI
-                                    model={model}
-                                    provider={provider}
-                                    isSelected={isSelected}
-                                  />
-                                </Button>
-                              );
-                            })
+                            const isSelected =
+                              activeSelectedProvider === provider &&
+                              activeSelectedDisplayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  cxStyles.default,
+                                  isSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
+                                )}
+                                onClick={() => {
+                                  setDraftProvider(provider);
+                                  handleModelSelect(provider, model);
+                                }}>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
                         ) : provider === "alibaba" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =

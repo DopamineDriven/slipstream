@@ -21,30 +21,31 @@ export class AnthropicWorkup extends AnthropicBaseService {
     super(logger, prisma, apiKey);
   }
   private async *getAllAnthropicFiles(apiKey?: string, limit = 50) {
-    let has_more = true;
     let count = 0;
-    let after_id: string | undefined = undefined;
 
     const client = this.getClient(apiKey);
 
-    while (has_more) {
-      const page = await client.beta.files.list({
-        limit,
-        after_id,
-        betas: ["files-api-2025-04-14", "extended-cache-ttl-2025-04-11"]
-      });
+    // cursor-style pagination: the page carries data + next_page (an opaque
+    // cursor for the `page` param — after_id/first_id/last_id no longer
+    // exist); hasNextPage()/getNextPage() keep the cursor inside the sdk
+    let page = await client.beta.files.list({
+      limit,
+      betas: ["files-api-2025-04-14", "extended-cache-ttl-2025-04-11"]
+    });
 
-      has_more = page.has_more;
-      after_id = page.last_id ?? undefined;
+    while (true) {
+      const has_more = page.hasNextPage();
       count += page.data.length;
 
       yield {
         data: page.data,
         count,
         has_more,
-        first_id: page.first_id,
-        last_id: page.last_id
+        next_page: page.next_page
       };
+
+      if (!has_more) break;
+      page = await page.getNextPage();
     }
   }
 

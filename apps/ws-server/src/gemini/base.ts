@@ -196,6 +196,7 @@ export class GeminiBaseService {
 
   protected isGemini3ChatModel(m: string) {
     return (
+      m ==="gemini-3.8-flash" ||
       m === "gemini-3.7-flash" ||
       m === "gemini-3.6-flash" ||
       m === "gemini-3.5-flash" ||
@@ -219,7 +220,7 @@ export class GeminiBaseService {
     );
   }
   protected isLyriaModel(m: string) {
-    return m === "lyria-3-pro-preview" || m === "lyria-3-clip-preview";
+    return m==="lyria-3.5" || m === "lyria-3-pro-preview" || m === "lyria-3-clip-preview";
   }
 
   protected isDeepResearch(m: string) {

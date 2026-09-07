@@ -37,7 +37,7 @@ export const fromPrismaFormat = (provider: $Enums.Provider) => {
  * this at the send site; lyria targeting IS the intent, no user toggle
  */
 export const isAudioGenModel = (m: string) => {
-  return m === "lyria-3-pro-preview" || m === "lyria-3-clip-preview";
+  return m ==="lyria-3.5" || m === "lyria-3-pro-preview" || m === "lyria-3-clip-preview";
 };
 
 

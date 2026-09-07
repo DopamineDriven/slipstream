@@ -389,6 +389,7 @@ export class GeminiInteractionsService extends GeminiWorkupService {
 
   protected get lyriaFamTokenMax() {
     return {
+      "lyria-3.5": 131072,
       "lyria-3-pro-preview": 131072,
       "lyria-3-clip-preview": 131072
     } as const;

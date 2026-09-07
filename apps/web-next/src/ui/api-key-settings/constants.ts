@@ -1,4 +1,4 @@
-import type { ApiKeyData } from "@/ui/api-key-settings/types";
+import type { ProviderRosterEntry } from "@/ui/api-key-settings/types";
 import {
   AnthropicIcon,
   CohereIconCurrentColor,
@@ -16,120 +16,93 @@ import {
   Zai
 } from "@slipstream/ui";
 
-export const providerObj = [
+/** display order is roster order — both the configured list and the add grid follow it */
+export const providerRoster = [
   {
     provider: "anthropic",
     text: "Anthropic",
     icon: AnthropicIcon,
-    value: "sk-ant-*******************************************",
-    isSet: false,
-    isDefault: false
+    placeholder: "sk-ant-*******************************************"
   },
   {
     provider: "gemini",
     text: "Gemini",
     icon: GeminiIcon,
-    value: "AIza********************",
-    isSet: false,
-    isDefault: false
+    placeholder: "AIza********************"
   },
   {
     provider: "grok",
     text: "Grok",
     icon: XAiIcon,
-    value: "xai-*******************************************",
-    isSet: false,
-    isDefault: false
+    placeholder: "xai-*******************************************"
   },
   {
     provider: "openai",
     text: "OpenAI",
     icon: OpenAiIcon,
-    value: "sk-************************************************",
-    isSet: false,
-    isDefault: false
+    placeholder: "sk-************************************************"
   },
   {
     provider: "meta",
     text: "Meta",
     icon: MetaIcon,
-    value: "LLM_******************|*******************",
-    isSet: false,
-    isDefault: false
+    placeholder: "LLM_*************************************"
   },
   {
     provider: "vercel",
     text: "v0",
     icon: v0Icon,
-    value: "vck_********************************",
-    isDefault: false,
-    isSet: false
+    placeholder: "vck_********************************"
   },
   {
     provider: "mistral",
     text: "Mistral",
     icon: MistralIcon,
-    value: `SwM*****************************`,
-    isDefault: false,
-    isSet: false
+    placeholder: "SwM*****************************"
   },
   {
     provider: "cohere",
     text: "Cohere",
     icon: CohereIconCurrentColor,
-    value: "QlQ*************************************",
-    isSet: false,
-    isDefault: false
+    placeholder: "QlQ*************************************"
   },
   {
     provider: "deepseek",
     text: "DeepSeek",
     icon: DeepSeek,
-    value: "vck_********************************",
-    isSet: false,
-    isDefault: false
+    placeholder: "vck_********************************"
   },
   {
     provider: "moonshotai",
     text: "Moonshot AI",
     icon: Kimi,
-    value: "vck_********************************",
-    isSet: false,
-    isDefault: false
+    placeholder: "vck_********************************"
   },
   {
     provider: "zai",
     text: "Z.ai",
     icon: Zai,
-    value: "vck_********************************",
-    isSet: false,
-    isDefault: false
+    placeholder: "vck_********************************"
   },
   {
     provider: "alibaba",
     text: "Alibaba",
     icon: QwenIcon,
-    value: "vck_********************************",
-    isSet: false,
-    isDefault: false
+    placeholder: "vck_********************************"
   },
   {
     provider: "minimax",
     text: "MiniMax",
     icon: MinimaxIcon,
-    value: "vck_********************************",
-    isSet: false,
-    isDefault: false
+    placeholder: "vck_********************************"
   },
   {
     provider: "sakana",
     text: "Sakana",
     icon: SakanaIcon,
-    value: "fish_********************************",
-    isSet: false,
-    isDefault: false
+    placeholder: "fish_********************************"
   }
-] as ApiKeyData[];
+] as const satisfies readonly ProviderRosterEntry[];
 
 export const CARD_HEADER_TEXT =
   "Bring your own API keys for expanded model support. This allows for substantially higher usage limits and access to premium models.";
@@ -139,4 +112,4 @@ export const CARD_FOOTER_TEXT =
 export const API_KEY_SETTINGS_TEXT_CONSTS = {
   CARD_HEADER_TEXT,
   CARD_FOOTER_TEXT
-};
+} as const;

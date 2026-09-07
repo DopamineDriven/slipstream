@@ -1,5 +1,6 @@
 export const modelIdsByProvider = {
   openai: [
+    "gpt-6-astra",
     "gpt-5.6-sol",
     "gpt-5.6-terra",
     "gpt-5.6-luna",
@@ -50,6 +51,7 @@ export const modelIdsByProvider = {
     "sora-2-pro"
   ],
   gemini: [
+    "gemini-3.8-flash",
     "gemini-3.7-flash",
     "gemini-3.6-flash",
     "gemini-3.5-flash-lite",
@@ -62,12 +64,13 @@ export const modelIdsByProvider = {
     "gemini-3.1-flash-lite-image",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
+    "lyria-3.5",
+    "lyria-3-pro-preview",
+    "lyria-3-clip-preview",
     "gemini-omni-flash-preview",
     "veo-3.1-generate-preview",
     "veo-3.1-fast-generate-preview",
     "veo-3.1-lite-generate-preview",
-    "lyria-3-pro-preview",
-    "lyria-3-clip-preview",
     "gemini-2.5-pro",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
@@ -91,6 +94,7 @@ export const modelIdsByProvider = {
     "grok-imagine-video-1.5"
   ],
   anthropic: [
+    "claude-fable-5-1",
     "claude-opus-5",
     "claude-sonnet-5",
     "claude-fable-5",
@@ -102,7 +106,7 @@ export const modelIdsByProvider = {
     "claude-opus-4-5-20251101",
     "claude-haiku-4-5-20251001"
   ],
-  meta: ["muse-spark-1.2", "muse-spark-1.1"],
+  meta: ["muse-spark-1.3", "muse-spark-1.2", "muse-spark-1.1"],
   vercel: ["v0-1.5-md", "v0-1.0-md"],
   mistral: [
     "mistral-small-latest",
@@ -128,8 +132,17 @@ export const modelIdsByProvider = {
     "deepseek-v4-flash",
     "deepseek-r1"
   ],
-  zai: ["glm-5.2", "glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
+  zai: [
+    "glm-5.3",
+    "glm-5.2",
+    "glm-5.1",
+    "glm-5",
+    "glm-4.7",
+    "glm-4.6",
+    "glm-4.5"
+  ],
   alibaba: [
+    "qwen3.8-flash",
     "qwen3.8-max",
     "qwen3.7-max",
     "qwen3.7-plus",

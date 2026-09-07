@@ -1241,6 +1241,7 @@ export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> =
     : undefined;
 
 export type ImgGenWorkupRTObj = {
+  "gpt-6-astra": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.6-sol": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.6-terra": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.6-luna": GptImageAndFacilitatorsImgGenWorkupRT;

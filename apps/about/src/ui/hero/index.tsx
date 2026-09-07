@@ -3,7 +3,15 @@
 import dynamic from "next/dynamic";
 import { StatNumber } from "@/ui/stat-number";
 import { motion, useReducedMotion } from "motion/react";
+import { modelIdsByProvider } from "@slipstream/types";
 import { AICoalesce } from "@slipstream/ui";
+
+// derived from the codegen roster at build time — every model addition
+// redeploys with the repo, so the counts can never go stale (no fetch
+// needed). vercel is excluded from both: v0 is dead upstream.
+const { vercel: _vercel, ...liveProviders } = modelIdsByProvider;
+const MODEL_COUNT = Object.values(liveProviders).flat().length;
+const PROVIDER_COUNT = Object.keys(liveProviders).length;
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme").then(d => d.ThemeToggle),
@@ -97,13 +105,13 @@ export function Hero() {
             className="mt-14 flex items-start gap-8 sm:gap-12 md:gap-16">
             <div>
               <p className="text-[clamp(2.75rem,6.5vw,4.5rem)] font-medium tracking-tight">
-                <StatNumber value={126} delay={0.8} />
+                <StatNumber value={MODEL_COUNT} delay={0.8} />
               </p>
               <p className="text-muted-foreground mt-1 text-sm">models</p>
             </div>
             <div>
               <p className="text-[clamp(2.75rem,6.5vw,4.5rem)] font-medium tracking-tight">
-                <StatNumber value={13} delay={0.95} />
+                <StatNumber value={PROVIDER_COUNT} delay={0.95} />
               </p>
               <p className="text-muted-foreground mt-1 text-sm">providers</p>
             </div>

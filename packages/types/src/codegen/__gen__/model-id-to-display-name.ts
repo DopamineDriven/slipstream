@@ -1,5 +1,6 @@
 export const modelIdToDisplayName = {
   openai: {
+    "gpt-6-astra": "GPT-6 Astra",
     "gpt-5.6-sol": "GPT-5.6 Sol",
     "gpt-5.6-terra": "GPT-5.6 Terra",
     "gpt-5.6-luna": "GPT-5.6 Luna",
@@ -50,6 +51,7 @@ export const modelIdToDisplayName = {
     "sora-2-pro": "Sora 2 Pro"
   },
   gemini: {
+    "gemini-3.8-flash": "Gemini 3.8 Flash",
     "gemini-3.7-flash": "Gemini 3.7 Flash",
     "gemini-3.6-flash": "Gemini 3.6 Flash",
     "gemini-3.5-flash-lite": "Gemini 3.5 Flash Lite",
@@ -62,12 +64,13 @@ export const modelIdToDisplayName = {
     "gemini-3.1-flash-lite-image": "Nano Banana 2 Lite",
     "gemini-3-pro-image-preview": "Nano Banana Pro",
     "gemini-2.5-flash-image": "Nano Banana",
+    "lyria-3.5": "Lyria 3.5",
+    "lyria-3-pro-preview": "Lyria 3 Pro Preview",
+    "lyria-3-clip-preview": "Lyria 3 Clip Preview",
     "gemini-omni-flash-preview": "Gemini Omni Flash Preview",
     "veo-3.1-generate-preview": "Veo 3.1",
     "veo-3.1-fast-generate-preview": "Veo 3.1 fast",
     "veo-3.1-lite-generate-preview": "Veo 3.1 lite",
-    "lyria-3-pro-preview": "Lyria 3 Pro Preview",
-    "lyria-3-clip-preview": "Lyria 3 Clip Preview",
     "gemini-2.5-pro": "Gemini 2.5 Pro",
     "gemini-2.5-flash": "Gemini 2.5 Flash",
     "gemini-2.5-flash-lite": "Gemini 2.5 Flash-Lite",
@@ -92,6 +95,7 @@ export const modelIdToDisplayName = {
     "grok-imagine-video-1.5": "Grok Imagine Video 1.5"
   },
   anthropic: {
+    "claude-fable-5-1": "Claude Fable 5.1",
     "claude-opus-5": "Claude Opus 5",
     "claude-sonnet-5": "Claude Sonnet 5",
     "claude-fable-5": "Claude Fable 5",
@@ -104,6 +108,7 @@ export const modelIdToDisplayName = {
     "claude-haiku-4-5-20251001": "Claude Haiku 4.5"
   },
   meta: {
+    "muse-spark-1.3": "Muse Spark 1.3",
     "muse-spark-1.2": "Muse Spark 1.2",
     "muse-spark-1.1": "Muse Spark 1.1"
   },
@@ -136,6 +141,7 @@ export const modelIdToDisplayName = {
     "deepseek-r1": "DeepSeek R1"
   },
   zai: {
+    "glm-5.3": "GLM 5.3",
     "glm-5.2": "GLM 5.2",
     "glm-5.1": "GLM 5.1",
     "glm-5": "GLM 5",
@@ -144,6 +150,7 @@ export const modelIdToDisplayName = {
     "glm-4.5": "GLM 4.5"
   },
   alibaba: {
+    "qwen3.8-flash": "Qwen3.8-Flash",
     "qwen3.8-max": "Qwen3.8-Max",
     "qwen3.7-max": "Qwen3.7-Max",
     "qwen3.7-plus": "Qwen3.7-Plus",

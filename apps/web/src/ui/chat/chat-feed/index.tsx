@@ -135,7 +135,6 @@ export function ChatFeed({
     };
     requestAnimationFrame(() => {
       toBottom();
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDidInitialScroll(true);
     });
     const fallbackTimer = setTimeout(() => requestAnimationFrame(toBottom), 50);
