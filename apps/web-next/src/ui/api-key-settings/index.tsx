@@ -1,19 +1,31 @@
 "use client";
 
-import type { ApiKeyData } from "@/ui/api-key-settings/types";
+import type { EditorState } from "@/ui/api-key-settings/editor";
+import type { ProviderRosterEntry } from "@/ui/api-key-settings/types";
 import type { ApiKeySubmissionState } from "@/ui/atoms/multi-state-submission-badge";
 import type { User } from "@/utils/auth-client";
+import type { SubmitEvent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getDecryptedApiKeyOnEdit, upsertApiKey } from "@/app/actions/api-key";
+import {
+  deleteApiKey,
+  getDecryptedApiKeyOnEdit,
+  upsertApiKey
+} from "@/app/actions/api-key";
 import { useApiKeys } from "@/context/api-keys-context";
 import { cn } from "@/lib/utils";
 import {
   API_KEY_SETTINGS_TEXT_CONSTS,
-  providerObj
+  providerRoster
 } from "@/ui/api-key-settings/constants";
-import { MultiStateApiKeySubmissionBadge } from "@/ui/atoms/multi-state-submission-badge";
+import {
+  DELETE_CONFIRMATION,
+  deriveRows,
+  describeFailure,
+  isDeleteConfirmation
+} from "@/ui/api-key-settings/derive";
+import { ApiKeyEditor } from "@/ui/api-key-settings/editor";
 import { AnimatePresence, motion } from "motion/react";
-import type { ClientContextWorkupProps, Provider } from "@slipstream/types";
+import type { Provider } from "@slipstream/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,122 +44,26 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Eye,
-  EyeOff,
   Input,
   Label,
   SquarePen,
-  Switch,
-  Trash,
-  X
+  Trash
 } from "@slipstream/ui";
 
-const getPlaceholder = (provider: Provider) => {
-  switch (provider) {
-    case "anthropic":
-      return "sk-ant-*******************************************";
-    case "grok":
-      return "xai-*******************************************";
-    case "meta":
-      return "LLM_*************************************";
-    case "vercel":
-      return "vck_********************************";
-    case "gemini":
-      return "AIza********************";
-    case "mistral":
-      return `SwM*****************************`;
-    case "cohere":
-      return "QlQ*************************************";
-    case "deepseek":
-      return "vck_********************************";
-    case "moonshotai":
-      return "vck_********************************";
-    case "zai":
-      return "vck_********************************";
-    case "alibaba":
-      return "vck_********************************";
-    case "minimax":
-      return "vck_********************************";
-    case "sakana":
-      return "fish_********************************";
-    case "openai":
-    default:
-      return "sk-************************************************";
-  }
-};
-const toProviderContext = (providerObj: ApiKeyData[]) => {
-  const r = {
-    isDefault: {
-      gemini: false,
-      grok: false,
-      meta: false,
-      vercel: false,
-      mistral: false,
-      openai: false,
-      cohere: false,
-      anthropic: false,
-      deepseek: false,
-      moonshotai: false,
-      zai: false,
-      alibaba: false,
-      minimax: false,
-      sakana: false
-    },
-    isSet: {
-      gemini: false,
-      grok: false,
-      mistral: false,
-      meta: false,
-      vercel: false,
-      openai: false,
-      cohere: false,
-      anthropic: false,
-      deepseek: false,
-      moonshotai: false,
-      zai: false,
-      alibaba: false,
-      minimax: false,
-      sakana: false
-    }
-  };
-  providerObj.forEach(function (o) {
-    r.isDefault[o.provider] = o.isDefault;
-    r.isSet[o.provider] = o.isSet;
-  });
-  return r;
-};
+/**
+ * a write we've completed against the action and are now waiting to see
+ * reflected by the server (`provider_context_update_ack`). `ackSeq` is the
+ * context's counter at send time; the ack has landed once it advances.
+ */
+interface PendingWrite {
+  readonly provider: Provider;
+  readonly kind: "save" | "delete";
+  readonly ackSeq: number;
+}
 
-function equalityCheck(
-  one: ClientContextWorkupProps,
-  two: ClientContextWorkupProps
-) {
-  const isSet = { o: one.isSet, t: two.isSet } as const;
-
-  const isDefault = { o: one.isDefault, t: two.isDefault } as const;
-
-  const p = [
-    "anthropic",
-    "cohere",
-    "gemini",
-    "openai",
-    "meta",
-    "mistral",
-    "vercel",
-    "grok",
-    "deepseek",
-    "moonshotai",
-    "zai",
-    "alibaba",
-    "minimax",
-    "sakana"
-  ] as const;
-
-  for (const provider of p) {
-    if (isSet.o[provider] !== isSet.t[provider]) return false;
-    if (isDefault.o[provider] !== isDefault.t[provider]) return false;
-  }
-
-  return true;
+interface RowNotice {
+  readonly provider: Provider;
+  readonly text: string;
 }
 
 interface ApiKeysTabProps {
@@ -157,421 +73,266 @@ interface ApiKeysTabProps {
 
 const { CARD_HEADER_TEXT, CARD_FOOTER_TEXT } = API_KEY_SETTINGS_TEXT_CONSTS;
 
+/** how long the "Saved" flourish lingers on a row — cosmetic only, owns no state */
+const SAVED_FLOURISH_MS = 2000;
+
+function rosterEntry(provider: Provider) {
+  return providerRoster.find(entry => entry.provider === provider);
+}
+
+function textOf(provider: Provider) {
+  return rosterEntry(provider)?.text ?? provider;
+}
+
+const Spinner = () => (
+  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+);
+
+/**
+ * BYOK settings. Server truth (`providerContext`) is rendered directly; the
+ * only local state is ONE editor's draft plus what's in flight. Saves close
+ * on the server's ack — never on a timer.
+ */
 export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
-  // State for managing API keys
-  const [apiKeys, setApiKeys] = useState<ApiKeyData[]>([]);
-  const [editingKey, setEditingKey] = useState<Provider | null>(null);
-  const [visibleKeys, setVisibleKeys] = useState<Set<Provider>>(new Set());
-  const tempValuesRef = useRef<Map<Provider, string>>(new Map());
-  const [_tempValueTrigger, setTempValueTrigger] = useState(0);
-  const [originalValues, setOriginalValues] = useState<
-    Partial<Record<Provider, { value: string; isDefault: boolean }>>
-  >({});
-  const [tempDefaults, setTempDefaults] = useState<
-    Partial<Record<Provider, boolean>>
-  >({});
-
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [keyToDelete, setKeyToDelete] = useState<Provider | null>(null);
-  const [decryptingKey, setDecryptingKey] = useState<Provider | null>(null);
-
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  const [submissionStates, setSubmissionStates] = useState<
-    Partial<Record<Provider, ApiKeySubmissionState>>
-  >({});
-
-  // Add ref for auto-focusing new key inputs
-  const inputRefs = useRef(new Map<Provider, HTMLInputElement | null>());
-
-  const getInputRef = useCallback((provider: Provider) => {
-    return inputRefs.current.get(provider) ?? null;
-  }, []);
-
-  const setInputRef = useCallback(
-    (provider: Provider, element: HTMLInputElement | null) => {
-      inputRefs.current.set(provider, element);
-    },
-    []
-  );
-
-  const getTempDefault = useCallback(
-    (provider: Provider) => {
-      return tempDefaults[provider] ?? false;
-    },
-    [tempDefaults]
-  );
-
-  const getSubmissionState = useCallback(
-    (provider: Provider) => {
-      return submissionStates[provider] ?? "idle";
-    },
-    [submissionStates]
-  );
-
-  const getOriginalValue = useCallback(
-    (provider: Provider) => {
-      return originalValues[provider];
-    },
-    [originalValues]
-  );
-
   const {
     providerContext,
-    isAwaitingInitial,
-    isAwaitingPong,
-    isAwaitingUpdateAck,
-    sendProviderContextUpdate
+    sendProviderContextUpdate,
+    updateAckSeq,
+    subscribeUpdateAck
   } = useApiKeys();
 
-  useEffect(() => {
-    if (!providerContext) return;
-    if ((isAwaitingInitial || isAwaitingPong || isAwaitingUpdateAck) === true)
-      return;
-    if (equalityCheck(toProviderContext(apiKeys), providerContext) === false) {
-      const arr = Array.of<ApiKeyData>();
-      for (const p of providerObj) {
-        if (providerContext.isSet[p.provider]) {
-          p.isSet = true;
-          if (providerContext.isDefault[p.provider]) {
-            p.isDefault = true;
-            arr.push(p);
-          } else {
-            p.isDefault = false;
-            arr.push(p);
-          }
-        } else {
-          p.isSet = false;
-          p.isDefault = false;
-          arr.push(p);
-        }
-      }
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setApiKeys(arr);
-    }
-  }, [
-    providerContext,
-    apiKeys,
-    isAwaitingInitial,
-    isAwaitingPong,
-    isAwaitingUpdateAck
-  ]);
+  const [editor, setEditor] = useState<EditorState | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [pending, setPendingState] = useState<PendingWrite | null>(null);
+  const [revealing, setRevealing] = useState<Provider | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Provider | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [rowNotice, setRowNotice] = useState<RowNotice | null>(null);
+  const [justSaved, setJustSaved] = useState<Provider | null>(null);
 
-  const toggleVisibility = async (provider: Provider) => {
-    const newVisible = new Set(visibleKeys);
-    const keyData = apiKeys.find(key => key.provider === provider);
-
-    if (newVisible.has(provider)) {
-      newVisible.delete(provider);
-    } else {
-      if (keyData?.isSet && editingKey !== provider) {
-        setDecryptingKey(provider);
-        try {
-          if (!tempValuesRef.current.has(provider)) {
-            const decryptedValue = await getDecryptedApiKeyOnEdit(provider);
-            tempValuesRef.current.set(provider, decryptedValue);
-            setTempValueTrigger(prev => prev + 1);
-          }
-          newVisible.add(provider);
-        } catch (error) {
-          console.error("Failed to decrypt API key:", error);
-        } finally {
-          setDecryptingKey(null);
-        }
-      } else {
-        newVisible.add(provider);
-      }
-    }
-    setVisibleKeys(newVisible);
-  };
-
-  const startEditing = async (provider: Provider) => {
-    const currentKey = apiKeys.find(key => key.provider === provider);
-
-    if (currentKey?.isSet) {
-      setDecryptingKey(provider);
-
-      try {
-        const decryptedValue = await getDecryptedApiKeyOnEdit(provider);
-
-        setOriginalValues(prev => ({
-          ...prev,
-          [provider]: {
-            value: decryptedValue,
-            isDefault: currentKey?.isDefault ?? false
-          }
-        }));
-
-        tempValuesRef.current.set(provider, decryptedValue);
-        setTempValueTrigger(prev => prev + 1);
-
-        setTempDefaults(prev => ({
-          ...prev,
-          [provider]: currentKey?.isDefault ?? false
-        }));
-        setEditingKey(provider);
-
-        setVisibleKeys(prev => {
-          const newVisible = new Set(prev);
-          newVisible.delete(provider);
-          return newVisible;
-        });
-      } catch (error) {
-        console.error("Failed to decrypt API key:", error);
-      } finally {
-        setDecryptingKey(null);
-      }
-    } else {
-      setEditingKey(provider);
-      setTempDefaults(prev => ({
-        ...prev,
-        [provider]: false
-      }));
-
-      setVisibleKeys(prev => {
-        const newVisible = new Set(prev);
-        newVisible.add(provider);
-        return newVisible;
-      });
-
-      setTimeout(() => {
-        const input = getInputRef(provider);
-        if (input) {
-          input.focus();
-        }
-      }, 100);
-    }
-  };
-
-  const hasChanges = useCallback(
-    (provider: Provider) => {
-      const original = getOriginalValue(provider);
-      const current = {
-        value: tempValuesRef.current.get(provider) ?? "",
-        isDefault: getTempDefault(provider)
-      };
-
-      if (!original) return true;
-
-      return (
-        original.value !== current.value ||
-        original.isDefault !== current.isDefault
-      );
-    },
-    [getOriginalValue, getTempDefault]
-  );
-
-  const cancelEditing = (provider: Provider) => {
-    const currentKey = apiKeys.find(key => key.provider === provider);
-
-    if (!currentKey?.isSet) {
-      setApiKeys(prev => prev.filter(key => key.provider !== provider));
-    }
-
-    setEditingKey(null);
-    tempValuesRef.current.delete(provider);
-    setTempValueTrigger(prev => prev + 1);
-
-    setTempDefaults(prev => {
-      const newTemp = { ...prev };
-      delete newTemp[provider];
-      return newTemp;
-    });
-    setOriginalValues(prev => {
-      const newTemp = { ...prev };
-      delete newTemp[provider];
-      return newTemp;
-    });
-
-    setVisibleKeys(prev => {
-      const newVisible = new Set(prev);
-      newVisible.delete(provider);
-      return newVisible;
-    });
-  };
-
-  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    const provider = formData.get("provider") as Provider;
-
-    setSubmissionStates(prev => ({ ...prev, [provider]: "processing" }));
-    setSubmitError(null);
-
-    try {
-      const getResult = await upsertApiKey(formData);
-      sendProviderContextUpdate(getResult.success);
-      if (getResult.success) {
-        const apiKey = formData.get("apiKey") as string;
-        const asDefault = formData.get("asDefault") === "true";
-
-        console.log("Form Data Captured:", {
-          apiKey,
-          provider,
-          asDefault,
-          id: getResult.id
-        });
-
-        setSubmissionStates(prev => ({ ...prev, [provider]: "success" }));
-
-        setTimeout(() => {
-          setApiKeys(prev =>
-            prev.map(key => {
-              if (key.provider === provider) {
-                return {
-                  ...key,
-                  value: apiKey,
-                  isSet: apiKey.length > 0,
-                  isDefault: asDefault
-                };
-              }
-              if (asDefault && key.isDefault) {
-                return { ...key, isDefault: false };
-              }
-              return key;
-            })
-          );
-
-          setEditingKey(null);
-          tempValuesRef.current.delete(provider);
-          setTempValueTrigger(prev => prev + 1);
-          setTempDefaults(prev => {
-            const newTemp = { ...prev };
-            delete newTemp[provider];
-            return newTemp;
-          });
-          setVisibleKeys(prev => {
-            const newVisible = new Set(prev);
-            newVisible.delete(provider);
-            return newVisible;
-          });
-          setOriginalValues(prev => {
-            const newOriginal = { ...prev };
-            delete newOriginal[provider];
-            return newOriginal;
-          });
-
-          setSubmissionStates(prev => {
-            const newStates = { ...prev };
-            delete newStates[provider];
-            return newStates;
-          });
-        }, 1500);
-      } else {
-        setSubmissionStates(prev => ({ ...prev, [provider]: "error" }));
-        setSubmitError("Failed to save API key. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error saving API key:", error);
-      setSubmissionStates(prev => ({ ...prev, [provider]: "error" }));
-      setSubmitError("An unexpected error occurred. Please try again.");
-    }
-  };
-
-  const updateTempValue = (provider: Provider, value: string) => {
-    tempValuesRef.current.set(provider, value);
-    setTempValueTrigger(prev => prev + 1);
-  };
-
-  const updateTempDefault = (provider: Provider, isDefault: boolean) => {
-    setTempDefaults(prev => ({
-      ...prev,
-      [provider]: isDefault
-    }));
-  };
-
-  const confirmDelete = (provider: Provider) => {
-    setKeyToDelete(provider);
-    setDeleteConfirmOpen(true);
-  };
-
-  const deleteKey = () => {
-    if (keyToDelete) {
-      setApiKeys(prev => prev.filter(key => key.provider !== keyToDelete));
-
-      if (editingKey === keyToDelete) {
-        setEditingKey(null);
-      }
-      setVisibleKeys(prev => {
-        const newVisible = new Set(prev);
-        newVisible.delete(keyToDelete);
-        return newVisible;
-      });
-      tempValuesRef.current.delete(keyToDelete);
-      setTempValueTrigger(prev => prev + 1);
-      setTempDefaults(prev => {
-        const newTemp = { ...prev };
-        delete newTemp[keyToDelete];
-        return newTemp;
-      });
-      setOriginalValues(prev => {
-        const newTemp = { ...prev };
-        delete newTemp[keyToDelete];
-        return newTemp;
-      });
-    }
-    setDeleteConfirmOpen(false);
-    setKeyToDelete(null);
-  };
-
-  const getDisplayValue = useCallback(
-    (keyData: ApiKeyData) => {
-      if (editingKey === keyData.provider) {
-        return tempValuesRef.current.get(keyData.provider) ?? "";
-      }
-
-      if (!keyData.isSet || !keyData.value) {
-        return "";
-      }
-
-      if (
-        visibleKeys.has(keyData.provider) &&
-        tempValuesRef.current.has(keyData.provider)
-      ) {
-        return tempValuesRef.current.get(keyData.provider) ?? "";
-      }
-
-      return getPlaceholder(keyData.provider);
-    },
-    [editingKey, visibleKeys]
-  );
-
-  const getCurrentDefault = useCallback(
-    (provider: Provider) => {
-      if (editingKey === provider) {
-        return getTempDefault(provider);
-      }
-      const keyData = apiKeys.find(key => key.provider === provider);
-      return keyData?.isDefault ?? false;
-    },
-    [editingKey, getTempDefault, apiKeys]
-  );
-
-  const getAvailableProviders = () => {
-    const currentProviders = new Set(apiKeys.map(key => key.provider));
-    return providerObj.filter(
-      provider => !currentProviders.has(provider.provider)
-    );
-  };
-
-  const addProvider = (provider: Provider) => {
-    const providerData = providerObj.find(p => p.provider === provider);
-    if (providerData) {
-      setApiKeys(prev => [
-        ...prev,
-        { ...providerData, isSet: false, value: "", isDefault: false }
-      ]);
-      startEditing(provider);
-    }
-  };
-
-  useEffect(() => {
-    const x = tempValuesRef.current;
-    return () => {
-      x?.clear();
-    };
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const confirmInputRef = useRef<HTMLInputElement | null>(null);
+  // ref twin of `pending` so the ack listener (an external-event callback) reads the live value
+  const pendingRef = useRef<PendingWrite | null>(null);
+  const setPending = useCallback((next: PendingWrite | null) => {
+    pendingRef.current = next;
+    setPendingState(next);
   }, []);
+
+  const busy = submitting || pending !== null;
+
+  // our in-flight write's ack landed → the row re-derives from providerContext; close up
+  useEffect(
+    () =>
+      subscribeUpdateAck(seq => {
+        const current = pendingRef.current;
+        if (!current || seq <= current.ackSeq) return;
+        setPending(null);
+        if (current.kind === "save") {
+          setEditor(null);
+          setJustSaved(current.provider);
+        }
+      }),
+    [subscribeUpdateAck, setPending]
+  );
+
+  // cosmetic: let the "Saved" flourish fade
+  useEffect(() => {
+    if (!justSaved) return;
+    const timer = setTimeout(() => setJustSaved(null), SAVED_FLOURISH_MS);
+    return () => clearTimeout(timer);
+  }, [justSaved]);
+
+  // focus the field whenever an editor opens
+  const editorProvider = editor?.provider ?? null;
+  useEffect(() => {
+    if (editorProvider) inputRef.current?.focus();
+  }, [editorProvider]);
+
+  const openAdd = useCallback(
+    (provider: Provider) => {
+      if (busy) return;
+      setRowNotice(null);
+      setEditor({
+        provider,
+        mode: "add",
+        value: "",
+        original: "",
+        isDefault: false,
+        originalDefault: false,
+        masked: false,
+        error: null
+      });
+    },
+    [busy]
+  );
+
+  const openEdit = useCallback(
+    async (provider: Provider, currentDefault: boolean) => {
+      if (busy || revealing) return;
+      setRowNotice(null);
+      setRevealing(provider);
+      const result = await getDecryptedApiKeyOnEdit(provider);
+      setRevealing(null);
+      if (!result.success) {
+        setRowNotice({
+          provider,
+          text: describeFailure(result.payload, textOf(provider))
+        });
+        return;
+      }
+      setEditor({
+        provider,
+        mode: "edit",
+        value: result.payload,
+        original: result.payload,
+        isDefault: currentDefault,
+        originalDefault: currentDefault,
+        masked: true,
+        error: null
+      });
+    },
+    [busy, revealing]
+  );
+
+  const cancelEditing = useCallback(() => {
+    if (submitting) return;
+    setEditor(null);
+  }, [submitting]);
+
+  const updateValue = useCallback((value: string) => {
+    setEditor(prev => (prev ? { ...prev, value, error: null } : prev));
+  }, []);
+
+  const updateDefault = useCallback((isDefault: boolean) => {
+    setEditor(prev => (prev ? { ...prev, isDefault, error: null } : prev));
+  }, []);
+
+  const toggleMask = useCallback(() => {
+    setEditor(prev => (prev ? { ...prev, masked: !prev.masked } : prev));
+  }, []);
+
+  const handleSubmit = useCallback(
+    async (event: SubmitEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (!editor || busy) return;
+      const { provider, isDefault } = editor;
+      const apiKey = editor.value.trim();
+      if (apiKey.length === 0) return;
+
+      setSubmitting(true);
+      const formData = new FormData();
+      formData.set("provider", provider);
+      formData.set("apiKey", apiKey);
+      formData.set("asDefault", String(isDefault));
+
+      const result = await upsertApiKey(formData);
+      setSubmitting(false);
+      if (!result.success) {
+        const error = describeFailure(result.payload, textOf(provider));
+        setEditor(prev =>
+          prev?.provider === provider ? { ...prev, error } : prev
+        );
+        return;
+      }
+      // persisted — now wait for the server to re-read and ack with fresh providerContext
+      setPending({ provider, kind: "save", ackSeq: updateAckSeq });
+      sendProviderContextUpdate(true);
+    },
+    [editor, busy, updateAckSeq, sendProviderContextUpdate, setPending]
+  );
+
+  const openDeleteConfirm = useCallback((provider: Provider) => {
+    setDeleteConfirmText("");
+    setConfirmDelete(provider);
+  }, []);
+
+  const closeDeleteConfirm = useCallback(() => {
+    setConfirmDelete(null);
+    setDeleteConfirmText("");
+  }, []);
+
+  const deleteArmed = isDeleteConfirmation(deleteConfirmText);
+
+  const confirmDeleteNow = useCallback(
+    async (provider: Provider) => {
+      if (!deleteArmed) return;
+      closeDeleteConfirm();
+      if (busy) return;
+      setRowNotice(null);
+      if (editor?.provider === provider) setEditor(null);
+      setPending({ provider, kind: "delete", ackSeq: updateAckSeq });
+
+      const formData = new FormData();
+      formData.set("provider", provider);
+      formData.set("confirm", DELETE_CONFIRMATION);
+      const result = await deleteApiKey(formData);
+      if (!result.success) {
+        setPending(null);
+        setRowNotice({
+          provider,
+          text: describeFailure(result.payload, textOf(provider))
+        });
+        return;
+      }
+      sendProviderContextUpdate(true);
+    },
+    [
+      deleteArmed,
+      closeDeleteConfirm,
+      busy,
+      editor,
+      updateAckSeq,
+      sendProviderContextUpdate,
+      setPending
+    ]
+  );
+
+  const editorBadgeState: ApiKeySubmissionState = !editor
+    ? "idle"
+    : editor.error
+      ? "error"
+      : submitting || pending?.provider === editor.provider
+        ? "processing"
+        : "idle";
+
+  const canSave =
+    editor !== null &&
+    !busy &&
+    editor.value.trim().length > 0 &&
+    (editor.mode === "add" ||
+      editor.value !== editor.original ||
+      editor.isDefault !== editor.originalDefault);
+
+  const renderEditor = (entry: ProviderRosterEntry) =>
+    editor?.provider === entry.provider ? (
+      <ApiKeyEditor
+        entry={entry}
+        editor={editor}
+        badgeState={editorBadgeState}
+        busy={busy}
+        canSave={canSave}
+        inputRef={inputRef}
+        onValueChange={updateValue}
+        onDefaultChange={updateDefault}
+        onToggleMask={toggleMask}
+        onCancel={cancelEditing}
+        onSubmit={e => void handleSubmit(e)}
+      />
+    ) : null;
+
+  const rows = providerContext
+    ? deriveRows(providerContext, providerRoster)
+    : null;
+  const addEntry =
+    editor?.mode === "add" ? (rosterEntry(editor.provider) ?? null) : null;
+  const gridEntries =
+    rows?.available.filter(entry => entry.provider !== addEntry?.provider) ??
+    [];
+  const allConfigured =
+    rows !== null &&
+    rows.configured.length === providerRoster.length &&
+    editor === null;
 
   return (
     <BreakoutWrapper>
@@ -589,19 +350,35 @@ export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* Configured Providers Section */}
-            {apiKeys.filter(key => key.isSet).length > 0 && (
+            {rows === null && (
+              <div className="text-brand-text-muted flex items-center space-x-2 text-sm">
+                <Spinner />
+                <span>Loading your keys…</span>
+              </div>
+            )}
+
+            {/* Configured providers — derived from providerContext.isSet */}
+            {rows && rows.configured.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-brand-text-muted sr-only text-sm font-medium">
                   Configured Providers
                 </h3>
                 <AnimatePresence mode="popLayout">
-                  {apiKeys
-                    .filter(key => key.isSet)
-                    // eslint-disable-next-line
-                    .map(keyData => (
+                  {rows.configured.map(row => {
+                    const isEditing = editor?.provider === row.provider;
+                    const isRevealing = revealing === row.provider;
+                    const isDeleting =
+                      pending?.kind === "delete" &&
+                      pending.provider === row.provider;
+                    const status =
+                      justSaved === row.provider
+                        ? "✓ Saved"
+                        : row.isDefault
+                          ? "✓ Default provider"
+                          : "Key on file";
+                    return (
                       <motion.div
-                        key={keyData.provider}
+                        key={row.provider}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10, height: 0 }}
@@ -609,12 +386,12 @@ export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
                         className="space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="relative flex items-center space-x-2">
-                            <keyData.icon className="size-4 shrink-0" />
+                            <row.icon className="size-4 shrink-0" />
                             <span className="text-foreground text-sm font-medium">
-                              {keyData.text}
+                              {row.text}
                             </span>
                             <div className="motion-safe:animate-twinkle size-1.5 shrink-0 rounded-full bg-green-600" />
-                            {keyData.isDefault && (
+                            {row.isDefault && (
                               <span className="bg-foreground/20 text-foreground/80 text-xxs sr-only shrink-0 rounded-2xl bg-clip-border px-1 py-0.5">
                                 default
                               </span>
@@ -626,58 +403,98 @@ export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
                               type="button"
                               variant="ghost"
                               size="sm"
-                              onClick={() => startEditing(keyData.provider)}
-                              disabled={decryptingKey === keyData.provider}
+                              onClick={() =>
+                                void openEdit(row.provider, row.isDefault)
+                              }
+                              disabled={isRevealing || isDeleting || busy}
+                              aria-label={`Edit ${row.text} API key`}
                               className="hover:bg-brand-primary/20 h-8 w-8 p-0">
-                              {decryptingKey === keyData.provider ? (
-                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                              {isRevealing ? (
+                                <Spinner />
                               ) : (
                                 <SquarePen className="h-4 w-4" />
                               )}
                             </Button>
 
                             <AlertDialog
-                              open={
-                                deleteConfirmOpen &&
-                                keyToDelete === keyData.provider
-                              }
+                              open={confirmDelete === row.provider}
                               onOpenChange={open => {
-                                if (!open) {
-                                  setDeleteConfirmOpen(false);
-                                  setKeyToDelete(null);
-                                }
+                                if (!open) closeDeleteConfirm();
                               }}>
                               <AlertDialogTrigger asChild>
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() =>
-                                    confirmDelete(keyData.provider)
-                                  }
+                                  onClick={() => openDeleteConfirm(row.provider)}
+                                  disabled={isDeleting || busy}
+                                  aria-label={`Delete ${row.text} API key`}
                                   className="h-8 w-8 p-0 text-red-500 hover:bg-red-500/20">
-                                  <Trash className="h-4 w-4" />
+                                  {isDeleting ? (
+                                    <Spinner />
+                                  ) : (
+                                    <Trash className="h-4 w-4" />
+                                  )}
                                 </Button>
                               </AlertDialogTrigger>
-                              <AlertDialogContent className="bg-brand-component border-brand-border mx-4 sm:mx-0">
+                              <AlertDialogContent
+                                className="bg-brand-component border-brand-border mx-4 sm:mx-0"
+                                onOpenAutoFocus={e => {
+                                  e.preventDefault();
+                                  confirmInputRef.current?.focus();
+                                }}>
                                 <AlertDialogHeader>
                                   <AlertDialogTitle className="text-brand-text-emphasis">
                                     Delete API Key
                                   </AlertDialogTitle>
                                   <AlertDialogDescription className="text-brand-text-muted">
-                                    Are you sure you want to delete your{" "}
-                                    {keyData.text} API key? This action cannot
-                                    be undone and you'll need to re-enter your
-                                    API key to use this provider again.
+                                    This removes your {row.text} API key. It
+                                    cannot be undone — you'll need to re-enter a
+                                    key to use this provider again. Type{" "}
+                                    <span className="text-brand-text-emphasis font-mono font-semibold">
+                                      {DELETE_CONFIRMATION}
+                                    </span>{" "}
+                                    to confirm.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
+                                <div className="space-y-2">
+                                  <Label
+                                    htmlFor={`confirm-delete-${row.provider}`}
+                                    className="text-brand-text-muted sr-only text-sm">
+                                    Type {DELETE_CONFIRMATION} to confirm
+                                  </Label>
+                                  <Input
+                                    ref={confirmInputRef}
+                                    id={`confirm-delete-${row.provider}`}
+                                    type="text"
+                                    inputMode="text"
+                                    autoComplete="off"
+                                    autoCapitalize="characters"
+                                    spellCheck={false}
+                                    placeholder={DELETE_CONFIRMATION}
+                                    value={deleteConfirmText}
+                                    onChange={e =>
+                                      setDeleteConfirmText(e.target.value)
+                                    }
+                                    onKeyDown={e => {
+                                      if (e.key === "Enter" && deleteArmed) {
+                                        e.preventDefault();
+                                        void confirmDeleteNow(row.provider);
+                                      }
+                                    }}
+                                    className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text font-mono"
+                                  />
+                                </div>
                                 <AlertDialogFooter>
                                   <AlertDialogCancel className="">
                                     Cancel
                                   </AlertDialogCancel>
                                   <AlertDialogAction
-                                    onClick={deleteKey}
-                                    className="bg-red-600 text-white hover:bg-red-700">
+                                    disabled={!deleteArmed}
+                                    onClick={() =>
+                                      void confirmDeleteNow(row.provider)
+                                    }
+                                    className="bg-red-600 text-white hover:bg-red-700 disabled:opacity-50">
                                     Delete Key
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
@@ -686,309 +503,91 @@ export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
                           </div>
                         </div>
 
-                        {/* Show status when not editing */}
-                        {editingKey !== keyData.provider && (
+                        {!isEditing && (
                           <div className="flex items-center space-x-2 pl-7">
                             <div className="text-brand-text-muted text-sm">
-                              {keyData.isDefault
-                                ? "✓ Default provider"
-                                : "Available provider"}
+                              {status}
                             </div>
                           </div>
                         )}
 
-                        {/* Edit form - only show when editing this specific key */}
-                        {editingKey === keyData.provider && (
-                          <form
-                            id={`form-${keyData.provider}`}
-                            onSubmit={handleFormSubmit}
-                            className="space-y-4 pl-7">
-                            <input
-                              type="hidden"
-                              name="provider"
-                              value={keyData.provider}
-                            />
-                            <input
-                              type="hidden"
-                              name="asDefault"
-                              value={getCurrentDefault(
-                                keyData.provider
-                              ).toString()}
-                            />
-
-                            <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 lg:space-x-3">
-                              <div className="relative flex-1">
-                                <Input
-                                  ref={el => setInputRef(keyData.provider, el)}
-                                  name="apiKey"
-                                  id={`${keyData.provider}-key`}
-                                  type={
-                                    !visibleKeys.has(keyData.provider)
-                                      ? "password"
-                                      : "text"
-                                  }
-                                  inputMode="text"
-                                  placeholder={getPlaceholder(keyData.provider)}
-                                  value={getDisplayValue(keyData)}
-                                  onChange={e =>
-                                    updateTempValue(
-                                      keyData.provider,
-                                      e.target.value
-                                    )
-                                  }
-                                  disabled={false}
-                                  className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text pr-12"
-                                  required
-                                />
-
-                                {/* Only show eye toggle for existing keys */}
-                                {keyData.isSet && (
-                                  <div className="absolute top-1/2 right-2 -translate-y-1/2">
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() =>
-                                        toggleVisibility(keyData.provider)
-                                      }
-                                      disabled={
-                                        decryptingKey === keyData.provider
-                                      }
-                                      aria-pressed={visibleKeys.has(
-                                        keyData.provider
-                                      )}
-                                      aria-label={`${visibleKeys.has(keyData.provider) ? "Hide" : "Show"} ${keyData.text} API key`}
-                                      className="hover:bg-brand-primary/20 h-8 w-8 p-0">
-                                      {decryptingKey === keyData.provider ? (
-                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                                      ) : visibleKeys.has(keyData.provider) ? (
-                                        <Eye className="h-4 w-4" />
-                                      ) : (
-                                        <EyeOff className="h-4 w-4" />
-                                      )}
-                                    </Button>
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 lg:flex-col lg:space-y-3 lg:space-x-0 xl:flex-row xl:space-y-0 xl:space-x-3">
-                                <MultiStateApiKeySubmissionBadge
-                                  state={getSubmissionState(keyData.provider)}
-                                  context={keyData.isSet ? "update" : "add"}
-                                  disabled={
-                                    keyData.isSet &&
-                                    !hasChanges(keyData.provider)
-                                  }
-                                  onClick={() => {
-                                    const form = document.getElementById(
-                                      `form-${keyData.provider}`
-                                    ) as HTMLFormElement;
-                                    if (form) form.requestSubmit();
-                                  }}
-                                  className="flex-1 sm:flex-none lg:flex-1 xl:flex-none"
-                                />
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  onClick={() =>
-                                    cancelEditing(keyData.provider)
-                                  }
-                                  className="bg-brand-sidebar border-brand-border text-brand-text min-h-11 flex-1 hover:bg-red-500/20 sm:flex-none lg:flex-1 xl:flex-none">
-                                  <X className="mr-2 h-4 w-4" />
-                                  Cancel
-                                </Button>
-                              </div>
-                            </div>
-
-                            {/* Default provider toggle */}
-                            <div className="flex items-center space-x-3">
-                              <Switch
-                                id={`default-${keyData.provider}`}
-                                checked={getCurrentDefault(keyData.provider)}
-                                onCheckedChange={checked =>
-                                  updateTempDefault(keyData.provider, checked)
-                                }
-                              />
-                              <Label
-                                htmlFor={`default-${keyData.provider}`}
-                                className="text-brand-text-muted text-sm">
-                                Set as default provider
-                              </Label>
-                            </div>
-
-                            {/* Error display */}
-                            {submitError && editingKey === keyData.provider && (
-                              <div className="text-sm text-red-500">
-                                {submitError}
-                              </div>
-                            )}
-                          </form>
+                        {rowNotice?.provider === row.provider && (
+                          <div
+                            role="alert"
+                            className="pl-7 text-sm text-red-500">
+                            {rowNotice.text}
+                          </div>
                         )}
+
+                        {renderEditor(row)}
                       </motion.div>
-                    ))}
+                    );
+                  })}
                 </AnimatePresence>
               </div>
             )}
 
-            {/* Divider - only show if we have both configured and available providers */}
-            {apiKeys.filter(key => key.isSet).length > 0 &&
-              (apiKeys.filter(key => !key.isSet).length > 0 ||
-                getAvailableProviders().length > 0) && (
+            {/* Divider — only when both sections render */}
+            {rows &&
+              rows.configured.length > 0 &&
+              (addEntry !== null || gridEntries.length > 0) && (
                 <div className="flex items-center space-x-4 py-2">
                   <div className="border-brand-border flex-1 border-t border-dotted"></div>
                 </div>
               )}
 
-            {/* Available Providers Section - providers that are available but not yet configured */}
-            {apiKeys.filter(key => !key.isSet).length > 0 && (
+            {/* Add a provider — the one open add-editor (if any) above the grid of the rest */}
+            {rows && (addEntry !== null || gridEntries.length > 0) && (
               <div className="space-y-4">
                 <div className="text-brand-text-muted text-sm font-medium">
-                  Available Providers
+                  Add a provider
                 </div>
-                <AnimatePresence mode="popLayout">
-                  {apiKeys
-                    .filter(key => !key.isSet)
-                    // eslint-disable-next-line
-                    .map(keyData => (
-                      <motion.div
-                        key={keyData.provider}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-3">
-                        <div className="flex items-center space-x-2">
-                          <keyData.icon className="h-5 w-5 shrink-0" />
-                          <label
-                            htmlFor={`${keyData.provider}-key`}
-                            className="text-brand-text-muted text-sm font-medium">
-                            {keyData.text}
-                          </label>
-                        </div>
 
-                        {/* Always show the form for new keys - no intermediate state */}
-                        <form
-                          id={`form-${keyData.provider}`}
-                          onSubmit={handleFormSubmit}
-                          className="space-y-4 pl-7">
-                          <input
-                            type="hidden"
-                            name="provider"
-                            value={keyData.provider}
-                          />
-                          <input
-                            type="hidden"
-                            name="asDefault"
-                            value={getCurrentDefault(
-                              keyData.provider
-                            ).toString()}
-                          />
+                {addEntry && (
+                  <motion.div
+                    key={addEntry.provider}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <addEntry.icon className="h-5 w-5 shrink-0" />
+                      <label
+                        htmlFor={`${addEntry.provider}-key`}
+                        className="text-brand-text-muted text-sm font-medium">
+                        {addEntry.text}
+                      </label>
+                    </div>
+                    {renderEditor(addEntry)}
+                  </motion.div>
+                )}
 
-                          <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 lg:space-x-3">
-                            <div className="relative flex-1">
-                              <Input
-                                ref={el => setInputRef(keyData.provider, el)}
-                                name="apiKey"
-                                id={`${keyData.provider}-key`}
-                                type="text"
-                                inputMode="text"
-                                placeholder={getPlaceholder(keyData.provider)}
-                                value={getDisplayValue(keyData)}
-                                onChange={e =>
-                                  updateTempValue(
-                                    keyData.provider,
-                                    e.target.value
-                                  )
-                                }
-                                className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text"
-                                required
-                              />
-                              {/* No eye toggle for new keys - they're always visible */}
-                            </div>
-
-                            <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 lg:flex-col lg:space-y-3 lg:space-x-0 xl:flex-row xl:space-y-0 xl:space-x-3">
-                              <MultiStateApiKeySubmissionBadge
-                                state={getSubmissionState(keyData.provider)}
-                                context="add"
-                                disabled={false}
-                                onClick={() => {
-                                  const form = document.getElementById(
-                                    `form-${keyData.provider}`
-                                  ) as HTMLFormElement;
-                                  if (form) form.requestSubmit();
-                                }}
-                                className="flex-1 sm:flex-none lg:flex-1 xl:flex-none"
-                              />
-                              <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => cancelEditing(keyData.provider)}
-                                className="bg-brand-sidebar border-brand-border text-brand-text min-h-11 flex-1 hover:bg-red-500/20 sm:flex-none lg:flex-1 xl:flex-none">
-                                <X className="mr-2 h-4 w-4" />
-                                Cancel
-                              </Button>
-                            </div>
-                          </div>
-
-                          {/* Default provider toggle */}
-                          <div className="flex items-center space-x-3">
-                            <Switch
-                              id={`default-${keyData.provider}`}
-                              checked={getCurrentDefault(keyData.provider)}
-                              onCheckedChange={checked =>
-                                updateTempDefault(keyData.provider, checked)
-                              }
-                            />
-                            <Label
-                              htmlFor={`default-${keyData.provider}`}
-                              className="text-brand-text-muted text-sm">
-                              Set as default provider
-                            </Label>
-                          </div>
-                          {submitError && editingKey === keyData.provider && (
-                            <div className="text-sm text-red-500">
-                              {submitError}
-                            </div>
-                          )}
-                        </form>
-                      </motion.div>
+                {gridEntries.length > 0 && (
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+                    {gridEntries.map(entry => (
+                      <Button
+                        key={entry.provider}
+                        type="button"
+                        variant="outline"
+                        onClick={() => openAdd(entry.provider)}
+                        disabled={busy}
+                        className="bg-brand-sidebar border-brand-border hover:bg-brand-primary/20 text-brand-text h-auto min-h-14 justify-start space-x-1.5">
+                        <entry.icon className="h-6 w-6 shrink-0" />
+                        <span className="text-left text-sm">{entry.text}</span>
+                      </Button>
                     ))}
-                </AnimatePresence>
-              </div>
-            )}
-
-            {/* Provider Configuration Section - providers not yet added */}
-            {getAvailableProviders().length > 0 && (
-              <div className="space-y-4">
-                <div className="text-brand-text-muted text-sm font-medium">
-                  Provider Configuration
-                </div>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-                  {getAvailableProviders().map(provider => (
-                    <Button
-                      key={provider.provider}
-                      variant="outline"
-                      onClick={() => addProvider(provider.provider)}
-                      className="bg-brand-sidebar border-brand-border hover:bg-brand-primary/20 text-brand-text h-auto min-h-14 justify-start space-x-1.5">
-                      <provider.icon className="h-6 w-6 shrink-0" />
-                      <span className="text-left text-sm">{provider.text}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Shown only when all offered providers are configured */}
-            {getAvailableProviders().length === 0 &&
-              apiKeys.filter(key => !key.isSet).length === 0 &&
-              apiKeys.filter(key => key.isSet).length ===
-                providerObj.length && (
-                <div className="py-8 text-center">
-                  <div className="text-brand-text-muted text-sm">
-                    🎉 All supported providers have been configured!
                   </div>
+                )}
+              </div>
+            )}
+
+            {allConfigured && (
+              <div className="py-8 text-center">
+                <div className="text-brand-text-muted text-sm">
+                  🎉 All supported providers have been configured!
                 </div>
-              )}
+              </div>
+            )}
           </CardContent>
           <CardFooter className="text-brand-text-muted text-xs tracking-tight">
             {CARD_FOOTER_TEXT}

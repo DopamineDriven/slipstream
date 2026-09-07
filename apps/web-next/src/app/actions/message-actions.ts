@@ -61,6 +61,7 @@ export async function rxnAction(
           image: true,
           document: true,
           imageGenOutput: true,
+          audioGenOutput: true,
           audio: true
         }
       }

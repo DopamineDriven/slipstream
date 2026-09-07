@@ -120,6 +120,7 @@ export class ProviderValidation {
 
   public openAIFacilitatingImgGenModel(model: string) {
     return (
+      model === "gpt-6-astra" ||
       model === "gpt-5.6-sol" ||
       model === "gpt-5.6-terra" ||
       model === "gpt-5.6-luna" ||
@@ -178,7 +179,7 @@ export class ProviderValidation {
   }
 
   public isImgGenCapableModel<const V extends string = string>(
-    model = "gpt-5.5" as V
+    model = "gpt-6-astra" as V
   ) {
     if (
       this.grokImgGenCapable(model) ||
@@ -194,7 +195,7 @@ export class ProviderValidation {
     model: Exclude<AllModelsUnion, AllPureImgGenModelsUnion>
   ): false;
   public isPureImgGenModel<const V extends AllModelsUnion = AllModelsUnion>(
-    model = "gpt-5.5" as V
+    model = "gpt-5.6-astra" as V
   ) {
     if (!(
       this.grokImgGenCapable(model) ||
@@ -244,7 +245,7 @@ export class ProviderValidation {
     data?: { n?: number }
   ): undefined;
   public handleImgGenCount(
-    model: AllModelsUnion = "gpt-5.6-sol",
+    model: AllModelsUnion = "gpt-6-astra",
     data?: { n?: number }
   ) {
     if (this.grokImgGenCapable(model)) {
@@ -281,7 +282,7 @@ export class ProviderValidation {
     return b === "auto" || b === "transparent" || b === "opaque";
   }
   public handleImgGenOutputFormat(
-    model: AllModelsUnion = "gpt-5.6-sol",
+    model: AllModelsUnion = "gpt-6-astra",
     data?: { format?: ModelToOutputFormatOpts<typeof model> }
   ) {
     const m = model;
@@ -484,7 +485,7 @@ export class ProviderValidation {
   }
 
   public handleImgGenOutputQuality(
-    model: AllModelsUnion = "gpt-5.6-sol",
+    model: AllModelsUnion = "gpt-6-astra",
     data?: { output_quality: ModelToQualityOpts<typeof model> }
   ) {
     const q = data?.output_quality;
@@ -542,7 +543,7 @@ export class ProviderValidation {
         return "grok-imagine-image" satisfies AllModelsUnion;
       }
       case "openai": {
-        return "gpt-5.5" satisfies AllModelsUnion;
+        return "gpt-6-astra" satisfies AllModelsUnion;
       }
       case "cohere":
       case "mistral":
@@ -667,7 +668,7 @@ export class ProviderValidation {
   }
 
   public handlePartialImgGen(
-    model: AllModelsUnion = "gpt-5.6-sol",
+    model: AllModelsUnion = "gpt-6-astra",
     data?: { partialImagesRequested?: number }
   ) {
     if (this.openAIImgGenCapable(model)) {
@@ -689,7 +690,7 @@ export class ProviderValidation {
   }
 
   public handleOutputSize<const M extends AllModelsUnion = AllModelsUnion>(
-    model = "gpt-5.6-sol" as M,
+    model = "gpt-6-astra" as M,
     data?: { output_size?: ModelToAspectRatioOpts<typeof model> }
   ) {
     if (!model) return;
@@ -755,7 +756,9 @@ export class ProviderValidation {
     keyId: string | null;
   }) {
     const model =
-      data?.model ?? this.fallbackImgGenModelByProvider(provider) ?? "gpt-5.5";
+      data?.model ??
+      this.fallbackImgGenModelByProvider(provider) ??
+      "gpt-6-astra";
 
     const outputCompression = this.handleImgGenCompression(model, {
         output_compression: data.imgGenFields?.output_compression,

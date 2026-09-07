@@ -16,6 +16,7 @@ dotenv.config({ quiet: true });
 
 const providerModelImagesApi = {
   openai: [
+    "gpt-6-astra",
     "gpt-5.6-sol",
     "gpt-5.6-terra",
     "gpt-5.6-luna",
@@ -59,6 +60,10 @@ const providerModelImagesApi = {
   ]
 } as const;
 
+const providerModelAudioApi = {
+  gemini: ["lyria-3.5", "lyria-3-pro-preview", "lyria-3-clip-preview"]
+};
+
 const providerModelVideosApi = {
   openai: ["sora-2", "sora-2-pro"],
   gemini: [
@@ -72,6 +77,7 @@ const providerModelVideosApi = {
 
 const providerModelChatApi = {
   openai: [
+    "gpt-6-astra",
     "gpt-5.6-sol",
     "gpt-5.6-terra",
     "gpt-5.6-luna",
@@ -122,6 +128,7 @@ const providerModelChatApi = {
     "sora-2-pro"
   ],
   gemini: [
+    "gemini-3.8-flash",
     "gemini-3.7-flash",
     "gemini-3.6-flash",
     "gemini-3.5-flash-lite",
@@ -134,12 +141,13 @@ const providerModelChatApi = {
     "gemini-3.1-flash-lite-image",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
+    "lyria-3.5",
+    "lyria-3-pro-preview",
+    "lyria-3-clip-preview",
     "gemini-omni-flash-preview",
     "veo-3.1-generate-preview",
     "veo-3.1-fast-generate-preview",
     "veo-3.1-lite-generate-preview",
-    "lyria-3-pro-preview",
-    "lyria-3-clip-preview",
     "gemini-2.5-pro",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
@@ -163,6 +171,7 @@ const providerModelChatApi = {
     "grok-imagine-video-1.5"
   ],
   anthropic: [
+    "claude-fable-5-1",
     "claude-opus-5",
     "claude-sonnet-5",
     "claude-fable-5",
@@ -174,7 +183,7 @@ const providerModelChatApi = {
     "claude-opus-4-5-20251101",
     "claude-haiku-4-5-20251001"
   ],
-  meta: ["muse-spark-1.2", "muse-spark-1.1"],
+  meta: ["muse-spark-1.3", "muse-spark-1.2", "muse-spark-1.1"],
   vercel: ["v0-1.5-md", "v0-1.0-md"],
   mistral: [
     "mistral-small-latest",
@@ -200,8 +209,17 @@ const providerModelChatApi = {
     "deepseek-v4-flash",
     "deepseek-r1"
   ],
-  zai: ["glm-5.2", "glm-5.1", "glm-5", "glm-4.7", "glm-4.6", "glm-4.5"],
+  zai: [
+    "glm-5.3",
+    "glm-5.2",
+    "glm-5.1",
+    "glm-5",
+    "glm-4.7",
+    "glm-4.6",
+    "glm-4.5"
+  ],
   alibaba: [
+    "qwen3.8-flash",
     "qwen3.8-max",
     "qwen3.7-max",
     "qwen3.7-plus",
@@ -238,6 +256,7 @@ async function geminiFetcher() {
 }
 
 const META_NAME_OVERRIDES = {
+  "muse-spark-1.3": "Muse Spark 1.3",
   "muse-spark-1.2": "Muse Spark 1.2",
   "muse-spark-1.1": "Muse Spark 1.1"
 } as const;
@@ -264,7 +283,8 @@ const ALIBABA_NAME_OVERRIDES = {
   "qwen3.7-plus": "Qwen3.7-Plus",
   "qwen3.7-max": "Qwen3.7-Max",
   "qwen3.7-flash": "Qwen3.7-Flash",
-  "qwen3.8-max": "Qwen3.8-Max"
+  "qwen3.8-max": "Qwen3.8-Max",
+  "qwen3.8-flash": "Qwen3.8-Flash"
 } as const;
 
 const MINIMAX_NAME_OVERRIDES = {
@@ -288,6 +308,7 @@ const COHERE_NAME_OVERRIDES = {
 } as const;
 
 const ZAI_NAME_OVERRIDES = {
+  "glm-5.3": "GLM 5.3",
   "glm-5.2": "GLM 5.2",
   "glm-5.1": "GLM 5.1",
   "glm-5": "GLM 5",
@@ -344,7 +365,8 @@ function filterForAlibaba(id: string) {
     id === "qwen3.7-max" ||
     id === "qwen3.7-plus" ||
     id === "qwen3.7-flash" ||
-    id === "qwen3.8-max"
+    id === "qwen3.8-max" ||
+    id === "qwen3.8-flash"
   );
 }
 
@@ -391,12 +413,17 @@ function filterForZai(id: string) {
     id === "glm-4.6" ||
     id === "glm-4.5" ||
     id === "glm-5.1" ||
-    id === "glm-5.2"
+    id === "glm-5.2" ||
+    id === "glm-5.3"
   );
 }
 
 function filterForMeta(id: string) {
-  return id === "muse-spark-1.1" || id === "muse-spark-1.2";
+  return (
+    id === "muse-spark-1.1" ||
+    id === "muse-spark-1.2" ||
+    id === "muse-spark-1.3"
+  );
 }
 
 function filterForMistral(id: string) {
@@ -547,6 +574,7 @@ function prettyModelName(id: string, provider: Provider = "openai") {
 }
 
 const gptNameMap = {
+  "gpt-6-astra": "GPT-6 Astra",
   "gpt-5.6-sol": "GPT-5.6 Sol",
   "gpt-5.6-terra": "GPT-5.6 Terra",
   "gpt-5.6-luna": "GPT-5.6 Luna",
@@ -571,6 +599,7 @@ const gptNameMap = {
 
 function filterForGPT(s: string) {
   return (
+    s === "gpt-6-astra" ||
     s === "gpt-5.6-sol" ||
     s === "gpt-5.6-terra" ||
     s === "gpt-5.6-luna" ||
@@ -788,6 +817,38 @@ const modelMapper = async (modelKeys = true) => {
               : helper.push([
                   parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
                     model,
+                  model
+                ]);
+          });
+          return helper;
+        }
+      }
+    }
+  );
+};
+
+const audioModelMapper = async (modelKeys = true) => {
+  const geminiData = await geminiFetcher().then(d => d.text());
+  const parseGemini = formattedGemini(JSON.parse(geminiData));
+
+  return Array.from(Object.entries(providerModelAudioApi)).map(
+    ([provider, models]) => {
+      const p = provider as keyof typeof providerModelAudioApi;
+
+      switch (p) {
+        case "gemini":
+        default: {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            modelKeys === true
+              ? helper.push([
+                  model,
+                  parseGemini.find(t => t.name === `models/${model}`)
+                    ?.displayName ?? model
+                ])
+              : helper.push([
+                  parseGemini.find(t => t.name === `models/${model}`)
+                    ?.displayName ?? model,
                   model
                 ]);
           });
@@ -1049,6 +1110,42 @@ async function displayNameModelIdGen<
   };
 }
 
+async function displayNameModelIdGenAudio<
+  const T extends "keys=model-id" | "keys=display-name",
+  const V extends "model-id-only" | "display-name-only"
+>(target: T, arrayOnly?: V) {
+  const mapper = await audioModelMapper(
+    target === "keys=display-name" ? false : true
+  );
+  const gemini = mapper[0];
+
+  if (!gemini) {
+    throw new Error("empty data in displayNameModelIdGenAudio");
+  }
+  if (typeof arrayOnly !== "undefined") {
+    if (arrayOnly === "display-name-only") {
+      if (target === "keys=display-name") {
+        return {
+          gemini: gemini.map(([keys, _v]) => keys)
+        };
+      } else {
+        return { gemini: gemini.map(([_, vals]) => vals) };
+      }
+    } else {
+      if (target === "keys=display-name") {
+        return { gemini: gemini.map(([_, vals]) => vals) };
+      } else {
+        return {
+          gemini: gemini.map(([keys, _v]) => keys)
+        };
+      }
+    }
+  }
+  return {
+    gemini: Object.fromEntries(gemini)
+  };
+}
+
 async function displayNameModelIdGenImages<
   const T extends "keys=model-id" | "keys=display-name",
   const V extends "model-id-only" | "display-name-only"
@@ -1151,7 +1248,7 @@ async function displayNameModelIdGenVideos<
   };
 }
 async function Multimodal<
-  const S extends "default" | "img" | "video",
+  const S extends "default" | "img" | "video" | "audio",
   const T extends "keys=model-id" | "keys=display-name",
   const V extends "model-id-only" | "display-name-only"
 >(mode: S, target: T, arrayOnly?: V): Promise<MultimodalRT> {
@@ -1165,6 +1262,11 @@ async function Multimodal<
       return await (arrayOnly
         ? displayNameModelIdGenVideos(target, arrayOnly)
         : displayNameModelIdGenVideos(target));
+    }
+    case "audio": {
+      return await (arrayOnly
+        ? displayNameModelIdGenAudio(target, arrayOnly)
+        : displayNameModelIdGenAudio(target));
     }
     case "default": {
       return await (arrayOnly
@@ -1180,9 +1282,10 @@ async function Multimodal<
 if (
   process.argv[3] === "img" ||
   process.argv[3] === "default" ||
-  process.argv[3] === "video"
+  process.argv[3] === "video" ||
+  process.argv[3] === "audio"
 ) {
-  (async (target: "img" | "default" | "video") => {
+  (async (target: "img" | "default" | "video" | "audio") => {
     const displayNameToModelId = await Multimodal(target, "keys=display-name");
 
     const displayNameOnly = await Multimodal(
@@ -1202,31 +1305,40 @@ if (
     const format = {
       default: "",
       img: "ImgGen",
-      video: "VideoGen"
+      video: "VideoGen",
+      audio: "AudioGen"
     } as const;
 
-    const displayNameToModelIdsScaffold = (t: "default" | "video" | "img") =>
+    const displayNameToModelIdsScaffold = (
+      t: "default" | "video" | "img" | "audio"
+    ) =>
       `export const displayNameToModelId${format[t]} = ${JSON.stringify(displayNameToModelId, null, 2)} as const;` as const;
 
-    const displayNameOnlyScaffold = (t: "default" | "video" | "img") =>
+    const displayNameOnlyScaffold = (
+      t: "default" | "video" | "img" | "audio"
+    ) =>
       `export const displayNameModelsByProvider${format[t]} = ${JSON.stringify(displayNameOnly, null, 2)} as const;` as const;
 
-    const modelIdsOnlyScaffold = (t: "default" | "video" | "img") =>
+    const modelIdsOnlyScaffold = (t: "default" | "video" | "img" | "audio") =>
       `export const modelIdsByProvider${format[t]} = ${JSON.stringify(modelIdsOnly, null, 2)} as const;` as const;
 
-    const modelIdToDisplayNameScaffold = (t: "default" | "video" | "img") =>
+    const modelIdToDisplayNameScaffold = (
+      t: "default" | "video" | "img" | "audio"
+    ) =>
       `export const modelIdToDisplayName${format[t]} = ${JSON.stringify(modelIdToDisplayName, null, 2)} as const;` as const;
 
     const displayNameToModelIdObj = {
       template: {
         default: displayNameToModelIdsScaffold("default"),
         img: displayNameToModelIdsScaffold("img"),
-        video: displayNameToModelIdsScaffold("video")
+        video: displayNameToModelIdsScaffold("video"),
+        audio: displayNameToModelIdsScaffold("audio")
       },
       path: {
         default: "src/codegen/__gen__/display-name-to-model-id.ts",
         img: "src/codegen/__gen__/display-name-to-model-id-img-gen.ts",
-        video: "src/codegen/__gen__/display-name-to-model-id-video-gen.ts"
+        video: "src/codegen/__gen__/display-name-to-model-id-video-gen.ts",
+        audio: "src/codegen/__gen__/display-name-to-model-id-audio-gen.ts"
       }
     } as const;
 
@@ -1234,12 +1346,14 @@ if (
       template: {
         default: displayNameOnlyScaffold("default"),
         img: displayNameOnlyScaffold("img"),
-        video: displayNameOnlyScaffold("video")
+        video: displayNameOnlyScaffold("video"),
+        audio: displayNameOnlyScaffold("audio")
       },
       path: {
         default: "src/codegen/__gen__/display-names-by-provider.ts",
         img: "src/codegen/__gen__/display-names-by-provider-img-gen.ts",
-        video: "src/codegen/__gen__/display-names-by-provider-video-gen.ts"
+        video: "src/codegen/__gen__/display-names-by-provider-video-gen.ts",
+        audio: "src/codegen/__gen__/display-names-by-provider-audio-gen.ts"
       }
     } as const;
 
@@ -1247,12 +1361,14 @@ if (
       template: {
         default: modelIdToDisplayNameScaffold("default"),
         img: modelIdToDisplayNameScaffold("img"),
-        video: modelIdToDisplayNameScaffold("video")
+        video: modelIdToDisplayNameScaffold("video"),
+        audio: modelIdToDisplayNameScaffold("audio")
       },
       path: {
         default: "src/codegen/__gen__/model-id-to-display-name.ts",
         img: "src/codegen/__gen__/model-id-to-display-name-img-gen.ts",
-        video: "src/codegen/__gen__/model-id-to-display-name-video-gen.ts"
+        video: "src/codegen/__gen__/model-id-to-display-name-video-gen.ts",
+        audio: "src/codegen/__gen__/model-id-to-display-name-audio-gen.ts"
       }
     } as const;
 
@@ -1260,12 +1376,14 @@ if (
       template: {
         default: modelIdsOnlyScaffold("default"),
         img: modelIdsOnlyScaffold("img"),
-        video: modelIdsOnlyScaffold("video")
+        video: modelIdsOnlyScaffold("video"),
+        audio: modelIdsOnlyScaffold("audio")
       },
       path: {
         default: "src/codegen/__gen__/model-ids-by-provider.ts",
         img: "src/codegen/__gen__/model-ids-by-provider-img-gen.ts",
-        video: "src/codegen/__gen__/model-ids-by-provider-video-gen.ts"
+        video: "src/codegen/__gen__/model-ids-by-provider-video-gen.ts",
+        audio: "src/codegen/__gen__/model-ids-by-provider-audio-gen.ts"
       }
     } as const;
 

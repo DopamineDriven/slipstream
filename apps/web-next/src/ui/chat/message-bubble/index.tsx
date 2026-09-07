@@ -10,12 +10,14 @@ import { processStreamingMarkdown } from "@/lib/markdown-streaming";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentDisplay } from "@/ui/chat/attachment-display";
+import { AudioPlayer } from "@/ui/chat/audio-player";
 import { ImageGenerationCanvasTest } from "@/ui/chat/image-gen/test";
 import { MessageIcons } from "@/ui/chat/message-bubble/message-icons";
 import { ThinkingSection } from "@/ui/chat/thinking";
 import { useTheme } from "next-themes";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
+  AIChatResponseAudioGenFields,
   AIChatResponseImgGenFieldsFinal,
   AttachmentSingleton,
   MessageSingleton,
@@ -37,6 +39,9 @@ interface ChatMessageProps {
   liveImgGenEnabled?: boolean;
   liveImgGenFields?: AIChatResponseImgGenFieldsFinal;
   liveImgGenAttachmentId?: string;
+  liveAudioGenFields?: AIChatResponseAudioGenFields;
+  /** per-turn AudioGenCtx milestone — lyrics landed (audio may still be compiling) */
+  liveHasLyrics?: boolean;
 }
 
 type ImageDataCache = {
@@ -68,7 +73,9 @@ function MessageBubbleImpl({
   liveIsThinking,
   liveThinkingDuration,
   liveImgGenFields,
-  liveImgGenAttachmentId
+  liveImgGenAttachmentId,
+  liveAudioGenFields,
+  liveHasLyrics
 }: ChatMessageProps) {
   useEffect(() => {
     console.log({
@@ -153,6 +160,35 @@ function MessageBubbleImpl({
     () => (isStreaming ? processStreamingMarkdown(message.content) : null),
     [isStreaming, message.content]
   );
+
+  // lyria playback source — the live envelope while streaming, the committed
+  // attachment (audioGenOutput != null) thereafter; durationMs is the exact
+  // server-side frame-walk value so the timeline pre-paints before metadata
+  const audioGenPlayback = useMemo(() => {
+    if (message.messageType !== "AUDIO_GEN" || message.senderType !== "AI") {
+      return undefined;
+    }
+    const live = liveAudioGenFields?.audio;
+    if (live?.cdnUrl) {
+      return {
+        src: live.cdnUrl,
+        durationMs: live.audio?.duration ?? undefined
+      } as const;
+    }
+    const att = message.attachments.find(a => a.audioGenOutput != null);
+    if (att?.cdnUrl) {
+      return {
+        src: att.cdnUrl,
+        durationMs: att.audio?.duration ?? undefined
+      } as const;
+    }
+    return undefined;
+  }, [
+    message.messageType,
+    message.senderType,
+    message.attachments,
+    liveAudioGenFields
+  ]);
 
   const imageGenerationData = useMemo(() => {
     const imageUrls = Array.of<string>();
@@ -576,7 +612,14 @@ function MessageBubbleImpl({
                 ? "bg-[#2252ba] text-[#fefefe]"
                 : "bg-[#0d2a6b] text-[#fafafa]"
           )}>
-          {hasRenderableMessageBlocks ? (
+          {message.messageType === "AUDIO_GEN" &&
+          message.senderType === "AI" ? (
+            // lyria lyrics render as a plain txt block — the [[A0]]/[25.6:]
+            // structural notation is markdown-hostile, so no processor pass
+            <pre className="mt-1 overflow-x-auto rounded-lg bg-black/25 p-3 font-mono text-xs leading-relaxed whitespace-pre">
+              {message.content}
+            </pre>
+          ) : hasRenderableMessageBlocks ? (
             renderedMessageBlocks
           ) : (
             <>
@@ -620,6 +663,19 @@ function MessageBubbleImpl({
               </div>
             </>
           )}
+          {message.messageType === "AUDIO_GEN" &&
+            message.senderType === "AI" &&
+            (audioGenPlayback !== undefined || liveHasLyrics === true) && (
+              // ONE mounted player for the whole turn: it appears in its
+              // compiling state once lyrics start landing (hasLyrics) and
+              // morphs in place — no remount, no replayed entrance — when
+              // the cdnUrl arrives (src flips defined)
+              <AudioPlayer
+                src={audioGenPlayback?.src}
+                durationMs={audioGenPlayback?.durationMs}
+                className="mt-3"
+              />
+            )}
           {message.senderType !== "USER" &&
             (imageGenerationData ? (
               <ImageGenerationCanvasTest

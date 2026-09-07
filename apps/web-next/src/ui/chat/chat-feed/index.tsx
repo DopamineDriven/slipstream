@@ -11,6 +11,7 @@ import { SelectionToolbar } from "@/ui/chat/chat-selection";
 import { MessageBubble } from "@/ui/chat/message-bubble";
 import { motion } from "motion/react";
 import type {
+  AIChatResponseAudioGenFields,
   AIChatResponseImgGenFieldsFinal,
   MessageSingleton
 } from "@slipstream/types";
@@ -33,6 +34,9 @@ interface ChatFeedProps {
   activeConversationId?: string;
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatResponseImgGenFieldsFinal;
+  audioGenFields?: AIChatResponseAudioGenFields;
+  /** per-turn milestone from AudioGenCtx — lyrics landed, audio still compiling */
+  audioGenHasLyrics?: boolean;
   imgGenAttachmentId?: string;
   currentAiMsgId?: string;
   /** Upward pagination (UI-oriented names; the SWR `loadMore`/`hasMore`/`isLoadingMore` forwarded from the bridge). */
@@ -57,6 +61,8 @@ export function ChatFeed({
   thinkingDuration,
   imgGenEnabled,
   imgGenFields,
+  audioGenFields,
+  audioGenHasLyrics,
   imgGenAttachmentId,
   currentAiMsgId,
   loadOlderMessages,
@@ -214,6 +220,12 @@ export function ChatFeed({
                 }
                 liveImgGenFields={
                   isStreamingMessage ? (imgGenFields ?? undefined) : undefined
+                }
+                liveAudioGenFields={
+                  isStreamingMessage ? (audioGenFields ?? undefined) : undefined
+                }
+                liveHasLyrics={
+                  isStreamingMessage ? audioGenHasLyrics : undefined
                 }
                 liveImgGenAttachmentId={
                   // Pass attachment ID for streaming messages and the specific AI message with matching ID

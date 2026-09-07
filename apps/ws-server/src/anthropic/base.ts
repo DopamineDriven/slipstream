@@ -32,6 +32,7 @@ export class AnthropicBaseService {
   }
   protected supportsAdaptive(mod: string) {
     return (
+      mod ==="claude-fable-5-1"||
       mod === "claude-opus-5" ||
       mod === "claude-opus-4-8" ||
       mod === "claude-opus-4-7" ||
@@ -55,6 +56,7 @@ export class AnthropicBaseService {
        * Avoid paying the prompt-cache cost twice when you retry a refused Claude Fable 5 request on another model.
        * https://platform.claude.com/docs/en/build-with-claude/fallback-credit
        */
+      case "claude-fable-5-1":
       case "claude-opus-5":
       case "claude-fable-5":
       case "claude-sonnet-5":
@@ -129,6 +131,7 @@ export class AnthropicBaseService {
   }
 
   protected outputTokenCeilingByModel = {
+    "claude-fable-5-1": 128000,
     "claude-opus-5": 128000,
     "claude-sonnet-5": 128000,
     "claude-fable-5": 128000,
@@ -142,6 +145,7 @@ export class AnthropicBaseService {
   } as const;
 
   protected inputTokenCeilingByModel = {
+    "claude-fable-5-1": 1000000,
     "claude-opus-5": 1000000,
     "claude-sonnet-5": 1000000,
     "claude-fable-5": 1000000,

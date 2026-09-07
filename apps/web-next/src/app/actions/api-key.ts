@@ -1,119 +1,187 @@
 "use server";
 
-import { updateTag, refresh } from "next/cache";
-import { prismaClient, prismaClientAccelerate } from "@/lib/prisma";
+import { prismaClient } from "@/lib/prisma";
+import { safeErr } from "@/lib/safe-err";
 import { getSession } from "@/utils/auth";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { Providers } from "@slipstream/types";
 import { EncryptionService } from "@slipstream/encryption";
 import { KeyValidator } from "@slipstream/key-validator";
-import { toPrismaFormat } from "@slipstream/types";
+import { isProvider, toPrismaFormat } from "@slipstream/types";
+
+interface RtProps {
+  id: string;
+  userId: string;
+  provider: $Enums.Provider;
+  apiKey: string;
+  iv: string;
+  authTag: string;
+  label: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  isDefault: boolean;
+}
+
+function isAsDefault(s: string) {
+  return s === "true" || s === "false";
+}
 
 function handleAsDefault(asDefault: FormDataEntryValue | null) {
-  if (asDefault && typeof asDefault === "string") {
-    const booleanish = asDefault as `${true}` | `${false}`;
-    if (booleanish === "false") return false;
+  if (asDefault && typeof asDefault === "string" && isAsDefault(asDefault)) {
+    if (asDefault === "false") return false;
     else return true;
   } else return false;
 }
 
 export async function upsertApiKey(formdata: FormData) {
-  const getKey = formdata.get("apiKey");
-  const getProvider = formdata.get("provider");
   const authData = await getSession();
   const userId = authData?.user?.id;
+  if (!userId) {
+    return { success: false, payload: "unauthorized" } as const;
+  }
+
+  const getKey = formdata.get("apiKey");
+  const getProvider = formdata.get("provider");
   const asDefault = formdata.get("asDefault");
+
+  if (typeof getProvider !== "string") {
+    return { success: false, payload: `no input provider provided` } as const;
+  }
+  if (!isProvider(getProvider)) {
+    return {
+      success: false,
+      payload: `invalid provider input ${getProvider}`
+    } as const;
+  }
+
   if (typeof getKey !== "string") {
     return {
       success: false,
-      id: "input api key is not of type string"
+      payload: "input api key is not of type string"
     } as const;
   }
-  const validator = new KeyValidator(getKey, getProvider as Providers);
+
+  const validator = new KeyValidator(getKey, getProvider);
 
   const { isValid, message } = await validator.validateProvider();
 
-  if (getProvider && typeof getProvider === "string" && userId && isValid) {
+  if (isValid) {
     const cryptService = new EncryptionService(process.env.ENCRYPTION_KEY);
 
     const { authTag, data, iv } = await cryptService.encryptText(getKey);
-    const createUserKey = await prismaClient.userKey.upsert({
+    const isDefault = handleAsDefault(asDefault);
+
+    let rt: RtProps;
+
+    const upsertArgs = {
       create: {
         apiKey: data,
         authTag,
         iv,
-        isDefault: handleAsDefault(asDefault),
-        provider: toPrismaFormat(getProvider as Providers),
+        isDefault,
+        provider: toPrismaFormat(getProvider),
         userId
       },
       update: {
         apiKey: data,
         iv,
         authTag,
-        isDefault: handleAsDefault(asDefault)
+        isDefault
       },
       where: {
         userId_provider: {
-          provider: toPrismaFormat(getProvider as Providers),
+          provider: toPrismaFormat(getProvider),
           userId
         }
       }
-    });
-    await prismaClientAccelerate.$accelerate.invalidate({
-      tags: [`user_api_keys_${userId}`]
-    });
-    updateTag(`user_api_keys_${userId}`);
-    // Refresh uncached server-driven UI to reflect changes immediately
-    refresh();
+    };
 
-    return { success: true, id: createUserKey.id } as const;
-  } else return { success: false, id: message } as const;
+    if (isDefault) {
+      rt = await prismaClient.$transaction(async t => {
+        await t.userKey.updateMany({
+          where: {
+            userId,
+            isDefault,
+            NOT: { provider: toPrismaFormat(getProvider) }
+          },
+          data: { isDefault: false }
+        });
+        return await t.userKey.upsert(upsertArgs);
+      });
+    } else {
+      rt = await prismaClient.userKey.upsert(upsertArgs);
+    }
+    return { success: true, payload: rt.id } as const;
+  } else
+    return {
+      success: false,
+      payload: `validator message: ${message}`
+    } as const;
 }
 
-/**
- * handles the scenario when a user wants to inspect and/or edit an existing (stored) api key --
- * they understandably expect to see it just as it was when they input the value -- decrypted
- * that said, this doesn't necessitate a database update event by default; sometimes people
- * click edit just to view the key they have stored and cross-reference it with a key value they have
- * open in another tab or program to verify it's the key they intended to be using. In these cases, once
- * they verify what they wanted to verify, they'll just click cancel or done (depending on available ui options).
- * THIS action handles those scenarios if an actual edit does happen, the `upsertApiKey` action will be triggered
- */
-
-const decryptMapper = new Map<Providers, string | undefined>();
-export async function getDecryptedApiKeyOnEdit(
-  provider: Providers
-): Promise<string> {
-  const cryptService = new EncryptionService(process.env.ENCRYPTION_KEY);
+export async function deleteApiKey(f: FormData) {
   const authData = await getSession();
   const userId = authData?.user?.id;
   if (!userId) {
-    decryptMapper.clear();
-    throw new Error("unauthorized");
+    return { success: false, payload: "unauthorized" } as const;
   }
-  const rec = await prismaClientAccelerate.userKey.findUnique({
+
+  const getProvider = f.get("provider");
+
+  if (typeof getProvider !== "string") {
+    return { success: false, payload: `no input provider provided` } as const;
+  }
+
+  if (!isProvider(getProvider)) {
+    return {
+      success: false,
+      payload: `invalid provider input ${getProvider}`
+    } as const;
+  }
+
+
+  const deleteIt = await prismaClient.userKey.deleteMany({
+    where: { userId, provider: toPrismaFormat(getProvider) }
+  });
+  return {
+    success: true,
+    payload: `deleted ${deleteIt.count} api key for ${getProvider}`
+  } as const;
+}
+
+export async function getDecryptedApiKeyOnEdit(provider: Providers) {
+  const authData = await getSession();
+  const userId = authData?.user?.id;
+  if (!userId) {
+    return {
+      success: false,
+      payload: `unauthorized`
+    } as const;
+  }
+  const cryptService = new EncryptionService(process.env.ENCRYPTION_KEY);
+  const rec = await prismaClient.userKey.findUnique({
     where: { userId_provider: { userId, provider: toPrismaFormat(provider) } },
     select: { authTag: true, apiKey: true, iv: true }
   });
   if (!rec) {
-    throw new Error(`No API key configured for ${provider}!`);
+    return {
+      success: false,
+      payload: `No API key configured for ${provider}!`
+    } as const;
   }
   try {
-    const hasKey = decryptMapper.get(provider);
-    if (typeof hasKey !== "undefined") {
-      return hasKey;
-    }
-
     const decrypted = await cryptService.decryptText({
       authTag: rec.authTag,
       data: rec.apiKey,
       iv: rec.iv
     });
-    decryptMapper.set(provider, decrypted);
-    return decrypted;
+
+    return { success: true, payload: decrypted } as const;
   } catch (err) {
-    if (err instanceof Error) {
-      console.error(`Decryption failed for: ${provider}, ` + err.message);
-      throw new Error(`Failed to Decrypt API key for ${provider}`);
-    } else throw new Error(`Failed to Decrypt api key for ${provider}`);
+    console.error(`Decryption failed for: ${provider}, ` + safeErr(err));
+    return {
+      success: false,
+      payload: `Failed to Decrypt API key for ${provider}`
+    } as const;
   }
 }

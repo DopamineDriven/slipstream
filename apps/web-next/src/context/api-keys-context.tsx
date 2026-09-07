@@ -20,6 +20,19 @@ interface ApiKeysContextValue {
   isAwaitingUpdateAck: boolean;
   isAwaitingInitial: boolean;
   isAwaitingPong: boolean;
+  /**
+   * monotonic count of `provider_context_update_ack` frames received. Snapshot
+   * it before sending `provider_context_update`; an ack whose seq exceeds the
+   * snapshot is yours — even when its providerContext equals the current one
+   * (e.g. editing an existing key).
+   */
+  updateAckSeq: number;
+  /**
+   * subscribe to ack arrivals; the listener receives the new seq. Returns the
+   * unsubscribe. This is the sanctioned "external event → setState in a
+   * callback" shape, so consumers don't need a setState-in-effect watcher.
+   */
+  subscribeUpdateAck: (listener: (seq: number) => void) => () => void;
 }
 
 const ApiKeysContext = createContext<ApiKeysContextValue | undefined>(
@@ -83,6 +96,10 @@ export function ApiKeysProvider({
   const [isAwaitingUpdateAck, setIsAwaitingUpdateAck] = useState(false);
   const [isAwaitingPong, setIsAwaitingPong] = useState(false);
   const [isAwaitingInitial, setIsAwaitingInitial] = useState(true);
+  const [updateAckSeq, setUpdateAckSeq] = useState(0);
+  // ref-backed so the (once-registered) socket handler always sees the live seq + listeners
+  const ackSeqRef = useRef(0);
+  const ackListenersRef = useRef(new Set<(seq: number) => void>());
 
   useEffect(() => {
     providerContextRef.current = providerContext;
@@ -103,10 +120,12 @@ export function ApiKeysProvider({
     ) => {
       if (eqCheck(providerContextRef.current, ev.providerContext) === false) {
         setProviderContext(ev.providerContext);
-        setIsAwaitingUpdateAck(false);
-      } else {
-        setIsAwaitingUpdateAck(false);
       }
+      setIsAwaitingUpdateAck(false);
+      ackSeqRef.current += 1;
+      const seq = ackSeqRef.current;
+      setUpdateAckSeq(seq);
+      for (const listener of ackListenersRef.current) listener(seq);
     };
 
     const handleProviderContextPong = (
@@ -150,6 +169,14 @@ export function ApiKeysProvider({
     });
   }, [sendEvent]);
 
+  const subscribeUpdateAck = useCallback((listener: (seq: number) => void) => {
+    const listeners = ackListenersRef.current;
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  }, []);
+
   return (
     <ApiKeysContext.Provider
       value={{
@@ -158,7 +185,9 @@ export function ApiKeysProvider({
         isAwaitingUpdateAck,
         sendProviderContextPing,
         sendProviderContextUpdate,
-        providerContext
+        providerContext,
+        updateAckSeq,
+        subscribeUpdateAck
       }}>
       {children}
     </ApiKeysContext.Provider>

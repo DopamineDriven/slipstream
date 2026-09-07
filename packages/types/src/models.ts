@@ -1,13 +1,17 @@
 import type { Unenumerate } from "@/utils.ts";
+import { displayNameToModelIdAudioGen } from "@/codegen/__gen__/display-name-to-model-id-audio-gen.ts";
 import { displayNameToModelIdImgGen } from "@/codegen/__gen__/display-name-to-model-id-img-gen.ts";
 import { displayNameToModelIdVideoGen } from "@/codegen/__gen__/display-name-to-model-id-video-gen.ts";
 import { displayNameToModelId } from "@/codegen/__gen__/display-name-to-model-id.ts";
+import { displayNameModelsByProviderAudioGen } from "@/codegen/__gen__/display-names-by-provider-audio-gen.ts";
 import { displayNameModelsByProviderImgGen } from "@/codegen/__gen__/display-names-by-provider-img-gen.ts";
 import { displayNameModelsByProviderVideoGen } from "@/codegen/__gen__/display-names-by-provider-video-gen.ts";
 import { displayNameModelsByProvider } from "@/codegen/__gen__/display-names-by-provider.ts";
+import { modelIdToDisplayNameAudioGen } from "@/codegen/__gen__/model-id-to-display-name-audio-gen.ts";
 import { modelIdToDisplayNameImgGen } from "@/codegen/__gen__/model-id-to-display-name-img-gen.ts";
 import { modelIdToDisplayNameVideoGen } from "@/codegen/__gen__/model-id-to-display-name-video-gen.ts";
 import { modelIdToDisplayName } from "@/codegen/__gen__/model-id-to-display-name.ts";
+import { modelIdsByProviderAudioGen } from "@/codegen/__gen__/model-ids-by-provider-audio-gen.ts";
 import { modelIdsByProviderImgGen } from "@/codegen/__gen__/model-ids-by-provider-img-gen.ts";
 import { modelIdsByProviderVideoGen } from "@/codegen/__gen__/model-ids-by-provider-video-gen.ts";
 import { modelIdsByProvider } from "@/codegen/__gen__/model-ids-by-provider.ts";
@@ -70,6 +74,7 @@ export function isProvider(s: string) {
 
 export const providerModelImageGenFacilitatingApi = {
   openai: [
+    "gpt-6-astra",
     "gpt-5.6-sol",
     "gpt-5.6-terra",
     "gpt-5.6-luna",
@@ -214,6 +219,22 @@ export type GetVideoModelUtilRT<T = VideoGenProviders> = T extends "openai"
     : T extends "grok"
       ? GrokVideoGenModels
       : never;
+
+export type AudioGenProviders = keyof typeof modelIdsByProviderAudioGen;
+
+export type AudioGenModelMap = {
+  readonly [P in keyof typeof modelIdsByProviderAudioGen]: Unenumerate<
+    (typeof modelIdsByProviderAudioGen)[P]
+  >;
+};
+
+export type GeminiAudioGenModels = AudioGenModelMap["gemini"];
+
+export type AllAudioGenModels = GeminiAudioGenModels;
+
+export type GetAudioModelUtilRT<T = AudioGenProviders> = T extends "gemini"
+  ? GeminiAudioGenModels
+  : never;
 
 export const providerModelChatApi = modelIdsByProvider;
 
@@ -637,6 +658,23 @@ export type ModelDisplayNameToModelIdVideoGen<T extends VideoGenProviders> =
 export type ModelIdToModelDisplayNameVideoGen<T extends VideoGenProviders> =
   keyof (typeof modelIdToDisplayNameVideoGen)[T];
 
+export type ModelDisplayNameToModelIdAudioGen<T extends AudioGenProviders> =
+  keyof (typeof displayNameToModelIdAudioGen)[T];
+
+export type ModelIdToModelDisplayNameAudioGen<T extends AudioGenProviders> =
+  keyof (typeof modelIdToDisplayNameAudioGen)[T];
+
+/**
+ * valid audio gen capable gemini model display names
+ */
+export type GeminiDisplayNameUnionAudioGen =
+  ModelDisplayNameToModelIdAudioGen<"gemini">;
+
+/**
+ * valid audio gen capable gemini model ids
+ */
+export type GeminiModelIdUnionAudioGen =
+  ModelIdToModelDisplayNameAudioGen<"gemini">;
 /**
  * valid video gen capable openai model display names
  */
@@ -823,6 +861,10 @@ export {
   displayNameToModelId,
   displayNameModelsByProvider,
   modelIdsByProvider,
+  modelIdToDisplayNameAudioGen,
+  displayNameToModelIdAudioGen,
+  displayNameModelsByProviderAudioGen,
+  modelIdsByProviderAudioGen,
   modelIdToDisplayNameImgGen,
   modelIdsByProviderImgGen,
   displayNameModelsByProviderImgGen,
@@ -832,6 +874,37 @@ export {
   modelIdToDisplayNameVideoGen,
   modelIdsByProviderVideoGen
 };
+
+export type GetModelsForProviderRTAudioGen<T extends Provider> =
+  T extends "gemini"
+    ? GeminiModelIdUnionAudioGen
+    : T extends "grok"
+      ? undefined
+      : T extends "openai"
+        ? undefined
+        : T extends "anthropic"
+          ? undefined
+          : T extends "meta"
+            ? undefined
+            : T extends "vercel"
+              ? undefined
+              : T extends "mistral"
+                ? undefined
+                : T extends "cohere"
+                  ? undefined
+                  : T extends "deepseek"
+                    ? undefined
+                    : T extends "moonshotai"
+                      ? undefined
+                      : T extends "zai"
+                        ? undefined
+                        : T extends "alibaba"
+                          ? undefined
+                          : T extends "minimax"
+                            ? undefined
+                            : T extends "sakana"
+                              ? undefined
+                              : never;
 
 export type GetModelsForProviderRTImgGen<T extends Provider> =
   T extends "gemini"
@@ -894,7 +967,36 @@ export type GetModelsForProviderRTVideoGen<T extends Provider> =
                             : T extends "sakana"
                               ? undefined
                               : never;
-
+export type GetDisplayNamesForProviderRTAudioGen<T extends Provider> =
+  T extends "gemini"
+    ? GeminiDisplayNameUnionAudioGen
+    : T extends "grok"
+      ? undefined
+      : T extends "openai"
+        ? undefined
+        : T extends "anthropic"
+          ? undefined
+          : T extends "meta"
+            ? undefined
+            : T extends "vercel"
+              ? undefined
+              : T extends "mistral"
+                ? undefined
+                : T extends "cohere"
+                  ? undefined
+                  : T extends "deepseek"
+                    ? undefined
+                    : T extends "moonshotai"
+                      ? undefined
+                      : T extends "zai"
+                        ? undefined
+                        : T extends "alibaba"
+                          ? undefined
+                          : T extends "minimax"
+                            ? undefined
+                            : T extends "sakana"
+                              ? undefined
+                              : never;
 export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
   T extends "gemini"
     ? GeminiDisplayNameUnionImgGen
@@ -1039,6 +1141,18 @@ export function getModelsForProviderImgGen<const T extends Provider>(
     .map(([_tt, vv]) => vv);
 }
 
+export function getModelsForProviderAudioGen<const T extends Provider>(
+  provider = "gemini" as T
+) {
+  const p = provider as Provider;
+  if (p !== "gemini") return undefined;
+  return Object.entries(displayNameToModelIdAudioGen[p])
+    .map(([t, v]) => {
+      return [t as T, v as GetModelsForProviderRTAudioGen<T>] as const;
+    })
+    .map((_tt, vv) => vv);
+}
+
 export function getModelsForProviderVideoGen<const T extends Provider>(
   provider: T
 ) {
@@ -1060,6 +1174,18 @@ export function getDisplayNamesForProvider<const T extends Provider>(
       return [k as T, v as GetDisplayNamesForProviderRT<T>] as const;
     })
     .map(([_kk, vv]) => vv);
+}
+
+export function getDisplayNamesForProviderAudioGen<const T extends Provider>(
+  provider = "gemini" as T
+) {
+  const p = provider as Provider;
+  if (p !== "gemini") return undefined;
+  return Object.entries(modelIdToDisplayNameAudioGen[p])
+    .map(([k, v]) => {
+      return [k as T, v as GetDisplayNamesForProviderRTAudioGen<T>] as const;
+    })
+    .map((_kk, vv) => vv);
 }
 
 export function getDisplayNamesForProviderImgGen<
@@ -1094,12 +1220,17 @@ export function allProviders() {
   ) satisfies readonly Lowercase<$Enums.Provider>[];
 }
 export function allImgGenProviders() {
-  return ["gemini", "grok", "openai"] as const;
+  return Object.keys(modelIdsByProviderImgGen).map(t => t);
 }
 
 export function allVideoGenProviders() {
-  return ["gemini", "grok", "openai"] as const;
+  return Object.keys(modelIdsByProviderVideoGen).map(t => t);
 }
+
+export function allAudioGenProviders() {
+  return Object.keys(modelIdsByProviderAudioGen).map(t => t);
+}
+
 export function getAllProviders() {
   return allProviders();
 }
@@ -1110,6 +1241,10 @@ export function getAllImgGenProviders() {
 
 export function getAllVideoGenProviders() {
   return allVideoGenProviders();
+}
+
+export function getAllAudioGenProviders() {
+  return allAudioGenProviders();
 }
 
 export const imgMimeSupportByProvider = {

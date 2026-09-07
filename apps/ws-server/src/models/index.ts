@@ -11,6 +11,7 @@ export class ModelService extends ModelToolDefsService {
   }
   public isOpenAIImgGenFacilitating(m: string) {
     return (
+      m ==="gpt-6-astra" ||
       m === "gpt-5.6-sol" ||
       m === "gpt-5.6-terra" ||
       m === "gpt-5.6-luna" ||
@@ -133,11 +134,12 @@ export class ModelService extends ModelToolDefsService {
   }
 
   public isGeminiLyriaModel(m: string) {
-    return m === "lyria-3-clip-preview" || m === "lyria-3-pro-preview";
+    return m ==="lyria-3.5" || m === "lyria-3-clip-preview" || m === "lyria-3-pro-preview";
   }
 
   public isGeminiModel(m: string) {
     return (
+      m === "gemini-3.8-flash" ||
       m === "gemini-3.7-flash" ||
       m === "gemini-3.6-flash" ||
       m === "gemini-3.5-flash" ||
@@ -193,6 +195,7 @@ export class ModelService extends ModelToolDefsService {
   }
   public isAnthropicAdaptiveModel(mod: string) {
     return (
+      mod === "claude-fable-5-1" ||
       mod === "claude-opus-5" ||
       mod === "claude-opus-4-8" ||
       mod === "claude-opus-4-7" ||
@@ -217,7 +220,7 @@ export class ModelService extends ModelToolDefsService {
   }
 
   public isMetaModel(m: string) {
-    return m === "muse-spark-1.1" || m === "muse-spark-1.2";
+    return m === "muse-spark-1.1" || m === "muse-spark-1.2" || m === "muse-spark-1.3";
   }
 
   public isV0Model(m: string) {
@@ -265,6 +268,7 @@ export class ModelService extends ModelToolDefsService {
 
   public isZaiModel(m: string) {
     return (
+      m==="glm-5.3" ||
       m === "glm-5.2" ||
       m === "glm-5.1" ||
       m === "glm-5" ||
@@ -276,6 +280,7 @@ export class ModelService extends ModelToolDefsService {
 
   public isQwenModel(m: string) {
     return (
+      m ==="qwen3.8-flash" ||
       m === "qwen3.8-max" ||
       m === "qwen3.7-max" ||
       m === "qwen3.7-plus" ||

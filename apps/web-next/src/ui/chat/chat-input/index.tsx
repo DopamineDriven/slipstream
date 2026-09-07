@@ -17,6 +17,7 @@ import { useImageGen } from "@/context/image-gen-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { usePathnameContext } from "@/context/pathname-context";
 import { useAssets } from "@/hooks/use-assets";
+import { isPureImageModel } from "@/lib/helpers";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
@@ -221,15 +222,21 @@ export function ChatInput({
     setIsImageSettingsOpen(prev => !prev);
   }, [imgGen]);
 
+  // pure image-gen models are auto-enabled (derived in ImageGenProvider) and
+  // can't be toggled off — the server routes on imgGenEnabled, so for these
+  // models it must stay true; the stored toggle is left untouched so a
+  // facilitator model's manual preference survives pure-model detours
+  const pureImageModel = isPureImageModel(selectedModel.modelId);
+
   const handleToggleImageMode = useCallback(() => {
-    if (!imgGen.supported) return;
+    if (!imgGen.supported || pureImageModel) return;
     if (imgGen.enabled) {
       imgGen.setEnabled(false);
       setIsImageSettingsOpen(false);
       return;
     }
     imgGen.setEnabled(true);
-  }, [imgGen]);
+  }, [imgGen, pureImageModel]);
 
   // Consume an initial prompt passed from parent (or recovered from sessionStorage)
   useEffect(() => {
@@ -328,9 +335,8 @@ export function ChatInput({
       isLockedRef.current = true;
       setIsSubmitting(true);
       const quotedMarkdown = quotes.map(formatAsMarkdown).join("\n\n");
-      const composed =
-        quotedMarkdown ?
-          `${quotedMarkdown}\n\n${trimmedMessage}`
+      const composed = quotedMarkdown
+        ? `${quotedMarkdown}\n\n${trimmedMessage}`
         : trimmedMessage;
       if (isHome) {
         try {
@@ -486,14 +492,12 @@ export function ChatInput({
   };
   const fileMemo = useMemo(
     () =>
-      (
-        selectedModel.provider === "openai" ||
-        selectedModel.provider === "anthropic" ||
-        selectedModel.provider === "gemini" ||
-        selectedModel.provider === "grok"
-      ) ?
-        ".md,.txt,.pdf,.docx,.xlsx,.pptx,application/text,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/pdf,text/markdown,application/*,text/*"
-      : ".pdf,.docx,application/*,text/*",
+      selectedModel.provider === "openai" ||
+      selectedModel.provider === "anthropic" ||
+      selectedModel.provider === "gemini" ||
+      selectedModel.provider === "grok"
+        ? ".md,.txt,.pdf,.docx,.xlsx,.pptx,application/text,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/pdf,text/markdown,application/*,text/*"
+        : ".pdf,.docx,application/*,text/*",
     [selectedModel.provider]
   );
 
@@ -702,9 +706,9 @@ export function ChatInput({
                       variant="ghost"
                       size="icon"
                       title={
-                        imgGen.supported ? "Image settings" : (
-                          "Image settings unavailable for selected model"
-                        )
+                        imgGen.supported
+                          ? "Image settings"
+                          : "Image settings unavailable for selected model"
                       }
                       className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
                       onClick={handleImageSettingsClick}>
@@ -716,17 +720,24 @@ export function ChatInput({
                       variant={imgGen.enabled ? "default" : "ghost"}
                       size="icon"
                       title={
-                        imgGen.supported ?
-                          imgGen.enabled ?
-                            "Disable image generation"
-                          : "Enable image generation"
-                        : "Selected model does not support image generation"
+                        !imgGen.supported
+                          ? "Selected model does not support image generation"
+                          : pureImageModel
+                            ? "Pure image gen model, auto-enabled"
+                            : imgGen.enabled
+                              ? "Disable image generation"
+                              : "Enable image generation"
                       }
+                      // NOT the `disabled` attr for pure models — the base
+                      // Button's disabled:pointer-events-none would suppress
+                      // the hover title; the click no-ops in the handler
                       disabled={!imgGen.supported}
+                      aria-disabled={!imgGen.supported || pureImageModel}
                       className={cn(
-                        imgGen.enabled ?
-                          "hover:bg-accent text-foreground h-8"
-                        : "hover:bg-accent text-muted-foreground hover:text-foreground h-8"
+                        imgGen.enabled
+                          ? "hover:bg-accent text-foreground h-8"
+                          : "hover:bg-accent text-muted-foreground hover:text-foreground h-8",
+                        pureImageModel && "cursor-default"
                       )}
                       onClick={handleToggleImageMode}>
                       <ImageGen className="size-4" />
@@ -759,15 +770,17 @@ export function ChatInput({
                       variant="ghost"
                       size="icon"
                       title={
-                        attachmentsReadyForSend ? "Submit prompt" : (
-                          "Waiting for attachments"
-                        )
+                        attachmentsReadyForSend
+                          ? "Submit prompt"
+                          : "Waiting for attachments"
                       }
                       className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
                       disabled={isSendDisabled}>
-                      {isSubmitting ?
+                      {isSubmitting ? (
                         <Loader className="h-5 w-5 animate-spin" />
-                      : <SendMessage className="size-5" />}
+                      ) : (
+                        <SendMessage className="size-5" />
+                      )}
                       <span className="sr-only">{`Submit Prompt`}</span>
                     </Button>
                   </div>

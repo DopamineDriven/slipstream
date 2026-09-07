@@ -1,5 +1,6 @@
 export const displayNameModelsByProvider = {
   openai: [
+    "GPT-6 Astra",
     "GPT-5.6 Sol",
     "GPT-5.6 Terra",
     "GPT-5.6 Luna",
@@ -50,6 +51,7 @@ export const displayNameModelsByProvider = {
     "Sora 2 Pro"
   ],
   gemini: [
+    "Gemini 3.8 Flash",
     "Gemini 3.7 Flash",
     "Gemini 3.6 Flash",
     "Gemini 3.5 Flash Lite",
@@ -62,12 +64,13 @@ export const displayNameModelsByProvider = {
     "Nano Banana 2 Lite",
     "Nano Banana Pro",
     "Nano Banana",
+    "Lyria 3.5",
+    "Lyria 3 Pro Preview",
+    "Lyria 3 Clip Preview",
     "Gemini Omni Flash Preview",
     "Veo 3.1",
     "Veo 3.1 fast",
     "Veo 3.1 lite",
-    "Lyria 3 Pro Preview",
-    "Lyria 3 Clip Preview",
     "Gemini 2.5 Pro",
     "Gemini 2.5 Flash",
     "Gemini 2.5 Flash-Lite",
@@ -91,6 +94,7 @@ export const displayNameModelsByProvider = {
     "Grok Imagine Video 1.5"
   ],
   anthropic: [
+    "Claude Fable 5.1",
     "Claude Opus 5",
     "Claude Sonnet 5",
     "Claude Fable 5",
@@ -102,7 +106,7 @@ export const displayNameModelsByProvider = {
     "Claude Opus 4.5",
     "Claude Haiku 4.5"
   ],
-  meta: ["Muse Spark 1.2", "Muse Spark 1.1"],
+  meta: ["Muse Spark 1.3", "Muse Spark 1.2", "Muse Spark 1.1"],
   vercel: ["v0 medium", "v0 medium (legacy)"],
   mistral: [
     "Mistral Small 4",
@@ -124,8 +128,17 @@ export const displayNameModelsByProvider = {
     "DeepSeek V4 Flash",
     "DeepSeek R1"
   ],
-  zai: ["GLM 5.2", "GLM 5.1", "GLM 5", "GLM 4.7", "GLM 4.6", "GLM 4.5"],
+  zai: [
+    "GLM 5.3",
+    "GLM 5.2",
+    "GLM 5.1",
+    "GLM 5",
+    "GLM 4.7",
+    "GLM 4.6",
+    "GLM 4.5"
+  ],
   alibaba: [
+    "Qwen3.8-Flash",
     "Qwen3.8-Max",
     "Qwen3.7-Max",
     "Qwen3.7-Plus",

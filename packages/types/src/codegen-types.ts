@@ -108,32 +108,40 @@ export type MultimodalRT = XOR<
         };
       }
   >,
-  | {
-      openai: string[];
-      gemini: string[];
-      grok: string[];
-      anthropic: string[];
-      meta: string[];
-      vercel: string[];
-    }
-  | {
-      openai: {
-        [k: string]: string;
-      };
-      gemini: {
-        [k: string]: string;
-      };
-      grok: {
-        [k: string]: string;
-      };
-      anthropic: {
-        [k: string]: string;
-      };
-      meta: {
-        [k: string]: string;
-      };
-      vercel: {
-        [k: string]: string;
-      };
-    }
+  XOR<
+    | { gemini: string[] }
+    | {
+        gemini: {
+          [k: string]: string;
+        };
+      },
+    | {
+        openai: string[];
+        gemini: string[];
+        grok: string[];
+        anthropic: string[];
+        meta: string[];
+        vercel: string[];
+      }
+    | {
+        openai: {
+          [k: string]: string;
+        };
+        gemini: {
+          [k: string]: string;
+        };
+        grok: {
+          [k: string]: string;
+        };
+        anthropic: {
+          [k: string]: string;
+        };
+        meta: {
+          [k: string]: string;
+        };
+        vercel: {
+          [k: string]: string;
+        };
+      }
+  >
 >;

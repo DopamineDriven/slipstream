@@ -15,28 +15,28 @@ dangerouslyAllowAllBuilds: true
 
 catalogs:
   anthropic:
-    "@anthropic-ai/sdk": ^0.116.0
+    "@anthropic-ai/sdk": ^0.124.0
   auth:
-    better-auth: ^1.6.27
+    better-auth: ^1.7.3
   aws:
-    "@aws-sdk/client-s3": ^3.1109.0
-    "@aws-sdk/client-secrets-manager": ^3.1109.0
-    "@aws-sdk/credential-providers": ^3.1109.0
-    "@aws-sdk/lib-storage": ^3.1109.0
-    "@aws-sdk/s3-request-presigner": ^3.1109.0
-    "@aws-sdk/types": ^3.974.3
+    "@aws-sdk/client-s3": ^3.1127.0
+    "@aws-sdk/client-secrets-manager": ^3.1127.0
+    "@aws-sdk/credential-providers": ^3.1127.0
+    "@aws-sdk/lib-storage": ^3.1127.0
+    "@aws-sdk/s3-request-presigner": ^3.1127.0
+    "@aws-sdk/types": ^3.974.5
   babel:
     babel-plugin-react-compiler: ^1.0.0
   biome:
-    "@biomejs/biome": ^2.5.8
+    "@biomejs/biome": ^2.5.12
   bui:
-    "@base-ui/react": ^1.7.0
+    "@base-ui/react": ^1.8.0
   clsx:
     clsx: ^2.1.1
   cmdk:
     cmdk: ^1.1.1
   cohere:
-    cohere-ai: ^8.0.0
+    cohere-ai: ^8.1.0
   colorjs:
     "colorjs.io": ^0.7.1
   cookies:
@@ -59,10 +59,10 @@ catalogs:
     dotenv-cli: ^11.0.0
     dotenv-expand: ^1000.0.0
   eslint:
-    "@eslint/compat": ^2.1.0
+    "@eslint/compat": ^2.1.1
     "@eslint/config-helpers": ^0.7.0
     "@eslint/js": ^10.0.1
-    eslint: ^10.8.1
+    eslint: ^10.10.0
     eslint-plugin-import: ^2.32.0
     eslint-plugin-import-x: ^4.17.1
     eslint-plugin-jsx-a11y: ^6.10.2
@@ -75,19 +75,19 @@ catalogs:
   glob:
     glob: ^13.0.6
   google:
-    "@google/genai": ^2.16.0
+    "@google/genai": ^2.21.0
   gtag:
     "@types/gtag.js": ^0.0.20
   jiti:
     jiti: ^2.7.0
   jose:
-    jose: ^6.2.8
+    jose: ^6.2.12
   jsdom:
     "@types/jsdom": ^30.0.0
     jsdom: ^30.0.1
   katex:
     "@types/katex": ^0.16.8
-    katex: ^0.18.4
+    katex: ^0.18.7
   lightningcss:
     unplugin-lightningcss: ^0.5.0
   mcp:
@@ -95,7 +95,7 @@ catalogs:
   mdast:
     "@types/mdast": ^4.0.4
   mistral:
-    "@mistralai/mistralai": ^2.6.1
+    "@mistralai/mistralai": ^2.6.4
   motion:
     motion: ^12.43.0
     motion-dom: ^12.43.0
@@ -104,24 +104,24 @@ catalogs:
   nanoid:
     nanoid: ^6.0.1
   napi:
-    "@napi-rs/canvas": ^1.0.5
+    "@napi-rs/canvas": ^1.0.8
   next:
-    "@next/eslint-plugin-next": ^16.3.0
-    eslint-config-next: ^16.3.0
-    next: ^16.3.0
+    "@next/eslint-plugin-next": ^16.3.4
+    eslint-config-next: ^16.3.4
+    next: ^16.3.4
     next-themes: ^0.4.6
   node:
-    "@types/node": ^26.2.0
-    node-html-parser: ^9.0.1
+    "@types/node": ^26.4.1
+    node-html-parser: ^9.0.4
     nodemon: ^3.1.14
   nyc:
     nyc: ^18.0.0
   openai:
-    openai: ^7.4.0
+    openai: ^7.10.0
   p-limit:
-    p-limit: ^7.3.1
+    p-limit: ^7.3.2
   pg:
-    "@types/pg": ^8.21.0
+    "@types/pg": ^8.23.1
     pg: ^8.23.0
   pico:
     picocolors: ^1.1.1
@@ -136,11 +136,11 @@ catalogs:
     prettier: ^3.9.6
     prettier-plugin-tailwindcss: ^0.8.1
   prisma:
-    "@prisma/adapter-pg": ^7.9.1
-    "@prisma/client": ^7.9.1
-    "@prisma/client-runtime-utils": ^7.9.1
+    "@prisma/adapter-pg": ^7.10.0
+    "@prisma/client": ^7.10.0
+    "@prisma/client-runtime-utils": ^7.10.0
     "@prisma/extension-accelerate": ^3.0.1
-    prisma: ^7.9.1
+    prisma: ^7.10.0
   py:
     pythonia: ^1.2.6
   radix:
@@ -168,12 +168,12 @@ catalogs:
     "@radix-ui/react-toggle-group": ^1.1.19
     "@radix-ui/react-tooltip": ^1.2.16
   react:
-    "@testing-library/react": ^16.3.2
+    "@testing-library/react": ^16.3.3
     "@types/react": ^19.2.18
-    "@types/react-dom": ^19.2.4
+    "@types/react-dom": ^19.2.7
     react: ^19.2.8
     react-dom: ^19.2.8
-    react-resizable-panels: ^4.12.2
+    react-resizable-panels: ^4.12.4
     vaul: ^1.1.2
   redis:
     redis: ^6.2.1
@@ -190,48 +190,48 @@ catalogs:
     remark-parse: ^11.0.0
     remark-rehype: ^11.1.2
   rolldown:
-    rolldown: ^1.2.4
-    rolldown-plugin-dts: ^0.28.2
+    rolldown: ^1.2.7
+    rolldown-plugin-dts: ^0.28.5
     rolldown-plugin-wasm: ^0.3.2
   sharp:
-    sharp: ^0.35.3
+    sharp: ^0.35.4
   shiki:
     "@shikijs/transformers": ^4.4.3
     shiki: ^4.4.3
   smithy:
-    "@smithy/node-http-handler": ^4.10.0
+    "@smithy/node-http-handler": ^4.12.1
   store:
     use-sync-external-store: ^1.6.0
     "@types/use-sync-external-store": ^1.5.0
   styles:
-    autoprefixer: ^10.5.4
-    postcss: ^8.5.26
-    postcss-import: ^16.2.0
+    autoprefixer: ^10.5.5
+    postcss: ^8.5.28
+    postcss-import: ^17.0.0
   swr:
     swr: ^2.5.1
   tanstack:
-    "@tanstack/react-virtual": ^3.14.9
+    "@tanstack/react-virtual": ^3.14.10
   test:
-    "@playwright/test": ^1.62.1
+    "@playwright/test": ^1.63.0
   tiktoken:
     tiktoken: ^1.0.22
   ts:
     typescript: ^6.0.3
   tsdown:
-    tsdown: ^0.22.14
-    "@tsdown/css": ^0.22.14
+    tsdown: ^0.23.0
+    "@tsdown/css": ^0.23.0
   tseslint:
-    typescript-eslint: ^8.67.0
+    typescript-eslint: ^8.69.0
   tsgo:
     "@typescript/native-preview": ^7.0.0-dev.20260707.2
   tslib:
     tslib: ^2.8.1
   tsx:
-    tsx: ^4.23.12
+    tsx: ^4.23.13
   turbo:
-    eslint-config-turbo: ^2.10.9
-    eslint-plugin-turbo: ^2.10.9
-    turbo: ^2.10.9
+    eslint-config-turbo: ^2.10.12
+    eslint-plugin-turbo: ^2.10.12
+    turbo: ^2.10.12
   tw:
     "@tailwindcss/forms": ^0.5.11
     "@tailwindcss/postcss": ^4.3.3
@@ -247,21 +247,21 @@ catalogs:
     unist-util-remove: ^4.0.0
     unist-util-visit: ^5.1.0
   utils:
-    "@changesets/cli": ^3.0.0
+    "@changesets/cli": ^3.0.2
     husky: ^9.1.7
     wait-on: ^9.1.0
   vercel:
     "@vercel/analytics": ^2.0.1
-    "@vercel/functions": ^3.9.3
+    "@vercel/functions": ^3.9.5
   vfile:
     vfile: ^6.0.3
   vite:
-    "@vitejs/plugin-react": ^6.0.5
-    vite: ^8.2.1
+    "@vitejs/plugin-react": ^6.1.1
+    vite: ^8.2.2
   vitest:
-    "@vitest/coverage-istanbul": ^4.1.10
-    "@vitest/ui": ^4.1.10
-    vitest: ^4.1.10
+    "@vitest/coverage-istanbul": ^4.1.11
+    "@vitest/ui": ^4.1.11
+    vitest: ^4.1.11
   ws:
     "@types/ws": ^8.18.1
     ws: ^8.21.3
@@ -294,4 +294,4 @@ allowBuilds:
   unrs-resolver: true
 
 patchedDependencies:
-  '@anthropic-ai/sdk@0.116.0': patches/@anthropic-ai__sdk@0.101.0.patch
+  '@anthropic-ai/sdk@0.124.0': patches/@anthropic-ai__sdk@0.101.0.patch

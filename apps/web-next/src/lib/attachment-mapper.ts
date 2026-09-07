@@ -222,6 +222,7 @@ export function buildOptimisticAttachment(
     generationGroupId, // Set for generated assets (seriesId is extracted but used in imageGenOutput)
     image: null,
     document: null,
-    imageGenOutput: null
+    imageGenOutput: null,
+    audioGenOutput: null
   } satisfies AttachmentSingleton<true>;
 }

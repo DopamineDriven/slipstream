@@ -43,6 +43,7 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
 
   private reasoningByModel(m: string) {
     if (
+      m==="gpt-6-astra" ||
       m==="gpt-5.6=sol" ||
       m==="gpt-5.6-terra"||
       m==="gpt-5.6-luna" ||
