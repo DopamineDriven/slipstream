@@ -4,12 +4,9 @@ import type {
   AttachmentSingleton
 } from "@slipstream/types";
 
-
 function imgGenToAttachmentWorkup(
   tt:
-    | AIChatResponseImgGenSubFields[]
-    | AIChatResponseImgGenSubFields
-    | undefined
+    AIChatResponseImgGenSubFields[] | AIChatResponseImgGenSubFields | undefined
 ):
   | (AttachmentSingleton<true> | undefined)[]
   | AttachmentSingleton<true>
@@ -22,6 +19,7 @@ function imgGenToAttachmentWorkup(
         assetType: "IMAGE",
         batchId: null,
         bucket: t.bucket,
+        audioGenOutput: null,
         cacheControl: t.cacheControl,
         cdnUrl: t.cdnUrl,
         checksumAlgo: t.checksumAlgo,
@@ -89,11 +87,13 @@ function imgGenToAttachmentWorkup(
       batchId: null,
       bucket: t.bucket,
       cacheControl: t.cacheControl,
-      cdnUrl: t.cdnUrl,audio: null,
+      cdnUrl: t.cdnUrl,
+      audio: null,
       checksumAlgo: t.checksumAlgo,
       checksumSha256: t.checksumSha256,
       compatCdnUrl: t.compatCdnUrl,
       compatExt: t.compatExt,
+      audioGenOutput: null,
       id: `attachment-${t.itemId ?? t.seriesId}-${t.index}`,
       compatKey: t.compatKey,
       key: t.key,
@@ -153,16 +153,13 @@ export function normalizeImgGenFields(
   if (!r) return undefined;
   const { partialImages, activeImage, images, ...rest } = r;
   const partialImgsNormalized = imgGenToAttachmentWorkup(partialImages) as (
-    | AttachmentSingleton<true>
-    | undefined
+    AttachmentSingleton<true> | undefined
   )[];
   const imgsNormalized = imgGenToAttachmentWorkup(images) as (
-    | AttachmentSingleton<true>
-    | undefined
+    AttachmentSingleton<true> | undefined
   )[];
   const activeImgNormalized = imgGenToAttachmentWorkup(activeImage) as
-    | undefined
-    | AttachmentSingleton<true>;
+    undefined | AttachmentSingleton<true>;
   return {
     activeImage: activeImgNormalized,
     partialImages: partialImgsNormalized,

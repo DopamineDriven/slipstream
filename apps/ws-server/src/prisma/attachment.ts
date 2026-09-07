@@ -161,6 +161,23 @@ export class PrismaAttachmentService extends PrismaUserStoreService {
 
     const { conversationId, ...rest } = data;
 
+    // nested metadata inputs are `...WithoutAttachment` shapes — the relation
+    // scoping supplies the FK, so `attachmentId` must be stripped before the
+    // upsert spreads (Prisma rejects it there as an unknown argument, even
+    // though the singleton types carry it)
+    const imgMeta =
+      metadata?.type === "IMAGE" && metadata.img
+        ? (({ attachmentId: _fk, ...m }) => m)(metadata.img)
+        : undefined;
+    const docMeta =
+      metadata?.type === "DOCUMENT" && metadata.doc
+        ? (({ attachmentId: _fk, ...m }) => m)(metadata.doc)
+        : undefined;
+    const audioMeta =
+      metadata?.type === "AUDIO" && metadata.audio
+        ? (({ attachmentId: _fk, ...m }) => m)(metadata.audio)
+        : undefined;
+
     return await this.prismaClient.attachment.update({
       where: {
         id: rest.id
@@ -168,36 +185,33 @@ export class PrismaAttachmentService extends PrismaUserStoreService {
       include: { image: true, document: true, audio: true },
       data: {
         ...rest,
-        image:
-          metadata?.type === "IMAGE" && metadata.img
-            ? {
-                upsert: {
-                  where: { attachmentId: rest.id },
-                  create: { ...metadata.img },
-                  update: { ...metadata.img }
-                }
+        image: imgMeta
+          ? {
+              upsert: {
+                where: { attachmentId: rest.id },
+                create: { ...imgMeta },
+                update: { ...imgMeta }
               }
-            : undefined,
-        document:
-          metadata?.type === "DOCUMENT" && metadata.doc
-            ? {
-                upsert: {
-                  where: { attachmentId: rest.id },
-                  create: { ...metadata.doc },
-                  update: { ...metadata.doc }
-                }
+            }
+          : undefined,
+        document: docMeta
+          ? {
+              upsert: {
+                where: { attachmentId: rest.id },
+                create: { ...docMeta },
+                update: { ...docMeta }
               }
-            : undefined,
-        audio:
-          metadata?.type === "AUDIO" && metadata.audio
-            ? {
-                upsert: {
-                  where: { attachmentId: rest.id },
-                  create: { ...metadata.audio },
-                  update: { ...metadata.audio }
-                }
+            }
+          : undefined,
+        audio: audioMeta
+          ? {
+              upsert: {
+                where: { attachmentId: rest.id },
+                create: { ...audioMeta },
+                update: { ...audioMeta }
               }
-            : undefined,
+            }
+          : undefined,
         conversationId: this.convoId(conversationId)
       }
     });

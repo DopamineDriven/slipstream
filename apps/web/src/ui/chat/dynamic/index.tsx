@@ -13,6 +13,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
+import { useAudioGenCtx } from "@/context/audio-gen-context";
 import { ChatScrollProvider } from "@/context/chat-scroll-context";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
@@ -56,6 +57,7 @@ export function ChatInterface({
     thinkingDuration,
     imgGenEnabled,
     imgGenFields,
+    audioGenFields,
     currentImgGenAttachmentId,
     currentAiMsgId,
     currentStreamingMessage,
@@ -68,15 +70,35 @@ export function ChatInterface({
   const { get } = useCookiesCtx();
   const tz = get("client-tz");
 
+  // Per-turn audioGen milestones (reset on send in use-send-chat): lyrics =
+  // the streaming AUDIO_GEN bubble's first content (lyria delivers the full
+  // lyric sheet before the audio), audio = the envelope's cdnUrl. The window
+  // between them gates the AudioPlayer's "sit tight, audio compiling…" state.
+  // Setters bail on unchanged values, so the per-token effect runs are free.
+  const { hasLyrics, setHasLyrics, setHasAudio } = useAudioGenCtx();
+  useEffect(() => {
+    if (
+      currentStreamingMessage?.messageType === "AUDIO_GEN" &&
+      currentStreamingMessage.content.length > 0
+    ) {
+      setHasLyrics(true);
+    }
+  }, [currentStreamingMessage, setHasLyrics]);
+  useEffect(() => {
+    if (audioGenFields?.audio?.cdnUrl) {
+      setHasAudio(true);
+    }
+  }, [audioGenFields, setHasAudio]);
+
   // The committed timeline (referentially stable across tokens — the perf invariant).
   const committed = useChatCommitted(store);
 
   // Hydrate cold history client-side via SWR (replaces the old server-route `initialMessages` seed). Home / new-chat
   // carry no server history, so skip the fetch. The store stays the single read model; the bridge writes into it.
   const historyConversationId =
-    conversationId === "new-chat" || conversationId === "home" ?
-      undefined
-    : conversationId;
+    conversationId === "new-chat" || conversationId === "home"
+      ? undefined
+      : conversationId;
   const {
     error: historyError,
     loadMore,
@@ -206,9 +228,10 @@ export function ChatInterface({
           "flex h-full flex-col",
           isHome ? "mx-auto items-center justify-center p-4" : "overflow-y-auto"
         )}>
-        {showSkeleton ?
+        {showSkeleton ? (
           <ChatAreaSkeleton />
-        : <ChatFeed
+        ) : (
+          <ChatFeed
             messages={feed}
             streamedText={isStreaming ? streamedText : ""}
             isAwaitingFirstChunk={isAwaitingFirstChunk}
@@ -221,6 +244,8 @@ export function ChatInterface({
             thinkingDuration={thinkingDuration ?? undefined}
             imgGenEnabled={imgGenEnabled}
             imgGenFields={imgGenFields}
+            audioGenFields={audioGenFields}
+            audioGenHasLyrics={hasLyrics}
             imgGenAttachmentId={currentImgGenAttachmentId ?? undefined}
             currentAiMsgId={currentAiMsgId ?? undefined}
             loadOlderMessages={loadMore}
@@ -229,7 +254,7 @@ export function ChatInterface({
             user={user}>
             <ChatHero user={user} selectedModel={selectedModel} tz={tz} />
           </ChatFeed>
-        }
+        )}
         <Suspense>
           <ChatInput
             handlePromptConsumed={handlePromptConsumed}

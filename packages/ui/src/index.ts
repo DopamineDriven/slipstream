@@ -231,6 +231,8 @@ export { Trash } from "@/icons/trash";
 export { TrashSimple } from "@/icons/trash-simple";
 export { User } from "@/icons/user";
 export { VercelIcon } from "@/icons/vercel";
+export { Volume } from "@/icons/volume";
+export { VolumeMuted } from "@/icons/volume-muted";
 export { X } from "@/icons/x";
 export { XAiIcon } from "@/icons/xai";
 export { Zai } from "@/icons/zai";

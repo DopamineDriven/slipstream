@@ -7,19 +7,18 @@
  * readiness, it just fires. Per-conversation: it skips if the store is already streaming, plus a 500ms duplicate-
  * send guard keyed by prompt. Reads (never mutates) the outer contexts (model / api-keys / asset / cookies / WS).
  */
-
+import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
+import type { ChatStore } from "@/state/chat/store";
 import { useCallback, useMemo, useRef } from "react";
 import { useApiKeys } from "@/context/api-keys-context";
 import { useAssetUpload } from "@/context/asset-context";
+import { useAudioGenCtx } from "@/context/audio-gen-context";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
-import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
 import { buildOptimisticAttachment } from "@/lib/attachment-mapper";
 import { getModel } from "@/lib/models";
 import { createUserMessage } from "@/lib/ui-message-helpers";
-import type { ChatStore } from "@/state/chat/store";
-import { toPrismaFormat } from "@slipstream/types";
 import type {
   AIChatRequest,
   AIChatRequestImgGenFields,
@@ -27,6 +26,7 @@ import type {
   ClientContextWorkupProps,
   UserMetadata
 } from "@slipstream/types";
+import { toPrismaFormat } from "@slipstream/types";
 
 /** The payload `ChatInput` emits via `onUserMessage` — assets are already real (gated upstream on `asset_ready`). */
 export interface SendChatPayload {
@@ -75,6 +75,7 @@ const fallbackApiKeys = {
 
 export function useSendChat(store: ChatStore, userId?: string) {
   const { selectedModel } = useModelSelection();
+  const { isAudioGenEnabled, setHasLyrics, setHasAudio } = useAudioGenCtx();
   const { providerContext } = useApiKeys();
   const { startNewBatch, currentBatchId, getUploadsByBatchId, getByPreviewId } =
     useAssetUpload();
@@ -182,7 +183,10 @@ export function useSendChat(store: ChatStore, userId?: string) {
         conversationId,
         prompt: content,
         provider: selectedModel.provider,
-        model: getModel(selectedModel.provider, selectedModel.modelId as AllModelsUnion),
+        model: getModel(
+          selectedModel.provider,
+          selectedModel.modelId as AllModelsUnion
+        ),
         hasProviderConfigured: keys.isSet[selectedModel.provider],
         isDefaultProvider: keys.isDefault[selectedModel.provider],
         maxTokens: undefined,
@@ -191,9 +195,16 @@ export function useSendChat(store: ChatStore, userId?: string) {
         topP: undefined,
         batchId,
         imgGenEnabled: payload.imgGenEnabled,
+        // auto-set from the targeted model (lyria = audio gen, no user
+        // toggle) — the derivation lives in AudioGenProvider
+        audioGenEnabled: isAudioGenEnabled,
         imgGenFields:
           payload.imgGenEnabled === true ? payload.imgGenFields : undefined
       } satisfies AIChatRequest;
+
+      // re-arm the per-turn audioGen milestones (lyrics → audio) for this send
+      setHasLyrics(false);
+      setHasAudio(false);
 
       store.beginSend(request, optimisticUser);
       sendEvent("ai_chat_request", request);
@@ -203,6 +214,9 @@ export function useSendChat(store: ChatStore, userId?: string) {
       store,
       userId,
       selectedModel,
+      isAudioGenEnabled,
+      setHasLyrics,
+      setHasAudio,
       providerContext,
       metadata,
       currentBatchId,

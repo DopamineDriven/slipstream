@@ -1,4 +1,3 @@
-// src/lib/ui-message-helpers.ts
 import type {
   ChatChunkAndResMsgBlock,
   MessageBlockSingleton,
@@ -40,9 +39,7 @@ export function toMessageBlocks(
 /**
  * Creates a properly typed MessageSingleton for user messages
  */
-export function createUserMessage(
-  params: MessageSingleton<true>
-): MessageSingleton<true> {
+export function createUserMessage(params: MessageSingleton<true>) {
   return {
     id: params.id,
     ordinal: params.ordinal,
@@ -50,6 +47,10 @@ export function createUserMessage(
     responseOutput: null,
     provider: params.provider,
     isImageGen: params.isImageGen,
+    audioGenJob: params.audioGenJob,
+    ttsJob: params.ttsJob,
+    conversationMemoryChunk: params.conversationMemoryChunk,
+    userKey: params.userKey,
     createdAt:
       params.createdAt instanceof Date
         ? params.createdAt
@@ -73,20 +74,22 @@ export function createUserMessage(
     imageGenJob: params.imageGenJob ?? null,
     attachments: params.attachments ?? [],
     messageBlocks: params.messageBlocks
-  };
+  } satisfies MessageSingleton<true>;
 }
 
 /**
  * Creates a properly typed MessageSingleton for AI messages
  */
-export function createAIMessage(
-  params: MessageSingleton<true>
-): MessageSingleton<true> {
+export function createAIMessage(params: MessageSingleton<true>) {
   return {
     id: params.id,
     ordinal: params.ordinal,
     userId: params.userId,
     provider: params.provider,
+    audioGenJob: params.audioGenJob,
+    ttsJob: params.ttsJob,
+    conversationMemoryChunk: params.conversationMemoryChunk,
+    userKey: params.userKey,
     createdAt:
       params.createdAt instanceof Date
         ? params.createdAt
@@ -112,5 +115,5 @@ export function createAIMessage(
     imageGenJob: params.imageGenJob ?? null,
     attachments: params.attachments ?? [],
     messageBlocks: params.messageBlocks
-  };
+  } satisfies MessageSingleton<true>;
 }

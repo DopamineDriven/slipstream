@@ -91,6 +91,8 @@ import { Trash } from "@/icons/trash";
 import { TrashSimple } from "@/icons/trash-simple";
 import { User } from "@/icons/user";
 import { VercelIcon } from "@/icons/vercel";
+import { Volume } from "@/icons/volume";
+import { VolumeMuted } from "@/icons/volume-muted";
 import { X } from "@/icons/x";
 import { XAiIcon } from "@/icons/xai";
 import { Zai } from "@/icons/zai";
@@ -190,6 +192,8 @@ const IconComponents = {
   TrashSimple,
   User,
   VercelIcon,
+  Volume,
+  VolumeMuted,
   X,
   XAiIcon,
   Zai,
@@ -323,6 +327,8 @@ export {
   TrashSimple,
   User,
   VercelIcon,
+  Volume,
+  VolumeMuted,
   X,
   XAiIcon,
   Zai,
