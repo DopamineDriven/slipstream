@@ -964,7 +964,9 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
   }
 
   private isAudioGenModel(m: string) {
-    return m === "lyria-3-pro-preview" || m === "lyria-3-clip-preview";
+    // delegates to ModelService (the maintained roster) — this method exists
+    // for its audioGen call-site semantics, not as another lyria list
+    return this.isGeminiLyriaModel(m);
   }
 
   public async handleAiChatRequest({

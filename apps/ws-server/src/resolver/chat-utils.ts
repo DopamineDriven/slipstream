@@ -11,13 +11,13 @@ import type {
 import type { WSServer } from "@/ws-server/index.ts";
 import type { Responses } from "openai/resources";
 import type { WebSocket } from "ws";
+import { ResolverAssetCompleteService } from "@/resolver/asset-complete.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   EventTypeMap,
   MessageSingleton,
   Provider
 } from "@slipstream/types";
-import { ResolverAssetCompleteService } from "./asset-complete.ts";
 
 export class ResolverChatUtilsService extends ResolverAssetCompleteService {
   constructor(
@@ -160,16 +160,16 @@ export class ResolverChatUtilsService extends ResolverAssetCompleteService {
       content.push({ type: "input_text", text });
       try {
         const res = await openai.responses.create({
-          model: "gpt-5.4-nano",
+          model: "gpt-5.6-luna",
           store: false,
           reasoning: { effort: "medium" },
-          instructions: `Generate a creative & descriptive yet concise title  ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
+          instructions: `Generate a creative & descriptive yet concise title  ( **MAX 7-10 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
           temperature: 1,
           input: [
             {
               role: "system",
               content:
-                "Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes."
+                "Generate a creative & descriptive yet concise title ( **MAX 7-10 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes."
             },
             { role: "user", content } as const
           ]
@@ -188,16 +188,17 @@ export class ResolverChatUtilsService extends ResolverAssetCompleteService {
     content.push({ type: "input_text", text });
     try {
       const res = await openai.responses.create({
-        model: "gpt-5.4-nano",
+        model: "gpt-5.6-luna",
         store: false,
         reasoning: { effort: "medium" },
-        instructions: `Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
+        instructions:
+          "Generate a creative & descriptive yet concise title ( **MAX 7-10 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.",
         temperature: 1,
         input: [
           {
             role: "system",
             content:
-              "Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes."
+              "Generate a creative & descriptive yet concise title ( **MAX 7-10 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes."
           },
           { role: "user", content } as const
         ]

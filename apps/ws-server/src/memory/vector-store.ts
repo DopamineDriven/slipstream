@@ -1,5 +1,5 @@
-import type { StreamSummaryMessageParams } from "@/anthropic/types.ts";
 import type { AnthropicSummarizerService } from "@/anthropic/summarizer.ts";
+import type { StreamSummaryMessageParams } from "@/anthropic/types.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { GatewayRequestContentPart } from "@/memory/summarizer-loop.ts";
 import type {
@@ -844,6 +844,8 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
         }
       ],
       foldArmKey: "sol",
+      // see MemorySummarizerConfig.rollingFoldEnabled — decoupled, no consumer
+      rollingFoldEnabled: false,
       maxConcurrentSummaryJobs: 12,
       rawTranscriptAb: true,
       // fleet default is 10 (deepseek gets 15) — if 8 rounds of foraging
@@ -1274,8 +1276,7 @@ The System prompt given to all models in the source material being summarized is
     // §6.2 roster rotation: deterministic per-chunk arm — stable across
     // retries (unlike LRU), and every row carries its arm's receipts
     const rotation = this.summarizerRotation;
-    const entry =
-      rotation[chunk.chunkIndex % Math.max(rotation.length, 1)];
+    const entry = rotation[chunk.chunkIndex % Math.max(rotation.length, 1)];
     // §8.5 global cap: acquire BEFORE the SUMMARIZING transition so a
     // slot-starved chunk holds QUEUED — stale-reclaim never false-fires on
     // a job that is merely waiting its turn
@@ -1437,9 +1438,11 @@ The System prompt given to all models in the source material being summarized is
       if (pending.length === 0) {
         // release the claim — an empty wave never drains and would wedge the context
         this.summaryJobRegistry.delete(contextId);
-        // dry — the whole-backlog digest folds now (no-ops unless new
-        // summaries landed since the fold watermark)
-        void this.foldRollingSummaryForContext(contextId);
+        // dry — the whole-backlog digest would fold here; gated while the
+        // rolling summary is decoupled (rollingFoldEnabled)
+        if (this.memorySummarizerConfig.rollingFoldEnabled) {
+          void this.foldRollingSummaryForContext(contextId);
+        }
         return;
       }
       const context = await this.prisma.getMemoryContextById(contextId);

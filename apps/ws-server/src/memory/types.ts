@@ -1,12 +1,12 @@
-import type { PrismaConversationMemoryService } from "@/prisma/convo-memory-service.ts";
-import type { Voyage } from "@/voyage/types.ts";
-import type { ReasoningEffort } from "openai/resources/shared.mjs";
-import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { AlibabaSummarizerService } from "@/alibaba/summarizer.ts";
 import type { DeepSeekSummarizerService } from "@/deepseek/summarizer.ts";
 import type { KimiSummarizerService } from "@/kimi/summarizer.ts";
 import type { MiniMaxSummarizerService } from "@/minimax/summarizer.ts";
+import type { PrismaConversationMemoryService } from "@/prisma/convo-memory-service.ts";
+import type { Voyage } from "@/voyage/types.ts";
 import type { ZaiSummarizerService } from "@/zai/summarizer.ts";
+import type { ReasoningEffort } from "openai/resources/shared.mjs";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AlibabaModelIdUnion,
   AnthropicModelIdUnion,
@@ -195,13 +195,7 @@ export type ConversationMemoryGetChunkTarget =
 
 /** roster keys — stable identifiers for rotation membership + fold pinning */
 export type SummarizerArmKey =
-  | "sonnet"
-  | "sol"
-  | "deepseek"
-  | "minimax"
-  | "qwen"
-  | "kimi"
-  | "glm";
+  "sonnet" | "sol" | "deepseek" | "minimax" | "qwen" | "kimi" | "glm";
 
 interface SummarizerArmBase {
   key: SummarizerArmKey;
@@ -276,6 +270,14 @@ export interface MemorySummarizerConfig {
    * workers, the fold is an editor)
    */
   foldArmKey: SummarizerArmKey;
+  /**
+   * master switch for the rolling fold. DECOUPLED 2026-09-07: the digest has
+   * no consumer anywhere (its only reader was the next fold's own input) and
+   * every drained wave billed the fold arm — thousands of folds on monster
+   * convos. Flip to re-couple when a legitimate use case lands; the schema,
+   * CAS writer, and fold machinery all stay intact and dormant.
+   */
+  rollingFoldEnabled: boolean;
   /**
    * content-delivery A/B (Andrew, 2026-07-07): when true, summarizers
    * alternate between the structured preamble build and the RAW
