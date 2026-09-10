@@ -1,9 +1,6 @@
 export const displayNameToModelIdVideoGen = {
-  openai: {
-    "Sora 2": "sora-2",
-    "Sora 2 Pro": "sora-2-pro"
-  },
   gemini: {
+    "Gemini Omni 1.1 Flash": "gemini-omni-1.1-flash",
     "Gemini Omni Flash Preview": "gemini-omni-flash-preview",
     "Veo 3.1": "veo-3.1-generate-preview",
     "Veo 3.1 fast": "veo-3.1-fast-generate-preview",

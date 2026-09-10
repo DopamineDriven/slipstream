@@ -396,18 +396,6 @@ export class GeminiWorkupService extends GeminiEnsureService {
     if (this.isNanoBanana2(m) || this.isNanoBananaPro(m)) {
       return [{ googleSearch: {} }] satisfies GenerateContentConfig["tools"];
     }
-    if (m === "gemini-2.0-flash" || m === "gemini-2.0-flash-lite") {
-      return [
-        {
-          functionDeclarations: [
-            this.userStoreSearchTool(),
-            this.memorySearchTool(),
-            this.memoryGetChunkTool(),
-            ...localDeclarations
-          ]
-        }
-      ] satisfies GenerateContentConfig["tools"];
-    }
     if (localDeclarations.length > 0) {
       return [
         { functionDeclarations: localDeclarations }

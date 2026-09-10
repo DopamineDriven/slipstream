@@ -53,7 +53,7 @@ export class AlibabaWorkupService {
   }
 
   protected async *stream(
-    model = "qwen3.7-max" satisfies AlibabaModelIdUnion,
+    model = "qwen3.8-max" satisfies AlibabaModelIdUnion,
     messages: readonly AlibabaRequestMessage[],
     apiKey?: string,
     options?: {

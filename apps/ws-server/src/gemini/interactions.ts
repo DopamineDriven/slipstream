@@ -337,15 +337,6 @@ export class GeminiInteractionsService extends GeminiWorkupService {
     }
     if (this.isNanoBanana2(m)) {
       return [{ type: "google_search" }] satisfies Interactions.Tool[];
-    }
-
-    if (m === "gemini-2.0-flash" || m === "gemini-2.0-flash-lite") {
-      return [
-        this.memorySearchToolInteractions(),
-        this.getMemoryChunkToolInteractions(),
-        this.userStoreSearchToolInteractions(),
-        ...localTools
-      ] satisfies Interactions.Tool[];
     } else {
       return [] satisfies Interactions.Tool[];
     }

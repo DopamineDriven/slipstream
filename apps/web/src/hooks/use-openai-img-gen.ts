@@ -175,12 +175,16 @@ export const OPENAI_BACKGROUNDS = [
   "opaque"
 ] satisfies OpenAIImageGenOpts["background"][];
 
-const OPENAI_DEFAULT_SETTINGS = {
-  aspectRatio: "auto",
-  quality: "high",
-  outputFormat: "png",
-  background: "auto"
-} satisfies OpenAIImageSettings;
+const OPENAI_DEFAULT_SETTINGS = (modelId: string) =>
+  ({
+    aspectRatio: "auto",
+    quality:
+      modelId === "gpt-image-2.5-sunburst" || modelId === "gpt-image-2.5-flare"
+        ? "xhigh"
+        : "high",
+    outputFormat: "png",
+    background: "auto"
+  }) satisfies OpenAIImageSettings;
 
 const STORAGE_KEY_PREFIX = "openai-image-settings";
 
@@ -208,7 +212,7 @@ export function useOpenAIImageSettings(modelId: string) {
     [modelId]
   );
   const [settings, setSettings] = useState<OpenAIImageSettings>(
-    OPENAI_DEFAULT_SETTINGS
+    OPENAI_DEFAULT_SETTINGS(modelId)
   );
 
   useEffect(() => {
@@ -229,20 +233,20 @@ export function useOpenAIImageSettings(modelId: string) {
             ? aspectRatioOptions.find(
                 option => option.value === parsed.aspectRatio
               )?.value
-            : undefined) ?? OPENAI_DEFAULT_SETTINGS.aspectRatio;
+            : undefined) ?? OPENAI_DEFAULT_SETTINGS(modelId).aspectRatio;
         const quality =
           parsed.quality && imgCtx.isValidOpenAIQuality(parsed.quality)
             ? parsed.quality
-            : OPENAI_DEFAULT_SETTINGS.quality;
+            : OPENAI_DEFAULT_SETTINGS(modelId).quality;
         const outputFormat =
           parsed.outputFormat &&
           imgCtx.isValidOpenAIOutputFormat(parsed.outputFormat)
             ? parsed.outputFormat
-            : OPENAI_DEFAULT_SETTINGS.outputFormat;
+            : OPENAI_DEFAULT_SETTINGS(modelId).outputFormat;
         const backgroundCandidate =
           parsed.background && imgCtx.isValidOpenAIBg(parsed.background)
             ? parsed.background
-            : OPENAI_DEFAULT_SETTINGS.background;
+            : OPENAI_DEFAULT_SETTINGS(modelId).background;
         const background =
           outputFormat === "jpeg" ? undefined : backgroundCandidate;
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -253,10 +257,10 @@ export function useOpenAIImageSettings(modelId: string) {
           background
         });
       } else {
-        setSettings(OPENAI_DEFAULT_SETTINGS);
+        setSettings(OPENAI_DEFAULT_SETTINGS(modelId));
       }
     } catch {
-      setSettings(OPENAI_DEFAULT_SETTINGS);
+      setSettings(OPENAI_DEFAULT_SETTINGS(modelId));
     }
   }, [aspectRatioOptions, isCapable, modelId]);
 
@@ -270,55 +274,58 @@ export function useOpenAIImageSettings(modelId: string) {
     }
   }, [isCapable, modelId, settings]);
 
-  const updateSettings = useCallback((updates: OpenAIImageSettingsUpdates) => {
-    setSettings(prev => {
-      const aspectRatio =
-        typeof updates.aspectRatio === "string"
-          ? aspectRatioOptions.find(
-              option => option.value === updates.aspectRatio
-            )?.value
-          : undefined;
-      const quality =
-        typeof updates.quality === "string" &&
-        imgCtx.isValidOpenAIQuality(updates.quality)
-          ? OPENAI_QUALITIES.find(option => option.value === updates.quality)
-              ?.value
-          : undefined;
-      const outputFormat =
-        typeof updates.outputFormat === "string" &&
-        imgCtx.isValidOpenAIOutputFormat(updates.outputFormat)
-          ? OPENAI_OUTPUT_FORMATS.find(
-              option => option === updates.outputFormat
-            )
-          : undefined;
-      const nextOutputFormat =
-        outputFormat ??
-        prev.outputFormat ??
-        OPENAI_DEFAULT_SETTINGS.outputFormat;
-      const backgroundCandidate =
-        typeof updates.background === "string" &&
-        imgCtx.isValidOpenAIBg(updates.background)
-          ? OPENAI_BACKGROUNDS.find(option => option === updates.background)
-          : undefined;
-      const background =
-        nextOutputFormat === "jpeg"
-          ? undefined
-          : (backgroundCandidate ??
-            prev.background ??
-            OPENAI_DEFAULT_SETTINGS.background);
+  const updateSettings = useCallback(
+    (updates: OpenAIImageSettingsUpdates) => {
+      setSettings(prev => {
+        const aspectRatio =
+          typeof updates.aspectRatio === "string"
+            ? aspectRatioOptions.find(
+                option => option.value === updates.aspectRatio
+              )?.value
+            : undefined;
+        const quality =
+          typeof updates.quality === "string" &&
+          imgCtx.isValidOpenAIQuality(updates.quality)
+            ? OPENAI_QUALITIES.find(option => option.value === updates.quality)
+                ?.value
+            : undefined;
+        const outputFormat =
+          typeof updates.outputFormat === "string" &&
+          imgCtx.isValidOpenAIOutputFormat(updates.outputFormat)
+            ? OPENAI_OUTPUT_FORMATS.find(
+                option => option === updates.outputFormat
+              )
+            : undefined;
+        const nextOutputFormat =
+          outputFormat ??
+          prev.outputFormat ??
+          OPENAI_DEFAULT_SETTINGS(modelId).outputFormat;
+        const backgroundCandidate =
+          typeof updates.background === "string" &&
+          imgCtx.isValidOpenAIBg(updates.background)
+            ? OPENAI_BACKGROUNDS.find(option => option === updates.background)
+            : undefined;
+        const background =
+          nextOutputFormat === "jpeg"
+            ? undefined
+            : (backgroundCandidate ??
+              prev.background ??
+              OPENAI_DEFAULT_SETTINGS(modelId).background);
 
-      return {
-        aspectRatio: aspectRatio ?? prev.aspectRatio,
-        quality: quality ?? prev.quality,
-        outputFormat: nextOutputFormat,
-        background
-      };
-    });
-  }, [aspectRatioOptions]);
+        return {
+          aspectRatio: aspectRatio ?? prev.aspectRatio,
+          quality: quality ?? prev.quality,
+          outputFormat: nextOutputFormat,
+          background
+        };
+      });
+    },
+    [aspectRatioOptions, modelId]
+  );
 
   const resetSettings = useCallback(() => {
-    setSettings(OPENAI_DEFAULT_SETTINGS);
-  }, []);
+    setSettings(OPENAI_DEFAULT_SETTINGS(modelId));
+  }, [modelId]);
 
   return {
     settings,

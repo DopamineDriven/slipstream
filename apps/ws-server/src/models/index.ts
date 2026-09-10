@@ -11,7 +11,7 @@ export class ModelService extends ModelToolDefsService {
   }
   public isOpenAIImgGenFacilitating(m: string) {
     return (
-      m ==="gpt-6-astra" ||
+      m === "gpt-6-astra" ||
       m === "gpt-5.6-sol" ||
       m === "gpt-5.6-terra" ||
       m === "gpt-5.6-luna" ||
@@ -23,7 +23,6 @@ export class ModelService extends ModelToolDefsService {
       m === "gpt-4.1-mini" ||
       m === "gpt-4.1-nano" ||
       m === "gpt-5" ||
-      m === "gpt-5-chat-latest" ||
       m === "gpt-5-mini" ||
       m === "gpt-5-nano" ||
       m === "gpt-5-pro" ||
@@ -40,7 +39,6 @@ export class ModelService extends ModelToolDefsService {
 
   public isOpenAINonReasoningModel(m: string) {
     return (
-      m === "chatgpt-4o-latest" ||
       m === "gpt-3.5-turbo" ||
       m === "gpt-4" ||
       m === "gpt-4-turbo" ||
@@ -50,8 +48,7 @@ export class ModelService extends ModelToolDefsService {
       m === "gpt-4o" ||
       m === "gpt-4o-mini" ||
       m === "gpt-image-1" ||
-      m === "gpt-image-1-mini" ||
-      this.isOpenAIVideoModel(m)
+      m === "gpt-image-1-mini"
     );
   }
 
@@ -61,6 +58,8 @@ export class ModelService extends ModelToolDefsService {
 
   public isOpenAIImgModel(m: string) {
     return (
+      m === "gpt-image-2.5-sunburst" ||
+      m === "gpt-image-2.5-flare" ||
       m === "gpt-image-2" ||
       m === "gpt-image-1.5" ||
       m === "gpt-image-1" ||
@@ -68,33 +67,16 @@ export class ModelService extends ModelToolDefsService {
     );
   }
 
-  public isOpenAIVideoModel(m: string) {
-    return m === "sora-2" || m === "sora-2-pro";
-  }
-
   public isOpenAICodexModel(m: string) {
-    return (
-      m === "gpt-5.3-codex" ||
-      m === "gpt-5.2-codex" ||
-      m === "gpt-5.1-codex-max" ||
-      m === "gpt-5.1-codex-mini" ||
-      m === "gpt-5.1-codex" ||
-      m === "gpt-5-codex"
-    );
+    return m === "gpt-5.3-codex";
   }
 
   public isOpenAIModel(m: string) {
     return (
       this.isOpenAIImgGenFacilitating(m) ||
       this.isOpenAIImgModel(m) ||
-      this.isOpenAIVideoModel(m) ||
       this.isOpenAICodexModel(m) ||
-      m === "gpt-5.2-chat-latest" ||
-      m === "gpt-5.1-chat-latest" ||
-      m === "chatgpt-4o-latest" ||
       m === "o4-mini" ||
-      m === "o4-mini-deep-research" ||
-      m === "o3-deep-research" ||
       m === "o3-pro" ||
       m === "o3-mini" ||
       m === "o1" ||
@@ -119,6 +101,7 @@ export class ModelService extends ModelToolDefsService {
 
   public isGeminiVideoModel(m: string) {
     return (
+      m === "gemini-omni-1.1-flash" ||
       m === "gemini-omni-flash-preview" ||
       m === "veo-3.1-lite-generate-preview" ||
       m === "veo-3.1-fast-generate-preview" ||
@@ -134,7 +117,11 @@ export class ModelService extends ModelToolDefsService {
   }
 
   public isGeminiLyriaModel(m: string) {
-    return m ==="lyria-3.5" || m === "lyria-3-clip-preview" || m === "lyria-3-pro-preview";
+    return (
+      m === "lyria-3.5" ||
+      m === "lyria-3-clip-preview" ||
+      m === "lyria-3-pro-preview"
+    );
   }
 
   public isGeminiModel(m: string) {
@@ -151,8 +138,6 @@ export class ModelService extends ModelToolDefsService {
       m === "gemini-2.5-pro" ||
       m === "gemini-2.5-flash-lite" ||
       m === "gemini-2.5-flash" ||
-      m === "gemini-2.0-flash" ||
-      m === "gemini-2.0-flash-lite" ||
       this.isGeminiLyriaModel(m) ||
       this.isGeminiDeepResearchModel(m) ||
       this.isGeminiImgModel(m) ||
@@ -220,7 +205,9 @@ export class ModelService extends ModelToolDefsService {
   }
 
   public isMetaModel(m: string) {
-    return m === "muse-spark-1.1" || m === "muse-spark-1.2" || m === "muse-spark-1.3";
+    return (
+      m === "muse-spark-1.1" || m === "muse-spark-1.2" || m === "muse-spark-1.3"
+    );
   }
 
   public isV0Model(m: string) {
@@ -250,7 +237,9 @@ export class ModelService extends ModelToolDefsService {
   public isKimiModel(m: string) {
     return (
       m === "kimi-k3" ||
+      m === "kimi-k3-fast" ||
       m === "kimi-k2.7-code" ||
+      m === "kimi-k2.7-code-highspeed" ||
       m === "kimi-k2.6" ||
       m === "kimi-k2.5" ||
       m === "kimi-k2-thinking"
@@ -262,14 +251,18 @@ export class ModelService extends ModelToolDefsService {
       m === "deepseek-r1" ||
       m === "deepseek-v4-pro" ||
       m === "deepseek-v4-pro-0813" ||
-      m === "deepseek-v4-flash"
+      m === "deepseek-v4-flash" ||
+      m === "deepseek-v4-flash-0731"
     );
   }
 
   public isZaiModel(m: string) {
     return (
-      m==="glm-5.3" ||
+      m === "glm-5.3" ||
+      m === "glm-5.3-fast" ||
+      m === "glm-5.3-flash" ||
       m === "glm-5.2" ||
+      m === "glm-5.2-fast" ||
       m === "glm-5.1" ||
       m === "glm-5" ||
       m === "glm-4.7" ||
@@ -280,7 +273,9 @@ export class ModelService extends ModelToolDefsService {
 
   public isQwenModel(m: string) {
     return (
-      m ==="qwen3.8-flash" ||
+      m === "qwen3.8-max-0902" ||
+      m === "qwen3.8-flash" ||
+      m === "qwen3.8-flash" ||
       m === "qwen3.8-max" ||
       m === "qwen3.7-max" ||
       m === "qwen3.7-plus" ||

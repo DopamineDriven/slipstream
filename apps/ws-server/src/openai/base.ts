@@ -13,8 +13,7 @@ import type {
   AIChatRequest,
   AIChatResponseImgGenSubFields,
   AttachmentSingleton,
-  ImgGenWorkupResRT,
-  OpenAiModelIdUnion
+  ImgGenWorkupResRT
 } from "@slipstream/types";
 
 export class OpenAIBaseService {
@@ -311,7 +310,7 @@ export class OpenAIBaseService {
     });
   }
 
-  protected canCallImageApi(model: OpenAiModelIdUnion) {
+  protected canCallImageApi(model: string) {
     return this.prisma.isOpenAIImgModel(model);
   }
 
@@ -345,10 +344,8 @@ export class OpenAIBaseService {
       }
       case "o1":
       case "o1-pro":
-      case "o3-deep-research":
       case "o3":
-      case "o3-pro":
-      case "o4-mini-deep-research": {
+      case "o3-pro": {
         if (imgGenEnabled === true) {
           return { effort: "low", summary } as const satisfies Reasoning;
         } else {
@@ -395,9 +392,7 @@ export class OpenAIBaseService {
           }
         }
       }
-      case "gpt-5.2-codex":
-      case "gpt-5.3-codex":
-      case "gpt-5.1-codex-max": {
+      case "gpt-5.3-codex": {
         if (
           effort &&
           (this.isEffortHighMedLow(effort) || this.isEffortXHigh(effort))
@@ -447,15 +442,11 @@ export class OpenAIBaseService {
         }
       }
       case "o3-mini":
-      case "gpt-5.2-chat-latest":
-      case "gpt-5-codex":
       case "gpt-image-2":
       case "gpt-image-1.5":
-      case "gpt-5-chat-latest":
-      case "gpt-5.1-codex":
-      case "gpt-5.1-codex-mini":
+      case "gpt-image-2.5-flare":
+      case "gpt-image-2.5-sunburst":
       case "o4-mini":
-      case "gpt-5.1-chat-latest":
       default: {
         if (effort && this.isEffortHighMedLow(effort)) {
           return { effort, summary } as const satisfies Reasoning;
@@ -480,11 +471,9 @@ export class OpenAIBaseService {
       case "gpt-5.5-pro":
       case "gpt-5.4-mini":
       case "gpt-5.4-nano":
-      case "gpt-5.2-codex":
       case "gpt-5.3-codex":
       case "gpt-5.4":
       case "gpt-5.4-pro":
-      case "gpt-5.1-codex-max":
       case "gpt-5.2":
       case "gpt-5.1":
       case "gpt-5.2-pro":
@@ -493,20 +482,16 @@ export class OpenAIBaseService {
         return { verbosity: "high" } as const;
       }
       case "gpt-5-mini":
-      case "gpt-5-chat-latest":
       case "gpt-5-nano": {
         if (imgGenEnabled) {
           return { verbosity: "low" } satisfies ResponseTextConfig;
         }
         return { verbosity } satisfies ResponseTextConfig;
       }
+      case "gpt-image-2.5-flare":
+      case "gpt-image-2.5-sunburst":
       case "gpt-image-2":
-      case "gpt-image-1.5":
-      case "gpt-5.2-chat-latest":
-      case "gpt-5-codex":
-      case "gpt-5.1-chat-latest":
-      case "gpt-5.1-codex":
-      case "gpt-5.1-codex-mini": {
+      case "gpt-image-1.5": {
         return { verbosity } satisfies ResponseTextConfig;
       }
       case "o3":
@@ -517,18 +502,13 @@ export class OpenAIBaseService {
       case "gpt-4":
       case "gpt-4-turbo":
       case "gpt-4.1":
-      case "chatgpt-4o-latest":
       case "o1":
       case "o1-pro":
-      case "sora-2-pro":
-      case "sora-2":
       case "gpt-image-1":
       case "gpt-image-1-mini":
       case "gpt-4.1-mini":
       case "gpt-4.1-nano":
       case "gpt-4o":
-      case "o3-deep-research":
-      case "o4-mini-deep-research":
       case "gpt-4o-mini":
       default: {
         return { verbosity } as const satisfies ResponseTextConfig;

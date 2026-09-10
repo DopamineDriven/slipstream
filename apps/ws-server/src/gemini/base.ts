@@ -209,7 +209,7 @@ export class GeminiBaseService {
   }
 
   protected isOmniModel(m: string) {
-    return m === "gemini-omni-flash-preview";
+    return m === "gemini-omni-flash-preview" || m==="gemini-omni-1.1-flash";
   }
 
   protected isVeoModel(m: string) {
@@ -220,6 +220,7 @@ export class GeminiBaseService {
     );
   }
   protected isLyriaModel(m: string) {
+    
     return m==="lyria-3.5" || m === "lyria-3-pro-preview" || m === "lyria-3-clip-preview";
   }
 

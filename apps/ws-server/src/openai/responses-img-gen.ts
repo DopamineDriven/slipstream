@@ -311,17 +311,14 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       {
         action: "auto",
         type: "image_generation",
-        // gpt-image-2 doesn't support background transparency
-        // background: r.output_background,
-        // gpt-image-2 does not support input fidelity, causes an error to be thrown
-        // input_fidelity: imgCounts > 0 ? "high" : r.input_fidelity,
-        model: "gpt-image-2",
+        background: r.output_background,
+        model: "gpt-image-2.5-sunburst",
         moderation: "low",
         output_compression: r.output_compression,
         output_format: r.output_format,
         partial_images: r.partialImagesRequested ?? 3,
-        quality: "high",
-        size: (r.output_size ?? "auto") as "auto"
+        quality: "xhigh",
+        size: (r.output_size ?? "auto")
       } satisfies OpenAI.Responses.Tool.ImageGeneration
     );
 
@@ -340,7 +337,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
           input: roundInput,
           instructions: this.prisma.formatSysNote(systemPrompt),
           store: false,
-          reasoning: this.openaiReasoning(mod, "high", "auto", true),
+          reasoning: this.openaiReasoning(mod, "xhigh", "auto", true),
           model: mod,
           text: this.openAiVerbosity(mod, "medium", imgGenEnabled),
           max_output_tokens: max_tokens,

@@ -1,13 +1,15 @@
 export { ProviderValidation } from "@/provider-validation/index.ts";
 export type {
   AllImgGenCapableModelUnion,
+  AllNonImgGenCapableUnion,
   AllPureImgGenModelsUnion,
   BackgroundFormattingOpts,
+  GrokQualityUnion,
   ModelToAspectRatioOpts,
   ModelToBackgroundFormatOpts,
   ModelToOutputFormatOpts,
   ModelToOutputFormatOptsProps,
-  ModelToQualityOpts,
+  ModelToQuality as ModelToQualityOpts,
   ModelToQualityOptsProps
 } from "@/provider-validation/index.ts";
 

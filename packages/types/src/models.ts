@@ -21,6 +21,8 @@ export type ImageGenModels =
   | "gpt-image-1"
   | "gpt-image-1.5"
   | "gpt-image-2"
+  | "gpt-image-2.5-sunburst"
+  | "gpt-image-2.5-flare"
   | "gpt-image-1-mini"
   | "grok-imagine-image-2.0"
   | "grok-imagine-image"
@@ -30,8 +32,45 @@ export type ImageGenModels =
   | "gemini-3.1-flash-image-preview"
   | "gemini-3.1-flash-lite-image";
 
+export type PureImageGenModelsByProvider<
+  P extends "gpt" | "gemini" | "grok",
+  T = string
+> = P extends "gpt"
+  ? T extends `${P}-${infer U}`
+    ? `${P}-${U}`
+    : never
+  : P extends "gemini"
+    ? T extends `${P}-${infer U}`
+      ? `${P}-${U}`
+      : never
+    : P extends "grok"
+      ? T extends `${P}-${infer U}`
+        ? `${P}-${U}`
+        : never
+      : never;
+
+export type OpenAIPureImageGenModels = PureImageGenModelsByProvider<
+  "gpt",
+  ImageGenModels
+>;
+export type GeminiPureImageGenModels = PureImageGenModelsByProvider<
+  "gemini",
+  ImageGenModels
+>;
+
+export type GrokPureImageGenModels = PureImageGenModelsByProvider<
+  "grok",
+  ImageGenModels
+>;
 export const providerModelImageGenApi = {
-  openai: ["gpt-image-2", "gpt-image-1", "gpt-image-1.5", "gpt-image-1-mini"],
+  openai: [
+    "gpt-image-2.5-sunburst",
+    "gpt-image-2.5-flare",
+    "gpt-image-2",
+    "gpt-image-1",
+    "gpt-image-1.5",
+    "gpt-image-1-mini"
+  ],
   gemini: [
     "gemini-3.1-flash-image-preview",
     "gemini-3.1-flash-lite-image",
@@ -87,7 +126,6 @@ export const providerModelImageGenFacilitatingApi = {
     "gpt-5",
     "gpt-5-mini",
     "gpt-5-nano",
-    "gpt-5-chat-latest",
     "gpt-5.5-pro",
     "gpt-5.4-pro",
     "gpt-5.2-pro",
@@ -204,21 +242,17 @@ export type VideoGenModelMap = {
   >;
 };
 
-export type OpenAIVideoGenModels = VideoGenModelMap["openai"];
-
 export type GeminiVideoGenModels = VideoGenModelMap["gemini"];
 
 export type GrokVideoGenModels = VideoGenModelMap["grok"];
 
 export type AllVideoGenModels = VideoGenModelMap[VideoGenProviders];
 
-export type GetVideoModelUtilRT<T = VideoGenProviders> = T extends "openai"
-  ? OpenAIVideoGenModels
-  : T extends "gemini"
-    ? GeminiVideoGenModels
-    : T extends "grok"
-      ? GrokVideoGenModels
-      : never;
+export type GetVideoModelUtilRT<T = VideoGenProviders> = T extends "gemini"
+  ? GeminiVideoGenModels
+  : T extends "grok"
+    ? GrokVideoGenModels
+    : never;
 
 export type AudioGenProviders = keyof typeof modelIdsByProviderAudioGen;
 
@@ -611,14 +645,14 @@ export const defaultModelDisplayNameByProvider = {
   gemini: "Gemini 3.1 Pro Preview" satisfies GeminiDisplayNameUnion,
   grok: "Grok 4.6" satisfies GrokDisplayNameUnion,
   anthropic: "Claude Opus 5" satisfies AnthropicDisplayNameUnion,
-  meta: "Muse Spark 1.2" satisfies MetaDisplayNameUnion,
+  meta: "Muse Spark 1.3" satisfies MetaDisplayNameUnion,
   vercel: "v0 medium" satisfies VercelDisplayNameUnion,
-  mistral: "Mistral Medium 3.5" satisfies MistralDisplayNameUnion,
+  mistral: "Mistral Small 4" satisfies MistralDisplayNameUnion,
   cohere: "Command A Plus" satisfies CohereDisplayNameUnion,
-  deepseek: "DeepSeek V4 Pro" satisfies DeepSeekDisplayNameUnion,
+  deepseek: "DeepSeek V4 Pro 0813" satisfies DeepSeekDisplayNameUnion,
   moonshotai: "Kimi K3" satisfies KimiDisplayNameUnion,
-  zai: "GLM 5.2" satisfies ZaiDisplayNameUnion,
-  alibaba: "Qwen3.7-Plus" satisfies AlibabaDisplayNameUnion,
+  zai: "GLM 5.3" satisfies ZaiDisplayNameUnion,
+  alibaba: "Qwen 3.8 Max" satisfies AlibabaDisplayNameUnion,
   minimax: "MiniMax-M3" satisfies MiniMaxDisplayNameUnion,
   sakana: "Fugu" satisfies SakanaDisplayNameUnion
 } as const;
@@ -628,14 +662,14 @@ export const defaultModelIdByProvider = {
   gemini: "gemini-3.1-pro-preview" satisfies GeminiModelIdUnion,
   grok: "grok-4.6" satisfies GrokModelIdUnion,
   anthropic: "claude-opus-5" satisfies AnthropicModelIdUnion,
-  meta: "muse-spark-1.2" satisfies MetaModelIdUnion,
+  meta: "muse-spark-1.3" satisfies MetaModelIdUnion,
   vercel: "v0-1.5-md" satisfies VercelModelIdUnion,
-  mistral: "mistral-medium-3.5" satisfies MistralModelIdUnion,
+  mistral: "mistral-small-latest" satisfies MistralModelIdUnion,
   cohere: "command-a-plus-05-2026" satisfies CohereModelIdUnion,
   deepseek: "deepseek-v4-pro-0813" satisfies DeepSeekModelIdUnion,
   moonshotai: "kimi-k3" satisfies KimiModelIdUnion,
-  zai: "glm-5.2" satisfies ZaiModelIdUnion,
-  alibaba: "qwen3.7-plus" satisfies AlibabaModelIdUnion,
+  zai: "glm-5.3" satisfies ZaiModelIdUnion,
+  alibaba: "qwen3.8-max" satisfies AlibabaModelIdUnion,
   minimax: "minimax-m3" satisfies MiniMaxModelIdUnion,
   sakana: "fugu" satisfies SakanaModelIdUnion
 } as const;
@@ -675,11 +709,6 @@ export type GeminiDisplayNameUnionAudioGen =
  */
 export type GeminiModelIdUnionAudioGen =
   ModelIdToModelDisplayNameAudioGen<"gemini">;
-/**
- * valid video gen capable openai model display names
- */
-export type OpenAiDisplayNameUnionVideoGen =
-  ModelDisplayNameToModelIdVideoGen<"openai">;
 
 /**
  * valid video gen capable gemini model display names
@@ -782,11 +811,6 @@ export type OpenAiModelIdUnionImgGen =
  */
 export type GeminiModelIdUnionImgGen =
   ModelIdToModelDisplayNameImgGen<"gemini">;
-/**
- * valid openai video models to call
- */
-export type OpenAiModelIdUnionVideoGen =
-  ModelIdToModelDisplayNameVideoGen<"openai">;
 /**
  * valid gemini video models to call
  */
@@ -943,7 +967,7 @@ export type GetModelsForProviderRTVideoGen<T extends Provider> =
     : T extends "grok"
       ? GrokModelIdUnionVideoGen
       : T extends "openai"
-        ? OpenAiModelIdUnionVideoGen
+        ? undefined
         : T extends "anthropic"
           ? undefined
           : T extends "meta"
@@ -1064,7 +1088,7 @@ export type GetDisplayNamesForProviderRTVideoGen<T extends Provider> =
     : T extends "grok"
       ? GrokDisplayNameUnionVideoGen
       : T extends "openai"
-        ? OpenAiDisplayNameUnionVideoGen
+        ? undefined
         : T extends "anthropic"
           ? undefined
           : T extends "meta"
@@ -1156,8 +1180,7 @@ export function getModelsForProviderAudioGen<const T extends Provider>(
 export function getModelsForProviderVideoGen<const T extends Provider>(
   provider: T
 ) {
-  if (!(provider === "gemini" || provider === "openai" || provider === "grok"))
-    return undefined;
+  if (!(provider === "gemini" || provider === "grok")) return undefined;
   const p = provider satisfies VideoGenProviders;
   return Object.entries(displayNameToModelIdVideoGen[p])
     .map(([t, v]) => {
@@ -1204,8 +1227,7 @@ export function getDisplayNamesForProviderImgGen<
 export function getDisplayNamesForProviderVideoGen<
   const V extends Provider = Provider
 >(provider: V) {
-  if (!(provider === "gemini" || provider === "openai" || provider === "grok"))
-    return undefined;
+  if (!(provider === "gemini" || provider === "grok")) return undefined;
   const p = provider as VideoGenProviders;
   return Object.entries(modelIdToDisplayNameVideoGen[p])
     .map(([k, v]) => {

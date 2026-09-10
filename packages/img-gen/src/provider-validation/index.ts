@@ -36,6 +36,11 @@ export type AllImgGenCapableModelUnion =
   | GeminiImgGenModels
   | GrokImgGenModels;
 
+export type AllNonImgGenCapableUnion = Exclude<
+  AllModelsUnion,
+  AllImgGenCapableModelUnion
+>;
+
 export type ModelToAspectRatioOpts<T extends AllModelsUnion> =
   T extends AllImgGenCapableModelUnion
     ? T extends GeminiModelIdUnionImgGen
@@ -44,32 +49,39 @@ export type ModelToAspectRatioOpts<T extends AllModelsUnion> =
         ? GrokImagineARUnion
         : T extends OpenAIImgCapableModels
           ? T extends "gpt-image-1-mini" | "gpt-image-1" | "gpt-image-1.5"
-            ? OpenAINativeImgModelAspectRatioWorkup["gpt-image-1.5"]
-            : OpenAINativeImgModelAspectRatioWorkup["gpt-image-2"]
+            ? OpenAINativeImgModelAspectRatioWorkup[
+                "gpt-image-1.5" | "gpt-image-1" | "gpt-image-1-mini"]
+            : OpenAINativeImgModelAspectRatioWorkup[
+                | "gpt-image-2"
+                | "gpt-image-2.5-flare"
+                | "gpt-image-2.5-sunburst"]
           : undefined
     : undefined;
 
-export type ModelToQualityOpts<T extends AllModelsUnion> =
-  T extends AllImgGenCapableModelUnion
-    ? T extends GeminiImgGenModels
-      ? T extends
-          | "gemini-3.1-flash-lite-image"
-          | "gemini-3-pro-image-preview"
-          | "gemini-3.1-flash-image-preview"
-          | "deep-research-max-preview-04-2026"
-          | "deep-research-preview-04-2026"
-        ? T extends "gemini-3.1-flash-image-preview"
-          ? GeminiImageQuality["gemini-3.1-flash-image-preview"]
-          : T extends "gemini-3.1-flash-lite-image"
-            ? GeminiImageQuality["gemini-3.1-flash-lite-image"]
-            : GeminiImageQuality[GeminiImgGenModels]
-        : undefined
-      : T extends GrokImagineImgModelUnion
-        ? "1k" | "2k" | "4k" | "auto"
-        : T extends OpenAIImgCapableModels
-          ? OpenAINativeImgModelQualityWorkup["gpt-image-1.5"]
-          : undefined
-    : undefined;
+export type GrokQualityUnion = "1k" | "2k" | "4k" | "auto";
+
+export type ModelToQuality<T extends AllModelsUnion> =
+  T extends Exclude<AllModelsUnion, AllImgGenCapableModelUnion>
+    ? undefined
+    : T extends
+          "gpt-image-1-mini" | "gpt-image-1" | "gpt-image-1.5" | "gpt-image-2"
+      ? OpenAINativeImgModelQualityWorkup[T]
+      : T extends "gpt-image-2.5-flare" | "gpt-image-2.5-sunburst"
+        ? OpenAINativeImgModelQualityWorkup[T]
+        : T extends GrokImagineImgModelUnion
+          ? GrokQualityUnion
+          : T extends "gemini-3.1-flash-image-preview"
+            ? GeminiImageQuality[T]
+            : T extends "gemini-2.5-flash-image"
+              ? GeminiImageQuality[T]
+              : T extends "gemini-3.1-flash-lite-image"
+                ? GeminiImageQuality[T]
+                : T extends
+                      | "gemini-3-pro-image-preview"
+                      | "deep-research-max-preview-04-2026"
+                      | "deep-research-preview-04-2026"
+                  ? GeminiImageQuality[T]
+                  : undefined;
 
 export type ModelToOutputFormatOpts<Q extends AllModelsUnion> =
   Q extends OpenAIImgCapableModels
@@ -89,7 +101,7 @@ export type ModelToOutputFormatOptsProps<Q extends AllModelsUnion> = {
 };
 
 export type ModelToQualityOptsProps<T extends AllModelsUnion> = {
-  output_quality: ModelToQualityOpts<T>;
+  output_quality: ModelToQuality<T>;
 };
 export class ProviderValidation {
   public grokImgGenCapable(m: string) {
@@ -114,8 +126,16 @@ export class ProviderValidation {
     return m === "gpt-image-2";
   }
 
+  public gptImg2dot5Model(m: string) {
+    return m === "gpt-image-2.5-flare" || m === "gpt-image-2.5-sunburst";
+  }
+
   public openAIGptImgModel(m: string) {
-    return this.baseOpenAIGptImgModel(m) || this.gptImg2Model(m);
+    return (
+      this.baseOpenAIGptImgModel(m) ||
+      this.gptImg2Model(m) ||
+      this.gptImg2dot5Model(m)
+    );
   }
 
   public openAIFacilitatingImgGenModel(model: string) {
@@ -136,7 +156,6 @@ export class ProviderValidation {
       model === "gpt-5" ||
       model === "gpt-5-mini" ||
       model === "gpt-5-nano" ||
-      model === "gpt-5-chat-latest" ||
       model === "gpt-5-pro" ||
       model === "gpt-4o" ||
       model === "gpt-4o-mini" ||
@@ -195,7 +214,7 @@ export class ProviderValidation {
     model: Exclude<AllModelsUnion, AllPureImgGenModelsUnion>
   ): false;
   public isPureImgGenModel<const V extends AllModelsUnion = AllModelsUnion>(
-    model = "gpt-5.6-astra" as V
+    model = "gpt-6-astra" as V
   ) {
     if (!(
       this.grokImgGenCapable(model) ||
@@ -472,6 +491,14 @@ export class ProviderValidation {
     return q === "1K" || q === "2K";
   }
 
+  public isValidGptOutputQuality(q: string) {
+    return q === "low" || q === "medium" || q === "high" || q === "auto";
+  }
+
+  public isValidGpt2Dot5OutputQuality(q: string) {
+    return q === "xhigh" || q === "max" || this.isValidGptOutputQuality(q);
+  }
+
   public isValidNanoBananaProAndTwoOutputQuality(q: string) {
     return this.isValidImagenOutputQuality(q) || q === "4K";
   }
@@ -485,13 +512,112 @@ export class ProviderValidation {
   }
 
   public handleImgGenOutputQuality(
-    model: AllModelsUnion = "gpt-6-astra",
-    data?: { output_quality: ModelToQualityOpts<typeof model> }
+    model: Exclude<
+      AllModelsUnion,
+      Exclude<AllModelsUnion, AllNonImgGenCapableUnion>
+    >,
+    data?: { output_quality: undefined }
+  ): undefined;
+  public handleImgGenOutputQuality(
+    model: Exclude<AllModelsUnion, Exclude<AllModelsUnion, GrokImgGenModels>>,
+    data?: { output_quality: "1k" | "2k" }
+  ): "1k" | "2k";
+  public handleImgGenOutputQuality(
+    model: Exclude<
+      AllModelsUnion,
+      Exclude<
+        AllModelsUnion,
+        | "gemini-3-pro-image-preview"
+        | "deep-research-preview-04-2026"
+        | "deep-research-max-preview-04-2026"
+      >
+    >,
+    data?: { output_quality: "1K" | "2K" | "4K" }
+  ): "1K" | "2K" | "4K";
+  public handleImgGenOutputQuality(
+    model: Exclude<
+      AllModelsUnion,
+      Exclude<AllModelsUnion, "gemini-3.1-flash-image-preview">
+    >,
+    data?: { output_quality: "0.5K" | "1K" | "2K" | "4K" }
+  ): "0.5K" | "1K" | "2K" | "4K";
+  public handleImgGenOutputQuality(
+    model: Exclude<
+      AllModelsUnion,
+      Exclude<AllModelsUnion, "gemini-3.1-flash-lite-image">
+    >,
+    data?: { output_quality: "0.5K" | "1K" }
+  ): "0.5K" | "1K";
+  public handleImgGenOutputQuality(
+    model: Exclude<
+      AllModelsUnion,
+      Exclude<AllModelsUnion, "gemini-2.5-flash-image">
+    >,
+    data?: { output_quality: "1K" }
+  ): "1K";
+  public handleImgGenOutputQuality(
+    model: Exclude<
+      AllModelsUnion,
+      Exclude<
+        AllModelsUnion,
+        "gpt-image-1" | "gpt-image-1-mini" | "gpt-image-1.5" | "gpt-image-2"
+      >
+    >,
+    data?: { output_quality: "high" | "medium" | "low" | "auto" }
+  ): "high" | "medium" | "low" | "auto";
+  public handleImgGenOutputQuality(
+    model: Exclude<
+      AllModelsUnion,
+      Exclude<
+        AllModelsUnion,
+        Exclude<
+          OpenAIImgCapableModels,
+          "gpt-image-1" | "gpt-image-1-mini" | "gpt-image-1.5" | "gpt-image-2"
+        >
+      >
+    >,
+    data?: {
+      output_quality: "max" | "xhigh" | "high" | "medium" | "low" | "auto";
+    }
+  ): "max" | "xhigh" | "high" | "medium" | "low" | "auto";
+  public handleImgGenOutputQuality(
+    model: AllModelsUnion,
+    data?: {
+      output_quality:
+        | "0.5K"
+        | "1K"
+        | "1k"
+        | "2K"
+        | "2k"
+        | "4K"
+        | "auto"
+        | "high"
+        | "low"
+        | "max"
+        | "medium"
+        | "xhigh"
+        | undefined;
+    }
+  ):
+    | "0.5K"
+    | "1K"
+    | "1k"
+    | "2K"
+    | "2k"
+    | "4K"
+    | "auto"
+    | "high"
+    | "low"
+    | "max"
+    | "medium"
+    | "xhigh"
+    | undefined;
+  public handleImgGenOutputQuality(
+    model: AllModelsUnion,
+    data?: { output_quality: ModelToQuality<typeof model> }
   ) {
     const q = data?.output_quality;
-    if (!model) return;
     const m = model;
-
     if (this.geminiNanoBananasModel(m) && m !== "gemini-2.5-flash-image") {
       if (
         m === "gemini-3.1-flash-lite-image" &&
@@ -499,39 +625,44 @@ export class ProviderValidation {
         this.isValidNanoBananaTwoLiteOutputQuality(q)
       ) {
         return q;
-      }
-      if (
+      } else if (
         m === "gemini-3.1-flash-image-preview" &&
         q &&
         this.isValidNanoBananaTwoOutputQuality(q)
       ) {
         return q;
       }
+
       if (q && this.isValidNanoBananaProAndTwoOutputQuality(q)) {
         return q;
       } else return "2K";
-    }
-    if (this.geminiNanoBananaTwo(m)) {
+    } else if (this.geminiNanoBananaTwo(m)) {
       if (q && this.isValidNanoBananaTwoOutputQuality(q)) {
         return q;
       } else {
         return "2K" as const satisfies GeminiImageQuality["gemini-3.1-flash-image-preview"];
       }
-    }
-    if (this.grokImagineImgGenModel(model)) {
-      if (q && this.isValidGrokQuality(q)) {
-        return q;
-      } else {
-        if (m === "grok-imagine-image-quality") {
-          return "2k";
-        } else return "1k";
+    } else if (this.grokImagineImgGenModel(m)) {
+      if (q && this.isValidGrokQuality(q)) return q;
+      else if (
+        model === "grok-imagine-image-quality" ||
+        model === "grok-imagine-image-2.0"
+      )
+        return "2k";
+      else {
+        return "1k";
       }
-    }
-    if (this.openAIImgGenCapable(model)) {
-      if (q && this.isValidOpenAIQuality(q)) {
+    } else if (this.openAIImgGenCapable(m)) {
+      if (
+        (this.baseOpenAIGptImgModel(m) || this.gptImg2Model(m)) &&
+        q &&
+        this.isValidOpenAIQuality(q)
+      ) {
+        return q;
+      } else if (q && this.isValidGpt2Dot5OutputQuality(q)) {
         return q;
       } else return "auto";
-    }
+    } else return;
   }
 
   public fallbackImgGenModelByProvider(provider: Provider) {
@@ -689,8 +820,8 @@ export class ProviderValidation {
     }
   }
 
-  public handleOutputSize<const M extends AllModelsUnion = AllModelsUnion>(
-    model = "gpt-6-astra" as M,
+  public handleOutputSize(
+    model: AllModelsUnion = "gpt-6-astra",
     data?: { output_size?: ModelToAspectRatioOpts<typeof model> }
   ) {
     if (!model) return;
@@ -719,24 +850,25 @@ export class ProviderValidation {
         if (ar && this.isValidNanoBananaGenTwoAR(ar)) {
           return ar;
         } else return "1:1";
-      }
-      if (this.geminiNanoBananasModel(m)) {
+      } else {
         if (ar && this.isValidNanoBananaGenOneAR(ar)) {
           return ar;
         } else return "1:1";
-      } else return "1:1" satisfies NanoBanana2OutputAR;
+      }
     }
-    if (this.baseOpenAIGptImgModel(m)) {
-      const ar = data?.output_size;
-      if (ar && this.isValidOpenAISize(ar)) {
-        return ar;
-      } else return "auto";
-    }
+
     if (this.openAIImgGenCapable(m)) {
-      const ar = data?.output_size;
-      if (ar && this.isValidGPTImage2Size(ar)) {
-        return ar;
-      } else return "auto" as const;
+      if (this.baseOpenAIGptImgModel(m)) {
+        const ar = data?.output_size;
+        if (ar && this.isValidOpenAISize(ar)) {
+          return ar;
+        } else return "auto";
+      } else {
+        const ar = data?.output_size;
+        if (ar && this.isValidGPTImage2Size(ar)) {
+          return ar;
+        } else return "auto" as const;
+      }
     }
   }
 
@@ -759,7 +891,6 @@ export class ProviderValidation {
       data?.model ??
       this.fallbackImgGenModelByProvider(provider) ??
       "gpt-6-astra";
-
     const outputCompression = this.handleImgGenCompression(model, {
         output_compression: data.imgGenFields?.output_compression,
         output_format: data.imgGenFields?.output_format
