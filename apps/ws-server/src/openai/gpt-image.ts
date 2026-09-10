@@ -209,7 +209,6 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
         dualStream = (await client.images.edit(
           {
             image: handleEditsOrGen.images,
-            input_fidelity: r.input_fidelity,
             prompt: handleEditsOrGen.text,
             background: r.output_background,
             output_compression: r.output_compression,
@@ -219,7 +218,11 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
             // n=1 for streaming, no higher; n = 10 max for non-streaming, coming soon
             n: 1,
             partial_images,
-            quality: r.output_quality ?? "high",
+            quality:
+              r.output_quality ??
+              (m === "gpt-image-2.5-flare" || m === "gpt-image-2.5-sunburst"
+                ? "max"
+                : "high"),
             size: (r.output_size ?? "auto") as "auto",
             stream: true
           } satisfies OpenAI.Images.ImageEditParamsStreaming,
@@ -240,7 +243,10 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
             // n=1 for streaming, no higher; n = 10 max for non-streaming, coming soon
             n: 1,
             partial_images,
-            quality: r.output_quality ?? "high",
+            quality:
+              m === "gpt-image-2.5-flare" || m === "gpt-image-2.5-sunburst"
+                ? "max"
+                : "high",
             size: (r.output_size ?? "auto") as "auto",
             stream: true
           },

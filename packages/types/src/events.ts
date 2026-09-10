@@ -676,11 +676,13 @@ export type ImageGenRequest = {
   /**
    *  gpt-image-2, gpt-image-1.5, gpt-image-1, gpt-image-1-mini:
    *
-   * "auto" (default); "low" | "medium" | "high" | "auto"
+   * "low" | "medium" | "high" | "auto"
    *
-   * imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
-   * "1K" (default); "1K" | "2K"
+   * gpt-image-2.5-sunburst, gpt-image-2.5-flare
+   *
+   * "low" | "medium" | "high" | "xhigh" | "max" | "auto"
+   *
    */
   output_quality: string;
   /**

@@ -1,8 +1,7 @@
 import type {
   AnthropicResponse,
   GeminiResponse,
-  MultimodalRT,
-  OpenAiResponse
+  MultimodalRT
 } from "@/codegen-types.ts";
 import type { Provider } from "@/models.ts";
 import { Fs } from "@d0paminedriven/fs";
@@ -32,7 +31,6 @@ const providerModelImagesApi = {
     "gpt-5",
     "gpt-5-mini",
     "gpt-5-nano",
-    "gpt-5-chat-latest",
     "gpt-5-pro",
     "gpt-4.1",
     "gpt-4.1-mini",
@@ -40,6 +38,8 @@ const providerModelImagesApi = {
     "gpt-4o",
     "gpt-4o-mini",
     "o3",
+    "gpt-image-2.5-sunburst",
+    "gpt-image-2.5-flare",
     "gpt-image-2",
     "gpt-image-1.5",
     "gpt-image-1",
@@ -65,8 +65,8 @@ const providerModelAudioApi = {
 };
 
 const providerModelVideosApi = {
-  openai: ["sora-2", "sora-2-pro"],
   gemini: [
+    "gemini-omni-1.1-flash",
     "gemini-omni-flash-preview",
     "veo-3.1-generate-preview",
     "veo-3.1-fast-generate-preview",
@@ -86,36 +86,27 @@ const providerModelChatApi = {
     "gpt-5.4-mini",
     "gpt-5.4-nano",
     "gpt-5.2",
-    "gpt-5.2-chat-latest",
     "gpt-5.1",
     "gpt-5",
     "gpt-5-mini",
     "gpt-5-nano",
-    "gpt-5.1-chat-latest",
     "gpt-5.3-codex",
-    "gpt-5.2-codex",
-    "gpt-5.1-codex-max",
-    "gpt-5.1-codex",
-    "gpt-5.1-codex-mini",
-    "gpt-5-codex",
     "gpt-5.5-pro",
     "gpt-5.4-pro",
     "gpt-5.2-pro",
     "gpt-5-pro",
-    "gpt-5-chat-latest",
     "gpt-4.1",
     "gpt-4.1-mini",
     "gpt-4.1-nano",
     "gpt-4o",
     "gpt-4o-mini",
+    "gpt-image-2.5-sunburst",
+    "gpt-image-2.5-flare",
     "gpt-image-2",
     "gpt-image-1.5",
     "gpt-image-1",
     "gpt-image-1-mini",
-    "chatgpt-4o-latest",
     "o4-mini",
-    "o4-mini-deep-research",
-    "o3-deep-research",
     "o3",
     "o3-pro",
     "o3-mini",
@@ -123,9 +114,7 @@ const providerModelChatApi = {
     "o1-pro",
     "gpt-4",
     "gpt-4-turbo",
-    "gpt-3.5-turbo",
-    "sora-2",
-    "sora-2-pro"
+    "gpt-3.5-turbo"
   ],
   gemini: [
     "gemini-3.8-flash",
@@ -144,6 +133,7 @@ const providerModelChatApi = {
     "lyria-3.5",
     "lyria-3-pro-preview",
     "lyria-3-clip-preview",
+    "gemini-omni-1.1-flash",
     "gemini-omni-flash-preview",
     "veo-3.1-generate-preview",
     "veo-3.1-fast-generate-preview",
@@ -152,9 +142,7 @@ const providerModelChatApi = {
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
     "deep-research-max-preview-04-2026",
-    "deep-research-preview-04-2026",
-    "gemini-2.0-flash",
-    "gemini-2.0-flash-lite"
+    "deep-research-preview-04-2026"
   ],
   grok: [
     "grok-4.6",
@@ -198,7 +186,9 @@ const providerModelChatApi = {
   ],
   moonshotai: [
     "kimi-k3",
+    "kimi-k3-fast",
     "kimi-k2.7-code",
+    "kimi-k2.7-code-highspeed",
     "kimi-k2.6",
     "kimi-k2.5",
     "kimi-k2-thinking"
@@ -206,12 +196,16 @@ const providerModelChatApi = {
   deepseek: [
     "deepseek-v4-pro-0813",
     "deepseek-v4-pro",
+    "deepseek-v4-flash-0731",
     "deepseek-v4-flash",
     "deepseek-r1"
   ],
   zai: [
     "glm-5.3",
+    "glm-5.3-fast",
+    "glm-5.3-flash",
     "glm-5.2",
+    "glm-5.2-fast",
     "glm-5.1",
     "glm-5",
     "glm-4.7",
@@ -219,8 +213,10 @@ const providerModelChatApi = {
     "glm-4.5"
   ],
   alibaba: [
-    "qwen3.8-flash",
+    "qwen3.8-max-0902",
     "qwen3.8-max",
+    "qwen3.8-flash-next",
+    "qwen3.8-flash",
     "qwen3.7-max",
     "qwen3.7-plus",
     "qwen3.7-flash",
@@ -237,14 +233,6 @@ async function anthropicFetcher() {
     headers: {
       "x-api-key": process.env.ANTHROPIC_API_KEY ?? "",
       "anthropic-version": "2023-06-01"
-    }
-  });
-}
-
-async function openAiFetcher() {
-  return await fetch("https://api.openai.com/v1/models", {
-    headers: {
-      Authorization: `Bearer ` + (process.env.OPENAI_API_KEY ?? "")
     }
   });
 }
@@ -277,14 +265,16 @@ const GROK_NAME_OVERRIDES = {
 } as const;
 
 const ALIBABA_NAME_OVERRIDES = {
-  "qwen3.5-flash": "Qwen3.5-Flash",
-  "qwen3.5-plus": "Qwen3.5-Plus",
-  "qwen3.6-plus": "Qwen3.6-Plus",
-  "qwen3.7-plus": "Qwen3.7-Plus",
-  "qwen3.7-max": "Qwen3.7-Max",
-  "qwen3.7-flash": "Qwen3.7-Flash",
-  "qwen3.8-max": "Qwen3.8-Max",
-  "qwen3.8-flash": "Qwen3.8-Flash"
+  "qwen3.5-flash": "Qwen 3.5 Flash",
+  "qwen3.5-plus": "Qwen 3.5 Plus",
+  "qwen3.6-plus": "Qwen 3.6 Plus",
+  "qwen3.7-plus": "Qwen 3.7 Plus",
+  "qwen3.7-max": "Qwen 3.7 Max",
+  "qwen3.7-flash": "Qwen 3.7 Flash",
+  "qwen3.8-max": "Qwen 3.8 Max",
+  "qwen3.8-flash": "Qwen 3.8 Flash",
+  "qwen3.8-flash-next": "Qwen 3.8 Flash Next",
+  "qwen3.8-max-0902": "Qwen 3.8 Max 0902"
 } as const;
 
 const MINIMAX_NAME_OVERRIDES = {
@@ -309,7 +299,10 @@ const COHERE_NAME_OVERRIDES = {
 
 const ZAI_NAME_OVERRIDES = {
   "glm-5.3": "GLM 5.3",
+  "glm-5.3-flash": "GLM 5.3 Flash",
+  "glm-5.3-fast": "GLM 5.3 Fast",
   "glm-5.2": "GLM 5.2",
+  "glm-5.2-fast": "GLM 5.2 Fast",
   "glm-5.1": "GLM 5.1",
   "glm-5": "GLM 5",
   "glm-4.7": "GLM 4.7",
@@ -319,7 +312,9 @@ const ZAI_NAME_OVERRIDES = {
 
 const KIMI_NAME_OVERRIDES = {
   "kimi-k3": "Kimi K3",
+  "kimi-k3-fast": "Kimi K3 Fast",
   "kimi-k2.7-code": "Kimi K2.7 Code",
+  "kimi-k2.7-code-highspeed": "Kimi K2.7 Code Highspeed",
   "kimi-k2-thinking": "Kimi K2 Thinking",
   "kimi-k2.5": "Kimi K2.5",
   "kimi-k2.6": "Kimi K2.6"
@@ -327,8 +322,9 @@ const KIMI_NAME_OVERRIDES = {
 
 const DEEPSEEK_NAME_OVERRIDES = {
   "deepseek-r1": "DeepSeek R1",
-  "deepseek-v4-pro": "DeepSeek V4 Pro Preview",
-  "deepseek-v4-pro-0813": "DeepSeek V4 Pro",
+  "deepseek-v4-pro": "DeepSeek V4 Pro",
+  "deepseek-v4-pro-0813": "DeepSeek V4 Pro 0813",
+  "deepseek-v4-flash-0731": "DeepSeek V4 Flash 0731",
   "deepseek-v4-flash": "DeepSeek V4 Flash"
 } as const;
 
@@ -366,7 +362,9 @@ function filterForAlibaba(id: string) {
     id === "qwen3.7-plus" ||
     id === "qwen3.7-flash" ||
     id === "qwen3.8-max" ||
-    id === "qwen3.8-flash"
+    id === "qwen3.8-max-0902" ||
+    id === "qwen3.8-flash" ||
+    id === "qwen3.8-flash-next"
   );
 }
 
@@ -393,6 +391,8 @@ function filterForKimi(id: string) {
     id === "kimi-k2.5" ||
     id === "kimi-k2.6" ||
     id === "kimi-k2.7-code" ||
+    id === "kimi-k2.7-code-highspeed" ||
+    id === "kimi-k3-fast" ||
     id === "kimi-k3"
   );
 }
@@ -402,7 +402,8 @@ function filterForDeepseek(id: string) {
     id === "deepseek-r1" ||
     id === "deepseek-v4-pro" ||
     id === "deepseek-v4-pro-0813" ||
-    id === "deepseek-v4-flash"
+    id === "deepseek-v4-flash" ||
+    id === "deepseek-v4-flash-0731"
   );
 }
 
@@ -413,7 +414,10 @@ function filterForZai(id: string) {
     id === "glm-4.6" ||
     id === "glm-4.5" ||
     id === "glm-5.1" ||
+    id === "glm-5.2-fast" ||
     id === "glm-5.2" ||
+    id === "glm-5.3-fast" ||
+    id === "glm-5.3-flash" ||
     id === "glm-5.3"
   );
 }
@@ -505,6 +509,94 @@ function cohereDisplayName(id: string) {
   } else return id;
 }
 
+const gptNameMap = {
+  "gpt-6-astra": "GPT-6 Astra",
+  "gpt-5.6-sol": "GPT-5.6 Sol",
+  "gpt-5.6-terra": "GPT-5.6 Terra",
+  "gpt-5.6-luna": "GPT-5.6 Luna",
+  "gpt-5.5": "GPT-5.5",
+  "gpt-5.5-pro": "GPT-5.5 Pro",
+  "gpt-5.4": "GPT-5.4",
+  "gpt-5.4-pro": "GPT-5.4 Pro",
+  "gpt-5.4-mini": "GPT-5.4 Mini",
+  "gpt-5.4-nano": "GPT-5.4 nano",
+  "gpt-5.3-codex": "GPT-5.3-Codex",
+  "gpt-5.2": "GPT-5.2",
+  "gpt-5.2-pro": "GPT-5.2 Pro",
+  "gpt-5.1": "GPT-5.1",
+  "gpt-5": "GPT-5",
+  "gpt-5-pro": "GPT-5 Pro",
+  "gpt-5-mini": "GPT-5 Mini",
+  "gpt-5-nano": "GPT-5 nano",
+  "gpt-4.1": "GPT-4.1",
+  "gpt-4.1-mini": "GPT-4.1 Mini",
+  "gpt-4.1-nano": "GPT-4.1 nano",
+  "gpt-4o": "GPT-4o",
+  "gpt-4o-mini": "GPT-4o Mini",
+  "gpt-4": "GPT-4",
+  "gpt-4-turbo": "GPT-4 Turbo",
+  "gpt-3.5-turbo": "GPT-3.5 Turbo",
+  o3: "o3",
+  "o3-pro": "o3-pro",
+  "o3-mini": "o3-mini",
+  o1: "o1",
+  "o1-pro": "o1-pro",
+  "gpt-image-2.5-sunburst": "GPT-Image-2.5 Sunburst",
+  "gpt-image-2.5-flare": "GPT-Image-2.5 Flare",
+  "gpt-image-1": "GPT-Image-1",
+  "gpt-image-1-mini": "GPT-Image-1 mini",
+  "gpt-image-1.5": "GPT-Image-1.5",
+  "gpt-image-2": "GPT-Image-2"
+} as const;
+
+function filterForGPT(s: string) {
+  return (
+    s === "gpt-6-astra" ||
+    s === "gpt-5.6-sol" ||
+    s === "gpt-5.6-terra" ||
+    s === "gpt-5.6-luna" ||
+    s === "gpt-5.5" ||
+    s === "gpt-5.5-pro" ||
+    s === "gpt-5.4" ||
+    s === "gpt-5.4-pro" ||
+    s === "gpt-5.4-mini" ||
+    s === "gpt-5.4-nano" ||
+    s === "gpt-5.3-codex" ||
+    s === "gpt-5.2" ||
+    s === "gpt-5.2-pro" ||
+    s === "gpt-5.1" ||
+    s === "gpt-5" ||
+    s === "gpt-5-pro" ||
+    s === "gpt-5-mini" ||
+    s === "gpt-5-nano" ||
+    s === "gpt-4.1" ||
+    s === "gpt-4.1-mini" ||
+    s === "gpt-4.1-nano" ||
+    s === "gpt-4o" ||
+    s === "gpt-4o-mini" ||
+    s === "gpt-4" ||
+    s === "gpt-4-turbo" ||
+    s === "gpt-3.5-turbo" ||
+    s === "o3" ||
+    s === "o3-pro" ||
+    s === "o3-mini" ||
+    s === "o1" ||
+    s === "o1-pro" ||
+    s === "gpt-image-2.5-sunburst" ||
+    s === "gpt-image-2.5-flare" ||
+    s === "gpt-image-1" ||
+    s === "gpt-image-1.5" ||
+    s === "gpt-image-2" ||
+    s === "gpt-image-1-mini"
+  );
+}
+
+function gptDisplayNames(id: string) {
+  if (filterForGPT(id)) {
+    return gptNameMap[id];
+  } else return prettyModelName(id);
+}
+
 function displayNameV0(id: string) {
   const raw = id?.trim();
   if (!raw) return "";
@@ -573,69 +665,6 @@ function prettyModelName(id: string, provider: Provider = "openai") {
     .join(provider === "openai" ? "" : " ");
 }
 
-const gptNameMap = {
-  "gpt-6-astra": "GPT-6 Astra",
-  "gpt-5.6-sol": "GPT-5.6 Sol",
-  "gpt-5.6-terra": "GPT-5.6 Terra",
-  "gpt-5.6-luna": "GPT-5.6 Luna",
-  "gpt-image-1": "GPT Image 1",
-  "gpt-image-1-mini": "GPT Image 1 mini",
-  "gpt-image-1.5": "GPT Image 1.5",
-  "gpt-image-2": "GPT Image 2",
-  "gpt-5-codex": "GPT-5-Codex",
-  "gpt-5.1-codex": "GPT-5.1 Codex",
-  "gpt-5.1-codex-mini": "GPT-5.1 Codex mini",
-  "sora-2": "Sora 2",
-  "sora-2-pro": "Sora 2 Pro",
-  "o4-mini-deep-research": "o4-mini-deep-research",
-  "o3-deep-research": "o3-deep-research",
-  "chatgpt-4o-latest": "ChatGPT-4o",
-  "gpt-5-chat-latest": "GPT-5 Chat",
-  "gpt-5.1-chat-latest": "GPT-5.1 Chat",
-  "gpt-5.2-chat-latest": "GPT-5.2 Chat",
-  "gpt-5.2-pro": "GPT-5.2 pro",
-  "gpt-5.1-codex-max": "GPT-5.1-Codex-Max"
-} as const;
-
-function filterForGPT(s: string) {
-  return (
-    s === "gpt-6-astra" ||
-    s === "gpt-5.6-sol" ||
-    s === "gpt-5.6-terra" ||
-    s === "gpt-5.6-luna" ||
-    s === "gpt-image-1" ||
-    s === "gpt-image-1.5" ||
-    s === "gpt-image-2" ||
-    s === "gpt-image-1-mini" ||
-    s === "gpt-5-codex" ||
-    s === "gpt-5.1-codex" ||
-    s === "gpt-5.1-codex-mini" ||
-    s === "sora-2" ||
-    s === "sora-2-pro" ||
-    s === "o4-mini-deep-research" ||
-    s === "o3-deep-research" ||
-    s === "chatgpt-4o-latest" ||
-    s === "gpt-5-chat-latest" ||
-    s === "gpt-5.1-chat-latest" ||
-    s === "gpt-5.2-chat-latest" ||
-    s === "gpt-5.2-pro" ||
-    s === "gpt-5.1-codex-max"
-  );
-}
-
-function formattedOpenAi(props: OpenAiResponse) {
-  if (!props.data) throw new Error(props.error.message);
-  return props?.data?.map(t => {
-    const { id, ...rest } = t;
-    if (filterForGPT(id)) {
-      return { id, displayName: gptNameMap[id], ...rest };
-    } else {
-      const displayName = prettyModelName(id);
-      return { id, displayName, ...rest };
-    }
-  });
-}
-
 function formattedGemini(props: GeminiResponse) {
   if (!props.models) throw new Error(props.error.message);
   return props.models;
@@ -648,13 +677,11 @@ function formattedAnthropic(props: AnthropicResponse) {
 const fs = new Fs(process.cwd());
 
 const modelMapper = async (modelKeys = true) => {
-  const [data, openAiData, geminiData] = await Promise.all([
+  const [data, geminiData] = await Promise.all([
     anthropicFetcher().then(d => d.text()),
-    openAiFetcher().then(d => d.text()),
     geminiFetcher().then(d => d.text())
   ]);
   const parseGemini = formattedGemini(JSON.parse(geminiData));
-  const parseOpenAi = formattedOpenAi(JSON.parse(openAiData));
   const parseIt = formattedAnthropic(JSON.parse(data));
 
   return Array.from(Object.entries(providerModelChatApi)).map(
@@ -808,17 +835,10 @@ const modelMapper = async (modelKeys = true) => {
         default: {
           let helper = Array.of<[string, string]>();
           models.forEach(function (model) {
+            const name = gptDisplayNames(model);
             modelKeys === true
-              ? helper.push([
-                  model,
-                  parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
-                    model
-                ])
-              : helper.push([
-                  parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
-                    model,
-                  model
-                ]);
+              ? helper.push([model, name])
+              : helper.push([name, model]);
           });
           return helper;
         }
@@ -860,10 +880,8 @@ const audioModelMapper = async (modelKeys = true) => {
 };
 
 const imageModelMapper = async (modelKeys = true) => {
-  const openAiData = await openAiFetcher().then(d => d.text());
   const geminiData = await geminiFetcher().then(d => d.text());
   const parseGemini = formattedGemini(JSON.parse(geminiData));
-  const parseOpenAi = formattedOpenAi(JSON.parse(openAiData));
   return Array.from(Object.entries(providerModelImagesApi)).map(
     ([provider, models]) => {
       const p = provider as keyof typeof providerModelImagesApi;
@@ -899,17 +917,10 @@ const imageModelMapper = async (modelKeys = true) => {
         default: {
           let helper = Array.of<[string, string]>();
           models.forEach(function (model) {
+            const name = gptDisplayNames(model);
             modelKeys === true
-              ? helper.push([
-                  model,
-                  parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
-                    model
-                ])
-              : helper.push([
-                  parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
-                    model,
-                  model
-                ]);
+              ? helper.push([model, name])
+              : helper.push([name, model]);
           });
           return helper;
         }
@@ -919,10 +930,8 @@ const imageModelMapper = async (modelKeys = true) => {
 };
 
 const videoModelMapper = async (modelKeys = true) => {
-  const openAiData = await openAiFetcher().then(d => d.text());
   const geminiData = await geminiFetcher().then(d => d.text());
   const parseGemini = formattedGemini(JSON.parse(geminiData));
-  const parseOpenAi = formattedOpenAi(JSON.parse(openAiData));
   return Array.from(Object.entries(providerModelVideosApi)).map(
     ([provider, models]) => {
       const p = provider as keyof typeof providerModelVideosApi;
@@ -937,6 +946,7 @@ const videoModelMapper = async (modelKeys = true) => {
           });
           return helper;
         }
+        default:
         case "gemini": {
           let helper = Array.of<[string, string]>();
           models.forEach(function (model) {
@@ -949,24 +959,6 @@ const videoModelMapper = async (modelKeys = true) => {
               : helper.push([
                   parseGemini.find(t => t.name === `models/${model}`)
                     ?.displayName ?? model,
-                  model
-                ]);
-          });
-          return helper;
-        }
-        case "openai":
-        default: {
-          let helper = Array.of<[string, string]>();
-          models.forEach(function (model) {
-            modelKeys === true
-              ? helper.push([
-                  model,
-                  parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
-                    model
-                ])
-              : helper.push([
-                  parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
-                    model,
                   model
                 ]);
           });
@@ -1204,23 +1196,19 @@ async function displayNameModelIdGenVideos<
   const mapper = await videoModelMapper(
     target === "keys=display-name" ? false : true
   );
-  const openai = mapper[0];
-  const gemini = mapper[1];
-  const grok = mapper[2];
-  if (!openai || !gemini || !grok)
-    throw new Error("empty data in displayNameModelIdGen");
+  const gemini = mapper[0];
+  const grok = mapper[1];
+  if (!gemini || !grok) throw new Error("empty data in displayNameModelIdGen");
 
   if (typeof arrayOnly !== "undefined") {
     if (arrayOnly === "display-name-only") {
       if (target === "keys=display-name") {
         return {
-          openai: openai.map(([keys, _v]) => keys),
           gemini: gemini.map(([keys, _v]) => keys),
           grok: grok.map(([keys, _v]) => keys)
         };
       } else {
         return {
-          openai: openai.map(([_, vals]) => vals),
           gemini: gemini.map(([_, vals]) => vals),
           grok: grok.map(([_, vals]) => vals)
         };
@@ -1228,13 +1216,11 @@ async function displayNameModelIdGenVideos<
     } else {
       if (target === "keys=display-name") {
         return {
-          openai: openai.map(([_, vals]) => vals),
           gemini: gemini.map(([_, vals]) => vals),
           grok: grok.map(([_, vals]) => vals)
         };
       } else {
         return {
-          openai: openai.map(([keys, _v]) => keys),
           gemini: gemini.map(([keys, _v]) => keys),
           grok: grok.map(([keys, _v]) => keys)
         };
@@ -1242,7 +1228,6 @@ async function displayNameModelIdGenVideos<
     }
   }
   return {
-    openai: Object.fromEntries(openai),
     gemini: Object.fromEntries(gemini),
     grok: Object.fromEntries(grok)
   };

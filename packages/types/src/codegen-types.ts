@@ -96,11 +96,11 @@ export type MultimodalRT = XOR<
         };
       },
     | {
-        openai: string[];
+        grok: string[];
         gemini: string[];
       }
     | {
-        openai: {
+        grok: {
           [k: string]: string;
         };
         gemini: {

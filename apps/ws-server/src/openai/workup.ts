@@ -102,7 +102,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
             client,
             keyFingerprint
           );
-          content.push({ type: "input_image", file_id, detail: "auto" });
+          content.push({ type: "input_image", file_id, detail: "high" });
           continue;
         } catch (error) {
           this.logger.warn(
@@ -110,7 +110,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
             "Failed to upload image to OpenAI, falling back to base64 data URL"
           );
           const image_url = await this.encodeImageAsDataUrl(att);
-          content.push({ type: "input_image", image_url, detail: "auto" });
+          content.push({ type: "input_image", image_url, detail: "high" });
           continue;
         }
       } else {

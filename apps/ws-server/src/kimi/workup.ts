@@ -34,7 +34,7 @@ export class KimiWorkupService {
   }
 
   protected async *stream(
-    model = "kimi-k2.6" satisfies KimiModelIdUnion,
+    model = "kimi-k3" satisfies KimiModelIdUnion,
     messages: readonly KimiRequestMessage[],
     apiKey?: string,
     options?: {

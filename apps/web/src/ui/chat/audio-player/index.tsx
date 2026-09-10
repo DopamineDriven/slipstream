@@ -55,7 +55,7 @@ export interface AudioPlayerProps {
 export function AudioPlayer({
   src,
   durationMs,
-  pendingLabel = "sit tight, audio compiling…",
+  pendingLabel = "",
   className,
   onPlay,
   onPause,

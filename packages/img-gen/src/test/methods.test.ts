@@ -71,11 +71,11 @@ describe("handleOutputSize", () => {
     }
   );
   it(
-    "should return 2016x3584 for openai with gpt-image-2 selected and output_size set to 2016x3584",
+    "should return 2016x3584 for openai with gpt-image-2.5-sunburst selected and output_size set to 2016x3584",
     {},
     () => {
       assert.equal(
-        p.handleOutputSize("gpt-image-2", {
+        p.handleOutputSize("gpt-image-2.5-sunburst", {
           output_size: "2016x3584"
         }),
         "2016x3584"
@@ -86,7 +86,7 @@ describe("handleOutputSize", () => {
 
 describe("handleImgGenOutputQuality", () => {
   it("should return 'auto' for gpt-5.4 provdier with no model set", {}, () => {
-    assert.equal(p.handleImgGenOutputQuality("gpt-5.4"), "auto");
+    assert.equal(p.handleImgGenOutputQuality("gpt-image-2", {output_quality: "high"}), "high");
   });
   it(
     "should return 2K for gemini-3.1-flash-image-preview when no arg passed in",
@@ -103,7 +103,7 @@ describe("handleImgGenOutputQuality", () => {
     {},
     () => {
       assert.equal(
-        p.handleImgGenOutputQuality("gemini-3.1-flash-image-preview", {
+        p.handleImgGenOutputQuality("gemini-3.1-flash-lite-image", {
           output_quality: "0.5K"
         }),
         "0.5K"

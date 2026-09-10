@@ -43,33 +43,25 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
 
   private reasoningByModel(m: string) {
     if (
-      m==="gpt-6-astra" ||
-      m==="gpt-5.6=sol" ||
-      m==="gpt-5.6-terra"||
-      m==="gpt-5.6-luna" ||
+      m === "gpt-6-astra" ||
+      m === "gpt-5.6=sol" ||
+      m === "gpt-5.6-terra" ||
+      m === "gpt-5.6-luna" ||
       m === "gpt-5.5" ||
       m === "gpt-5.5-pro" ||
       m === "gpt-5.2" ||
       m === "gpt-5.4" ||
-      m === "gpt-5.2-codex" ||
       m === "gpt-5.4-pro" ||
       m === "gpt-5.3-codex" ||
-      m === "gpt-5.1-codex-max" ||
       m === "gpt-5.2-pro"
     ) {
       return "xhigh";
     } else if (
       m === "gpt-5" ||
-      m === "gpt-5-codex" ||
-      m === "gpt-5-chat-latest" ||
       m === "gpt-5-mini" ||
       m === "gpt-5-nano" ||
       m === "gpt-5-pro" ||
       m === "gpt-5.1" ||
-      m === "gpt-5.1-chat-latest" ||
-      m === "gpt-5.1-codex" ||
-      m === "gpt-5.1-codex-mini" ||
-      m === "gpt-5.2-chat-latest" ||
       m === "gpt-5.4-mini" ||
       m === "gpt-5.4-nano" ||
       m === "o3-pro" ||
@@ -104,10 +96,9 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     const m =
       model &&
       this.prisma.isOpenAIModel(model) &&
-      !this.prisma.isOpenAIImgModel(model) &&
-      !this.prisma.isOpenAIVideoModel(model)
+      !this.prisma.isOpenAIImgModel(model)
         ? model
-        : "gpt-5.5";
+        : "gpt-5.6-sol";
 
     const provider = "openai" as const;
 

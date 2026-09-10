@@ -236,6 +236,8 @@ export type OpenAIImgNativeGPTImgAR = {
   "gpt-image-1": BaseOpenAISize;
   "gpt-image-1-mini": BaseOpenAISize;
   "gpt-image-2": GPTImage2Size;
+  "gpt-image-2.5-sunburst": GPTImage2Size;
+  "gpt-image-2.5-flare": GPTImage2Size;
 };
 export type OpenAINativeImgModelAspectRatioWorkup = OpenAIImgNativeGPTImgAR;
 export type OpenAIModelAspectRatio = {
@@ -382,10 +384,18 @@ export type GeminiImageQuality = {
   "deep-research-preview-04-2026": "1K" | "2K" | "4K";
 };
 
-export type OpenAINativeImgModelQualityWorkup = Record<
-  OpenAIImgGenModels,
-  "low" | "medium" | "high" | "auto"
->;
+export type OpenAIBaseQuality = "low" | "medium" | "high" | "auto";
+
+export type OpenAIGptImage2Point5Quality =
+  "low" | "medium" | "high" | "xhigh" | "max" | "auto";
+export type OpenAINativeImgModelQualityWorkup = {
+  "gpt-image-1.5": OpenAIBaseQuality;
+  "gpt-image-1": OpenAIBaseQuality;
+  "gpt-image-1-mini": OpenAIBaseQuality;
+  "gpt-image-2": OpenAIBaseQuality;
+  "gpt-image-2.5-sunburst": OpenAIGptImage2Point5Quality;
+  "gpt-image-2.5-flare": OpenAIGptImage2Point5Quality;
+};
 
 /**
  * OpenAI Image Size & Quality Options
@@ -621,7 +631,12 @@ export interface SharedOpenAIImageOpts<T extends OpenAIImgGenModels> {
 }
 
 export interface GptImage1Opts extends SharedOpenAIImageOpts<
-  "gpt-image-1" | "gpt-image-1-mini" | "gpt-image-1.5" | "gpt-image-2"
+  | "gpt-image-1"
+  | "gpt-image-1-mini"
+  | "gpt-image-1.5"
+  | "gpt-image-2"
+  | "gpt-image-2.5-flare"
+  | "gpt-image-2.5-sunburst"
 > {
   /**
    *
@@ -1245,6 +1260,8 @@ export type ImgGenWorkupRTObj = {
   "gpt-5.6-sol": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.6-terra": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.6-luna": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-image-2.5-sunburst": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-image-2.5-flare": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-image-1.5": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-image-1": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-image-1-mini": GptImageAndFacilitatorsImgGenWorkupRT;
@@ -1259,7 +1276,6 @@ export type ImgGenWorkupRTObj = {
   o3: GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-4o": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-4o-mini": GptImageAndFacilitatorsImgGenWorkupRT;
-  "gpt-5-chat-latest": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.2": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.2-pro": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.1": GptImageAndFacilitatorsImgGenWorkupRT;
@@ -1270,27 +1286,14 @@ export type ImgGenWorkupRTObj = {
   "gpt-5.4-mini": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.4-nano": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.3-codex": undefined;
-  "gpt-5.2-codex": undefined;
-  "gpt-5.1-codex-mini": undefined;
   o1: undefined;
   "o1-pro": undefined;
-  "gpt-5.2-chat-latest": undefined;
-  "gpt-5.1-codex-max": undefined;
-  "sora-2": undefined;
-  "sora-2-pro": undefined;
-  "gpt-5-codex": undefined;
   "gpt-4-turbo": undefined;
   "gpt-3.5-turbo": undefined;
-  "chatgpt-4o-latest": undefined;
-  "o3-deep-research": undefined;
-  "o4-mini-deep-research": undefined;
   "gpt-4": undefined;
   "o3-pro": undefined;
   "o3-mini": undefined;
   "o4-mini": undefined;
-  "gpt-5.1-chat-latest": undefined;
-  "gpt-5.1-codex": undefined;
-  "gpt-5.1.-codex-mini": undefined;
 };
 
 export type ImgGenWorkupResRT<T extends keyof ImgGenWorkupRTObj> =

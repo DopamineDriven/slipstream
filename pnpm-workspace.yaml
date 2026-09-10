@@ -19,11 +19,11 @@ catalogs:
   auth:
     better-auth: ^1.7.3
   aws:
-    "@aws-sdk/client-s3": ^3.1127.0
-    "@aws-sdk/client-secrets-manager": ^3.1127.0
-    "@aws-sdk/credential-providers": ^3.1127.0
-    "@aws-sdk/lib-storage": ^3.1127.0
-    "@aws-sdk/s3-request-presigner": ^3.1127.0
+    "@aws-sdk/client-s3": ^3.1129.0
+    "@aws-sdk/client-secrets-manager": ^3.1129.0
+    "@aws-sdk/credential-providers": ^3.1129.0
+    "@aws-sdk/lib-storage": ^3.1129.0
+    "@aws-sdk/s3-request-presigner": ^3.1129.0
     "@aws-sdk/types": ^3.974.5
   babel:
     babel-plugin-react-compiler: ^1.0.0
@@ -95,7 +95,7 @@ catalogs:
   mdast:
     "@types/mdast": ^4.0.4
   mistral:
-    "@mistralai/mistralai": ^2.6.4
+    "@mistralai/mistralai": ^2.7.0
   motion:
     motion: ^12.43.0
     motion-dom: ^12.43.0
@@ -104,7 +104,7 @@ catalogs:
   nanoid:
     nanoid: ^6.0.1
   napi:
-    "@napi-rs/canvas": ^1.0.8
+    "@napi-rs/canvas": ^1.0.9
   next:
     "@next/eslint-plugin-next": ^16.3.4
     eslint-config-next: ^16.3.4
@@ -117,7 +117,7 @@ catalogs:
   nyc:
     nyc: ^18.0.0
   openai:
-    openai: ^7.10.0
+    openai: ^7.13.0
   p-limit:
     p-limit: ^7.3.2
   pg:
@@ -169,10 +169,10 @@ catalogs:
     "@radix-ui/react-tooltip": ^1.2.16
   react:
     "@testing-library/react": ^16.3.3
-    "@types/react": ^19.2.18
-    "@types/react-dom": ^19.2.7
-    react: ^19.2.8
-    react-dom: ^19.2.8
+    "@types/react": ^19.3.0
+    "@types/react-dom": ^19.3.0
+    react: ^19.3.0
+    react-dom: ^19.3.0
     react-resizable-panels: ^4.12.4
     vaul: ^1.1.2
   redis:
@@ -190,7 +190,7 @@ catalogs:
     remark-parse: ^11.0.0
     remark-rehype: ^11.1.2
   rolldown:
-    rolldown: ^1.2.7
+    rolldown: ^1.2.8
     rolldown-plugin-dts: ^0.28.5
     rolldown-plugin-wasm: ^0.3.2
   sharp:
@@ -201,8 +201,8 @@ catalogs:
   smithy:
     "@smithy/node-http-handler": ^4.12.1
   store:
-    use-sync-external-store: ^1.6.0
-    "@types/use-sync-external-store": ^1.5.0
+    use-sync-external-store: ^1.7.0
+    "@types/use-sync-external-store": ^1.7.0
   styles:
     autoprefixer: ^10.5.5
     postcss: ^8.5.28
@@ -210,7 +210,7 @@ catalogs:
   swr:
     swr: ^2.5.1
   tanstack:
-    "@tanstack/react-virtual": ^3.14.10
+    "@tanstack/react-virtual": ^3.14.11
   test:
     "@playwright/test": ^1.63.0
   tiktoken:
@@ -221,7 +221,7 @@ catalogs:
     tsdown: ^0.23.0
     "@tsdown/css": ^0.23.0
   tseslint:
-    typescript-eslint: ^8.69.0
+    typescript-eslint: ^8.70.0
   tsgo:
     "@typescript/native-preview": ^7.0.0-dev.20260707.2
   tslib:
@@ -252,7 +252,7 @@ catalogs:
     wait-on: ^9.1.0
   vercel:
     "@vercel/analytics": ^2.0.1
-    "@vercel/functions": ^3.9.5
+    "@vercel/functions": ^3.9.7
   vfile:
     vfile: ^6.0.3
   vite:
