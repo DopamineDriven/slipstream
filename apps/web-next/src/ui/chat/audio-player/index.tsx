@@ -55,7 +55,7 @@ export interface AudioPlayerProps {
 export function AudioPlayer({
   src,
   durationMs,
-  pendingLabel = "sit tight, audio compiling…",
+  pendingLabel = "",
   className,
   onPlay,
   onPause,
@@ -73,6 +73,7 @@ export function AudioPlayer({
 
   useEffect(() => {
     if (durationMs) {
+      // eslint-disable-next-line
       setDuration(durationMs / 1000);
     }
   }, [durationMs]);
@@ -168,8 +169,9 @@ export function AudioPlayer({
   // cross-origin `download` attr is ignored, opening the cdnUrl in a new tab
   const handleDownload = useCallback(() => {
     if (!src) return;
-    const filename =
-      src.split("/").at(-1)?.split("?")[0] || `generated-${Date.now()}.mp3`;
+    // cdn basenames are always `epochMs-filename.ext` with no query params —
+    // a server-pipeline invariant, so no defensive parsing
+    const filename = src.slice(src.lastIndexOf("/") + 1);
     const fallbackOpen = () => {
       const link = document.createElement("a");
       link.href = src;
