@@ -7,9 +7,9 @@ import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
-import type { ContentListUnion, Interactions } from "@google/genai";
+import type { Interactions } from "@google/genai";
 import { GeminiWorkupService } from "@/gemini/workup.ts";
-import type { MessageSingleton } from "@slipstream/types";
+import type { GeminiImgGenModels, MessageSingleton } from "@slipstream/types";
 
 export class GeminiInteractionsService extends GeminiWorkupService {
   constructor(
@@ -355,18 +355,6 @@ export class GeminiInteractionsService extends GeminiWorkupService {
     } else return;
   }
 
-  protected async getTokens(
-    contents: ContentListUnion,
-    model = "gemini-3.1-flash-image-preview",
-    apiKey = this.apiKey
-  ) {
-    const client = this.getClient(apiKey);
-    return await client.models.countTokens({
-      model,
-      contents
-    });
-  }
-
   protected get nanoBananaFamTokenMax() {
     return {
       "gemini-3.1-flash-image-preview": 131072,
@@ -425,6 +413,14 @@ export class GeminiInteractionsService extends GeminiWorkupService {
     } satisfies Interactions.CreateModelInteractionParamsStreaming;
   }
 
+  private convertPreviewModels(s: GeminiImgGenModels) {
+    if (s === "gemini-3-pro-image-preview") {
+      return "gemini-3-pro-image" as const;
+    } else if (s === "gemini-3.1-flash-image-preview") {
+      return "gemini-3.1-flash-image" as const;
+    } else return s;
+  }
+
   /**
    * 🍌 🍌 🍌 🍌 🍌
    */
@@ -459,24 +455,30 @@ export class GeminiInteractionsService extends GeminiWorkupService {
       apiKey
     );
 
-    const toContentGen = this.interactionStepsToContents(input);
-
-    const getTokens = await this.getTokens(toContentGen, model, apiKey);
-
     let nanobananaInput: (
       Interactions.ModelOutputStep | Interactions.UserInputStep
     )[];
 
-    if (
-      getTokens?.totalTokens &&
-      getTokens.totalTokens < maxInputTokens - 4000
-    ) {
+    if (maxInputTokens === 131072 && input.length < 50) {
+      nanobananaInput = input;
+    } else if (maxInputTokens === 65536 && input.length < 30) {
       nanobananaInput = input;
     } else {
-      if (maxInputTokens === 131072) {
-        nanobananaInput = input.slice(input.length - 50);
+      const toContentGen = this.interactionStepsToContents(input);
+      const t = await this.getTokenCount(
+        toContentGen,
+        this.convertPreviewModels(model),
+        apiKey
+      );
+
+      if (t.success && t.tokenCount < maxInputTokens - 4000) {
+        nanobananaInput = input;
       } else {
-        nanobananaInput = input.slice(input.length - 30);
+        if (maxInputTokens === 131072) {
+          nanobananaInput = input.slice(input.length - 50);
+        } else {
+          nanobananaInput = input.slice(input.length - 30);
+        }
       }
     }
 
@@ -492,7 +494,6 @@ export class GeminiInteractionsService extends GeminiWorkupService {
       response_format: [
         {
           type: "image",
-          mime_type: "image/jpeg",
           aspect_ratio: imageConfig?.aspectRatio ?? "16:9",
           image_size: imageConfig?.imageSize ?? "1K"
         },
@@ -539,21 +540,16 @@ export class GeminiInteractionsService extends GeminiWorkupService {
       apiKey
     );
 
-    const toContentGen = this.interactionStepsToContents(input);
-
-    const getTokens = await this.getTokens(toContentGen, model, apiKey);
-
     let lyriaInput: (
       Interactions.ModelOutputStep | Interactions.UserInputStep
     )[];
 
-    if (
-      getTokens?.totalTokens &&
-      getTokens.totalTokens < maxInputTokens - 4000
-    ) {
+    if (input.length < 50) {
       lyriaInput = input;
     } else {
-      if (input.length < 50) {
+      const toContentGen = this.interactionStepsToContents(input);
+      const t = await this.getTokenCount(toContentGen, model, apiKey);
+      if (t.success && t.tokenCount < maxInputTokens - 4000) {
         lyriaInput = input;
       } else {
         lyriaInput = input.slice(input.length - 50);

@@ -52,12 +52,8 @@ export class FileSearchStoreService extends GeminiBaseService {
   protected storeDocDbRegistry = new Map<string, StoreDocDbRegistryProps>();
 
   protected lastRegistrySync: Date | null = null;
-  constructor(
-    logger: LoggerService,
-    protected prisma: PrismaService,
-    protected apiKey: string
-  ) {
-    super(logger, apiKey);
+  constructor(logger: LoggerService, prisma: PrismaService, apiKey: string) {
+    super(logger, prisma, apiKey);
   }
 
   protected fssToDbState = {
