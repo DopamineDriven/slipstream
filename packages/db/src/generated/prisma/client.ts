@@ -102,6 +102,11 @@ export type Conversation = Prisma.ConversationModel
  */
 export type ConversationSettings = Prisma.ConversationSettingsModel
 /**
+ * Model Dictation
+ * 
+ */
+export type Dictation = Prisma.DictationModel
+/**
  * Model ImageGenJob
  * 
  */

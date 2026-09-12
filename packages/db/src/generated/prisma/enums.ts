@@ -188,6 +188,45 @@ export const OutputVerbosity = {
 export type OutputVerbosity = (typeof OutputVerbosity)[keyof typeof OutputVerbosity]
 
 
+export const DictationCouplingStatus = {
+  PENDING: 'PENDING',
+  DECOUPLED: 'DECOUPLED',
+  COUPLED: 'COUPLED',
+  ORPHANED: 'ORPHANED',
+  FAILED: 'FAILED'
+} as const
+
+export type DictationCouplingStatus = (typeof DictationCouplingStatus)[keyof typeof DictationCouplingStatus]
+
+
+export const DictationStatus = {
+  QUEUED: 'QUEUED',
+  GENERATING: 'GENERATING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+  CANCELED: 'CANCELED'
+} as const
+
+export type DictationStatus = (typeof DictationStatus)[keyof typeof DictationStatus]
+
+
+export const DictationVersion = {
+  v1_0: 'v1_0'
+} as const
+
+export type DictationVersion = (typeof DictationVersion)[keyof typeof DictationVersion]
+
+
+export const DictationEncoding = {
+  PCM: 'PCM',
+  ALAW: 'ALAW',
+  MULAW: 'MULAW',
+  OPUS: 'OPUS'
+} as const
+
+export type DictationEncoding = (typeof DictationEncoding)[keyof typeof DictationEncoding]
+
+
 export const ImageGenOutputKind = {
   PARTIAL: 'PARTIAL',
   FINAL: 'FINAL'

@@ -113,7 +113,7 @@ export namespace STTTypes {
      * Optional (default: false): When `true`, filler words (e.g. `uh`, `um`, `er`) are included in the transcript.
      * When `false` (default), filler words are automatically removed from the transcript text and the `words` array.
      */
-    filter_words?: boolean;
+    filler_words?: boolean;
     /**
      * Optional: Enable Smart Turn end-of-turn detection. Set to a confidence threshold between `0.0` and `1.0`.
      * When the model's end-of-turn probability exceeds this threshold at a VAD silence boundary, `speech_final` fires immediately.

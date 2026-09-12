@@ -507,6 +507,101 @@ export type EnumOutputVerbosityNullableWithAggregatesFilter<$PrismaModel = never
   _max?: Prisma.NestedEnumOutputVerbosityNullableFilter<$PrismaModel>
 }
 
+export type EnumDictationEncodingFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationEncoding | Prisma.EnumDictationEncodingFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationEncoding[] | Prisma.ListEnumDictationEncodingFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationEncoding[] | Prisma.ListEnumDictationEncodingFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationEncodingFilter<$PrismaModel> | $Enums.DictationEncoding
+}
+
+export type FloatFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  in?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
+  notIn?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
+  lt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedFloatFilter<$PrismaModel> | number
+}
+
+export type EnumDictationStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationStatus | Prisma.EnumDictationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationStatus[] | Prisma.ListEnumDictationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationStatus[] | Prisma.ListEnumDictationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationStatusFilter<$PrismaModel> | $Enums.DictationStatus
+}
+
+export type EnumDictationCouplingStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationCouplingStatus | Prisma.EnumDictationCouplingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationCouplingStatus[] | Prisma.ListEnumDictationCouplingStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationCouplingStatus[] | Prisma.ListEnumDictationCouplingStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationCouplingStatusFilter<$PrismaModel> | $Enums.DictationCouplingStatus
+}
+
+export type EnumDictationVersionFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationVersion | Prisma.EnumDictationVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationVersion[] | Prisma.ListEnumDictationVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationVersion[] | Prisma.ListEnumDictationVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationVersionFilter<$PrismaModel> | $Enums.DictationVersion
+}
+
+export type EnumDictationEncodingWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationEncoding | Prisma.EnumDictationEncodingFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationEncoding[] | Prisma.ListEnumDictationEncodingFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationEncoding[] | Prisma.ListEnumDictationEncodingFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationEncodingWithAggregatesFilter<$PrismaModel> | $Enums.DictationEncoding
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDictationEncodingFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDictationEncodingFilter<$PrismaModel>
+}
+
+export type FloatWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  in?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
+  notIn?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
+  lt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedFloatWithAggregatesFilter<$PrismaModel> | number
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatFilter<$PrismaModel>
+  _sum?: Prisma.NestedFloatFilter<$PrismaModel>
+  _min?: Prisma.NestedFloatFilter<$PrismaModel>
+  _max?: Prisma.NestedFloatFilter<$PrismaModel>
+}
+
+export type EnumDictationStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationStatus | Prisma.EnumDictationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationStatus[] | Prisma.ListEnumDictationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationStatus[] | Prisma.ListEnumDictationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationStatusWithAggregatesFilter<$PrismaModel> | $Enums.DictationStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDictationStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDictationStatusFilter<$PrismaModel>
+}
+
+export type EnumDictationCouplingStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationCouplingStatus | Prisma.EnumDictationCouplingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationCouplingStatus[] | Prisma.ListEnumDictationCouplingStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationCouplingStatus[] | Prisma.ListEnumDictationCouplingStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationCouplingStatusWithAggregatesFilter<$PrismaModel> | $Enums.DictationCouplingStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDictationCouplingStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDictationCouplingStatusFilter<$PrismaModel>
+}
+
+export type EnumDictationVersionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationVersion | Prisma.EnumDictationVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationVersion[] | Prisma.ListEnumDictationVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationVersion[] | Prisma.ListEnumDictationVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationVersionWithAggregatesFilter<$PrismaModel> | $Enums.DictationVersion
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDictationVersionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDictationVersionFilter<$PrismaModel>
+}
+
 export type EnumImageGenStageFilter<$PrismaModel = never> = {
   equals?: $Enums.ImageGenStage | Prisma.EnumImageGenStageFieldRefInput<$PrismaModel>
   in?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
@@ -1418,6 +1513,90 @@ export type NestedEnumOutputVerbosityNullableWithAggregatesFilter<$PrismaModel =
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumOutputVerbosityNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumOutputVerbosityNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumDictationEncodingFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationEncoding | Prisma.EnumDictationEncodingFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationEncoding[] | Prisma.ListEnumDictationEncodingFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationEncoding[] | Prisma.ListEnumDictationEncodingFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationEncodingFilter<$PrismaModel> | $Enums.DictationEncoding
+}
+
+export type NestedEnumDictationStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationStatus | Prisma.EnumDictationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationStatus[] | Prisma.ListEnumDictationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationStatus[] | Prisma.ListEnumDictationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationStatusFilter<$PrismaModel> | $Enums.DictationStatus
+}
+
+export type NestedEnumDictationCouplingStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationCouplingStatus | Prisma.EnumDictationCouplingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationCouplingStatus[] | Prisma.ListEnumDictationCouplingStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationCouplingStatus[] | Prisma.ListEnumDictationCouplingStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationCouplingStatusFilter<$PrismaModel> | $Enums.DictationCouplingStatus
+}
+
+export type NestedEnumDictationVersionFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationVersion | Prisma.EnumDictationVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationVersion[] | Prisma.ListEnumDictationVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationVersion[] | Prisma.ListEnumDictationVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationVersionFilter<$PrismaModel> | $Enums.DictationVersion
+}
+
+export type NestedEnumDictationEncodingWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationEncoding | Prisma.EnumDictationEncodingFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationEncoding[] | Prisma.ListEnumDictationEncodingFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationEncoding[] | Prisma.ListEnumDictationEncodingFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationEncodingWithAggregatesFilter<$PrismaModel> | $Enums.DictationEncoding
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDictationEncodingFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDictationEncodingFilter<$PrismaModel>
+}
+
+export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  in?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
+  notIn?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
+  lt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedFloatWithAggregatesFilter<$PrismaModel> | number
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatFilter<$PrismaModel>
+  _sum?: Prisma.NestedFloatFilter<$PrismaModel>
+  _min?: Prisma.NestedFloatFilter<$PrismaModel>
+  _max?: Prisma.NestedFloatFilter<$PrismaModel>
+}
+
+export type NestedEnumDictationStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationStatus | Prisma.EnumDictationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationStatus[] | Prisma.ListEnumDictationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationStatus[] | Prisma.ListEnumDictationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationStatusWithAggregatesFilter<$PrismaModel> | $Enums.DictationStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDictationStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDictationStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumDictationCouplingStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationCouplingStatus | Prisma.EnumDictationCouplingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationCouplingStatus[] | Prisma.ListEnumDictationCouplingStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationCouplingStatus[] | Prisma.ListEnumDictationCouplingStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationCouplingStatusWithAggregatesFilter<$PrismaModel> | $Enums.DictationCouplingStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDictationCouplingStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDictationCouplingStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumDictationVersionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationVersion | Prisma.EnumDictationVersionFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationVersion[] | Prisma.ListEnumDictationVersionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationVersion[] | Prisma.ListEnumDictationVersionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationVersionWithAggregatesFilter<$PrismaModel> | $Enums.DictationVersion
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDictationVersionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDictationVersionFilter<$PrismaModel>
 }
 
 export type NestedEnumImageGenStageFilter<$PrismaModel = never> = {

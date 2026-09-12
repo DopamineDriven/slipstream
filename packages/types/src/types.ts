@@ -13,6 +13,7 @@ import type {
   ConversationMemoryContext,
   ConversationMemoryStore,
   ConversationSettings,
+  Dictation,
   DocumentMetadata,
   ImageGenJob,
   ImageGenOutput,
@@ -47,6 +48,7 @@ export interface UserSingleton<T extends boolean = false> extends User {
   userStores?: UserStoreSingleton<T>[];
   cliConfig?: CliConfigSingleton<T>;
   cliConversationActivity?: CliConversationActivitySingleton<T>[];
+  dictationJobs?: DictationSingleton<T>[];
 }
 
 export interface CliConfigSingleton<
@@ -76,6 +78,14 @@ export interface ProfileSingleton<T extends boolean = false> extends Profile {
 
 export interface SettingsSingleton<T extends boolean = false> extends Settings {
   user?: UserSingleton<T>;
+}
+
+export interface DictationSingleton<
+  T extends boolean = false
+> extends Dictation {
+  user?: UserSingleton<T>;
+  conversation?: ConversationSingleton<T>;
+  message?: MessageSingleton<T>;
 }
 
 export interface UserStoreSingleton<
@@ -211,6 +221,7 @@ export interface AttachmentSingleton<
   audioGenOutput: AudioGenOutputSingleton<T> | null;
   userStoreDoc?: UserStoreDocSingleton<T>;
   ttsJob?: TTSJobSingleton<T>;
+  dictationJobs?: DictationSingleton<T>[];
 }
 
 export interface UserKeySingleton<T extends boolean = false> extends UserKey {
@@ -240,6 +251,7 @@ export interface ConversationSingleton<
   user?: UserSingleton<T>;
   conversationContextState?: ConversationMemoryContextSingleton<T>;
   cliConversationActivity?: CliConversationActivitySingleton<T>[];
+  dictationJobs?: DictationSingleton<T>[];
 }
 export interface ConversationSingletonOneOff<
   T extends boolean = false

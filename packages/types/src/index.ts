@@ -455,6 +455,7 @@ export type {
   ConversationSingleton,
   ConversationSingletonOneOff,
   ConvoSettingsSingleton,
+  DictationSingleton,
   DocumentSingleton,
   ImageGenJobSingleton,
   ImageGenOutputSingleton,

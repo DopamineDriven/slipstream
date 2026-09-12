@@ -37,9 +37,12 @@ export const fromPrismaFormat = (provider: $Enums.Provider) => {
  * this at the send site; lyria targeting IS the intent, no user toggle
  */
 export const isAudioGenModel = (m: string) => {
-  return m ==="lyria-3.5" || m === "lyria-3-pro-preview" || m === "lyria-3-clip-preview";
+  return (
+    m === "lyria-3.5" ||
+    m === "lyria-3-pro-preview" ||
+    m === "lyria-3-clip-preview"
+  );
 };
-
 
 /**
  * automatically toggle the image gen to active for these pure image generation models.
@@ -58,8 +61,52 @@ export const isPureImageModel = (m: string) => {
     m === "gpt-image-1-mini" ||
     m === "gpt-image-1.5" ||
     m === "gpt-image-2" ||
+    m === "gpt-image-2.5-sunburst" ||
+    m === "gpt-image-2.5-flare" ||
     m === "grok-imagine-image" ||
     m === "grok-imagine-image-2.0" ||
     m === "grok-imagine-image-quality"
   );
 };
+
+export function isValidLangSTT(l: string) {
+  return (
+    l === "ar" ||
+    l === "cs" ||
+    l === "da" ||
+    l === "de" ||
+    l === "en" ||
+    l === "es" ||
+    l === "fa" ||
+    l === "fil" ||
+    l === "fr" ||
+    l === "hi" ||
+    l === "id" ||
+    l === "it" ||
+    l === "ja" ||
+    l === "ko" ||
+    l === "mk" ||
+    l === "ms" ||
+    l === "nl" ||
+    l === "pl" ||
+    l === "pt" ||
+    l === "ro" ||
+    l === "ru" ||
+    l === "sv" ||
+    l === "th" ||
+    l === "tr" ||
+    l === "vi"
+  );
+}
+/**
+ * locale → provider language code: BCP-47 puts the language FIRST, so cut at
+ * the first separator (`zh-Hant-TW` → `zh`, `hi-Latn-IN` → `hi`,
+ * `fil-PH` → `fil`), lowercase, and anchor-validate so junk never passes as
+ * a code. `tl` (how some platforms tag Filipino locales) maps to the
+ * provider's `fil`.
+ */
+export function languageHelperSTT(t: string) {
+  const base = t.toLowerCase().split(/[-_]/)[0];
+  if (!base || !/^[a-z]{2,3}$/.test(base)) return;
+  return base === "tl" ? "fil" : base;
+}
