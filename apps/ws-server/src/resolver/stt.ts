@@ -37,50 +37,175 @@ export class ResolverSTTService extends ResolverChatUtilsService {
     );
   }
 
+  private readonly MAX_KEYTERMS = 100;
+  private readonly MAX_KEYTERM_CHARS = 50;
+
+  private sttError(
+    ws: WebSocket,
+    draftId: string,
+    status: number,
+    statusText: string
+  ) {
+    ws.send(
+      JSON.stringify({
+        type: "stt_user_error",
+        draftId,
+        status,
+        statusText
+      } satisfies EventTypeMap["stt_user_error"])
+    );
+  }
+
+  /**
+   * the one ownership check — client-minted draftId vs the socket's session
+   * userId; frame/finish/present are bound to the live session on `ws`
+   * instead, so they never re-parse
+   */
+  private ownsDraft(ws: WebSocket, userId: string, draftId: string) {
+    if (!this.wsServer.prisma.canParseDraftId(draftId)) {
+      this.sttError(ws, draftId, 400, "malformed draftId");
+      return null;
+    }
+    const parsed = this.wsServer.prisma.draftIdEpimerize(draftId);
+    if (parsed.userId !== userId) {
+      this.sttError(ws, draftId, 403, "draft owner mismatch");
+      return null;
+    }
+    return parsed;
+  }
+
+  private clampInt(value: number, min: number, max: number) {
+    return Math.min(max, Math.max(min, Math.round(value)));
+  }
+
+  /** synchronous forward — nothing may be awaited before `pushFrame` */
   protected async sttUserBinaryFrame(
-    _event: EventTypeMap["stt_user_binary_frame"],
-    _ws: WebSocket,
+    event: EventTypeMap["stt_user_binary_frame"],
+    ws: WebSocket,
     _userId: string,
     _userData?: UserData
-  ) {}
+  ) {
+    this.sttService.pushFrame(ws, event);
+  }
 
   protected async sttUserCancel(
-    _event: EventTypeMap["stt_user_cancel"],
-    _ws: WebSocket,
-    _userId: string,
+    event: EventTypeMap["stt_user_cancel"],
+    ws: WebSocket,
+    userId: string,
     _userData?: UserData
-  ) {}
+  ) {
+    if (!this.ownsDraft(ws, userId, event.draftId)) return;
+    await this.sttService.cancel(ws, userId, event);
+  }
 
   protected async sttUserConnect(
-    _event: EventTypeMap["stt_user_connect"],
-    _ws: WebSocket,
-    _userId: string,
+    event: EventTypeMap["stt_user_connect"],
+    ws: WebSocket,
+    userId: string,
     _userData?: UserData
-  ) {}
+  ) {
+    const parsed = this.ownsDraft(ws, userId, event.draftId);
+    if (!parsed) return;
+    if (
+      parsed.batchId !== event.batchId ||
+      parsed.dictationOrdinal !== event.ordinal ||
+      (parsed.isNewConvo ? null : parsed.convoId) !== event.conversationId
+    ) {
+      this.sttError(ws, event.draftId, 400, "draftId constituents mismatch");
+      return;
+    }
+    if (!this.sttService.isValidSampleRate(event.sampleRate)) {
+      this.sttError(ws, event.draftId, 400, "unsupported sampleRate");
+      return;
+    }
+
+    // explicit field pick — unknown client keys never reach the row
+    const sanitized: EventTypeMap["stt_user_connect"] = {
+      type: event.type,
+      draftId: event.draftId,
+      batchId: event.batchId,
+      ordinal: event.ordinal,
+      conversationId: event.conversationId,
+      sampleRate: event.sampleRate
+    } satisfies EventTypeMap["stt_user_connect"];
+    if (
+      typeof event.inputSampleRate === "number" &&
+      Number.isFinite(event.inputSampleRate) &&
+      event.inputSampleRate > 0
+    ) {
+      sanitized.inputSampleRate = Math.round(event.inputSampleRate);
+    }
+    if (
+      typeof event.language === "string" &&
+      this.sttService.isValidLanguage(event.language)
+    ) {
+      sanitized.language = event.language;
+    }
+    if (Array.isArray(event.keyterms)) {
+      const keyterms = event.keyterms
+        .filter(
+          k =>
+            k.length > 0 &&
+            k.length <= this.MAX_KEYTERM_CHARS &&
+            !k.includes("::")
+        )
+        .slice(0, this.MAX_KEYTERMS);
+      if (keyterms.length > 0) sanitized.keyterms = keyterms;
+    }
+    if (
+      typeof event.endpointing === "number" &&
+      Number.isFinite(event.endpointing)
+    ) {
+      sanitized.endpointing = this.clampInt(event.endpointing, 0, 5000);
+    }
+    if (typeof event.diarize === "boolean") sanitized.diarize = event.diarize;
+    if (typeof event.fillerWords === "boolean") {
+      sanitized.fillerWords = event.fillerWords;
+    }
+    if (
+      typeof event.vadThreshold === "number" &&
+      Number.isFinite(event.vadThreshold)
+    ) {
+      sanitized.vadThreshold = Math.min(1, Math.max(0, event.vadThreshold));
+    }
+
+    await this.sttService.connect(ws, userId, sanitized);
+  }
+
   protected async sttUserFinish(
-    _event: EventTypeMap["stt_user_finish"],
-    _ws: WebSocket,
+    event: EventTypeMap["stt_user_finish"],
+    ws: WebSocket,
     _userId: string,
     _userData?: UserData
-  ) {}
+  ) {
+    this.sttService.finish(ws, event);
+  }
 
   protected async sttUserPresent(
-    _event: EventTypeMap["stt_user_present"],
-    _ws: WebSocket,
+    event: EventTypeMap["stt_user_present"],
+    ws: WebSocket,
     _userId: string,
     _userData?: UserData
-  ) {}
+  ) {
+    this.sttService.present(ws, event);
+  }
 
   protected async sttUserRecover(
-    _event: EventTypeMap["stt_user_recover"],
-    _ws: WebSocket,
-    _userId: string,
+    event: EventTypeMap["stt_user_recover"],
+    ws: WebSocket,
+    userId: string,
     _userData?: UserData
-  ) {}
+  ) {
+    await this.sttService.recover(ws, userId, event);
+  }
+
   protected async sttUserRestore(
-    _event: EventTypeMap["stt_user_restore"],
-    _ws: WebSocket,
-    _userId: string,
+    event: EventTypeMap["stt_user_restore"],
+    ws: WebSocket,
+    userId: string,
     _userData?: UserData
-  ) {}
+  ) {
+    if (!this.ownsDraft(ws, userId, event.draftId)) return;
+    await this.sttService.restore(ws, userId, event);
+  }
 }

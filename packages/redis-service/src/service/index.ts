@@ -241,6 +241,16 @@ export class RedisInstance {
   ) {
     return this.#client.expire(key, seconds, mode);
   }
+  public set(
+    key: RedisArg,
+    value: RedisArg,
+    options?: Parameters<RedisClientEntity["set"]>[2]
+  ) {
+    return this.#client.set(key, value, options);
+  }
+  public get(key: RedisArg) {
+    return this.#client.get(key);
+  }
   // method for Redis DEL command (for cleanup)
   public del(key: RedisArg | RedisArg[]) {
     return this.#client.del(key);

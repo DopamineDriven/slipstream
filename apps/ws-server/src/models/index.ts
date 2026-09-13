@@ -1,6 +1,7 @@
 import type { InferTopLevelMime } from "@/types/index.ts";
 import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import { ModelToolDefsService } from "@/models/tool-defs.ts";
+import { FromDraftIdRT } from "@/prisma/types.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { GetModelUtilRT, Provider } from "@slipstream/types";
 import { providerModelChatApi } from "@slipstream/types";
@@ -9,6 +10,88 @@ export class ModelService extends ModelToolDefsService {
   constructor() {
     super();
   }
+
+  private DRAFT_ID_RE =
+    /^[a-z0-9]{24}~(?:[a-z0-9]{24}|new-chat)~[a-z0-9]{24}~(?:0|[1-9][0-9]*)$/;
+
+  private draftIdFormat({
+    batchId,
+    convoId,
+    dictationOrdinal,
+    userId
+  }: FromDraftIdRT) {
+    return `${userId}~${convoId}~${batchId}~${dictationOrdinal}`;
+  }
+  private parseDraftIdSingleton(d: string) {
+    if (!this.DRAFT_ID_RE.test(d)) {
+      throw new Error(`[malformed draftId detected in parseDraftId]: ${d}`);
+    }
+    const [userId, convoId, batchId, dictationOrdinal] = d.split("~") as [
+      string,
+      string,
+      string,
+      string
+    ];
+
+    return {
+      userId,
+      convoId,
+      batchId,
+      dictationOrdinal: Number.parseInt(dictationOrdinal, 10),
+      isNewConvo: d.length < 76
+    } satisfies FromDraftIdRT;
+  }
+
+  public canParseDraftId(d: string) {
+    return this.DRAFT_ID_RE.test(d);
+  }
+
+  public parseDraftId(d: string): FromDraftIdRT;
+  public parseDraftId(d: string[]): FromDraftIdRT[];
+  public parseDraftId(d: string | string[]) {
+    if (typeof d === "string") {
+      return this.parseDraftIdSingleton(d);
+    } else {
+      return d.map(tt => this.parseDraftIdSingleton(tt));
+    }
+  }
+
+  public toDraftId(d: FromDraftIdRT[]): string[];
+  public toDraftId(d: FromDraftIdRT): string;
+  public toDraftId(d: FromDraftIdRT | FromDraftIdRT[]) {
+    if (Array.isArray(d)) {
+      const arr = Array.of<string>();
+      for (const dd of d) {
+        arr.push(this.draftIdFormat(dd));
+      }
+      return arr;
+    } else {
+      return this.draftIdFormat(d);
+    }
+  }
+
+  public draftIdEpimerize(d: string[]): FromDraftIdRT[];
+  public draftIdEpimerize(d: FromDraftIdRT[]): string[];
+  public draftIdEpimerize(d: FromDraftIdRT): string;
+  public draftIdEpimerize(d: string): FromDraftIdRT;
+  public draftIdEpimerize(
+    d: FromDraftIdRT | FromDraftIdRT[] | string[] | string
+  ) {
+    if (typeof d === "string") {
+      return this.parseDraftId(d);
+    } else if (Array.isArray(d)) {
+      return d.map(t => {
+        if (typeof t === "string") {
+          return this.parseDraftId(t);
+        } else {
+          return this.toDraftId(t);
+        }
+      });
+    } else {
+      return this.toDraftId(d);
+    }
+  }
+
   public isOpenAIImgGenFacilitating(m: string) {
     return (
       m === "gpt-6-astra" ||

@@ -1,5 +1,6 @@
 import type { CTR, UTR } from "@/utils.ts";
 import type { WebSocket } from "ws";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 
 export namespace STTTypes {
   /**
@@ -140,18 +141,76 @@ export namespace STTTypes {
   export type SessionPhase =
     "starting" | "recording" | "finishing" | "terminal";
 
+  export type Segment = {
+    text: string;
+    start: number;
+    duration: number;
+    words: Transcript.Words[];
+  };
+
+  export type CheckpointState = "active" | "completed" | "interrupted";
+
+  export interface Checkpoint {
+    v: 1;
+    draftId: string;
+    externalId: string | null;
+    ownerRunId: string;
+    leaseUntil: number;
+    state: CheckpointState;
+    text: string;
+    segments: Segment[];
+    reconciled: boolean;
+    settings: {
+      encoding: Encoding;
+      sampleRate: SampleRate;
+      language?: Language;
+    };
+    duration?: number;
+    updatedAt: number;
+  }
+
+  export type SettledDraft = {
+    draftId: string;
+    batchId: string;
+    ordinal: number;
+    conversationId: string | null;
+    text: string;
+    terminationReason: $Enums.DictationTerminationReason;
+    couplingStatus: Extract<
+      $Enums.DictationCouplingStatus,
+      "DECOUPLED" | "RECOVERABLE"
+    >;
+    reconciled: boolean;
+    recoveryExpiresAt: number | null;
+    createdAt: number;
+    settledAt: number;
+  };
+
   export interface Session {
     readonly draftId: string;
     readonly userId: string;
+    readonly batchId: string;
+    readonly ordinal: number;
+    readonly conversationId: string | null;
+    readonly createdAt: number;
     readonly ws: WebSocket; // hop 1 — the aic-client socket
+    readonly sampleRate: SampleRate;
     xaiClient: WebSocket | null; // hop 2 — null until opened
+    externalId: string | null;
     phase: SessionPhase;
+    pendingReason: "USER_FINISHED" | "IDLE_TIMEOUT";
+    disconnected: boolean;
     expectedFrameOrdinal: number;
     lastUtteranceAt: number;
     idleTimer: NodeJS.Timeout | null;
     closeTimer: NodeJS.Timeout | null;
+    deadlineTimer: NodeJS.Timeout | null;
     finalReceived: boolean;
-    segments: { text: string; start: number; duration: number }[];
+    reconciled: boolean;
+    segments: Segment[];
+    storage: "ok" | "unavailable";
+    pendingSnapshot: Checkpoint | null;
+    writeInFlight: boolean;
   }
 
   /**
