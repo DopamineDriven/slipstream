@@ -409,6 +409,8 @@ export const DictationScalarFieldEnum = {
   interimResults: 'interimResults',
   smartTurn: 'smartTurn',
   smartTurnTimeout: 'smartTurnTimeout',
+  recoveryExpiresAt: 'recoveryExpiresAt',
+  terminationReason: 'terminationReason',
   status: 'status',
   couplingStatus: 'couplingStatus',
   version: 'version'

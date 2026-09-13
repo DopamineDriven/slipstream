@@ -525,6 +525,13 @@ export type FloatFilter<$PrismaModel = never> = {
   not?: Prisma.NestedFloatFilter<$PrismaModel> | number
 }
 
+export type EnumDictationTerminationReasonFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationTerminationReason | Prisma.EnumDictationTerminationReasonFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationTerminationReason[] | Prisma.ListEnumDictationTerminationReasonFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationTerminationReason[] | Prisma.ListEnumDictationTerminationReasonFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationTerminationReasonFilter<$PrismaModel> | $Enums.DictationTerminationReason
+}
+
 export type EnumDictationStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.DictationStatus | Prisma.EnumDictationStatusFieldRefInput<$PrismaModel>
   in?: $Enums.DictationStatus[] | Prisma.ListEnumDictationStatusFieldRefInput<$PrismaModel>
@@ -570,6 +577,16 @@ export type FloatWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedFloatFilter<$PrismaModel>
   _min?: Prisma.NestedFloatFilter<$PrismaModel>
   _max?: Prisma.NestedFloatFilter<$PrismaModel>
+}
+
+export type EnumDictationTerminationReasonWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationTerminationReason | Prisma.EnumDictationTerminationReasonFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationTerminationReason[] | Prisma.ListEnumDictationTerminationReasonFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationTerminationReason[] | Prisma.ListEnumDictationTerminationReasonFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationTerminationReasonWithAggregatesFilter<$PrismaModel> | $Enums.DictationTerminationReason
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDictationTerminationReasonFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDictationTerminationReasonFilter<$PrismaModel>
 }
 
 export type EnumDictationStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -1522,6 +1539,13 @@ export type NestedEnumDictationEncodingFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumDictationEncodingFilter<$PrismaModel> | $Enums.DictationEncoding
 }
 
+export type NestedEnumDictationTerminationReasonFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationTerminationReason | Prisma.EnumDictationTerminationReasonFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationTerminationReason[] | Prisma.ListEnumDictationTerminationReasonFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationTerminationReason[] | Prisma.ListEnumDictationTerminationReasonFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationTerminationReasonFilter<$PrismaModel> | $Enums.DictationTerminationReason
+}
+
 export type NestedEnumDictationStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.DictationStatus | Prisma.EnumDictationStatusFieldRefInput<$PrismaModel>
   in?: $Enums.DictationStatus[] | Prisma.ListEnumDictationStatusFieldRefInput<$PrismaModel>
@@ -1567,6 +1591,16 @@ export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedFloatFilter<$PrismaModel>
   _min?: Prisma.NestedFloatFilter<$PrismaModel>
   _max?: Prisma.NestedFloatFilter<$PrismaModel>
+}
+
+export type NestedEnumDictationTerminationReasonWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DictationTerminationReason | Prisma.EnumDictationTerminationReasonFieldRefInput<$PrismaModel>
+  in?: $Enums.DictationTerminationReason[] | Prisma.ListEnumDictationTerminationReasonFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DictationTerminationReason[] | Prisma.ListEnumDictationTerminationReasonFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDictationTerminationReasonWithAggregatesFilter<$PrismaModel> | $Enums.DictationTerminationReason
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDictationTerminationReasonFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDictationTerminationReasonFilter<$PrismaModel>
 }
 
 export type NestedEnumDictationStatusWithAggregatesFilter<$PrismaModel = never> = {

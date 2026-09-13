@@ -80,6 +80,8 @@ export type DictationMinAggregateOutputType = {
   interimResults: boolean | null
   smartTurn: number | null
   smartTurnTimeout: number | null
+  recoveryExpiresAt: Date | null
+  terminationReason: $Enums.DictationTerminationReason | null
   status: $Enums.DictationStatus | null
   couplingStatus: $Enums.DictationCouplingStatus | null
   version: $Enums.DictationVersion | null
@@ -113,6 +115,8 @@ export type DictationMaxAggregateOutputType = {
   interimResults: boolean | null
   smartTurn: number | null
   smartTurnTimeout: number | null
+  recoveryExpiresAt: Date | null
+  terminationReason: $Enums.DictationTerminationReason | null
   status: $Enums.DictationStatus | null
   couplingStatus: $Enums.DictationCouplingStatus | null
   version: $Enums.DictationVersion | null
@@ -146,6 +150,8 @@ export type DictationCountAggregateOutputType = {
   interimResults: number
   smartTurn: number
   smartTurnTimeout: number
+  recoveryExpiresAt: number
+  terminationReason: number
   status: number
   couplingStatus: number
   version: number
@@ -207,6 +213,8 @@ export type DictationMinAggregateInputType = {
   interimResults?: true
   smartTurn?: true
   smartTurnTimeout?: true
+  recoveryExpiresAt?: true
+  terminationReason?: true
   status?: true
   couplingStatus?: true
   version?: true
@@ -240,6 +248,8 @@ export type DictationMaxAggregateInputType = {
   interimResults?: true
   smartTurn?: true
   smartTurnTimeout?: true
+  recoveryExpiresAt?: true
+  terminationReason?: true
   status?: true
   couplingStatus?: true
   version?: true
@@ -273,6 +283,8 @@ export type DictationCountAggregateInputType = {
   interimResults?: true
   smartTurn?: true
   smartTurnTimeout?: true
+  recoveryExpiresAt?: true
+  terminationReason?: true
   status?: true
   couplingStatus?: true
   version?: true
@@ -393,6 +405,8 @@ export type DictationGroupByOutputType = {
   interimResults: boolean
   smartTurn: number | null
   smartTurnTimeout: number | null
+  recoveryExpiresAt: Date | null
+  terminationReason: $Enums.DictationTerminationReason
   status: $Enums.DictationStatus
   couplingStatus: $Enums.DictationCouplingStatus
   version: $Enums.DictationVersion
@@ -449,6 +463,8 @@ export type DictationWhereInput = {
   interimResults?: Prisma.BoolFilter<"Dictation"> | boolean
   smartTurn?: Prisma.FloatNullableFilter<"Dictation"> | number | null
   smartTurnTimeout?: Prisma.IntNullableFilter<"Dictation"> | number | null
+  recoveryExpiresAt?: Prisma.DateTimeNullableFilter<"Dictation"> | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFilter<"Dictation"> | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFilter<"Dictation"> | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFilter<"Dictation"> | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFilter<"Dictation"> | $Enums.DictationVersion
@@ -485,6 +501,8 @@ export type DictationOrderByWithRelationInput = {
   interimResults?: Prisma.SortOrder
   smartTurn?: Prisma.SortOrderInput | Prisma.SortOrder
   smartTurnTimeout?: Prisma.SortOrderInput | Prisma.SortOrder
+  recoveryExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  terminationReason?: Prisma.SortOrder
   status?: Prisma.SortOrder
   couplingStatus?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -525,6 +543,8 @@ export type DictationWhereUniqueInput = Prisma.AtLeast<{
   interimResults?: Prisma.BoolFilter<"Dictation"> | boolean
   smartTurn?: Prisma.FloatNullableFilter<"Dictation"> | number | null
   smartTurnTimeout?: Prisma.IntNullableFilter<"Dictation"> | number | null
+  recoveryExpiresAt?: Prisma.DateTimeNullableFilter<"Dictation"> | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFilter<"Dictation"> | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFilter<"Dictation"> | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFilter<"Dictation"> | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFilter<"Dictation"> | $Enums.DictationVersion
@@ -561,6 +581,8 @@ export type DictationOrderByWithAggregationInput = {
   interimResults?: Prisma.SortOrder
   smartTurn?: Prisma.SortOrderInput | Prisma.SortOrder
   smartTurnTimeout?: Prisma.SortOrderInput | Prisma.SortOrder
+  recoveryExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  terminationReason?: Prisma.SortOrder
   status?: Prisma.SortOrder
   couplingStatus?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -602,6 +624,8 @@ export type DictationScalarWhereWithAggregatesInput = {
   interimResults?: Prisma.BoolWithAggregatesFilter<"Dictation"> | boolean
   smartTurn?: Prisma.FloatNullableWithAggregatesFilter<"Dictation"> | number | null
   smartTurnTimeout?: Prisma.IntNullableWithAggregatesFilter<"Dictation"> | number | null
+  recoveryExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Dictation"> | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonWithAggregatesFilter<"Dictation"> | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusWithAggregatesFilter<"Dictation"> | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusWithAggregatesFilter<"Dictation"> | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionWithAggregatesFilter<"Dictation"> | $Enums.DictationVersion
@@ -632,6 +656,8 @@ export type DictationCreateInput = {
   interimResults?: boolean
   smartTurn?: number | null
   smartTurnTimeout?: number | null
+  recoveryExpiresAt?: Date | string | null
+  terminationReason?: $Enums.DictationTerminationReason
   status?: $Enums.DictationStatus
   couplingStatus?: $Enums.DictationCouplingStatus
   version?: $Enums.DictationVersion
@@ -668,6 +694,8 @@ export type DictationUncheckedCreateInput = {
   interimResults?: boolean
   smartTurn?: number | null
   smartTurnTimeout?: number | null
+  recoveryExpiresAt?: Date | string | null
+  terminationReason?: $Enums.DictationTerminationReason
   status?: $Enums.DictationStatus
   couplingStatus?: $Enums.DictationCouplingStatus
   version?: $Enums.DictationVersion
@@ -698,6 +726,8 @@ export type DictationUpdateInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -734,6 +764,8 @@ export type DictationUncheckedUpdateInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -767,6 +799,8 @@ export type DictationCreateManyInput = {
   interimResults?: boolean
   smartTurn?: number | null
   smartTurnTimeout?: number | null
+  recoveryExpiresAt?: Date | string | null
+  terminationReason?: $Enums.DictationTerminationReason
   status?: $Enums.DictationStatus
   couplingStatus?: $Enums.DictationCouplingStatus
   version?: $Enums.DictationVersion
@@ -797,6 +831,8 @@ export type DictationUpdateManyMutationInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -830,6 +866,8 @@ export type DictationUncheckedUpdateManyInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -878,6 +916,8 @@ export type DictationCountOrderByAggregateInput = {
   interimResults?: Prisma.SortOrder
   smartTurn?: Prisma.SortOrder
   smartTurnTimeout?: Prisma.SortOrder
+  recoveryExpiresAt?: Prisma.SortOrder
+  terminationReason?: Prisma.SortOrder
   status?: Prisma.SortOrder
   couplingStatus?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -924,6 +964,8 @@ export type DictationMaxOrderByAggregateInput = {
   interimResults?: Prisma.SortOrder
   smartTurn?: Prisma.SortOrder
   smartTurnTimeout?: Prisma.SortOrder
+  recoveryExpiresAt?: Prisma.SortOrder
+  terminationReason?: Prisma.SortOrder
   status?: Prisma.SortOrder
   couplingStatus?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -957,6 +999,8 @@ export type DictationMinOrderByAggregateInput = {
   interimResults?: Prisma.SortOrder
   smartTurn?: Prisma.SortOrder
   smartTurnTimeout?: Prisma.SortOrder
+  recoveryExpiresAt?: Prisma.SortOrder
+  terminationReason?: Prisma.SortOrder
   status?: Prisma.SortOrder
   couplingStatus?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -1027,6 +1071,10 @@ export type FloatFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type EnumDictationTerminationReasonFieldUpdateOperationsInput = {
+  set?: $Enums.DictationTerminationReason
 }
 
 export type EnumDictationStatusFieldUpdateOperationsInput = {
@@ -1150,6 +1198,8 @@ export type DictationCreateWithoutConversationInput = {
   interimResults?: boolean
   smartTurn?: number | null
   smartTurnTimeout?: number | null
+  recoveryExpiresAt?: Date | string | null
+  terminationReason?: $Enums.DictationTerminationReason
   status?: $Enums.DictationStatus
   couplingStatus?: $Enums.DictationCouplingStatus
   version?: $Enums.DictationVersion
@@ -1184,6 +1234,8 @@ export type DictationUncheckedCreateWithoutConversationInput = {
   interimResults?: boolean
   smartTurn?: number | null
   smartTurnTimeout?: number | null
+  recoveryExpiresAt?: Date | string | null
+  terminationReason?: $Enums.DictationTerminationReason
   status?: $Enums.DictationStatus
   couplingStatus?: $Enums.DictationCouplingStatus
   version?: $Enums.DictationVersion
@@ -1246,6 +1298,8 @@ export type DictationScalarWhereInput = {
   interimResults?: Prisma.BoolFilter<"Dictation"> | boolean
   smartTurn?: Prisma.FloatNullableFilter<"Dictation"> | number | null
   smartTurnTimeout?: Prisma.IntNullableFilter<"Dictation"> | number | null
+  recoveryExpiresAt?: Prisma.DateTimeNullableFilter<"Dictation"> | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFilter<"Dictation"> | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFilter<"Dictation"> | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFilter<"Dictation"> | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFilter<"Dictation"> | $Enums.DictationVersion
@@ -1276,6 +1330,8 @@ export type DictationCreateWithoutMessageInput = {
   interimResults?: boolean
   smartTurn?: number | null
   smartTurnTimeout?: number | null
+  recoveryExpiresAt?: Date | string | null
+  terminationReason?: $Enums.DictationTerminationReason
   status?: $Enums.DictationStatus
   couplingStatus?: $Enums.DictationCouplingStatus
   version?: $Enums.DictationVersion
@@ -1310,6 +1366,8 @@ export type DictationUncheckedCreateWithoutMessageInput = {
   interimResults?: boolean
   smartTurn?: number | null
   smartTurnTimeout?: number | null
+  recoveryExpiresAt?: Date | string | null
+  terminationReason?: $Enums.DictationTerminationReason
   status?: $Enums.DictationStatus
   couplingStatus?: $Enums.DictationCouplingStatus
   version?: $Enums.DictationVersion
@@ -1366,6 +1424,8 @@ export type DictationCreateWithoutUserInput = {
   interimResults?: boolean
   smartTurn?: number | null
   smartTurnTimeout?: number | null
+  recoveryExpiresAt?: Date | string | null
+  terminationReason?: $Enums.DictationTerminationReason
   status?: $Enums.DictationStatus
   couplingStatus?: $Enums.DictationCouplingStatus
   version?: $Enums.DictationVersion
@@ -1400,6 +1460,8 @@ export type DictationUncheckedCreateWithoutUserInput = {
   interimResults?: boolean
   smartTurn?: number | null
   smartTurnTimeout?: number | null
+  recoveryExpiresAt?: Date | string | null
+  terminationReason?: $Enums.DictationTerminationReason
   status?: $Enums.DictationStatus
   couplingStatus?: $Enums.DictationCouplingStatus
   version?: $Enums.DictationVersion
@@ -1458,6 +1520,8 @@ export type DictationCreateManyConversationInput = {
   interimResults?: boolean
   smartTurn?: number | null
   smartTurnTimeout?: number | null
+  recoveryExpiresAt?: Date | string | null
+  terminationReason?: $Enums.DictationTerminationReason
   status?: $Enums.DictationStatus
   couplingStatus?: $Enums.DictationCouplingStatus
   version?: $Enums.DictationVersion
@@ -1488,6 +1552,8 @@ export type DictationUpdateWithoutConversationInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -1522,6 +1588,8 @@ export type DictationUncheckedUpdateWithoutConversationInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -1554,6 +1622,8 @@ export type DictationUncheckedUpdateManyWithoutConversationInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -1586,6 +1656,8 @@ export type DictationCreateManyMessageInput = {
   interimResults?: boolean
   smartTurn?: number | null
   smartTurnTimeout?: number | null
+  recoveryExpiresAt?: Date | string | null
+  terminationReason?: $Enums.DictationTerminationReason
   status?: $Enums.DictationStatus
   couplingStatus?: $Enums.DictationCouplingStatus
   version?: $Enums.DictationVersion
@@ -1616,6 +1688,8 @@ export type DictationUpdateWithoutMessageInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -1650,6 +1724,8 @@ export type DictationUncheckedUpdateWithoutMessageInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -1682,6 +1758,8 @@ export type DictationUncheckedUpdateManyWithoutMessageInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -1714,6 +1792,8 @@ export type DictationCreateManyUserInput = {
   interimResults?: boolean
   smartTurn?: number | null
   smartTurnTimeout?: number | null
+  recoveryExpiresAt?: Date | string | null
+  terminationReason?: $Enums.DictationTerminationReason
   status?: $Enums.DictationStatus
   couplingStatus?: $Enums.DictationCouplingStatus
   version?: $Enums.DictationVersion
@@ -1744,6 +1824,8 @@ export type DictationUpdateWithoutUserInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -1778,6 +1860,8 @@ export type DictationUncheckedUpdateWithoutUserInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -1810,6 +1894,8 @@ export type DictationUncheckedUpdateManyWithoutUserInput = {
   interimResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
   smartTurn?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   smartTurnTimeout?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  recoveryExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  terminationReason?: Prisma.EnumDictationTerminationReasonFieldUpdateOperationsInput | $Enums.DictationTerminationReason
   status?: Prisma.EnumDictationStatusFieldUpdateOperationsInput | $Enums.DictationStatus
   couplingStatus?: Prisma.EnumDictationCouplingStatusFieldUpdateOperationsInput | $Enums.DictationCouplingStatus
   version?: Prisma.EnumDictationVersionFieldUpdateOperationsInput | $Enums.DictationVersion
@@ -1845,6 +1931,8 @@ export type DictationSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   interimResults?: boolean
   smartTurn?: boolean
   smartTurnTimeout?: boolean
+  recoveryExpiresAt?: boolean
+  terminationReason?: boolean
   status?: boolean
   couplingStatus?: boolean
   version?: boolean
@@ -1881,6 +1969,8 @@ export type DictationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   interimResults?: boolean
   smartTurn?: boolean
   smartTurnTimeout?: boolean
+  recoveryExpiresAt?: boolean
+  terminationReason?: boolean
   status?: boolean
   couplingStatus?: boolean
   version?: boolean
@@ -1917,6 +2007,8 @@ export type DictationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   interimResults?: boolean
   smartTurn?: boolean
   smartTurnTimeout?: boolean
+  recoveryExpiresAt?: boolean
+  terminationReason?: boolean
   status?: boolean
   couplingStatus?: boolean
   version?: boolean
@@ -1953,12 +2045,14 @@ export type DictationSelectScalar = {
   interimResults?: boolean
   smartTurn?: boolean
   smartTurnTimeout?: boolean
+  recoveryExpiresAt?: boolean
+  terminationReason?: boolean
   status?: boolean
   couplingStatus?: boolean
   version?: boolean
 }
 
-export type DictationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "messageOrdinal" | "conversationId" | "userId" | "messageId" | "ordinal" | "createdAt" | "draftId" | "batchId" | "durationMs" | "content" | "updatedAt" | "inputSampleRate" | "externalId" | "encoding" | "language" | "sampleRate" | "keyterms" | "fillerWords" | "diarize" | "vadThreshold" | "endpointing" | "channels" | "multichannel" | "interimResults" | "smartTurn" | "smartTurnTimeout" | "status" | "couplingStatus" | "version", ExtArgs["result"]["dictation"]>
+export type DictationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "messageOrdinal" | "conversationId" | "userId" | "messageId" | "ordinal" | "createdAt" | "draftId" | "batchId" | "durationMs" | "content" | "updatedAt" | "inputSampleRate" | "externalId" | "encoding" | "language" | "sampleRate" | "keyterms" | "fillerWords" | "diarize" | "vadThreshold" | "endpointing" | "channels" | "multichannel" | "interimResults" | "smartTurn" | "smartTurnTimeout" | "recoveryExpiresAt" | "terminationReason" | "status" | "couplingStatus" | "version", ExtArgs["result"]["dictation"]>
 export type DictationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   message?: boolean | Prisma.Dictation$messageArgs<ExtArgs>
@@ -2058,6 +2152,8 @@ export type $DictationPayload<ExtArgs extends runtime.Types.Extensions.InternalA
      * Maximum silence duration in ms before forcing `speech_final`, even when the Smart Turn model predicts the speaker hasn't finished. Acts as a safety net to prevent sessions from hanging during extended silence. Only applies when `smart_turn` is enabled. Range: 1–5000. Example: `smart_turn_timeout=3000`
      */
     smartTurnTimeout: number | null
+    recoveryExpiresAt: Date | null
+    terminationReason: $Enums.DictationTerminationReason
     status: $Enums.DictationStatus
     couplingStatus: $Enums.DictationCouplingStatus
     version: $Enums.DictationVersion
@@ -2514,6 +2610,8 @@ export interface DictationFieldRefs {
   readonly interimResults: Prisma.FieldRef<"Dictation", 'Boolean'>
   readonly smartTurn: Prisma.FieldRef<"Dictation", 'Float'>
   readonly smartTurnTimeout: Prisma.FieldRef<"Dictation", 'Int'>
+  readonly recoveryExpiresAt: Prisma.FieldRef<"Dictation", 'DateTime'>
+  readonly terminationReason: Prisma.FieldRef<"Dictation", 'DictationTerminationReason'>
   readonly status: Prisma.FieldRef<"Dictation", 'DictationStatus'>
   readonly couplingStatus: Prisma.FieldRef<"Dictation", 'DictationCouplingStatus'>
   readonly version: Prisma.FieldRef<"Dictation", 'DictationVersion'>

@@ -192,6 +192,7 @@ export const DictationCouplingStatus = {
   PENDING: 'PENDING',
   DECOUPLED: 'DECOUPLED',
   COUPLED: 'COUPLED',
+  RECOVERABLE: 'RECOVERABLE',
   ORPHANED: 'ORPHANED',
   FAILED: 'FAILED'
 } as const
@@ -202,12 +203,26 @@ export type DictationCouplingStatus = (typeof DictationCouplingStatus)[keyof typ
 export const DictationStatus = {
   QUEUED: 'QUEUED',
   GENERATING: 'GENERATING',
+  INTERRUPTED: 'INTERRUPTED',
   COMPLETED: 'COMPLETED',
   FAILED: 'FAILED',
   CANCELED: 'CANCELED'
 } as const
 
 export type DictationStatus = (typeof DictationStatus)[keyof typeof DictationStatus]
+
+
+export const DictationTerminationReason = {
+  USER_FINISHED: 'USER_FINISHED',
+  IDLE_TIMEOUT: 'IDLE_TIMEOUT',
+  USER_CANCELED: 'USER_CANCELED',
+  CLIENT_DISCONNECTED: 'CLIENT_DISCONNECTED',
+  UPSTREAM_ERROR: 'UPSTREAM_ERROR',
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
+  NONE: 'NONE'
+} as const
+
+export type DictationTerminationReason = (typeof DictationTerminationReason)[keyof typeof DictationTerminationReason]
 
 
 export const DictationVersion = {

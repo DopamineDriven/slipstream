@@ -15,11 +15,8 @@
         "events-workup": [
           "dist/events-workup.d.ts"
         ],
-        "events": [
-          "dist/events.d.ts"
-        ],
-        "local-tools": [
-          "dist/local-tools.d.ts"
+        "contract": [
+          "dist/contract/*.d.ts"
         ],
         "models": [
           "dist/models.d.ts"
@@ -35,6 +32,12 @@
         ],
         "codegen": [
           "dist/codegen/__gen__/*.d.ts"
+        ],
+        "stt": [
+          "dist/stt.d.ts"
+        ],
+        "tts": [
+          "dist/tts.d.ts"
         ]
       }
     }
@@ -52,11 +55,8 @@
       "events-workup": [
         "dist/events-workup.d.ts"
       ],
-      "events": [
-        "dist/events.d.ts"
-      ],
-      "local-tools": [
-        "dist/local-tools.d.ts"
+      "contract": [
+        "dist/contract/*.d.ts"
       ],
       "models": [
         "dist/models.d.ts"
@@ -72,6 +72,12 @@
       ],
       "codegen": [
         "dist/codegen/__gen__/*.d.ts"
+      ],
+      "stt": [
+        "dist/stt.d.ts"
+      ],
+      "tts": [
+        "dist/tts.d.ts"
       ]
     }
   },
@@ -90,12 +96,16 @@
     "./events-audio": "./dist/events-audio.js",
     "./events-images": "./dist/events-images.js",
     "./events-workup": "./dist/events-workup.js",
-    "./events": "./dist/events.js",
-    "./local-tools": "./dist/local-tools.js",
+    "./contract/*": "./dist/contract/*.js",
     "./codegen-types": "./dist/codegen-types.js",
-    "./codegen/*": "./dist/codegen/__gen__/*.js"
+    "./codegen/*": "./dist/codegen/__gen__/*.js",
+    "./stt": "./dist/stt.js",
+    "./tts": "./dist/tts.js"
   },
   "scripts": {
+    "prebuild": "pnpm gen:tsdown",
+    "gen:tsdown": "tsx src/services/automate-tsdown.ts --target gen",
+    "postgen:tsdown": "prettier --write tsdown.config.ts --ignore-unknown --cache",
     "build": "tsdown",
     "dev": "pnpm build",
     "lint": "eslint",

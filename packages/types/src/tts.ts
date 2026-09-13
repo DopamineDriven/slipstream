@@ -1,4 +1,4 @@
-import type { UnionToRecord } from "@slipstream/types";
+import type { UTR } from "@/utils.ts";
 
 export namespace TTSTypes {
   export type Language =
@@ -23,6 +23,17 @@ export namespace TTSTypes {
     | "es-ES"
     | "tr"
     | "vi";
+
+  export type Voice = "eve" | "ara" | "rex" | "sal" | "leo" | "una";
+
+  export type Codec = "wav" | "mp3" | "pcm" | "mulaw" | "alaw";
+
+  export type BitRate = 32000 | 64000 | 96000 | 128000 | 192000;
+
+  export type SampleRate = 8000 | 16000 | 22050 | 24000 | 44100 | 48000;
+
+  export type VoiceDisplayName = Capitalize<Voice>;
+
   export namespace Text {
     export interface Delta {
       type: "text.delta";
@@ -33,7 +44,7 @@ export namespace TTSTypes {
     }
   }
   export type Outbound = Text.Delta | Text.Done;
-  export type OutboundRecord = UnionToRecord<Outbound>;
+  export type OutboundRecord = UTR<Outbound, "type">;
   export namespace Audio {
     export interface Delta {
       type: "audio.delta";
@@ -51,9 +62,9 @@ export namespace TTSTypes {
   }
 
   export type Inbound = Audio.Delta | Audio.Done | Audio.Error;
-  export type InboundRecord = UnionToRecord<Inbound>;
+  export type InboundRecord = UTR<Inbound, "type">;
 
-  export type IORecord = UnionToRecord<Inbound | Outbound>;
+  export type IORecord = UTR<IOUnion, "type">;
   export type IOUnion = Inbound | Outbound;
 
   export type CreateTTSJob = {

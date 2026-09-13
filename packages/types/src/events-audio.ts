@@ -1,3 +1,4 @@
+import type { TTSTypes } from "@/tts.ts";
 import type { AudioGenOutputSingleton, AudioSingleton } from "@/types.ts";
 import type { Rm } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
@@ -10,14 +11,13 @@ export type GeminiCodecTTS = "wav" | "mp3";
  * Grok Types
  */
 
-export type GrokAudioCodecTTS = "wav" | "mp3" | "pcm" | "mulaw" | "alaw";
+export type GrokAudioCodecTTS = TTSTypes.Codec;
 
 export type TTSCodec = GrokAudioCodecTTS | OpenAICodecTTS | GeminiCodecTTS;
 
-export type GrokVoiceTTS = "eve" | "ara" | "rex" | "sal" | "leo" | "una";
+export type GrokVoiceTTS = TTSTypes.Voice;
 
-export type GrokVoiceDisplayNameTTS =
-  "Eve" | "Ara" | "Sal" | "Rex" | "Leo" | "Una";
+export type GrokVoiceDisplayNameTTS = TTSTypes.VoiceDisplayName;
 
 export const grokVoiceIdsTTS = [
   "eve",
@@ -66,34 +66,13 @@ export const grokVoiceDisplayNameToIdTTS = {
   Una: "una"
 } as const;
 
-export type GrokLanguageTTS =
-  | "auto"
-  | "en"
-  | "ar-EG"
-  | "ar-SA"
-  | "ar-AE"
-  | "bn"
-  | "zh"
-  | "fr"
-  | "de"
-  | "hi"
-  | "id"
-  | "it"
-  | "ja"
-  | "ko"
-  | "pt-BR"
-  | "pt-PT"
-  | "ru"
-  | "es-MX"
-  | "es-ES"
-  | "tr"
-  | "vi";
+export type GrokLanguageTTS = TTSTypes.Language;
 
 /**
  * Sample rate in Hz
  */
-export type GrokSampleRateTTS = 8000 | 16000 | 22050 | 24000 | 44100 | 48000;
-export type GrokBitRateTTS = 32000 | 64000 | 96000 | 128000 | 192000;
+export type GrokSampleRateTTS = TTSTypes.SampleRate;
+export type GrokBitRateTTS = TTSTypes.BitRate;
 
 export type GrokOutputFormatTTS = {
   codec: GrokAudioCodecTTS;

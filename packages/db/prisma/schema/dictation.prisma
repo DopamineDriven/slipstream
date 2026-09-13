@@ -5,6 +5,8 @@ enum DictationCouplingStatus {
   DECOUPLED
   /// terminal state; coupled with its message
   COUPLED
+  /// ephemeral recovery available following a user cancel action or disconnection
+  RECOVERABLE
   /// terminal state; permanently decoupled
   ORPHANED
   /// terminal state; xAI error or internal error
@@ -14,11 +16,22 @@ enum DictationCouplingStatus {
 enum DictationStatus {
   QUEUED
   GENERATING
+  INTERRUPTED
   COMPLETED
   /// womp womp.
   FAILED
   /// used for restoration on accidental cancelations
   CANCELED
+}
+
+enum DictationTerminationReason {
+  USER_FINISHED
+  IDLE_TIMEOUT
+  USER_CANCELED
+  CLIENT_DISCONNECTED
+  UPSTREAM_ERROR
+  INTERNAL_ERROR
+  NONE
 }
 
 enum DictationVersion {
@@ -37,55 +50,59 @@ enum DictationEncoding {
 }
 
 model Dictation {
-  id               String                  @id @default(cuid(2))
-  messageOrdinal   Int?
-  conversationId   String?
-  userId           String
-  messageId        String?
-  ordinal          Int
-  createdAt        DateTime                @default(now())
+  id                String            @id @default(cuid(2))
+  messageOrdinal    Int?
+  conversationId    String?
+  userId            String
+  messageId         String?
+  ordinal           Int
+  createdAt         DateTime          @default(now())
   /// has the shape `${userId}~${conversationId}~${batchId}~${ordinal}` -> `${string}~${string}~${string}~${number}`
-  draftId          String                  @unique
-  batchId          String
-  durationMs       Int                     @default(0)
-  content          String
-  updatedAt        DateTime                @updatedAt
+  draftId           String            @unique
+  batchId           String
+  durationMs        Int               @default(0)
+  content           String
+  updatedAt         DateTime          @updatedAt
   /// Browser-reported input-track rate, when exposed
-  inputSampleRate  Int?
+  inputSampleRate   Int?
   /// xAI's returned job id
-  externalId       String?
+  externalId        String?
   /// Audio encoding format (default: PCM)
-  encoding         DictationEncoding       @default(PCM)
+  encoding          DictationEncoding @default(PCM)
   /// When set, enables Inverse Text Normalization — spoken-form numbers, currencies, and units are converted to their written form: `"ar" | "cs" | "da" | "de" | "en" | "es" | "fa" | "fil" | "fr" | "hi" | "id" | "it" | "ja" | "ko" | "mk" | "ms" | "nl" | "pl" | "pt" | "ro" | "ru" | "sv" | "th" | "tr" | "vi"`
-  language         String?
+  language          String?
   /// (default: 16000) Audio sample rate in Hz. Ignored when `encoding=opus` (Opus packets are sample-rate-agnostic): `8000 | 16000 | 22050 | 24000 | 44100 | 48000`
-  sampleRate       Int                     @default(16000)
+  sampleRate        Int               @default(16000)
   /// (repeatable): A key term to bias transcription toward (e.g. product names, proper nouns). keyterms are separated by a `::` delimiter; the absence of a `::` delimiter means only 1 keyterm is present. Max 100 keyterms/request; max 50 chars/keyterm. For example, `Doge::Deuterated::etc`
-  keyterms         String?
+  keyterms          String?
   /// When `true`, filler words (e.g. `uh`, `um`, `er`) are included in the transcript. When `false` (default), filler words are automatically removed from the transcript text and the `words` array.
-  fillerWords      Boolean                 @default(false)
+  fillerWords       Boolean           @default(false)
   /// (default: false) When `true`, enables speaker diarization. Words in `transcript.partial` and `transcript.done` events include a `speaker` field (integer) identifying the detected speaker.
-  diarize          Boolean                 @default(false)
+  diarize           Boolean           @default(false)
   /// (default: 0.08) Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio in chunks scoring below the threshold is treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise; `0` disables the gate entirely. Does not affect endpointing or `speech_final` timing.
-  vadThreshold     Float                   @default(0.08)
+  vadThreshold      Float             @default(0.08)
   /// Silence duration in milliseconds before the server fires a `speech_final=true` event, indicating the speaker stopped talking. Range: 0–5000. Set to `0` for no delay (fire on any VAD silence boundary). Default: 400ms.
-  endpointing      Int                     @default(400)
+  endpointing       Int               @default(400)
   /// Number of interleaved audio channels. Required when `multichannel=true`. Min: 2, Max: 8. Default: 1.
-  channels         Int                     @default(1)
+  channels          Int               @default(1)
   /// When `true`, enables per-channel transcription for interleaved multichannel audio. Requires `channels` to be set to ≥ 2. Not supported with `encoding=opus`.
-  multichannel     Boolean                 @default(false)
+  multichannel      Boolean           @default(false)
   /// When `true`, the server emits partial transcript events (`is_final=false`) approximately every 500 ms while audio is being processed. When `false` (default), only finalized results are sent.
-  interimResults   Boolean                 @default(false)
+  interimResults    Boolean           @default(false)
   /// Enable Smart Turn end-of-turn detection. Set to a confidence threshold between `0.0` and `1.0`.When the model's end-of-turn probability exceeds this threshold at a VAD silence boundary, `speech_final` fires immediately. When confidence is below the threshold, `speech_final` is suppressed and the event is demoted to `chunk_final`. Every `transcript.partial` event includes an `end_of_turn_confidence` field (0.0–1.0) when Smart Turn is enabled. Example: `smart_turn=0.7`.
-  smartTurn        Float?
+  smartTurn         Float?
   /// Maximum silence duration in ms before forcing `speech_final`, even when the Smart Turn model predicts the speaker hasn't finished. Acts as a safety net to prevent sessions from hanging during extended silence. Only applies when `smart_turn` is enabled. Range: 1–5000. Example: `smart_turn_timeout=3000`
-  smartTurnTimeout Int?
-  status           DictationStatus         @default(QUEUED)
-  couplingStatus   DictationCouplingStatus @default(PENDING)
-  version          DictationVersion        @default(v1_0)
-  user             User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  message          Message?                @relation("MessageDictation", fields: [messageId], references: [id], onDelete: Cascade)
-  conversation     Conversation?           @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  smartTurnTimeout  Int?
+  recoveryExpiresAt DateTime?
+
+  terminationReason DictationTerminationReason @default(NONE)
+  status            DictationStatus            @default(QUEUED)
+  couplingStatus    DictationCouplingStatus    @default(PENDING)
+  version           DictationVersion           @default(v1_0)
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message      Message?      @relation("MessageDictation", fields: [messageId], references: [id], onDelete: Cascade)
+  conversation Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@unique([batchId, ordinal])
   @@index([conversationId, createdAt])
@@ -94,6 +111,6 @@ model Dictation {
   @@index([status])
   @@index([batchId, conversationId])
   @@index([userId, createdAt])
-  @@index([messageId])
+  @@index([messageId, ordinal])
   @@index([externalId])
 }

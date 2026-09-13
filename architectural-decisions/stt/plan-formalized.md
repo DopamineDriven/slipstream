@@ -525,3 +525,161 @@ interaction history.
 | `stt/types.ts`: `filter_words` → `filler_words` if any trace remains; `TTSWebSocket` alias → `STTWebSocket` | with M1 |
 | language allowlist → one `as const` array in `@slipstream/types` | with the global-context refactor |
 | M1 relay + client per §11 | Fable |
+
+---
+
+## Addendum A (2026-09-12) — idle close, `RECOVERABLE`, event renames
+
+Supersedes the matching parts of §2, §6.3, §6.4, §6.6, §7, §8.2 and §8.3.
+
+### A.1 Requirement 2, refined
+
+No **silent** cutoff. A recording still never ends on silence alone — but a
+recording with **no utterances for 30 s** (a server-side signal: no finalized
+`transcript.partial` events) gets a prompted close: *"Still there? Dictation
+will close in 15 s."* Any utterance or an explicit "I'm here" resets it. If
+it lapses, the **server** sends `audio.done`, stamps
+`terminationReason: IDLE_TIMEOUT`, and delivers the text so far exactly as
+■ would — text is always returned, never discarded. Server-authoritative
+because the client may be the party that went away. This also bounds
+per-minute billing on a forgotten mic.
+
+### A.2 Schema additions (live in `dictation.prisma`)
+
+- `DictationCouplingStatus` + **`RECOVERABLE`** — ephemeral recovery
+  available after a user cancel or a client disconnect.
+- `DictationStatus` + **`INTERRUPTED`**; `CANCELED` retained for restoration
+  of accidental cancels.
+- **`DictationTerminationReason`** (`USER_FINISHED | IDLE_TIMEOUT |
+  USER_CANCELED | CLIENT_DISCONNECTED | UPSTREAM_ERROR | INTERNAL_ERROR |
+  NONE`) as `terminationReason @default(NONE)` — *how the recording ended*,
+  orthogonal to *what state the row is in*.
+- **`recoveryExpiresAt DateTime?`** — set **only** on entry to
+  `RECOVERABLE` (1 h), null in every other state.
+- `@@index([messageId, ordinal])` replaces `[messageId]`.
+
+Termination → state mapping (keep the enums from drifting):
+
+| `terminationReason` | `status` | `couplingStatus` |
+| --- | --- | --- |
+| `USER_FINISHED`, `IDLE_TIMEOUT` | `COMPLETED` | `DECOUPLED` (text returned to the draft) |
+| `USER_CANCELED` | `CANCELED` | `RECOVERABLE` → `ORPHANED` on expiry |
+| `CLIENT_DISCONNECTED` | `INTERRUPTED` | `RECOVERABLE` → `ORPHANED` on expiry |
+| `UPSTREAM_ERROR`, `INTERNAL_ERROR` — text captured | `INTERRUPTED` | `RECOVERABLE` → `ORPHANED` on expiry (client present: delivered via `stt_user_interrupted`, restored via `stt_user_restore`) |
+| `UPSTREAM_ERROR`, `INTERNAL_ERROR` — nothing captured | `FAILED` | `FAILED` |
+
+### A.3 Expiry boundary (the no-expiry rule, made precise)
+
+Draft state the user **kept** (`DECOUPLED`) never expires. Text the user
+**cancelled or lost to a disconnect** (`RECOVERABLE`) is a one-hour safety
+net. The sweep is `where: { couplingStatus: "RECOVERABLE", recoveryExpiresAt:
+{ lt: now } }` — it cannot touch a `DECOUPLED` row by construction. On expiry
+the row moves to `ORPHANED` as a **tombstone**: `content` cleared to `""`,
+metadata retained. Cancel is therefore no longer a hard delete; it is
+`RECOVERABLE` for an hour, then tombstoned. The client-side undo toast still
+exists for the immediate case and needs no server round-trip.
+
+### A.4 Wire contract — renamed `stt_user_*`, results carry persisted state
+
+Binary audio frames remain **outside** `EventTypeMap`: every `AnyEvent`
+member is a JSON frame with a `type` discriminant, a `Buffer` inside one
+serializes to base64 (forbidden upstream, +33 % bytes, a parse per 100 ms),
+and the frame's discriminant is `ws`'s `isBinary`. `STTTypes.AudioFrame` may
+be re-exported from `@slipstream/types` for visibility but is not an event.
+
+| dir | event | payload |
+| --- | --- | --- |
+| C→S | `stt_user_connect` | `draftId`, `batchId`, `ordinal`, `conversationId?`, `sampleRate`, `inputSampleRate?`, `language?`, `keyterms?: string[]` — server-owned config (`endpointing`, `diarize`, `fillerWords`, `vadThreshold`) stays off the wire unless explicitly a validated, clamped override |
+| C→S | *binary frame* | raw PCM chunk; not an event |
+| C→S | `stt_user_finish` | `draftId` |
+| C→S | `stt_user_cancel` | `draftId` |
+| C→S | `stt_user_resume` | `draftId` — "I'm here"; resets the idle timer |
+| C→S | `stt_user_recover` *(M2)* | `draftIds: string[]` |
+| S→C | `stt_user_connected` | `draftId`, `externalId` |
+| S→C | `stt_user_idle` | `draftId`, `closesAt` (ISO) — opens the countdown dialog |
+| S→C | `stt_user_active` | `draftId` — an utterance arrived; dismiss the dialog |
+| S→C | `stt_user_finished` | `draftId`, `text`, `words`, `duration`, `sampleRate`, `terminationReason`, `couplingStatus` (`DECOUPLED`) |
+| S→C | `stt_user_interrupted` | `draftId`, `text`, `terminationReason`, `couplingStatus` (`RECOVERABLE`), `recoveryExpiresAt` |
+| S→C | `stt_user_canceled` | `draftId`, `couplingStatus` (`RECOVERABLE`), `recoveryExpiresAt` |
+| S→C | `stt_user_recovered` *(M2)* | `results: { draftId, state: "completed" \| "interrupted" \| "missing" \| "owned", text? }[]` |
+| S→C | `stt_user_error` | `draftId`, `status`, `statusText` |
+
+The former `storage: "stored" | "unavailable" | "deleted" | "unconfirmed"`
+fields are gone: the DB row is the truth, results carry the **persisted**
+`couplingStatus` (plus `recoveryExpiresAt` where it applies), and a failed
+content write after `transcript.done` surfaces as `stt_user_error` rather
+than a soft flag.
+
+### A.5 State-machine additions
+
+| trigger | behavior |
+| --- | --- |
+| recording / 30 s without a finalized utterance | `stt_user_idle { closesAt: now + 15 s }`; timer is server-owned |
+| idle / utterance or `stt_user_resume` | reset; `stt_user_active` so the dialog dismisses |
+| idle / `closesAt` reached | server sends `audio.done`; `terminationReason: IDLE_TIMEOUT`; `stt_user_finished` — identical to ■ |
+| any active state / client disconnect | bounded completion attempt; row → `INTERRUPTED` / `RECOVERABLE` / `recoveryExpiresAt = now + 1 h`; `terminationReason: CLIENT_DISCONNECTED` |
+| recording / ✕ confirmed | row → `CANCELED` / `RECOVERABLE` / `recoveryExpiresAt = now + 1 h`; `terminationReason: USER_CANCELED` |
+| sweep / `RECOVERABLE` past `recoveryExpiresAt` | → `ORPHANED`, `content = ""` |
+
+### A.6 Relay topology — four parties, typed on hop 1, raw on hop 2
+
+```
+browser ws client  ⇄(1)⇄  ws-server  ⇄(2)⇄  ws-server's client  ⇄  xAI STT
+```
+
+- **Hop 1 (browser ⇄ ws-server): every frame is a typed `EventTypeMap`
+  event.** Audio travels as `stt_user_binary_frame` (or `stt_user_audio_frame`)
+  `{ draftId, ordinal, frame: string /* base64 */ }`. `Buffer` is not a wire
+  type — it doesn't exist in the browser and stringifies to a number array —
+  so the field is base64 (~+33 %, ~128 KB/s at 48 kHz PCM16; trivial). The
+  frame goes through the ordinary JSON dispatch like any other event.
+- **Hop 2 (ws-server ⇄ xAI): raw binary only.** `Buffer.from(frame,
+  "base64")` forwarded as a binary WebSocket frame, no event wrapper.
+- **Withdrawn:** the `isBinary` gate on the chat socket, the `{ raw, isBinary }`
+  pre-auth inbox tuple, and the objection to typing the frame. The inbox
+  byte/message bound stands on its own merits.
+- **Ordering:** the audio handler forwards **synchronously** — no `await`
+  between dispatch and `xaiWs.send` — so hop-2 order equals hop-1 order.
+  `ordinal` is a gap/duplicate detector (interrupt on a gap), not a reorder
+  buffer.
+- **`sendImmediate`** is a typed sibling of the client's `send` (same
+  `EventTypeMap` signature), never queued, never replayed; used for the audio
+  event and all STT controls. `bufferedAmount` ceilings apply on both hops.
+
+### A.7 Navigation, recovery query, and the end of new-chat special-casing
+
+- **Navigation never implies cancel.** Cancel is an explicit user intent; leaving
+  the page expresses nothing about the text, so the default is always
+  *preserve*. Socket alive (in-app route change) → client sends
+  `stt_user_finish` (implicit ■); the result binds to its originating draft
+  (§9.2), the row lands `DECOUPLED` with the originating `conversationId`
+  (null for new-chat) and waits without expiry. Socket dead (tab close /
+  crash) → the server close handler runs a bounded completion attempt
+  (`audio.done` → `transcript.done`), stores the text, marks `INTERRUPTED /
+  RECOVERABLE / recoveryExpiresAt = +1 h / CLIENT_DISCONNECTED`; `pagehide`
+  may still try `stt_user_finish` as best effort.
+- **Draft hydration.** Returning to a conversation reloads its uncoupled
+  dictations — `{ userId, conversationId (null = new-chat), couplingStatus:
+  "DECOUPLED" }` — exactly as uncoupled attachments return to the composer.
+  The row is the draft persistence.
+- **`stt_user_recover` takes no draftIds** — recovery matters most when local
+  state is gone. Server query: `{ userId, couplingStatus: "RECOVERABLE",
+  recoveryExpiresAt: { gt: now } }`, optional `conversationId` scope
+  (`null` = new-chat). Results carry `draftId`, `batchId`, `ordinal`,
+  `conversationId`, `text`, `terminationReason`, `recoveryExpiresAt`,
+  `createdAt` (numbers as epoch ms). Consumption is `stt_user_restore
+  { draftId }` → `DECOUPLED`, `recoveryExpiresAt → null`; dismissal is
+  simply expiry into the tombstone.
+- **`stt_user_canceled`** is the ack for `stt_user_cancel` and carries no text
+  (it already arrived via `stt_user_finished`): `{ draftId,
+  terminationReason: USER_CANCELED, couplingStatus: RECOVERABLE | ORPHANED,
+  recoveryExpiresAt: number | null }` — `ORPHANED` + `null` when there was
+  nothing to keep (✕ during starting / zero utterances), tombstoned
+  immediately rather than hard-deleted so the ack shape stays uniform.
+- **New-chat is no longer special-cased anywhere.** The aggressive orphan
+  sweep in §6.6 existed only for the `("new-chat", 0)` collision under the
+  ordinal-derived identity; cuid2 `batchId`s make every new-chat row unique,
+  so it is treated exactly like any conversation. §6.6's new-chat predicate is
+  withdrawn.
+- Timing numbers on the wire are **ms** (`closesInMs` relative for the idle
+  probe — skew-proof; `recoveryExpiresAt`/`createdAt` epoch ms).

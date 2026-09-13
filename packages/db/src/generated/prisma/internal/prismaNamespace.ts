@@ -3315,6 +3315,8 @@ export const DictationScalarFieldEnum = {
   interimResults: 'interimResults',
   smartTurn: 'smartTurn',
   smartTurnTimeout: 'smartTurnTimeout',
+  recoveryExpiresAt: 'recoveryExpiresAt',
+  terminationReason: 'terminationReason',
   status: 'status',
   couplingStatus: 'couplingStatus',
   version: 'version'
@@ -4120,6 +4122,20 @@ export type EnumDictationEncodingFieldRefInput<$PrismaModel> = FieldRefInputType
  * Reference to a field of type 'DictationEncoding[]'
  */
 export type ListEnumDictationEncodingFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationEncoding[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DictationTerminationReason'
+ */
+export type EnumDictationTerminationReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationTerminationReason'>
+    
+
+
+/**
+ * Reference to a field of type 'DictationTerminationReason[]'
+ */
+export type ListEnumDictationTerminationReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationTerminationReason[]'>
     
 
 
