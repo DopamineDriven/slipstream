@@ -9,7 +9,7 @@ import type { WebSocket } from "ws";
 import { ResolverCliRecentConvos } from "@/resolver/cli-recent-convos.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { ClientContextWorkupProps, EventTypeMap } from "@slipstream/types";
-
+import type { STTService } from "@/stt/index.ts";
 export class ResolverConnectionService extends ResolverCliRecentConvos {
   constructor(
     wsServer: WSServer,
@@ -20,7 +20,8 @@ export class ResolverConnectionService extends ResolverCliRecentConvos {
     userVectorStore: UserStoreVectorService,
     xaiManagementApikey: string,
     logger: LoggerService,
-    ttsService: TTSService
+    ttsService: TTSService,
+    sttService: STTService
   ) {
     super(
       wsServer,
@@ -31,7 +32,8 @@ export class ResolverConnectionService extends ResolverCliRecentConvos {
       userVectorStore,
       xaiManagementApikey,
       logger,
-      ttsService
+      ttsService,
+      sttService
     );
   }
   protected async postHandleConnectionEstablishedJob(

@@ -447,6 +447,15 @@ async function exe() {
       cfg.X_AI_KEY
     );
 
+    const { STTService } = await import("@/stt/index.ts");
+
+    const sttService = new STTService(
+      redisInstance,
+      logger,
+      prisma,
+      cfg.X_AI_KEY
+    );
+
     const { ImageCompatService } = await import("@/image/index.ts");
 
     const imgCompatService = new ImageCompatService(s3, prisma);
@@ -460,7 +469,8 @@ async function exe() {
       userStore,
       process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY,
       logger,
-      ttsService
+      ttsService,
+      sttService
     );
 
     resolver.registerAll();
@@ -567,11 +577,3 @@ declare module "pythonia" {
     <T = unknown>(fileName: string): Promise<T>;
   }
 }
-enum DEGREES {
-  PhD,
-  MD,
-  MSW
-
-}
-
-Object.keys(DEGREES)

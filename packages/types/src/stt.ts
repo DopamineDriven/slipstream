@@ -1,4 +1,5 @@
 import type { CTR, UTR } from "@/utils.ts";
+import type { WebSocket } from "ws";
 
 export namespace STTTypes {
   /**
@@ -134,6 +135,23 @@ export namespace STTTypes {
      * Does not affect endpointing or `speech_final` timing.
      */
     vad_threshold?: number;
+  }
+
+  export type SessionPhase =
+    "starting" | "recording" | "finishing" | "terminal";
+
+  export interface Session {
+    readonly draftId: string;
+    readonly userId: string;
+    readonly ws: WebSocket; // hop 1 — the aic-client socket
+    xaiClient: WebSocket | null; // hop 2 — null until opened
+    phase: SessionPhase;
+    expectedFrameOrdinal: number;
+    lastUtteranceAt: number;
+    idleTimer: NodeJS.Timeout | null;
+    closeTimer: NodeJS.Timeout | null;
+    finalReceived: boolean;
+    segments: { text: string; start: number; duration: number }[];
   }
 
   /**

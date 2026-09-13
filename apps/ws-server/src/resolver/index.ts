@@ -2,6 +2,7 @@ import type { ImageCompatService } from "@/image/index.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ProviderService } from "@/providers/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { STTService } from "@/stt/index.ts";
 import type { TTSService } from "@/tts/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
 import { ResolverDispatchService } from "@/resolver/dispatch.ts";
@@ -74,7 +75,8 @@ export class Resolver extends ResolverDispatchService {
     userVectorStore: UserStoreVectorService,
     xaiManagementApikey: string,
     logger: LoggerService,
-    ttsService: TTSService
+    ttsService: TTSService,
+    sttService: STTService
   ) {
     super(
       wsServer,
@@ -85,7 +87,8 @@ export class Resolver extends ResolverDispatchService {
       userVectorStore,
       xaiManagementApikey,
       logger,
-      ttsService
+      ttsService,
+      sttService
     );
   }
 }

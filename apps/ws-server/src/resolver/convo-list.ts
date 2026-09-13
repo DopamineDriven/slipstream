@@ -9,7 +9,7 @@ import type { WebSocket } from "ws";
 import { ResolverHydrateConvoService } from "@/resolver/convo-hydration.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap } from "@slipstream/types";
-
+import type { STTService } from "@/stt/index.ts";
 export class ResolverConvoListService extends ResolverHydrateConvoService {
   constructor(
     wsServer: WSServer,
@@ -20,7 +20,8 @@ export class ResolverConvoListService extends ResolverHydrateConvoService {
     userVectorStore: UserStoreVectorService,
     xaiManagementApikey: string,
     logger: LoggerService,
-    ttsService: TTSService
+    ttsService: TTSService,
+    sttService: STTService
   ) {
     super(
       wsServer,
@@ -31,7 +32,8 @@ export class ResolverConvoListService extends ResolverHydrateConvoService {
       userVectorStore,
       xaiManagementApikey,
       logger,
-      ttsService
+      ttsService,
+      sttService
     );
   }
 

@@ -122,7 +122,9 @@
   "dependencies": {
     "@d0paminedriven/fs": "catalog:dd",
     "@slipstream/db": "workspace:*",
-    "dotenv": "catalog:dotenv"
+    "@types/ws": "catalog:ws",
+    "dotenv": "catalog:dotenv",
+    "ws": "catalog:ws"
   },
   "devDependencies": {
     "@slipstream/eslint-config": "workspace:*",

@@ -624,16 +624,16 @@ than a soft flag.
 ### A.6 Relay topology — four parties, typed on hop 1, raw on hop 2
 
 ```
-browser ws client  ⇄(1)⇄  ws-server  ⇄(2)⇄  ws-server's client  ⇄  xAI STT
+aic-client  ⇄(1)⇄  aic-server  ⇄(2)⇄  xai-client  ⇄  xai-server
 ```
 
-- **Hop 1 (browser ⇄ ws-server): every frame is a typed `EventTypeMap`
+- **Hop 1 (aic-client ⇄ aic-server): every frame is a typed `EventTypeMap`
   event.** Audio travels as `stt_user_binary_frame` (or `stt_user_audio_frame`)
   `{ draftId, ordinal, frame: string /* base64 */ }`. `Buffer` is not a wire
   type — it doesn't exist in the browser and stringifies to a number array —
   so the field is base64 (~+33 %, ~128 KB/s at 48 kHz PCM16; trivial). The
   frame goes through the ordinary JSON dispatch like any other event.
-- **Hop 2 (ws-server ⇄ xAI): raw binary only.** `Buffer.from(frame,
+- **Hop 2 (xai-client ⇄ xai-server): raw binary only.** `Buffer.from(frame,
   "base64")` forwarded as a binary WebSocket frame, no event wrapper.
 - **Withdrawn:** the `isBinary` gate on the chat socket, the `{ raw, isBinary }`
   pre-auth inbox tuple, and the objection to typing the frame. The inbox
@@ -683,3 +683,581 @@ browser ws client  ⇄(1)⇄  ws-server  ⇄(2)⇄  ws-server's client  ⇄  xAI
   withdrawn.
 - Timing numbers on the wire are **ms** (`closesInMs` relative for the idle
   probe — skew-proof; `recoveryExpiresAt`/`createdAt` epoch ms).
+
+---
+
+## Addendum B (2026-09-13) — Step-by-step implementation, with diagrams
+
+Everything below is M1 unless marked. Snippets are skeletons in the repo's
+dialect (`satisfies`/`as const`, class methods, constructor injection,
+structured logger) — shapes to build against, not drop-in code.
+
+### B.0 The four nodes
+
+```mermaid
+flowchart LR
+  AC["aic-client<br/>browser · AudioWorklet → Int16LE → base64<br/>(typed stt_user_* events only)"]
+  AS["aic-server<br/>ws-server · STTService · session registry<br/>Postgres row · Redis checkpoints"]
+  XC["xai-client<br/>the ws socket aic-server opens<br/>(STTSession.xaiClient)"]
+  XS["xai-server<br/>wss://api.x.ai/v1/stt"]
+  AC <-- "hop 1: JSON events" --> AS
+  AS --- XC
+  XC <-- "hop 2: raw binary frames + {type:'audio.done'}" --> XS
+```
+
+### B.1 Happy path (■ Stop / ↑ Send)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant AC as aic-client
+  participant AS as aic-server
+  participant DB as Postgres
+  participant R as Redis
+  participant XS as xai-server
+
+  AC->>AS: stt_user_connect {draftId, batchId, ordinal, conversationId, sampleRate, language?}
+  AS->>DB: INSERT Dictation {status: QUEUED, couplingStatus: PENDING, config…}
+  AS->>R: SET stt:own:{userId}:{draftId} NX EX lease
+  AS->>XS: (xaiClient) GET wss://api.x.ai/v1/stt?encoding=pcm&sample_rate=…&interim_results=false
+  XS-->>AS: transcript.created {id}
+  AS->>DB: UPDATE {externalId, status: GENERATING}
+  AS-->>AC: stt_user_connected {draftId, externalId}
+  loop every ~100 ms
+    AC->>AS: stt_user_binary_frame {draftId, frameOrdinal, frame(b64)}
+    AS->>XS: raw PCM bytes (synchronous forward)
+  end
+  loop every ~3 s of speech / utterance boundary
+    XS-->>AS: transcript.partial {is_final: true, …}
+    AS->>R: checkpoint (coalescing writer)
+    Note over AS: resets idle timer
+  end
+  AC->>AC: worklet flush ack
+  AC->>AS: stt_user_finish {draftId}
+  AS->>XS: {type: "audio.done"}
+  XS-->>AS: transcript.done {text, words, duration}
+  AS->>DB: UPDATE {content, durationMs, status: COMPLETED, couplingStatus: DECOUPLED, terminationReason: USER_FINISHED}
+  AS->>R: DEL checkpoints + lease
+  AS-->>AC: stt_user_finished {text, words, duration, sampleRate, terminationReason, couplingStatus}
+  AC->>AC: ■ → append to draft · ↑ → sendChat(draft + text, sttBatchId)
+```
+
+### B.2 Row state machines
+
+```mermaid
+stateDiagram-v2
+  direction LR
+  [*] --> QUEUED: stt_user_connect (row insert)
+  QUEUED --> GENERATING: transcript.created
+  GENERATING --> COMPLETED: transcript.done
+  GENERATING --> INTERRUPTED: upstream close/error with text · client disconnect
+  GENERATING --> CANCELED: ✕ confirmed
+  QUEUED --> FAILED: provider never ready
+  GENERATING --> FAILED: error with no text
+  note right of COMPLETED: status = the recording
+```
+
+```mermaid
+stateDiagram-v2
+  direction LR
+  [*] --> PENDING: row insert
+  PENDING --> DECOUPLED: transcript.done (■ / ↑ / IDLE_TIMEOUT)
+  PENDING --> RECOVERABLE: disconnect · interrupted with text
+  PENDING --> FAILED: nothing captured
+  DECOUPLED --> COUPLED: message persisted (updateMany)
+  DECOUPLED --> RECOVERABLE: ✕ confirmed
+  RECOVERABLE --> DECOUPLED: stt_user_restore
+  RECOVERABLE --> ORPHANED: recoveryExpiresAt lapsed (tombstone, content = "")
+  note right of COUPLED: terminal · messageId set
+  note right of ORPHANED: terminal
+  note right of FAILED: terminal
+  note left of DECOUPLED: never expires
+```
+
+### B.3 Idle probe
+
+```mermaid
+sequenceDiagram
+  participant AC as aic-client
+  participant AS as aic-server
+  participant XS as xai-server
+  Note over AS: 30 s with no finalized partial
+  AS-->>AC: stt_user_timeout {draftId, closesInMs: 15000}
+  AC->>AC: show "Still there?" + countdown from closesInMs
+  alt user clicks "I'm here" OR local voice energy detected
+    AC->>AS: stt_user_present {draftId}
+    AS->>AS: reset timer (dialog dismisses on ack/next utterance)
+  else utterance arrives at server
+    XS-->>AS: transcript.partial {is_final: true}
+    AS->>AS: reset timer
+  else countdown lapses
+    AS->>XS: {type: "audio.done"}
+    XS-->>AS: transcript.done
+    AS-->>AC: stt_user_finished {…, terminationReason: IDLE_TIMEOUT}
+  end
+```
+
+### B.4 ✕ Cancel — two-phase with undo
+
+```mermaid
+sequenceDiagram
+  participant AC as aic-client
+  participant AS as aic-server
+  participant DB as Postgres
+  AC->>AC: ✕ pressed → discardPending = true, show "Discarded · Undo" toast
+  AC->>AS: stt_user_finish {draftId}   (identical to ■)
+  AS-->>AC: stt_user_finished {text…}  (row DECOUPLED)
+  alt Undo within the toast window
+    AC->>AC: insert text into draft. discardPending = false
+  else toast lapses
+    AC->>AS: stt_user_cancel {draftId}
+    AS->>DB: UPDATE {status: CANCELED, couplingStatus: RECOVERABLE, recoveryExpiresAt: +1h, terminationReason: USER_CANCELED}
+    AS-->>AC: stt_user_canceled {couplingStatus: RECOVERABLE, recoveryExpiresAt}
+  end
+```
+
+### B.5 Disconnect → recover → restore (M1 server side, M2 client UI)
+
+```mermaid
+sequenceDiagram
+  participant AC as aic-client
+  participant AS as aic-server
+  participant DB as Postgres
+  participant XS as xai-server
+  AC--xS: socket drops mid-recording
+  AS->>XS: {type: "audio.done"} (bounded completion attempt)
+  XS-->>AS: transcript.done
+  AS->>DB: UPDATE {status: INTERRUPTED, couplingStatus: RECOVERABLE, recoveryExpiresAt: +1h, terminationReason: CLIENT_DISCONNECTED}
+  Note over AC: later — new socket
+  AC->>AS: stt_user_recover {conversationId?}
+  AS->>DB: SELECT where {userId, couplingStatus: RECOVERABLE, recoveryExpiresAt > now}
+  AS-->>AC: stt_user_recovered {results[]}
+  AC->>AS: stt_user_restore {draftId}
+  AS->>DB: UPDATE {couplingStatus: DECOUPLED, recoveryExpiresAt: null}
+  AS-->>AC: stt_user_restored {draftId, couplingStatus: DECOUPLED}
+```
+
+---
+
+### Step 1 — contract wiring (types package) — ✅ done
+
+Fold the union into `AnyEvent` in `contract/index.ts` so `EventTypeMap`
+gains the fifteen `stt_user_*` keys; nothing else in the package changes.
+
+```ts
+// packages/types/src/contract/index.ts
+export type AnyEvent =
+  | AIChatEventUnion
+  | AssetEventUnion
+  | STTEventUnion
+  | TTSEventUnion
+  | …;
+```
+
+Consumers with exhaustive `Record<AnyEvent["type"], …>` maps (the CLI's
+dispatcher) gain no-op entries when they're next touched.
+
+### Step 2 — `STTService` skeleton (ws-server)
+
+Constructed in `exe()`, constructor-injected `(redis, logger, prisma,
+apiKey)`; one live session per client socket; the registry entry is reserved
+**synchronously** before any `await`.
+
+```ts
+// apps/ws-server/src/stt/index.ts
+interface STTSession {
+  readonly draftId: string;
+  readonly userId: string;
+  readonly ws: WebSocket;              // hop 1 — the aic-client socket
+  xaiClient: WebSocket | null;         // hop 2 — null until opened
+  phase: "starting" | "recording" | "finishing" | "terminal";
+  expectedFrameOrdinal: number;
+  lastUtteranceAt: number;
+  idleTimer: NodeJS.Timeout | null;
+  closeTimer: NodeJS.Timeout | null;
+  finalReceived: boolean;
+  segments: { text: string; start: number; duration: number }[];
+}
+
+export class STTService {
+  private readonly sessions = new Map<WebSocket, STTSession>();
+
+  constructor(
+    protected redis: EnhancedRedisPubSub,
+    logger: LoggerService,
+    protected prisma: PrismaService,
+    protected apiKey: string
+  ) { /* pino child as TTS does */ }
+
+  public async connect(ws: WebSocket, userId: string, ev: EventTypeMap["stt_user_connect"]) {
+    if (this.sessions.has(ws)) {
+      ws.send(JSON.stringify({ type: "stt_user_error", draftId: ev.draftId, status: 409, statusText: "session already live" } satisfies EventTypeMap["stt_user_error"]));
+      return;
+    }
+    const [ownerId] = parseDraftId(ev.draftId);
+    if (ownerId !== userId) {
+      ws.send(JSON.stringify({ type: "stt_user_error", draftId: ev.draftId, status: 403, statusText: "draft owner mismatch" } satisfies EventTypeMap["stt_user_error"]));
+      return;
+    }
+
+    const session = { draftId: ev.draftId, userId, ws, xaiClient: null,
+      phase: "starting", expectedFrameOrdinal: 0, lastUtteranceAt: Date.now(),
+      idleTimer: null, closeTimer: null, finalReceived: false,
+      segments: Array.of<{ text: string; start: number; duration: number }>()
+    } satisfies STTSession;
+    this.sessions.set(ws, session);                     // reserved before any await
+
+    await this.prisma.dictationInsert({ ...ev, userId }); // row durable BEFORE the provider
+    const leased = await this.redis.setNx(`stt:own:${userId}:${ev.draftId}`, this.runId, LEASE_S);
+    if (!leased) return this.fail(session, "INTERNAL_ERROR", "draftId already owned");
+
+    this.openXaiClient(session, ev);
+  }
+}
+```
+
+### Step 3 — xai-client socket + exhaustive inbound switch
+
+```ts
+private buildUrl(ev: EventTypeMap["stt_user_connect"]) {
+  const params = new URLSearchParams();
+  params.set("encoding", "pcm");
+  params.set("sample_rate", String(ev.sampleRate));
+  params.set("interim_results", "false");
+  if (typeof ev.language === "string" && this.isValidLanguage(ev.language)) {
+    params.set("language", ev.language);
+  }
+  for (const k of ev.keyterms ?? []) params.append("keyterm", k);
+  return `${this.baseSTTUrl}?${params.toString()}`;
+}
+
+private openXaiClient(session: STTSession, ev: EventTypeMap["stt_user_connect"]) {
+  const xaiClient = new STTWebSocket(this.buildUrl(ev), {
+    headers: { Authorization: `Bearer ${this.apiKey}` }
+  });
+  session.xaiClient = xaiClient;
+
+  xaiClient.on("message", (raw: RawData) => {
+    if (this.sessions.get(session.ws) !== session) return;   // stale callback guard
+    const event = JSON.parse<STTTypes.Inbound>(raw.toString());
+    switch (event.type) {
+      case "transcript.created": {
+        session.phase = "recording";
+        void this.prisma.dictationTransition(session.draftId, { externalId: event.id, status: "GENERATING" });
+        this.armIdleTimer(session);
+        return this.send(session.ws, "stt_user_connected", { draftId: session.draftId, externalId: event.id });
+      }
+      case "transcript.partial": {
+        if (!event.is_final) return;                              // never expected with interims off
+        session.lastUtteranceAt = Date.now();
+        this.armIdleTimer(session);
+        this.checkpoint(session, event);                          // §8.5 reconciliation + coalescing writer
+        return;
+      }
+      case "transcript.done": {
+        session.finalReceived = true;
+        return void this.complete(session, event, "USER_FINISHED");
+      }
+      case "error": {
+        return void this.interrupt(session, "UPSTREAM_ERROR", event.message);
+      }
+    }
+  });
+
+  xaiClient.on("close", () => {
+    if (session.finalReceived || session.phase === "terminal") return;   // normal close after done
+    void this.interrupt(session, "UPSTREAM_ERROR", "xai-server closed before transcript.done");
+  });
+}
+```
+
+### Step 4 — frame relay (synchronous forward, ordinal gap detection)
+
+```ts
+public pushFrame(ws: WebSocket, ev: EventTypeMap["stt_user_binary_frame"]) {
+  const session = this.sessions.get(ws);
+  if (!session || session.draftId !== ev.draftId) return;          // stale tail from a replaced session → drop
+  if (session.phase !== "recording" || !session.xaiClient) return;
+  if (ev.frameOrdinal < session.expectedFrameOrdinal) return;       // duplicate
+  if (ev.frameOrdinal > session.expectedFrameOrdinal) {
+    return void this.interrupt(session, "INTERNAL_ERROR", `frame gap at ${session.expectedFrameOrdinal}`);
+  }
+  session.expectedFrameOrdinal += 1;
+  if (session.xaiClient.bufferedAmount > MAX_XAI_CLIENT_BUFFER) {
+    return void this.interrupt(session, "INTERNAL_ERROR", "xai-client stalled");
+  }
+  session.xaiClient.send(Buffer.from(ev.frame, "base64"), { binary: true }); // no await before this line
+}
+```
+
+### Step 5 — finish / cancel / present / idle
+
+```ts
+public finish(ws: WebSocket, ev: EventTypeMap["stt_user_finish"], reason: "USER_FINISHED" | "IDLE_TIMEOUT" = "USER_FINISHED") {
+  const session = this.sessions.get(ws);
+  if (!session || session.draftId !== ev.draftId) {
+    ws.send(JSON.stringify({ type: "stt_user_error", draftId: ev.draftId, status: 404, statusText: "no live session for draftId" } satisfies EventTypeMap["stt_user_error"]));
+    return;
+  }
+  if (session.phase !== "recording") return;                         // duplicate finish → ignored
+  session.phase = "finishing";                                        // synchronous terminal-ward gate
+  this.clearTimers(session);
+  session.pendingReason = reason;
+  session.xaiClient?.send(JSON.stringify({ type: "audio.done" } satisfies STTTypes.OutboundRecord["audio.done"]));
+  this.armFinishDeadline(session);                                    // operational: transcript.done must arrive
+}
+
+public async cancel(ws: WebSocket, ev: EventTypeMap["stt_user_cancel"]) {
+  const row = await this.prisma.dictationFind(ev.draftId);
+  const keep = row.status === "COMPLETED" && row.content.length > 0;
+  const next = keep
+    ? { status: "CANCELED", couplingStatus: "RECOVERABLE", recoveryExpiresAt: new Date(Date.now() + HOUR_MS) }
+    : { status: "CANCELED", couplingStatus: "ORPHANED", content: "", recoveryExpiresAt: null };
+  await this.prisma.dictationTransition(ev.draftId, { ...next, terminationReason: "USER_CANCELED" });
+  this.send(ws, "stt_user_canceled", {
+    draftId: ev.draftId, terminationReason: "USER_CANCELED",
+    couplingStatus: next.couplingStatus,
+    recoveryExpiresAt: next.recoveryExpiresAt?.getTime() ?? null
+  });
+}
+
+public present(ws: WebSocket, ev: EventTypeMap["stt_user_present"]) {
+  const session = this.sessions.get(ws);
+  if (!session || session.draftId !== ev.draftId) return;
+  session.lastUtteranceAt = Date.now();
+  this.armIdleTimer(session);                                         // clears the close timer too
+}
+
+private armIdleTimer(session: STTSession) {
+  this.clearTimers(session);
+  session.idleTimer = setTimeout(() => {
+    this.send(session.ws, "stt_user_timeout", { draftId: session.draftId, closesInMs: CLOSE_MS });
+    session.closeTimer = setTimeout(
+      () => this.finish(session.ws, { type: "stt_user_finish", draftId: session.draftId }, "IDLE_TIMEOUT"),
+      CLOSE_MS
+    );
+  }, IDLE_MS);
+}
+```
+
+### Step 6 — completion, interruption, socket close
+
+```ts
+private async complete(session: STTSession, done: STTTypes.Transcript.Done, reason: STTTypes.FinishReason) {
+  session.phase = "terminal";
+  this.clearTimers(session);
+  await this.prisma.dictationTransition(session.draftId, {
+    content: done.text, durationMs: Math.round(done.duration * 1000),
+    status: "COMPLETED", couplingStatus: "DECOUPLED", terminationReason: reason
+  });
+  await this.releaseRedis(session);
+  this.send(session.ws, "stt_user_finished", {
+    draftId: session.draftId, text: done.text, words: done.words, duration: done.duration,
+    sampleRate: session.sampleRate, couplingStatus: "DECOUPLED", terminationReason: reason
+  });
+  this.teardown(session);
+}
+
+private async interrupt(session: STTSession, reason: "UPSTREAM_ERROR" | "INTERNAL_ERROR", why: string) {
+  if (session.phase === "terminal") return;
+  session.phase = "terminal";
+  this.clearTimers(session);
+  const { text, words, duration } = this.reconciled(session.segments);   // §8.5
+  const keep = text.length > 0;
+  await this.prisma.dictationTransition(session.draftId, keep
+    ? { content: text, status: "INTERRUPTED", couplingStatus: "RECOVERABLE", recoveryExpiresAt: new Date(Date.now() + HOUR_MS), terminationReason: reason }
+    : { status: "FAILED", couplingStatus: "FAILED", terminationReason: reason });
+  this.logger.warn({ draftId: session.draftId, reason, why }, "stt interrupted");
+  this.send(session.ws, "stt_user_interrupted", { /* per contract */ });
+  this.teardown(session);
+}
+
+/** called from the ws-server close handler alongside localToolBroker.dropSocket */
+public handleSocketClose(ws: WebSocket) {
+  const session = this.sessions.get(ws);
+  if (!session || session.phase === "terminal") return;
+  // bounded completion attempt: aic-client is gone, xai-client is not
+  session.phase = "finishing";
+  session.disconnected = true;                                        // complete() stores as INTERRUPTED/RECOVERABLE, sends nothing
+  session.xaiClient?.send(JSON.stringify({ type: "audio.done" } satisfies STTTypes.OutboundRecord["audio.done"]));
+  this.armFinishDeadline(session);
+}
+```
+
+### Step 7 — Redis: coalescing writer with terminal gate (§8.4)
+
+```ts
+private checkpoint(session: STTSession, ev: STTTypes.Transcript.Partial) {
+  if (session.phase === "terminal") return;                            // gate: terminal rows admit nothing
+  session.segments = this.reconcile(session.segments, ev);
+  session.pendingSnapshot = this.snapshot(session);                    // captured by value; overwrites the slot
+  if (!session.writeInFlight) void this.drain(session);
+}
+
+private async drain(session: STTSession) {
+  while (session.pendingSnapshot) {
+    const snap = session.pendingSnapshot;
+    session.pendingSnapshot = null;
+    session.writeInFlight = true;
+    try {
+      await this.redis.setWithDeadline(`stt:${session.userId}:${session.draftId}`, snap, STORAGE_DEADLINE_MS);
+    } catch (err) {
+      this.logger.warn({ draftId: session.draftId, err: this.prisma.safeErrMsg(err) }, "checkpoint write failed");
+    } finally {
+      session.writeInFlight = false;
+    }
+  }
+}
+```
+
+### Step 8 — dispatch + resolver
+
+`resolver/dispatch.ts` gains the `stt_user_*` cases in its allowlist and
+`resolver/stt.ts` mirrors `resolver/tts.ts` — each handler validates the
+payload's client-supplied fields (`sampleRate` via `isValidSampleRate`,
+`language` via `isValidLanguage`, config overrides clamped) then calls the
+service. The audio frame handler must stay **synchronous** end to end
+(`pushFrame` has no `await`), so hop-2 order equals hop-1 order.
+
+```ts
+// resolver/dispatch.ts (excerpt)
+case "stt_user_connect":      return this.handleSttConnect(event, ws, userId);
+case "stt_user_binary_frame": return this.sttService.pushFrame(ws, event);   // sync
+case "stt_user_finish":       return this.sttService.finish(ws, event);
+case "stt_user_cancel":       return this.sttService.cancel(ws, event);
+case "stt_user_present":      return this.sttService.present(ws, event);
+case "stt_user_recover":      return this.handleSttRecover(event, ws, userId); // M2
+case "stt_user_restore":      return this.handleSttRestore(event, ws, userId); // M2
+```
+
+The drain gate becomes type-aware: `stt_user_*` traffic during shutdown gets
+`stt_user_error`, and `finish`/`cancel` are still honored.
+
+### Step 9 — coupling at the convergence point
+
+After `handleAiChatRequest` returns, in `resolver/chat.ts` — outside the
+16-branch matrix:
+
+```ts
+if (typeof request.sttBatchId === "string") {
+  await this.wsServer.prisma.dictationCouple({
+    where: { batchId: request.sttBatchId, userId, couplingStatus: "DECOUPLED" },
+    data: { messageId: requestMessageId, conversationId, messageOrdinal, couplingStatus: "COUPLED" }
+  });
+}
+```
+
+(`updateMany` under the hood; idempotent on repeat; a missing/expired batch
+never blocks the chat message.)
+
+### Step 10 — client: `sendImmediate`
+
+```ts
+// apps/web/src/utils/chat-ws-client.ts
+public sendImmediate<const T extends keyof EventTypeMap>(event: T, data: EventTypeMap[T]) {
+  if (this.socket?.readyState !== WebSocket.OPEN) return false;      // never queued, never replayed
+  if (this.socket.bufferedAmount > MAX_CLIENT_BUFFER) return false;  // stalled hop 1 → caller interrupts
+  this.socket.send(JSON.stringify({ ...data, type: event } satisfies EventTypeMap[T] & { type: T }));
+  return true;
+}
+```
+
+### Step 11 — client: capture pipeline
+
+```mermaid
+flowchart LR
+  M["getUserMedia<br/>(mono)"] --> C["AudioContext<br/>(default rate → sampleRate)"]
+  C --> W["AudioWorklet<br/>Float32 blocks"]
+  C --> A["AnalyserNode<br/>waveform + voice-energy auto-present"]
+  W -- "postMessage(Float32Array)" --> T["main thread<br/>accumulate → 100 ms → Int16LE → base64"]
+  T --> E["sendImmediate('stt_user_binary_frame', {draftId, frameOrdinal, frame})"]
+```
+
+```ts
+// worklet (registered via audioWorklet.addModule)
+class PcmTapProcessor extends AudioWorkletProcessor {
+  process(inputs: Float32Array[][]) {
+    const ch0 = inputs[0]?.[0];
+    if (ch0) this.port.postMessage(ch0.slice());                     // copy — the buffer is reused
+    return true;
+  }
+}
+registerProcessor("pcm-tap", PcmTapProcessor);
+```
+
+```ts
+// main thread: explicit float → Int16LE, then base64
+function toInt16Le(f32: Float32Array) {
+  const out = new Uint8Array(f32.length * 2);
+  const view = new DataView(out.buffer);
+  for (let i = 0; i < f32.length; i++) {
+    const s = Math.max(-1, Math.min(1, f32[i] ?? 0));
+    view.setInt16(i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true);    // little-endian
+  }
+  return out;
+}
+function toBase64(bytes: Uint8Array) {
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+// accumulate worklet blocks until sampleRate / 10 samples, then:
+client.sendImmediate("stt_user_binary_frame", { draftId, frameOrdinal: seq++, frame: toBase64(toInt16Le(chunk)) });
+```
+
+Flush ack before finish: post `{ cmd: "flush" }` to the worklet, wait for its
+`{ ack: "flushed" }`, drain the accumulator (send the short tail as a final
+frame), *then* `sendImmediate("stt_user_finish", …)`. On cancel the tail is
+discarded.
+
+### Step 12 — client: state + UI
+
+```ts
+type DictationPhase = "idle" | "starting" | "recording" | "finishing" | "timeoutPrompt";
+
+// useDictation() — a context sibling of AudioGenProvider; one active dictation per composer
+const start = () => { draftId = createDraftId(userId, conversationId ?? "new-chat", batchId, ordinal++); /* row born server-side */ };
+const on = {
+  stt_user_connected:   () => setPhase("recording"),                 // ■/↑ enable here; ✕ always enabled
+  stt_user_timeout:     e  => { setPhase("timeoutPrompt"); startCountdown(e.closesInMs); },
+  stt_user_finished:    e  => discardPending ? holdForUndo(e) : intent === "send" ? sendChat(draft + e.text, { sttBatchId: batchId }) : appendToDraft(e.text),
+  stt_user_interrupted: e  => offerRestore(e),                        // partial text → user decides
+  stt_user_canceled:    e  => dropLocalRef(e.draftId),
+  stt_user_error:       e  => surfaceInterrupted(e),
+};
+```
+
+- **Send** computes the final draft value explicitly and passes it to the
+  existing `sendChat` (no closure over stale state); `hasUploads ||
+  hasDictations` decides whether the request carries a batch.
+- **Navigation** while recording → `stt_user_finish` (implicit ■), result
+  bound to the originating draft; on return, hydrate `DECOUPLED` rows for
+  that conversation into the composer.
+- **Timeout dialog** counts down from `closesInMs` locally; "I'm here" *or*
+  `AnalyserNode` voice energy → `stt_user_present`.
+
+### Step 13 — sweep (RECOVERABLE → ORPHANED tombstone)
+
+Interval job in the ws-server composition root; never touches `DECOUPLED`:
+
+```ts
+await prisma.dictation.updateMany({
+  where: { couplingStatus: "RECOVERABLE", recoveryExpiresAt: { lt: new Date() } },
+  data:  { couplingStatus: "ORPHANED", content: "", recoveryExpiresAt: null }
+});
+```
+
+### Step 14 — acceptance (M1)
+
+- [ ] long silence then speech; idle probe → present resets; lapse → `IDLE_TIMEOUT` finish with text
+- [ ] ✕ before ready → `ORPHANED`/null; ✕ after text → toast → undo inserts; lapse → `RECOVERABLE`
+- [ ] duplicate finish ignored; mismatched `draftId` → `stt_user_error`, session untouched
+- [ ] frame gap → interrupted; duplicate frame → dropped; stale-session frame → dropped
+- [ ] last short chunk preserved (flush ack)
+- [ ] provider closes after `transcript.done` with storage pending → no false interrupted
+- [ ] provider `error` → `INTERRUPTED/RECOVERABLE` with text, `FAILED/FAILED` without
+- [ ] socket drop mid-recording → server completes → `RECOVERABLE`; `recover`/`restore` round-trip
+- [ ] Redis reconnect mid-session → checkpoint write times out, lifecycle proceeds
+- [ ] shutdown with pending writes → type-aware drain
+- [ ] two dictations in one batch couple to one message; sweep tombstones expired `RECOVERABLE` only
+- [ ] **live event trace** confirms the §8.5 overlap rule

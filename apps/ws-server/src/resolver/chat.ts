@@ -18,7 +18,7 @@ import type {
   MessageSingleton,
   Provider
 } from "@slipstream/types";
-
+import type { STTService } from "@/stt/index.ts";
 export class ResolverChatService extends ResolverTTSService {
   public userStoreDocStatus = new Map<string, boolean>();
   constructor(
@@ -30,7 +30,8 @@ export class ResolverChatService extends ResolverTTSService {
     userVectorStore: UserStoreVectorService,
     xaiManagementApikey: string,
     logger: LoggerService,
-    ttsService: TTSService
+    ttsService: TTSService,
+    sttService: STTService
   ) {
     super(
       wsServer,
@@ -41,7 +42,8 @@ export class ResolverChatService extends ResolverTTSService {
       userVectorStore,
       xaiManagementApikey,
       logger,
-      ttsService
+      ttsService,
+      sttService
     );
   }
 

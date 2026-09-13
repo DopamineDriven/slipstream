@@ -1,3 +1,5 @@
+import type { Socket } from "net";
+
 /**
  * api-handling types for codegen
  */
@@ -564,5 +566,11 @@ declare global {
           ? `${K}`
           : never
       : never)[];
+  }
+}
+
+declare module "ws" {
+  interface WebSocket {
+    _socket: Socket;
   }
 }

@@ -2,6 +2,7 @@ import type { ImageCompatService } from "@/image/index.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ProviderService } from "@/providers/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { STTService } from "@/stt/index.ts";
 import type { TTSService } from "@/tts/index.ts";
 import type { BufferLike, UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
@@ -24,7 +25,8 @@ export class ResolverDispatchService extends ResolverConnectionService {
     userVectorStore: UserStoreVectorService,
     xaiManagementApikey: string,
     logger: LoggerService,
-    ttsService: TTSService
+    ttsService: TTSService,
+    sttService: STTService
   ) {
     super(
       wsServer,
@@ -35,7 +37,8 @@ export class ResolverDispatchService extends ResolverConnectionService {
       userVectorStore,
       xaiManagementApikey,
       logger,
-      ttsService
+      ttsService,
+      sttService
     );
   }
   /** Dispatches incoming events to handlers */
@@ -69,29 +72,23 @@ export class ResolverDispatchService extends ResolverConnectionService {
     userData?: UserData
   ) {
     switch (event.type) {
-      case "typing":
-        await this.handleTyping(event, ws, userId);
-        break;
-      case "ping":
-        await this.handlePing(event, ws, userId);
-        break;
       case "ai_chat_request":
         await this.handleAIChat(event, ws, userId, userData);
         break;
-      case "asset_paste":
-        await this.handleAssetPaste(event, ws, userId, userData);
+      case "asset_attached":
+        await this.handleAssetAttached(event, ws, userId, userData);
         break;
       case "asset_fetch_request":
         await this.handleAssetFetchRequest(event, ws, userId, userData);
+        break;
+      case "asset_paste":
+        await this.handleAssetPaste(event, ws, userId, userData);
         break;
       case "asset_upload_complete":
         await this.handleAssetUploadComplete(event, ws, userId, userData);
         break;
       case "asset_upload_progress":
         await this.handleAssetProgress(event, ws, userId, userData);
-        break;
-      case "asset_attached":
-        await this.handleAssetAttached(event, ws, userId, userData);
         break;
       case "cli_config_hydrate":
         await this.cliConfigHydrate(event, ws, userId, userData);
@@ -102,23 +99,50 @@ export class ResolverDispatchService extends ResolverConnectionService {
       case "cli_recent_convos":
         await this.cliRecentConvos(event, ws, userId, userData);
         break;
+      case "conversation_list":
+        await this.conversationList(event, ws, userId, userData);
+        break;
+      case "hydrate_conversation":
+        await this.hydrateConversationAck(event, ws, userId, userData);
+        break;
+      case "local_tool_result":
+        await this.localToolResult(event, ws, userId, userData);
+        break;
+      case "ping":
+        await this.handlePing(event, ws, userId);
+        break;
       case "provider_context_ping":
         await this.handleProviderContextPing(event, ws, userId, userData);
         break;
       case "provider_context_update":
         await this.handleProviderContextUpdate(event, ws, userId, userData);
         break;
+      case "stt_user_binary_frame":
+        await this.sttUserBinaryFrame(event, ws, userId, userData);
+        break;
+      case "stt_user_cancel":
+        await this.sttUserCancel(event, ws, userId, userData);
+        break;
+      case "stt_user_connect":
+        await this.sttUserConnect(event, ws, userId, userData);
+        break;
+      case "stt_user_finish":
+        await this.sttUserFinish(event, ws, userId, userData);
+        break;
+      case "stt_user_present":
+        await this.sttUserPresent(event, ws, userId, userData);
+        break;
+      case "stt_user_recover":
+        await this.sttUserRecover(event, ws, userId, userData);
+        break;
+      case "stt_user_restore":
+        await this.sttUserRestore(event, ws, userId, userData);
+        break;
+      case "typing":
+        await this.handleTyping(event, ws, userId);
+        break;
       case "user_tts_request":
         await this.handleUserTTSRequest(event, ws, userId, userData);
-        break;
-      case "hydrate_conversation":
-        await this.hydrateConversationAck(event, ws, userId, userData);
-        break;
-      case "conversation_list":
-        await this.conversationList(event, ws, userId, userData);
-        break;
-      case "local_tool_result":
-        await this.localToolResult(event, ws, userId, userData);
         break;
       default:
         await this.wsServer.redis.publish(
@@ -175,6 +199,21 @@ export class ResolverDispatchService extends ResolverConnectionService {
     "provider_context_pong",
     "provider_context_update",
     "provider_context_update_ack",
+    "stt_user_binary_frame",
+    "stt_user_cancel",
+    "stt_user_canceled",
+    "stt_user_connect",
+    "stt_user_connected",
+    "stt_user_error",
+    "stt_user_finish",
+    "stt_user_finished",
+    "stt_user_interrupted",
+    "stt_user_present",
+    "stt_user_recover",
+    "stt_user_recovered",
+    "stt_user_restore",
+    "stt_user_restored",
+    "stt_user_timeout",
     "typing",
     "user_tts_chunk",
     "user_tts_error",
@@ -311,5 +350,15 @@ export class ResolverDispatchService extends ResolverConnectionService {
     );
     this.wsServer.on("conversation_list", this.conversationList.bind(this));
     this.wsServer.on("local_tool_result", this.localToolResult.bind(this));
+    this.wsServer.on(
+      "stt_user_binary_frame",
+      this.sttUserBinaryFrame.bind(this)
+    );
+    this.wsServer.on("stt_user_cancel", this.sttUserCancel.bind(this));
+    this.wsServer.on("stt_user_connect", this.sttUserConnect.bind(this));
+    this.wsServer.on("stt_user_finish", this.sttUserFinish.bind(this));
+    this.wsServer.on("stt_user_present", this.sttUserPresent.bind(this));
+    this.wsServer.on("stt_user_recover", this.sttUserRecover.bind(this));
+    this.wsServer.on("stt_user_restore", this.sttUserRestore.bind(this));
   }
 }
