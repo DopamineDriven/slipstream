@@ -56,6 +56,34 @@ export class ResolverSTTService extends ResolverChatUtilsService {
     );
   }
 
+  protected coupleDictations({
+    conversationId,
+    messageOrdinal,
+    userId,
+    messageId,
+    sttBatchId
+  }: {
+    userId: string;
+    conversationId: string;
+    messageOrdinal: number;
+    messageId?: string;
+    sttBatchId?: string;
+  }) {
+    if (typeof sttBatchId === "string" && typeof messageId === "string") {
+      void this.wsServer.prisma
+        .dictationCouple(sttBatchId, userId, {
+          conversationId,
+          messageId,
+          messageOrdinal
+        })
+        .then(() => this.sttService.forgetBatch(userId, sttBatchId))
+        .catch(err => {
+          console.warn(
+            `dictation coupling failed: ` + this.wsServer.prisma.safeErrMsg(err)
+          );
+        });
+    }
+  }
   /**
    * the one ownership check — client-minted draftId vs the socket's session
    * userId; frame/finish/present are bound to the live session on `ws`
@@ -120,19 +148,25 @@ export class ResolverSTTService extends ResolverChatUtilsService {
     }
 
     // explicit field pick — unknown client keys never reach the row
-    const sanitized: EventTypeMap["stt_user_connect"] = {
+    const sanitized = {
       type: event.type,
+      diarize: event.diarize ?? false,
+      endpointing: event.endpointing,
+      fillerWords: event.fillerWords,
+      inputSampleRate: event.inputSampleRate,
+      keyterms: event.keyterms,
+      language:
+        event.language && this.sttService.isValidLanguage(event.language)
+          ? event.language
+          : undefined,
+      vadThreshold: event.vadThreshold,
       draftId: event.draftId,
       batchId: event.batchId,
       ordinal: event.ordinal,
       conversationId: event.conversationId,
       sampleRate: event.sampleRate
     } satisfies EventTypeMap["stt_user_connect"];
-    if (
-      typeof event.inputSampleRate === "number" &&
-      Number.isFinite(event.inputSampleRate) &&
-      event.inputSampleRate > 0
-    ) {
+    if (typeof event.inputSampleRate === "number" && event.inputSampleRate) {
       sanitized.inputSampleRate = Math.round(event.inputSampleRate);
     }
     if (

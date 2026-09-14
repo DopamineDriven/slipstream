@@ -57,6 +57,7 @@ export type AIChatRequest = {
   isDefaultProvider?: boolean;
   metadata?: UserMetadata;
   batchId?: string;
+  sttBatchId?: string;
   // TODO
   // enableVideoGen?: boolean
   imgGenEnabled?: boolean;

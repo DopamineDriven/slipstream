@@ -2,6 +2,7 @@ import type { ImageCompatService } from "@/image/index.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ProviderService } from "@/providers/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { STTService } from "@/stt/index.ts";
 import type { TTSService } from "@/tts/index.ts";
 import type {
   HandleAiChatRequestRT,
@@ -18,7 +19,7 @@ import type {
   MessageSingleton,
   Provider
 } from "@slipstream/types";
-import type { STTService } from "@/stt/index.ts";
+
 export class ResolverChatService extends ResolverTTSService {
   public userStoreDocStatus = new Map<string, boolean>();
   constructor(
@@ -69,7 +70,8 @@ export class ResolverChatService extends ResolverTTSService {
       batchId = event.batchId,
       isImgGenEnabled = event.imgGenEnabled,
       isAudioGenEnabled = event.audioGenEnabled,
-      imgGenFields = event.imgGenFields;
+      imgGenFields = event.imgGenFields,
+      sttBatchId = event.sttBatchId;
 
     // Quick server-side guardrail: limit free-tier (fallback key) usage
     // Trust client-provided hasProviderConfigured to avoid extra lookups.
@@ -166,12 +168,21 @@ export class ResolverChatService extends ResolverTTSService {
       conversationId = res.id,
       apiKey = res.apiKey ?? undefined,
       jobId = res.jobId,
+      messageOrdinal = res.messages.length - 1,
       requestMessageId = res.requestMessageId,
       keyId = res.userKeyId,
       streamChannel = this.redisChannels.conversationStream(conversationId),
       userChannel = this.redisChannels.user(userId),
       existingState = await this.wsServer.redis.getStreamState(conversationId),
       createdAt = res.createdAt;
+
+    void this.coupleDictations({
+      conversationId,
+      messageOrdinal,
+      userId,
+      messageId: requestMessageId,
+      sttBatchId
+    });
 
     void this.handleAIChatRequestIndexing(msgs, requestMessageId);
 

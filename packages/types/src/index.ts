@@ -500,7 +500,13 @@ export type {
   XOR
 } from "@/utils.ts";
 
-export { createDraftId, instanceFunc, parseDraftId } from "@/utils.ts";
+export {
+  asciiToSymbol,
+  createDraftId,
+  instanceFunc,
+  parseDraftId,
+  symbolToAscii
+} from "@/utils.ts";
 
 export type { STTTypes } from "@/stt.ts";
 

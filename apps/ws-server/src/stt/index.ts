@@ -954,6 +954,16 @@ export class STTService {
     return this.evictSettled(userId)?.get(draftId) ?? null;
   }
 
+  /** after `dictationCouple` lands: coupled rows must not linger as DECOUPLED in memory */
+  public forgetBatch(userId: string, batchId: string) {
+    const drafts = this.settledByUser.get(userId);
+    if (!drafts) return;
+    for (const [draftId, entry] of drafts) {
+      if (entry.batchId === batchId) drafts.delete(draftId);
+    }
+    if (drafts.size === 0) this.settledByUser.delete(userId);
+  }
+
   private recoverableEntries(userId: string, conversationId?: string | null) {
     const out = Array.of<
       STTTypes.Session.SettledDraft & {

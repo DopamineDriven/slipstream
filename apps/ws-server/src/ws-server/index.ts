@@ -4,6 +4,7 @@ import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { PdfService } from "@/pdf/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
+import type { STTService } from "@/stt/index.ts";
 import type { TTSService } from "@/tts/index.ts";
 import type {
   BufferLike,
@@ -62,6 +63,8 @@ export class WSServer {
    * registrations; the gate prevents the inputs in the first place.
    */
   private isDraining = false;
+
+  private sttService?: STTService;
 
   constructor(
     private opts: WSServerOptions,
@@ -128,6 +131,10 @@ export class WSServer {
     this.ttsService = ttsService;
   }
 
+  public setSTTService(sttService: STTService) {
+    this.sttService = sttService;
+  }
+
   /**
    * Best-effort socket send. Mirrors `TTSService.trySend`. Used by the
    * shutdown admission gate to inform clients that new requests are being
@@ -154,8 +161,33 @@ export class WSServer {
       return false;
     }
   }
-
-  public async start(): Promise<void> {
+  private peekEvent(raw: RawData) {
+    let text: string;
+    if (typeof raw === "string") text = raw;
+    else if (Array.isArray(raw)) text = Buffer.concat(raw).toString();
+    else if (raw instanceof ArrayBuffer) text = Buffer.from(raw).toString();
+    else text = raw.toString();
+    try {
+      const parsed = JSON.parse<unknown>(text);
+      if (
+        typeof parsed !== "object" ||
+        parsed === null ||
+        !("type" in parsed)
+      ) {
+        return null;
+      }
+      const { type } = parsed;
+      if (typeof type !== "string") return null;
+      const draftId =
+        "draftId" in parsed && typeof parsed.draftId === "string"
+          ? parsed.draftId
+          : undefined;
+      return { type, draftId };
+    } catch {
+      return null;
+    }
+  }
+  public async start() {
     await this.redis.connect();
     // now we listen on our HTTP server (which also speaks WS)
     this.httpServer.listen(this.opts.port, () => {
@@ -277,10 +309,7 @@ export class WSServer {
     return providerContext;
   }
 
-  private async handleConnection(
-    ws: WebSocket,
-    req: IncomingMessage
-  ): Promise<void> {
+  private async handleConnection(ws: WebSocket, req: IncomingMessage) {
     const cookies = req.headers.cookie;
     const cookieObj = this.parsedCookies(cookies);
 
@@ -376,14 +405,27 @@ export class WSServer {
       // re-snapshot loop alone is insufficient — it only catches *late*
       // registrations, not new arrivals from already-connected clients.
       if (this.isDraining) {
-        this.trySend(ws, "user_tts_error", {
-          type: "user_tts_error",
-          status: 503,
-          statusText: "Server is draining, please retry shortly",
-          conversationId: "",
-          messageId: ""
-        } satisfies EventTypeMap["user_tts_error"]);
-        return;
+        const peek = this.peekEvent(raw);
+        if (peek?.type === "stt_user_cancel") {
+          // settles existing work rather than creating it — admitted through to the resolver
+        } else if (peek?.type.startsWith("stt_user_")) {
+          this.trySend(ws, "stt_user_error", {
+            type: "stt_user_error",
+            draftId: peek.draftId ?? "",
+            status: 503,
+            statusText: "Server is draining, please retry shortly"
+          } satisfies EventTypeMap["stt_user_error"]);
+          return;
+        } else {
+          this.trySend(ws, "user_tts_error", {
+            type: "user_tts_error",
+            status: 503,
+            statusText: "Server is draining, please retry shortly",
+            conversationId: "",
+            messageId: ""
+          } satisfies EventTypeMap["user_tts_error"]);
+          return;
+        }
       }
       if (this.resolver) {
         const uid = this.userMap.get(ws) ?? "";
@@ -417,6 +459,7 @@ export class WSServer {
       // synthesize CLIENT_DISCONNECTED for any tool call parked on this
       // socket — a vanished CLI must never wedge a provider loop
       this.localToolBroker.dropSocket(ws);
+      this.sttService?.handleSocketClose(ws);
       this.userMap.delete(ws);
       // userDataMap is keyed per-USER while sockets are per-CLIENT — with
       // web + CLI connected as the same user, the first close used to evict
@@ -563,7 +606,7 @@ export class WSServer {
   public on<const T extends keyof EventTypeMap>(
     event: T,
     handler: MessageHandler<T>
-  ): void {
+  ) {
     this.handlers[event] = handler as HandlerMap[T];
   }
 
@@ -573,7 +616,7 @@ export class WSServer {
   }
 
   // Safely stringify events, handling BigInt values gracefully
-  private safeStringify(data: unknown): string {
+  private safeStringify(data: unknown) {
     const replacer = (_key: string, value: unknown) => {
       if (typeof value === "bigint") {
         const asNumber = Number(value);
@@ -585,7 +628,7 @@ export class WSServer {
   }
 
   /** Broadcast a raw JSON message string to all connected clients */
-  public broadcastRaw(msg: BufferLike): void {
+  public broadcastRaw(msg: BufferLike) {
     for (const client of this.wss.clients) {
       if (client.readyState === WebSocket.OPEN) {
         client.send(msg, err => this.broadcastRawErrorCb(err));
@@ -597,7 +640,7 @@ export class WSServer {
   public broadcast<T extends keyof EventTypeMap>(
     event: T,
     data: EventTypeMap[T]
-  ): void {
+  ) {
     const msg = this.safeStringify({ ...data, type: event });
     this.broadcastRaw(msg);
   }
@@ -624,8 +667,17 @@ export class WSServer {
     this.logger.info("Shutdown initiated, entering drain mode");
     this.isDraining = true;
     await this.teardownPubSub();
-    if (this.ttsService) {
+    if (!this.sttService && this.ttsService) {
       await this.ttsService.awaitAllInflight();
+    } else if (this.sttService && this.ttsService) {
+      await Promise.all([
+        this.ttsService.awaitAllInflight(),
+        this.sttService.stop()
+      ]);
+    } else if (this.sttService && !this.ttsService) {
+      await this.sttService.stop();
+    } else {
+      // continue;
     }
     await this.redis.quit();
     this.wss.close();

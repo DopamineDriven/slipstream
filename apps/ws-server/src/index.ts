@@ -478,6 +478,22 @@ async function exe() {
 
     wsServer.setResolver(resolver);
     wsServer.setTTSService(ttsService);
+    wsServer.setSTTService(sttService);
+
+    const sweepDictations = () => {
+      void prisma
+        .dictationSweep()
+        .then(count => {
+          if (count > 0)
+            log.info({ count }, "dictation sweep tombstoned expired rows");
+        })
+        .catch((err: unknown) => {
+          log.warn("dictation sweep failed: ".concat(prisma.safeErrMsg(err)));
+        });
+    };
+    sweepDictations();
+
+    const dictationSweepHandle = setInterval(sweepDictations, 5 * 60_000);
 
     const redisPingHandle = setInterval(async () => {
       try {
@@ -485,7 +501,7 @@ async function exe() {
       } catch (err) {
         log.error(
           "Redis health check failed: ".concat(
-            err instanceof Error ? err.message : ""
+            err instanceof Error ? err.message : prisma.safeErrMsg(err)
           )
         );
       }
@@ -505,6 +521,7 @@ async function exe() {
 
       try {
         clearInterval(redisPingHandle);
+        clearInterval(dictationSweepHandle);
         await wsServer.stop();
         log.info("Cleanup complete, exiting gracefully");
         process.exitCode = 0;
