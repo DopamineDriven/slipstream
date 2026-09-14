@@ -54,28 +54,31 @@ export type STTUserRecover = {
    */
   conversationId?: string | null;
 };
+
+export type STTUserRecoveredResultSingleton = {
+  draftId: string;
+  batchId: string;
+  ordinal: number;
+  conversationId: string | null;
+  text: string;
+  terminationReason: Exclude<
+    $Enums.DictationTerminationReason,
+    "USER_FINISHED" | "IDLE_TIMEOUT" | "NONE"
+  >;
+  reconciled: boolean;
+  /**
+   * epoch ms
+   */
+  recoveryExpiresAt: number;
+  createdAt: number;
+};
+
 /**
  * S→C
  */
 export type STTUserRecovered = {
   type: "stt_user_recovered";
-  results: {
-    draftId: string;
-    batchId: string;
-    ordinal: number;
-    conversationId: string | null;
-    text: string;
-    terminationReason:  Exclude<
-      $Enums.DictationTerminationReason,
-      "USER_FINISHED" | "IDLE_TIMEOUT" | "NONE"
-    >;
-    reconciled: boolean;
-    /**
-     * epoch ms
-     */
-    recoveryExpiresAt: number;
-    createdAt: number;
-  }[];
+  results: STTUserRecoveredResultSingleton[];
 };
 
 /**
@@ -210,4 +213,5 @@ export type STTEventUnion =
   | STTUserRestored
   | STTUserTimeout;
 
-export type STTEventRecord = UTR<STTEventUnion, "type">;
+export type STTEventRecord<T extends boolean = false> = UTR<STTEventUnion, "type", T>;
+

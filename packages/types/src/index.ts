@@ -268,6 +268,7 @@ export type {
   STTUserPresent,
   STTUserRecover,
   STTUserRecovered,
+  STTUserRecoveredResultSingleton,
   STTUserRestore,
   STTUserRestored,
   STTUserTimeout,

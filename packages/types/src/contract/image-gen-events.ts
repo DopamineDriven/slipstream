@@ -246,4 +246,8 @@ export type ImageGenProgress = {
 export type ImageGenEventUnion =
   ImageGenError | ImageGenProgress | ImageGenRequest | ImageGenResponse;
 
-export type ImageGenEventRecord = UTR<ImageGenEventUnion, "type">;
+export type ImageGenEventRecord<T extends boolean = false> = UTR<
+  ImageGenEventUnion,
+  "type",
+  T
+>;

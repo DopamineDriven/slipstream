@@ -354,4 +354,8 @@ export type AssetEventUnion =
   | AssetUploadRequest
   | AssetUploadResponse;
 
-export type AssetEventRecord = UTR<AssetEventUnion, "type">;
+export type AssetEventRecord<T extends boolean = false> = UTR<
+  AssetEventUnion,
+  "type",
+  T
+>;

@@ -2,12 +2,7 @@ import type { ExtractService } from "@/extract/index.ts";
 import { PrismaTTSService } from "@/prisma/tts.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { Rm, STTEventRecord, STTTypes } from "@slipstream/types";
-
-export type STTSansTypes<X extends keyof STTEventRecord> = Rm<
-  STTEventRecord[X],
-  "type"
->;
+import type { STTEventRecord, STTTypes } from "@slipstream/types";
 
 export type DictationCoupleParams = {
   messageId: string;
@@ -46,7 +41,7 @@ export class PrismaSTTService extends PrismaTTSService {
   public async dictationInsert({
     keyterms,
     ...rest
-  }: STTSansTypes<"stt_user_connect">) {
+  }: STTEventRecord<true>["stt_user_connect"]) {
     const { userId } = this.draftIdEpimerize(rest.draftId);
     return await this.prismaClient.dictation.create({
       data: {

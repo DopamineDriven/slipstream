@@ -42,7 +42,7 @@ export class STTService {
    */
   private readonly settledByUser = new Map<
     string,
-    Map<string, STTTypes.SettledDraft>
+    Map<string, STTTypes.Session.SettledDraft>
   >();
   private readonly runId = randomUUID();
   private isDraining = false;
@@ -178,7 +178,7 @@ export class STTService {
       deadlineTimer: null,
       finalReceived: false,
       reconciled: true,
-      segments: Array.of<STTTypes.Segment>(),
+      segments: Array.of<STTTypes.Session.Segment>(),
       storage: "ok",
       pendingSnapshot: null,
       writeInFlight: false
@@ -235,7 +235,7 @@ export class STTService {
    */
   public pushFrame(ws: WebSocket, ev: EventTypeMap["stt_user_binary_frame"]) {
     const session = this.sessions.get(ws);
-    if (!session || session.draftId !== ev.draftId) return; // stale tail from a replaced session
+    if (session?.draftId !== ev.draftId) return; // stale tail from a replaced session
     if (session.phase !== "recording" || !session.xaiClient) return; // before created / after finish
     if (ev.frameOrdinal < session.expectedFrameOrdinal) return; // duplicate
     if (ev.frameOrdinal > session.expectedFrameOrdinal) {
@@ -261,7 +261,7 @@ export class STTService {
     reason: FinishReason = "USER_FINISHED"
   ) {
     const session = this.sessions.get(ws);
-    if (!session || session.draftId !== ev.draftId) {
+    if (session?.draftId !== ev.draftId) {
       this.sendError(ws, ev.draftId, 404, "no live session for draftId");
       return;
     }
@@ -287,11 +287,7 @@ export class STTService {
     ev: EventTypeMap["stt_user_cancel"]
   ) {
     const session = this.sessions.get(ws);
-    if (
-      session &&
-      session.draftId === ev.draftId &&
-      session.phase !== "terminal"
-    ) {
+    if (session?.draftId === ev.draftId && session.phase !== "terminal") {
       if (session.phase === "starting" && session.xaiClient === null) {
         session.phase = "terminal"; // connect() continuation settles the row + sends canceled
         return;
@@ -370,7 +366,7 @@ export class STTService {
   /** `stt_user_present` — "I'm here" button or local voice energy */
   public present(ws: WebSocket, ev: EventTypeMap["stt_user_present"]) {
     const session = this.sessions.get(ws);
-    if (!session || session.draftId !== ev.draftId) {
+    if (session?.draftId !== ev.draftId) {
       this.sendError(ws, ev.draftId, 404, "no live session for draftId");
       return;
     }
@@ -433,7 +429,7 @@ export class STTService {
         recoveryExpiresAt: row.recoveryExpiresAt.getTime(),
         createdAt: row.createdAt.getTime(),
         settledAt: Date.now()
-      } satisfies STTTypes.SettledDraft;
+      } satisfies STTTypes.Session.SettledDraft;
       this.settledFor(userId).set(row.draftId, entry);
       results.push({
         draftId: entry.draftId,
@@ -650,7 +646,7 @@ export class STTService {
 
   private sendAudioDone(session: STTTypes.Session) {
     const xaiClient = session.xaiClient;
-    if (!xaiClient || xaiClient.readyState !== STTWebSocket.OPEN) return;
+    if (xaiClient?.readyState !== STTWebSocket.OPEN) return;
     xaiClient.send(
       JSON.stringify({
         type: "audio.done"
@@ -928,7 +924,7 @@ export class STTService {
   private settledFor(userId: string) {
     let drafts = this.settledByUser.get(userId);
     if (!drafts) {
-      drafts = new Map<string, STTTypes.SettledDraft>();
+      drafts = new Map<string, STTTypes.Session.SettledDraft>();
       this.settledByUser.set(userId, drafts);
     }
     return drafts;
@@ -960,7 +956,7 @@ export class STTService {
 
   private recoverableEntries(userId: string, conversationId?: string | null) {
     const out = Array.of<
-      STTTypes.SettledDraft & {
+      STTTypes.Session.SettledDraft & {
         terminationReason: RecoverableReason;
         recoveryExpiresAt: number;
       }
@@ -1021,7 +1017,7 @@ export class STTService {
    * text → RECOVERABLE (trailing row write); already RECOVERABLE → idempotent
    * re-ack; empty → ORPHANED (trailing row write, entry dropped)
    */
-  private cancelSettled(userId: string, entry: STTTypes.SettledDraft) {
+  private cancelSettled(userId: string, entry: STTTypes.Session.SettledDraft) {
     if (entry.couplingStatus === "RECOVERABLE") {
       return {
         couplingStatus: "RECOVERABLE",
@@ -1086,7 +1082,7 @@ export class STTService {
     const cents = (seconds: number) => Math.round(seconds * 100);
     const nextStart = cents(ev.start);
     const nextEnd = cents(ev.start + ev.duration);
-    const kept = Array.of<STTTypes.Segment>();
+    const kept = Array.of<STTTypes.Session.Segment>();
     for (const seg of session.segments) {
       const segStart = cents(seg.start);
       const segEnd = cents(seg.start + seg.duration);
@@ -1111,7 +1107,7 @@ export class STTService {
     session.segments = kept;
   }
 
-  private reconciledText(segments: STTTypes.Segment[]) {
+  private reconciledText(segments: STTTypes.Session.Segment[]) {
     const last = segments.at(-1);
     return {
       text: segments.map(s => s.text).join(" "),
@@ -1132,7 +1128,7 @@ export class STTService {
 
   private snapshot(
     session: STTTypes.Session,
-    state: STTTypes.CheckpointState,
+    state: STTTypes.Session.CheckpointState,
     text: string,
     duration: number
   ) {
@@ -1149,7 +1145,7 @@ export class STTService {
       settings: { encoding: "pcm", sampleRate: session.sampleRate },
       duration,
       updatedAt: Date.now()
-    } satisfies STTTypes.Checkpoint;
+    } satisfies STTTypes.Session.Checkpoint;
   }
 
   /** one pending slot, one write in flight; superseded snapshots coalesce */
@@ -1182,7 +1178,7 @@ export class STTService {
   /** the terminal snapshot goes through the same writer after the slot clears */
   private async terminalWrite(
     session: STTTypes.Session,
-    snap: STTTypes.Checkpoint
+    snap: STTTypes.Session.Checkpoint
   ) {
     session.pendingSnapshot = snap;
     if (!session.writeInFlight) {
@@ -1348,7 +1344,7 @@ export class STTService {
    * never throws
    */
   public awaitAllInflight(
-    timeoutMs = Number(process.env.INFLIGHT_DRAIN_TIMEOUT_MS) || 90_000
+    timeoutMs = Number(process.env.INFLIGHT_DRAIN_TIMEOUT_MS ?? 90_000)
   ) {
     if (this.inflightPromises.size === 0) return Promise.resolve();
 

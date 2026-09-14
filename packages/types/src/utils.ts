@@ -78,9 +78,11 @@ export type IsExact<T, U> = [T] extends [U]
 export type UTR<
   TUnion extends Record<TKey, string>,
   TKey extends string = "kind",
-  TDiscriminant extends string = TUnion[TKey]
+  TExclude extends `strip-${TKey}` | boolean = false
 > = {
-  [K in TDiscriminant]: Extract<TUnion, Record<TKey, K>>;
+  [K in TUnion[TKey]]: TExclude extends false
+    ? Extract<TUnion, Record<TKey, K>>
+    : Rm<Extract<TUnion, Record<TKey, K>>, TKey>;
 };
 
 /**

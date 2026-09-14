@@ -168,8 +168,11 @@ export type ChatWsEvent = AnyEvent;
  */
 export type ChatWsEventTypeUnion = ChatWsEvent["type"];
 
-export type EventTypeMap = UTR<AnyEvent, "type">;
+export type EventTypeMap<T extends boolean = false> = UTR<AnyEvent, "type", T>;
 
-export type EventMap<T extends keyof EventTypeMap> = {
-  [P in T]: EventTypeMap[P];
+export type EventMap<
+  T extends keyof EventTypeMap,
+  V extends boolean = false
+> = {
+  [P in T]: EventTypeMap<V>[P];
 }[T];

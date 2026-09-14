@@ -138,54 +138,55 @@ export namespace STTTypes {
     vad_threshold?: number;
   }
 
-  export type SessionPhase =
-    "starting" | "recording" | "finishing" | "terminal";
+  export namespace Session {
+    export type SessionPhase =
+      "starting" | "recording" | "finishing" | "terminal";
 
-  export type Segment = {
-    text: string;
-    start: number;
-    duration: number;
-    words: Transcript.Words[];
-  };
+    export type Segment = {
+      text: string;
+      start: number;
+      duration: number;
+      words: Transcript.Words[];
+    };
 
-  export type CheckpointState = "active" | "completed" | "interrupted";
-
-  export interface Checkpoint {
-    v: 1;
-    draftId: string;
-    externalId: string | null;
-    ownerRunId: string;
-    leaseUntil: number;
-    state: CheckpointState;
-    text: string;
-    segments: Segment[];
-    reconciled: boolean;
-    settings: {
+    export type CheckpointState = "active" | "completed" | "interrupted";
+    export interface CheckpointSettings {
       encoding: Encoding;
       sampleRate: SampleRate;
       language?: Language;
+    }
+    export interface Checkpoint {
+      v: 1;
+      draftId: string;
+      externalId: string | null;
+      ownerRunId: string;
+      leaseUntil: number;
+      state: CheckpointState;
+      text: string;
+      segments: Segment[];
+      reconciled: boolean;
+      settings: CheckpointSettings;
+      duration?: number;
+      updatedAt: number;
+    }
+
+    export type SettledDraft = {
+      draftId: string;
+      batchId: string;
+      ordinal: number;
+      conversationId: string | null;
+      text: string;
+      terminationReason: $Enums.DictationTerminationReason;
+      couplingStatus: Extract<
+        $Enums.DictationCouplingStatus,
+        "DECOUPLED" | "RECOVERABLE"
+      >;
+      reconciled: boolean;
+      recoveryExpiresAt: number | null;
+      createdAt: number;
+      settledAt: number;
     };
-    duration?: number;
-    updatedAt: number;
   }
-
-  export type SettledDraft = {
-    draftId: string;
-    batchId: string;
-    ordinal: number;
-    conversationId: string | null;
-    text: string;
-    terminationReason: $Enums.DictationTerminationReason;
-    couplingStatus: Extract<
-      $Enums.DictationCouplingStatus,
-      "DECOUPLED" | "RECOVERABLE"
-    >;
-    reconciled: boolean;
-    recoveryExpiresAt: number | null;
-    createdAt: number;
-    settledAt: number;
-  };
-
   export interface Session {
     readonly draftId: string;
     readonly userId: string;
@@ -197,7 +198,7 @@ export namespace STTTypes {
     readonly sampleRate: SampleRate;
     xaiClient: WebSocket | null; // hop 2 — null until opened
     externalId: string | null;
-    phase: SessionPhase;
+    phase: Session.SessionPhase;
     pendingReason: "USER_FINISHED" | "IDLE_TIMEOUT";
     disconnected: boolean;
     expectedFrameOrdinal: number;
@@ -207,9 +208,9 @@ export namespace STTTypes {
     deadlineTimer: NodeJS.Timeout | null;
     finalReceived: boolean;
     reconciled: boolean;
-    segments: Segment[];
+    segments: Session.Segment[];
     storage: "ok" | "unavailable";
-    pendingSnapshot: Checkpoint | null;
+    pendingSnapshot: Session.Checkpoint | null;
     writeInFlight: boolean;
   }
 

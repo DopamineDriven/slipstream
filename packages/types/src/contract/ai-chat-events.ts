@@ -111,4 +111,8 @@ export type AIChatError = DX<
 export type AIChatEventUnion =
   AIChatChunk | AIChatError | AIChatInlineData | AIChatRequest | AIChatResponse;
 
-export type AIChatEventRecord = UTR<AIChatEventUnion, "type">;
+export type AIChatEventRecord<T extends boolean = false> = UTR<
+  AIChatEventUnion,
+  "type",
+  T
+>;

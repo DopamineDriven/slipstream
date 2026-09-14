@@ -31,4 +31,8 @@ export type ProviderContextEventUnion =
   | ProviderContextUpdate
   | ProviderContextUpdateAck;
 
-export type ProviderContextEventRecord = UTR<ProviderContextEventUnion, "type">;
+export type ProviderContextEventRecord<T extends boolean = false> = UTR<
+  ProviderContextEventUnion,
+  "type",
+  T
+>;

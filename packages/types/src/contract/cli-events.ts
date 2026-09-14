@@ -51,4 +51,8 @@ export type CliEventUnion =
   | CliRecentConvos
   | CliRecentConvosAck;
 
-export type CliEventRecord = UTR<CliEventUnion, "type">;
+export type CliEventRecord<T extends boolean = false> = UTR<
+  CliEventUnion,
+  "type",
+  T
+>;
