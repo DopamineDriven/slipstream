@@ -409,4 +409,45 @@ export namespace STTTypes {
   export type IO = Outbound | Inbound;
 
   export type IORecord = UTR<IO, "type">;
+
+  export namespace Web {
+    export type LanguageSelection = Language | undefined;
+    export type Alpha2Subset =
+      | "CZ"
+      | "DE"
+      | "DK"
+      | "FR"
+      | "ID"
+      | "IN"
+      | "IR"
+      | "IT"
+      | "JP"
+      | "KR"
+      | "MK"
+      | "MX"
+      | "MY"
+      | "NL"
+      | "PH"
+      | "PL"
+      | "PT"
+      | "RO"
+      | "RU"
+      | "SA"
+      | "SE"
+      | "TH"
+      | "TR"
+      | "US"
+      | "VN"
+      | (string & {});
+    export interface LanguageOption {
+      name: string;
+      nativeName: string;
+      countryCode: string;
+      language: Language;
+      flag: string;
+      flagAspectRatio: string;
+      alpha2: Alpha2Subset;
+      aspectClassName?: string;
+    }
+  }
 }

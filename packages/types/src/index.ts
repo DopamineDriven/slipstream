@@ -34,7 +34,7 @@ export type {
   GrokTTSReqShape,
   OpenAICodecTTS,
   TTSCodec
-} from "@/events-audio.ts";
+} from "@/contract/audio.ts";
 
 export {
   grokVoiceDisplayNameToIdTTS,
@@ -42,7 +42,7 @@ export {
   grokVoiceIdToDisplayNameTTS,
   grokVoiceIdsTTS,
   grokVoices
-} from "@/events-audio.ts";
+} from "@/contract/audio.ts";
 
 export type {
   AIChatRequestImgGenFields,
@@ -97,9 +97,9 @@ export type {
   S3Checksum,
   S3StorageClass,
   SharedOpenAIImageOpts
-} from "@/events-images.ts";
+} from "@/contract/images.ts";
 
-export { GPT_IMAGE_2_EXTENDED_OPTIONS } from "@/events-images.ts";
+export { GPT_IMAGE_2_EXTENDED_OPTIONS } from "@/contract/images.ts";
 
 export type {
   AIChatEventTypeUnion,
@@ -135,7 +135,7 @@ export type {
   UserMetadata,
   UserRxnAction,
   WithExpiry
-} from "@/events-workup.ts";
+} from "@/contract/workup.ts";
 
 /**
  * shared websocket (client-server) events

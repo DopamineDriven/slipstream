@@ -1,4 +1,4 @@
-import type { ClientContextWorkupProps } from "@/events-workup.ts";
+import type { ClientContextWorkupProps } from "@/contract/workup.ts";
 import type { UTR } from "@/utils.ts";
 
 export type ConnectionEstablished = {

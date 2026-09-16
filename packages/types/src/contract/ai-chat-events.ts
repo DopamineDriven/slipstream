@@ -1,10 +1,10 @@
-import type { LocalToolCapabilities } from "@/contract/local-tool-events.ts";
-import type { AIChatResponseAudioGenFields } from "@/events-audio.ts";
+import type { AIChatResponseAudioGenFields } from "@/contract/audio.ts";
 import type {
   AIChatRequestImgGenFields,
   AIChatResponseImgGenFieldsFinal
-} from "@/events-images.ts";
-import type { AIChatEventTypeUnion, UserMetadata } from "@/events-workup.ts";
+} from "@/contract/images.ts";
+import type { LocalToolCapabilities } from "@/contract/local-tool-events.ts";
+import type { AIChatEventTypeUnion, UserMetadata } from "@/contract/workup.ts";
 import type { AllModelsUnion, Provider } from "@/models.ts";
 import type { ConversationSingleton } from "@/types.ts";
 import type { CTR, DX, Rm, UTR } from "@/utils.ts";

@@ -9,12 +9,6 @@
         "*": [
           "dist/index.d.ts"
         ],
-        "events-images": [
-          "dist/events-images.d.ts"
-        ],
-        "events-workup": [
-          "dist/events-workup.d.ts"
-        ],
         "contract": [
           "dist/contract/*.d.ts"
         ],
@@ -48,12 +42,6 @@
     "*": {
       "*": [
         "dist/index.d.ts"
-      ],
-      "events-images": [
-        "dist/events-images.d.ts"
-      ],
-      "events-workup": [
-        "dist/events-workup.d.ts"
       ],
       "contract": [
         "dist/contract/*.d.ts"
@@ -93,9 +81,6 @@
     "./utils": "./dist/utils.js",
     "./types": "./dist/types.js",
     "./models": "./dist/models.js",
-    "./events-audio": "./dist/events-audio.js",
-    "./events-images": "./dist/events-images.js",
-    "./events-workup": "./dist/events-workup.js",
     "./contract/*": "./dist/contract/*.js",
     "./codegen-types": "./dist/codegen-types.js",
     "./codegen/*": "./dist/codegen/__gen__/*.js",

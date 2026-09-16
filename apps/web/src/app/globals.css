@@ -198,7 +198,6 @@
   --text-sxs--line-height: calc(0.875 / 0.625);
   --text-xxs: 0.5rem;
   --text-xxs--line-height: calc(0.75 / 0.5);
-
   --animate-shimmer: shimmer 3s cubic-bezier(0.4, 0.7, 0.6, 1) infinite;
   @keyframes shimmer {
     0% {
@@ -448,10 +447,16 @@ body::-webkit-scrollbar-thumb {
 
 :root {
   --radius: 0.5rem;
+  --drawer-width: 460px;
 }
 
 @utility bob-multiplier-* {
   --bob-multiplier: --value(integer);
+}
+
+@utility drawer-width-* {
+  --drawer-width: calc(--value(integer) * 1px);
+  --drawer-width: --value([length]);
 }
 
 @utility scale-* {

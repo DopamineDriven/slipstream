@@ -8,6 +8,20 @@ export default {
     serverActions: { bodySizeLimit: `50mb` },
     authInterrupts: true
   },
+  async headers() {
+    return [
+      {
+        source: "/flags/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable"
+          }
+        ]
+      }
+    ];
+  },
+  supportsImmutableAssets: true,
   typescript: { ignoreBuildErrors: false, tsconfigPath: "./tsconfig.json" },
   images: {
     localPatterns: [
@@ -19,6 +33,7 @@ export default {
       { pathname: "/misc/**" },
       { pathname: "/providers/**" },
       { pathname: "/svgs/**" },
+      { pathname: "/flags/**" },
       { pathname: "/*" }
     ],
     qualities: [75, 80, 85, 90, 95, 100],

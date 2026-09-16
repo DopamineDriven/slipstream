@@ -1,4 +1,4 @@
-import type { UserRxnAction } from "@/events-workup.ts";
+import type { UserRxnAction } from "@/contract/workup.ts";
 
 export type UserRxnUpdate = {
   type: "user_rxn_update";

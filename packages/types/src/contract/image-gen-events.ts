@@ -1,5 +1,5 @@
-import type { ImgGenStage } from "@/events-images.ts";
-import type { UserMetadata } from "@/events-workup.ts";
+import type { UserMetadata } from "@/contract/workup.ts";
+import type { ImgGenStage } from "@/contract/images.ts";
 import type {
   AllImgGenFacilitatingModelsUnion,
   AllImgGenModelsUnion,

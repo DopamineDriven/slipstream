@@ -7,7 +7,7 @@ import type {
   MetadataUnion,
   S3ObjectId,
   WithExpiry
-} from "@/events-workup.ts";
+} from "@/contract/workup.ts";
 import type { DX, UTR } from "@/utils.ts";
 
 /**

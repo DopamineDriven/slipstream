@@ -110,3 +110,11 @@ export function languageHelperSTT(t: string) {
   if (!base || !/^[a-z]{2,3}$/.test(base)) return;
   return base === "tl" ? "fil" : base;
 }
+
+export function normalizeLanguageSearch(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLocaleLowerCase()
+    .trim();
+}
