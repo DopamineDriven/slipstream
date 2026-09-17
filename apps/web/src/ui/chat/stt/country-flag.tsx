@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { STTTypes } from "@slipstream/types";
 
@@ -39,7 +38,7 @@ export function CountryFlag({
   const height = (width / w) * h;
 
   return (
-    <Image
+    <img
       src={language.flag}
       alt={""}
       aria-hidden="true"
