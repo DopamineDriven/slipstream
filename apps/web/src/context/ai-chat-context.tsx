@@ -1,21 +1,5 @@
 "use client";
 
-/**
- * `AIChatProvider` — the thin, store-fed façade. It owns NO chat state: the per-conversation `ChatStore`
- * (resolved from `chatStoreRegistry`) is the single source of truth, fed React-free by the registry's WS
- * listener. The façade's whole job is the React seam:
- *   - resolve the active store CLIENT-ONLY (the registry's module-global Map must never be mutated server-side),
- *   - bind the registry's fan-out listener to the live client (`bindClient`),
- *   - own the React-bound half of the new-chat → real-id router deception (`setRekeyHandler`: re-point the active
- *     id on `decoupled`, the MANDATORY `router.replace` on `recoupled`),
- *   - derive the live draft ONCE and assemble the legacy `AIChatContextValue` so existing consumers
- *     (`dynamic`, `sidebar`) keep their `useAIChatContext()` ergonomics unchanged.
- *
- * Everything the old conductor did with ~20 `useState` + ~14 ref mirrors + a ~300-line WS handler now lives in
- * `ChatStore`. `currentStreamingMessage` is now the real synthetic `streaming-<id>` `MessageSingleton<true>`
- * (single-derived here, consumed by `dynamic`); the active `store` is exposed so `dynamic` reads the committed
- * timeline via `useChatCommitted(store)`.
- */
 import type { SendChatPayload } from "@/hooks/use-send-chat";
 import type { ReactNode } from "react";
 import {
@@ -254,3 +238,20 @@ export function useAIChatContext() {
   }
   return context;
 }
+
+/**
+ * `AIChatProvider` — the thin, store-fed façade. It owns NO chat state: the per-conversation `ChatStore`
+ * (resolved from `chatStoreRegistry`) is the single source of truth, fed React-free by the registry's WS
+ * listener. The façade's whole job is the React seam:
+ *   - resolve the active store CLIENT-ONLY (the registry's module-global Map must never be mutated server-side),
+ *   - bind the registry's fan-out listener to the live client (`bindClient`),
+ *   - own the React-bound half of the new-chat → real-id router deception (`setRekeyHandler`: re-point the active
+ *     id on `decoupled`, the MANDATORY `router.replace` on `recoupled`),
+ *   - derive the live draft ONCE and assemble the legacy `AIChatContextValue` so existing consumers
+ *     (`dynamic`, `sidebar`) keep their `useAIChatContext()` ergonomics unchanged.
+ *
+ * Everything the old conductor did with ~20 `useState` + ~14 ref mirrors + a ~300-line WS handler now lives in
+ * `ChatStore`. `currentStreamingMessage` is now the real synthetic `streaming-<id>` `MessageSingleton<true>`
+ * (single-derived here, consumed by `dynamic`); the active `store` is exposed so `dynamic` reads the committed
+ * timeline via `useChatCommitted(store)`.
+ */

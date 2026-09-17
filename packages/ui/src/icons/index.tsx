@@ -219,8 +219,6 @@ export type BaseSVGProps = Omit<
   | "viewBox"
   | "xmlns"
   | "fill"
-  | "stroke"
-  | "strokeWidth"
   | "strokeLinecap"
   | "strokeLinejoin"
 >;

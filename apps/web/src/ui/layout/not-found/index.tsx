@@ -1,5 +1,5 @@
 import { ScrollVelocityLinkedOffset } from "@/ui/atoms/scroll-velocity";
 
-export function TestPage() {
+export function NotFound() {
   return <ScrollVelocityLinkedOffset />;
 }

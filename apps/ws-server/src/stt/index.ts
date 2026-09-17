@@ -251,7 +251,18 @@ export class STTService {
       void this.interrupt(session, "INTERNAL_ERROR", "xai-client stalled");
       return;
     }
-    session.xaiClient.send(Buffer.from(ev.frame, "base64"), { binary: true });
+    const pcm = Buffer.from(ev.frame, "base64");
+    if (ev.frameOrdinal === 0 || ev.frameOrdinal % 50 === 0) {
+      this.logger.debug(
+        {
+          draftId: session.draftId,
+          frameOrdinal: ev.frameOrdinal,
+          bytes: pcm.byteLength
+        },
+        "frame → xai-client"
+      );
+    }
+    session.xaiClient.send(pcm, { binary: true });
   }
 
   /** `stt_user_finish` (■ / ↑) and the idle-close path (`IDLE_TIMEOUT`) */
@@ -274,6 +285,14 @@ export class STTService {
     this.clearTimers(session);
     session.pendingReason = reason;
     this.sendAudioDone(session);
+    this.logger.info(
+      {
+        draftId: session.draftId,
+        reason,
+        frames: session.expectedFrameOrdinal
+      },
+      "audio.done sent"
+    );
     this.armFinishDeadline(session);
   }
 
@@ -584,11 +603,19 @@ export class STTService {
         );
         return;
       }
+      this.logger.debug(
+        { draftId: session.draftId, type: event.type },
+        "xai-server frame"
+      );
       switch (event.type) {
         case "transcript.created": {
           this.clearDeadline(session);
           session.phase = "recording";
           session.externalId = event.id;
+          this.logger.info(
+            { draftId: session.draftId, externalId: event.id },
+            "xai-server ready → stt_user_connected"
+          );
           void this.prisma
             .dictationGenerating(session.draftId, event.id)
             .catch((err: unknown) =>
@@ -607,6 +634,10 @@ export class STTService {
         }
         case "transcript.partial": {
           if (!event.is_final) return; // never expected with interims off
+          this.logger.debug(
+            { draftId: session.draftId, event },
+            "transcript.partial (final) — verbose probe"
+          );
           session.lastUtteranceAt = Date.now();
           if (session.phase === "recording") this.armIdleTimer(session);
           this.checkpoint(session, event);
@@ -614,6 +645,19 @@ export class STTService {
         }
         case "transcript.done": {
           session.finalReceived = true;
+          this.logger.debug(
+            { draftId: session.draftId, event },
+            "transcript.done — verbose probe"
+          );
+          this.logger.info(
+            {
+              draftId: session.draftId,
+              chars: event.text.length,
+              duration: event.duration,
+              reason: session.pendingReason
+            },
+            "transcript.done"
+          );
           void this.complete(session, event, session.pendingReason);
           return;
         }
@@ -646,7 +690,13 @@ export class STTService {
 
   private sendAudioDone(session: STTTypes.Session) {
     const xaiClient = session.xaiClient;
-    if (xaiClient?.readyState !== STTWebSocket.OPEN) return;
+    if (xaiClient?.readyState !== STTWebSocket.OPEN) {
+      this.logger.warn(
+        { draftId: session.draftId, readyState: xaiClient?.readyState },
+        "audio.done skipped — xai-client not open; finish deadline will settle the row"
+      );
+      return;
+    }
     xaiClient.send(
       JSON.stringify({
         type: "audio.done"
@@ -796,11 +846,12 @@ export class STTService {
     session.phase = "terminal";
     this.clearTimers(session);
     const durationMs = Math.round(done.duration * 1000);
+    const { text, words } = this.finalTranscript(session, done);
 
     // completed checkpoint lands before the row and before stt_user_finished
     await this.terminalWrite(
       session,
-      this.snapshot(session, "completed", done.text, done.duration)
+      this.snapshot(session, "completed", text, done.duration)
     );
 
     try {
@@ -808,13 +859,17 @@ export class STTService {
         // aic-client gone: stored for `stt_user_recover`, nothing to send
         const outcome = await this.prisma.dictationInterrupt(
           session.draftId,
-          { text: done.text, durationMs },
+          { text, durationMs },
           "CLIENT_DISCONNECTED"
         );
-        this.settle(session, done.text, "CLIENT_DISCONNECTED", true, outcome);
+        this.settle(session, text, "CLIENT_DISCONNECTED", true, outcome);
       } else {
-        await this.prisma.dictationComplete(session.draftId, done, reason);
-        this.settle(session, done.text, reason, true, {
+        await this.prisma.dictationComplete(
+          session.draftId,
+          { ...done, text, words },
+          reason
+        );
+        this.settle(session, text, reason, true, {
           couplingStatus: "DECOUPLED",
           recoveryExpiresAt: null
         });
@@ -834,11 +889,22 @@ export class STTService {
       return;
     }
     await this.releaseRedis(session);
+    this.logger.info(
+      {
+        draftId: session.draftId,
+        chars: text.length,
+        tailChars: done.text.length,
+        words: words.length,
+        tailWords: done.words.length,
+        reason
+      },
+      "stt_user_finished → aic-client"
+    );
     this.trySend(session.ws, {
       type: "stt_user_finished",
       draftId: session.draftId,
-      words: done.words,
-      text: done.text,
+      words,
+      text,
       duration: done.duration,
       sampleRate: session.sampleRate,
       couplingStatus: "DECOUPLED",
@@ -1115,6 +1181,35 @@ export class STTService {
     });
     kept.sort((a, b) => a.start - b.start);
     session.segments = kept;
+  }
+
+  /**
+   * `transcript.done.text` is the tail flushed by `audio.done`, not the
+   * cumulative transcript (probe 2026-09-16: the utterance-final partial
+   * carried 41 chars, done carried 0). The reconciled segments ARE the
+   * transcript; `done` contributes only what they don't already hold.
+   * Absent word confidence is documented as 0, so it is filled in as 0.
+   */
+  private finalTranscript(
+    session: STTTypes.Session,
+    done: STTTypes.Transcript.Done
+  ) {
+    const reconciled = this.reconciledText(session.segments);
+    const words = reconciled.words.map(word => ({
+      ...word,
+      confidence: word.confidence ?? 0
+    }));
+    const tail = done.text.trim();
+    if (tail.length === 0) return { text: reconciled.text, words };
+    // cumulative done (or a single utterance): done is the whole
+    if (tail.startsWith(reconciled.text))
+      return { text: tail, words: done.words };
+    // the tail's own utterance-final already landed
+    if (reconciled.text.endsWith(tail)) return { text: reconciled.text, words };
+    return {
+      text: `${reconciled.text} ${tail}`.trim(),
+      words: [...words, ...done.words]
+    };
   }
 
   private reconciledText(segments: STTTypes.Session.Segment[]) {

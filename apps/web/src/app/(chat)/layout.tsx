@@ -9,6 +9,7 @@ import { ConversationHydrationProvider } from "@/context/convo-hydration-context
 import { ImageGenProvider } from "@/context/image-gen-context";
 import { ModelSelectionProvider } from "@/context/model-selection-context";
 import { SettingsDrawerProvider } from "@/context/settings-drawer-context";
+import { STTProvider } from "@/context/stt-context";
 import { TTSProvider } from "@/context/tts-context";
 import { getSession } from "@/utils/auth";
 
@@ -25,17 +26,19 @@ export default async function AuthedLayout({
         <ApiKeysProvider>
           <SettingsDrawerProvider>
             <AssetProvider userId={session.user.id}>
-              <AudioGenProvider>
-                <ImageGenProvider>
-                  <TTSProvider>
-                    <ConversationHydrationProvider userId={session.user.id}>
-                      <AIChatProvider userId={session.user.id}>
-                        {children}
-                      </AIChatProvider>
-                    </ConversationHydrationProvider>
-                  </TTSProvider>
-                </ImageGenProvider>
-              </AudioGenProvider>
+              <STTProvider userId={session.user.id}>
+                <AudioGenProvider>
+                  <ImageGenProvider>
+                    <TTSProvider>
+                      <ConversationHydrationProvider userId={session.user.id}>
+                        <AIChatProvider userId={session.user.id}>
+                          {children}
+                        </AIChatProvider>
+                      </ConversationHydrationProvider>
+                    </TTSProvider>
+                  </ImageGenProvider>
+                </AudioGenProvider>
+              </STTProvider>
             </AssetProvider>
           </SettingsDrawerProvider>
         </ApiKeysProvider>

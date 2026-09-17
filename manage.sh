@@ -138,6 +138,7 @@ build_targeted() {
         "@slipstream/redis-service"
         "@slipstream/credentials"
         "@slipstream/encryption"
+        "@slipstream/stt-worklet"
         "@slipstream/key-validator"
         "@slipstream/types"
         "@slipstream/cli"

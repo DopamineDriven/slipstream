@@ -52,6 +52,7 @@ catalogs:
     "@d0paminedriven/iso-3166-1": ^1.4.0
     "@d0paminedriven/metadata": ^6.0.1
     "@d0paminedriven/pdfdown": ^0.9.9
+    "@d0paminedriven/stt-worklet": ^1.0.6
   decimal:
     "decimal.js": ^10.6.0
   dotenv:

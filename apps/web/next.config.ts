@@ -6,7 +6,8 @@ export default {
   // defaults to to 1mb :|
   experimental: {
     serverActions: { bodySizeLimit: `50mb` },
-    authInterrupts: true
+    authInterrupts: true,
+    globalNotFound: true
   },
   async headers() {
     return [
@@ -18,10 +19,18 @@ export default {
             value: "public, max-age=31536000, immutable"
           }
         ]
+      },
+      {
+        source: "/fonts/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable"
+          }
+        ]
       }
     ];
   },
-  supportsImmutableAssets: true,
   typescript: { ignoreBuildErrors: false, tsconfigPath: "./tsconfig.json" },
   images: {
     localPatterns: [

@@ -588,6 +588,8 @@ export class ChatWebSocketClient {
   private socket: WebSocket | null = null;
   private reconnectAttempts = 0;
   private readonly maxReconnectAttempts = 5;
+  /** hop-1 send backlog above this = stalled socket; the caller interrupts */
+  private readonly maxClientBuffer = 1 << 20;
   private reconnectTimeout: NodeJS.Timeout | null = null;
   private messageQueue = Array.of<string>();
   private listeners = new Set<ChatEventListener>();
@@ -692,6 +694,26 @@ export class ChatWebSocketClient {
         this.connect();
       }
     }
+  }
+
+  /**
+   * Real-time send: never queued, never replayed after a reconnect. Audio
+   * frames and the finish that follows them are only meaningful on the
+   * socket they were captured against. `false` means the caller must treat
+   * the dictation as interrupted.
+   */
+  public sendImmediate<const T extends keyof EventTypeMap>(
+    event: T,
+    data: EventTypeMap[T]
+  ) {
+    if (this.socket?.readyState !== WebSocket.OPEN) return false;
+    if (this.socket.bufferedAmount > this.maxClientBuffer) return false;
+    this.socket.send(
+      JSON.stringify({ ...data, type: event } satisfies EventTypeMap[T] & {
+        type: T;
+      })
+    );
+    return true;
   }
 
   public addListener(listener: ChatEventListener) {

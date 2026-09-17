@@ -25,6 +25,7 @@
     "@base-ui/react": "catalog:bui",
     "@d0paminedriven/iso-3166-1": "catalog:dd",
     "@d0paminedriven/metadata": "catalog:dd",
+    "@d0paminedriven/stt-worklet": "catalog:dd",
     "@paralleldrive/cuid2": "catalog:cuid2",
     "@radix-ui/react-avatar": "catalog:radix",
     "@radix-ui/react-dialog": "catalog:radix",

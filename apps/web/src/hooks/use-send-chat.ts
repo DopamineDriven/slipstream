@@ -16,6 +16,7 @@ import { useAudioGenCtx } from "@/context/audio-gen-context";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
+import { useSTTCtx } from "@/context/stt-context";
 import { buildOptimisticAttachment } from "@/lib/attachment-mapper";
 import { getModel } from "@/lib/models";
 import { createUserMessage } from "@/lib/ui-message-helpers";
@@ -79,6 +80,11 @@ export function useSendChat(store: ChatStore, userId?: string) {
   const { providerContext } = useApiKeys();
   const { startNewBatch, currentBatchId, getUploadsByBatchId, getByPreviewId } =
     useAssetUpload();
+  const {
+    currentBatchId: currentSttBatchId,
+    hasDictations,
+    rotateBatch: rotateSttBatch
+  } = useSTTCtx();
   const { getAll } = useCookiesCtx();
   const { sendEvent } = useChatWebSocketContext();
 
@@ -176,6 +182,12 @@ export function useSendChat(store: ChatStore, userId?: string) {
         batchId = hasUploads ? current : undefined;
       }
 
+      // sttBatchId: the current dictation batch only if it holds DECOUPLED
+      // dictations — same shape as the asset batch derivation above
+      const sttBatchId = hasDictations
+        ? (currentSttBatchId ?? undefined)
+        : undefined;
+
       const keys = providerContext ?? fallbackApiKeys;
       const request = {
         metadata,
@@ -194,6 +206,7 @@ export function useSendChat(store: ChatStore, userId?: string) {
         temperature: undefined,
         topP: undefined,
         batchId,
+        sttBatchId,
         imgGenEnabled: payload.imgGenEnabled,
         // auto-set from the targeted model (lyria = audio gen, no user
         // toggle) — the derivation lives in AudioGenProvider
@@ -209,6 +222,7 @@ export function useSendChat(store: ChatStore, userId?: string) {
       store.beginSend(request, optimisticUser);
       sendEvent("ai_chat_request", request);
       startNewBatch();
+      rotateSttBatch();
     },
     [
       store,
@@ -223,6 +237,9 @@ export function useSendChat(store: ChatStore, userId?: string) {
       getUploadsByBatchId,
       getByPreviewId,
       startNewBatch,
+      currentSttBatchId,
+      hasDictations,
+      rotateSttBatch,
       sendEvent
     ]
   );

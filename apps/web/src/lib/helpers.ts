@@ -118,3 +118,91 @@ export function normalizeLanguageSearch(value: string) {
     .toLocaleLowerCase()
     .trim();
 }
+export type FromDraftIdRT = {
+  userId: string;
+  convoId: string;
+  batchId: string;
+  dictationOrdinal: number;
+  isNewConvo: boolean;
+};
+
+export const DRAFT_ID_RE =
+  /^[a-z0-9]{24}~(?:[a-z0-9]{24}|new-chat)~[a-z0-9]{24}~(?:0|[1-9][0-9]*)$/;
+
+export function draftIdFormat({
+  batchId,
+  convoId,
+  dictationOrdinal,
+  userId
+}: FromDraftIdRT) {
+  return `${userId}~${convoId}~${batchId}~${dictationOrdinal}`;
+}
+export function parseDraftIdSingleton(d: string) {
+  if (!DRAFT_ID_RE.test(d)) {
+    throw new Error(`[malformed draftId detected in parseDraftId]: ${d}`);
+  }
+  const [userId, convoId, batchId, dictationOrdinal] = d.split("~") as [
+    string,
+    string,
+    string,
+    string
+  ];
+
+  return {
+    userId,
+    convoId,
+    batchId,
+    dictationOrdinal: Number.parseInt(dictationOrdinal, 10),
+    isNewConvo: d.length < 76
+  } satisfies FromDraftIdRT;
+}
+
+export function canParseDraftId(d: string) {
+  return DRAFT_ID_RE.test(d);
+}
+
+export function parseDraftId(d: string): FromDraftIdRT;
+export function parseDraftId(d: string[]): FromDraftIdRT[];
+export function parseDraftId(d: string | string[]) {
+  if (typeof d === "string") {
+    return parseDraftIdSingleton(d);
+  } else {
+    return d.map(tt => parseDraftIdSingleton(tt));
+  }
+}
+
+export function toDraftId(d: FromDraftIdRT[]): string[];
+export function toDraftId(d: FromDraftIdRT): string;
+export function toDraftId(d: FromDraftIdRT | FromDraftIdRT[]) {
+  if (Array.isArray(d)) {
+    const arr = Array.of<string>();
+    for (const dd of d) {
+      arr.push(draftIdFormat(dd));
+    }
+    return arr;
+  } else {
+    return draftIdFormat(d);
+  }
+}
+
+export function draftIdEpimerize(d: string[]): FromDraftIdRT[];
+export function draftIdEpimerize(d: FromDraftIdRT[]): string[];
+export function draftIdEpimerize(d: FromDraftIdRT): string;
+export function draftIdEpimerize(d: string): FromDraftIdRT;
+export function draftIdEpimerize(
+  d: FromDraftIdRT | FromDraftIdRT[] | string[] | string
+) {
+  if (typeof d === "string") {
+    return parseDraftId(d);
+  } else if (Array.isArray(d)) {
+    return d.map(t => {
+      if (typeof t === "string") {
+        return parseDraftId(t);
+      } else {
+        return toDraftId(t);
+      }
+    });
+  } else {
+    return toDraftId(d);
+  }
+}

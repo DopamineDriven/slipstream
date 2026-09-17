@@ -46,7 +46,6 @@ export function CountryFlag({
       width={width}
       height={height}
       draggable={false}
-      placeholder="blur"
       decoding="async"
       className={cn(
         "pointer-events-none block shrink-0 object-contain",

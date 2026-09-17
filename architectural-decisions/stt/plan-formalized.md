@@ -63,6 +63,13 @@ Reference: `reference.md` (copied 2026-09-11). Types: `apps/ws-server/src/stt/ty
   where it means `audio.done`. The param is spelled `filler_words`. REST and
   streaming are separate contracts (`audio_format` vs `encoding`; VAD default
   `0.5` vs `0.08`; `format=true` is REST-only) — never mixed.
+- **Probe-verified 2026-09-16:** `transcript.done.text` is the tail flushed
+  by `audio.done`, **not** the cumulative transcript (a 41-char utterance
+  arrived in the utterance-final `transcript.partial`; `done.text` was `""`
+  with `duration` = the total). After `audio.done` the provider emits one
+  more partial-final for the tail, then `done` repeating it. The §8.5
+  reconciled segments are the transcript; `STTService.finalTranscript()`
+  appends `done.text` only when the segments don't already end with it.
 
 ## 4. Application-owned configuration
 

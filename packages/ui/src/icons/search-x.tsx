@@ -1,13 +1,17 @@
 import type { BaseSVGProps } from "@/icons/index.ts";
 
-export function SearchX({ role = "img", ...svg }: BaseSVGProps) {
+export function SearchX({
+  role = "img",
+  strokeWidth = "2",
+  ...svg
+}: BaseSVGProps) {
   return (
     <svg
-      aria-role={role}
+      role={role}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="none"
-      strokeWidth="2"
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
       stroke="currentColor"
