@@ -81,10 +81,10 @@ interface STTContextValue {
   // lifecycle
   phase: DictationPhase;
   activeDraftId: string | null;
-  /** epoch ms when frames started flowing; the bar derives elapsed from it */
+  /** `performance.now()` when frames started flowing; the bar derives elapsed from it */
   startedAt: number | null;
-  /** last chunk's RMS (0..1) — waveform amplitude */
-  level: number;
+  /** last chunk's RMS (0..1), read per animation frame — never a render trigger */
+  readLevel: () => number;
   timeoutClosesInMs: number | null;
   intent: FinishIntent;
   error: string | null;
@@ -123,6 +123,13 @@ const MAX_PRECONNECT_CHUNKS = 50;
 const VOICE_RMS_THRESHOLD = 0.015;
 /** ✕ undo window before `stt_user_cancel` goes out */
 const UNDO_WINDOW_MS = 6_000;
+/**
+ * raw RMS → waveform level on a dB scale, so a hot USB mic (Yeti) and a
+ * quiet laptop mic both land in range: -50 dBFS is a resting bar, -10 dBFS
+ * a full one; speech typically sits between -35 and -15
+ */
+const LEVEL_FLOOR_DB = -50;
+const LEVEL_CEIL_DB = -10;
 
 /** M1 event trace (plan Step 14) — dev only */
 const sttLog = (event: string, detail?: unknown) => {
@@ -284,7 +291,20 @@ export function STTProvider({
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null);
   const activeDraftRef = useRef<string | null>(null);
   const [startedAt, setStartedAt] = useState<number | null>(null);
-  const [level, setLevel] = useState(0);
+  // ref, not state: the worklet posts ~10 levels/s and the waveform samples
+  // per frame; routing that through React would re-render every consumer.
+  // The ref holds raw RMS (the presence threshold reads it); the reader
+  // maps it onto a dB window so the waveform reads 0..1 regardless of mic gain
+  const levelRef = useRef(0);
+  const readLevel = useCallback(() => {
+    const rms = levelRef.current;
+    if (rms <= 0) return 0;
+    const db = 20 * Math.log10(rms);
+    return Math.min(
+      1,
+      Math.max(0, (db - LEVEL_FLOOR_DB) / (LEVEL_CEIL_DB - LEVEL_FLOOR_DB))
+    );
+  }, []);
   const [timeoutClosesInMs, setTimeoutClosesInMs] = useState<number | null>(
     null
   );
@@ -316,7 +336,7 @@ export function STTProvider({
       activeDraftRef.current = null;
       setActiveDraftId(null);
       setStartedAt(null);
-      setLevel(0);
+      levelRef.current = 0;
       setTimeoutClosesInMs(null);
       setPhaseSync("idle");
       sttLog("interrupted locally", message);
@@ -489,7 +509,7 @@ export function STTProvider({
 
   const handleLevel = useCallback(
     (rms: number) => {
-      setLevel(rms);
+      levelRef.current = rms;
       if (phaseRef.current === "timeoutPrompt" && rms > VOICE_RMS_THRESHOLD) {
         present();
       }
@@ -591,7 +611,7 @@ export function STTProvider({
 
         const { sampleRate, inputSampleRate } = await capture.start();
         if (captureRef.current !== capture) return; // torn down mid-start
-        setStartedAt(Date.now());
+        setStartedAt(performance.now());
         sttLog("stt_user_connect", {
           draftId,
           sampleRate,
@@ -653,7 +673,7 @@ export function STTProvider({
       activeDraftRef.current = null;
       setActiveDraftId(null);
       setStartedAt(null);
-      setLevel(0);
+      levelRef.current = 0;
       setTimeoutClosesInMs(null);
       setPhaseSync("idle");
     };
@@ -905,7 +925,7 @@ export function STTProvider({
       phase,
       activeDraftId,
       startedAt,
-      level,
+      readLevel,
       timeoutClosesInMs,
       intent,
       error,
@@ -937,7 +957,7 @@ export function STTProvider({
       phase,
       activeDraftId,
       startedAt,
-      level,
+      readLevel,
       timeoutClosesInMs,
       intent,
       error,

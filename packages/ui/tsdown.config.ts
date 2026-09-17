@@ -39,6 +39,7 @@ export default defineConfig(
       tsconfig: relative(process.cwd(), "tsconfig.json"),
       cwd: process.cwd(),
       clean: true,
+      sourcemap: false,
       outDir: "dist",
       unbundle: true,
       css: {

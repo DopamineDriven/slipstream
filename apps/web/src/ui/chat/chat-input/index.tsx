@@ -24,7 +24,8 @@ import { cn } from "@/lib/utils";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { ChatInputImageGenSettingsDrawer } from "@/ui/chat/chat-input/image-gen-controls";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
-import { motion } from "motion/react";
+import { SpeechWaveform } from "@/ui/chat/stt/speech-waveform";
+import { AnimatePresence, motion } from "motion/react";
 import type { AIChatRequestImgGenFields } from "@slipstream/types";
 import {
   Button,
@@ -661,9 +662,12 @@ export function ChatInput({
             {children}
             <form onSubmit={handleSend} ref={formRef}>
               <div className="group bg-background focus-within:ring-ring/20 rounded-lg border transition-colors focus-within:ring-1 focus-within:ring-offset-0">
-                <div className="p-3 pb-2">
+                <div className="relative p-3 pb-2">
                   <Textarea
                     ref={textareaRef}
+                    // the waveform overlays this box while recording; inert
+                    // keeps focus and keystrokes from landing underneath it
+                    inert={isRecording}
                     value={message}
                     onChange={e => setMessage(e.target.value)}
                     onPaste={handleEnhancedPaste}
@@ -679,7 +683,7 @@ export function ChatInput({
                       maxHeight: `${MAX_TEXTAREA_HEIGHT_PX}px`
                     }}
                   />
-                  {showExpandButton && (
+                  {showExpandButton && !isRecording && (
                     <Button
                       type="button"
                       variant="ghost"
@@ -692,6 +696,24 @@ export function ChatInput({
                       <span className="sr-only">Expand to fullscreen</span>
                     </Button>
                   )}
+                  <AnimatePresence>
+                    {isRecording && (
+                      <SpeechWaveform
+                        readLevel={stt.readLevel}
+                        // no interim text with interim_results off; the line
+                        // doubles as the idle-probe prompt until the dialog exists
+                        interim={
+                          stt.phase === "timeoutPrompt"
+                            ? "Still there? Keep talking to continue, or stop to finish."
+                            : ""
+                        }
+                        languageName={stt.languageOption?.name ?? "Auto-detect"}
+                        startedAt={stt.startedAt}
+                        transcriptionAvailable={true}
+                        onDiscard={() => void stt.discard()}
+                      />
+                    )}
+                  </AnimatePresence>
                 </div>
                 <div className="bg-muted/20 flex items-center justify-between border-t px-3 py-2">
                   <div className="flex items-center space-x-2">

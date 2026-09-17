@@ -77,7 +77,7 @@ export function RadialLanguageMenu({
         aria-label="Quick languages">
         <motion.div
           aria-hidden="true"
-          className="absolute size-30.5 rounded-full border border-dashed border-[color-mix(in_srgb,var(--foreground)_17%,transparent)]"
+          className="absolute size-30.5 rounded-full border border-dashed border-[color-mix(in_srgb,var(--color-foreground)_17%,transparent)]"
           animate={{ opacity: isOpen ? 1 : 0, scale: isOpen ? 1 : 0.6 }}
           transition={{ duration: 0.2 }}
         />
@@ -91,7 +91,6 @@ export function RadialLanguageMenu({
               const x = Math.cos(radian) * radius;
               const y = Math.sin(radian) * radius;
               const active = language.language === value;
-
               return (
                 <motion.div
                   key={language.language}
@@ -111,12 +110,12 @@ export function RadialLanguageMenu({
                     className={cn(
                       "group/radial-language text-foreground relative flex size-10 items-center justify-center rounded-full border",
                       active
-                        ? "border-[color-mix(in_srgb,var(--primary)_75%,transparent)] bg-[color-mix(in_srgb,var(--primary)_9%,var(--surface))] shadow-[0_0_0_3px_color-mix(in_srgb,var(--primary)_10%,transparent)]"
-                        : "bg-secondary border-[color-mix(in_srgb,var(--foreground)_15%,transparent)] shadow-[0_2px_8px_color-mix(in_srgb,var(--background)_45%,transparent)]"
+                        ? "border-[color-mix(in_srgb,var(--color-primary)_75%,transparent)] bg-[color-mix(in_srgb,var(--color-primary)_9%,var(--color-surface))] shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-primary)_10%,transparent)]"
+                        : "bg-secondary border-[color-mix(in_srgb,var(--color-foreground)_15%,transparent)] shadow-[0_2px_8px_color-mix(in_srgb,var(--color-background)_45%,transparent)]"
                     )}
                     aria-label={`Select ${language.name}`}
                     aria-pressed={active}>
-                    <CountryFlag language={language} />
+                    <CountryFlag width={24} language={language} />
                     <span
                       className="border-border bg-foreground text-background pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 rounded-md border px-2.25 py-1.25 text-[14px] whitespace-nowrap opacity-0 transition-opacity duration-140 ease-[ease] group-focus-visible/radial-language:opacity-100 group-[:hover]/radial-language:opacity-100"
                       aria-hidden="true">
@@ -126,7 +125,7 @@ export function RadialLanguageMenu({
                       <span
                         className="border-secondary bg-primary text-primary-foreground absolute -right-0.5 -bottom-px flex size-3.75 items-center justify-center rounded-full border-2"
                         aria-hidden="true">
-                        <Check className="size-2.5" />
+                        <Check className="size-2.5" strokeWidth={3} />
                       </span>
                     )}
                   </motion.button>
@@ -134,7 +133,6 @@ export function RadialLanguageMenu({
               );
             })}
         </AnimatePresence>
-
         <motion.button
           type="button"
           className="text-primary z-2 flex size-11.25 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--primary)_27%,transparent)] bg-[color-mix(in_srgb,var(--primary)_10%,var(--surface))]"
@@ -148,7 +146,7 @@ export function RadialLanguageMenu({
           }
           aria-expanded={isOpen}
           data-primary-action>
-          <Globe aria-hidden="true" className="size-5" />
+          <Globe aria-hidden="true" className="size-5" strokeWidth={1.5} />
         </motion.button>
       </div>
     </section>

@@ -290,8 +290,8 @@ export type { AvatarProps } from "@/ui/avatar";
 export { Badge, badgeVariants } from "@/ui/badge";
 export type { BadgeProps } from "@/ui/badge";
 export { BreakoutWrapper } from "@/ui/breakout-wrapper";
-export { Button, buttonVariants } from "@/ui/button";
-export type { ButtonProps } from "@/ui/button";
+export { Button, buttonVariants, IconButton } from "@/ui/button";
+export type { ButtonProps, IconButtonProps } from "@/ui/button";
 export { ButtonDos, buttonDosVariants } from "@/ui/button-dos";
 export type { ButtonDosProps } from "@/ui/button-dos";
 export {

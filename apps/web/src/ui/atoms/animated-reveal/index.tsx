@@ -92,7 +92,7 @@ export default function CreateButton({
                   position: "relative",
                   rotate: 45,
                   willChange: "transform",
-                  color: "var(--accent, var(--foreground))",
+                  color: "var(--color-accent, var(--color-foreground))",
                   fontSize: "0.625rem"
                 }}>
                 <CloseIcon />
