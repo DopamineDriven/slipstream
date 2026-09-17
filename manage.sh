@@ -145,7 +145,7 @@ build_targeted() {
         "@slipstream/img-gen"
         "@slipstream/storage-s3"
         "@slipstream/ws-server"
-        "@slipstream/web-next"
+        "@slipstream/web"
         "@slipstream/about"
     )
 
