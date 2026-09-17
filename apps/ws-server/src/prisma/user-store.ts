@@ -5,7 +5,7 @@ import type {
   CreateUserStoreRT
 } from "@/prisma/types.ts";
 import type { Voyage } from "@/voyage/types.ts";
-import { PrismaTTSService } from "@/prisma/tts.ts";
+import { PrismaSTTService } from "@/prisma/stt.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import {
@@ -16,7 +16,7 @@ import {
   updateUserStoreDocState
 } from "@slipstream/db/sql-node";
 
-export class PrismaUserStoreService extends PrismaTTSService {
+export class PrismaUserStoreService extends PrismaSTTService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,

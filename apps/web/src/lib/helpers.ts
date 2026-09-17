@@ -37,9 +37,12 @@ export const fromPrismaFormat = (provider: $Enums.Provider) => {
  * this at the send site; lyria targeting IS the intent, no user toggle
  */
 export const isAudioGenModel = (m: string) => {
-  return m ==="lyria-3.5" || m === "lyria-3-pro-preview" || m === "lyria-3-clip-preview";
+  return (
+    m === "lyria-3.5" ||
+    m === "lyria-3-pro-preview" ||
+    m === "lyria-3-clip-preview"
+  );
 };
-
 
 /**
  * automatically toggle the image gen to active for these pure image generation models.
@@ -58,8 +61,148 @@ export const isPureImageModel = (m: string) => {
     m === "gpt-image-1-mini" ||
     m === "gpt-image-1.5" ||
     m === "gpt-image-2" ||
+    m === "gpt-image-2.5-sunburst" ||
+    m === "gpt-image-2.5-flare" ||
     m === "grok-imagine-image" ||
     m === "grok-imagine-image-2.0" ||
     m === "grok-imagine-image-quality"
   );
 };
+
+export function isValidLangSTT(l: string) {
+  return (
+    l === "ar" ||
+    l === "cs" ||
+    l === "da" ||
+    l === "de" ||
+    l === "en" ||
+    l === "es" ||
+    l === "fa" ||
+    l === "fil" ||
+    l === "fr" ||
+    l === "hi" ||
+    l === "id" ||
+    l === "it" ||
+    l === "ja" ||
+    l === "ko" ||
+    l === "mk" ||
+    l === "ms" ||
+    l === "nl" ||
+    l === "pl" ||
+    l === "pt" ||
+    l === "ro" ||
+    l === "ru" ||
+    l === "sv" ||
+    l === "th" ||
+    l === "tr" ||
+    l === "vi"
+  );
+}
+/**
+ * locale → provider language code: BCP-47 puts the language FIRST, so cut at
+ * the first separator (`zh-Hant-TW` → `zh`, `hi-Latn-IN` → `hi`,
+ * `fil-PH` → `fil`), lowercase, and anchor-validate so junk never passes as
+ * a code. `tl` (how some platforms tag Filipino locales) maps to the
+ * provider's `fil`.
+ */
+export function languageHelperSTT(t: string) {
+  const base = t.toLowerCase().split(/[-_]/)[0];
+  if (!base || !/^[a-z]{2,3}$/.test(base)) return;
+  return base === "tl" ? "fil" : base;
+}
+
+export function normalizeLanguageSearch(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLocaleLowerCase()
+    .trim();
+}
+export type FromDraftIdRT = {
+  userId: string;
+  convoId: string;
+  batchId: string;
+  dictationOrdinal: number;
+  isNewConvo: boolean;
+};
+
+export const DRAFT_ID_RE =
+  /^[a-z0-9]{24}~(?:[a-z0-9]{24}|new-chat)~[a-z0-9]{24}~(?:0|[1-9][0-9]*)$/;
+
+export function draftIdFormat({
+  batchId,
+  convoId,
+  dictationOrdinal,
+  userId
+}: FromDraftIdRT) {
+  return `${userId}~${convoId}~${batchId}~${dictationOrdinal}`;
+}
+export function parseDraftIdSingleton(d: string) {
+  if (!DRAFT_ID_RE.test(d)) {
+    throw new Error(`[malformed draftId detected in parseDraftId]: ${d}`);
+  }
+  const [userId, convoId, batchId, dictationOrdinal] = d.split("~") as [
+    string,
+    string,
+    string,
+    string
+  ];
+
+  return {
+    userId,
+    convoId,
+    batchId,
+    dictationOrdinal: Number.parseInt(dictationOrdinal, 10),
+    isNewConvo: d.length < 76
+  } satisfies FromDraftIdRT;
+}
+
+export function canParseDraftId(d: string) {
+  return DRAFT_ID_RE.test(d);
+}
+
+export function parseDraftId(d: string): FromDraftIdRT;
+export function parseDraftId(d: string[]): FromDraftIdRT[];
+export function parseDraftId(d: string | string[]) {
+  if (typeof d === "string") {
+    return parseDraftIdSingleton(d);
+  } else {
+    return d.map(tt => parseDraftIdSingleton(tt));
+  }
+}
+
+export function toDraftId(d: FromDraftIdRT[]): string[];
+export function toDraftId(d: FromDraftIdRT): string;
+export function toDraftId(d: FromDraftIdRT | FromDraftIdRT[]) {
+  if (Array.isArray(d)) {
+    const arr = Array.of<string>();
+    for (const dd of d) {
+      arr.push(draftIdFormat(dd));
+    }
+    return arr;
+  } else {
+    return draftIdFormat(d);
+  }
+}
+
+export function draftIdEpimerize(d: string[]): FromDraftIdRT[];
+export function draftIdEpimerize(d: FromDraftIdRT[]): string[];
+export function draftIdEpimerize(d: FromDraftIdRT): string;
+export function draftIdEpimerize(d: string): FromDraftIdRT;
+export function draftIdEpimerize(
+  d: FromDraftIdRT | FromDraftIdRT[] | string[] | string
+) {
+  if (typeof d === "string") {
+    return parseDraftId(d);
+  } else if (Array.isArray(d)) {
+    return d.map(t => {
+      if (typeof t === "string") {
+        return parseDraftId(t);
+      } else {
+        return toDraftId(t);
+      }
+    });
+  } else {
+    return toDraftId(d);
+  }
+}

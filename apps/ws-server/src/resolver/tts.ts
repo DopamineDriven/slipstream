@@ -2,15 +2,16 @@ import type { ImageCompatService } from "@/image/index.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ProviderService } from "@/providers/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { STTService } from "@/stt/index.ts";
 import type { TTSService } from "@/tts/index.ts";
 import type { UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
-import { ResolverChatUtilsService } from "@/resolver/chat-utils.ts";
+import { ResolverSTTService } from "@/resolver/stt.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap, TTSJobSingleton } from "@slipstream/types";
 
-export class ResolverTTSService extends ResolverChatUtilsService {
+export class ResolverTTSService extends ResolverSTTService {
   constructor(
     wsServer: WSServer,
     providers: ProviderService,
@@ -20,7 +21,8 @@ export class ResolverTTSService extends ResolverChatUtilsService {
     userVectorStore: UserStoreVectorService,
     xaiManagementApikey: string,
     logger: LoggerService,
-    ttsService: TTSService
+    ttsService: TTSService,
+    sttService: STTService
   ) {
     super(
       wsServer,
@@ -31,7 +33,8 @@ export class ResolverTTSService extends ResolverChatUtilsService {
       userVectorStore,
       xaiManagementApikey,
       logger,
-      ttsService
+      ttsService,
+      sttService
     );
   }
 

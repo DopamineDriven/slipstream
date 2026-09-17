@@ -1,6 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
-import type { TTSTypes } from "@/tts/types.ts";
 import type { Logger as PinoLogger } from "pino";
 import type { RawData, WebSocket } from "ws";
 import { WebSocket as TTSWebSocket } from "ws";
@@ -9,12 +8,9 @@ import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   EventTypeMap,
-  GrokAudioCodecTTS,
-  GrokBitRateTTS,
-  GrokSampleRateTTS,
-  GrokVoiceTTS,
   MessageSingleton,
-  TTSJobSingleton
+  TTSJobSingleton,
+  TTSTypes
 } from "@slipstream/types";
 
 export class TTSService {
@@ -185,14 +181,14 @@ export class TTSService {
       bit_rate?: number | null;
     }
   ) {
-    let sample_rate: GrokSampleRateTTS,
-      bit_rate: GrokBitRateTTS,
-      codec: GrokAudioCodecTTS;
+    let sample_rate: TTSTypes.SampleRate,
+      bit_rate: TTSTypes.BitRate,
+      codec: TTSTypes.Codec;
 
     // voice
     const voice =
       voice_id && this.isValidVoice(voice_id)
-        ? (voice_id satisfies GrokVoiceTTS)
+        ? (voice_id satisfies TTSTypes.Voice)
         : "eve";
 
     // language

@@ -33,11 +33,13 @@ import { FileText } from "@/icons/file-text";
 import { Folder } from "@/icons/folder";
 import { GeminiIcon } from "@/icons/gemini";
 import { Github } from "@/icons/github";
+import { Globe } from "@/icons/globe";
 import { GoogleIcon } from "@/icons/google";
 import { GripVertical } from "@/icons/grip-vertical";
 import { History } from "@/icons/history";
 import { ImageGen } from "@/icons/image-gen";
 import { ImageIcon } from "@/icons/image-icon";
+import { Info } from "@/icons/info";
 import { Key } from "@/icons/key";
 import { KeyRound } from "@/icons/key-round";
 import { Kimi } from "@/icons/kimi";
@@ -75,10 +77,13 @@ import { RetryIcon } from "@/icons/retry";
 import { SakanaIcon } from "@/icons/sakana";
 import { Save } from "@/icons/save";
 import { Search } from "@/icons/search";
+import { SearchX } from "@/icons/search-x";
 import { Send } from "@/icons/send";
 import { SendMessage } from "@/icons/send-message";
 import { Settings } from "@/icons/settings";
+import { SettingsUser } from "@/icons/settings-user";
 import { ShareIcon } from "@/icons/share-icon";
+import { SlidersHorizontal } from "@/icons/sliders-horizontal";
 import { Sparkles } from "@/icons/sparkles";
 import { SquarePen } from "@/icons/square-pen";
 import { Stop } from "@/icons/stop";
@@ -91,6 +96,7 @@ import { Trash } from "@/icons/trash";
 import { TrashSimple } from "@/icons/trash-simple";
 import { User } from "@/icons/user";
 import { VercelIcon } from "@/icons/vercel";
+import { Voice } from "@/icons/voice";
 import { Volume } from "@/icons/volume";
 import { VolumeMuted } from "@/icons/volume-muted";
 import { X } from "@/icons/x";
@@ -134,11 +140,13 @@ const IconComponents = {
   Folder,
   GeminiIcon,
   Github,
+  Globe,
   GoogleIcon,
   GripVertical,
   History,
   ImageGen,
   ImageIcon,
+  Info,
   Key,
   KeyRound,
   Kimi,
@@ -176,10 +184,13 @@ const IconComponents = {
   SakanaIcon,
   Save,
   Search,
+  SearchX,
   Send,
   SendMessage,
   Settings,
+  SettingsUser,
   ShareIcon,
+  SlidersHorizontal,
   Sparkles,
   SquarePen,
   Stop,
@@ -192,6 +203,7 @@ const IconComponents = {
   TrashSimple,
   User,
   VercelIcon,
+  Voice,
   Volume,
   VolumeMuted,
   X,
@@ -207,8 +219,6 @@ export type BaseSVGProps = Omit<
   | "viewBox"
   | "xmlns"
   | "fill"
-  | "stroke"
-  | "strokeWidth"
   | "strokeLinecap"
   | "strokeLinejoin"
 >;
@@ -269,11 +279,13 @@ export {
   Folder,
   GeminiIcon,
   Github,
+  Globe,
   GoogleIcon,
   GripVertical,
   History,
   ImageGen,
   ImageIcon,
+  Info,
   Key,
   KeyRound,
   Kimi,
@@ -311,10 +323,13 @@ export {
   SakanaIcon,
   Save,
   Search,
+  SearchX,
   Send,
   SendMessage,
   Settings,
+  SettingsUser,
   ShareIcon,
+  SlidersHorizontal,
   Sparkles,
   SquarePen,
   Stop,
@@ -327,6 +342,7 @@ export {
   TrashSimple,
   User,
   VercelIcon,
+  Voice,
   Volume,
   VolumeMuted,
   X,

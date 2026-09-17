@@ -249,3 +249,25 @@ export interface GetConversationHydrationPagesParams {
   readonly take?: number;
   readonly maxPages?: number;
 }
+
+export type FromDraftIdRT = {
+  userId: string;
+  convoId: string;
+  batchId: string;
+  dictationOrdinal: number;
+  isNewConvo: boolean;
+};
+export type ToDraftIdProps =
+  | {
+      userId: string;
+      convoId: string;
+      batchId: string;
+      dictationOrdinal: number;
+      isNewConvo: boolean;
+    }
+  | {
+      userId: string;
+      convoId: string;
+      batchId: string;
+      dictationOrdinal: number;
+    };

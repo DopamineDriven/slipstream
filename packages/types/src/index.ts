@@ -1,3 +1,5 @@
+import type { Socket } from "net";
+
 /**
  * api-handling types for codegen
  */
@@ -32,7 +34,7 @@ export type {
   GrokTTSReqShape,
   OpenAICodecTTS,
   TTSCodec
-} from "@/events-audio.ts";
+} from "@/contract/audio.ts";
 
 export {
   grokVoiceDisplayNameToIdTTS,
@@ -40,7 +42,7 @@ export {
   grokVoiceIdToDisplayNameTTS,
   grokVoiceIdsTTS,
   grokVoices
-} from "@/events-audio.ts";
+} from "@/contract/audio.ts";
 
 export type {
   AIChatRequestImgGenFields,
@@ -95,9 +97,9 @@ export type {
   S3Checksum,
   S3StorageClass,
   SharedOpenAIImageOpts
-} from "@/events-images.ts";
+} from "@/contract/images.ts";
 
-export { GPT_IMAGE_2_EXTENDED_OPTIONS } from "@/events-images.ts";
+export { GPT_IMAGE_2_EXTENDED_OPTIONS } from "@/contract/images.ts";
 
 export type {
   AIChatEventTypeUnion,
@@ -133,24 +135,39 @@ export type {
   UserMetadata,
   UserRxnAction,
   WithExpiry
-} from "@/events-workup.ts";
+} from "@/contract/workup.ts";
 
 /**
  * shared websocket (client-server) events
  */
 export type {
+  AnyEvent,
+  AnyEventTypeUnion,
+  ChatWsEvent,
+  ChatWsEventTypeUnion,
+  EventMap,
+  EventTypeMap
+} from "@/contract/index.ts";
+
+export type {
   AIChatChunk,
   AIChatError,
+  AIChatEventRecord,
+  AIChatEventUnion,
   AIChatInlineData,
   AIChatRequest,
   AIChatResEntity,
   AIChatResponse,
   AIChatResponseDb,
-  AnyEvent,
-  AnyEventTypeUnion,
+  ChatChunkAndResMsgBlock
+} from "@/contract/ai-chat-events.ts";
+
+export type {
   AssetAttachedToMessage,
   AssetBatchUpload,
   AssetDeleted,
+  AssetEventRecord,
+  AssetEventUnion,
   AssetFetchError,
   AssetFetchRequest,
   AssetFetchResponse,
@@ -166,42 +183,41 @@ export type {
   AssetUploadProgress,
   AssetUploadedNotification,
   AssetUploadRequest,
-  AssetUploadResponse,
-  ChatChunkAndResMsgBlock,
-  ChatWsEvent,
-  ChatWsEventTypeUnion,
+  AssetUploadResponse
+} from "@/contract/asset-events.ts";
+
+export type {
   CliConfigDTO,
+  CliEventRecord,
+  CliEventUnion,
   CliConfigHydrate,
   CliConfigHydrateAck,
   CliConfigUpdate,
   CliConfigUpdateAck,
   CliRecentConvos,
-  CliRecentConvosAck,
-  ConnectionEstablished,
+  CliRecentConvosAck
+} from "@/contract/cli-events.ts";
+
+export type {
   ConversationList,
   ConversationListAck,
-  ConversationListEntry,
-  EventMap,
-  EventTypeMap,
+  ConversationListEntry
+} from "@/contract/conversation-list-events.ts";
+
+export type {
   HydrateConversation,
   HydrateConversationAck,
-  HydrateConversationPage,
+  HydrateConversationPage
+} from "@/contract/hydrate-conversation.ts";
+
+export type {
   ImageGenError,
+  ImageGenEventRecord,
+  ImageGenEventUnion,
   ImageGenProgress,
   ImageGenRequest,
-  ImageGenResponse,
-  PingMessage,
-  ProviderContextPing,
-  ProviderContextPong,
-  ProviderContextUpdate,
-  ProviderContextUpdateAck,
-  TypingIndicator,
-  UserTTSChunk,
-  UserTTSError,
-  UserTTSRequest,
-  UserTTSResponse,
-  UserTTSResponsePreexisting
-} from "@/events.ts";
+  ImageGenResponse
+} from "@/contract/image-gen-events.ts";
 
 export type {
   CanonicalSchemaProperty,
@@ -218,13 +234,58 @@ export type {
   LocalToolSuccess,
   ReadFileOutput,
   RepoSearchOutput
-} from "@/local-tools.ts";
+} from "@/contract/local-tool-events.ts";
 
 export {
   LOCAL_TOOL_DEFINITIONS,
   LOCAL_TOOL_NAMES,
   isLocalToolName
-} from "@/local-tools.ts";
+} from "@/contract/local-tool-events.ts";
+
+export type { PingMessage } from "@/contract/ping.ts";
+
+export type {
+  ConnectionEstablished,
+  ProviderContextEventRecord,
+  ProviderContextEventUnion,
+  ProviderContextPing,
+  ProviderContextPong,
+  ProviderContextUpdate,
+  ProviderContextUpdateAck
+} from "@/contract/provider-context-events.ts";
+
+export type {
+  STTUserBinaryFrame,
+  STTUserCancel,
+  STTUserCanceled,
+  STTUserConnect,
+  STTUserConnected,
+  STTUserError,
+  STTEventRecord,
+  STTEventUnion,
+  STTUserFinish,
+  STTUserFinished,
+  STTUserPresent,
+  STTUserRecover,
+  STTUserRecovered,
+  STTUserRecoveredResultSingleton,
+  STTUserRestore,
+  STTUserRestored,
+  STTUserTimeout,
+  STTUserInterrupted
+} from "@/contract/stt-events.ts";
+
+export type {
+  UserTTSChunk,
+  UserTTSError,
+  UserTTSEventRecord,
+  UserTTSEventUnion,
+  UserTTSRequest,
+  UserTTSResponse,
+  UserTTSResponsePreexisting
+} from "@/contract/tts-events.ts";
+
+export type { TypingIndicator } from "@/contract/typing-indicator.ts";
 
 /**
  * model/provider types
@@ -266,6 +327,7 @@ export type {
   GeminiModelIdUnionAudioGen,
   GeminiModelIdUnionImgGen,
   GeminiModelIdUnionVideoGen,
+  GeminiPureImageGenModels,
   GeminiVideoGenModels,
   GetDisplayNamesForProviderRT,
   GetDisplayNamesForProviderRTAudioGen,
@@ -284,11 +346,11 @@ export type {
   GrokDisplayNameUnion,
   GrokDisplayNameUnionImgGen,
   GrokDisplayNameUnionVideoGen,
-  ProviderModelRecord,
   GrokImgGenModels,
   GrokModelIdUnion,
   GrokModelIdUnionImgGen,
   GrokModelIdUnionVideoGen,
+  GrokPureImageGenModels,
   GrokVideoGenModels,
   ImageGenFacilitatingModelsByProvider,
   ImageGenFacilitatingProviders,
@@ -326,8 +388,11 @@ export type {
   OpenAIImgGenModels,
   OpenAiModelIdUnionImgGen,
   OpenAiModelIdUnion,
+  OpenAIPureImageGenModels,
   Provider,
+  ProviderModelRecord,
   Providers,
+  PureImageGenModelsByProvider,
   SakanaChatModels,
   SakanaDisplayNameUnion,
   SakanaModelIdUnion,
@@ -435,7 +500,17 @@ export type {
   XOR
 } from "@/utils.ts";
 
-export { createDraftId, instanceFunc, parseDraftId } from "@/utils.ts";
+export {
+  asciiToSymbol,
+  createDraftId,
+  instanceFunc,
+  parseDraftId,
+  symbolToAscii
+} from "@/utils.ts";
+
+export type { STTTypes } from "@/stt.ts";
+
+export type { TTSTypes } from "@/tts.ts";
 
 /**
  * domain level types
@@ -455,6 +530,7 @@ export type {
   ConversationSingleton,
   ConversationSingletonOneOff,
   ConvoSettingsSingleton,
+  DictationSingleton,
   DocumentSingleton,
   ImageGenJobSingleton,
   ImageGenOutputSingleton,
@@ -497,5 +573,11 @@ declare global {
           ? `${K}`
           : never
       : never)[];
+  }
+}
+
+declare module "ws" {
+  interface WebSocket {
+    _socket: Socket;
   }
 }

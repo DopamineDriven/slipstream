@@ -50,6 +50,7 @@ model User {
   settings                Settings?
   cliConfig               CliConfig?
   cliConversationActivity CliConversationActivity[]
+  dictationJobs           Dictation[]
   userStores              UserStore[]
   createdAt               DateTime                  @default(now())
   updatedAt               DateTime                  @updatedAt

@@ -447,6 +447,15 @@ async function exe() {
       cfg.X_AI_KEY
     );
 
+    const { STTService } = await import("@/stt/index.ts");
+
+    const sttService = new STTService(
+      redisInstance,
+      logger,
+      prisma,
+      cfg.X_AI_KEY
+    );
+
     const { ImageCompatService } = await import("@/image/index.ts");
 
     const imgCompatService = new ImageCompatService(s3, prisma);
@@ -460,7 +469,8 @@ async function exe() {
       userStore,
       process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY,
       logger,
-      ttsService
+      ttsService,
+      sttService
     );
 
     resolver.registerAll();
@@ -468,6 +478,22 @@ async function exe() {
 
     wsServer.setResolver(resolver);
     wsServer.setTTSService(ttsService);
+    wsServer.setSTTService(sttService);
+
+    const sweepDictations = () => {
+      void prisma
+        .dictationSweep()
+        .then(count => {
+          if (count > 0)
+            log.info({ count }, "dictation sweep tombstoned expired rows");
+        })
+        .catch((err: unknown) => {
+          log.warn("dictation sweep failed: ".concat(prisma.safeErrMsg(err)));
+        });
+    };
+    sweepDictations();
+
+    const dictationSweepHandle = setInterval(sweepDictations, 5 * 60_000);
 
     const redisPingHandle = setInterval(async () => {
       try {
@@ -475,7 +501,7 @@ async function exe() {
       } catch (err) {
         log.error(
           "Redis health check failed: ".concat(
-            err instanceof Error ? err.message : ""
+            err instanceof Error ? err.message : prisma.safeErrMsg(err)
           )
         );
       }
@@ -495,6 +521,7 @@ async function exe() {
 
       try {
         clearInterval(redisPingHandle);
+        clearInterval(dictationSweepHandle);
         await wsServer.stop();
         log.info("Cleanup complete, exiting gracefully");
         process.exitCode = 0;
@@ -567,11 +594,3 @@ declare module "pythonia" {
     <T = unknown>(fileName: string): Promise<T>;
   }
 }
-enum DEGREES {
-  PhD,
-  MD,
-  MSW
-
-}
-
-Object.keys(DEGREES)

@@ -409,6 +409,7 @@ export const ModelName = {
   CliConversationActivity: 'CliConversationActivity',
   Conversation: 'Conversation',
   ConversationSettings: 'ConversationSettings',
+  Dictation: 'Dictation',
   ImageGenJob: 'ImageGenJob',
   ImageGenOutput: 'ImageGenOutput',
   ConversationMemoryStore: 'ConversationMemoryStore',
@@ -445,7 +446,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "audioGenJob" | "audioGenOutput" | "cliConfig" | "cliConversationActivity" | "conversation" | "conversationSettings" | "imageGenJob" | "imageGenOutput" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "messageBlock" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
+    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "audioGenJob" | "audioGenOutput" | "cliConfig" | "cliConversationActivity" | "conversation" | "conversationSettings" | "dictation" | "imageGenJob" | "imageGenOutput" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "messageBlock" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1334,6 +1335,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ConversationSettingsCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ConversationSettingsCountAggregateOutputType> | number
+        }
+      }
+    }
+    Dictation: {
+      payload: Prisma.$DictationPayload<ExtArgs>
+      fields: Prisma.DictationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DictationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DictationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DictationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DictationPayload>
+        }
+        findFirst: {
+          args: Prisma.DictationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DictationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DictationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DictationPayload>
+        }
+        findMany: {
+          args: Prisma.DictationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DictationPayload>[]
+        }
+        create: {
+          args: Prisma.DictationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DictationPayload>
+        }
+        createMany: {
+          args: Prisma.DictationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DictationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DictationPayload>[]
+        }
+        delete: {
+          args: Prisma.DictationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DictationPayload>
+        }
+        update: {
+          args: Prisma.DictationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DictationPayload>
+        }
+        deleteMany: {
+          args: Prisma.DictationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DictationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DictationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DictationPayload>[]
+        }
+        upsert: {
+          args: Prisma.DictationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DictationPayload>
+        }
+        aggregate: {
+          args: Prisma.DictationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDictation>
+        }
+        groupBy: {
+          args: Prisma.DictationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DictationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DictationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DictationCountAggregateOutputType> | number
         }
       }
     }
@@ -3212,6 +3287,44 @@ export const ConversationSettingsScalarFieldEnum = {
 export type ConversationSettingsScalarFieldEnum = (typeof ConversationSettingsScalarFieldEnum)[keyof typeof ConversationSettingsScalarFieldEnum]
 
 
+export const DictationScalarFieldEnum = {
+  id: 'id',
+  messageOrdinal: 'messageOrdinal',
+  conversationId: 'conversationId',
+  userId: 'userId',
+  messageId: 'messageId',
+  ordinal: 'ordinal',
+  createdAt: 'createdAt',
+  draftId: 'draftId',
+  batchId: 'batchId',
+  durationMs: 'durationMs',
+  content: 'content',
+  updatedAt: 'updatedAt',
+  inputSampleRate: 'inputSampleRate',
+  externalId: 'externalId',
+  encoding: 'encoding',
+  language: 'language',
+  sampleRate: 'sampleRate',
+  keyterms: 'keyterms',
+  fillerWords: 'fillerWords',
+  diarize: 'diarize',
+  vadThreshold: 'vadThreshold',
+  endpointing: 'endpointing',
+  channels: 'channels',
+  multichannel: 'multichannel',
+  interimResults: 'interimResults',
+  smartTurn: 'smartTurn',
+  smartTurnTimeout: 'smartTurnTimeout',
+  recoveryExpiresAt: 'recoveryExpiresAt',
+  terminationReason: 'terminationReason',
+  status: 'status',
+  couplingStatus: 'couplingStatus',
+  version: 'version'
+} as const
+
+export type DictationScalarFieldEnum = (typeof DictationScalarFieldEnum)[keyof typeof DictationScalarFieldEnum]
+
+
 export const ImageGenJobScalarFieldEnum = {
   id: 'id',
   requestMessageId: 'requestMessageId',
@@ -3999,6 +4112,76 @@ export type ListEnumOutputVerbosityFieldRefInput<$PrismaModel> = FieldRefInputTy
 
 
 /**
+ * Reference to a field of type 'DictationEncoding'
+ */
+export type EnumDictationEncodingFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationEncoding'>
+    
+
+
+/**
+ * Reference to a field of type 'DictationEncoding[]'
+ */
+export type ListEnumDictationEncodingFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationEncoding[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DictationTerminationReason'
+ */
+export type EnumDictationTerminationReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationTerminationReason'>
+    
+
+
+/**
+ * Reference to a field of type 'DictationTerminationReason[]'
+ */
+export type ListEnumDictationTerminationReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationTerminationReason[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DictationStatus'
+ */
+export type EnumDictationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'DictationStatus[]'
+ */
+export type ListEnumDictationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DictationCouplingStatus'
+ */
+export type EnumDictationCouplingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationCouplingStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'DictationCouplingStatus[]'
+ */
+export type ListEnumDictationCouplingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationCouplingStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DictationVersion'
+ */
+export type EnumDictationVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationVersion'>
+    
+
+
+/**
+ * Reference to a field of type 'DictationVersion[]'
+ */
+export type ListEnumDictationVersionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DictationVersion[]'>
+    
+
+
+/**
  * Reference to a field of type 'ImageGenStage'
  */
 export type EnumImageGenStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImageGenStage'>
@@ -4468,6 +4651,7 @@ export type GlobalOmitConfig = {
   cliConversationActivity?: Prisma.CliConversationActivityOmit
   conversation?: Prisma.ConversationOmit
   conversationSettings?: Prisma.ConversationSettingsOmit
+  dictation?: Prisma.DictationOmit
   imageGenJob?: Prisma.ImageGenJobOmit
   imageGenOutput?: Prisma.ImageGenOutputOmit
   conversationMemoryStore?: Prisma.ConversationMemoryStoreOmit

@@ -138,13 +138,14 @@ build_targeted() {
         "@slipstream/redis-service"
         "@slipstream/credentials"
         "@slipstream/encryption"
+        "@slipstream/stt-worklet"
         "@slipstream/key-validator"
         "@slipstream/types"
         "@slipstream/cli"
         "@slipstream/img-gen"
         "@slipstream/storage-s3"
         "@slipstream/ws-server"
-        "@slipstream/web-next"
+        "@slipstream/web"
         "@slipstream/about"
     )
 

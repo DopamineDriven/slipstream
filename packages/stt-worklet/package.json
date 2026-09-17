@@ -1,0 +1,90 @@
+{
+  "name": "@slipstream/stt-worklet",
+  "version": "1.0.6",
+  "description": "convenient stt-worklet",
+  "publishConfig": {
+    "access": "public",
+    "typesVersions": {
+      "*": {
+        "*": [
+          "dist/index.d.ts"
+        ],
+        "bin": [
+          "dist/bin/cli.d.ts"
+        ],
+        "types": [
+          "dist/types/index.d.ts"
+        ],
+        "worklet": [
+          "dist/worklet.d.ts"
+        ]
+      }
+    }
+  },
+  "bin": {
+    "sttworklet": "dist/bin/cli.js"
+  },
+  "license": "BUSL-1.1",
+  "source": "src/index.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/index.d.ts"
+      ],
+      "bin": [
+        "dist/bin/cli.d.ts"
+      ],
+      "types": [
+        "dist/types/index.d.ts"
+      ],
+      "worklet": [
+        "dist/worklet.d.ts"
+      ]
+    }
+  },
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": ["./dist/worklet.js"],
+  "files": [
+    "dist/**/*.{js,cjs,mjs,d.ts,d.cts,d.mts}"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./bin": "./dist/bin/cli.js",
+    "./types": "./dist/types/index.js",
+    "./worklet": "./dist/worklet.js"
+  },
+  "scripts": {
+    "prebuilds": "pnpm gen:tsdown",
+    "posbuild": "cp src/types/audioworklet.d.ts ./dist/types/audioworklet.d.ts",
+    "gen:tsdown": "tsx src/services/automate-tsdown.ts --target gen",
+    "postgen:tsdown": "prettier --write tsdown.config.ts --ignore-unknown --cache",
+    "build": "tsdown",
+    "dev": "pnpm build",
+    "lint": "eslint",
+    "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml}\" --ignore-unknown --cache",
+    "clean": "git clean -xdf .turbo dist node_modules",
+    "typecheck": "tsgo --noEmit"
+  },
+  "dependencies": {
+    "@d0paminedriven/fs": "catalog:dd"
+  },
+  "devDependencies": {
+    "@slipstream/eslint-config": "workspace:*",
+    "@slipstream/prettier-config": "workspace:*",
+    "@slipstream/tsconfig": "workspace:*",
+    "@types/node": "catalog:node",
+    "@typescript/native-preview": "catalog:tsgo",
+    "dotenv-expand": "catalog:dotenv",
+    "eslint": "catalog:eslint",
+    "jiti": "catalog:jiti",
+    "prettier": "catalog:prettier",
+    "tsdown": "catalog:tsdown",
+    "tslib": "catalog:tslib",
+    "tsx": "catalog:tsx",
+    "typescript": "catalog:ts",
+    "typescript-eslint": "catalog:tseslint"
+  },
+  "prettier": "@slipstream/prettier-config"
+}

@@ -16,6 +16,7 @@ import { useCookiesCtx } from "@/context/cookie-context";
 import { useImageGen } from "@/context/image-gen-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { usePathnameContext } from "@/context/pathname-context";
+import { useSTTCtx } from "@/context/stt-context";
 import { useAssets } from "@/hooks/use-assets";
 import { isPureImageModel } from "@/lib/helpers";
 import { providerMetadata } from "@/lib/models";
@@ -23,7 +24,8 @@ import { cn } from "@/lib/utils";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { ChatInputImageGenSettingsDrawer } from "@/ui/chat/chat-input/image-gen-controls";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
-import { motion } from "motion/react";
+import { SpeechWaveform } from "@/ui/chat/stt/speech-waveform";
+import { AnimatePresence, motion } from "motion/react";
 import type { AIChatRequestImgGenFields } from "@slipstream/types";
 import {
   Button,
@@ -112,6 +114,37 @@ export function ChatInput({
 
   const [message, setMessage] = useState("");
   const imgGen = useImageGen();
+  const stt = useSTTCtx();
+  const {
+    pendingInserts: sttPendingInserts,
+    markInserted: sttMarkInserted,
+    intent: sttIntent
+  } = stt;
+  const isRecording =
+    stt.phase === "recording" || stt.phase === "timeoutPrompt";
+  const isSttBusy = stt.phase === "starting" || stt.phase === "finishing";
+
+  // transcripts land in the draft as they settle; a "send" intent submits
+  // once the text is in place. An empty transcript never submits anything.
+  useEffect(() => {
+    if (sttPendingInserts.length === 0) return;
+    const text = sttPendingInserts
+      .map(dictation => dictation.text.trim())
+      .filter(part => part.length > 0)
+      .join(" ");
+    for (const dictation of sttPendingInserts) {
+      sttMarkInserted(dictation.draftId);
+    }
+    if (text.length === 0) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMessage(prev => {
+      const base = prev.trimEnd();
+      return base.length > 0 ? `${base} ${text}` : text;
+    });
+    if (sttIntent === "send") {
+      requestAnimationFrame(() => formRef.current?.requestSubmit());
+    }
+  }, [sttPendingInserts, sttMarkInserted, sttIntent]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -629,9 +662,12 @@ export function ChatInput({
             {children}
             <form onSubmit={handleSend} ref={formRef}>
               <div className="group bg-background focus-within:ring-ring/20 rounded-lg border transition-colors focus-within:ring-1 focus-within:ring-offset-0">
-                <div className="p-3 pb-2">
+                <div className="relative p-3 pb-2">
                   <Textarea
                     ref={textareaRef}
+                    // the waveform overlays this box while recording; inert
+                    // keeps focus and keystrokes from landing underneath it
+                    inert={isRecording}
                     value={message}
                     onChange={e => setMessage(e.target.value)}
                     onPaste={handleEnhancedPaste}
@@ -647,7 +683,7 @@ export function ChatInput({
                       maxHeight: `${MAX_TEXTAREA_HEIGHT_PX}px`
                     }}
                   />
-                  {showExpandButton && (
+                  {showExpandButton && !isRecording && (
                     <Button
                       type="button"
                       variant="ghost"
@@ -660,6 +696,24 @@ export function ChatInput({
                       <span className="sr-only">Expand to fullscreen</span>
                     </Button>
                   )}
+                  <AnimatePresence>
+                    {isRecording && (
+                      <SpeechWaveform
+                        readLevel={stt.readLevel}
+                        // no interim text with interim_results off; the line
+                        // doubles as the idle-probe prompt until the dialog exists
+                        interim={
+                          stt.phase === "timeoutPrompt"
+                            ? "Still there? Keep talking to continue, or stop to finish."
+                            : ""
+                        }
+                        languageName={stt.languageOption?.name ?? "Auto-detect"}
+                        startedAt={stt.startedAt}
+                        transcriptionAvailable={true}
+                        onDiscard={() => void stt.discard()}
+                      />
+                    )}
+                  </AnimatePresence>
                 </div>
                 <div className="bg-muted/20 flex items-center justify-between border-t px-3 py-2">
                   <div className="flex items-center space-x-2">
@@ -747,12 +801,35 @@ export function ChatInput({
                   <div className="flex items-center space-x-2">
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant={isRecording ? "default" : "ghost"}
                       size="icon"
-                      title="Voice to text"
-                      className="text-muted-foreground hover:text-foreground hover:bg-accent h-8">
-                      <Mic className="size-4" />
-                      <span className="sr-only">Voice Input</span>
+                      title={
+                        isRecording
+                          ? "Stop dictation"
+                          : stt.languageOption
+                            ? `Voice to text (${stt.languageOption.name})`
+                            : "Voice to text (auto-detect)"
+                      }
+                      aria-pressed={isRecording}
+                      disabled={isSubmitting || !isConnected || isSttBusy}
+                      onClick={() => {
+                        if (stt.phase === "idle") void stt.start("insert");
+                        else if (isRecording) void stt.finish("insert");
+                      }}
+                      className={cn(
+                        "h-8",
+                        isRecording
+                          ? "hover:bg-accent text-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                      )}>
+                      {isSttBusy ? (
+                        <Loader className="size-4 animate-spin" />
+                      ) : (
+                        <Mic className="size-4" />
+                      )}
+                      <span className="sr-only">
+                        {isRecording ? "Stop dictation" : "Voice Input"}
+                      </span>
                     </Button>
                     <Button
                       type="button"
@@ -770,12 +847,21 @@ export function ChatInput({
                       variant="ghost"
                       size="icon"
                       title={
-                        attachmentsReadyForSend
-                          ? "Submit prompt"
-                          : "Waiting for attachments"
+                        isRecording
+                          ? "Finish dictation and send"
+                          : attachmentsReadyForSend
+                            ? "Submit prompt"
+                            : "Waiting for attachments"
                       }
+                      // ↑ while recording: finish first, the transcript
+                      // lands, then the send goes out with it in place
+                      onClick={e => {
+                        if (!isRecording) return;
+                        e.preventDefault();
+                        void stt.finish("send");
+                      }}
                       className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
-                      disabled={isSendDisabled}>
+                      disabled={isRecording ? isSttBusy : isSendDisabled}>
                       {isSubmitting ? (
                         <Loader className="h-5 w-5 animate-spin" />
                       ) : (

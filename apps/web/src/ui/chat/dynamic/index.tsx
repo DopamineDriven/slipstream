@@ -275,5 +275,6 @@ export function ChatInterface({
 declare module "react" {
   export interface CSSProperties extends Properties<string | number> {
     "--bob-multiplier"?: number;
+    "--drawer-width"?: string;
   }
 }

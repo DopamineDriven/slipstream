@@ -18,7 +18,6 @@ import type {
 } from "@/memory/types.ts";
 import type { OpenAISummarizerService } from "@/openai/summarizer.ts";
 import type { PrismaService } from "@/prisma/index.ts";
-import type { FileSearchToolInput } from "@/store/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { VoyageEmbeddingService } from "@/voyage/index.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";

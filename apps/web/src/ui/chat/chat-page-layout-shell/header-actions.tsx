@@ -1,27 +1,33 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useCallback } from "react";
+import { useState } from "react";
 import { useSettingsDrawer } from "@/context/settings-drawer-context";
-import { Button, Settings, ShareIcon } from "@slipstream/ui";
+import { useSTTCtx } from "@/context/stt-context";
+import { LanguageSettings } from "@/ui/chat/stt";
+import { Button, Settings, SlidersHorizontal } from "@slipstream/ui";
 
 export function HeaderActions({ children }: { children: ReactNode }) {
   const { openToTab } = useSettingsDrawer();
-
-  const handleShareChat = useCallback(() => {
-    console.log("Share chat clicked. Implement sharing logic.");
-    alert("Share functionality to be implemented!");
-  }, []);
+  const stt = useSTTCtx();
+  const [isSpeechSettingsOpen, setIsSpeechSettingsOpen] = useState(false);
 
   return (
     <div className="flex items-center space-x-1 sm:space-x-2">
       <Button
         variant="ghost"
         size="icon"
-        onClick={handleShareChat}
+        title={
+          stt.languageOption
+            ? `Speech language (${stt.languageOption.name})`
+            : "Speech language (auto-detect)"
+        }
+        aria-haspopup="dialog"
+        aria-expanded={isSpeechSettingsOpen}
+        onClick={() => setIsSpeechSettingsOpen(true)}
         className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
-        <ShareIcon className="size-5" />
-        <span className="sr-only">Share chat</span>
+        <SlidersHorizontal className="size-5" />
+        <span className="sr-only">Speech language settings</span>
       </Button>
       <Button
         variant="ghost"
@@ -32,6 +38,13 @@ export function HeaderActions({ children }: { children: ReactNode }) {
         <span className="sr-only">Settings</span>
       </Button>
       {children}
+      <LanguageSettings
+        open={isSpeechSettingsOpen}
+        onOpenChange={setIsSpeechSettingsOpen}
+        value={stt.language}
+        onChange={stt.setLanguage}
+        languages={stt.languages}
+      />
     </div>
   );
 }

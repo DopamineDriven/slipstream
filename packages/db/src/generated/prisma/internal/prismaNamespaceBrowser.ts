@@ -63,6 +63,7 @@ export const ModelName = {
   CliConversationActivity: 'CliConversationActivity',
   Conversation: 'Conversation',
   ConversationSettings: 'ConversationSettings',
+  Dictation: 'Dictation',
   ImageGenJob: 'ImageGenJob',
   ImageGenOutput: 'ImageGenOutput',
   ConversationMemoryStore: 'ConversationMemoryStore',
@@ -378,6 +379,44 @@ export const ConversationSettingsScalarFieldEnum = {
 } as const
 
 export type ConversationSettingsScalarFieldEnum = (typeof ConversationSettingsScalarFieldEnum)[keyof typeof ConversationSettingsScalarFieldEnum]
+
+
+export const DictationScalarFieldEnum = {
+  id: 'id',
+  messageOrdinal: 'messageOrdinal',
+  conversationId: 'conversationId',
+  userId: 'userId',
+  messageId: 'messageId',
+  ordinal: 'ordinal',
+  createdAt: 'createdAt',
+  draftId: 'draftId',
+  batchId: 'batchId',
+  durationMs: 'durationMs',
+  content: 'content',
+  updatedAt: 'updatedAt',
+  inputSampleRate: 'inputSampleRate',
+  externalId: 'externalId',
+  encoding: 'encoding',
+  language: 'language',
+  sampleRate: 'sampleRate',
+  keyterms: 'keyterms',
+  fillerWords: 'fillerWords',
+  diarize: 'diarize',
+  vadThreshold: 'vadThreshold',
+  endpointing: 'endpointing',
+  channels: 'channels',
+  multichannel: 'multichannel',
+  interimResults: 'interimResults',
+  smartTurn: 'smartTurn',
+  smartTurnTimeout: 'smartTurnTimeout',
+  recoveryExpiresAt: 'recoveryExpiresAt',
+  terminationReason: 'terminationReason',
+  status: 'status',
+  couplingStatus: 'couplingStatus',
+  version: 'version'
+} as const
+
+export type DictationScalarFieldEnum = (typeof DictationScalarFieldEnum)[keyof typeof DictationScalarFieldEnum]
 
 
 export const ImageGenJobScalarFieldEnum = {

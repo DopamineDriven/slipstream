@@ -1,9 +1,8 @@
 import type { ExtractService } from "@/extract/index.ts";
-import type { TTSTypes } from "@/tts/types.ts";
 import { PrismaProviderStoreService } from "@/prisma/provider-store.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { Rm, TTSJobSingleton } from "@slipstream/types";
+import type { Rm, TTSJobSingleton, TTSTypes } from "@slipstream/types";
 
 export type CreateTTSJobParams = {
   conversationId: string;

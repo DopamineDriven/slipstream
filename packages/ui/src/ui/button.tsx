@@ -36,8 +36,7 @@ const buttonVariants = cva(
 );
 
 interface ButtonProps
-  extends ComponentPropsWithRef<"button">,
-    VariantProps<typeof buttonVariants> {
+  extends ComponentPropsWithRef<"button">, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
@@ -60,4 +59,27 @@ function Button({
   );
 }
 
-export { Button, buttonVariants, type ButtonProps };
+interface IconButtonProps extends ButtonProps {
+  label: string;
+}
+
+function IconButton({ label, children, className, ...props }: IconButtonProps) {
+  return (
+    <Button
+      variant="ghost"
+      aria-label={label}
+      title={label}
+      className={cn("size-10 min-h-10 shrink-0 rounded-lg", className)}
+      {...props}>
+      {children}
+    </Button>
+  );
+}
+
+export {
+  Button,
+  IconButton,
+  buttonVariants,
+  type ButtonProps,
+  type IconButtonProps
+};

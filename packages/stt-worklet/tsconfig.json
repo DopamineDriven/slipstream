@@ -1,0 +1,21 @@
+{
+  "extends": "@slipstream/tsconfig/node-pkg.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "types": ["*"],
+    "sourceMap": false,
+    "declarationMap": false
+  },
+  "include": [
+    "**/*.ts",
+    "src/**/*.ts",
+    "src/types/audioworklet.d.ts",
+    "**/*.mjs",
+    "**/*.preset.ts",
+    "tsdown.config.ts"
+  ],
+  "exclude": ["dist"]
+}

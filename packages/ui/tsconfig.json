@@ -12,7 +12,9 @@
     "types": ["*"],
     "rootDir": ".",
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "outDir": "dist"
+    "outDir": "dist",
+    "sourceMap": false,
+    "declarationMap": false
   },
 
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/globals.d.ts", "next-env.d.ts", "**/*.ts", "**/*.mjs"],

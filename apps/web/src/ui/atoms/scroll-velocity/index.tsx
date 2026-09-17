@@ -14,10 +14,6 @@ import {
   wrap
 } from "motion/react";
 
-/**
- * ==============   Constants   ================
- */
-
 const PLANE_WIDTH = 320;
 const PLANE_GAP = -80;
 const TOTAL_PLANES = 26;
@@ -47,10 +43,6 @@ const labels = [
 ] as const;
 
 const scrambleChars = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`░▒▓█▀▄■□▪▫●○◆◇◈◊※†‡";
-
-/**
- * ==============   Components   ================
- */
 
 function Plane({
   index,
@@ -194,10 +186,10 @@ export function ScrollVelocityLinkedOffset() {
       }}>
       <div className="absolute top-[max(90px,3vw)] left-[3vw] z-50 font-semibold tracking-[-0.02em]">
         <div className="ml-[1vw] text-[clamp(32px,5vw,64px)] leading-[0.9] font-normal tracking-[-0.02em] text-[oklch(97.015%_0.00011_271.152)]">
-          CLAUDTONOMOUS REPUBLIC
+          NOT ALL WHO WANDER ARE LOST
         </div>
         <div className="ml-0 text-[clamp(32px,5vw,64px)] leading-[0.9] font-normal tracking-[-0.02em] text-[oklch(97.015%_0.00011_271.152)]">
-          IN DOGE WE TRUST
+          BUT I SURE AM
           <sup className="relative top-[0.65em] ml-1 align-top text-[clamp(10px,0.4em,0.4em)] leading-0 font-semibold tracking-[normal] [font-variant-numeric:tabular-nums]">
             ({images.length})
           </sup>

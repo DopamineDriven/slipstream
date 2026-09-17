@@ -1,4 +1,5 @@
 import type { LoggerService } from "@/logger/index.ts";
+import type { PrismaService } from "@/prisma/index.ts";
 import type {
   Content,
   ContentListUnion,
@@ -17,6 +18,7 @@ export class GeminiBaseService {
   protected nanoid: Promise<<Type extends string>(size?: number) => Type>;
   constructor(
     logger: LoggerService,
+    protected prisma: PrismaService,
     protected apiKey: string
   ) {
     this.nanoid = import("nanoid").then(d => d.nanoid);
@@ -41,6 +43,29 @@ export class GeminiBaseService {
     }
     return this.defaultClient;
   }
+
+  protected async getTokenCount(
+    contents: ContentListUnion,
+    model = "gemini-3.1-flash-image-preview",
+    apiKey = this.apiKey
+  ) {
+    const client = this.getClient(apiKey);
+    try {
+      const tokens = await client.models.countTokens({ model, contents });
+      if (tokens.totalTokens) {
+        return { success: true, tokenCount: tokens.totalTokens } as const;
+      } else {
+        return { success: false, tokenCount: 0 } as const;
+      }
+    } catch (err) {
+      this.logger.warn(
+        { model, err: this.prisma.safeErrMsg(err) },
+        "getTokenCount failed - falling back to default input slice"
+      );
+      return { success: false, tokenCount: 0 } as const;
+    }
+  }
+
   /**
    * gemini-3-* only
    */
@@ -81,8 +106,10 @@ export class GeminiBaseService {
    * context window for the smaller-window models (nano bananas, lyria)
    * before the interaction is created. user_input → role "user",
    * model_output → role "model"; each Content block becomes the Part it
-   * would have been on the old lane (uri → fileData, data → inlineData,
-   * resolution → mediaResolution). Content[] is a member of
+   * would have been on the old lane (uri → fileData, data → inlineData).
+   * `resolution` is deliberately NOT mapped to a per-part mediaResolution —
+   * countTokens rejects it (400 INVALID_ARGUMENT); that field only belongs
+   * on generateContent parts (see workup.ts). Content[] is a member of
    * ContentListUnion — countTokens' `contents` type — so the return feeds
    * getTokens directly.
    */
@@ -100,18 +127,16 @@ export class GeminiBaseService {
           }
           case "image": {
             if (content.uri) {
+              // no per-part mediaResolution here: countTokens (this
+              // converter's only consumer) 400s INVALID_ARGUMENT on it
+              // (probe-verified 2026-09-10) — the Interactions payload
+              // itself still carries `resolution`; the budget count
+              // simply undercounts an ultra_high image slightly
               parts.push({
                 fileData: {
                   fileUri: content.uri,
                   mimeType: content.mime_type
-                },
-                ...(content.resolution
-                  ? {
-                      mediaResolution: this.mediaResolutionLevel(
-                        content.mime_type
-                      )
-                    }
-                  : {})
+                }
               } satisfies Part);
             } else if (content.data) {
               parts.push({
@@ -196,7 +221,7 @@ export class GeminiBaseService {
 
   protected isGemini3ChatModel(m: string) {
     return (
-      m ==="gemini-3.8-flash" ||
+      m === "gemini-3.8-flash" ||
       m === "gemini-3.7-flash" ||
       m === "gemini-3.6-flash" ||
       m === "gemini-3.5-flash" ||
@@ -209,7 +234,7 @@ export class GeminiBaseService {
   }
 
   protected isOmniModel(m: string) {
-    return m === "gemini-omni-flash-preview" || m==="gemini-omni-1.1-flash";
+    return m === "gemini-omni-flash-preview" || m === "gemini-omni-1.1-flash";
   }
 
   protected isVeoModel(m: string) {
@@ -220,8 +245,11 @@ export class GeminiBaseService {
     );
   }
   protected isLyriaModel(m: string) {
-    
-    return m==="lyria-3.5" || m === "lyria-3-pro-preview" || m === "lyria-3-clip-preview";
+    return (
+      m === "lyria-3.5" ||
+      m === "lyria-3-pro-preview" ||
+      m === "lyria-3-clip-preview"
+    );
   }
 
   protected isDeepResearch(m: string) {
@@ -289,7 +317,7 @@ export class GeminiBaseService {
 
   protected mediaModalities(model: string) {
     if (this.isLyriaModel(model)) {
-      return ["TEXT", "IMAGE"]
+      return ["TEXT", "IMAGE"];
     }
     if (!this.isNanoBananaFam(model)) {
       return ["TEXT"];
