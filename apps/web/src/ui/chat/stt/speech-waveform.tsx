@@ -140,6 +140,8 @@ export function SpeechWaveform({
             {formatElapsed(0, TIMER_DECIMALS)}
           </span>
           <IconButton
+            // inside the chat <form>: a button without a type submits it
+            type="button"
             label="Discard recording"
             onClick={onDiscard}
             className="size-6 min-h-6 rounded-md">

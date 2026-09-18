@@ -13,6 +13,8 @@ import { ChevronDown } from "@/icons/chevron-down";
 import { ChevronRight } from "@/icons/chevron-right";
 import { ChevronUp } from "@/icons/chevron-up";
 import { Circle } from "@/icons/circle";
+import { CircleAlert } from "@/icons/circle-alert";
+import { CircleCheck } from "@/icons/circle-check";
 import { CirclePlus } from "@/icons/circle-plus";
 import { ClaudeIcon } from "@/icons/claude";
 import { Code } from "@/icons/code";
@@ -118,6 +120,8 @@ const IconComponents = {
   ChevronDown,
   ChevronRight,
   ChevronUp,
+  CircleAlert,
+  CircleCheck,
   CirclePlus,
   Circle,
   ClaudeIcon,
@@ -216,11 +220,7 @@ export type IconName = keyof typeof IconComponents;
 
 export type BaseSVGProps = Omit<
   ComponentPropsWithRef<"svg">,
-  | "viewBox"
-  | "xmlns"
-  | "fill"
-  | "strokeLinecap"
-  | "strokeLinejoin"
+  "viewBox" | "xmlns" | "fill" | "strokeLinecap" | "strokeLinejoin"
 >;
 
 export interface IconProps<T extends IconName> extends BaseSVGProps {
@@ -257,6 +257,8 @@ export {
   ChevronDown,
   ChevronRight,
   ChevronUp,
+  CircleAlert,
+  CircleCheck,
   CirclePlus,
   Circle,
   ClaudeIcon,

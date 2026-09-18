@@ -181,7 +181,7 @@ export function LanguagePicker({
       </div>
 
       <div className="shrink-0 px-6 pb-4 [@media(width<=767px)]:px-5">
-        <div className="text-foreground flex h-11 items-center gap-2.5 rounded-[9px] border border-[color-mix(in_srgb,var(--color-foreground)_13%,transparent)] bg-[color-mix(in_srgb,var(--color-surface)_75%,transparent)] px-3.25 transition-[border-color,box-shadow] duration-160 ease-[ease] focus-within:border-[color-mix(in_srgb,var(--primary)_65%,transparent)] focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--primary)_8%,transparent)]">
+        <div className="text-foreground flex h-11 items-center gap-2.5 rounded-[9px] border border-[color-mix(in_srgb,var(--color-foreground)_13%,transparent)] bg-[color-mix(in_srgb,var(--color-surface)_75%,transparent)] px-3.25 transition-[border-color,box-shadow] duration-160 ease-[ease] focus-within:border-[color-mix(in_srgb,var(--color-primary)_65%,transparent)] focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-primary)_8%,transparent)]">
           <Search
             aria-hidden="true"
             className="text-muted-foreground size-4 shrink-0"
@@ -219,7 +219,7 @@ export function LanguagePicker({
             </button>
           ) : (
             <kbd
-              className="border-border text-muted-foreground inline-flex h-5.75 w-5.25 items-center justify-center rounded-sm border font-[family-name:var(--font-geist),monospace] text-[14px]"
+              className="border-border text-muted-foreground inline-flex h-5.75 w-5.25 items-center justify-center rounded-sm border font-geist-mono text-sm"
               aria-hidden="true">
               /
             </kbd>
@@ -234,7 +234,7 @@ export function LanguagePicker({
             className={cn(
               "has-[input:focus-visible]:outline-primary flex min-h-16.5 cursor-pointer items-center gap-3 rounded-[10px] border px-3 py-2.5 transition-[background,border-color] duration-150 ease-[ease] has-[input:focus-visible]:outline-2 has-[input:focus-visible]:-outline-offset-2",
               draft === undefined
-                ? "border-[color-mix(in_srgb,var(--primary)_36%,transparent)] bg-[color-mix(in_srgb,var(--primary)_8%,var(--background))] [&:hover]:bg-[color-mix(in_srgb,var(--primary)_8%,var(--background))]"
+                ? "border-[color-mix(in_srgb,var(--color-primary)_36%,transparent)] bg-[color-mix(in_srgb,var(--color-primary)_8%,var(--color-background))] [&:hover]:bg-[color-mix(in_srgb,var(--color-primary)_8%,var(--color-background))]"
                 : "border-border [&:hover]:bg-secondary"
             )}>
             <input
@@ -296,7 +296,7 @@ export function LanguagePicker({
                   className={cn(
                     "has-[input:focus-visible]:outline-primary flex min-h-15 cursor-pointer items-center gap-3.25 rounded-[9px] border px-2.75 py-2 transition-[background,border-color] duration-150 ease-[ease] has-[input:focus-visible]:outline-2 has-[input:focus-visible]:-outline-offset-2 [&+[data-language-row]]:mt-0.75 [@media(height<=850px)]:min-h-14 [@media(width<=380px)]:gap-2.5",
                     active
-                      ? "border-[color-mix(in_srgb,var(--primary)_36%,transparent)] bg-[color-mix(in_srgb,var(--primary)_8%,var(--background))] [&:hover]:bg-[color-mix(in_srgb,var(--primary)_8%,var(--background))]"
+                      ? "border-[color-mix(in_srgb,var(--color-primary)_36%,transparent)] bg-[color-mix(in_srgb,var(--color-primary)_8%,var(--color-background))] [&:hover]:bg-[color-mix(in_srgb,var(--color-primary)_8%,var(--color-background))]"
                       : "[&:hover]:bg-secondary border-transparent"
                   )}>
                   <input

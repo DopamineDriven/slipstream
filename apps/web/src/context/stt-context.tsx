@@ -13,6 +13,7 @@ import {
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { usePathnameContext } from "@/context/pathname-context";
+import { useToast } from "@/context/toast-context";
 import { useLangSTT } from "@/hooks/use-stt-lang";
 import {
   canParseDraftId,
@@ -146,6 +147,7 @@ export function STTProvider({
 }) {
   const { conversationId: pathConvId } = usePathnameContext();
   const { client, sendEvent, isConnected } = useChatWebSocketContext();
+  const { toast, dismiss: dismissToast } = useToast();
   const detectedLanguage = useLangSTT();
 
   // ── conversation (passive read of PathnameContext, same as AssetContext) ──
@@ -388,37 +390,71 @@ export function STTProvider({
     undoTimerRef.current = null;
   }, []);
 
+  // ref mirrors `pendingUndo` so the toast action and `undoDiscard` never
+  // close over a stale value
+  const pendingUndoRef = useRef<SettledDictation | null>(null);
+  const undoToastId = (draftId: string) => `stt-undo-${draftId}`;
+
   /** window lapsed (or the composer moved on): the row goes RECOVERABLE server-side */
   const resolveDiscard = useCallback(
     (entry: SettledDictation) => {
       clearUndoTimer();
+      if (pendingUndoRef.current?.draftId === entry.draftId) {
+        pendingUndoRef.current = null;
+      }
       setPendingUndo(current =>
         current?.draftId === entry.draftId ? null : current
       );
       draftsRef.current.delete(entry.draftId);
+      dismissToast(undoToastId(entry.draftId));
       cancel(entry.draftId);
     },
-    [cancel, clearUndoTimer]
+    [cancel, clearUndoTimer, dismissToast]
+  );
+
+  /** Undo: the held transcript enters the draft as if ■ had been pressed */
+  const restoreDiscarded = useCallback(
+    (entry: SettledDictation) => {
+      if (pendingUndoRef.current?.draftId !== entry.draftId) return;
+      clearUndoTimer();
+      pendingUndoRef.current = null;
+      setPendingUndo(null);
+      upsertSettled([entry]);
+      dismissToast(undoToastId(entry.draftId));
+    },
+    [clearUndoTimer, upsertSettled, dismissToast]
   );
 
   const holdForUndo = useCallback(
     (entry: SettledDictation) => {
       clearUndoTimer();
+      pendingUndoRef.current = entry;
       setPendingUndo(entry);
       undoTimerRef.current = setTimeout(
         () => resolveDiscard(entry),
         UNDO_WINDOW_MS
       );
+      const preview = entry.text.trim();
+      toast({
+        id: undoToastId(entry.draftId),
+        title: "Dictation discarded",
+        description: preview.length > 80 ? `${preview.slice(0, 77)}…` : preview,
+        duration: UNDO_WINDOW_MS,
+        action: { label: "Undo", onClick: () => restoreDiscarded(entry) }
+      });
     },
-    [clearUndoTimer, resolveDiscard]
+    [clearUndoTimer, resolveDiscard, restoreDiscarded, toast]
   );
 
   const undoDiscard = useCallback(() => {
-    if (!pendingUndo) return;
-    clearUndoTimer();
-    upsertSettled([pendingUndo]);
-    setPendingUndo(null);
-  }, [pendingUndo, clearUndoTimer, upsertSettled]);
+    const entry = pendingUndoRef.current;
+    if (entry) restoreDiscarded(entry);
+  }, [restoreDiscarded]);
+
+  // errors surface as toasts; `error` stays on the context for inline UI
+  useEffect(() => {
+    if (error) toast.error("Dictation", { description: error });
+  }, [error, toast]);
 
   /**
    * after a message is dispatched: the batch is coupled server-side, so its
