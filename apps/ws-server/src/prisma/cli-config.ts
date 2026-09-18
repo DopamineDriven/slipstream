@@ -8,7 +8,7 @@ import type {
   Provider
 } from "@slipstream/types";
 import { modelIdsByProvider } from "@slipstream/types";
-
+import type { LoggerService } from "@/logger/index.ts";
 /**
  * identity-plane knobs a client may patch — everything else is
  * server-owned. Provider arrives in the wire's lowercase format (the CLI
@@ -31,9 +31,10 @@ export class PrismaCliConfigService extends PrismaConvoListService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
 
   protected cliConfigRegistry = new Map<string, CliConfigSingleton>();

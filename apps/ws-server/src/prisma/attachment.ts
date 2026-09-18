@@ -16,14 +16,15 @@ import type {
   VideoMetadata
 } from "@slipstream/db/node/generated/client";
 import type { CTR, Rm, RTC, XOR } from "@slipstream/types";
-
+import type { LoggerService } from "@/logger/index.ts";
 export class PrismaAttachmentService extends PrismaUserStoreService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
 
   async createAttachment({

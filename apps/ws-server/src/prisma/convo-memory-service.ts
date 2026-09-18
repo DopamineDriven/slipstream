@@ -26,7 +26,7 @@ import {
   updateMemoryChunkSummary,
   updateMemoryChunkSummaryState
 } from "@slipstream/db/sql-node";
-
+import type { LoggerService } from "@/logger/index.ts";
 /**
  * Rollback vehicle for the claim transaction — throwing is Prisma's only
  * mechanism to abort an interactive transaction. This leg is unreachable
@@ -44,9 +44,10 @@ export class PrismaConversationMemoryService extends PrismaConvoHydrationService
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
 
   // ── BigInt Normalization ─────────────────────────────────────────────

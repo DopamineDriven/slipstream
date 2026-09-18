@@ -18,14 +18,15 @@ import { PrismaAttachmentService } from "@/prisma/attachment.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { AIChatRequest, Rm } from "@slipstream/types";
-
+import type { LoggerService } from "@/logger/index.ts";
 export class PrismaChatRequestService extends PrismaAttachmentService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
 
   private get includeGamma() {

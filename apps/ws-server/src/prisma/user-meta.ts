@@ -1,5 +1,6 @@
 import type { ExtractService } from "@/extract/index.ts";
 import type { UserData } from "@/types/index.ts";
+import type { LoggerService } from "@/logger/index.ts";
 import { PrismaUtilsService } from "@/prisma/utils.ts";
 import * as dotenv from "dotenv";
 import type { PrismaDbService } from "@slipstream/db/factory";
@@ -17,9 +18,10 @@ export class PrismaUserMetaService extends PrismaUtilsService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
   }
 

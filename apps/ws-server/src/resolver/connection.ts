@@ -2,6 +2,7 @@ import type { ImageCompatService } from "@/image/index.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ProviderService } from "@/providers/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { STTService } from "@/stt/index.ts";
 import type { TTSService } from "@/tts/index.ts";
 import type { UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
@@ -9,7 +10,7 @@ import type { WebSocket } from "ws";
 import { ResolverCliRecentConvos } from "@/resolver/cli-recent-convos.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type { ClientContextWorkupProps, EventTypeMap } from "@slipstream/types";
-import type { STTService } from "@/stt/index.ts";
+
 export class ResolverConnectionService extends ResolverCliRecentConvos {
   constructor(
     wsServer: WSServer,
@@ -36,6 +37,7 @@ export class ResolverConnectionService extends ResolverCliRecentConvos {
       sttService
     );
   }
+
   protected async postHandleConnectionEstablishedJob(
     ws: WebSocket,
     userId: string
@@ -45,8 +47,11 @@ export class ResolverConnectionService extends ResolverCliRecentConvos {
 
     // const gemini = this.providers.getInstance("gemini");
     const anthropic = this.providers.getInstance("anthropic");
+
     // const grok = this.providers.getInstance("grok");
     void this.sendInitialConversationList(ws, userId);
+    void this.wsServer.prisma.housekeepingSTT(userId);
+
     return await Promise.all([
       // ensure BEFORE sync: a brand-new user has no UserStore row until
       // first upload — ensureUserStore is the check-first get-or-create the

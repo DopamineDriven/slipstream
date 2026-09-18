@@ -12,14 +12,15 @@ import type {
   Rm,
   TTSJobSingleton
 } from "@slipstream/types";
-
+import type { LoggerService } from "@/logger/index.ts";
 export class PrismaChatResponseService extends PrismaChatRequestService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
   private bigIntToIntMsg(
     messages: Rm<MessageSingleton<true | false>, "userKey">[]

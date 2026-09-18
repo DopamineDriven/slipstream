@@ -6,7 +6,7 @@ import type {
   ConversationSingleton,
   HydrateConversationPage
 } from "@slipstream/types";
-
+import type { LoggerService } from "@/logger/index.ts";
 const CONVERSATION_PAGE_SIZE = 12;
 const MAX_CONVERSATION_HYDRATE_PAGES = 4;
 const MAX_CONVERSATION_HYDRATE_TAKE = 50;
@@ -15,9 +15,10 @@ export class PrismaConvoHydrationService extends PrismaChatResponseService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
 
   public async *getConversationHydrationPages({

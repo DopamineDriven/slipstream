@@ -1,4 +1,5 @@
 import type { ExtractService } from "@/extract/index.ts";
+import type { LoggerService } from "@/logger/index.ts";
 import { PrismaTTSService } from "@/prisma/tts.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
@@ -16,9 +17,10 @@ export class PrismaSTTService extends PrismaTTSService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
   private recoveryExpiresAt() {
     return new Date(Date.now() + this.RECOVERY_WINDOW_MS);
@@ -206,6 +208,59 @@ export class PrismaSTTService extends PrismaTTSService {
     return coupled.count;
   }
 
+  /**
+   * per-user housekeeping, drained in the background at handshake. Each step
+   * yields its write count; a throwing step ends the pass and names itself.
+   * Never touches a DECOUPLED row that has text — draft state has no expiry.
+   */
+  public async *dictationHousekeeping(userId: string) {
+    const now = Date.now();
+    // zero-content DECOUPLED rows older than the recovery window: a finish
+    // over silence that was never sent; nothing to keep, not even for M3
+    const emptyDecoupled = await this.prismaClient.dictation.deleteMany({
+      where: {
+        userId,
+        couplingStatus: "DECOUPLED",
+        messageId: null,
+        content: "",
+        createdAt: { lt: new Date(now - this.RECOVERY_WINDOW_MS) }
+      }
+    });
+    yield {
+      step: "delete-empty-decoupled",
+      count: emptyDecoupled.count
+    } as const;
+
+    // PENDING rows a day old are sessions that died with the process (no
+    // close handler ran): content is always "" before a terminal write
+    const strandedPending = await this.prismaClient.dictation.deleteMany({
+      where: {
+        userId,
+        couplingStatus: "PENDING",
+        createdAt: { lt: new Date(now - 24 * 60 * 60 * 1000) }
+      }
+    });
+    yield {
+      step: "delete-stranded-pending",
+      count: strandedPending.count
+    } as const;
+
+    // the per-user face of dictationSweep, so a returning user is clean
+    // without waiting for the interval
+    const tombstoned = await this.prismaClient.dictation.updateMany({
+      where: {
+        userId,
+        couplingStatus: "RECOVERABLE",
+        recoveryExpiresAt: { lt: new Date(now) }
+      },
+      data: { couplingStatus: "ORPHANED", content: "", recoveryExpiresAt: null }
+    });
+    yield {
+      step: "tombstone-expired-recoverable",
+      count: tombstoned.count
+    } as const;
+  }
+
   /** interval job — expired RECOVERABLE → ORPHANED tombstone; never touches DECOUPLED */
   public async dictationSweep() {
     const swept = await this.prismaClient.dictation.updateMany({
@@ -236,5 +291,24 @@ export class PrismaSTTService extends PrismaTTSService {
       orderBy: { createdAt: "desc" },
       select: this.selectForDictationRecover
     });
+  }
+
+  private async drainDictationHousekeeping(userId: string) {
+    for await (const { step, count } of this.dictationHousekeeping(userId)) {
+      if (count > 0) {
+        this.logger.info({ userId, step, count }, "dictation housekeeping");
+      }
+    }
+  }
+
+  public async housekeepingSTT(userId: string) {
+    return await this.drainDictationHousekeeping(userId).catch(
+      (err: unknown) => {
+        this.logger.warn(
+          { userId, err: this.safeErrMsg(err) },
+          "dictation housekeeping failed; connection unaffected"
+        );
+      }
+    );
   }
 }

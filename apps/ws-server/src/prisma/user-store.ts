@@ -15,14 +15,16 @@ import {
   updateUserStoreChunkState,
   updateUserStoreDocState
 } from "@slipstream/db/sql-node";
+import type { LoggerService } from "@/logger/index.ts";
 
 export class PrismaUserStoreService extends PrismaSTTService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
 
   public async hasUserStoreDocs(userId: string) {
