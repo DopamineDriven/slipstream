@@ -653,10 +653,6 @@ export class STTService {
         }
         case "transcript.partial": {
           if (!event.is_final) return; // never expected with interims off
-          this.logger.debug(
-            { draftId: session.draftId, event },
-            "transcript.partial (final) — verbose probe"
-          );
           // xai-server emits empty finals over silence; only text is presence
           if (event.text.trim().length > 0) {
             session.lastUtteranceAt = performance.now();
@@ -667,10 +663,6 @@ export class STTService {
         }
         case "transcript.done": {
           session.finalReceived = true;
-          this.logger.debug(
-            { draftId: session.draftId, event },
-            "transcript.done — verbose probe"
-          );
           this.logger.info(
             {
               draftId: session.draftId,

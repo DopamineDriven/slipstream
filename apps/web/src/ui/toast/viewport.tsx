@@ -35,7 +35,7 @@ export function ToastViewport({
     <section
       aria-label="Notifications"
       tabIndex={-1}
-      className="pointer-events-none fixed inset-x-0 bottom-20 z-50 flex justify-center p-4 outline-none sm:right- sm:left-auto sm:w-96 sm:p-6">
+      className="pointer-events-none fixed inset-x-0 bottom-20 z-50 flex justify-center p-4 outline-none sm:right-20 sm:left-auto sm:w-96 sm:p-6">
       <ol
         className="flex w-full flex-col gap-2"
         onPointerEnter={() => setHovered(true)}
@@ -46,7 +46,7 @@ export function ToastViewport({
           {visible.map(toast => (
             <ToastItem
               key={toast.id}
-              toast={toast} 
+              toast={toast}
               paused={paused}
               onDismiss={onDismiss}
             />

@@ -166,7 +166,7 @@ export default function CreateButton({
                         fontSize: "11px",
                         letterSpacing: "var(--kicker-tracking-loose)",
                         textTransform: "uppercase",
-                        color: "var(--foreground-feint)",
+                        color: "var(--color-muted-foreground)",
                         fontVariationSettings: '"wght" 560'
                       }}>
                       Create new
@@ -181,7 +181,7 @@ export default function CreateButton({
                         padding: "0.5rem",
                         margin: "-0.5rem",
                         willChange: "transform",
-                        color: "var(--foreground)",
+                        color: "var(--color-foreground)",
                         fontSize: "0.625rem"
                       }}
                       initial={{ rotate: 45 }}
@@ -246,7 +246,7 @@ function GridItemButton({
   const [hovered, setHovered] = useState(false);
   const col = index % 3;
   const row = Math.floor(index / 3);
-  const dotted = "1px dotted var(--border)";
+  const dotted = "1px dotted var(--color-border)";
 
   return (
     <motion.div
@@ -408,12 +408,12 @@ const triggerButton = {
   backgroundColor: "var(--layer)",
   backgroundImage: `repeating-linear-gradient(
         var(--dossier-stripe-angle, 119deg),
-        color-mix(in srgb, var(--foreground) 6%, transparent) 0,
-        color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
+        color-mix(in srgb, var(--color-foreground) 6%, transparent) 0,
+        color-mix(in srgb, var(--color-foreground) 6%, transparent) 1px,
         transparent 1px,
         transparent 5px
     )`,
-  color: "var(--foreground)",
+  color: "var(--color-foreground)",
   padding: "0.7rem 1.1rem",
   cursor: "pointer",
   willChange: "transform",
@@ -421,13 +421,13 @@ const triggerButton = {
   outline: "none",
   fontFamily: "inherit",
   fontSize: "inherit"
-} satisfies React.CSSProperties ;
+} satisfies React.CSSProperties;
 
 const triggerCap: React.CSSProperties = {
   position: "absolute",
   width: "10px",
   height: "10px",
-  border: "1.5px solid var(--accent, var(--foreground))",
+  border: "1.5px solid var(--color-accent, var(--color-foreground))",
   pointerEvents: "none",
   zIndex: 1
 };
@@ -437,11 +437,11 @@ const expandedMenu: React.CSSProperties = {
   backgroundColor: "var(--layer)",
   border: "1px dotted var(--border)",
   width: "min(22rem, 90vw)",
-  color: "var(--foreground)",
+  color: "var(--color-foreground)",
   overflow: "hidden",
   willChange: "transform",
   boxShadow:
-    "0 16px 48px color-mix(in srgb, var(--background) 70%, transparent)"
+    "0 16px 48px color-mix(in srgb, var(--color-background) 70%, transparent)"
 };
 
 const menuHeader: React.CSSProperties = {
@@ -450,7 +450,7 @@ const menuHeader: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "space-between",
   padding: "0.875rem 1.1rem",
-  borderBottom: "1px dotted var(--border)",
+  borderBottom: "1px dotted var(--color-border)",
   boxSizing: "border-box"
 };
 
@@ -478,14 +478,14 @@ const gridItem: React.CSSProperties = {
   gap: "0.55rem",
   padding: "1.1rem 0.5rem",
   backgroundColor: "var(--layer)",
-  color: "var(--foreground-feint)"
+  color: "var(--color-muted-foreground)"
 };
 
 const gridItemHighlight: React.CSSProperties = {
   position: "absolute",
   inset: 0,
   backgroundColor:
-    "var(--accent-light, color-mix(in srgb, var(--foreground) 8%, transparent))",
+    "var(--color-accent-foreground, color-mix(in srgb, var(--color-foreground) 8%, transparent))",
   pointerEvents: "none"
 };
 
@@ -494,14 +494,14 @@ const gridItemIcon: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  color: "var(--foreground-feint)"
+  color: "var(--color-muted-foreground)"
 };
 
 const gridItemLabel: React.CSSProperties = {
   position: "relative",
   fontFamily: "var(--font-mono)",
   fontSize: "10px",
-  color: "var(--foreground)",
+  color: "var(--color-foreground)",
   lineHeight: 1,
   letterSpacing: "var(--kicker-tracking-tight, 0.1em)",
   textTransform: "uppercase",
