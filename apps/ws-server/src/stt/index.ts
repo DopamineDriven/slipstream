@@ -64,6 +64,17 @@ export class STTService {
   private readonly SETTLED_TTL_MS = 60 * 60 * 1000;
   /** xai-client send backlog above this = stalled hop 2 */
   private readonly MAX_XAI_CLIENT_BUFFER = 1 << 20;
+  /**
+   * voice detection is RELATIVE to a per-session noise floor: a fan, A/C, or
+   * open window is steady, speech is bursty. A frame is voiced when it is
+   * both above an absolute minimum and well above the tracked floor; the
+   * floor learns only from quiet frames (fast fall, slow rise) so continuous
+   * speech never lifts it into a false idle
+   */
+  private readonly VOICE_ABS_MIN_RMS = 0.01; // -40 dBFS: nothing below this counts, however quiet the room
+  private readonly VOICE_OVER_FLOOR = 3; // ≈ +9.5 dB above the floor
+  private readonly FLOOR_ADAPT = 0.05; // per quiet frame; ~2 s to settle at 10 fps
+  private readonly noiseFloors = new WeakMap<STTTypes.Session, number>();
   protected readonly baseSTTUrl = "wss://api.x.ai/v1/stt";
   protected logger: PinoLogger;
 
@@ -172,7 +183,7 @@ export class STTService {
       pendingReason: "USER_FINISHED",
       disconnected: false,
       expectedFrameOrdinal: 0,
-      lastUtteranceAt: Date.now(),
+      lastUtteranceAt: performance.now(), // monotonic: the idle clock, never wall time
       idleTimer: null,
       closeTimer: null,
       deadlineTimer: null,
@@ -252,12 +263,20 @@ export class STTService {
       return;
     }
     const pcm = Buffer.from(ev.frame, "base64");
+    // the idle clock runs from the last VOICED frame, not the last finalized
+    // utterance — a long unbroken sentence must never look idle
+    const rms = this.frameRms(pcm);
+    const voiced = this.isVoiced(session, rms);
+    if (voiced) this.noteVoice(session);
     if (ev.frameOrdinal === 0 || ev.frameOrdinal % 50 === 0) {
       this.logger.debug(
         {
           draftId: session.draftId,
           frameOrdinal: ev.frameOrdinal,
-          bytes: pcm.byteLength
+          bytes: pcm.byteLength,
+          rms: Number(rms.toFixed(4)),
+          floor: Number((this.noiseFloors.get(session) ?? 0).toFixed(4)),
+          voiced
         },
         "frame → xai-client"
       );
@@ -390,7 +409,7 @@ export class STTService {
       return;
     }
     if (session.phase !== "recording") return;
-    session.lastUtteranceAt = Date.now();
+    session.lastUtteranceAt = performance.now();
     this.armIdleTimer(session); // clears the close timer too
     this.renewLease(session);
   }
@@ -638,8 +657,11 @@ export class STTService {
             { draftId: session.draftId, event },
             "transcript.partial (final) — verbose probe"
           );
-          session.lastUtteranceAt = Date.now();
-          if (session.phase === "recording") this.armIdleTimer(session);
+          // xai-server emits empty finals over silence; only text is presence
+          if (event.text.trim().length > 0) {
+            session.lastUtteranceAt = performance.now();
+            if (session.phase === "recording") this.armIdleTimer(session);
+          }
           this.checkpoint(session, event);
           return;
         }
@@ -720,10 +742,57 @@ export class STTService {
 
   // ── timers ───────────────────────────────────────────────────────────
 
+  /** RMS of an Int16LE PCM frame, normalised to 0..1 */
+  private frameRms(pcm: Buffer) {
+    const samples = pcm.byteLength >> 1;
+    if (samples === 0) return 0;
+    let sumSq = 0;
+    for (let i = 0; i < samples; i++) {
+      const s = pcm.readInt16LE(i << 1) / 0x8000;
+      sumSq += s * s;
+    }
+    return Math.sqrt(sumSq / samples);
+  }
+
+  /** relative VAD — see the VOICE_* constants */
+  private isVoiced(session: STTTypes.Session, rms: number) {
+    const floor = this.noiseFloors.get(session) ?? rms;
+    const voiced =
+      rms > this.VOICE_ABS_MIN_RMS && rms > floor * this.VOICE_OVER_FLOOR;
+    // a floor seeded mid-sentence self-corrects on the first quiet frame
+    // (fast fall); quiet frames drift it up slowly; voiced frames leave it alone
+    const next = voiced
+      ? floor
+      : rms < floor
+        ? rms
+        : floor + (rms - floor) * this.FLOOR_ADAPT;
+    this.noiseFloors.set(session, next);
+    return voiced;
+  }
+
+  /**
+   * a voiced frame arrived: stamp the clock, and if the "still there?" prompt
+   * is up, that IS the answer — back to recording without waiting for
+   * `stt_user_present` (the client dismisses its own dialog from local energy)
+   */
+  private noteVoice(session: STTTypes.Session) {
+    session.lastUtteranceAt = performance.now();
+    if (session.closeTimer) this.armIdleTimer(session);
+  }
+
+  /**
+   * check-on-fire: the timer wakes at IDLE_MS and re-arms for the remainder
+   * if voice was heard since, so a voiced frame every 100 ms never churns it
+   */
   private armIdleTimer(session: STTTypes.Session) {
     this.clearIdleTimers(session);
-    session.idleTimer = setTimeout(() => {
+    const tick = () => {
       if (session.phase !== "recording") return;
+      const idleFor = performance.now() - session.lastUtteranceAt;
+      if (idleFor < this.IDLE_MS) {
+        session.idleTimer = setTimeout(tick, this.IDLE_MS - idleFor);
+        return;
+      }
       this.trySend(session.ws, {
         type: "stt_user_timeout",
         draftId: session.draftId,
@@ -737,7 +806,8 @@ export class STTService {
           "IDLE_TIMEOUT"
         );
       }, this.CLOSE_MS);
-    }, this.IDLE_MS);
+    };
+    session.idleTimer = setTimeout(tick, this.IDLE_MS);
   }
 
   private armFinishDeadline(session: STTTypes.Session) {

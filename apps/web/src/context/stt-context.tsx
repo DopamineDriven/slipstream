@@ -121,9 +121,18 @@ const LANGUAGES: STTTypes.Web.LanguageOption[] = Array.from(arrSTT);
 /** frames buffered while `stt_user_connect` is in flight; ~5 s at 100 ms */
 const MAX_PRECONNECT_CHUNKS = 50;
 /** RMS above this while the timeout prompt is up counts as "I'm here" */
-const VOICE_RMS_THRESHOLD = 0.015;
+/**
+ * relative VAD, mirroring the server: a frame is voiced when above an
+ * absolute minimum AND well above a tracked noise floor, so a fan or A/C
+ * never answers the prompt. The floor learns from quiet frames only
+ */
+const VOICE_ABS_MIN_RMS = 0.01;
+const VOICE_OVER_FLOOR = 3;
+const FLOOR_ADAPT = 0.05;
 /** ✕ undo window before `stt_user_cancel` goes out */
 const UNDO_WINDOW_MS = 6_000;
+/** the "still there?" prompt is one persistent toast, updated in place each second */
+const TIMEOUT_TOAST_ID = "stt_user_timeout";
 /**
  * raw RMS → waveform level on a dB scale, so a hot USB mic (Yeti) and a
  * quiet laptop mic both land in range: -50 dBFS is a resting bar, -10 dBFS
@@ -323,6 +332,16 @@ export function STTProvider({
 
   const clearError = useCallback(() => setError(null), []);
 
+  // ── idle probe ("still there?") as a persistent, in-place-updated toast ──
+  const timeoutTickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const clearTimeoutPrompt = useCallback(() => {
+    if (timeoutTickRef.current) clearInterval(timeoutTickRef.current);
+    timeoutTickRef.current = null;
+    setTimeoutClosesInMs(() => null);
+    dismissToast(TIMEOUT_TOAST_ID);
+  }, [dismissToast]);
+
   const setPhaseSync = useCallback((next: DictationPhase) => {
     phaseRef.current = next;
     setPhase(next);
@@ -339,12 +358,12 @@ export function STTProvider({
       setActiveDraftId(null);
       setStartedAt(null);
       levelRef.current = 0;
-      setTimeoutClosesInMs(null);
+      clearTimeoutPrompt();
       setPhaseSync("idle");
       sttLog("interrupted locally", message);
       setError(message);
     },
-    [setPhaseSync]
+    [setPhaseSync, clearTimeoutPrompt]
   );
 
   // ── server-only actions ───────────────────────────────────────────────
@@ -360,9 +379,36 @@ export function STTProvider({
     const draftId = activeDraftRef.current;
     if (!draftId || phaseRef.current !== "timeoutPrompt") return;
     sendEvent("stt_user_present", { type: "stt_user_present", draftId });
-    setTimeoutClosesInMs(null);
+    clearTimeoutPrompt();
     setPhaseSync("recording");
-  }, [sendEvent, setPhaseSync]);
+  }, [sendEvent, setPhaseSync, clearTimeoutPrompt]);
+
+  /**
+   * the server's clock is the authority; the toast just mirrors it — a
+   * countdown re-issued under one id, `Infinity` duration so hover/focus
+   * pauses can't desync it, "I'm here" as the action, dismissed on answer
+   */
+  const showTimeoutPrompt = useCallback(
+    (closesInMs: number) => {
+      if (timeoutTickRef.current) clearInterval(timeoutTickRef.current);
+      const closesAt = performance.now() + closesInMs;
+      const render = () => {
+        const remaining = Math.max(0, closesAt - performance.now());
+        const seconds = Math.ceil(remaining / 1000);
+        toast({
+          id: TIMEOUT_TOAST_ID,
+          variant: "info",
+          title: "Still there?",
+          description: `Recording finishes in ${seconds}s. Keep talking, or tap Still thinking.`,
+          duration: Infinity,
+          action: { label: "Still thinking", onClick: present }
+        });
+      };
+      render();
+      timeoutTickRef.current = setInterval(render, 1_000);
+    },
+    [toast, present]
+  );
 
   const restore = useCallback(
     (draftId: string) => {
@@ -543,12 +589,19 @@ export function STTProvider({
     [interruptLocal, sendFrame]
   );
 
+  const noiseFloorRef = useRef<number | null>(null);
+
   const handleLevel = useCallback(
     (rms: number) => {
       levelRef.current = rms;
-      if (phaseRef.current === "timeoutPrompt" && rms > VOICE_RMS_THRESHOLD) {
-        present();
-      }
+      const floor = noiseFloorRef.current ?? rms;
+      const voiced = rms > VOICE_ABS_MIN_RMS && rms > floor * VOICE_OVER_FLOOR;
+      noiseFloorRef.current = voiced
+        ? floor
+        : rms < floor
+          ? rms
+          : floor + (rms - floor) * FLOOR_ADAPT;
+      if (voiced && phaseRef.current === "timeoutPrompt") present();
     },
     [present]
   );
@@ -580,7 +633,7 @@ export function STTProvider({
         return;
       }
       setPhaseSync("finishing");
-      setTimeoutClosesInMs(null);
+      clearTimeoutPrompt();
       const stopped = await capture.stop();
       sttLog("capture stopped", { draftId, ...stopped }); // tail chunk flowed through handleChunk during "finishing"
       if (captureRef.current === capture) captureRef.current = null;
@@ -591,7 +644,7 @@ export function STTProvider({
       sttLog("stt_user_finish sent", { draftId, ok });
       if (!ok) interruptLocal("Connection lost while finishing the dictation.");
     },
-    [client, interruptLocal, setPhaseSync]
+    [client, interruptLocal, setPhaseSync, clearTimeoutPrompt]
   );
 
   // latest-callback ref for the capture and route-change paths, which are
@@ -621,6 +674,7 @@ export function STTProvider({
         onInterrupted: handleInterrupted
       });
       captureRef.current = capture;
+      noiseFloorRef.current = null; // a new room, a new mic, a new floor
       discardRef.current = false;
       finishRequestedRef.current = false;
       preConnectRef.current = [];
@@ -710,7 +764,7 @@ export function STTProvider({
       setActiveDraftId(null);
       setStartedAt(null);
       levelRef.current = 0;
-      setTimeoutClosesInMs(null);
+      clearTimeoutPrompt();
       setPhaseSync("idle");
     };
 
@@ -738,6 +792,7 @@ export function STTProvider({
       sttLog("stt_user_timeout", evt);
       setPhaseSync("timeoutPrompt");
       setTimeoutClosesInMs(evt.closesInMs);
+      showTimeoutPrompt(evt.closesInMs);
     };
 
     const handleFinished = (evt: EventTypeMap["stt_user_finished"]) => {
@@ -881,7 +936,9 @@ export function STTProvider({
     sendFrame,
     setPhaseSync,
     holdForUndo,
-    resolveDiscard
+    resolveDiscard,
+    showTimeoutPrompt,
+    clearTimeoutPrompt
   ]);
 
   // socket gone while live: the server settles the row on close; the mic is released here
