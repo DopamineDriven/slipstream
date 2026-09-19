@@ -135,6 +135,9 @@ export class ResolverDispatchService extends ResolverConnectionService {
       case "stt_user_recover":
         await this.sttUserRecover(event, ws, userId, userData);
         break;
+      case "stt_user_rehydrate":
+        await this.sttUserRehydrate(event, ws, userId, userData);
+        break;
       case "stt_user_restore":
         await this.sttUserRestore(event, ws, userId, userData);
         break;
@@ -211,6 +214,8 @@ export class ResolverDispatchService extends ResolverConnectionService {
     "stt_user_present",
     "stt_user_recover",
     "stt_user_recovered",
+    "stt_user_rehydrate",
+    "stt_user_rehydrated",
     "stt_user_restore",
     "stt_user_restored",
     "stt_user_timeout",
@@ -359,6 +364,7 @@ export class ResolverDispatchService extends ResolverConnectionService {
     this.wsServer.on("stt_user_finish", this.sttUserFinish.bind(this));
     this.wsServer.on("stt_user_present", this.sttUserPresent.bind(this));
     this.wsServer.on("stt_user_recover", this.sttUserRecover.bind(this));
+    this.wsServer.on("stt_user_rehydrate", this.sttUserRehydrate.bind(this));
     this.wsServer.on("stt_user_restore", this.sttUserRestore.bind(this));
   }
 }

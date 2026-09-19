@@ -82,10 +82,27 @@ class EventHandlerRegistry {
     "provider_context_pong",
     "provider_context_update",
     "provider_context_update_ack",
+    "stt_user_binary_frame",
+    "stt_user_cancel",
+    "stt_user_canceled",
+    "stt_user_connect",
+    "stt_user_connected",
+    "stt_user_error",
+    "stt_user_finish",
+    "stt_user_finished",
+    "stt_user_interrupted",
+    "stt_user_present",
+    "stt_user_recover",
+    "stt_user_recovered",
+    "stt_user_rehydrate",
+    "stt_user_rehydrated",
+    "stt_user_restore",
+    "stt_user_restored",
+    "stt_user_timeout",
     "typing",
-    "user_tts_request",
     "user_tts_chunk",
     "user_tts_error",
+    "user_tts_request",
     "user_tts_response",
     "user_tts_response_preexisting"
   ] as const satisfies AnyEventTypeUnion[];
@@ -392,6 +409,12 @@ class EventHandlerRegistry {
           handler(event, socket);
         }
       },
+      image_gen_error: () => {
+        const handler = this.handlers.image_gen_error;
+        if (handler && event.type === "image_gen_error") {
+          handler(event, socket);
+        }
+      },
       local_tool_request: () => {
         const handler = this.handlers.local_tool_request;
         if (handler && event.type === "local_tool_request") {
@@ -401,12 +424,6 @@ class EventHandlerRegistry {
       local_tool_result: () => {
         const handler = this.handlers.local_tool_result;
         if (handler && event.type === "local_tool_result") {
-          handler(event, socket);
-        }
-      },
-      image_gen_error: () => {
-        const handler = this.handlers.image_gen_error;
-        if (handler && event.type === "image_gen_error") {
           handler(event, socket);
         }
       },
@@ -437,6 +454,108 @@ class EventHandlerRegistry {
       provider_context_update_ack: () => {
         const handler = this.handlers.provider_context_update_ack;
         if (handler && event.type === "provider_context_update_ack") {
+          handler(event, socket);
+        }
+      },
+      stt_user_binary_frame: () => {
+        const handler = this.handlers.stt_user_binary_frame;
+        if (handler && event.type === "stt_user_binary_frame") {
+          handler(event, socket);
+        }
+      },
+      stt_user_cancel: () => {
+        const handler = this.handlers.stt_user_cancel;
+        if (handler && event.type === "stt_user_cancel") {
+          handler(event, socket);
+        }
+      },
+      stt_user_canceled: () => {
+        const handler = this.handlers.stt_user_canceled;
+        if (handler && event.type === "stt_user_canceled") {
+          handler(event, socket);
+        }
+      },
+      stt_user_connect: () => {
+        const handler = this.handlers.stt_user_connect;
+        if (handler && event.type === "stt_user_connect") {
+          handler(event, socket);
+        }
+      },
+      stt_user_connected: () => {
+        const handler = this.handlers.stt_user_connected;
+        if (handler && event.type === "stt_user_connected") {
+          handler(event, socket);
+        }
+      },
+      stt_user_error: () => {
+        const handler = this.handlers.stt_user_error;
+        if (handler && event.type === "stt_user_error") {
+          handler(event, socket);
+        }
+      },
+      stt_user_finish: () => {
+        const handler = this.handlers.stt_user_finish;
+        if (handler && event.type === "stt_user_finish") {
+          handler(event, socket);
+        }
+      },
+      stt_user_finished: () => {
+        const handler = this.handlers.stt_user_finished;
+        if (handler && event.type === "stt_user_finished") {
+          handler(event, socket);
+        }
+      },
+      stt_user_interrupted: () => {
+        const handler = this.handlers.stt_user_interrupted;
+        if (handler && event.type === "stt_user_interrupted") {
+          handler(event, socket);
+        }
+      },
+      stt_user_present: () => {
+        const handler = this.handlers.stt_user_present;
+        if (handler && event.type === "stt_user_present") {
+          handler(event, socket);
+        }
+      },
+      stt_user_recover: () => {
+        const handler = this.handlers.stt_user_recover;
+        if (handler && event.type === "stt_user_recover") {
+          handler(event, socket);
+        }
+      },
+      stt_user_recovered: () => {
+        const handler = this.handlers.stt_user_recovered;
+        if (handler && event.type === "stt_user_recovered") {
+          handler(event, socket);
+        }
+      },
+      stt_user_rehydrate: () => {
+        const handler = this.handlers.stt_user_rehydrate;
+        if (handler && event.type === "stt_user_rehydrate") {
+          handler(event, socket);
+        }
+      },
+      stt_user_rehydrated: () => {
+        const handler = this.handlers.stt_user_rehydrated;
+        if (handler && event.type === "stt_user_rehydrated") {
+          handler(event, socket);
+        }
+      },
+      stt_user_restore: () => {
+        const handler = this.handlers.stt_user_restore;
+        if (handler && event.type === "stt_user_restore") {
+          handler(event, socket);
+        }
+      },
+      stt_user_restored: () => {
+        const handler = this.handlers.stt_user_restored;
+        if (handler && event.type === "stt_user_restored") {
+          handler(event, socket);
+        }
+      },
+      stt_user_timeout: () => {
+        const handler = this.handlers.stt_user_timeout;
+        if (handler && event.type === "stt_user_timeout") {
           handler(event, socket);
         }
       },

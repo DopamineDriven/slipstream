@@ -152,6 +152,8 @@ export { Check } from "@/icons/check";
 export { ChevronDown } from "@/icons/chevron-down";
 export { ChevronRight } from "@/icons/chevron-right";
 export { ChevronUp } from "@/icons/chevron-up";
+export { CircleAlert } from "@/icons/circle-alert";
+export { CircleCheck } from "@/icons/circle-check";
 export { CirclePlus } from "@/icons/circle-plus";
 export { Circle } from "@/icons/circle";
 export { ClaudeIcon } from "@/icons/claude";

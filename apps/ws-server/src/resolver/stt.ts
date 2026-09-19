@@ -9,7 +9,7 @@ import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
 import { ResolverChatUtilsService } from "@/resolver/chat-utils.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type { EventTypeMap } from "@slipstream/types";
+import type { EventTypeMap, STTUserRehydrated } from "@slipstream/types";
 
 export class ResolverSTTService extends ResolverChatUtilsService {
   constructor(
@@ -241,5 +241,18 @@ export class ResolverSTTService extends ResolverChatUtilsService {
   ) {
     if (!this.ownsDraft(ws, userId, event.draftId)) return;
     await this.sttService.restore(ws, userId, event);
+  }
+
+  protected async sttUserRehydrate(
+    event: EventTypeMap["stt_user_rehydrate"],
+    ws: WebSocket,
+    userId: string,
+    _userData?: UserData
+  ) {
+    const data = await this.wsServer.prisma.sttUserRehydrated(
+      userId,
+      event.conversationId
+    );
+    ws.send(JSON.stringify(data satisfies STTUserRehydrated));
   }
 }

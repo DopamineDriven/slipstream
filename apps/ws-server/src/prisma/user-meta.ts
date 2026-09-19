@@ -1,4 +1,5 @@
 import type { ExtractService } from "@/extract/index.ts";
+import type { LoggerService } from "@/logger/index.ts";
 import type { UserData } from "@/types/index.ts";
 import { PrismaUtilsService } from "@/prisma/utils.ts";
 import * as dotenv from "dotenv";
@@ -17,9 +18,10 @@ export class PrismaUserMetaService extends PrismaUtilsService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
   }
 
@@ -57,7 +59,7 @@ export class PrismaUserMetaService extends PrismaUtilsService {
       key = fallbackApiKey;
     }
 
-    console.info(
+    this.logger.info(
       `${tryApiKey.apiKey === null ? "no " + provider + " key on file" : provider + " api key on file"}`
     );
 
@@ -216,7 +218,7 @@ export class PrismaUserMetaService extends PrismaUtilsService {
       }
     });
     if (!rec) {
-      console.info(`No API key configured for ${provider}!`);
+      this.logger.info(`No API key configured for ${provider}!`);
       return { apiKey: null, keyId: null };
     }
     try {
@@ -228,10 +230,13 @@ export class PrismaUserMetaService extends PrismaUtilsService {
       return { apiKey: decrypted, keyId: rec.id };
     } catch (err) {
       if (err instanceof Error) {
-        console.error(`Decryption failed for: ${provider}, ` + err.message);
+        this.logger.error(
+          { err },
+          `Decryption failed for: ${provider}, ` + err.message
+        );
         return { apiKey: null, keyId: null };
       } else {
-        console.error(this.safeErrMsg(err));
+        this.logger.error(this.safeErrMsg(err));
         return { apiKey: null, keyId: null };
       }
     }

@@ -1,4 +1,5 @@
 import type { ExtractService } from "@/extract/index.ts";
+import type { LoggerService } from "@/logger/index.ts";
 import { PrismaCliConfigService } from "@/prisma/cli-config.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 
@@ -43,6 +44,10 @@ import type { PrismaDbService } from "@slipstream/db/factory";
  *
  *  ⬆
  *
+ * `@/prisma/stt.ts`
+ *
+ *  ⬆
+ *
  * `@/prisma/tts.ts`
  *
  *  ⬆
@@ -68,8 +73,9 @@ export class PrismaService extends PrismaCliConfigService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
 }

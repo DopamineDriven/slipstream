@@ -77,7 +77,7 @@ async function exe() {
 
     const { PrismaService } = await import("@/prisma/index.ts");
 
-    const prisma = new PrismaService(db, extract, isProd);
+    const prisma = new PrismaService(db, extract, logger, isProd);
 
     const port = cfg.PORT ? Number.parseInt(cfg.PORT) : 4000;
 

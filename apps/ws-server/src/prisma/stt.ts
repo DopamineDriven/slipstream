@@ -1,8 +1,13 @@
 import type { ExtractService } from "@/extract/index.ts";
+import type { LoggerService } from "@/logger/index.ts";
 import { PrismaTTSService } from "@/prisma/tts.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { STTEventRecord, STTTypes } from "@slipstream/types";
+import type {
+  STTEventRecord,
+  STTTypes,
+  STTUserRehydrated
+} from "@slipstream/types";
 
 export type DictationCoupleParams = {
   messageId: string;
@@ -16,9 +21,10 @@ export class PrismaSTTService extends PrismaTTSService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
   private recoveryExpiresAt() {
     return new Date(Date.now() + this.RECOVERY_WINDOW_MS);
@@ -61,7 +67,7 @@ export class PrismaSTTService extends PrismaTTSService {
     });
   }
 
-  /** `transcript.done` — COMPLETED / DECOUPLED; never expires */
+  /** `transcript.done` — COMPLETED / DECOUPLED; rehydratable for 24 h if never sent */
   public async dictationComplete(
     draftId: string,
     done: STTTypes.Transcript.Done,
@@ -206,6 +212,90 @@ export class PrismaSTTService extends PrismaTTSService {
     return coupled.count;
   }
 
+  /**
+   * per-user housekeeping, drained in the background at handshake. Each step
+   * yields its write count; a throwing step ends the pass and names itself.
+   *
+   * Append-only: rows are tombstoned, never deleted, so a batch's ordinals
+   * stay contiguous from 0 and `stt_user_rehydrated.dictations.length` is
+   * always the next ordinal. Each step's write takes the row out of its own
+   * `where`, so a row is written once.
+   */
+  public async *dictationHousekeeping(userId: string) {
+    const now = Date.now();
+    /**
+     * 24h ago
+     */
+    const lt = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    // zero-content DECOUPLED rows a day old: a finish over silence that was
+    // never sent. The job did complete, so status / terminationReason stand;
+    // the row stays to hold its ordinal
+    const emptyDecoupled = await this.prismaClient.dictation.updateMany({
+      where: {
+        userId,
+        couplingStatus: "DECOUPLED",
+        messageId: null,
+        content: "",
+        createdAt: { lt: lt }
+      },
+      data: { couplingStatus: "ORPHANED" }
+    });
+    yield {
+      step: "tombstone-empty-decoupled",
+      count: emptyDecoupled.count
+    } as const;
+
+    // PENDING rows a day old are sessions that died with the process (no
+    // close handler ran): content is always "" before a terminal write.
+    // FAILED with the reason left at NONE = ended, cause never witnessed —
+    // a client drop or xAI fault would have stamped its own reason
+    const strandedPending = await this.prismaClient.dictation.updateMany({
+      where: {
+        userId,
+        couplingStatus: "PENDING",
+        createdAt: { lt }
+      },
+      data: {
+        status: "FAILED",
+        couplingStatus: "FAILED",
+        terminationReason: "NONE"
+      }
+    });
+    yield {
+      step: "tombstone-stranded-pending",
+      count: strandedPending.count
+    } as const;
+
+    // the per-user face of dictationSweep, so a returning user is clean
+    // without waiting for the interval
+    const tombstoned = await this.prismaClient.dictation.updateMany({
+      where: {
+        userId,
+        couplingStatus: "RECOVERABLE",
+        recoveryExpiresAt: { lt: new Date(now) }
+      },
+      data: { couplingStatus: "ORPHANED", content: "", recoveryExpiresAt: null }
+    });
+    yield {
+      step: "tombstone-expired-recoverable",
+      count: tombstoned.count
+    } as const;
+
+    // unsent transcripts nobody came back for: the end of the 24 h rehydrate
+    // window. `updatedAt`, so restoring a canceled dictation earns a fresh day
+    const unsent = await this.prismaClient.dictation.updateMany({
+      where: {
+        userId,
+        couplingStatus: "DECOUPLED",
+        messageId: null,
+        content: { not: "" },
+        updatedAt: { lt }
+      },
+      data: { couplingStatus: "ORPHANED", content: "" }
+    });
+    yield { step: "tombstone-expired-unsent", count: unsent.count } as const;
+  }
+
   /** interval job — expired RECOVERABLE → ORPHANED tombstone; never touches DECOUPLED */
   public async dictationSweep() {
     const swept = await this.prismaClient.dictation.updateMany({
@@ -235,6 +325,97 @@ export class PrismaSTTService extends PrismaTTSService {
       },
       orderBy: { createdAt: "desc" },
       select: this.selectForDictationRecover
+    });
+  }
+
+  private async drainDictationHousekeeping(userId: string) {
+    for await (const { step, count } of this.dictationHousekeeping(userId)) {
+      if (count > 0) {
+        this.logger.info({ userId, step, count }, "dictation housekeeping");
+      }
+    }
+  }
+
+  public async housekeepingSTT(userId: string) {
+    return await this.drainDictationHousekeeping(userId).catch(
+      (err: unknown) => {
+        this.logger.warn(
+          { userId, err: this.safeErrMsg(err) },
+          "dictation housekeeping failed; connection unaffected"
+        );
+      }
+    );
+  }
+
+  public async sttUserRehydrated(
+    userId: string,
+    conversationId: string | null
+  ) {
+    // 24h
+    const gte = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const couplingStatus = {
+      in: Array.of<"DECOUPLED" | "RECOVERABLE">("DECOUPLED", "RECOVERABLE")
+    };
+    const where = {
+      conversationId,
+      couplingStatus,
+      userId,
+      content: { not: "" },
+      updatedAt: { gte }
+    } as const;
+
+    const recentExists = await this.prismaClient.dictation.count({ where });
+    if (recentExists < 1) {
+      return {
+        type: "stt_user_rehydrated",
+        hasRecent: false,
+        data: undefined
+      } as const satisfies STTUserRehydrated;
+    }
+    return await this.prismaClient.$transaction(async t => {
+      const mostRecent = await t.dictation.findFirst({
+        where,
+        orderBy: { updatedAt: "desc" },
+        select: { batchId: true, conversationId: true, recoveryExpiresAt: true }
+      });
+
+      if (!mostRecent?.batchId) {
+        return {
+          type: "stt_user_rehydrated",
+          hasRecent: false,
+          data: undefined
+        } as const satisfies STTUserRehydrated;
+      }
+
+      const batchId = mostRecent.batchId;
+
+      const dictations = await t.dictation.findMany({
+        where: { userId, batchId },
+        orderBy: { ordinal: "asc" },
+        select: {
+          draftId: true,
+          ordinal: true,
+          content: true,
+          couplingStatus: true
+        }
+      });
+
+      const expiresAt =
+        mostRecent.recoveryExpiresAt !== null
+          ? new Date(mostRecent.recoveryExpiresAt).getTime()
+          : new Date(Date.now() + 24 * 60 * 60 * 1000).getTime();
+
+      return {
+        type: "stt_user_rehydrated",
+        hasRecent: true,
+        data: {
+          conversationId: mostRecent.conversationId,
+          dictations,
+          batchId,
+          ordinals: dictations.map(t => t.ordinal),
+          expiresAt
+        }
+      } as const satisfies STTUserRehydrated;
     });
   }
 }

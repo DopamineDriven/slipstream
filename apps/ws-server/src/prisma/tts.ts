@@ -3,7 +3,7 @@ import { PrismaProviderStoreService } from "@/prisma/provider-store.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { Rm, TTSJobSingleton, TTSTypes } from "@slipstream/types";
-
+import type { LoggerService } from "@/logger/index.ts";
 export type CreateTTSJobParams = {
   conversationId: string;
   sourceMessageId: string;
@@ -30,9 +30,10 @@ export class PrismaTTSService extends PrismaProviderStoreService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
 
   private ttsJobBigIntToNum(job: TTSJobSingleton<true | false>) {

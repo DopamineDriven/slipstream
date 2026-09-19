@@ -135,7 +135,7 @@ export function RadialLanguageMenu({
         </AnimatePresence>
         <motion.button
           type="button"
-          className="text-primary z-2 flex size-11.25 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--primary)_27%,transparent)] bg-[color-mix(in_srgb,var(--primary)_10%,var(--surface))]"
+          className="text-primary z-2 flex size-11.25 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--color-primary)_27%,transparent)] bg-[color-mix(in_srgb,var(--color-primary)_10%,var(--color-surface))]"
           onClick={() => setIsOpen(current => !current)}
           animate={{ rotate: isOpen ? 0 : -35 }}
           whileHover={{ scale: 1.05 }}

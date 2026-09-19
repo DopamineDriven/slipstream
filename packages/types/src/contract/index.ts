@@ -73,6 +73,8 @@ import type {
   STTUserPresent,
   STTUserRecover,
   STTUserRecovered,
+  STTUserRehydrate,
+  STTUserRehydrated,
   STTUserRestore,
   STTUserRestored,
   STTUserTimeout
@@ -146,6 +148,8 @@ export type AnyEvent =
   | STTUserPresent
   | STTUserRecover
   | STTUserRecovered
+  | STTUserRehydrate
+  | STTUserRehydrated
   | STTUserRestore
   | STTUserRestored
   | STTUserTimeout

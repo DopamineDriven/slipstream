@@ -1,7 +1,9 @@
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import type { ExtractService } from "@/extract/index.ts";
+import type { LoggerService } from "@/logger/index.ts";
 import type { AiChatRequestType, BigIntToCompatProps } from "@/types/index.ts";
+import type { Logger as PinoLogger } from "pino";
 import { ModelService } from "@/models/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { AttachmentSingleton } from "@slipstream/types";
@@ -9,15 +11,19 @@ import { PrismaClient, PrismaDbService } from "@slipstream/db/factory";
 
 export class PrismaUtilsService extends ModelService {
   protected readonly prismaClient: PrismaClient;
-
+  protected logger: PinoLogger;
   public extractor: ExtractService;
 
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     public isProd: boolean
   ) {
     super();
+    this.logger = logger
+      .getPinoInstance()
+      .child({ node_version: process.version }, { msgPrefix: "[prisma] " });
     this.prismaClient = prisma.p(false);
     this.extractor = extractor;
   }
@@ -367,15 +373,14 @@ export class PrismaUtilsService extends ModelService {
     try {
       if (this.extractor.exists(absTmpPath)) {
         this.extractor.rmFile(absTmpPath);
-        console.log(
+        this.logger.info(
           `cleaned up tmp file ${tmpUniquename} following ${provider.toLowerCase()} file upload.`
         );
       }
     } catch (err) {
-      console.warn(
-        `cleanup of tmp file ${tmpUniquename} having path ${absTmpPath} failed following ${provider.toLowerCase()} file upload.`.concat(
-          this.safeErrMsg(err)
-        )
+      this.logger.warn(
+        { err },
+        `cleanup of tmp file ${tmpUniquename} having path ${absTmpPath} failed following ${provider.toLowerCase()} file upload.`
       );
     }
   }

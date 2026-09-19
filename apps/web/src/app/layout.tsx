@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import Script from "next/script";
 import { CookieProvider } from "@/context/cookie-context";
 import { PathnameProvider } from "@/context/pathname-context";
+import { ToastProvider } from "@/context/toast-context";
 import { getAnalyticsMode, getSiteUrl } from "@/lib/site-url";
 import { PathnameSync } from "@/ui/pathname-sync";
 import * as ga from "@/utils/google-analytics";
@@ -142,12 +143,14 @@ export default async function RootLayout({
         }>
         <CookieProvider>
           <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
-            <PathnameProvider>
-              <Suspense fallback={null}>
-                <PathnameSync />
-              </Suspense>
-              {children}
-            </PathnameProvider>
+            <ToastProvider>
+              <PathnameProvider>
+                <Suspense fallback={null}>
+                  <PathnameSync />
+                </Suspense>
+                {children}
+              </PathnameProvider>
+            </ToastProvider>
           </ThemeProvider>
         </CookieProvider>
         <Analytics mode={mode} />

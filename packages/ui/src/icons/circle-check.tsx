@@ -1,8 +1,8 @@
 import type { BaseSVGProps } from "@/icons/index";
 
-export function Info({
-  strokeWidth = 1.5,
+export function CircleCheck({
   role = "img",
+  strokeWidth = 1,
   ...svg
 }: BaseSVGProps) {
   return (
@@ -17,8 +17,7 @@ export function Info({
       strokeLinejoin="round"
       {...svg}>
       <circle cx="12" cy="12" r="10" />
-      <path d="M12 16v-4" />
-      <path d="M12 8h.01" />
+      <path d="m16 9-5.5 5.5L8 12" />
     </svg>
   );
 }

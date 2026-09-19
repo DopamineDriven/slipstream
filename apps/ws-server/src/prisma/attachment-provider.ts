@@ -1,4 +1,5 @@
 import type { ExtractService } from "@/extract/index.ts";
+import type { LoggerService } from "@/logger/index.ts";
 import { PrismaUserMetaService } from "@/prisma/user-meta.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
@@ -8,9 +9,10 @@ export class PrismaAttachmentProviderService extends PrismaUserMetaService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
     this.extractor = extractor;
   }
 

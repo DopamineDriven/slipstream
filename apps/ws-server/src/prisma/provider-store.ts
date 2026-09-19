@@ -18,14 +18,15 @@ import type {
   ProviderStoreDocumentSingleton,
   ProviderStoreSingleton
 } from "@slipstream/types";
-
+import type { LoggerService } from "@/logger/index.ts";
 export class PrismaProviderStoreService extends PrismaAttachmentProviderService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
   private convertProviderStoreDocBigInt(
     obj: ProviderStoreDocumentSingleton<true | false>

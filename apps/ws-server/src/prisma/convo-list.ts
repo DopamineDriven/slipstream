@@ -2,7 +2,7 @@ import type { ExtractService } from "@/extract/index.ts";
 import { PrismaConversationMemoryService } from "@/prisma/convo-memory-service.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { ConversationListEntry } from "@slipstream/types";
-
+import type { LoggerService } from "@/logger/index.ts";
 const CONVERSATION_LIST_PAGE_SIZE = 25;
 const MAX_CONVERSATION_LIST_PAGE_SIZE = 100;
 
@@ -10,9 +10,10 @@ export class PrismaConvoListService extends PrismaConversationMemoryService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,
+    logger: LoggerService,
     isProd: boolean
   ) {
-    super(prisma, extractor, isProd);
+    super(prisma, extractor, logger, isProd);
   }
 
   /**

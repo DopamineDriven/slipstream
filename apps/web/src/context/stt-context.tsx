@@ -13,6 +13,7 @@ import {
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { usePathnameContext } from "@/context/pathname-context";
+import { useToast } from "@/context/toast-context";
 import { useLangSTT } from "@/hooks/use-stt-lang";
 import {
   canParseDraftId,
@@ -21,6 +22,7 @@ import {
 } from "@/lib/helpers";
 import { arrSTT } from "@/lib/stt-data";
 import { PcmCapture, pcmToBase64 } from "@/lib/stt-pcm-capture";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EventTypeMap, STTTypes } from "@slipstream/types";
 
 export type DictationPhase =
@@ -37,21 +39,21 @@ export type SettledDictation = {
   conversationId: string | null;
   text: string;
   reconciled: boolean;
-  couplingStatus:
-    | EventTypeMap["stt_user_finished"]["couplingStatus"]
-    | EventTypeMap["stt_user_interrupted"]["couplingStatus"]
-    | EventTypeMap["stt_user_canceled"]["couplingStatus"];
-  terminationReason:
-    | EventTypeMap["stt_user_finished"]["terminationReason"]
-    | EventTypeMap["stt_user_interrupted"]["terminationReason"]
-    | EventTypeMap["stt_user_canceled"]["terminationReason"]
-    | EventTypeMap["stt_user_recovered"]["results"][number]["terminationReason"];
+  /** a settled entry is never live (PENDING) and leaves memory once sent (COUPLED) */
+  couplingStatus: Exclude<
+    $Enums.DictationCouplingStatus,
+    "PENDING" | "COUPLED"
+  >;
+  /** absent on rehydrated entries — that wire mirrors the row's batch columns only */
+  terminationReason?: Exclude<$Enums.DictationTerminationReason, "NONE">;
   /** epoch ms; only while RECOVERABLE */
   recoveryExpiresAt?: number;
   /** seconds, 2 d.p. */
   duration?: number;
   words?: STTTypes.Transcript.Words[];
 };
+
+type RehydratedData = NonNullable<EventTypeMap["stt_user_rehydrated"]["data"]>;
 
 type DraftIdentity = Pick<
   SettledDictation,
@@ -120,9 +122,20 @@ const LANGUAGES: STTTypes.Web.LanguageOption[] = Array.from(arrSTT);
 /** frames buffered while `stt_user_connect` is in flight; ~5 s at 100 ms */
 const MAX_PRECONNECT_CHUNKS = 50;
 /** RMS above this while the timeout prompt is up counts as "I'm here" */
-const VOICE_RMS_THRESHOLD = 0.015;
+/**
+ * relative VAD, mirroring the server: a frame is voiced when above an
+ * absolute minimum AND well above a tracked noise floor, so a fan or A/C
+ * never answers the prompt. The floor learns from quiet frames only
+ */
+const VOICE_ABS_MIN_RMS = 0.01;
+const VOICE_OVER_FLOOR = 3;
+const FLOOR_ADAPT = 0.05;
 /** ✕ undo window before `stt_user_cancel` goes out */
 const UNDO_WINDOW_MS = 6_000;
+/** the "still there?" prompt is one persistent toast, updated in place each second */
+const TIMEOUT_TOAST_ID = "stt_user_timeout";
+/** one persistent toast for an unsent batch found after a reload; ✕ = not now, asked again next load */
+const REHYDRATE_TOAST_ID = "stt_user_rehydrated";
 /**
  * raw RMS → waveform level on a dB scale, so a hot USB mic (Yeti) and a
  * quiet laptop mic both land in range: -50 dBFS is a resting bar, -10 dBFS
@@ -146,6 +159,7 @@ export function STTProvider({
 }) {
   const { conversationId: pathConvId } = usePathnameContext();
   const { client, sendEvent, isConnected } = useChatWebSocketContext();
+  const { toast, dismiss: dismissToast } = useToast();
   const detectedLanguage = useLangSTT();
 
   // ── conversation (passive read of PathnameContext, same as AssetContext) ──
@@ -224,6 +238,15 @@ export function STTProvider({
   const [insertedDraftIds, setInsertedDraftIds] = useState<ReadonlySet<string>>(
     () => new Set<string>()
   );
+  // ref mirrors for the rehydrate toast action, which outlives the render it was created in
+  const settledRef = useRef(settled);
+  useEffect(() => {
+    settledRef.current = settled;
+  }, [settled]);
+  const activeConversationRef = useRef(activeConversationId);
+  useEffect(() => {
+    activeConversationRef.current = activeConversationId;
+  }, [activeConversationId]);
   // identity for drafts this client started; events after `start` carry
   // draftId only, so batch/ordinal/conversation are looked up here
   const draftsRef = useRef<Map<string, DraftIdentity>>(
@@ -321,6 +344,16 @@ export function STTProvider({
 
   const clearError = useCallback(() => setError(null), []);
 
+  // ── idle probe ("still there?") as a persistent, in-place-updated toast ──
+  const timeoutTickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const clearTimeoutPrompt = useCallback(() => {
+    if (timeoutTickRef.current) clearInterval(timeoutTickRef.current);
+    timeoutTickRef.current = null;
+    setTimeoutClosesInMs(() => null);
+    dismissToast(TIMEOUT_TOAST_ID);
+  }, [dismissToast]);
+
   const setPhaseSync = useCallback((next: DictationPhase) => {
     phaseRef.current = next;
     setPhase(next);
@@ -337,12 +370,12 @@ export function STTProvider({
       setActiveDraftId(null);
       setStartedAt(null);
       levelRef.current = 0;
-      setTimeoutClosesInMs(null);
+      clearTimeoutPrompt();
       setPhaseSync("idle");
       sttLog("interrupted locally", message);
       setError(message);
     },
-    [setPhaseSync]
+    [setPhaseSync, clearTimeoutPrompt]
   );
 
   // ── server-only actions ───────────────────────────────────────────────
@@ -358,9 +391,36 @@ export function STTProvider({
     const draftId = activeDraftRef.current;
     if (!draftId || phaseRef.current !== "timeoutPrompt") return;
     sendEvent("stt_user_present", { type: "stt_user_present", draftId });
-    setTimeoutClosesInMs(null);
+    clearTimeoutPrompt();
     setPhaseSync("recording");
-  }, [sendEvent, setPhaseSync]);
+  }, [sendEvent, setPhaseSync, clearTimeoutPrompt]);
+
+  /**
+   * the server's clock is the authority; the toast just mirrors it — a
+   * countdown re-issued under one id, `Infinity` duration so hover/focus
+   * pauses can't desync it, "I'm here" as the action, dismissed on answer
+   */
+  const showTimeoutPrompt = useCallback(
+    (closesInMs: number) => {
+      if (timeoutTickRef.current) clearInterval(timeoutTickRef.current);
+      const closesAt = performance.now() + closesInMs;
+      const render = () => {
+        const remaining = Math.max(0, closesAt - performance.now());
+        const seconds = Math.ceil(remaining / 1000);
+        toast({
+          id: TIMEOUT_TOAST_ID,
+          variant: "info",
+          title: "Still there?",
+          description: `Recording finishes in ${seconds}s. Keep talking, or tap Still thinking.`,
+          duration: Infinity,
+          action: { label: "Still thinking", onClick: present }
+        });
+      };
+      render();
+      timeoutTickRef.current = setInterval(render, 1_000);
+    },
+    [toast, present]
+  );
 
   const restore = useCallback(
     (draftId: string) => {
@@ -382,43 +442,150 @@ export function STTProvider({
     [sendEvent]
   );
 
+  // ── rehydrate: an unsent batch found after reload / reconnect ─────────
+  /**
+   * Restore: the server's batch becomes the current one again, so its text
+   * inserts through `pendingInserts` and couples on send like any dictation.
+   * `dictations` is the whole append-only batch, so its length is the next
+   * ordinal. DECOUPLED rows insert now; RECOVERABLE rows go through the
+   * existing `stt_user_restore` lane and insert when `stt_user_restored` lands
+   */
+  const adoptRehydrated = useCallback(
+    (data: RehydratedData) => {
+      const { batchId } = data;
+      if (batchId === null) return;
+      if (
+        (data.conversationId ?? "new-chat") !== activeConversationRef.current
+      ) {
+        dismissToast(REHYDRATE_TOAST_ID); // the user moved on; the next load asks again
+        return;
+      }
+      // one batch per message: a draft that already holds dictations goes first
+      const current = currentBatchRef.current;
+      if (current !== null && current !== batchId) {
+        for (const entry of settledRef.current.values()) {
+          if (
+            entry.batchId === current &&
+            entry.couplingStatus === "DECOUPLED"
+          ) {
+            toast.info("Send or clear your current dictation first", {
+              description: "Then tap Restore again."
+            });
+            return;
+          }
+        }
+      }
+      currentBatchRef.current = batchId;
+      setCurrentBatchId(batchId);
+      batchOrdinalRef.current.set(batchId, data.dictations.length);
+      // a restored transcript never auto-sends, whatever the last intent was
+      intentRef.current = "insert";
+      setIntent("insert");
+
+      const entries = Array.of<SettledDictation>();
+      for (const dictation of data.dictations) {
+        if (dictation.content.trim().length === 0) continue;
+        if (
+          dictation.couplingStatus !== "DECOUPLED" &&
+          dictation.couplingStatus !== "RECOVERABLE"
+        ) {
+          continue; // COUPLED / ORPHANED / FAILED / PENDING: counted, never inserted
+        }
+        draftsRef.current.set(dictation.draftId, {
+          batchId,
+          ordinal: dictation.ordinal,
+          conversationId: data.conversationId
+        });
+        entries.push({
+          draftId: dictation.draftId,
+          batchId,
+          ordinal: dictation.ordinal,
+          conversationId: data.conversationId,
+          text: dictation.content,
+          reconciled: true,
+          couplingStatus: dictation.couplingStatus
+        });
+      }
+      upsertSettled(entries);
+      for (const entry of entries) {
+        if (entry.couplingStatus === "RECOVERABLE") restore(entry.draftId);
+      }
+      dismissToast(REHYDRATE_TOAST_ID);
+    },
+    [dismissToast, restore, toast, upsertSettled]
+  );
+
   // ── ✕ undo window ─────────────────────────────────────────────────────
   const clearUndoTimer = useCallback(() => {
     if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
     undoTimerRef.current = null;
   }, []);
 
+  // ref mirrors `pendingUndo` so the toast action and `undoDiscard` never
+  // close over a stale value
+  const pendingUndoRef = useRef<SettledDictation | null>(null);
+  const undoToastId = (draftId: string) => `stt-undo-${draftId}`;
+
   /** window lapsed (or the composer moved on): the row goes RECOVERABLE server-side */
   const resolveDiscard = useCallback(
     (entry: SettledDictation) => {
       clearUndoTimer();
+      if (pendingUndoRef.current?.draftId === entry.draftId) {
+        pendingUndoRef.current = null;
+      }
       setPendingUndo(current =>
         current?.draftId === entry.draftId ? null : current
       );
       draftsRef.current.delete(entry.draftId);
+      dismissToast(undoToastId(entry.draftId));
       cancel(entry.draftId);
     },
-    [cancel, clearUndoTimer]
+    [cancel, clearUndoTimer, dismissToast]
+  );
+
+  /** Undo: the held transcript enters the draft as if ■ had been pressed */
+  const restoreDiscarded = useCallback(
+    (entry: SettledDictation) => {
+      if (pendingUndoRef.current?.draftId !== entry.draftId) return;
+      clearUndoTimer();
+      pendingUndoRef.current = null;
+      setPendingUndo(null);
+      upsertSettled([entry]);
+      dismissToast(undoToastId(entry.draftId));
+    },
+    [clearUndoTimer, upsertSettled, dismissToast]
   );
 
   const holdForUndo = useCallback(
     (entry: SettledDictation) => {
       clearUndoTimer();
+      pendingUndoRef.current = entry;
       setPendingUndo(entry);
       undoTimerRef.current = setTimeout(
         () => resolveDiscard(entry),
         UNDO_WINDOW_MS
       );
+      const preview = entry.text.trim();
+      toast({
+        id: undoToastId(entry.draftId),
+        title: "Dictation discarded",
+        description: preview.length > 80 ? `${preview.slice(0, 77)}…` : preview,
+        duration: UNDO_WINDOW_MS,
+        action: { label: "Undo", onClick: () => restoreDiscarded(entry) }
+      });
     },
-    [clearUndoTimer, resolveDiscard]
+    [clearUndoTimer, resolveDiscard, restoreDiscarded, toast]
   );
 
   const undoDiscard = useCallback(() => {
-    if (!pendingUndo) return;
-    clearUndoTimer();
-    upsertSettled([pendingUndo]);
-    setPendingUndo(null);
-  }, [pendingUndo, clearUndoTimer, upsertSettled]);
+    const entry = pendingUndoRef.current;
+    if (entry) restoreDiscarded(entry);
+  }, [restoreDiscarded]);
+
+  // errors surface as toasts; `error` stays on the context for inline UI
+  useEffect(() => {
+    if (error) toast.error("Dictation", { description: error });
+  }, [error, toast]);
 
   /**
    * after a message is dispatched: the batch is coupled server-side, so its
@@ -507,12 +674,19 @@ export function STTProvider({
     [interruptLocal, sendFrame]
   );
 
+  const noiseFloorRef = useRef<number | null>(null);
+
   const handleLevel = useCallback(
     (rms: number) => {
       levelRef.current = rms;
-      if (phaseRef.current === "timeoutPrompt" && rms > VOICE_RMS_THRESHOLD) {
-        present();
-      }
+      const floor = noiseFloorRef.current ?? rms;
+      const voiced = rms > VOICE_ABS_MIN_RMS && rms > floor * VOICE_OVER_FLOOR;
+      noiseFloorRef.current = voiced
+        ? floor
+        : rms < floor
+          ? rms
+          : floor + (rms - floor) * FLOOR_ADAPT;
+      if (voiced && phaseRef.current === "timeoutPrompt") present();
     },
     [present]
   );
@@ -544,7 +718,7 @@ export function STTProvider({
         return;
       }
       setPhaseSync("finishing");
-      setTimeoutClosesInMs(null);
+      clearTimeoutPrompt();
       const stopped = await capture.stop();
       sttLog("capture stopped", { draftId, ...stopped }); // tail chunk flowed through handleChunk during "finishing"
       if (captureRef.current === capture) captureRef.current = null;
@@ -555,7 +729,7 @@ export function STTProvider({
       sttLog("stt_user_finish sent", { draftId, ok });
       if (!ok) interruptLocal("Connection lost while finishing the dictation.");
     },
-    [client, interruptLocal, setPhaseSync]
+    [client, interruptLocal, setPhaseSync, clearTimeoutPrompt]
   );
 
   // latest-callback ref for the capture and route-change paths, which are
@@ -585,6 +759,7 @@ export function STTProvider({
         onInterrupted: handleInterrupted
       });
       captureRef.current = capture;
+      noiseFloorRef.current = null; // a new room, a new mic, a new floor
       discardRef.current = false;
       finishRequestedRef.current = false;
       preConnectRef.current = [];
@@ -674,7 +849,7 @@ export function STTProvider({
       setActiveDraftId(null);
       setStartedAt(null);
       levelRef.current = 0;
-      setTimeoutClosesInMs(null);
+      clearTimeoutPrompt();
       setPhaseSync("idle");
     };
 
@@ -702,6 +877,7 @@ export function STTProvider({
       sttLog("stt_user_timeout", evt);
       setPhaseSync("timeoutPrompt");
       setTimeoutClosesInMs(evt.closesInMs);
+      showTimeoutPrompt(evt.closesInMs);
     };
 
     const handleFinished = (evt: EventTypeMap["stt_user_finished"]) => {
@@ -811,6 +987,43 @@ export function STTProvider({
       });
     };
 
+    const handleRehydrated = (evt: EventTypeMap["stt_user_rehydrated"]) => {
+      const data = evt.data;
+      sttLog("stt_user_rehydrated", {
+        hasRecent: evt.hasRecent,
+        batchId: data?.batchId,
+        rows: data?.dictations.length
+      });
+      if (!evt.hasRecent || !data?.batchId) return;
+      // answered for a conversation the user has since left
+      if (
+        (data.conversationId ?? "new-chat") !== activeConversationRef.current
+      ) {
+        return;
+      }
+      // a reconnect mid-draft: this batch is already the live one
+      if (data.batchId === currentBatchRef.current) return;
+      if (phaseRef.current !== "idle") return;
+      const text = data.dictations
+        .filter(
+          d =>
+            d.couplingStatus === "DECOUPLED" ||
+            d.couplingStatus === "RECOVERABLE"
+        )
+        .map(d => d.content.trim())
+        .filter(part => part.length > 0)
+        .join(" ");
+      if (text.length === 0) return;
+      toast({
+        id: REHYDRATE_TOAST_ID,
+        variant: "info",
+        title: "Unsent dictation",
+        description: text.length > 80 ? `${text.slice(0, 77)}…` : text,
+        duration: Infinity,
+        action: { label: "Restore", onClick: () => adoptRehydrated(data) }
+      });
+    };
+
     const handleError = (evt: EventTypeMap["stt_user_error"]) => {
       sttLog("stt_user_error", evt);
       setError(`${evt.status}: ${evt.statusText}`);
@@ -824,6 +1037,7 @@ export function STTProvider({
     client.on("stt_user_canceled", handleCanceled);
     client.on("stt_user_recovered", handleRecovered);
     client.on("stt_user_restored", handleRestored);
+    client.on("stt_user_rehydrated", handleRehydrated);
     client.on("stt_user_error", handleError);
 
     return () => {
@@ -834,6 +1048,7 @@ export function STTProvider({
       client.off("stt_user_canceled");
       client.off("stt_user_recovered");
       client.off("stt_user_restored");
+      client.off("stt_user_rehydrated");
       client.off("stt_user_error");
     };
   }, [
@@ -845,8 +1060,30 @@ export function STTProvider({
     sendFrame,
     setPhaseSync,
     holdForUndo,
-    resolveDiscard
+    resolveDiscard,
+    showTimeoutPrompt,
+    clearTimeoutPrompt,
+    toast,
+    adoptRehydrated
   ]);
+
+  // ask once per connection per conversation: is there an unsent batch here?
+  // read-only on the server; the answer is filtered in `handleRehydrated`
+  const rehydrateKeyRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!isConnected) {
+      rehydrateKeyRef.current = null; // a reconnect asks again
+      return;
+    }
+    const key = activeConversationId ?? "new-chat";
+    if (rehydrateKeyRef.current === key) return;
+    rehydrateKeyRef.current = key;
+    dismissToast(REHYDRATE_TOAST_ID); // an offer for the previous conversation is stale
+    sendEvent("stt_user_rehydrate", {
+      type: "stt_user_rehydrate",
+      conversationId: key === "new-chat" ? null : key
+    });
+  }, [isConnected, activeConversationId, sendEvent, dismissToast]);
 
   // socket gone while live: the server settles the row on close; the mic is released here
   useEffect(() => {
