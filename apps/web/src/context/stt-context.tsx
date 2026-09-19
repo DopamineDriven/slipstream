@@ -22,6 +22,7 @@ import {
 } from "@/lib/helpers";
 import { arrSTT } from "@/lib/stt-data";
 import { PcmCapture, pcmToBase64 } from "@/lib/stt-pcm-capture";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EventTypeMap, STTTypes } from "@slipstream/types";
 
 export type DictationPhase =
@@ -38,21 +39,21 @@ export type SettledDictation = {
   conversationId: string | null;
   text: string;
   reconciled: boolean;
-  couplingStatus:
-    | EventTypeMap["stt_user_finished"]["couplingStatus"]
-    | EventTypeMap["stt_user_interrupted"]["couplingStatus"]
-    | EventTypeMap["stt_user_canceled"]["couplingStatus"];
-  terminationReason:
-    | EventTypeMap["stt_user_finished"]["terminationReason"]
-    | EventTypeMap["stt_user_interrupted"]["terminationReason"]
-    | EventTypeMap["stt_user_canceled"]["terminationReason"]
-    | EventTypeMap["stt_user_recovered"]["results"][number]["terminationReason"];
+  /** a settled entry is never live (PENDING) and leaves memory once sent (COUPLED) */
+  couplingStatus: Exclude<
+    $Enums.DictationCouplingStatus,
+    "PENDING" | "COUPLED"
+  >;
+  /** absent on rehydrated entries — that wire mirrors the row's batch columns only */
+  terminationReason?: Exclude<$Enums.DictationTerminationReason, "NONE">;
   /** epoch ms; only while RECOVERABLE */
   recoveryExpiresAt?: number;
   /** seconds, 2 d.p. */
   duration?: number;
   words?: STTTypes.Transcript.Words[];
 };
+
+type RehydratedData = NonNullable<EventTypeMap["stt_user_rehydrated"]["data"]>;
 
 type DraftIdentity = Pick<
   SettledDictation,
@@ -133,6 +134,8 @@ const FLOOR_ADAPT = 0.05;
 const UNDO_WINDOW_MS = 6_000;
 /** the "still there?" prompt is one persistent toast, updated in place each second */
 const TIMEOUT_TOAST_ID = "stt_user_timeout";
+/** one persistent toast for an unsent batch found after a reload; ✕ = not now, asked again next load */
+const REHYDRATE_TOAST_ID = "stt_user_rehydrated";
 /**
  * raw RMS → waveform level on a dB scale, so a hot USB mic (Yeti) and a
  * quiet laptop mic both land in range: -50 dBFS is a resting bar, -10 dBFS
@@ -235,6 +238,15 @@ export function STTProvider({
   const [insertedDraftIds, setInsertedDraftIds] = useState<ReadonlySet<string>>(
     () => new Set<string>()
   );
+  // ref mirrors for the rehydrate toast action, which outlives the render it was created in
+  const settledRef = useRef(settled);
+  useEffect(() => {
+    settledRef.current = settled;
+  }, [settled]);
+  const activeConversationRef = useRef(activeConversationId);
+  useEffect(() => {
+    activeConversationRef.current = activeConversationId;
+  }, [activeConversationId]);
   // identity for drafts this client started; events after `start` carry
   // draftId only, so batch/ordinal/conversation are looked up here
   const draftsRef = useRef<Map<string, DraftIdentity>>(
@@ -428,6 +440,79 @@ export function STTProvider({
       );
     },
     [sendEvent]
+  );
+
+  // ── rehydrate: an unsent batch found after reload / reconnect ─────────
+  /**
+   * Restore: the server's batch becomes the current one again, so its text
+   * inserts through `pendingInserts` and couples on send like any dictation.
+   * `dictations` is the whole append-only batch, so its length is the next
+   * ordinal. DECOUPLED rows insert now; RECOVERABLE rows go through the
+   * existing `stt_user_restore` lane and insert when `stt_user_restored` lands
+   */
+  const adoptRehydrated = useCallback(
+    (data: RehydratedData) => {
+      const { batchId } = data;
+      if (batchId === null) return;
+      if (
+        (data.conversationId ?? "new-chat") !== activeConversationRef.current
+      ) {
+        dismissToast(REHYDRATE_TOAST_ID); // the user moved on; the next load asks again
+        return;
+      }
+      // one batch per message: a draft that already holds dictations goes first
+      const current = currentBatchRef.current;
+      if (current !== null && current !== batchId) {
+        for (const entry of settledRef.current.values()) {
+          if (
+            entry.batchId === current &&
+            entry.couplingStatus === "DECOUPLED"
+          ) {
+            toast.info("Send or clear your current dictation first", {
+              description: "Then tap Restore again."
+            });
+            return;
+          }
+        }
+      }
+      currentBatchRef.current = batchId;
+      setCurrentBatchId(batchId);
+      batchOrdinalRef.current.set(batchId, data.dictations.length);
+      // a restored transcript never auto-sends, whatever the last intent was
+      intentRef.current = "insert";
+      setIntent("insert");
+
+      const entries = Array.of<SettledDictation>();
+      for (const dictation of data.dictations) {
+        if (dictation.content.trim().length === 0) continue;
+        if (
+          dictation.couplingStatus !== "DECOUPLED" &&
+          dictation.couplingStatus !== "RECOVERABLE"
+        ) {
+          continue; // COUPLED / ORPHANED / FAILED / PENDING: counted, never inserted
+        }
+        draftsRef.current.set(dictation.draftId, {
+          batchId,
+          ordinal: dictation.ordinal,
+          conversationId: data.conversationId
+        });
+        entries.push({
+          draftId: dictation.draftId,
+          batchId,
+          ordinal: dictation.ordinal,
+          conversationId: data.conversationId,
+          text: dictation.content,
+          reconciled: true,
+          couplingStatus: dictation.couplingStatus
+        });
+      }
+      upsertSettled(entries);
+      for (const entry of entries) {
+        if (entry.couplingStatus === "RECOVERABLE") restore(entry.draftId);
+      }
+      dismissToast(REHYDRATE_TOAST_ID);
+    },
+    [dismissToast, restore, toast, upsertSettled]
   );
 
   // ── ✕ undo window ─────────────────────────────────────────────────────
@@ -902,6 +987,43 @@ export function STTProvider({
       });
     };
 
+    const handleRehydrated = (evt: EventTypeMap["stt_user_rehydrated"]) => {
+      const data = evt.data;
+      sttLog("stt_user_rehydrated", {
+        hasRecent: evt.hasRecent,
+        batchId: data?.batchId,
+        rows: data?.dictations.length
+      });
+      if (!evt.hasRecent || !data?.batchId) return;
+      // answered for a conversation the user has since left
+      if (
+        (data.conversationId ?? "new-chat") !== activeConversationRef.current
+      ) {
+        return;
+      }
+      // a reconnect mid-draft: this batch is already the live one
+      if (data.batchId === currentBatchRef.current) return;
+      if (phaseRef.current !== "idle") return;
+      const text = data.dictations
+        .filter(
+          d =>
+            d.couplingStatus === "DECOUPLED" ||
+            d.couplingStatus === "RECOVERABLE"
+        )
+        .map(d => d.content.trim())
+        .filter(part => part.length > 0)
+        .join(" ");
+      if (text.length === 0) return;
+      toast({
+        id: REHYDRATE_TOAST_ID,
+        variant: "info",
+        title: "Unsent dictation",
+        description: text.length > 80 ? `${text.slice(0, 77)}…` : text,
+        duration: Infinity,
+        action: { label: "Restore", onClick: () => adoptRehydrated(data) }
+      });
+    };
+
     const handleError = (evt: EventTypeMap["stt_user_error"]) => {
       sttLog("stt_user_error", evt);
       setError(`${evt.status}: ${evt.statusText}`);
@@ -915,6 +1037,7 @@ export function STTProvider({
     client.on("stt_user_canceled", handleCanceled);
     client.on("stt_user_recovered", handleRecovered);
     client.on("stt_user_restored", handleRestored);
+    client.on("stt_user_rehydrated", handleRehydrated);
     client.on("stt_user_error", handleError);
 
     return () => {
@@ -925,6 +1048,7 @@ export function STTProvider({
       client.off("stt_user_canceled");
       client.off("stt_user_recovered");
       client.off("stt_user_restored");
+      client.off("stt_user_rehydrated");
       client.off("stt_user_error");
     };
   }, [
@@ -938,8 +1062,28 @@ export function STTProvider({
     holdForUndo,
     resolveDiscard,
     showTimeoutPrompt,
-    clearTimeoutPrompt
+    clearTimeoutPrompt,
+    toast,
+    adoptRehydrated
   ]);
+
+  // ask once per connection per conversation: is there an unsent batch here?
+  // read-only on the server; the answer is filtered in `handleRehydrated`
+  const rehydrateKeyRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!isConnected) {
+      rehydrateKeyRef.current = null; // a reconnect asks again
+      return;
+    }
+    const key = activeConversationId ?? "new-chat";
+    if (rehydrateKeyRef.current === key) return;
+    rehydrateKeyRef.current = key;
+    dismissToast(REHYDRATE_TOAST_ID); // an offer for the previous conversation is stale
+    sendEvent("stt_user_rehydrate", {
+      type: "stt_user_rehydrate",
+      conversationId: key === "new-chat" ? null : key
+    });
+  }, [isConnected, activeConversationId, sendEvent, dismissToast]);
 
   // socket gone while live: the server settles the row on close; the mic is released here
   useEffect(() => {

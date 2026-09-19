@@ -83,7 +83,7 @@ async function dryRun(
     poolMax: 5,
     idleTimeoutMs: 30000
   });
-  const prisma = new PrismaService(db, extract, isProd);
+  const prisma = new PrismaService(db, extract, logger, isProd);
   const voyage = new VoyageEmbeddingService(voyageApiKey);
   const workup = new ConversationMemoryWorkupService(logger, voyage, prisma);
 

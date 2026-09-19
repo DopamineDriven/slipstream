@@ -1,4 +1,5 @@
 import type { ExtractService } from "@/extract/index.ts";
+import type { LoggerService } from "@/logger/index.ts";
 import { PrismaChatRequestService } from "@/prisma/chat-request.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { ImageGenOutputCreateNestedOneWithoutAttachmentInput } from "@slipstream/db/node/generated/models";
@@ -12,7 +13,7 @@ import type {
   Rm,
   TTSJobSingleton
 } from "@slipstream/types";
-import type { LoggerService } from "@/logger/index.ts";
+
 export class PrismaChatResponseService extends PrismaChatRequestService {
   constructor(
     prisma: PrismaDbService,
@@ -101,7 +102,6 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
         const filename = p?.at(-1);
         const pathFragments = filename?.split(/-/gm);
         const seriesId = t.itemId ?? t.seriesId ?? pathFragments?.[1] ?? "";
-        console.log({ [`t.jobId`]: t.jobId, jobId: jobId });
         const da = {
           bucket: t.bucket,
           key: t.key,

@@ -38,7 +38,7 @@ const db = new PrismaDbService({
   idleTimeoutMs: 30000
 });
 
-const prisma = new PrismaService(db, extract, false);
+const prisma = new PrismaService(db, extract, logger, false);
 const voyage = new VoyageEmbeddingService(process.env.VOYAGE_API_KEY ?? "");
 const sharp = new SharpService();
 const vectorStore = new UserStoreVectorService(

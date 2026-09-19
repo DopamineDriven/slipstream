@@ -73,6 +73,8 @@ class EventHandlerRegistry {
     "stt_user_present",
     "stt_user_recover",
     "stt_user_recovered",
+    "stt_user_rehydrate",
+    "stt_user_rehydrated",
     "stt_user_restore",
     "stt_user_restored",
     "stt_user_timeout",
@@ -503,6 +505,18 @@ class EventHandlerRegistry {
       stt_user_recovered: () => {
         const handler = this.handlers.stt_user_recovered;
         if (handler && event.type === "stt_user_recovered") {
+          handler(event, socket);
+        }
+      },
+      stt_user_rehydrate: () => {
+        const handler = this.handlers.stt_user_rehydrate;
+        if (handler && event.type === "stt_user_rehydrate") {
+          handler(event, socket);
+        }
+      },
+      stt_user_rehydrated: () => {
+        const handler = this.handlers.stt_user_rehydrated;
+        if (handler && event.type === "stt_user_rehydrated") {
           handler(event, socket);
         }
       },

@@ -196,6 +196,38 @@ export type STTUserRestored = {
   couplingStatus: Extract<$Enums.DictationCouplingStatus, "DECOUPLED">;
 };
 
+/** C→S */
+export type STTUserRehydrate = {
+  type: "stt_user_rehydrate";
+  /** null = new-chat */
+  conversationId: string | null;
+};
+
+export type STTUserRehydratedDictation = {
+  draftId: string;
+  ordinal: number;
+  content: string;
+  couplingStatus: $Enums.DictationCouplingStatus;
+};
+
+export type STTUserRehydratedData = {
+  conversationId: string | null;
+  batchId: string | null;
+  ordinals: number[];
+  /** epoch ms */
+  expiresAt: number | null;
+  dictations: STTUserRehydratedDictation[];
+};
+
+/**
+ * S→C
+ */
+export type STTUserRehydrated = {
+  type: "stt_user_rehydrated";
+  hasRecent: boolean;
+  data?: STTUserRehydratedData;
+};
+
 export type STTEventUnion =
   | STTUserBinaryFrame
   | STTUserCancel
@@ -209,9 +241,14 @@ export type STTEventUnion =
   | STTUserPresent
   | STTUserRecover
   | STTUserRecovered
+  | STTUserRehydrate
+  | STTUserRehydrated
   | STTUserRestore
   | STTUserRestored
   | STTUserTimeout;
 
-export type STTEventRecord<T extends boolean = false> = UTR<STTEventUnion, "type", T>;
-
+export type STTEventRecord<T extends boolean = false> = UTR<
+  STTEventUnion,
+  "type",
+  T
+>;

@@ -373,15 +373,14 @@ export class PrismaUtilsService extends ModelService {
     try {
       if (this.extractor.exists(absTmpPath)) {
         this.extractor.rmFile(absTmpPath);
-        console.log(
+        this.logger.info(
           `cleaned up tmp file ${tmpUniquename} following ${provider.toLowerCase()} file upload.`
         );
       }
     } catch (err) {
-      console.warn(
-        `cleanup of tmp file ${tmpUniquename} having path ${absTmpPath} failed following ${provider.toLowerCase()} file upload.`.concat(
-          this.safeErrMsg(err)
-        )
+      this.logger.warn(
+        { err },
+        `cleanup of tmp file ${tmpUniquename} having path ${absTmpPath} failed following ${provider.toLowerCase()} file upload.`
       );
     }
   }
