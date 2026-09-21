@@ -2,13 +2,23 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { imgCtx } from "@/lib/img-ctx";
-import type { GrokImagineImageGenOpts } from "@slipstream/types";
+import type {
+  GrokImagine2ARUnion,
+  GrokImagine2QualityUnion,
+  GrokImagineARUnion,
+  GrokImagineImageGenOpts,
+  GrokImagineQualityUnion,
+  GrokPureImageGenModels
+} from "@slipstream/types";
 
-export type GrokImgModelId = GrokImagineImageGenOpts["model"];
+export type GrokImgModelId =
+  GrokImagineImageGenOpts<GrokPureImageGenModels>["model"];
 
-export type GrokAspectRatio = GrokImagineImageGenOpts["aspect_ratio"];
+export type GrokAspectRatio =
+  GrokImagineImageGenOpts<GrokPureImageGenModels>["aspect_ratio"];
 
-export type GrokQuality = GrokImagineImageGenOpts["resolution"];
+export type GrokQuality =
+  GrokImagineImageGenOpts<GrokPureImageGenModels>["resolution"];
 
 export interface GrokImageSettings {
   aspectRatio: Exclude<GrokAspectRatio, undefined | null>;
@@ -39,22 +49,57 @@ export const GROK_ASPECT_RATIOS = [
   "9:20",
   "1:2",
   "2:1"
-] satisfies GrokAspectRatio[];
+] as const satisfies GrokImagineARUnion[];
 
-export const GROK_QUALITIES = ["1k", "2k"] satisfies GrokQuality[];
+// grok-imagine-image-2.0 alone extends the range
+export const GROK_2_ASPECT_RATIOS = [
+  ...GROK_ASPECT_RATIOS,
+  "21:9",
+  "5:2"
+] as const satisfies GrokImagine2ARUnion[];
 
-const DEFAULT_SETTINGS = {
+const MODEL_ASPECT_RATIOS = new Map<
+  GrokImgModelId,
+  readonly GrokImageSettings["aspectRatio"][]
+>([
+  ["grok-imagine-image-2.0", GROK_2_ASPECT_RATIOS],
+  ["grok-imagine-image", GROK_ASPECT_RATIOS],
+  ["grok-imagine-image-quality", GROK_ASPECT_RATIOS]
+]);
+
+export const GROK_QUALITIES = ["1k", "2k"] satisfies GrokImagineQualityUnion[];
+
+// grok-imagine-image-2.0 alone adds the 1.5k tier
+export const GROK_2_QUALITIES = [
+  "1k",
+  "1.5k",
+  "2k"
+] satisfies GrokImagine2QualityUnion[];
+
+const MODEL_QUALITIES = new Map<
+  GrokImgModelId,
+  readonly GrokImageSettings["quality"][]
+>([
+  ["grok-imagine-image-2.0", GROK_2_QUALITIES],
+  ["grok-imagine-image", GROK_QUALITIES],
+  ["grok-imagine-image-quality", GROK_QUALITIES]
+]);
+
+const GROK_DEFAULTS = {
   aspectRatio: "auto",
   quality: "1k"
 } satisfies GrokImageSettings;
 
-export function isValidGrokAspectRatio(ar: string) {
-  return imgCtx.isValidGrokAR(ar);
-}
+const MODEL_DEFAULTS = new Map<GrokImgModelId, GrokImageSettings>([
+  ["grok-imagine-image-2.0", GROK_DEFAULTS],
+  ["grok-imagine-image", GROK_DEFAULTS],
+  ["grok-imagine-image-quality", GROK_DEFAULTS]
+]);
 
-export function isValidGrokQuality(q: string) {
-  return imgCtx.isValidGrokQuality(q);
-}
+// module-level so a non-grok model gets a stable reference, not a fresh
+// array per render feeding the effect deps below
+const NO_ASPECT_RATIOS = Array.of<GrokImageSettings["aspectRatio"]>();
+const NO_QUALITIES = Array.of<GrokImageSettings["quality"]>();
 
 const STORAGE_KEY_PREFIX = "grok-image-settings";
 
@@ -64,9 +109,24 @@ function getStorageKey(modelId: string) {
 
 export function useGrokImageSettings(modelId: string) {
   const isCapable = isGrokImgGenCapable(modelId);
-  const grokModelId = isCapable ? modelId : null;
+  const grokModelId = isCapable
+    ? (Array.from(MODEL_DEFAULTS.keys()).find(model => model === modelId) ??
+      null)
+    : null;
+  const defaultSettings = grokModelId
+    ? (MODEL_DEFAULTS.get(grokModelId) ?? GROK_DEFAULTS)
+    : GROK_DEFAULTS;
+  // the model's own lists are the single authority: what the UI offers, what
+  // `updateSettings` accepts, and what hydration restores all come from them
+  const aspectRatioOptions = grokModelId
+    ? (MODEL_ASPECT_RATIOS.get(grokModelId) ?? NO_ASPECT_RATIOS)
+    : NO_ASPECT_RATIOS;
+  const qualityOptions = grokModelId
+    ? (MODEL_QUALITIES.get(grokModelId) ?? NO_QUALITIES)
+    : NO_QUALITIES;
 
-  const [settings, setSettings] = useState<GrokImageSettings>(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState<GrokImageSettings>(defaultSettings);
+
   useEffect(() => {
     if (!grokModelId) return;
 
@@ -76,22 +136,32 @@ export function useGrokImageSettings(modelId: string) {
         const parsed = JSON.parse<{ aspectRatio?: string; quality?: string }>(
           stored
         );
-        const ar = parsed.aspectRatio ?? DEFAULT_SETTINGS.aspectRatio;
-        const q = parsed.quality ?? DEFAULT_SETTINGS.quality;
+        const ar = parsed.aspectRatio ?? defaultSettings.aspectRatio;
+        const q = parsed.quality ?? defaultSettings.quality;
+        const aspectRatio =
+          aspectRatioOptions.find(option => option === ar) ??
+          defaultSettings.aspectRatio;
+        const quality =
+          qualityOptions.find(option => option === q) ??
+          defaultSettings.quality;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setSettings({
-          aspectRatio: isValidGrokAspectRatio(ar)
-            ? ar
-            : DEFAULT_SETTINGS.aspectRatio,
-          quality: isValidGrokQuality(q) ? q : DEFAULT_SETTINGS.quality
+          aspectRatio,
+          quality
         });
       } else {
-        setSettings(DEFAULT_SETTINGS);
+        setSettings(defaultSettings);
       }
     } catch {
-      setSettings(DEFAULT_SETTINGS);
+      setSettings(defaultSettings);
     }
-  }, [modelId, grokModelId]);
+  }, [
+    aspectRatioOptions,
+    defaultSettings,
+    grokModelId,
+    modelId,
+    qualityOptions
+  ]);
 
   // Persist to localStorage on change
   useEffect(() => {
@@ -104,29 +174,30 @@ export function useGrokImageSettings(modelId: string) {
     }
   }, [modelId, grokModelId, settings]);
 
-  const updateSettings = useCallback((updates: GrokImageSettingsUpdates) => {
-    setSettings(prev => {
-      const aspectRatio =
-        typeof updates.aspectRatio === "string" &&
-        isValidGrokAspectRatio(updates.aspectRatio)
-          ? GROK_ASPECT_RATIOS.find(option => option === updates.aspectRatio)
-          : undefined;
-      const quality =
-        typeof updates.quality === "string" &&
-        isValidGrokQuality(updates.quality)
-          ? GROK_QUALITIES.find(option => option === updates.quality)
-          : undefined;
+  const updateSettings = useCallback(
+    (updates: GrokImageSettingsUpdates) => {
+      setSettings(prev => {
+        const aspectRatio =
+          typeof updates.aspectRatio === "string"
+            ? aspectRatioOptions.find(option => option === updates.aspectRatio)
+            : undefined;
+        const quality =
+          typeof updates.quality === "string"
+            ? qualityOptions.find(option => option === updates.quality)
+            : undefined;
 
-      return {
-        aspectRatio: aspectRatio ?? prev.aspectRatio,
-        quality: quality ?? prev.quality
-      };
-    });
-  }, []);
+        return {
+          aspectRatio: aspectRatio ?? prev.aspectRatio,
+          quality: quality ?? prev.quality
+        };
+      });
+    },
+    [aspectRatioOptions, qualityOptions]
+  );
 
   const resetSettings = useCallback(() => {
-    setSettings(DEFAULT_SETTINGS);
-  }, []);
+    setSettings(defaultSettings);
+  }, [defaultSettings]);
 
   return {
     settings,
@@ -134,8 +205,8 @@ export function useGrokImageSettings(modelId: string) {
     resetSettings,
     isCapable,
     modelId: grokModelId,
-    aspectRatios: GROK_ASPECT_RATIOS,
-    qualities: GROK_QUALITIES,
+    aspectRatios: aspectRatioOptions,
+    qualities: qualityOptions,
     supportsOutputFormat: false,
     supportsBackground: false
   };

@@ -12,13 +12,14 @@ import {
 import { useModelSelection } from "@/context/model-selection-context";
 import { useGoogleImageSettings } from "@/hooks/use-gemini-img-gen";
 import { useGrokImageSettings } from "@/hooks/use-grok-img-gen";
+import { useMetaImageSettings } from "@/hooks/use-meta-img-gen";
 import {
   OPENAI_BACKGROUNDS,
   OPENAI_OUTPUT_FORMATS,
   useOpenAIImageSettings
 } from "@/hooks/use-openai-img-gen";
 import { isPureImageModel } from "@/lib/helpers";
-import { imgCtx } from "@/lib/img-ctx";
+import { imgCtx, imgGenCapableModel } from "@/lib/img-ctx";
 import type {
   AIChatRequestImgGenFields,
   Provider,
@@ -33,7 +34,8 @@ export interface ImageGenOption {
 
 export interface UnifiedImageGenSettings {
   aspectRatio: string;
-  quality: string;
+  /** undefined for a provider with no quality tiers (meta) */
+  quality?: string;
   outputFormat?: string;
   background?: "auto" | "opaque" | "transparent";
 }
@@ -62,7 +64,10 @@ interface ImageGenContextType {
   resetSettings: () => void;
 }
 
-function normalizeOpenAIOutputFormat(model = "gpt-5.4", outputFormat?: string) {
+function normalizeOpenAIOutputFormat(
+  model = "gpt-5.6-sol",
+  outputFormat?: string
+) {
   if (!imgCtx.openAIImgGenCapable(model)) return;
   if (outputFormat && imgCtx.isValidOpenAIOutputFormat(outputFormat)) {
     return outputFormat;
@@ -71,7 +76,7 @@ function normalizeOpenAIOutputFormat(model = "gpt-5.4", outputFormat?: string) {
 }
 
 function normalizeOpenAIBackground(
-  model = "gpt-5.4",
+  model = "gpt-5.6-sol",
   background?: string,
   outputFormat?: string
 ) {
@@ -105,7 +110,7 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
     useState<ImageGenExtraFields>(DEFAULT_EXTRA_FIELDS);
 
   const supported = useMemo(() => {
-    if (imgCtx.imgGenCapableModels(currentModelId)) {
+    if (imgCtx.isImgGenCapableModel(currentModelId)) {
       return true;
     } else return false;
   }, [currentModelId]);
@@ -122,6 +127,7 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
   const openai = useOpenAIImageSettings(currentModelId);
   const google = useGoogleImageSettings(currentModelId);
   const grok = useGrokImageSettings(currentModelId);
+  const meta = useMetaImageSettings(currentModelId);
 
   const normalizedOpenAIOutputFormat = useMemo(
     () =>
@@ -150,7 +156,8 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
     if (!(
       currentProvider === "openai" ||
       currentProvider === "gemini" ||
-      currentProvider === "grok"
+      currentProvider === "grok" ||
+      currentProvider === "meta"
     )) {
       return null;
     }
@@ -176,6 +183,13 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
           quality: grok.settings.quality ?? "1k"
         } satisfies UnifiedImageGenSettings;
       }
+      case "meta": {
+        // size is muse-image-1.0's only knob — no quality tiers exist, so
+        // quality is simply absent and the picker hides
+        return {
+          aspectRatio: meta.settings.aspectRatio
+        } satisfies UnifiedImageGenSettings;
+      }
     }
   }, [
     currentProvider,
@@ -183,6 +197,7 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
     google.settings.quality,
     grok.settings.aspectRatio,
     grok.settings.quality,
+    meta.settings.aspectRatio,
     normalizedOpenAIBackground,
     normalizedOpenAIOutputFormat,
     openai.settings.aspectRatio,
@@ -200,14 +215,20 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
       }
       case "gemini": {
         return (google.aspectRatios ?? []).map(option => ({
-          value: option,
-          label: option
+          value: option ?? "1:1",
+          label: option ?? "1:1"
         })) satisfies ImageGenOption[];
       }
       case "grok": {
         return grok.aspectRatios.map(option => ({
           value: option,
           label: option
+        })) satisfies ImageGenOption[];
+      }
+      case "meta": {
+        return meta.aspectRatios.map(option => ({
+          value: option.value,
+          label: option.label
         })) satisfies ImageGenOption[];
       }
       default: {
@@ -218,6 +239,7 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
     currentProvider,
     google.aspectRatios,
     grok.aspectRatios,
+    meta.aspectRatios,
     openai.aspectRatios
   ]);
 
@@ -291,12 +313,16 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
           grok.updateSettings(updates);
           return;
         }
+        case "meta": {
+          meta.updateSettings(updates);
+          return;
+        }
         default: {
           return;
         }
       }
     },
-    [currentProvider, google, grok, openai]
+    [currentProvider, google, grok, meta, openai]
   );
 
   const resetSettings = useCallback(() => {
@@ -313,17 +339,20 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
         grok.resetSettings();
         return;
       }
+      case "meta": {
+        meta.resetSettings();
+        return;
+      }
       default: {
         return;
       }
     }
-  }, [currentProvider, google, grok, openai]);
+  }, [currentProvider, google, grok, meta, openai]);
 
   const updateFields = useCallback(
     (nextFields: RTC<AIChatRequestImgGenFields>) => {
-      if (!imgCtx.imgGenCapableModels(currentModelId)) return;
+      if (!imgGenCapableModel(currentModelId)) return;
       const nextSettings: RTC<UnifiedImageGenSettings> = {};
-
       if (typeof nextFields.output_size !== "undefined") {
         nextSettings.aspectRatio = nextFields.output_size;
       }
@@ -357,13 +386,60 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
   }, [resetSettings]);
 
   const fields = useMemo(() => {
-    const mod = imgCtx.imgGenCapableModels(currentModelId)
+    const mod = imgGenCapableModel(currentModelId)
       ? currentModelId
       : "gemini-2.5-flash-image";
-    const output_quality =
-      imgCtx.handleImgGenOutputQuality(mod, {
-        output_quality: settings?.quality
-      }) ?? DEFAULT_FIELDS.output_quality;
+
+    let output_quality: ReturnType<typeof imgCtx.handleImgGenOutputQuality>;
+    if (settings?.quality) {
+      if (mod === "muse-image-1.0") {
+        output_quality = undefined;
+      } else if (mod === "gemini-2.5-flash-image") {
+        output_quality = "1K";
+      } else if (mod === "gemini-3.1-flash-lite-image") {
+        if (imgCtx.isValidNanoBananaTwoLiteOutputQuality(settings?.quality)) {
+          output_quality = settings.quality;
+        } else output_quality = "1K";
+      } else if (
+        mod === "gemini-3.1-flash-image-preview" ||
+        mod === "deep-research-max-preview-04-2026" ||
+        mod === "deep-research-preview-04-2026"
+      ) {
+        if (imgCtx.isValidNanoBananaTwoOutputQuality(settings.quality)) {
+          output_quality = settings.quality;
+        } else output_quality = "2K";
+      } else if (mod === "gemini-3-pro-image-preview") {
+        if (imgCtx.isValidNanoBananaProAndTwoOutputQuality(settings.quality)) {
+          output_quality = settings.quality;
+        } else output_quality = "2K";
+      } else if (
+        mod === "grok-imagine-image" ||
+        mod === "grok-imagine-image-quality"
+      ) {
+        if (imgCtx.isValidGrokResolution(settings.quality)) {
+          output_quality = settings.quality;
+        } else output_quality = "1k";
+      } else if (mod === "grok-imagine-image-2.0") {
+        if (imgCtx.isValidGrok2Resolution(settings.quality)) {
+          output_quality = settings.quality;
+        } else output_quality = "1.5k";
+      } else if (
+        mod === "gpt-image-1" ||
+        mod === "gpt-image-1-mini" ||
+        mod === "gpt-image-1.5" ||
+        mod === "gpt-image-2"
+      ) {
+        if (imgCtx.isValidOpenAIQuality(settings.quality)) {
+          output_quality = settings.quality;
+        } else output_quality = "high";
+      } else {
+        if (imgCtx.isValidGpt2Dot5OutputQuality(settings.quality)) {
+          output_quality = settings.quality;
+        } else output_quality = "xhigh";
+      }
+    } else {
+      output_quality = undefined;
+    }
     const output_size =
       imgCtx.handleOutputSize(mod, {
         output_size: settings?.aspectRatio
@@ -372,7 +448,7 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
     const output_partial_images = imgCtx.handlePartialImgGen(mod, {
       partialImagesRequested: extraFields.output_partial_images
     });
-    const output_format = imgCtx.imgGenCapableModels(currentModelId)
+    const output_format = imgGenCapableModel(currentModelId)
       ? imgCtx.handleImgGenOutputFormat(currentModelId, {
           format: settings?.outputFormat
         })

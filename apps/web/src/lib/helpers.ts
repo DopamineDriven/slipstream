@@ -65,7 +65,8 @@ export const isPureImageModel = (m: string) => {
     m === "gpt-image-2.5-flare" ||
     m === "grok-imagine-image" ||
     m === "grok-imagine-image-2.0" ||
-    m === "grok-imagine-image-quality"
+    m === "grok-imagine-image-quality" ||
+    m === "muse-image-1.0"
   );
 };
 

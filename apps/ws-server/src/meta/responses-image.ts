@@ -61,14 +61,19 @@ export class MetaResponsesImageService extends MetaChatService {
   /**
    * the planner switches are on by default upstream and stay on here.
    * `size` sets aspect ratio only (the generator picks its own resolution),
-   * so an unrecognised value is omitted rather than sent as a guess
+   * so an unrecognised value is omitted rather than sent as a guess. "auto"
+   * is omitted too: the shared size validator admits it for OpenAI's sake,
+   * but Meta documents WxH only, and no size IS auto
    */
   private metaImageTool(imgGenFields?: AIChatRequestImgGenFields) {
     const size = imgGenFields?.output_size;
     const format = imgGenFields?.output_format;
     return {
       type: "image_generation",
-      size: size && this.prisma.isValidMetaSize(size) ? size : undefined,
+      size:
+        size && size !== "auto" && this.prisma.isValidMetaSize(size)
+          ? size
+          : undefined,
       output_format:
         format && this.prisma.isValidMetaOututFormat(format) ? format : "webp",
       reasoning_strength: "high",

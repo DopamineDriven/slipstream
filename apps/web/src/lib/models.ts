@@ -22,7 +22,7 @@ import type {
   MistralDisplayNameUnion,
   MistralModelIdUnion,
   OpenAiDisplayNameUnion,
-  OpenAiModelIdUnion,
+  OpenAIModelIdUnion,
   Provider,
   SakanaDisplayNameUnion,
   SakanaModelIdUnion,
@@ -143,7 +143,7 @@ export const providerMetadata = {
 } as const;
 
 export type DisplayNameWorkup<T extends Provider> = T extends "openai"
-  ? ReturnType<typeof getDisplayNameByModelId<T, OpenAiModelIdUnion>>
+  ? ReturnType<typeof getDisplayNameByModelId<T, OpenAIModelIdUnion>>
   : T extends "anthropic"
     ? ReturnType<typeof getDisplayNameByModelId<T, AnthropicModelIdUnion>>
     : T extends "grok"
@@ -412,11 +412,11 @@ export function getModelDisplayName(
                             : toProvider === "openai"
                               ? getDisplayNameByModelId(
                                   toProvider,
-                                  model as OpenAiModelIdUnion
+                                  model as OpenAIModelIdUnion
                                 )
                               : getDisplayNameByModelId(
                                   "openai",
-                                  model as OpenAiModelIdUnion
+                                  model as OpenAIModelIdUnion
                                 );
 }
 
@@ -445,7 +445,7 @@ export const getModel = <
         providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"grok">)
       ) {
         return model;
-      } else return "grok-4.3" as const as NonNullable<K>;
+      } else return "grok-4.6" as const as NonNullable<K>;
     }
     case "anthropic": {
       if (
@@ -463,7 +463,7 @@ export const getModel = <
         providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"meta">)
       ) {
         return model;
-      } else return "muse-spark-1.1" as const as NonNullable<K>;
+      } else return "muse-spark-1.3" as const as NonNullable<K>;
     }
     case "vercel": {
       if (
@@ -513,7 +513,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "kimi-k2.6" as const as NonNullable<K>;
+      } else return "kimi-3" as const as NonNullable<K>;
     }
     case "zai": {
       if (
@@ -521,7 +521,7 @@ export const getModel = <
         providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"zai">)
       ) {
         return model;
-      } else return "glm-5.1" as const as NonNullable<K>;
+      } else return "glm-5.3" as const as NonNullable<K>;
     }
     case "alibaba": {
       if (
@@ -562,7 +562,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "gpt-5.5" as const as NonNullable<K>;
+      } else return "gpt-5.6-sol" as const as NonNullable<K>;
     }
   }
 };

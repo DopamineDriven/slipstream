@@ -577,7 +577,7 @@ export class ProviderValidation {
       Exclude<AllModelsUnion, "grok-imagine-image-2.0">
     >,
     data?: { output_quality: "1k" | "1.5k" | "2k" }
-  ): "1k" | "2k";
+  ): "1k" | "1.5k" | "2k";
   public handleImgGenOutputQuality(
     model: Exclude<
       AllModelsUnion,
@@ -643,6 +643,7 @@ export class ProviderValidation {
         | "0.5K"
         | "1K"
         | "1k"
+        | "1.5k"
         | "2K"
         | "2k"
         | "4K"
@@ -658,6 +659,7 @@ export class ProviderValidation {
     | "0.5K"
     | "1K"
     | "1k"
+    | "1.5k"
     | "2K"
     | "2k"
     | "4K"
