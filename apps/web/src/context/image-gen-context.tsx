@@ -228,7 +228,8 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
       case "meta": {
         return meta.aspectRatios.map(option => ({
           value: option.value,
-          label: option.label
+          label: option.label,
+          pixelSize: option.pixelSize
         })) satisfies ImageGenOption[];
       }
       default: {

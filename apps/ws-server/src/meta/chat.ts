@@ -290,7 +290,7 @@ export class MetaChatService extends MetaWorkupService {
             // pools reasoning + visible output under one cap — muse-spark's
             // reasoning is encrypted like fugu-ultra's, and any cap starves
             // thinking FIRST, surfacing as response.incomplete with zero text
-            reasoning: this.handleReasoning(model, "high"),
+            reasoning: this.handleReasoning(model, "xhigh"),
             parallel_tool_calls: true,
             tools
           },

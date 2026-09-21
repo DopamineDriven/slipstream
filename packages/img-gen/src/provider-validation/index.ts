@@ -223,16 +223,19 @@ export class ProviderValidation {
     return this.geminiNanoBananasModel(m);
   }
 
-  public isImgGenCapableModel<const V extends string = string>(
-    model = "gpt-6-astra" as V
-  ) {
-    if (
+  public imgGenCapableModel(model: string) {
+    return (
       this.grokImgGenCapable(model) ||
       this.geminiImgGenCapable(model) ||
       this.openAIImgGenCapable(model) ||
       this.metaImgGenCapable(model)
-    )
-      return true;
+    );
+  }
+
+  public isImgGenCapableModel<const V extends string = string>(
+    model = "gpt-6-astra" as V
+  ) {
+    if (this.imgGenCapableModel(model)) return true;
     else return false;
   }
 
@@ -243,12 +246,7 @@ export class ProviderValidation {
   public isPureImgGenModel<const V extends AllModelsUnion = AllModelsUnion>(
     model = "gpt-6-astra" as V
   ) {
-    if (!(
-      this.grokImgGenCapable(model) ||
-      this.geminiImgGenCapable(model) ||
-      this.openAIGptImgModel(model) ||
-      this.metaImgGenCapable(model)
-    )) {
+    if (!this.imgGenCapableModel(model)) {
       return false;
     } else {
       if (
@@ -858,7 +856,7 @@ export class ProviderValidation {
   }
 
   public isValidMetaSize(s: string) {
-    return this.isValidGPTImage2Size(s);
+    return this.isValidOpenAISize(s);
   }
 
   public handlePartialImgGen(
@@ -890,13 +888,7 @@ export class ProviderValidation {
     const m = model;
     const ar = data?.output_size;
     if (!m) return;
-    else if (!(
-      this.geminiImgGenCapable(m) ||
-      this.grokImagineImgGenModel(m) ||
-      this.openAIImgGenCapable(m) ||
-      this.metaImgGenCapable(m)
-    ))
-      return;
+    else if (!this.imgGenCapableModel(m)) return;
     else if (this.metaImgGenCapable(m)) {
       if (ar && this.isValidMetaSize(ar)) {
         return ar;

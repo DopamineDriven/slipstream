@@ -7,9 +7,8 @@ import type { MetaImgGenOpts } from "@slipstream/types";
 // one model, one contract — every type here comes off MetaImgGenOpts
 export type MetaImgModelId = MetaImgGenOpts["model"];
 
-// "auto" = send no size and let the generator choose
-export type MetaAspectRatio =
-  Exclude<MetaImgGenOpts["size"], undefined> | "auto";
+// the contract's size union already carries "auto" (Meta's default shape)
+export type MetaAspectRatio = Exclude<MetaImgGenOpts["size"], undefined>;
 
 export interface MetaImageSettings {
   aspectRatio: MetaAspectRatio;
@@ -18,6 +17,7 @@ export interface MetaImageSettings {
 export interface MetaAspectRatioOption {
   value: MetaAspectRatio;
   label: string;
+  pixelSize?: string;
 }
 
 export interface MetaImageSettingsUpdates {
@@ -29,30 +29,23 @@ export function isMetaImgGenCapable(modelId: string) {
 }
 
 /**
- * muse-image-1.0 turns `size` into an aspect ratio and renders at its own
- * fixed resolution, so the pixel numbers carry no meaning beyond their ratio.
- * One option per ratio (the smallest valid WxH for it), never a resolution
- * ladder — "2K" / "Max" tiers would promise something the model ignores
+ * The Responses `image_generation` tool validates `size` against a fixed
+ * list, whatever Meta's prose says about "any WxH". Live-tested 2026-09-21:
+ * `auto`, `1024x1024`, `1024x1536` and `1536x1024` are all accepted;
+ * `1536x1152` (4:3) and `2048x1152` (16:9) return
+ * `400 tools[0] did not match any supported type`. That is exactly the set
+ * the OpenAI tool originally enumerated, and it is what `MetaImgSize` now
+ * encodes, so `satisfies` below rejects anything wider.
+ *
+ * `size` sets the aspect ratio only: the image comes back at the generator's
+ * own resolution (3:2 and `auto` both return 1920x1280). `pixelSize` shows the
+ * exact value sent, for parity with the GPT list
  */
 export const META_ASPECT_RATIOS = [
   { value: "auto", label: "Auto" },
-  { value: "1024x1024", label: "1:1" },
-  { value: "1024x1536", label: "2:3" },
-  { value: "1536x1024", label: "3:2" },
-  { value: "1152x1536", label: "3:4" },
-  { value: "1536x1152", label: "4:3" },
-  { value: "1024x1280", label: "4:5" },
-  { value: "1280x1024", label: "5:4" },
-  { value: "1152x2048", label: "9:16" },
-  { value: "2048x1152", label: "16:9" },
-  { value: "960x1536", label: "10:16" },
-  { value: "1536x960", label: "16:10" },
-  { value: "1024x2048", label: "1:2" },
-  { value: "2048x1024", label: "2:1" },
-  { value: "864x2016", label: "9:21" },
-  { value: "2016x864", label: "21:9" },
-  { value: "512x1536", label: "1:3" },
-  { value: "1536x512", label: "3:1" }
+  { value: "1024x1024", label: "1:1", pixelSize: "1024×1024" },
+  { value: "1024x1536", label: "2:3", pixelSize: "1024×1536" },
+  { value: "1536x1024", label: "3:2", pixelSize: "1536×1024" }
 ] satisfies MetaAspectRatioOption[];
 
 const META_DEFAULTS = {

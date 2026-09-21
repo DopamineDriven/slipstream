@@ -9,7 +9,7 @@ import type {
 } from "@slipstream/types";
 
 export interface MetaReasoningEffort {
-  effort: "none" | "minimal" | "low" | "medium" | "high" | "xhigh";
+  effort: "none" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max"
 }
 
 export interface MetaUserLocation {
@@ -62,11 +62,13 @@ export interface MetaRouteRequestEntity extends ProviderChatRequestEntity {
  */
 export type MetaImageGenerationTool = Pick<
   OpenAI.Responses.Tool.ImageGeneration,
-  "type" | "size" | "output_format"
+  "type" | "size" | "output_format" | "moderation"
 > &
   ToolEnablementProps & {
     reasoning_strength?: "low" | "high";
   };
+
+
 
 export interface PersistMetaImageParams {
   b64: string;

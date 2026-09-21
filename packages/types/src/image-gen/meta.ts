@@ -1,8 +1,8 @@
-import type { GPTSizesUnion } from "@/image-gen/openai.ts";
+import type { BaseOpenAISize } from "@/image-gen/openai.ts";
 import type { MetaImgGenModels, MetaModelIdUnion } from "@/models.ts";
 import type { DX } from "@/utils.ts";
 
-export type MetaImgSize = GPTSizesUnion["sizes"];
+export type MetaImgSize = BaseOpenAISize;
 
 export type MetaModelImgARWorkup = DX<
   Record<MetaImgGenModels, MetaImgSize> &

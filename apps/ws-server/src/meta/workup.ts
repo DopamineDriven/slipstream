@@ -3,6 +3,7 @@ import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type {
   MetaAttachmentRef,
   MetaFreshAssetSelection,
+  MetaImageGenerationTool,
   MetaUserLocation
 } from "@/meta/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
@@ -12,9 +13,11 @@ import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import { MetaStoreService } from "@/meta/store.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
+  AIChatRequestImgGenFields,
   AttachmentSingleton,
   LocalToolName,
-  MessageSingleton
+  MessageSingleton,
+  MetaImgSize
 } from "@slipstream/types";
 import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
@@ -45,7 +48,27 @@ export class MetaWorkupService extends MetaStoreService {
         : undefined
     ) satisfies OpenAI.Responses.WebSearchTool.UserLocation | null | undefined;
   }
+  protected metaImageTool(imgGenFields?: AIChatRequestImgGenFields) {
+    const size = (
+      imgGenFields?.output_size &&
+      this.prisma.isValidMetaSize(imgGenFields.output_size)
+        ? imgGenFields.output_size
+        : ("auto" as const)
+    ) satisfies MetaImgSize;
 
+    const output_format = imgGenFields?.output_format
+      ? this.prisma.isValidMetaOututFormat(imgGenFields.output_format)
+        ? imgGenFields.output_format
+        : "webp"
+      : undefined;
+
+    return {
+      type: "image_generation",
+      size,
+      reasoning_strength: "high",
+      output_format
+    } as const satisfies MetaImageGenerationTool;
+  }
   protected messageText(
     msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
   ) {

@@ -2,7 +2,6 @@ import type { LocalToolBroker } from "@/local-tools/local-tool-broker.ts";
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type {
-  MetaImageGenerationTool,
   MetaProviderChatRequestEntity,
   PersistMetaImageParams
 } from "@/meta/types.ts";
@@ -13,7 +12,6 @@ import { MetaChatService } from "@/meta/chat.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
-  AIChatRequestImgGenFields,
   AIChatResponseImgGenSubFields,
   EventTypeMap
 } from "@slipstream/types";
@@ -23,16 +21,17 @@ import type {
  * as its only tool (it accepts no function tools, so there is no tool loop).
  *
  * Wire shape, probe-verified 2026-09-21 (`probe-muse-image-1.sh`): Meta's
- * "stream" is TWO events — `response.created` at ~0.1-0.5 s, then
- * `response.completed` 10-40 s later carrying everything: a readable
- * reasoning summary, an assistant message whose text is "", and the
+ * "stream" is TWO events, and BOTH land at the end. The HTTP headers return
+ * in ~0.1-0.5 s, but `response.created` is not flushed until just before
+ * `response.completed` (observed live: ~0.7 s apart, i.e. the download time
+ * of the completed frame). `response.completed` carries everything: a
+ * readable reasoning summary, an assistant message whose text is "", and the
  * `image_generation_call` with the base64 in `result`. No deltas, no
  * output_item events, no partials (`partial_images` is accepted and ignored).
+ * Nothing on the wire can drive the UI during the wait, so we do.
  */
 export class MetaResponsesImageService extends MetaChatService {
   private readonly nanoId: Promise<(typeof import("nanoid"))["nanoid"]>;
-  /** Meta sends nothing between created and completed; the UI's clock is ours to tick */
-  private readonly HEARTBEAT_MS = 1_000;
   private readonly IMG_HEADER_BYTES = 4096 * 48;
 
   constructor(
@@ -56,31 +55,6 @@ export class MetaResponsesImageService extends MetaChatService {
       localToolBroker
     );
     this.nanoId = import("nanoid").then(t => t.nanoid);
-  }
-
-  /**
-   * the planner switches are on by default upstream and stay on here.
-   * `size` sets aspect ratio only (the generator picks its own resolution),
-   * so an unrecognised value is omitted rather than sent as a guess. "auto"
-   * is omitted too: the shared size validator admits it for OpenAI's sake,
-   * but Meta documents WxH only, and no size IS auto
-   */
-  private metaImageTool(imgGenFields?: AIChatRequestImgGenFields) {
-    const size = imgGenFields?.output_size;
-    const format = imgGenFields?.output_format;
-    return {
-      type: "image_generation",
-      size:
-        size && size !== "auto" && this.prisma.isValidMetaSize(size)
-          ? size
-          : undefined,
-      output_format:
-        format && this.prisma.isValidMetaOututFormat(format) ? format : "webp",
-      reasoning_strength: "high",
-      enable_web_search: true,
-      enable_image_search: true,
-      enable_shell: true
-    } as const satisfies MetaImageGenerationTool;
   }
 
   private metaGenMime(ext: string) {
@@ -229,7 +203,6 @@ export class MetaResponsesImageService extends MetaChatService {
       }
     } as const satisfies AIChatResponseImgGenSubFields;
   }
-
   protected async handleMetaResponsesImageRequest({
     conversationId,
     msgs,
@@ -260,56 +233,49 @@ export class MetaResponsesImageService extends MetaChatService {
     const client = this.getClient(apiKey ?? undefined);
     const input = this.formatMetaImageInput(requestMsg);
     const imageTool = this.metaImageTool(imgGenFields);
-    const tools = Array.of<OpenAI.Responses.Tool>(imageTool);
 
-    /**
-     * ONE THINKING block at ordinal 0 for the whole turn. It opens blank on
-     * `response.created`, re-sends each heartbeat with a growing duration,
-     * and is replaced by the real summary on `response.completed` — the
-     * client's block merge is last-wins by ordinal, so nothing concatenates
-     */
-    const sendThinking = (
-      content: string,
-      durationMs: number,
-      isThinking: boolean
-    ) => {
-      const frame = {
-        type: "ai_chat_chunk",
-        conversationId,
-        userId,
-        userMsgId,
-        model,
-        provider,
-        title,
-        systemPrompt,
-        temperature,
-        topP,
-        imgGenEnabled: true,
-        imgGenFields: undefined,
-        thinkingText: content.length > 0 ? content : undefined,
-        messageBlocks: {
-          type: "THINKING",
-          content,
-          ordinal: 0,
-          conversationId,
-          durationMs
-        },
-        thinkingDuration: durationMs > 0 ? durationMs : undefined,
-        isThinking,
-        done: false
-      } as const satisfies EventTypeMap["ai_chat_chunk"];
-      if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(frame));
-      void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", frame);
-    };
-
-    let createdAt = 0;
-    const elapsed = () =>
-      createdAt === 0
-        ? 0
-        : Math.max(0, Math.round(performance.now() - createdAt));
-
-    let heartbeat: ReturnType<typeof setInterval> | undefined = undefined;
+    // tInitial is stamped at DISPATCH. Meta flushes nothing until generation
+    // ends (through the SDK not even the headers: the await below blocks for
+    // the whole run), so `response.created` is useless as a start marker.
+    // tFinal is stamped when `response.completed` lands. The measured
+    // duration is their delta, taken once, and nothing else writes it
+    const tInitial = performance.now();
+    let tFinal = 0;
     let completed: OpenAI.Responses.Response | undefined = undefined;
+
+    // opens the THINKING block at ordinal 0 so the wait is visible. Sent
+    // once, here, before the request is awaited; no later path re-emits it
+    const thinkingOpened = {
+      type: "ai_chat_chunk",
+      conversationId,
+      userId,
+      userMsgId,
+      model,
+      provider,
+      title,
+      systemPrompt,
+      temperature,
+      topP,
+      imgGenEnabled: true,
+      imgGenFields: undefined,
+      thinkingText: undefined,
+      messageBlocks: {
+        type: "THINKING",
+        content: "",
+        ordinal: 0,
+        conversationId,
+        durationMs: 0
+      },
+      thinkingDuration: undefined,
+      isThinking: true,
+      done: false
+    } as const satisfies EventTypeMap["ai_chat_chunk"];
+    ws.send(JSON.stringify(thinkingOpened));
+    void this.redis.publishTypedEvent(
+      streamChannel,
+      "ai_chat_chunk",
+      thinkingOpened
+    );
 
     try {
       const streamRes = await client.responses.create(
@@ -318,33 +284,25 @@ export class MetaResponsesImageService extends MetaChatService {
           store: false,
           model,
           input,
-          tools,
+          tools: [
+            {
+...imageTool
+            }
+          ],
           safety_identifier: userId
         },
         { stream: true }
       );
 
       for await (const s of streamRes) {
-        if (s.type === "response.created" && createdAt === 0) {
-          createdAt = performance.now();
-          sendThinking("", 0, true);
-          heartbeat = setInterval(
-            () => sendThinking("", elapsed(), true),
-            this.HEARTBEAT_MS
-          );
-        }
-
         if (s.type === "response.completed") {
+          tFinal = performance.now();
           completed = s.response;
-        }
-
-        if (s.type === "response.incomplete") {
+        } else if (s.type === "response.incomplete") {
           throw new Error(
             `Meta image response ended incomplete (${s.response.incomplete_details?.reason ?? "unknown reason"})`
           );
-        }
-
-        if (s.type === "response.failed") {
+        } else if (s.type === "response.failed") {
           throw new Error(
             `Meta image response failed: ${s.response.error?.message ?? "unknown failure"}`
           );
@@ -356,17 +314,15 @@ export class MetaResponsesImageService extends MetaChatService {
         "Meta image stream request failed"
       );
       throw new Error(this.prisma.safeErrMsg(error));
-    } finally {
-      if (heartbeat) clearInterval(heartbeat);
     }
 
     if (!completed) {
       throw new Error("Meta image response stream ended without completion");
     }
 
-    // created → completed: reasoning, the planner's searches, generation and
+    // dispatch → completed: reasoning, the planner's searches, generation and
     // any self-correcting regeneration — the wait the user actually sat through
-    const duration = elapsed();
+    const duration = Math.round(tFinal - tInitial);
 
     const summaryParts = Array.of<string>();
     const results = Array.of<string>();
@@ -380,8 +336,39 @@ export class MetaResponsesImageService extends MetaChatService {
     }
     const summary = summaryParts.join("\n");
 
-    // the reasoning lands on screen now; S3 and the row write follow
-    sendThinking(summary, duration, false);
+    // the same ordinal, now with the summary and the measured duration. It
+    // lands on screen before S3 and the row write, which follow
+    const thinkingClosed = {
+      type: "ai_chat_chunk",
+      conversationId,
+      userId,
+      userMsgId,
+      model,
+      provider,
+      title,
+      systemPrompt,
+      temperature,
+      topP,
+      imgGenEnabled: true,
+      imgGenFields: undefined,
+      thinkingText: summary.length > 0 ? summary : undefined,
+      messageBlocks: {
+        type: "THINKING",
+        content: summary,
+        ordinal: 0,
+        conversationId,
+        durationMs: duration
+      },
+      thinkingDuration: duration,
+      isThinking: false,
+      done: false
+    } as const satisfies EventTypeMap["ai_chat_chunk"];
+    ws.send(JSON.stringify(thinkingClosed));
+    void this.redis.publishTypedEvent(
+      streamChannel,
+      "ai_chat_chunk",
+      thinkingClosed
+    );
     if (summary.length > 0) thinkingChunks.push(summary);
 
     if (results.length === 0) {
