@@ -21,7 +21,8 @@ import type {
   AIChatResponseImgGenSubFields,
   EventTypeMap,
   GptImageAndFacilitatorsImgGenWorkupRT,
-  MessageSingleton
+  MessageSingleton,
+  OpenAIPureImageGenModels
 } from "@slipstream/types";
 
 export class OpenAIGPTImageService extends OpenAIMemoryService {
@@ -181,7 +182,8 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
       );
 
     if (resImg.n === 1) {
-      const r = resImg satisfies GptImageAndFacilitatorsImgGenWorkupRT;
+      const r =
+        resImg satisfies GptImageAndFacilitatorsImgGenWorkupRT<OpenAIPureImageGenModels>;
       partialImgsRequested = typeof r.partialImagesRequested !== "undefined";
       outputFormat = r.output_format;
       uploadtInitial = performance.now();

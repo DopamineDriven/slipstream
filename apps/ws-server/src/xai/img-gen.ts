@@ -12,6 +12,7 @@ import type {
   AIChatRequestImgGenFields,
   AIChatResponseImgGenSubFields,
   EventTypeMap,
+  GrokImagine2ARUnion,
   GrokImagineARUnion,
   GrokImagineImgModelUnion,
   GrokImgGenModels,
@@ -112,16 +113,16 @@ export class GrokImgGenService extends GrokStreamWorkupService {
     const rawAspectRatio = imgGenFields?.output_size;
     const rawResolution = imgGenFields?.output_quality;
 
-    let ar: GrokImagineARUnion;
-    let r: "1k" | "2k";
+    let ar: GrokImagineARUnion | GrokImagine2ARUnion;
+    let r: "1k" | "1.5k" | "2k";
 
-    if (rawAspectRatio && this.prisma.isValidGrokAR(rawAspectRatio)) {
+    if (rawAspectRatio && this.prisma.isValidGrok2AR(rawAspectRatio)) {
       ar = rawAspectRatio;
     } else {
       ar = "auto" as const;
     }
 
-    if (rawResolution && this.prisma.isValidGrokQuality(rawResolution)) {
+    if (rawResolution && this.prisma.isValidGrok2Resolution(rawResolution)) {
       r = rawResolution;
     } else {
       r = "2k";
@@ -131,8 +132,8 @@ export class GrokImgGenService extends GrokStreamWorkupService {
       aspect_ratio: ar,
       resolution: r
     } as const satisfies {
-      aspect_ratio: GrokImagineARUnion;
-      resolution: "1k" | "2k";
+      aspect_ratio: GrokImagineARUnion | GrokImagine2ARUnion;
+      resolution: "1k" | "1.5k" | "2k";
     };
   }
 
@@ -188,8 +189,8 @@ export class GrokImgGenService extends GrokStreamWorkupService {
         model: GrokImagineImgModelUnion;
         prompt: string;
         n: number;
-        aspect_ratio: GrokImagineARUnion;
-        resolution: "1k" | "2k";
+        aspect_ratio: GrokImagineARUnion | GrokImagine2ARUnion;
+        resolution: "1k" | "1.5k" | "2k";
         response_format: "b64_json";
         user: string;
       };
@@ -520,15 +521,19 @@ export class GrokImgGenService extends GrokStreamWorkupService {
             .concat(`.${getIt.format}`);
 
           tInitial = performance.now();
-          const rtHelper = await this.s3.uploadGenerated(b64, this.prisma.isProd, {
-            contentType: getIt.contentType ?? "image/jpeg",
-            filename,
-            origin: "GENERATED",
-            userId,
-            size: getIt.byteSize,
-            conversationId
-          });
-          a = rtHelper
+          const rtHelper = await this.s3.uploadGenerated(
+            b64,
+            this.prisma.isProd,
+            {
+              contentType: getIt.contentType ?? "image/jpeg",
+              filename,
+              origin: "GENERATED",
+              userId,
+              size: getIt.byteSize,
+              conversationId
+            }
+          );
+          a = rtHelper;
           tDelta = performance.now() - tInitial;
           const uploadTime = tDelta;
 

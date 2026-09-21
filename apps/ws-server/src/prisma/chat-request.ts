@@ -1,4 +1,5 @@
 import type { ExtractService } from "@/extract/index.ts";
+import type { LoggerService } from "@/logger/index.ts";
 import type {
   HandleAiChatReqCreateSansAssetGenSansAttachmentsProps,
   HandleAiChatReqCreateSansAssetGenWithAttachmentsProps,
@@ -18,7 +19,7 @@ import { PrismaAttachmentService } from "@/prisma/attachment.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { AIChatRequest, Rm } from "@slipstream/types";
-import type { LoggerService } from "@/logger/index.ts";
+
 export class PrismaChatRequestService extends PrismaAttachmentService {
   constructor(
     prisma: PrismaDbService,
@@ -47,7 +48,10 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
 
   private isImgGenCapable(provider: Lowercase<$Enums.Provider>) {
     return (
-      provider === "gemini" || provider === "grok" || provider === "openai"
+      provider === "gemini" ||
+      provider === "grok" ||
+      provider === "openai" ||
+      provider === "meta"
     );
   }
 

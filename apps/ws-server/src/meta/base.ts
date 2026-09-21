@@ -1,9 +1,9 @@
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
+import type { MetaReasoningEffort } from "@/meta/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { Logger as PinoLogger } from "pino";
-import type { MetaReasoningEffort } from "@/meta/types.ts";
 import { OpenAI } from "openai";
 import type { S3Storage } from "@slipstream/storage-s3";
 
@@ -51,9 +51,9 @@ export class MetaBaseService {
         effort === "none" || effort === "low" || effort === "minimal"
           ? "medium"
           : effort;
-        return {
-          effort: normalizedEffort ?? "xhigh"
-        } as const satisfies MetaReasoningEffort;
+      return {
+        effort: normalizedEffort ?? "xhigh"
+      } as const satisfies MetaReasoningEffort;
     }
   }
 }

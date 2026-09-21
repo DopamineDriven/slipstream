@@ -266,6 +266,27 @@ export class MetaWorkupService extends MetaStoreService {
     } satisfies OpenAI.Responses.EasyInputMessage;
   }
 
+  /**
+   * image lane: the requesting user turn ONLY — muse-image-1.0 has no use for
+   * history or HMEM. Its images ride inline as `input_image` (same 3 cap and
+   * jpeg/png/webp gate as the chat lane); anything else degrades to a
+   * markdown link inside the prompt text, exactly as `formatUserMessage` does
+   */
+  protected formatMetaImageInput(msg: MessageSingleton<true>) {
+    const inlineAttachmentKeys = new Set<string>();
+    let imageCount = 0;
+    for (const attachment of msg.attachments) {
+      if (imageCount === 3) break;
+      const ref = this.MetaAttachmentRef(attachment);
+      if (!ref || !this.isMetaImage(ref)) continue;
+      inlineAttachmentKeys.add(this.attachmentOccurrenceKey(msg, attachment));
+      imageCount += 1;
+    }
+    return [
+      this.formatUserMessage(msg, { inlineAttachmentKeys })
+    ] satisfies ResponseInput;
+  }
+
   protected async formatMetaInput(msgs: MessageSingleton<true>[]) {
     if (msgs.length === 0) {
       return [{ role: "user", content: "" }] as const satisfies ResponseInput;
