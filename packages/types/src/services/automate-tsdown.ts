@@ -52,7 +52,7 @@ export default defineConfig(
       fixedExtension: false,
       dts: { tsgo: { path } },
       format: ["esm"],
-      sourcemap: true,
+      sourcemap: false,
       tsconfig: relative(process.cwd(), "tsconfig.json"),
       clean: true,
       outDir: "dist",

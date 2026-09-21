@@ -42,5 +42,6 @@ export const modelIdsByProviderImgGen = {
     "grok-imagine-image-2.0",
     "grok-imagine-image",
     "grok-imagine-image-quality"
-  ]
+  ],
+  meta: ["muse-image-1.0"]
 } as const;

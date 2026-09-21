@@ -6,6 +6,8 @@
     },
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "types": ["*"],
+    "sourceMap": false,
+    "declarationMap": false
   },
   "include": [
     "**/*.ts",

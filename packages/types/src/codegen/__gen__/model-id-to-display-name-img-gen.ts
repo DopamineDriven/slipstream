@@ -43,5 +43,8 @@ export const modelIdToDisplayNameImgGen = {
     "grok-imagine-image-2.0": "Grok Imagine Image 2.0",
     "grok-imagine-image": "Grok Imagine Image",
     "grok-imagine-image-quality": "Grok Imagine Image Quality"
+  },
+  meta: {
+    "muse-image-1.0": "Muse Image 1.0"
   }
 } as const;

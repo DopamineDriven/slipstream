@@ -14,7 +14,9 @@ export type {
   GeminiSuccess,
   GrokModelsResponse,
   ListModelsSingleton,
+  ModeUnion,
   MultimodalRT,
+  OmniMapperRT,
   OpenAiError,
   OpenAiResponse,
   SuccessResponse
@@ -43,63 +45,6 @@ export {
   grokVoiceIdsTTS,
   grokVoices
 } from "@/contract/audio.ts";
-
-export type {
-  AIChatRequestImgGenFields,
-  AIChatResponseImgGenFields,
-  AIChatResponseImgGenFieldsFinal,
-  AIChatResponseImgGenSubFields,
-  BaseNanoBananaOutputAR,
-  BaseOpenAISize,
-  GeminiImageQuality,
-  GeminiImageSize,
-  GeminiModelAspectRatio,
-  GeminiModelAspectRatioWorkup,
-  GoogleGenAIImageGenOpts,
-  GoogleHarmCategory,
-  GoogleImagePromptLanguage,
-  GoogleImagenGenerateImagesConfig,
-  GoogleImgSizeQualityOpts,
-  GooglePersonGeneration,
-  GoogleSafetyFilterLevel,
-  GPTImage2Size,
-  GptImageAndFacilitatorsImgGenWorkupRT,
-  GptImage1Opts,
-  GptImageOutputSize,
-  GrokImagineARUnion,
-  GrokImagineImageGenOpts,
-  GrokImagineImgModelUnion,
-  GrokImgGenUnionOpts,
-  GrokModelAspectRatio,
-  GrokModelAspectRatioWorkup,
-  ImageGenOptsByProvider,
-  ImageGenPartialArr,
-  ImagenOutputSize,
-  ImgGenStage,
-  ImgGenWorkupRT,
-  ImgGenWorkupRTObj,
-  ImgGenWorkupResRT,
-  ImgMetadataEntity,
-  NanoBanana2OutputAR,
-  NanoBananaImageGenOpts,
-  NanoBananaOutputSize,
-  OpenAIBaseQuality,
-  OpenAIGptImage2Point5Quality,
-  OpenAIImageGenOpts,
-  OpenAIImgCapableModels,
-  OpenAIImgNativeGPTImgAR,
-  OpenAIModelAspectRatio,
-  OpenAIModelAspectRatioWorkup,
-  OpenAINativeImgModelAspectRatioWorkup,
-  OpenAINativeImgModelQualityWorkup,
-  OpenAISizeQualityOpts,
-  OutputSizeProps,
-  S3Checksum,
-  S3StorageClass,
-  SharedOpenAIImageOpts
-} from "@/contract/images.ts";
-
-export { GPT_IMAGE_2_EXTENDED_OPTIONS } from "@/contract/images.ts";
 
 export type {
   AIChatEventTypeUnion,
@@ -291,6 +236,108 @@ export type {
 
 export type { TypingIndicator } from "@/contract/typing-indicator.ts";
 
+export type {
+  BaseNanoBananaOutputAR,
+  GeminiImageQuality,
+  GeminiImageSize,
+  GeminiModelAspectRatio,
+  GeminiModelAspectRatioWorkup,
+  GoogleGenAIImageGenOpts,
+  GoogleHarmCategory,
+  GoogleImagenGenerateImagesConfig,
+  GoogleImagePromptLanguage,
+  GoogleImgSizeQualityOpts,
+  GooglePersonGeneration,
+  GoogleSafetyFilterLevel,
+  ImagenOutputSize,
+  NanoBanana2OutputAR,
+  NanoBananaImageGenOpts,
+  NanoBananaOutputSize
+} from "@/image-gen/google.ts";
+
+export type {
+  GrokImagine2ARUnion,
+  GrokImagine2QualityUnion,
+  GrokImagineARUnion,
+  GrokImagineImageGenOpts,
+  GrokImagineImageGenOptsExtended,
+  GrokImagineImgModelUnion,
+  GrokImagineQualityUnion,
+  GrokImgGenUnionOpts,
+  GrokModelAspectRatio,
+  GrokModelAspectRatioWorkup,
+  GrokModelOptsRecord,
+  GrokModelOptsUnion
+} from "@/image-gen/grok.ts";
+
+export type {
+  AIChatRequestImgGenFields,
+  AIChatResponseImgGenFields,
+  AIChatResponseImgGenFieldsFinal,
+  AIChatResponseImgGenSubFields,
+  ImageGenPartialArr,
+  ImgGenStage,
+  ImgMetadataEntity,
+  OutputSizeProps,
+  S3Checksum,
+  S3StorageClass
+} from "@/image-gen/index.ts";
+
+export type {
+  MetaImgGenOpts,
+  MetaImgSize,
+  MetaImgSizeMap,
+  MetaModelImgARWorkup,
+  ToolEnablementProps
+} from "@/image-gen/meta.ts";
+
+export type {
+  BaseOpenAISize,
+  GPT10x16,
+  GPT16x10,
+  GPT16x9,
+  GPT1x2,
+  GPT1x3,
+  GPT21x9,
+  GPT2x1,
+  GPT2x3,
+  GPT3x1,
+  GPT3x2,
+  GPT3x4,
+  GPT4x3,
+  GPT4x5,
+  GPT5x4,
+  GPT9x16,
+  GPT9x21,
+  GPTImage2Size,
+  GPTImgOpts,
+  GPTSizesMap,
+  GPTSizesRecord,
+  GPTSizesUnion,
+  GptImageAndFacilitatorsImgGenWorkupRT,
+  GptImageOutputSize,
+  ImgGenWorkupRT,
+  ImgGenWorkupRTObj,
+  ImgGenWorkupResRT,
+  InputFidelity,
+  OpenAIAspectRatioRecord,
+  OpenAIBaseQuality,
+  OpenAIGptImage2Point5Quality,
+  OpenAIImageGenOpts,
+  OpenAIImgCapableModels,
+  OpenAIImgGenQualityRecord,
+  OpenAIImgNativeGPTImgAR,
+  OpenAIImgOpts,
+  OpenAIModelAspectRatio,
+  OpenAIModelAspectRatioWorkup,
+  OpenAINativeImgModelAspectRatioWorkup,
+  OpenAINativeImgModelQualityWorkup,
+  OpenAISizeQualityOpts,
+  SharedOpenAIImageOpts
+} from "@/image-gen/openai.ts";
+
+export { GPT_IMAGE_2_EXTENDED_OPTIONS } from "@/image-gen/openai.ts";
+
 /**
  * model/provider types
  */
@@ -368,7 +415,11 @@ export type {
   KimiModelIdUnion,
   MetaChatModels,
   MetaDisplayNameUnion,
+  MetaDisplayNameUnionImgGen,
+  MetaImgGenModels,
   MetaModelIdUnion,
+  MetaModelIdUnionImgGen,
+  MetaPureImageGenModels,
   MiniMaxChatModels,
   MiniMaxDisplayNameUnion,
   MiniMaxModelIdUnion,
@@ -392,6 +443,7 @@ export type {
   OpenAIImgGenModels,
   OpenAiModelIdUnionImgGen,
   OpenAiModelIdUnion,
+  OpenAIModelIdUnion,
   OpenAIPureImageGenModels,
   Provider,
   ProviderModelRecord,

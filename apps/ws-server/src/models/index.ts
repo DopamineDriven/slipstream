@@ -287,9 +287,16 @@ export class ModelService extends ModelToolDefsService {
     );
   }
 
+  public isMetaImgModel(m: string) {
+    return m === "muse-image-1.0";
+  }
+
   public isMetaModel(m: string) {
     return (
-      m === "muse-spark-1.1" || m === "muse-spark-1.2" || m === "muse-spark-1.3"
+      this.isMetaImgModel(m) ||
+      m === "muse-spark-1.1" ||
+      m === "muse-spark-1.2" ||
+      m === "muse-spark-1.3"
     );
   }
 
@@ -335,7 +342,8 @@ export class ModelService extends ModelToolDefsService {
       m === "deepseek-v4-pro" ||
       m === "deepseek-v4-pro-0813" ||
       m === "deepseek-v4-flash" ||
-      m === "deepseek-v4-flash-0731"
+      m === "deepseek-v4-flash-0731" ||
+      m === "deepseek-v4.1-flash"
     );
   }
 
@@ -344,6 +352,7 @@ export class ModelService extends ModelToolDefsService {
       m === "glm-5.3" ||
       m === "glm-5.3-fast" ||
       m === "glm-5.3-flash" ||
+      m === "glm-5.3-flashx" ||
       m === "glm-5.2" ||
       m === "glm-5.2-fast" ||
       m === "glm-5.1" ||
@@ -357,7 +366,7 @@ export class ModelService extends ModelToolDefsService {
   public isQwenModel(m: string) {
     return (
       m === "qwen3.8-max-0902" ||
-      m === "qwen3.8-flash" ||
+      m === "qwen3.8-flash-next" ||
       m === "qwen3.8-flash" ||
       m === "qwen3.8-max" ||
       m === "qwen3.7-max" ||
@@ -381,6 +390,7 @@ export class ModelService extends ModelToolDefsService {
   public isSakanaModel(m: string) {
     return (
       m === "fugu" ||
+      m === "fugu-max" ||
       m === "fugu-ultra" ||
       m === "fugu-cyber" ||
       m === "sakana-namazu"

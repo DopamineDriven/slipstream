@@ -47,7 +47,7 @@ export class MetaChatService extends MetaWorkupService {
     apiKey,
     jobId,
     requestMessageId,
-    model = "muse-spark-1.1" satisfies MetaModelIdUnion,
+    model = "muse-spark-1.3" satisfies MetaModelIdUnion,
     systemPrompt,
     temperature,
     title,

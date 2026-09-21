@@ -12,6 +12,9 @@
         "contract": [
           "dist/contract/*.d.ts"
         ],
+                "image-gen": [
+          "dist/image-gen/*.d.ts"
+        ],
         "models": [
           "dist/models.d.ts"
         ],
@@ -46,6 +49,9 @@
       "contract": [
         "dist/contract/*.d.ts"
       ],
+                      "image-gen": [
+          "dist/image-gen/*.d.ts"
+        ],
       "models": [
         "dist/models.d.ts"
       ],
@@ -82,6 +88,7 @@
     "./types": "./dist/types.js",
     "./models": "./dist/models.js",
     "./contract/*": "./dist/contract/*.js",
+    "./image-gen/*": "./dist/image-gen/*.js",
     "./codegen-types": "./dist/codegen-types.js",
     "./codegen/*": "./dist/codegen/__gen__/*.js",
     "./stt": "./dist/stt.js",

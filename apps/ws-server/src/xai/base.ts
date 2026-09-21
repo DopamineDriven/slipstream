@@ -36,6 +36,28 @@ export class GrokBaseService {
       !this.prisma.isGrokVideoModel(m)
     );
   }
+  /**
+   *  grok-4.3 defaults to "low" (only grok-4.3 supports "none")
+   *
+   *  grok-4.5 and grok-4.6 default to "high"
+   */
+  protected reasoningByModel(m: string) {
+    if (!this.prisma.isGrokModel(m)) return;
+    if (!(m === "grok-4.6" || m === "grok-4.5" || m === "grok-4.3")) return;
+    const base = {
+      low: "low",
+      medium: "medium",
+      high: "high",
+      xhigh: "xhigh"
+    } as const;
+
+    if (m === "grok-4.3") {
+      return {
+        ...base,
+        none: "none"
+      } as const;
+    } else return base;
+  }
 
   protected canViewDocs(model: GrokModelIdUnion) {
     return this.isGrok4Model(model) || this.isGrokBuild(model);

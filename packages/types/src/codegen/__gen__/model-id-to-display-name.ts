@@ -5,24 +5,25 @@ export const modelIdToDisplayName = {
     "gpt-5.6-terra": "GPT-5.6 Terra",
     "gpt-5.6-luna": "GPT-5.6 Luna",
     "gpt-5.5": "GPT-5.5",
+    "gpt-5.5-pro": "GPT-5.5 Pro",
     "gpt-5.4": "GPT-5.4",
     "gpt-5.4-mini": "GPT-5.4 Mini",
     "gpt-5.4-nano": "GPT-5.4 nano",
+    "gpt-5.4-pro": "GPT-5.4 Pro",
     "gpt-5.2": "GPT-5.2",
+    "gpt-5.2-pro": "GPT-5.2 Pro",
     "gpt-5.1": "GPT-5.1",
     "gpt-5": "GPT-5",
     "gpt-5-mini": "GPT-5 Mini",
     "gpt-5-nano": "GPT-5 nano",
-    "gpt-5.3-codex": "GPT-5.3-Codex",
-    "gpt-5.5-pro": "GPT-5.5 Pro",
-    "gpt-5.4-pro": "GPT-5.4 Pro",
-    "gpt-5.2-pro": "GPT-5.2 Pro",
     "gpt-5-pro": "GPT-5 Pro",
     "gpt-4.1": "GPT-4.1",
     "gpt-4.1-mini": "GPT-4.1 Mini",
     "gpt-4.1-nano": "GPT-4.1 nano",
     "gpt-4o": "GPT-4o",
     "gpt-4o-mini": "GPT-4o Mini",
+    o3: "o3",
+    "gpt-5.3-codex": "GPT-5.3-Codex",
     "gpt-image-2.5-sunburst": "GPT-Image-2.5 Sunburst",
     "gpt-image-2.5-flare": "GPT-Image-2.5 Flare",
     "gpt-image-2": "GPT-Image-2",
@@ -30,7 +31,6 @@ export const modelIdToDisplayName = {
     "gpt-image-1": "GPT-Image-1",
     "gpt-image-1-mini": "GPT-Image-1 mini",
     "o4-mini": "o4-mini",
-    o3: "o3",
     "o3-pro": "o3-pro",
     "o3-mini": "o3-mini",
     o1: "o1",
@@ -49,8 +49,8 @@ export const modelIdToDisplayName = {
     "gemini-3.1-pro-preview-customtools": "Gemini 3.1 Pro Preview Custom Tools",
     "gemini-3.1-flash-lite-preview": "Gemini 3.1 Flash Lite Preview",
     "gemini-3-flash-preview": "Gemini 3 Flash Preview",
-    "gemini-3.1-flash-image-preview": "Nano Banana 2",
     "gemini-3.1-flash-lite-image": "Nano Banana 2 Lite",
+    "gemini-3.1-flash-image-preview": "Nano Banana 2",
     "gemini-3-pro-image-preview": "Nano Banana Pro",
     "gemini-2.5-flash-image": "Nano Banana",
     "lyria-3.5": "Lyria 3.5",
@@ -79,8 +79,8 @@ export const modelIdToDisplayName = {
     "grok-imagine-image-2.0": "Grok Imagine Image 2.0",
     "grok-imagine-image": "Grok Imagine Image",
     "grok-imagine-image-quality": "Grok Imagine Image Quality",
-    "grok-imagine-video": "Grok Imagine Video",
-    "grok-imagine-video-1.5": "Grok Imagine Video 1.5"
+    "grok-imagine-video-1.5": "Grok Imagine Video 1.5",
+    "grok-imagine-video": "Grok Imagine Video"
   },
   anthropic: {
     "claude-fable-5-1": "Claude Fable 5.1",
@@ -98,7 +98,8 @@ export const modelIdToDisplayName = {
   meta: {
     "muse-spark-1.3": "Muse Spark 1.3",
     "muse-spark-1.2": "Muse Spark 1.2",
-    "muse-spark-1.1": "Muse Spark 1.1"
+    "muse-spark-1.1": "Muse Spark 1.1",
+    "muse-image-1.0": "Muse Image 1.0"
   },
   vercel: {
     "v0-1.5-md": "v0 medium",
@@ -125,6 +126,7 @@ export const modelIdToDisplayName = {
     "kimi-k2-thinking": "Kimi K2 Thinking"
   },
   deepseek: {
+    "deepseek-v4.1-flash": "DeepSeek V4.1 Flash",
     "deepseek-v4-pro-0813": "DeepSeek V4 Pro 0813",
     "deepseek-v4-pro": "DeepSeek V4 Pro",
     "deepseek-v4-flash-0731": "DeepSeek V4 Flash 0731",
@@ -135,6 +137,7 @@ export const modelIdToDisplayName = {
     "glm-5.3": "GLM 5.3",
     "glm-5.3-fast": "GLM 5.3 Fast",
     "glm-5.3-flash": "GLM 5.3 Flash",
+    "glm-5.3-flashx": "GLM 5.3 FlashX",
     "glm-5.2": "GLM 5.2",
     "glm-5.2-fast": "GLM 5.2 Fast",
     "glm-5.1": "GLM 5.1",
@@ -162,6 +165,7 @@ export const modelIdToDisplayName = {
     "minimax-m2.1": "MiniMax-M2.1"
   },
   sakana: {
+    "fugu-max": "Fugu Max",
     "fugu-ultra": "Fugu Ultra",
     fugu: "Fugu",
     "fugu-cyber": "Fugu Cyber",

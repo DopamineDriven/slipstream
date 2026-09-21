@@ -42,5 +42,6 @@ export const displayNameModelsByProviderImgGen = {
     "Grok Imagine Image 2.0",
     "Grok Imagine Image",
     "Grok Imagine Image Quality"
-  ]
+  ],
+  meta: ["Muse Image 1.0"]
 } as const;
