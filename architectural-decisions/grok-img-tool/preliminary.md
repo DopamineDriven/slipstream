@@ -46,8 +46,9 @@ The prompt asked for a forecast riff **and** a forecast image. So this is the
 | 1 each | `file_search_call.in_progress` / `.searching` / `.completed` |
 | 1 each | `created`, `in_progress`, `completed`, `content_part.added` / `.done`, `output_text.done`, `reasoning_summary_part.added` / `.done`, `reasoning_summary_text.done` |
 
-Three `: keepalive` comment lines were interleaved; the parser must ignore
-them.
+Three `: keepalive` comment lines were interleaved. Already handled: the SSE
+parser skips any line starting with `:` (the spec's comment form), so these
+never reach the event loop.
 
 ### 2.1 Output items, in order
 
