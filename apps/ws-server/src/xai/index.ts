@@ -7,7 +7,6 @@ import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import { GrokResponsesApiService } from "@/xai/responses-api.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type { GrokModelIdUnion } from "@slipstream/types";
 
 export class xAIService extends GrokResponsesApiService {
   constructor(
@@ -33,8 +32,14 @@ export class xAIService extends GrokResponsesApiService {
       localToolBroker
     );
   }
-  public async routeXai({ model: m, ...rest }: ProviderChatRequestEntity) {
-    const model = (m ?? "grok-4-1-fast-reasoning") as GrokModelIdUnion;
+  public async routeXai({ model, ...rest }: ProviderChatRequestEntity) {
+    if (!model || !this.prisma.isGrokModel(model)) {
+      throw new Error(
+        typeof model === "undefined"
+          ? `no model passed to routeXai`
+          : `non-grok model passed to routeXai ${model}`
+      );
+    }
     if (this.prisma.isGrokImgModel(model)) {
       return this.handleXAIAiImageGenRequest({ model, ...rest });
     } else {

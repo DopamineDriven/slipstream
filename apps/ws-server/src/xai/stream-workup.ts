@@ -7,6 +7,7 @@ import type {
   ContentBlockUnion,
   CreateResponseStreamProps,
   FileContentBlock,
+  FileSearchTool,
   HandleToolUsageParams,
   ImageContentBlock,
   LocalToolFunctionTool,
@@ -265,29 +266,35 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     return formatted;
   }
 
-  protected resolveResponsesTools({
-    collectionId: _c = undefined,
-    enableFileSearch: _e = false,
-    enableWebSearch = true,
-    enableXSearch = true,
-    enableCodeInterpreter = false,
-    fileSearchMaxResults: _x = 5,
-    web_enable_image_understanding = true,
-    x_enable_image_understanding = true,
-    x_enable_video_understanding = true
-  }: ResponsesToolsParams) {
+  protected resolveResponsesTools(
+    model: GrokModelIdUnion,
+    {
+      collectionId,
+      enableFileSearch: _xx,
+      enableWebSearch = true,
+      enableXSearch = true,
+      enableCodeInterpreter = false,
+      fileSearchMaxResults: _x = 5,
+      web_enable_image_understanding = true,
+      x_enable_image_understanding = true,
+      x_enable_video_understanding = true
+    }: ResponsesToolsParams
+  ) {
     const tools = Array.of<ToolUnion>();
 
-    // if (enableFileSearch && collectionId) {
-    //   if (collectionId) {
-    //     tools.push({
-    //       type: "file_search",
-    //       vector_store_ids: [collectionId],
-    //       max_num_results: fileSearchMaxResults
-    //     } satisfies FileSearchTool);
-    //   }
-    // }
-
+    if (this.prisma.isGrokMultiAgentModel(model) && collectionId) {
+      tools.push({
+        type: "file_search",
+        vector_store_ids: [collectionId],
+        max_num_results: 5
+      } satisfies FileSearchTool);
+    }
+    if (model === "grok-4.6" || model === "grok-4.7") {
+      tools.push({
+        type: "image_generation",
+        action: "auto"
+      });
+    }
     if (enableWebSearch) {
       tools.push({
         type: "web_search",
@@ -305,7 +312,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
       } satisfies XSearchTool);
     }
 
-    if (enableCodeInterpreter) {
+    if (enableCodeInterpreter || model === "grok-build-0.1") {
       tools.push({ type: "code_interpreter" } satisfies CodeInterpreterTool);
     }
     return tools;
@@ -357,7 +364,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     const tools = Array.of<ToolUnion>();
     if (this.canUseServerTools(model)) {
       tools.push(
-        ...this.resolveResponsesTools({
+        ...this.resolveResponsesTools(model, {
           collectionId,
           enableFileSearch,
           fileSearchMaxResults,
@@ -390,7 +397,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
   }
 
   protected async getResponsesApiInputWorkup({
-    model = "grok-4.5",
+    model = "grok-4.7",
     userId,
     msgs,
     keyFingerprint = "server",
@@ -410,7 +417,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     enableWebSearch = true,
     enableXSearch = true,
     web_enable_image_understanding = true,
-    reasoning,
+    reasoning = this.reasoningByModel(model),
     x_enable_image_understanding = true,
     x_enable_video_understanding = true,
     parallel_tool_calls = true,
@@ -465,26 +472,11 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
       managementKey
     );
 
-    if (this.prisma.isGrokMultiAgentModel(model)) {
+    if (this.prisma.isGrokReasoningEffortModel(model)) {
       return {
         input: history,
         model,
-        reasoning: reasoning ?? { effort: "low" },
-        instructions: systemInstruction,
-        tools: toolHandler,
-        tool_choice: tool_choice ?? "auto",
-        store: false,
-        include,
-        stream: true,
-        parallel_tool_calls,
-        max_output_tokens,
-        user: userId
-      } as const;
-    } else if (this.prisma.isGrokReasoningEffortModel(model)) {
-      return {
-        input: history,
-        model,
-        reasoning: reasoning ?? { effort: "high" },
+        reasoning,
         instructions: systemInstruction,
         tools: toolHandler,
         tool_choice: tool_choice ?? "auto",
@@ -511,6 +503,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
       } as const;
     }
   }
+
   protected async createResponsesStream({
     msgs,
     userId,
@@ -551,12 +544,12 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     const {
       input,
       instructions,
-      reasoning,
+      reasoning = this.reasoningByModel(m),
       max_output_tokens,
       model,
       parallel_tool_calls = parallel_tool_calling,
       tool_choice,
-      store,
+      store = false,
       stream: streaming = stream,
       tools,
       user
@@ -564,15 +557,15 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
       ? {
           input: round_input,
           instructions: this.prisma.formatSysNote(systemPrompt),
-          reasoning: undefined,
+          reasoning: this.reasoningByModel(m),
           max_output_tokens: max_tokens,
-          model: (m ?? "grok-4.5") as GrokModelIdUnion,
+          model: (m ?? "grok-4.7") as GrokModelIdUnion,
           parallel_tool_calls: parallel_tool_calling,
           tool_choice: tool_choice_input,
           store: false,
           stream,
           tools: this.handleTooling({
-            model: (m ?? "grok-4.5") as GrokModelIdUnion,
+            model: (m ?? "grok-4.7") as GrokModelIdUnion,
             collectionId: cId,
             enableFileSearch,
             enableUserStoreSearch: hasUserStoreDocs,
@@ -589,7 +582,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         }
       : await this.getResponsesApiInputWorkup({
           isNewChat,
-          model: (m ?? "grok-4.5") as GrokModelIdUnion,
+          model: (m ?? "grok-4.7") as GrokModelIdUnion,
           userId,
           msgs,
           keyFingerprint: keyId ?? "server",
@@ -599,7 +592,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
           detail: imgDetail,
           keyId: keyId ?? undefined,
           hasUserStoreDocs,
-          reasoning: m && this.prisma.isGrokMultiAgentModel(m) ? { effort: "low" } : undefined,
+          reasoning: this.reasoningByModel(m),
           apiKey: key,
           managementKey: mgmtApiKey,
           collectionId: cId,
@@ -617,40 +610,23 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
           localToolNames
         });
 
-    const requestBody = this.prisma.isGrokMultiAgentModel(model)
-      ? {
-          reasoning: reasoning ?? { effort: "low" },
-          model,
-          input,
-          store,
-          stream: streaming,
-          instructions,
-          temperature,
-          user,
-          top_p,
-          logprobs,
-          max_output_tokens,
-          tools,
-          include: ["reasoning.encrypted_content"] as const,
-          tool_choice,
-          parallel_tool_calls
-        }
-      : ({
-          model,
-          input,
-          store,
-          stream: streaming,
-          instructions,
-          temperature,
-          user,
-          top_p,
-          logprobs,
-          max_output_tokens,
-          tools,
-          include: ["reasoning.encrypted_content"] as const,
-          tool_choice,
-          parallel_tool_calls
-        } satisfies ResponsesContentWorkup);
+    const requestBody = {
+      model,
+      input,
+      store,
+      stream: streaming,
+      instructions,
+      temperature,
+      reasoning,
+      user,
+      top_p,
+      logprobs,
+      max_output_tokens,
+      tools,
+      include: ["reasoning.encrypted_content"] as const,
+      tool_choice,
+      parallel_tool_calls
+    } satisfies ResponsesContentWorkup;
 
     const response = await fetch(this.baseUrl, {
       method: "POST",

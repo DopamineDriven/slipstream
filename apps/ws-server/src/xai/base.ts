@@ -1,4 +1,5 @@
 import type { PrismaService } from "@/prisma/index.ts";
+import type { InputReasoningProps } from "@/xai/responses-types.ts";
 import type { DocumentStatus } from "@/xai/types.ts";
 import type { ProviderDocState } from "@slipstream/db/enums-node";
 import type { GrokModelIdUnion } from "@slipstream/types";
@@ -21,7 +22,11 @@ export class GrokBaseService {
   } as const satisfies Record<DocumentStatus, ProviderDocState>;
 
   protected canUseFunctionTools(m: GrokModelIdUnion) {
-    return !this.prisma.isGrokMultiAgentModel(m);
+    return !(
+      this.prisma.isGrokMultiAgentModel(m) ||
+      this.prisma.isGrokImgModel(m) ||
+      this.prisma.isGrokVideoModel(m)
+    );
   }
 
   protected isGrokBuild(m: string) {
@@ -37,26 +42,33 @@ export class GrokBaseService {
     );
   }
   /**
+   * keep grok-4.20-multi-agent-0309 to "low" to not spend a fortune on subagents
+   *
    *  grok-4.3 defaults to "low" (only grok-4.3 supports "none")
    *
    *  grok-4.5, grok-4.6, and grok-4.7 default to "high"
    */
-  protected reasoningByModel(m: string) {
+  protected reasoningByModel(m?: string) {
+    if (!m) return;
     if (!this.prisma.isGrokModel(m)) return;
-    if (!(m === "grok-4.6" || m === "grok-4.5" || m === "grok-4.3")) return;
-    const base = {
-      low: "low",
-      medium: "medium",
-      high: "high",
-      xhigh: "xhigh"
-    } as const;
-
-    if (m === "grok-4.3") {
+    else if (!this.prisma.isGrokReasoningEffortModel(m)) return;
+    else if (m === "grok-4.20-multi-agent-0309") {
       return {
-        ...base,
-        none: "none"
-      } as const;
-    } else return base;
+        effort: "low"
+      } satisfies InputReasoningProps<"grok-4.20-multi-agent-0309">;
+    } else if (m === "grok-4.3") {
+      return {
+        effort: "low"
+      } satisfies InputReasoningProps<"grok-4.3">;
+    } else if (m === "grok-4.5") {
+      return {
+        effort: "high"
+      } satisfies InputReasoningProps<"grok-4.5">;
+    } else {
+      return {
+        effort: "xhigh"
+      } satisfies InputReasoningProps<"grok-4.6" | "grok-4.7">;
+    }
   }
 
   protected canViewDocs(model: GrokModelIdUnion) {

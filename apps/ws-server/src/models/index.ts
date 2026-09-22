@@ -247,9 +247,24 @@ export class ModelService extends ModelToolDefsService {
     return m === "grok-build-0.1";
   }
 
-  public isGrokReasoningEffortModel(m: string) {
-    return m === "grok-4.6" || m === "grok-4.5" || m === "grok-4.3";
+  public isGrokImgFacilitatingModel(m: string) {
+    return m === "grok-4.7" || m === "grok-4.6";
   }
+
+  public isGrokImgCapableModel(m: string) {
+    return this.isGrokImgFacilitatingModel(m) || this.isGrokImgModel(m);
+  }
+
+  public isGrokReasoningEffortModel(m: string) {
+    return (
+      m === "grok-4.7" ||
+      m === "grok-4.6" ||
+      m === "grok-4.5" ||
+      m === "grok-4.3" ||
+      m === "grok-4.20-multi-agent-0309"
+    );
+  }
+
   public isGrokModel(m: string) {
     return (
       this.isGrokVideoModel(m) ||

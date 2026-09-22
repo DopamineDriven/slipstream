@@ -1,4 +1,7 @@
-import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
+import type {
+  GrokProviderChatRequestEntity,
+  GrokReasoningModel
+} from "@/xai/types.ts";
 import { xAIResponses } from "@/xai/event-types.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
@@ -170,10 +173,11 @@ export type ToolUnion =
   | FileSearchTool
   | CodeInterpreterTool
   | SlatherUserStoreTool
+  | ImageGenerationTool
   | MemoryFunctionTool
   | LocalToolFunctionTool;
 
-export type ToolUnionRecord = UTR<ToolUnion, "type">
+export type ToolUnionRecord = UTR<ToolUnion, "type">;
 
 export type ToolUnionGrok4_6_Grok4_7 =
   | WebSearchTool
@@ -185,7 +189,10 @@ export type ToolUnionGrok4_6_Grok4_7 =
   | LocalToolFunctionTool
   | ImageGenerationTool;
 
-export type ToolUnionGrok4_6_Grok4_7Record = UTR<ToolUnionGrok4_6_Grok4_7, "type">
+export type ToolUnionGrok4_6_Grok4_7Record = UTR<
+  ToolUnionGrok4_6_Grok4_7,
+  "type"
+>;
 
 /**
  * Controls which (if any) tool is called by the model
@@ -236,18 +243,21 @@ export type ContentBlockUnion =
   | FunctionCallOutput
   | FunctionCallContext;
 
-export type InputReasoningProps = {
-  /**
-   * `grok-4.3` accepts `"none" | "low" | "medium" | "high"`
-   *
-   * `grok-4.20-multiagent` accepts `"low" | "medium" | "high" | "xhigh"`
-   */
-  effort: ReasoningEffort | ReasoningEffortGrok4_3 | null;
-  /**
-   * A summary of the model's reasoning process. Possible values are auto, concise and detailed. Only included for compatibility. The model shall always return detailed.
-   */
-  summary: "auto" | "concise" | "detailed" | null;
-};
+export type InputReasoningProps<T extends GrokModelIdUnion = "grok-4.7"> =
+  T extends Exclude<GrokModelIdUnion, GrokReasoningModel>
+    ? undefined
+    : {
+        /**
+         * grok-4.3 accepts `"none" | "low" | "medium" | "high"`
+         *
+         * grok-4.20-multiagent, grok-4.5, grok-4.6, and grok-4.7: accept `"low" | "medium" | "high" | "xhigh"`
+         */
+        effort?: T extends "grok-4.3"
+          ? ReasoningEffortGrok4_3
+          : T extends "grok-4.5"
+            ? Exclude<ReasoningEffort, "xhigh">
+            : ReasoningEffort;
+      };
 
 export type TextFormat = {
   format: { type: "text" | "json_object" | "json_schema" };
@@ -474,7 +484,7 @@ export interface HandleToolUsageParams extends ResponsesToolsParams {
   localToolNames?: readonly LocalToolName[];
 }
 
-export interface MultiAgentReasoningEffort {
+export interface ReasoningEffortEntity {
   effort: ReasoningEffort;
 }
 
@@ -503,7 +513,7 @@ export interface ResponsesApiInputWorkupParams {
   x_enable_image_understanding?: boolean;
   x_enable_video_understanding?: boolean;
   parallel_tool_calls?: boolean;
-  reasoning?: MultiAgentReasoningEffort;
+  reasoning?: ReasoningEffortEntity;
   hasUserStoreDocs: boolean;
   localToolNames?: readonly LocalToolName[];
 }
