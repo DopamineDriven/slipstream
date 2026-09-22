@@ -283,26 +283,53 @@ block**, not an `IMAGE_GEN` message. No `ImageGenJob` is minted, and
 record-level signal that no job was bound. The job table keeps meaning
 "promised". This supersedes the lazy-mint idea.
 
-Schema, additive, no backfill:
+Schema, additive, no backfill (settled 2026-09-22, see step 1 for the
+full shape):
 
 ```prisma
 enum MessageBlockType { ENCRYPTED_THINKING THINKING TEXT IMAGE_GEN }
 
 model MessageBlock {
   …
-  attachmentId String?
-  attachment   Attachment? @relation(fields: [attachmentId], references: [id], onDelete: SetNull)
+  attachments Attachment[] @relation("MessageBlockAttachments")   // ONE block → MANY attachments
 }
+
+model Attachment {
+  …
+  messageBlockId       String?
+  messageBlock         MessageBlock?         @relation("MessageBlockAttachments", …, onDelete: SetNull)
+  inlineImageGenOutput InlineImageGenOutput?                      // one-off lineage, no job
+}
+
+model InlineImageGenOutput { … }   // kind / seriesIndex / seriesId / dims, keyed by attachment
 ```
+
+**Why one-to-many, not one-to-one (Andrew):** a facilitator's tool call can
+yield 0–3 partial images during streaming plus a final. One block must own
+all of them, or the partials render consecutively as separate images. The
+block is the group; the attachments are its frames.
+
+**Why a new table, not `ImageGenOutput` (Andrew):** `kind` / `seriesIndex`
+/ `isPartial` — the fields the renderer sorts and splits on — live on
+`ImageGenOutput`, whose `jobId` is required and cascades from `ImageGenJob`.
+An `ImageGenJob` is defined only for a `messageType: IMAGE_GEN` message; a
+spontaneous tool call is not a job and must not fake one. Making `jobId`
+optional ripples through every image lane. So a one-off's outputs get their
+own table, `InlineImageGenOutput`, fully independent of the job tables,
+hanging off `Attachment` one-to-one. (The earlier "mint a job at
+completion" idea is withdrawn: a job hangs off a message via a unique
+`requestMessageId`, and reaching it from the block through
+`attachments → imageGenOutput → job` while also linking it directly is
+circular.)
 
 The probe persists as:
 
-| ordinal | type | content | attachment |
+| ordinal | type | content | attachments |
 | --- | --- | --- | --- |
 | 0 | THINKING | summary | |
 | 1–5 | ENCRYPTED_THINKING | | |
 | 6 | TEXT | "…Image incoming with the reading." | |
-| 7 | IMAGE_GEN | Grok's 799-char `prompt` | the S3 attachment |
+| 7 | IMAGE_GEN | Grok's 799-char `prompt` | the S3 attachment(s): Grok emits one FINAL; OpenAI facilitators would add 0–3 PARTIALs |
 | 8 | ENCRYPTED_THINKING | | |
 | 9 | TEXT | "**CHICAGO, AS READ…**" | |
 
@@ -310,18 +337,23 @@ Consequences:
 
 - `content` has a natural value: the rewritten `prompt`, the same provenance
   `revisedPrompt` carries elsewhere.
+- **Every generated attachment still records its frame** — `kind`,
+  `seriesIndex`, `seriesId`, dims — just on `inlineImageGenOutput` instead
+  of `imageGenOutput`. The renderer's partial/final logic (sort by
+  `seriesIndex`, split on `isPartial`, show the FINAL or the latest PARTIAL)
+  reads the same field names off the other relation.
 - **The TEXT split is now correct, not a bug.** §5.2 step 1 is withdrawn:
   `finalizeActiveBlock()` on the image's `added` closes ordinal 6, the image
   takes 7, the resumed text opens 9. The wire's `output_index` order maps
   straight onto block ordinals, and the rewrite needs no special case.
-- The `Attachment` row is created exactly as today, on the message, `origin:
-  GENERATED`; the block is an ordered pointer to it, so attachment listings
-  keep working.
+- The `Attachment` rows are created exactly as today, on the message,
+  `origin: GENERATED`; the block is an ordered owner of them, so attachment
+  listings keep working.
 - The bubble's `renderedMessageBlocks` gains an `IMAGE_GEN` case that renders
   the attachment inline at its ordinal, and the trailing attachment group
   must skip attachments a block already claims (or the image shows twice).
-- `ChatChunkAndResMsgBlock` needs to carry the attachment on the block (or
-  the client resolves it from `imgGenFields` by id; on-block is cleaner).
+- `ChatChunkAndResMsgBlock` carries the block's attachments (plural) on the
+  block.
 - **The obligatory job path emits the same `IMAGE_GEN` block.** Same wire,
   same persist, same bubble code; the only difference is the message is
   also `messageType: IMAGE_GEN` with a job bound. The loop does not fork.
@@ -442,7 +474,10 @@ Build from the bottom of the dependency graph up: schema → types → server �
 web. Every package is rebuilt by Andrew after it changes; consumers typecheck
 against the rebuilt dist.
 
-### Step 1 — schema: `IMAGE_GEN` block, block → attachment link
+### Step 1 — schema: `IMAGE_GEN` block, block → attachments, `InlineImageGenOutput`
+
+Three edits. Andrew has written the first two (validated 2026-09-22); the
+third is the new table.
 
 `packages/db/prisma/schema/messageblock.prisma`:
 
@@ -456,33 +491,80 @@ enum MessageBlockType {
 
 model MessageBlock {
   …
-  attachmentId String?
-  attachment   Attachment? @relation("MessageBlockAttachment", fields: [attachmentId], references: [id], onDelete: SetNull)
-  @@index([attachmentId])
+  attachments Attachment[] @relation("MessageBlockAttachments")
 }
 ```
 
-`attachment.prisma` gains the back-relation:
-`messageBlocks MessageBlock[] @relation("MessageBlockAttachment")`.
+`attachment.prisma` — the holding side of the one-to-many, plus the
+one-off lineage relation:
 
-- Additive: one enum member, one nullable column, one relation, one index.
-  No backfill. Existing rows are untouched.
-- `SetNull`, not `Cascade`: if an attachment is deleted the block survives
-  with its `content` (the rewritten prompt) as the record of what was there.
-- **Scope of the link (Andrew, 2026-09-21): `attachmentId` is set on
-  `IMAGE_GEN` blocks only.** It does not mean "attachments belong to
-  blocks". A user message is one `TEXT` block minted at request time with
-  `content: prompt`; its attachments were uploaded as a batch before the
-  message existed, have no position in the text, and stay linked to the
-  **message** by `messageId` exactly as today. Only a generated image has a
-  position inside the output, and that position is what the block records.
-  Invariant enforced by the persist layer: `attachmentId` is non-null ⇔
-  `type === "IMAGE_GEN"`. The `IMAGE_GEN` attachment is also still on the
-  message's `attachments` list; the block is a pointer into that list, not a
-  replacement for it. User messages: no new blocks, no backfill, no render
-  change.
-- Migration + client regenerate + `pnpm build:types`-style rebuilds of
-  whatever packages re-export `$Enums`.
+```prisma
+model Attachment {
+  …
+  messageBlockId       String?
+  messageBlock         MessageBlock?         @relation("MessageBlockAttachments", fields: [messageBlockId], references: [id], onDelete: SetNull)
+  inlineImageGenOutput InlineImageGenOutput?
+  @@index([messageBlockId])
+}
+```
+
+New, `inline-imagegen.prisma` (or alongside `imagegen.prisma`), **completely
+independent of `ImageGenJob` and `ImageGenOutput`**:
+
+```prisma
+model InlineImageGenOutput {
+  id            String             @id @default(cuid(2))
+  attachmentId  String             @unique
+  /// mirrors ImageGenOutput's lineage fields, minus everything that only exists with a job
+  kind          ImageGenOutputKind @default(FINAL)
+  isPartial     Boolean
+  seriesId      String
+  seriesIndex   Int
+  width         Int?
+  height        Int?
+  mime          String?
+  ext           String?
+  /// the provider's rewritten prompt (Grok `prompt`, OpenAI `revised_prompt`)
+  revisedPrompt String?
+  provider      Provider
+  model         String
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  attachment Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+
+  @@unique([seriesId, kind, seriesIndex])
+  @@index([seriesId])
+}
+```
+
+- `ImageGenOutputKind` is reused, not duplicated: it is the same
+  PARTIAL / FINAL vocabulary.
+- `provider` and `model` are here because there is no job to carry them, and
+  provenance for a one-off should not depend on reading the parent message.
+- No `jobId`, no `jobIndex`: those are job concepts. The unique constraint
+  drops the `jobId` prefix accordingly.
+- All additive: one enum member, two nullable columns, one new table, no
+  backfill. Existing rows untouched. `ImageGenOutput.jobId` stays required.
+- `SetNull` on `Attachment.messageBlockId` so deleting a block leaves its
+  attachments on the message; `Cascade` on the lineage row so it dies with
+  its attachment, exactly as `ImageGenOutput` does.
+
+**Scope of the link (Andrew, 2026-09-21): `messageBlockId` is set on
+attachments owned by an `IMAGE_GEN` block only.** It does not mean
+"attachments belong to blocks". A user message is one `TEXT` block minted at
+request time with `content: prompt`; its attachments were uploaded as a
+batch before the message existed, have no position in the text, and stay
+linked to the **message** by `messageId` exactly as today. Only a generated
+image has a position inside the output, and that position is what the block
+records. Invariant enforced by the persist layer: an attachment has a
+`messageBlockId` ⇔ its block is `IMAGE_GEN`. The owned attachments are
+**also** still on the message's `attachments` list; the block is an ordered
+owner within that list, not a replacement for it. User messages: no new
+blocks, no backfill, no render change.
+
+Migration + client regenerate + rebuilds of whatever packages re-export
+`$Enums` / the Prisma types.
 
 **Ships alone.** Nothing reads the new member yet, so prod is unaffected.
 
@@ -497,14 +579,22 @@ export type ChatChunkAndResMsgBlock = {
   ordinal: number;
   conversationId: string;
   durationMs: number;
-  /** IMAGE_GEN only, always present on that block (§8.4a) */
-  attachment?: AIChatResponseImgGenSubFields;
+  /** IMAGE_GEN only: the frames this block owns, in seriesIndex order; each carries `inlineImageGenOutput` (§8.4a) */
+  attachments?: AIChatResponseImgGenSubFields[];
 };
 ```
 
-One optional field, `IMAGE_GEN` only, and always populated on that block:
-an `IMAGE_GEN` frame is sent only once the S3 url exists. Width and height
-ride on the attachment's own `image` metadata. `content` on that block is the
+One optional array, `IMAGE_GEN` only. An `IMAGE_GEN` frame is sent only once
+an S3 url exists, so the array is never empty on the wire. For Grok it holds
+one FINAL; for an OpenAI facilitator it grows as partials land and the same
+ordinal is re-sent (last-wins merge on the client replaces the array). Each
+entry's frame identity (`kind`, `isPartial`, `seriesIndex`, `seriesId`,
+dims, `revisedPrompt`) is on its `inlineImageGenOutput`, mirroring how
+`imageGenOutput` rides on a job's attachments.
+
+`AIChatResponseImgGenSubFields` gains `inlineImageGenOutput` beside the
+existing `imageGenOutput`; a given attachment populates exactly one of the
+two. `content` on that block is the
 provider's rewritten prompt (`item.prompt` for Grok, `revised_prompt` for
 OpenAI), empty on the opening frame.
 
@@ -516,26 +606,37 @@ Also, `apps/ws-server/src/xai/event-types.ts` `Usage` gains
 `responses-types.ts`: `null` already dropped from `ToolChoiceUnion` (Andrew,
 2026-09-21).
 
-### Step 3 — persist: link the block to its attachment
+### Step 3 — persist: own the attachments, write the lineage
 
 `apps/ws-server/src/prisma/chat-response.ts` creates `messageBlocks` and
 `attachments` as two independent nested `create` lists on one message, so no
-block can reference an attachment inside that single write. Two options:
+block can reference attachments inside that single write. Two options:
 
 - **(a) Two-phase, chosen.** Keep the message create as is. After it
-  returns, for each persisted block whose wire shape carried `attachment`,
-  find the created attachment by `s3ObjectId` (unique per upload, already on
-  the wire shape) and `update` the block's `attachmentId`. One extra query
-  per image block, inside the existing transaction.
+  returns, for each persisted `IMAGE_GEN` block, `updateMany` the created
+  attachments whose `s3ObjectId` is in the block's wire `attachments` (unique
+  per upload, already on the wire shape) to set `messageBlockId`. One extra
+  statement per image block, inside the existing transaction.
 - (b) Create attachments first, then the message with blocks that
   `connect` by id. Larger restructuring of a hot persist path for the same
   result. Rejected.
 
+The `InlineImageGenOutput` row is created **nested on the attachment
+create**, the same way `imageGenOutput` is today (`mapImgs` already builds a
+nested `imageGenOutput: { create }` when `jobId` is present). The rule:
+
+| attachment carries | nested create |
+| --- | --- |
+| `imageGenOutput` (a job's output) | `imageGenOutput: { create }` — unchanged |
+| `inlineImageGenOutput` (a one-off) | `inlineImageGenOutput: { create }` — new |
+| neither | none |
+
 `handleAiChatResponse` needs no signature change: `messageBlocks` already
-flows in, and the `attachment` field rides on each block. The `IMAGE_GEN`
-block's attachment is **also** still included in `imgGenFields.images`, so
-the attachment row is created by the existing `mapImgs` path and the block
-only links to it.
+flows in, the block's `attachments` ride on each block, and the same
+attachments are **also** in `imgGenFields.images` so `mapImgs` creates the
+rows. `messageType` stays whatever the request was (`TEXT` for a chat turn);
+`isImageGen` is left `false` for a one-off, since that flag means "this
+message is an image-gen message", which it is not.
 
 ### Step 4 — `responses-api-v2.ts`: the linear rewrite (§6)
 
@@ -592,7 +693,7 @@ Branches, in the order they matter:
 | `reasoning_summary_part.added` / `_text.delta` / `_text.done` / `_part.done` | as today, inline; phase maps keyed by `reasoningPhaseKey` |
 | `output_text.delta` | open a TEXT block if `active?.type !== "TEXT"`, append, send the text frame |
 | `output_item.done`, `reasoning` with `encrypted_content` | store; if no summary text was seen for this id and no placeholder yet: close active, push an `ENCRYPTED_THINKING` block, send the placeholder frame |
-| `output_item.done`, `image_generation_call` with `result` | (1) close the active block; (2) open a THINKING block, `content = item.prompt`, send its frame with `isThinking: true` — the client's own ticker starts; (3) `const uploadStartedAt = performance.now()`; decode; `getImageSpecsWorkup`; **`await` the S3 upload, plainly**; (4) close the THINKING block with `durationMs = now − uploadStartedAt`, send it with `isThinking: false`; (5) build the sub-fields (minted `seriesId`, `revisedPrompt = item.prompt`, `jobId` if the entry passed one, `imageGenOutput` only if `jobId`); push an `IMAGE_GEN` block `{ content: item.prompt, durationMs: 0, attachment }` — the wait was already attributed to the THINKING block; push into `images`; send its frame with `imgGenFields: { images, activeImage }`. No continuation, no second frame per block (§8.4a) |
+| `output_item.done`, `image_generation_call` with `result` | (1) close the active block; (2) open a THINKING block, `content = item.prompt`, send its frame with `isThinking: true` — the client's own ticker starts; (3) `const uploadStartedAt = performance.now()`; decode; `getImageSpecsWorkup`; **`await` the S3 upload, plainly**; (4) close the THINKING block with `durationMs = now − uploadStartedAt`, send it with `isThinking: false`; (5) build the sub-fields (minted `seriesId`, `revisedPrompt = item.prompt`; on the job path `jobId` + `imageGenOutput`, on the chat path `inlineImageGenOutput` with `kind: FINAL`, `seriesIndex: 0`, provider + model); push an `IMAGE_GEN` block `{ content: item.prompt, durationMs: 0, attachments: [attachment] }` — the wait was already attributed to the THINKING block; push into `images`; send its frame with `imgGenFields: { images, activeImage }`. No continuation, no second frame per block (§8.4a) |
 | `output_item.done`, `file_search_call` | `parseFileSearchResults` (unchanged) |
 | `output_item.done`, `function_call` | finalize the pending call (unchanged) |
 | `response.completed` | close the active block; `usage`; collect `function_call`s for the next round. **No second scan for encrypted reasoning** — every item already had its `done` |
@@ -690,12 +791,16 @@ first.
 - `apps/web/src/lib/ui-message-helpers.ts` `toMessageBlocks`: carry
   `attachment` through.
 - **New: an inline image-block component** (`apps/web/src/ui/chat/image-gen-block/`
-  or similar). Props: the block's `attachment` (always present). Renders
-  `next/image` with `placeholder="blur"` and
-  `blurDataURL={shimmer([attachment.width, attachment.height])}` from
-  `@slipstream/ui`'s `lib/shimmer.ts`, so nothing flashes between the CDN
-  url arriving and the bytes painting. The wait *before* the url is the
-  THINKING block (§8.4a), not this component.
+  or similar). Props: the block's `attachments` (never empty). Same logic as
+  `ui/chat/image-gen/index.tsx` uses for a job today — sort by
+  `seriesIndex`, split on `isPartial`, render the FINAL or, until it exists,
+  the latest PARTIAL — but reading `inlineImageGenOutput` instead of
+  `imageGenOutput`. Renders `next/image` with `placeholder="blur"` and
+  `blurDataURL={shimmer([width, height])}` from `@slipstream/ui`'s
+  `lib/shimmer.ts`, so nothing flashes between the CDN url arriving and the
+  bytes painting. The wait *before* the url is the THINKING block (§8.4a),
+  not this component. Partials never render consecutively: the block is one
+  slot that sharpens.
 - **Client-side text pacing (§8.4a).** When the store's draft receives a
   burst of text frames (the deltas that buffered while the server awaited an
   upload), drain them into the rendered draft at a fixed rate instead of in
@@ -705,12 +810,12 @@ first.
 - `apps/web/src/ui/chat/message-bubble/index.tsx`
   `renderedMessageBlocks`: an `IMAGE_GEN` case that renders that component
   at the block's ordinal.
-- **Double-render rule.** The `IMAGE_GEN` attachment is also on the
+- **Double-render rule.** The `IMAGE_GEN` attachments are also on the
   message's `attachments` list, so the trailing attachment group must skip
-  any attachment referenced by an `IMAGE_GEN` block, or the image draws
-  twice — once inline, once below. This is about slot ownership, not
-  loading: a committed message has the link via `MessageBlock.attachmentId`,
-  a streaming one via the wire field; both are covered by one filter. The
+  any attachment with a `messageBlockId` (committed) or referenced by an
+  `IMAGE_GEN` block's `attachments` (streaming), or the image draws twice —
+  once inline, once below. This is about slot ownership, not loading; both
+  cases are one filter. The
   trailing group is otherwise unchanged and keeps rendering user uploads
   and pure-image-lane outputs as today (it can adopt the same shimmer
   placeholder for its own loading, but that is independent of this work).
@@ -732,7 +837,7 @@ first.
 | commit | contents |
 | --- | --- |
 | A | step 6 alone (one-line prod fix) |
-| B | step 1 (schema + migration + rebuilds) |
+| B | step 1 (schema: block type, one-to-many, `InlineImageGenOutput`; migration + rebuilds) |
 | C | step 2 + 3 (types, persist link) |
 | D | step 4 (`responses-api-v2.ts`, not yet routed) |
 | E | step 5 (job entry) + router |

@@ -258,8 +258,12 @@ for await (const chunk of parser) {
       nextOrdinal += 1;
       activeBlock = undefined;
 
-      // (4) the IMAGE_GEN block, with its attachment, at the next ordinal
-      const attachment = { /* → the AIChatResponseImgGenSubFields literal: revisedPrompt: item.prompt, seriesId, jobId if imageJob, imageGenOutput only if imageJob */ } as const satisfies AIChatResponseImgGenSubFields;
+      // (4) the IMAGE_GEN block, owning its attachments, at the next ordinal.
+      // Grok emits one FINAL, so the array has one entry; the shape is an
+      // array because OpenAI facilitators add 0-3 PARTIALs to the same block.
+      // Lineage: job path → jobId + imageGenOutput; chat path →
+      // inlineImageGenOutput { kind: FINAL, isPartial: false, seriesIndex: 0, seriesId, provider, model, revisedPrompt: item.prompt }
+      const attachment = { /* → the AIChatResponseImgGenSubFields literal */ } as const satisfies AIChatResponseImgGenSubFields;
       images.push(attachment);
       blocks.push({ content: item.prompt, durationMs: 0, itemIds: [item.id], ordinal: nextOrdinal, previewContent: item.prompt, type: "IMAGE_GEN" });
       const imageBlockOrdinal = nextOrdinal;
@@ -271,7 +275,7 @@ for await (const chunk of parser) {
       ws.send(JSON.stringify(uploadClosed));
       void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", uploadClosed);
 
-      const imageFrame = { type: "ai_chat_chunk", …, isThinking: false, imgGenEnabled: true, imgGenFields: { images, activeImage: attachment, actualCount: images.length }, messageBlocks: { type: "IMAGE_GEN", content: item.prompt, ordinal: imageBlockOrdinal, conversationId, durationMs: 0, attachment }, done: false } as const satisfies EventTypeMap["ai_chat_chunk"];
+      const imageFrame = { type: "ai_chat_chunk", …, isThinking: false, imgGenEnabled: true, imgGenFields: { images, activeImage: attachment, actualCount: images.length }, messageBlocks: { type: "IMAGE_GEN", content: item.prompt, ordinal: imageBlockOrdinal, conversationId, durationMs: 0, attachments: [attachment] }, done: false } as const satisfies EventTypeMap["ai_chat_chunk"];
       ws.send(JSON.stringify(imageFrame));
       void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", imageFrame);
       // the text that resumes after this opens a fresh TEXT block in the delta branch
@@ -355,9 +359,9 @@ forms on one item.
 
 Result: 9 blocks, ordinals 0–8, the image at 6 with the upload THINKING at
 5 directly before it. Persisted via `handleAiChatResponse` with
-`messageBlocks: blocks` (each block's `attachment` on the `IMAGE_GEN` one),
+`messageBlocks: blocks` (the `IMAGE_GEN` block carrying its `attachments`),
 `imgGenEnabled: images.length > 0`, `imgGenFields: { images, … }` when
-non-empty.
+non-empty; each one-off attachment nests an `inlineImageGenOutput` create.
 
 ---
 
