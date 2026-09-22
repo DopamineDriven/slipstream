@@ -69,6 +69,7 @@ export const displayNameToModelId = {
     "Deep Research Preview (Apr-21-2026)": "deep-research-preview-04-2026"
   },
   grok: {
+    "Grok 4.7": "grok-4.7",
     "Grok 4.6": "grok-4.6",
     "Grok 4.5": "grok-4.5",
     "Grok 4.3": "grok-4.3",

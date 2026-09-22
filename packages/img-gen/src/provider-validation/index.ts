@@ -10,11 +10,13 @@ import type {
   GoogleSafetyFilterLevel,
   GPTImage2Size,
   GrokImagine2ARUnion,
-  GrokImagine2QualityUnion,
   GrokImagineARUnion,
   GrokImagineImgModelUnion,
-  GrokImagineQualityUnion,
+  GrokImgCapableModels,
+  GrokImgGenFacilitatingModels,
   GrokImgGenModels,
+  GrokQualityAnd2Resolution,
+  GrokResolutionBase,
   ImagenOutputSize,
   MetaImgGenModels,
   MetaImgSize,
@@ -39,7 +41,7 @@ export type AllPureImgGenModelsUnion =
 export type AllImgGenCapableModelUnion =
   | OpenAIImgCapableModels
   | GeminiImgGenModels
-  | GrokImgGenModels
+  | GrokImgCapableModels
   | MetaImgGenModels;
 
 export type AllNonImgGenCapableUnion = Exclude<
@@ -54,7 +56,7 @@ export type ModelToAspectRatioOpts<T extends AllModelsUnion> =
       ? MetaImgSize
       : T extends Exclude<GrokImagineImgModelUnion, "grok-imagine-image-2.0">
         ? GrokImagineARUnion
-        : T extends "grok-imagine-image-2.0"
+        : T extends "grok-imagine-image-2.0" | GrokImgGenFacilitatingModels
           ? GrokImagine2ARUnion
           : T extends
                 "gemini-3.1-flash-image-preview" | "gemini-3.1-flash-lite-image"
@@ -85,13 +87,10 @@ export type ModelToQuality<T extends AllModelsUnion> =
             "gpt-image-1-mini" | "gpt-image-1" | "gpt-image-1.5" | "gpt-image-2"
           >
         ? OpenAIGptImage2Point5Quality
-        : T extends "grok-imagine-image-2.0"
-          ? GrokImagine2QualityUnion
-          : T extends Exclude<
-                GrokImagineImgModelUnion,
-                "grok-imagine-image-2.0"
-              >
-            ? GrokImagineQualityUnion
+        : T extends "grok-imagine-image"
+          ? GrokResolutionBase
+          : T extends Exclude<GrokImgCapableModels, "grok-imagine-image">
+            ? GrokQualityAnd2Resolution
             : T extends "gemini-3.1-flash-image-preview"
               ? GoogleImgSizeQualityOpts["quality"][T]
               : T extends "gemini-2.5-flash-image"
@@ -127,7 +126,9 @@ export type ModelToQualityOptsProps<T extends AllModelsUnion> = {
 };
 export class ProviderValidation {
   public grokImgGenCapable(m: string) {
-    return this.grokImagineImgGenModel(m);
+    return (
+      this.grokImagineImgGenModel(m) || this.grokFacilitatingImgGenModel(m)
+    );
   }
 
   public grokImagineImgGenModel(m: string) {
@@ -136,6 +137,10 @@ export class ProviderValidation {
       m === "grok-imagine-image-quality" ||
       m === "grok-imagine-image-2.0"
     );
+  }
+
+  public grokFacilitatingImgGenModel(model: string) {
+    return model === "grok-4.7" || model === "grok-4.6";
   }
 
   public metaImgGenCapable(m: string) {
@@ -463,6 +468,10 @@ export class ProviderValidation {
     return q === "1k" || q === "2k";
   }
 
+  public isValidGrokQualityResolution(q: string) {
+    return this.isValidGrok2Resolution(q);
+  }
+
   public isValidGrok2Resolution(q: string) {
     return this.isValidGrokResolution(q) || q === "1.5k";
   }
@@ -564,7 +573,13 @@ export class ProviderValidation {
       AllModelsUnion,
       Exclude<
         AllModelsUnion,
-        Exclude<GrokImgGenModels, "grok-imagine-image-2.0">
+        Exclude<
+          GrokImgCapableModels,
+          | "grok-imagine-image-2.0"
+          | "grok-imagine-image-quality"
+          | "grok-4.6"
+          | "grok-4.7"
+        >
       >
     >,
     data?: { output_quality: "1k" | "2k" }
@@ -572,7 +587,13 @@ export class ProviderValidation {
   public handleImgGenOutputQuality(
     model: Exclude<
       AllModelsUnion,
-      Exclude<AllModelsUnion, "grok-imagine-image-2.0">
+      Exclude<
+        AllModelsUnion,
+        | "grok-imagine-image-2.0"
+        | "grok-imagine-image-quality"
+        | "grok-4.6"
+        | "grok-4.7"
+      >
     >,
     data?: { output_quality: "1k" | "1.5k" | "2k" }
   ): "1k" | "1.5k" | "2k";
@@ -698,8 +719,13 @@ export class ProviderValidation {
       } else {
         return "2K" as const satisfies GeminiImageQuality["gemini-3.1-flash-image-preview"];
       }
-    } else if (this.grokImagineImgGenModel(m)) {
-      if (m === "grok-imagine-image-2.0") {
+    } else if (this.grokImgGenCapable(m)) {
+      if (
+        m === "grok-imagine-image-2.0" ||
+        m === "grok-imagine-image-quality" ||
+        m === "grok-4.6" ||
+        m === "grok-4.7"
+      ) {
         if (q && this.isValidGrok2Resolution(q)) {
           return q;
         } else return "1.5k";
@@ -893,8 +919,12 @@ export class ProviderValidation {
       if (ar && this.isValidMetaSize(ar)) {
         return ar;
       } else return "auto" as const;
-    } else if (this.grokImagineImgGenModel(m)) {
-      if (m === "grok-imagine-image-2.0") {
+    } else if (this.grokImgGenCapable(m)) {
+      if (
+        m === "grok-imagine-image-2.0" ||
+        m === "grok-4.6" ||
+        m === "grok-4.7"
+      ) {
         if (ar && this.isValidGrok2AR(ar)) {
           return ar;
         } else return "auto" as const;

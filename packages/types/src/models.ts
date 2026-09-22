@@ -157,7 +157,8 @@ export const providerModelImageGenFacilitatingApi = {
     "gemini-3-pro-image-preview",
     "deep-research-max-preview-04-2026",
     "deep-research-preview-04-2026"
-  ]
+  ],
+  grok: ["grok-4.7", "grok-4.6"]
 } as const;
 
 export const imageModelSets = {
@@ -169,6 +170,7 @@ export const imageModelSets = {
 
 export const imageModelFacilitatorSets = {
   gemini: new Set(providerModelImageGenFacilitatingApi.gemini),
+  grok: new Set(providerModelImageGenFacilitatingApi.grok),
   openai: new Set(providerModelImageGenFacilitatingApi.openai)
 } as const;
 
@@ -177,7 +179,11 @@ export type AllImgGenProviderModels<
 > = Unenumerate<(typeof allImgSupportingProviderModels)[T]>;
 
 export const imageGenProviders = ["grok", "gemini", "meta", "openai"] as const;
-export const imageGenFacilitatingProviders = ["gemini", "openai"] as const;
+export const imageGenFacilitatingProviders = [
+  "gemini",
+  "grok",
+  "openai"
+] as const;
 export type ImageGenProviders = keyof typeof providerModelImageGenApi;
 export type ImageGenFacilitatingProviders =
   keyof typeof providerModelImageGenFacilitatingApi;
@@ -217,6 +223,8 @@ export type OpenAIImgGenFacilitatingModels =
 export type GeminiImgGenFacilitatingModels =
   ImgGenFacilitatingModelMap["gemini"];
 
+export type GrokImgGenFacilitatingModels = ImgGenFacilitatingModelMap["grok"];
+
 export type GeminiImgGenModels = ImgGenModelMap["gemini"];
 
 export type GrokImgGenModels = ImgGenModelMap["grok"];
@@ -242,7 +250,9 @@ export type GetImgGenFacilitatingModelUtilRT<
   ? OpenAIImgGenFacilitatingModels
   : T extends "gemini"
     ? GeminiImgGenFacilitatingModels
-    : never;
+    : T extends "grok"
+      ? GrokImgGenFacilitatingModels
+      : never;
 
 export type GetAllImgGenModelUtilRt<T = ImageGenProviders> = T extends "grok"
   ? GetImgModelUtilRT<"grok">
@@ -663,7 +673,7 @@ export const getDisplayNameByModelId = <
 export const defaultModelDisplayNameByProvider = {
   openai: "GPT-5.6 Sol" satisfies OpenAiDisplayNameUnion,
   gemini: "Gemini 3.1 Pro Preview" satisfies GeminiDisplayNameUnion,
-  grok: "Grok 4.6" satisfies GrokDisplayNameUnion,
+  grok: "Grok 4.7" satisfies GrokDisplayNameUnion,
   anthropic: "Claude Opus 4.6" satisfies AnthropicDisplayNameUnion,
   meta: "Muse Spark 1.3" satisfies MetaDisplayNameUnion,
   vercel: "v0 medium" satisfies VercelDisplayNameUnion,
@@ -680,7 +690,7 @@ export const defaultModelDisplayNameByProvider = {
 export const defaultModelIdByProvider = {
   openai: "gpt-5.6-sol" satisfies OpenAiModelIdUnion,
   gemini: "gemini-3.1-pro-preview" satisfies GeminiModelIdUnion,
-  grok: "grok-4.6" satisfies GrokModelIdUnion,
+  grok: "grok-4.7" satisfies GrokModelIdUnion,
   anthropic: "claude-opus-4-6" satisfies AnthropicModelIdUnion,
   meta: "muse-spark-1.3" satisfies MetaModelIdUnion,
   vercel: "v0-1.5-md" satisfies VercelModelIdUnion,
@@ -1095,7 +1105,7 @@ export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
     : T extends "grok"
       ? GrokModelIdUnion
       : T extends "openai"
-        ? OpenAiModelIdUnion
+        ? OpenAIModelIdUnion
         : T extends "vercel"
           ? VercelModelIdUnion
           : T extends "meta"
@@ -1359,7 +1369,7 @@ export const docMimeSupportByProvider = {
 } as const;
 
 export const audioMimeSupportByProvider = {
-  meta: [],
+  meta: ["audio/wav", "audio/mpeg"],
   grok: [],
   openai: [],
   vercel: [],
@@ -1386,7 +1396,7 @@ export const audioMimeSupportByProvider = {
 } as const;
 
 export const videoMimeSupportByProvider = {
-  meta: [],
+  meta: ["video/mp4"],
   grok: [],
   mistral: [],
   cohere: [],

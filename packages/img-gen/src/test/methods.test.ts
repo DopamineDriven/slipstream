@@ -141,7 +141,7 @@ describe("handleImgGenOutputQuality", () => {
     () => {
       assert.equal(
         p.handleImgGenOutputQuality("grok-imagine-image-quality"),
-        "1k"
+        "1.5k"
       );
     }
   );

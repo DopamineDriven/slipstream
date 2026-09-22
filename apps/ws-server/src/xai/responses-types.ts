@@ -7,6 +7,7 @@ import type {
   GrokModelIdUnion,
   LocalToolName,
   MessageSingleton,
+  UTR,
   XOR
 } from "@slipstream/types";
 
@@ -60,6 +61,15 @@ export type XSearchTool = {
       to_date?: string;
     }
   >;
+};
+
+export type ImageGenerationAction = "auto" | "generate" | "edit";
+/**
+ * grok 4.6 and grok 4.7 only
+ */
+export type ImageGenerationTool = {
+  type: "image_generation";
+  action?: ImageGenerationAction;
 };
 
 export type SlatherUserStoreTool = {
@@ -163,6 +173,20 @@ export type ToolUnion =
   | MemoryFunctionTool
   | LocalToolFunctionTool;
 
+export type ToolUnionRecord = UTR<ToolUnion, "type">
+
+export type ToolUnionGrok4_6_Grok4_7 =
+  | WebSearchTool
+  | XSearchTool
+  | FileSearchTool
+  | CodeInterpreterTool
+  | SlatherUserStoreTool
+  | MemoryFunctionTool
+  | LocalToolFunctionTool
+  | ImageGenerationTool;
+
+export type ToolUnionGrok4_6_Grok4_7Record = UTR<ToolUnionGrok4_6_Grok4_7, "type">
+
 /**
  * Controls which (if any) tool is called by the model
  *
@@ -182,8 +206,7 @@ export type ToolChoiceUnion =
   | "none"
   | "auto"
   | "required"
-  | { function: { name: string }; type: "function" }
-  | null;
+  | { function: { name: string }; type: "function" };
 
 export type ImageContentBlock = {
   type: "input_image";
@@ -398,6 +421,9 @@ export type XAIResponsesEvent =
   | xAIResponses.WebSearchCall.InProgress
   | xAIResponses.WebSearchCall.Searching
   | xAIResponses.WebSearchCall.Completed
+  | xAIResponses.ImageGenerationCall.InProgress
+  | xAIResponses.ImageGenerationCall.Genereating
+  | xAIResponses.ImageGenerationCall.Completed
   | xAIResponses.FileSearchCall.InProgress
   | xAIResponses.FileSearchCall.Searching
   | xAIResponses.FileSearchCall.Completed
@@ -405,6 +431,8 @@ export type XAIResponsesEvent =
   | xAIResponses.FunctionCallArguments.Done
   | xAIResponses.CustomToolCallInput.Delta
   | xAIResponses.CustomToolCallInput.Done;
+
+export type XAIResponsesRecord = UTR<XAIResponsesEvent, "type">;
 
 export type XAIResponsesEventTypes = XAIResponsesEvent["type"];
 

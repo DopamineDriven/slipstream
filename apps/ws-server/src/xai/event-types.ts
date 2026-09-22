@@ -90,6 +90,36 @@ export namespace xAIResponses {
       }
     }
   }
+
+  export namespace ImageGenerationCall {
+    export interface InProgress {
+      type: "response.image_generation_call.in_progress";
+      sequence_number: number;
+      output_index: number;
+      /**
+       * starts with "ig_"
+       */
+      item_id: string;
+    }
+    export interface Genereating {
+      type: "response.image_generation_call.generating";
+      sequence_number: number;
+      output_index: number;
+      /**
+       * starts with "ig_"
+       */
+      item_id: string;
+    }
+    export interface Completed {
+      type: "response.image_generation_call.completed";
+      sequence_number: number;
+      output_index: number;
+      /**
+       * starts with "ig_"
+       */
+      item_id: string;
+    }
+  }
   export namespace FunctionCallArguments {
     export interface Delta {
       sequence_number: number;
@@ -209,7 +239,15 @@ export namespace xAIResponses {
         queries: [];
         results: [];
       }
-
+      export interface ImageGenerationCall {
+        /**
+         * id starts with `ig_`
+         */
+        id: string;
+        type: "image_generation_call";
+        status: "in_progress";
+        result: null;
+      }
       export namespace WebSearchCall {
         export namespace Action {
           export interface Search {
@@ -266,6 +304,7 @@ export namespace xAIResponses {
         | Added.FileSearchCall
         | Added.WebSearchCall
         | Added.CustomToolCall
+        | Added.ImageGenerationCall
         | Added.FunctionCall;
       output_index: number;
     }
@@ -288,6 +327,20 @@ export namespace xAIResponses {
          */
         id: string;
         status: "completed";
+      }
+
+      export interface ImageGenerationCall {
+        /**
+         * id starts with `ig_`
+         */
+        id: string;
+        type: "image_generation_call";
+        status: "completed";
+        prompt: string;
+        /**
+         * b64 encoded img buffer
+         */
+        result: string;
       }
       export namespace Reasoning {
         export interface SummaryText {
@@ -385,6 +438,7 @@ export namespace xAIResponses {
       sequence_number: number;
       type: "response.output_item.done";
       item:
+        | Done.ImageGenerationCall
         | Done.Reasoning
         | Done.Message
         | Done.FileSearchCall

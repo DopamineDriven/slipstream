@@ -69,7 +69,8 @@ const MODEL_ASPECT_RATIOS = new Map<
 
 export const GROK_QUALITIES = ["1k", "2k"] satisfies GrokImagineQualityUnion[];
 
-// grok-imagine-image-2.0 alone adds the 1.5k tier
+// the 1.5k tier: grok-imagine-image-2.0 AND grok-imagine-image-quality.
+// Only the original grok-imagine-image is limited to 1k | 2k
 export const GROK_2_QUALITIES = [
   "1k",
   "1.5k",
@@ -81,8 +82,8 @@ const MODEL_QUALITIES = new Map<
   readonly GrokImageSettings["quality"][]
 >([
   ["grok-imagine-image-2.0", GROK_2_QUALITIES],
-  ["grok-imagine-image", GROK_QUALITIES],
-  ["grok-imagine-image-quality", GROK_QUALITIES]
+  ["grok-imagine-image-quality", GROK_2_QUALITIES],
+  ["grok-imagine-image", GROK_QUALITIES]
 ]);
 
 const GROK_DEFAULTS = {

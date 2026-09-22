@@ -31,14 +31,16 @@ export const displayNameModelsByProviderImgGen = {
     "GPT-Image-1 mini"
   ],
   gemini: [
-    "Deep Research Max Preview (Apr-21-2026)",
-    "Deep Research Preview (Apr-21-2026)",
     "Nano Banana 2 Lite",
     "Nano Banana 2",
     "Nano Banana Pro",
-    "Nano Banana"
+    "Nano Banana",
+    "Deep Research Max Preview (Apr-21-2026)",
+    "Deep Research Preview (Apr-21-2026)"
   ],
   grok: [
+    "Grok 4.7",
+    "Grok 4.6",
     "Grok Imagine Image 2.0",
     "Grok Imagine Image",
     "Grok Imagine Image Quality"

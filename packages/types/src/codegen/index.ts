@@ -27,7 +27,11 @@ export class ModelServiceImage {
   }
 
   public get imageGemini() {
-    return [...this.imageFacilitatingGemini, ...this.imagePureGemini] as const;
+    return [...this.imagePureGemini, ...this.imageFacilitatingGemini] as const;
+  }
+
+  public get imageFacilitatingGrok() {
+    return ["grok-4.7", "grok-4.6"] as const;
   }
 
   public get imagePureGrok() {
@@ -39,7 +43,7 @@ export class ModelServiceImage {
   }
 
   public get imageGrok() {
-    return [...this.imagePureGrok] as const;
+    return [...this.imageFacilitatingGrok, ...this.imagePureGrok] as const;
   }
 
   public get imagePureMeta() {
@@ -269,7 +273,6 @@ export class ModelServiceChat extends ModelServiceAudio {
 
   public get chatGen4Grok() {
     return [
-      "grok-4.6",
       "grok-4.5",
       "grok-4.3",
       "grok-4.20-multi-agent-0309",
@@ -284,9 +287,10 @@ export class ModelServiceChat extends ModelServiceAudio {
 
   public get chatGrok() {
     return [
+      ...this.imageFacilitatingGrok,
       ...this.chatGen4Grok,
       ...this.chatBuildGrok,
-      ...this.imageGrok,
+      ...this.imagePureGrok,
       ...this.videoGrok
     ] as const;
   }
@@ -465,6 +469,7 @@ export class ModelServiceNameOverrides extends ModelServiceChat {
   } as const;
 
   public GROK_NAME_OVERRIDES = {
+    "grok-4.7": "Grok 4.7",
     "grok-4.6": "Grok 4.6",
     "grok-4.5": "Grok 4.5",
     "grok-4.3": "Grok 4.3",
@@ -616,6 +621,7 @@ export class ModelServiceFilter extends ModelServiceNameOverrides {
 
   public filterForGrok(id: string) {
     return (
+      id === "grok-4.7" ||
       id === "grok-4.6" ||
       id === "grok-4.5" ||
       id === "grok-4.3" ||

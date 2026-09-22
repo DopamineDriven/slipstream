@@ -39,7 +39,7 @@ export class GrokBaseService {
   /**
    *  grok-4.3 defaults to "low" (only grok-4.3 supports "none")
    *
-   *  grok-4.5 and grok-4.6 default to "high"
+   *  grok-4.5, grok-4.6, and grok-4.7 default to "high"
    */
   protected reasoningByModel(m: string) {
     if (!this.prisma.isGrokModel(m)) return;

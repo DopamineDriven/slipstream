@@ -256,6 +256,7 @@ export type {
 } from "@/image-gen/google.ts";
 
 export type {
+  GrokAspectRatioAndResolutionOps,
   GrokImagine2ARUnion,
   GrokImagine2QualityUnion,
   GrokImagineARUnion,
@@ -263,11 +264,15 @@ export type {
   GrokImagineImageGenOptsExtended,
   GrokImagineImgModelUnion,
   GrokImagineQualityUnion,
+  GrokImgCapableModels,
   GrokImgGenUnionOpts,
   GrokModelAspectRatio,
   GrokModelAspectRatioWorkup,
   GrokModelOptsRecord,
-  GrokModelOptsUnion
+  GrokModelOptsUnion,
+  GrokQualityAnd2Resolution,
+  GrokResolutionBase,
+  GrokResolutionWorkup
 } from "@/image-gen/grok.ts";
 
 export type {
@@ -397,6 +402,7 @@ export type {
   GrokDisplayNameUnion,
   GrokDisplayNameUnionImgGen,
   GrokDisplayNameUnionVideoGen,
+  GrokImgGenFacilitatingModels,
   GrokImgGenModels,
   GrokModelIdUnion,
   GrokModelIdUnionImgGen,

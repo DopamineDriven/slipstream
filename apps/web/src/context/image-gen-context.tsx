@@ -413,14 +413,14 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
         if (imgCtx.isValidNanoBananaProAndTwoOutputQuality(settings.quality)) {
           output_quality = settings.quality;
         } else output_quality = "2K";
-      } else if (
-        mod === "grok-imagine-image" ||
-        mod === "grok-imagine-image-quality"
-      ) {
+      } else if (mod === "grok-imagine-image") {
         if (imgCtx.isValidGrokResolution(settings.quality)) {
           output_quality = settings.quality;
         } else output_quality = "1k";
-      } else if (mod === "grok-imagine-image-2.0") {
+      } else if (
+        mod === "grok-imagine-image-2.0" ||
+        mod === "grok-imagine-image-quality"
+      ) {
         if (imgCtx.isValidGrok2Resolution(settings.quality)) {
           output_quality = settings.quality;
         } else output_quality = "1.5k";

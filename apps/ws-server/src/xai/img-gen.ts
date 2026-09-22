@@ -14,10 +14,13 @@ import type {
   EventTypeMap,
   GrokImagine2ARUnion,
   GrokImagineARUnion,
-  GrokImagineImgModelUnion,
+  GrokImagineImageGenOpts,
   GrokImgGenModels,
-  GrokModelIdUnion,
-  MessageSingleton
+  GrokImgGenUnionOpts,
+  GrokQualityAnd2Resolution,
+  GrokResolutionBase,
+  MessageSingleton,
+  XOR
 } from "@slipstream/types";
 
 type xAIImageEditsInput = {
@@ -87,7 +90,12 @@ export class GrokImgGenService extends GrokStreamWorkupService {
       }
     }
 
-    const ceiling = msg.model === "grok-imagine-image" ? 3 : 1;
+    const ceiling =
+      msg.model === "grok-imagine-image"
+        ? 3
+        : msg.model === "grok-imagine-image-2.0"
+          ? 3
+          : 1;
 
     if (images.length > ceiling) {
       const mapIt = images
@@ -109,40 +117,78 @@ export class GrokImgGenService extends GrokStreamWorkupService {
     }
   }
 
-  private resolveGrokImagineImgOpts(imgGenFields?: AIChatRequestImgGenFields) {
-    const rawAspectRatio = imgGenFields?.output_size;
-    const rawResolution = imgGenFields?.output_quality;
-
+  private getAR(model: GrokImgGenModels, rawAspectRatio?: string) {
     let ar: GrokImagineARUnion | GrokImagine2ARUnion;
-    let r: "1k" | "1.5k" | "2k";
-
-    if (rawAspectRatio && this.prisma.isValidGrok2AR(rawAspectRatio)) {
-      ar = rawAspectRatio;
+    if (rawAspectRatio) {
+      if (model === "grok-imagine-image-2.0") {
+        if (this.prisma.isValidGrok2AR(rawAspectRatio)) {
+          ar = rawAspectRatio;
+        } else {
+          ar = "auto";
+        }
+      } else {
+        if (this.prisma.isValidGrokAR(rawAspectRatio)) {
+          ar = rawAspectRatio;
+        } else {
+          ar = "auto";
+        }
+      }
     } else {
-      ar = "auto" as const;
+      ar = "auto";
     }
+    return ar;
+  }
 
-    if (rawResolution && this.prisma.isValidGrok2Resolution(rawResolution)) {
-      r = rawResolution;
+  private getResolution(model: GrokImgGenModels, rawResolution?: string) {
+    let r: GrokResolutionBase | GrokQualityAnd2Resolution;
+    if (rawResolution) {
+      if (model !== "grok-imagine-image") {
+        if (this.prisma.isValidGrok2Resolution(rawResolution)) {
+          r = rawResolution;
+        } else {
+          r = "1.5k";
+        }
+      } else {
+        if (this.prisma.isValidGrokResolution(rawResolution)) {
+          r = rawResolution;
+        } else {
+          r = "1k";
+        }
+      }
     } else {
-      r = "2k";
+      r = "1k";
     }
+    return r;
+  }
+
+  private resolveGrokImagineImgOpts(
+    imgGenFields?: AIChatRequestImgGenFields,
+    model = "grok-imagine-image"
+  ) {
+    if (!this.prisma.isGrokImgModel(model)) {
+      throw new Error(
+        "non grok image model found in resolveGrokImagineImgOpts"
+      );
+    }
+    const aspect_ratio = this.getAR(model, imgGenFields?.output_size);
+    const resolution = this.getResolution(model, imgGenFields?.output_quality);
 
     return {
-      aspect_ratio: ar,
-      resolution: r
+      aspect_ratio,
+      resolution
     } as const satisfies {
       aspect_ratio: GrokImagineARUnion | GrokImagine2ARUnion;
-      resolution: "1k" | "1.5k" | "2k";
+      resolution: GrokResolutionBase | GrokQualityAnd2Resolution;
     };
   }
 
   private async handleImgGenReq(
     key: string,
-    url: typeof this.baseImgGenUrl | typeof this.baseImgEditsUrl,
+    imgCount: number,
     body: Record<string, unknown>
   ) {
-    const imgResponse = await fetch(url, {
+    const urlTarget = imgCount > 0 ? this.baseImgEditsUrl : this.baseImgGenUrl;
+    const imgResponse = await fetch(urlTarget, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${key}`,
@@ -153,7 +199,7 @@ export class GrokImgGenService extends GrokStreamWorkupService {
     if (!imgResponse.ok) {
       const errorText = await imgResponse.text();
       throw new Error(
-        `xAI API error (${imgResponse.status}, ${imgResponse.statusText}) at ${url}: ${errorText}`
+        `xAI API error (${imgResponse.status}, ${imgResponse.statusText}) at ${urlTarget}: ${errorText}`
       );
     }
     return await imgResponse.json<xAIImgGenResponse>();
@@ -167,42 +213,69 @@ export class GrokImgGenService extends GrokStreamWorkupService {
     userId: string,
     requestMessageId: string,
     imgGenFields?: AIChatRequestImgGenFields,
-    apiKey?: string
+    apiKey = this.xaiKey
   ) {
-    const key = apiKey ?? this.xaiKey;
-    if (this.prisma.grokImagineImgGenModel(model)) {
-      const { prompt, images } = this.handleMostRecentImagineMsg(
-        messages,
-        requestMessageId
-      );
-      const { aspect_ratio, resolution } =
-        this.resolveGrokImagineImgOpts(imgGenFields);
-      const baseBody = {
+    if (!this.prisma.grokImagineImgGenModel(model))
+      throw new Error("non-grok-imagine model found in handleImgGen");
+    let b: XOR<
+      XOR<
+        GrokImgGenUnionOpts<"grok-imagine-image-2.0">,
+        GrokImgGenUnionOpts<"grok-imagine-image-quality">
+      >,
+      GrokImgGenUnionOpts<"grok-imagine-image">
+    >;
+
+    const { prompt, images } = this.handleMostRecentImagineMsg(
+      messages,
+      requestMessageId
+    );
+    const { aspect_ratio, resolution } = this.resolveGrokImagineImgOpts(
+      imgGenFields,
+      model
+    );
+    const base_ar =
+      aspect_ratio === "5:2" || aspect_ratio === "21:9" ? "auto" : aspect_ratio;
+    if (model === "grok-imagine-image-2.0") {
+      b = {
         model,
         prompt,
         n,
         aspect_ratio,
         resolution,
         response_format: "b64_json",
+        user: userId,
+        quality: "medium"
+      } as const satisfies GrokImgGenUnionOpts<"grok-imagine-image-2.0">;
+    } else if (model === "grok-imagine-image-quality") {
+      b = {
+        model,
+        prompt,
+        n,
+        aspect_ratio: base_ar,
+        resolution,
+        response_format: "b64_json",
         user: userId
-      } as const satisfies {
-        model: GrokImagineImgModelUnion;
-        prompt: string;
-        n: number;
-        aspect_ratio: GrokImagineARUnion | GrokImagine2ARUnion;
-        resolution: "1k" | "1.5k" | "2k";
-        response_format: "b64_json";
-        user: string;
-      };
-
-      if (imageCount > 0) {
-        return await this.handleImgGenReq(key, this.baseImgEditsUrl, {
-          ...baseBody,
-          images
-        } satisfies typeof baseBody & { images: xAIImageEditsInput[] });
-      } else {
-        return await this.handleImgGenReq(key, this.baseImgGenUrl, baseBody);
-      }
+      } satisfies GrokImagineImageGenOpts<"grok-imagine-image-quality">;
+    } else {
+      b = {
+        model,
+        prompt,
+        n,
+        aspect_ratio: base_ar,
+        resolution: resolution === "1.5k" ? "1k" : resolution,
+        response_format: "b64_json",
+        user: userId
+      } satisfies GrokImagineImageGenOpts<"grok-imagine-image">;
+    }
+    if (imageCount > 0) {
+      return await this.handleImgGenReq(apiKey, imageCount, {
+        ...b,
+        images
+      } satisfies typeof b & { images: xAIImageEditsInput[] });
+    } else {
+      return await this.handleImgGenReq(apiKey, imageCount, {
+        ...b
+      });
     }
   }
 
@@ -363,10 +436,10 @@ export class GrokImgGenService extends GrokStreamWorkupService {
     conversationId,
     streamChannel,
     msgs,
-    apiKey,
+    apiKey = this.xaiKey,
     ws,
     userId,
-    model = "grok-imagine-image",
+    model = "grok-imagine-image-2.0",
     systemPrompt,
     temperature,
     imgCounts,
@@ -378,7 +451,7 @@ export class GrokImgGenService extends GrokStreamWorkupService {
     title,
     topP
   }: ProviderChatRequestEntity) {
-    const m = model as GrokModelIdUnion;
+    const m = model;
     if (!imgGenFields || !imgGenEnabled || !this.prisma.isGrokImgModel(m))
       return;
 
@@ -408,6 +481,14 @@ export class GrokImgGenService extends GrokStreamWorkupService {
       const n = this.prisma.handleImgGenCount(m, {
         n: imgGenFields?.n
       });
+      let key: string;
+      const lookupKey = await this.prisma.handleApiKeyLookup("grok", userId);
+
+      if (lookupKey?.apiKey) {
+        key = lookupKey.apiKey;
+      } else {
+        key = apiKey;
+      }
 
       totalDur = performance.now();
 
@@ -419,7 +500,7 @@ export class GrokImgGenService extends GrokStreamWorkupService {
         userId,
         requestMessageId ?? "",
         imgGenFields,
-        apiKey ?? undefined
+        key
       );
 
       text = "*Image Gen In Process...*";
