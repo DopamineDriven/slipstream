@@ -575,6 +575,10 @@ One `if / else if` chain over `chunk.event`. Every "close the active block"
 is the six inline lines from §6.2, repeated at each site that closes one.
 Frame literals are named `const`s at the send site, as the March file does.
 
+**The full loop skeleton is in `reference/loop-skeleton.md`** — state,
+round loop, the stream chain branch by branch, and a walk of the probe's
+ten output items through it showing the nine resulting block ordinals.
+
 Branches, in the order they matter:
 
 | event | does |
