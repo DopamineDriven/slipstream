@@ -147,7 +147,7 @@ export interface MessageBlockSingleton<
   T extends boolean = false
 > extends MessageBlock {
   message?: MessageSingleton<T>;
-  attachments?: AttachmentSingleton<T>;
+  attachments?: AttachmentSingleton<T>[];
 }
 
 export interface ProviderStoreSingleton<
