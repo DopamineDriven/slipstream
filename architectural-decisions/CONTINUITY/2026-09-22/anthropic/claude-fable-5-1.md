@@ -190,9 +190,9 @@ Meta `meta/types.ts` unused `MetaImgGenOpts` import (lint warning).
   `tInitial`/`tFinal` `performance.now()` deltas taken once, named `const` frames sent
   inline, `if / else if` chains. Andrew: earlier model generations "fought against the
   linearity at every turn". The March file is the reference.
-- **Never vouch for a typecheck without clearing tsgo's incremental cache first:**
-  `rm -f apps/*/node_modules/.cache/tsbuildinfo.json` then
-  `pnpm typecheck --filter=@slipstream/<pkg> --force`. I gave a false green once.
+- **Typecheck = the package-local script, nothing else:** `pnpm -C apps/ws-server typecheck`
+  (Andrew, 09-23: "it will error if anything is awry"). Do NOT `rm` the tsgo cache before every
+  run — he rejected that. Typecheck only my own edits; after his rebuilds / `clean:house`, don't.
 - **Formatting is not a gate.** Don't report prettier failures. Format my own files silently.
 - **Andrew always rebuilds packages he changes.** Don't check, don't remind.
 - **Don't edit his in-flight files** without asking; he rejected several of my edits to

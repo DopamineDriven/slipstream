@@ -3,7 +3,6 @@ import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
-import type { S3FinalizePayload } from "@/types/index.ts";
 import type {
   BlockImgData,
   FunctionCallContext,
@@ -22,7 +21,7 @@ import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap } from "@slipstream/types";
 
 export class GrokResponsesApiLinearService extends GrokImgGenService {
-  protected cuid2: Promise<(typeof import("@paralleldrive/cuid2"))["createId"]>;
+  protected cuid2: Promise<() => string>;
   constructor(
     redis: EnhancedRedisPubSub,
     s3: S3Storage,
@@ -102,16 +101,13 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
     let activeBlock: GrokActiveMessageBlock | undefined = undefined;
     let activeReasoningPhaseKey: string | undefined = undefined;
     let inlineImageActive = false;
-    let nextOrdinal = 0;
     let seriesOrdinal = -1;
     const inlineImageGenAgg = Array.of<InlineImageAggProps>();
     let seriesId: string | undefined = undefined;
     const seriesIdAgg = Array.of<string>();
     let inlineImgAggArr:
-        | [number, string, string, string, string, $Enums.ImageGenOutputKind]
-        | undefined = undefined,
-      uploadImgInitial = 0,
-      uploadImgFinal = 0;
+      | [number, string, string, string, string, $Enums.ImageGenOutputKind]
+      | undefined = undefined;
     const roundTrack = Array.of<{
       type: $Enums.MessageBlockType;
       content: string;
@@ -268,7 +264,6 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                 durationMs: number;
               }
             | undefined = undefined;
-          let s3RTHelper: S3FinalizePayload | undefined = undefined;
 
           // Close the preceding block before consuming an event that changes
           // the active item, phase, or kind of content.
@@ -294,64 +289,47 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                   activeReasoningPhaseKey !== phaseKey);
             }
           }
-          if (activeBlock) {
-            if (chunk.event === "response.output_item.added") {
-              if (chunk.data.item.type === "image_generation_call") {
-                thinkingText = "*Generating Image...*";
-                activeBlock = {
-                  type: "THINKING",
-                  content: thinkingText,
-                  itemIds: [chunk.data.item.id],
-                  startedAt: performance.now()
-                };
-                thinkingChunks.push(thinkingText);
-                grokThinkingDisplayAgg += thinkingText;
-              }
-            } else if (chunk.event === "response.output_item.done") {
-              if (chunk.data.item.type === "image_generation_call") {
-                if (typeof seriesId === "undefined") {
-                  const cuid2 = (await this.cuid2)();
-                  seriesId = cuid2;
-                } else {
-                  /**
-                 * Grok models don't do partial images, so this is safe to do for resetting seriesId
-                 * to a fresh cuid2 value in the event of greater than 1 inline image in a turn
-                 * else we would want to:
-                 * ```ts
-        *           if (inlineImageActive && typeof inlineImgAggArr !== "undefined") {
-                      if (
-                        typeof seriesId !== "undefined" &&
-                        inlineImgAggArr[8] === "FINAL" &&
-                        seriesId === inlineImgAggArr[7]
-                      ) {
-                        seriesId = undefined;
-                      }
-                    }
-                 * ```
-                 */
-                  const gt0 = seriesIdAgg.length > 0;
-                  if (gt0) {
-                    const lastIndex = seriesIdAgg[seriesIdAgg.length - 1];
-                    if (lastIndex && lastIndex === seriesId) {
-                      seriesId = undefined;
-                      const cuid2 = (await this.cuid2)();
-                      seriesId = cuid2;
-                    }
+
+          if (chunk.event === "response.output_item.added") {
+            if (chunk.data.item.type === "image_generation_call") {
+              thinkingText = "*Generating Image...*";
+              activeBlock = {
+                type: "THINKING",
+                content: thinkingText,
+                itemIds: [chunk.data.item.id],
+                startedAt: performance.now()
+              };
+              thinkingChunks.push(thinkingText);
+              grokThinkingDisplayAgg += thinkingText;
+            }
+          } else if (chunk.event === "response.output_item.done") {
+            if (chunk.data.item.type === "image_generation_call") {
+              if (typeof seriesId === "undefined") {
+                const cuid2 = (await this.cuid2)();
+                seriesId = cuid2;
+              } else {
+                const gt0 = seriesIdAgg.length > 0;
+                if (gt0) {
+                  const lastIndex = seriesIdAgg[seriesIdAgg.length - 1];
+                  if (lastIndex && lastIndex === seriesId) {
+                    seriesId = undefined;
+                    seriesId = (await this.cuid2)();
                   }
                 }
-                if (seriesOrdinal === -1) {
-                  seriesOrdinal += 1;
-                }
-                text = chunk.data.item.prompt;
-                inlineImgAggArr = [
-                  seriesOrdinal,
-                  chunk.data.item.result,
-                  chunk.data.item.id,
-                  chunk.data.item.prompt,
-                  seriesId,
-                  "FINAL"
-                ];
-                inlineImageActive = true;
+              }
+              if (seriesOrdinal === -1) {
+                seriesOrdinal += 1;
+              }
+              inlineImgAggArr = [
+                seriesOrdinal,
+                chunk.data.item.result,
+                chunk.data.item.id,
+                chunk.data.item.prompt,
+                seriesId,
+                "FINAL"
+              ];
+              inlineImageActive = true;
+              if (!seriesIdAgg.includes(seriesId)) {
                 seriesIdAgg.push(seriesId);
               }
             }
@@ -372,9 +350,9 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
             const filename = `${sId}-${sOrdinal}.${format}`;
             const mime = specs.contentType ?? this.prisma.getGenMime(format);
 
-            uploadImgInitial = performance.now();
+            const uploadImgInitial = performance.now();
 
-            s3RTHelper = await this.s3.uploadGenerated(
+            const s3RTHelper = await this.s3.uploadGenerated(
               Buffer.from(b64, "base64"),
               this.prisma.isProd,
               {
@@ -392,7 +370,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
 
             const s3LastModified = s3RTHelper.lastModified
               ? new Date(s3RTHelper.lastModified)
-              : new Date(uploadImgFinal);
+              : new Date(Date.now());
 
             const inlineImgObj = this.inlineImagePostUploadObj({
               specs,
@@ -407,7 +385,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               provider: "GROK",
               conversationId,
               seriesOrdinal: sOrdinal,
-              sId,
+              seriesId: sId,
               revisedPrompt,
               kind,
               uploadDuration,
@@ -415,14 +393,14 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
             });
 
             inlineImageGenAgg.push(inlineImgObj);
-            inlineImageActive = false;
-            inlineImgAggArr = undefined;
             if (kind === "FINAL" && seriesId) {
               seriesId = undefined;
             }
             if (kind === "FINAL" && seriesOrdinal !== -1) {
               seriesOrdinal = -1;
             }
+            inlineImageActive = false;
+            inlineImgAggArr = undefined;
           }
 
           if (closeBeforeEvent && activeBlock) {
@@ -459,7 +437,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                     : previewContent,
                 durationMs,
                 itemIds: Array.from(block.itemIds),
-                ordinal: nextOrdinal,
+                ordinal: trackedBlocks.length,
                 previewContent:
                   block.type === "ENCRYPTED_THINKING"
                     ? this.encryptedTag
@@ -467,7 +445,6 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                 type: block.type
               } satisfies GrokFinalizedMessageBlock;
               trackedBlocks.push(finalizedBlock);
-              nextOrdinal += 1;
 
               if (
                 block.type === "THINKING" ||
@@ -567,22 +544,22 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                   chunk.data.item.id
                 );
                 if (encryptedContent) {
-                  trackedBlocks.push({
+                  const encryptedBlock = {
                     content: encryptedContent,
                     durationMs: 0,
                     itemIds: [chunk.data.item.id],
-                    ordinal: nextOrdinal,
+                    ordinal: trackedBlocks.length,
                     previewContent: this.encryptedTag,
                     type: "ENCRYPTED_THINKING"
-                  });
+                  } satisfies GrokFinalizedMessageBlock;
+                  trackedBlocks.push(encryptedBlock);
                   thinkingMessageBlock = {
                     type: "ENCRYPTED_THINKING",
                     content: this.encryptedTag,
-                    ordinal: nextOrdinal,
+                    ordinal: encryptedBlock.ordinal,
                     conversationId,
                     durationMs: 0
                   };
-                  nextOrdinal += 1;
                 }
                 grokThinkingDisplayAgg =
                   grokThinkingDisplayAgg.length > 0
@@ -746,11 +723,10 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                     content: output.encrypted_content,
                     durationMs: 0,
                     itemIds: [output.id],
-                    ordinal: nextOrdinal,
+                    ordinal: trackedBlocks.length,
                     previewContent: this.encryptedTag,
                     type: "ENCRYPTED_THINKING"
                   });
-                  nextOrdinal += 1;
                   grokThinkingDisplayAgg =
                     grokThinkingDisplayAgg.length > 0
                       ? grokThinkingDisplayAgg.concat("\n", this.encryptedTag)
@@ -822,14 +798,13 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                     : previewContent,
                 durationMs,
                 itemIds: Array.from(block.itemIds),
-                ordinal: nextOrdinal,
+                ordinal: trackedBlocks.length,
                 previewContent:
                   block.type === "ENCRYPTED_THINKING"
                     ? this.encryptedTag
                     : previewContent,
                 type: block.type
               } satisfies GrokFinalizedMessageBlock);
-              nextOrdinal += 1;
               if (
                 block.type === "THINKING" ||
                 block.type === "ENCRYPTED_THINKING"
@@ -868,7 +843,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                     activeBlock.type === "ENCRYPTED_THINKING"
                       ? this.encryptedTag
                       : activeBlock.content,
-                  ordinal: nextOrdinal,
+                  ordinal: trackedBlocks.length,
                   conversationId,
                   durationMs: activeBlockDuration
                 }
@@ -934,7 +909,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               ? {
                   type: activeBlock.type,
                   content: activeBlock.content,
-                  ordinal: nextOrdinal,
+                  ordinal: trackedBlocks.length,
                   conversationId,
                   durationMs: activeBlockDuration
                 }
@@ -1115,11 +1090,10 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
           content: grokAgg,
           durationMs: 0,
           itemIds: Array.of<string>(),
-          ordinal: nextOrdinal,
+          ordinal: trackedBlocks.length,
           previewContent: grokAgg,
           type: "TEXT"
         });
-        nextOrdinal += 1;
       }
 
       for (const block of trackedBlocks) {

@@ -96,7 +96,7 @@ export class GrokBaseService {
     revisedPrompt,
     s3LastModified,
     s3RTHelper,
-    sId,
+    seriesId,
     seriesOrdinal,
     specs,
     uploadDuration,
@@ -136,7 +136,7 @@ export class GrokBaseService {
       region: "us-east-1",
       s3LastModified,
       s3ObjectId: s3RTHelper.s3ObjectId,
-      seriesId: sId,
+      seriesId,
       size: specs.byteSize ?? s3RTHelper.size ?? 0,
       sourceUrl: "buffer",
       sseAlgorithm: null,
@@ -178,12 +178,12 @@ export class GrokBaseService {
         mime,
         facilitatingModel,
         generatingModel,
-        height: specs.width,
-        width: specs.height,
+        width: specs.width,
+        height: specs.height,
         kind,
         provider,
         revisedPrompt,
-        seriesId: sId,
+        seriesId,
         seriesOrdinal
       }
     } satisfies InlineImageAggProps;

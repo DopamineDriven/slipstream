@@ -610,7 +610,7 @@ export type InlineImageAggProps = DX<
   > & {
     image: Rm<ImageSingleton, "attachmentId" | "createdAt" | "updatedAt">;
     inlineImageGenOutput: Rm<
-      InlineImageGenOutputSingleton,
+      InlineImageGenOutputSingleton<true>,
       "id" | "attachmentId" | "createdAt" | "updatedAt" | "attachment"
     >;
   }
@@ -629,7 +629,7 @@ export type InlinePostImageUploadProps = {
   provider: $Enums.Provider;
   conversationId: string;
   seriesOrdinal: number;
-  sId: string;
+  seriesId: string;
   revisedPrompt: string;
   kind: $Enums.ImageGenOutputKind;
   uploadDuration: number;
