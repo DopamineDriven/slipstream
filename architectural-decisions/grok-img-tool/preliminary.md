@@ -2,12 +2,16 @@
 
 Date: 2026-09-21
 
-Status: probe-verified, design open. Nothing here is built yet beyond the types
-in `apps/ws-server/src/xai/event-types.ts` and `responses-types.ts`.
+Status: probe-verified; design settled 2026-09-22. Shipped: the event and
+request types (`apps/ws-server/src/xai/event-types.ts`, `responses-types.ts`),
+tool equipping (`f6113ea`), and the step 1 schema (migrating 2026-09-22).
+Open: steps 2–8 of §8.
 
-Source: `apps/ws-server/grok-4-7-probe.sh` → `src/test/xai/tooling/grok-4.7.txt`
-(image base64 trimmed; rendered image at
-`src/test/__out__/grok/image_generation/one.jpg`, 1792×1008 JPEG, 16:9).
+Source: `apps/ws-server/grok-4-7-probe.sh`, run twice with the identical
+request → `src/test/xai/tooling/grok-4.7.txt` (run 1, image base64 trimmed;
+rendered image at `src/test/__out__/grok/image_generation/one.jpg`, 1792×1008
+JPEG, 16:9) and `grok-4.7-2.txt` (run 2). Every event shape is typed in
+`apps/ws-server/src/xai/event-types.ts`.
 
 ---
 
@@ -31,72 +35,86 @@ The prompt asked for a forecast riff **and** a forecast image. So this is the
 
 ---
 
-## 2. What came back
+## 2. What came back — two runs, same prompt
 
-1,144 SSE events, 10 output items, one `response.completed`.
+Run 1: 1,144 events. Run 2: 1,219 events. Both: 10 output items, one
+`message`, one `image_generation_call`, one `response.completed`. **The item
+order differs between them, and that is by design.** Grok runs its tool
+calls in parallel (`parallel_tool_calls: true`; up to 350 tools can be
+equipped at once), so the order in which tool items open and close is never
+the same twice. The handler must be order-agnostic. The only things it may
+rely on are the invariants in §2.2.
 
-| count | event |
+Three `: keepalive` comment lines were interleaved in run 1. Already
+handled: the SSE parser skips any line starting with `:`.
+
+### 2.1 The two item skeletons, side by side
+
+Delta runs collapsed; numbers are `sequence_number`.
+
+| run 1 (`grok-4.7.txt`) | run 2 (`grok-4.7-2.txt`) |
 | --- | --- |
-| 1042 | `response.output_text.delta` |
-| 47 | `response.reasoning_summary_text.delta` |
-| 14 | `response.output_text.annotation.added` |
-| 10 | `response.output_item.added` / `.done` |
-| 2 each | `web_search_call.in_progress` / `.searching` / `.completed` |
-| 1 each | `image_generation_call.in_progress` / `.generating` / `.completed` |
-| 1 each | `file_search_call.in_progress` / `.searching` / `.completed` |
-| 1 each | `created`, `in_progress`, `completed`, `content_part.added` / `.done`, `output_text.done`, `reasoning_summary_part.added` / `.done`, `reasoning_summary_text.done` |
+| 2–53 · reasoning `rs_` idx 0 — 47 visible summary deltas (203 chars); its `done` carries `encrypted_content` too | 2–13 · **four** `file_search_call` idx 0–3, all `added` before any `done` |
+| 54 · `file_search_call` idx 1 added | 14 · idx 3 `done` with **`status: "failed"`**, `results: []`, no `.completed` progress event |
+| 57–61 · `web_search_call` idx 2 | 15–19 · `web_search_call` idx 4 |
+| 62–63 · reasoning `tco_` idx 3, complete on `added` | 20–21 · reasoning `tco_` idx 5, complete on `added` |
+| 64–68 · `web_search_call` idx 4 | 22–27 · the file searches close as **1, 0, 2** — not by index |
+| 69–70 · reasoning `tco_` idx 5 | 28–79 · reasoning `rs_` idx 6 — 47 visible summary deltas (997 chars); its `done` carries `encrypted_content` too |
+| 71–72 · `file_search_call` idx 1 closes **after items 2–5** | |
+| 73–74 · reasoning `rs_` idx 6, encrypted, no deltas | |
+| 75–76 · `message` idx 7 opens | 80–81 · `message` idx 7 opens |
+| 77–116 · 40 text deltas | 82–107 · 26 text deltas |
+| 117–121 · `image_generation_call` idx 8: added / in_progress / generating / completed / done, consecutive; `prompt` 799 chars | 108–112 · `image_generation_call` idx 8: the same five, consecutive; `prompt` 734 chars |
+| 122–123 · reasoning `rs_` idx 9, encrypted, **inside the open message** | 113–114 · reasoning `rs_` idx 9, encrypted, **inside the open message** |
+| 124–1125 · 1,002 text deltas on the same `msg_` item | 115–428 · 314 text deltas on the same `msg_` item |
+| 1126–1139 · **14 annotations, all trailing** (`collections://` citations, indices 0/0) | 429 · **one annotation mid-text** (`url_citation`, indices 1274–1335) |
+| | 430–1214 · 785 more text deltas |
+| 1140–1142 · `output_text.done` (4,380 chars, one string); message `done` | 1215–1217 · `output_text.done` (4,730 chars, one string); message `done` |
+| 1143 · `response.completed` | 1218 · `response.completed` |
 
-Three `: keepalive` comment lines were interleaved. Already handled: the SSE
-parser skips any line starting with `:` (the spec's comment form), so these
-never reach the event loop.
+### 2.2 Invariants and variants
 
-### 2.1 Output items, in order
+Held in both runs — the handler may rely on these:
 
-| index | item | id prefix | how it streamed |
-| --- | --- | --- | --- |
-| 0 | reasoning | `rs_` | 47 visible summary deltas |
-| 1 | file_search_call | `fs_` | opened at seq 54, **closed at seq 72** — after items 2–5 |
-| 2 | web_search_call | `ws_` | |
-| 3 | reasoning | `tco_` | encrypted, arrives already `completed` on `added` |
-| 4 | web_search_call | `ws_` | |
-| 5 | reasoning | `tco_` | same as 3 |
-| 6 | reasoning | `rs_` | encrypted, no deltas |
-| **7** | **message** | `msg_` | **opened seq 75, closed seq 1142** |
-| **8** | **image_generation_call** | `ig_` | **seq 117–121, inside item 7** |
-| 9 | reasoning | `rs_` | encrypted, seq 122–123, **inside item 7** |
+1. **The message item stays open around the image.** The image call and an
+   encrypted `rs_` item open and close *inside* it; text resumes on the
+   same `msg_` item, same `content_index` 0, no new message item, no new
+   content part. `output_text.done` carries the whole text as one string.
+   OpenAI's Responses stream never does this — an item there finishes
+   before the next begins — and the current handler's block logic was
+   built on that assumption.
+2. **The image is a five-event burst**: `added`, `in_progress`,
+   `generating`, `completed`, `done`, consecutive, mid-text. `result` and
+   `prompt` are on `done` only (§2.3).
+3. **`tco_` reasoning items are complete on `added`** (§2.4).
+4. **A summarised `rs_` item's `done` also carries `encrypted_content`.**
+   The placeholder branch must know a summary was already streamed for
+   that id — the one dedupe `Set` the rewrite keeps (`summarisedItemIds`).
+5. **Tool items open in parallel and close out of order**, and a tool item
+   can `done` with `status: "failed"` (run 2, idx 3) without failing the
+   response: it carries `results: []`, gets no `.completed` progress event,
+   and is not counted in usage (`file_search_calls: 3` for four items).
+   Nothing to parse, nothing to throw.
+6. **Annotations are not a boundary.** They can land after all the text
+   (run 1) or between text deltas (run 2). The annotation branch is a no-op
+   in the March file and today, and stays one: it never closes the TEXT
+   block.
+7. Usage carries `image_generation_calls` and `cost_in_usd_ticks` (§2.5).
 
-### 2.2 The interleave itself
+Varied — the handler must not assume any of it:
 
-```
-  75  output_item.added        7  message
-  76  content_part.added       7
-  77  … 40 × output_text.delta (index 7)        ← "…Image incoming with the reading."
- 117  output_item.added        8  image_generation_call   result: null
- 118  image_generation_call.in_progress
- 119  image_generation_call.generating
- 120  image_generation_call.completed
- 121  output_item.done         8  image_generation_call   result: <b64>, prompt: <799 chars>
- 122  output_item.added        9  reasoning (rs_, encrypted, no deltas)
- 123  output_item.done         9
- 124  … 1002 × output_text.delta (index 7)      ← "**CHICAGO, AS READ BY THE UNFILTERED DESK**…"
-1126  … 14 × output_text.annotation.added (index 7)
-1140  output_text.done         7  (4,380 chars, ONE string)
-1141  content_part.done        7
-1142  output_item.done         7  message
-1143  response.completed
-```
+| | run 1 | run 2 |
+| --- | --- | --- |
+| where the visible reasoning sits | idx 0, **before** every tool | idx 6, **after** every tool, right before the message |
+| tool mix | 1 file search, 2 web searches, 2 `tco_` | 4 file searches (1 failed), 1 web search, 1 `tco_` |
+| close order of parallel items | idx 1 closes after 2–5 | 3, 4, 5, 1, 0, 2 |
+| text before / after the image | 40 / 1,002 deltas | 26 / 1,099 deltas |
+| annotations | 14, all trailing | 1, mid-text |
+| input / output / reasoning tokens | 57,743 / 4,373 / 3,041 | 102,700 / 3,399 / 1,908 |
+| `cost_in_usd_ticks` | 1,575,680,000 | 2,076,540,000 |
 
-**This is what "interleaving" means on the wire: the message item stays open
-while other items open and close beneath it.** The text stops mid-answer
-(195 chars, ending "Image incoming with the reading."), the image call runs,
-an encrypted reasoning item follows, and the text resumes (4,161 chars) on
-the **same** `msg_` item, same `content_index` 0, with no new message item and
-no new content part. `output_text.done` at the end carries the whole 4,380
-characters as one string.
-
-OpenAI's Responses stream does not do this; an item there finishes before
-the next begins. The chat handler's block logic was built on that
-assumption.
+Both runs happened to stream exactly 47 summary deltas. Coincidence, not a
+number to key on.
 
 ### 2.3 The two events that matter
 
@@ -123,8 +141,8 @@ assumption.
 
 - `result` carries the bytes and is present **only** on `done` (and again on
   the matching item inside `response.completed.output`).
-- `prompt` (799 chars) is the rewritten prompt Grok handed to the image
-  model. It is the Grok equivalent of `revised_prompt` and belongs in that
+- `prompt` (799 chars in run 1, 734 in run 2) is the rewritten prompt Grok
+  handed to the image model. It is the Grok equivalent of `revised_prompt` and belongs in that
   slot on persist.
 - The three progress events between them carry only `item_id` and
   `output_index`. They are UI signals, not data.
@@ -160,7 +178,22 @@ the image's position, then TEXT again.
 ```
 
 `image_generation_calls` is a first-class counter, and `cost_in_usd_ticks`
-is new. Neither is on the current `Usage` type in `event-types.ts`.
+is new. Neither is on the current `Usage` type in `event-types.ts`. Run 2
+counted `file_search_calls: 3` for four emitted items: the failed one is
+not billed.
+
+### 2.6 Generator model and chaining (xAI docs, 2026-09-22)
+
+Two facts from the tool's documentation rather than the probe:
+
+- The tool "uses the latest Imagine image models (grok-imagine-image-2.0)".
+  So `generatingModel` for a Grok facilitator is documented, as OpenAI's is
+  named on the tool definition; the facilitator → generator mapping is one
+  `as const` per provider.
+- "The model can also chain calls — generating an image and then editing
+  it — within a single request." One round can therefore carry **several**
+  `image_generation_call` items. The probe had one; the handler must not
+  assume one. Each `done` is handled on its own (§8, step 4).
 
 ---
 
@@ -180,7 +213,8 @@ every chat turn for `grok-4.6` and `grok-4.7`**, exactly as `web_search` and
   model can illustrate mid-answer with no user toggle.
 
 Guard: equip only when `isGrokImgGenFacilitating(model)`. The 4.3 and 4.20
-chat paths do not change.
+chat paths do not change. **Done in `f6113ea`**: `resolveResponsesTools` in
+`stream-workup.ts`.
 
 ---
 
@@ -301,7 +335,7 @@ model Attachment {
   inlineImageGenOutput InlineImageGenOutput?                      // one-off lineage, no job
 }
 
-model InlineImageGenOutput { … }   // kind / seriesIndex / seriesId / dims, keyed by attachment
+model InlineImageGenOutput { … }   // kind / seriesOrdinal / seriesId / dims / models, keyed by attachment
 ```
 
 **Why one-to-many, not one-to-one (Andrew):** a facilitator's tool call can
@@ -322,30 +356,43 @@ completion" idea is withdrawn: a job hangs off a message via a unique
 `attachments → imageGenOutput → job` while also linking it directly is
 circular.)
 
-The probe persists as:
+The two probe runs persist as (the upload THINKING block is §8.4a; the
+walk through the loop is in `reference/loop-skeleton.md` §5):
 
-| ordinal | type | content | attachments |
-| --- | --- | --- | --- |
-| 0 | THINKING | summary | |
-| 1–5 | ENCRYPTED_THINKING | | |
-| 6 | TEXT | "…Image incoming with the reading." | |
-| 7 | IMAGE_GEN | Grok's 799-char `prompt` | the S3 attachment(s): Grok emits one FINAL; OpenAI facilitators would add 0–3 PARTIALs |
-| 8 | ENCRYPTED_THINKING | | |
-| 9 | TEXT | "**CHICAGO, AS READ…**" | |
+| ordinal | run 1 | run 2 |
+| --- | --- | --- |
+| 0 | THINKING — summary | ENCRYPTED_THINKING — `tco_` |
+| 1 | ENCRYPTED_THINKING — `tco_` | THINKING — summary |
+| 2 | ENCRYPTED_THINKING — `tco_` | TEXT — "…Image incoming…" |
+| 3 | ENCRYPTED_THINKING — `rs_` | THINKING — the upload, `content` = the 734-char `prompt` |
+| 4 | TEXT — "…Image incoming with the reading." | **IMAGE_GEN** — `content` = the `prompt`, `attachments: [FINAL]` |
+| 5 | THINKING — the upload, `content` = the 799-char `prompt` | ENCRYPTED_THINKING — `rs_` |
+| 6 | **IMAGE_GEN** — `content` = the `prompt`, `attachments: [FINAL]` | TEXT — the rest |
+| 7 | ENCRYPTED_THINKING — `rs_` | |
+| 8 | TEXT — "**CHICAGO, AS READ…**" | |
+
+Grok emits one FINAL per image call; an OpenAI facilitator would put 0–3
+PARTIALs in the same `attachments` array. Nine blocks and seven blocks
+from the same prompt: the ordinals follow the wire, whatever order it
+comes in.
 
 Consequences:
 
 - `content` has a natural value: the rewritten `prompt`, the same provenance
   `revisedPrompt` carries elsewhere.
 - **Every generated attachment still records its frame** — `kind`,
-  `seriesIndex`, `seriesId`, dims — just on `inlineImageGenOutput` instead
-  of `imageGenOutput`. The renderer's partial/final logic (sort by
-  `seriesIndex`, split on `isPartial`, show the FINAL or the latest PARTIAL)
-  reads the same field names off the other relation.
+  `seriesOrdinal`, `seriesId`, dims, both models — on `inlineImageGenOutput`
+  instead of `imageGenOutput`. The one-off renderer sorts by `seriesOrdinal`
+  and shows the FINAL if present, else the highest PARTIAL. It must **not**
+  share a sort helper with the job renderer: `ImageGenOutput.seriesIndex` is
+  per kind (the FINAL is 0), `seriesOrdinal` is one counter across kinds (the
+  FINAL after three PARTIALs is 3).
 - **The TEXT split is now correct, not a bug.** §5.2 step 1 is withdrawn:
-  `finalizeActiveBlock()` on the image's `added` closes ordinal 6, the image
-  takes 7, the resumed text opens 9. The wire's `output_index` order maps
-  straight onto block ordinals, and the rewrite needs no special case.
+  closing the active block on the image's `added` ends the text before the
+  image; the upload THINKING and the `IMAGE_GEN` take the next two
+  ordinals; the resumed text opens a fresh TEXT block after the encrypted
+  placeholder. The wire's order maps straight onto block ordinals, and the
+  rewrite needs no special case.
 - The `Attachment` rows are created exactly as today, on the message,
   `origin: GENERATED`; the block is an ordered owner of them, so attachment
   listings keep working.
@@ -421,10 +468,12 @@ no captured state.
 
 ### 6.3 Folded in while rewriting
 
-1. **The image call** (§5.3): `added` closes the active TEXT block like any
-   other non-reasoning item; `done` stamps `tFinal`, uploads to S3, pushes an
-   `IMAGE_GEN` block at the next ordinal with `content = item.prompt` and the
-   attachment, and sends it on the next frame. A branch, not a closure.
+1. **The image call** (§5.3, §8.4a): `added` closes the active TEXT block
+   like any other non-reasoning item and opens the image THINKING block
+   (the clock starts here); `done` fills in `item.prompt`, uploads to S3,
+   closes the THINKING with one duration, pushes an `IMAGE_GEN` block at
+   the next ordinal with the attachment, and releases any held text. Two
+   branches, no closure.
 2. **`tco_` items** (§2.4): treat `added` for any reasoning item as a no-op
    and act on `done` only, so a `tco_` landing mid-text after the image can
    never split the TEXT block.
@@ -432,14 +481,19 @@ no captured state.
    `server_side_tool_usage_details.image_generation_calls` / `x_posts_fetched`
    / `x_users_fetched` / `context_details`.
 
-### 6.4 Estimate and cut-over
+### 6.4 Landed: `responses-api-linear.ts` (Andrew, 2026-09-22)
 
-Roughly 650 lines against the current 1,080; ~200 of the saved lines are the
-closures and the duplicated `completed` scans. Frame literals stay repeated.
-
-Because the file is live in prod: write as `responses-api-v2.ts` beside the
-current one, diff, cut over in `xai/index.ts`, delete the old file in a
-separate commit.
+Andrew linearized the current file himself rather than rebuilding from
+March: `apps/ws-server/src/xai/responses-api-linear.ts`, 1,124 lines, zero
+closures. The seven helpers became two inline close sites (a
+`closeBeforeEvent` decision at the top of the loop body, a `closeAfterEvent`
+decision at the bottom, each followed by the same six-line close written
+out) and named frame literals at the send site. The per-summary-part clocks
+(`reasoningPhase*` maps), the three dedupe sets, and the second
+`response.completed` scan are all **kept**, unchanged in behaviour; §6.2's
+proposed simplifications were not taken and are not needed. `xai/index.ts`
+extends it; live-tested for tool calling, image sharing, and document
+sharing. `responses-api.ts` stays beside it until commit G.
 
 ---
 
@@ -476,8 +530,7 @@ against the rebuilt dist.
 
 ### Step 1 — schema: `IMAGE_GEN` block, block → attachments, `InlineImageGenOutput`
 
-Three edits. Andrew has written the first two (validated 2026-09-22); the
-third is the new table.
+Three edits, all Andrew's (validated and migrated 2026-09-22).
 
 `packages/db/prisma/schema/messageblock.prisma`:
 
@@ -503,49 +556,63 @@ model Attachment {
   …
   messageBlockId       String?
   messageBlock         MessageBlock?         @relation("MessageBlockAttachments", fields: [messageBlockId], references: [id], onDelete: SetNull)
-  inlineImageGenOutput InlineImageGenOutput?
+  inlineImageGenOutput InlineImageGenOutput? @relation("InlineImageGenOutputToAttachment")
   @@index([messageBlockId])
 }
 ```
 
-New, `inline-imagegen.prisma` (or alongside `imagegen.prisma`), **completely
-independent of `ImageGenJob` and `ImageGenOutput`**:
+New, `inline-image-gen-output.prisma`, **completely independent of
+`ImageGenJob` and `ImageGenOutput`**:
 
 ```prisma
 model InlineImageGenOutput {
-  id            String             @id @default(cuid(2))
-  attachmentId  String             @unique
-  /// mirrors ImageGenOutput's lineage fields, minus everything that only exists with a job
-  kind          ImageGenOutputKind @default(FINAL)
-  isPartial     Boolean
-  seriesId      String
-  seriesIndex   Int
-  width         Int?
-  height        Int?
-  mime          String?
-  ext           String?
-  /// the provider's rewritten prompt (Grok `prompt`, OpenAI `revised_prompt`)
-  revisedPrompt String?
-  provider      Provider
-  model         String
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  id   String             @id @default(cuid(2))
+  kind ImageGenOutputKind @default(FINAL)
 
-  attachment Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  provider          Provider
+  facilitatingModel String
+  generatingModel   String
+  /// cuid2 (24 chars [a-z0-9]) shared by series ordinals
+  seriesId          String
+  /// 0-based, up to 4 total per series (0 through 3, eg, PARTIAL, PARTIAL, PARTIAL, FINAL)
+  seriesOrdinal     Int
+  attachmentId      String     @unique
+  width             Int
+  height            Int
+  mime              String
+  ext               String
+  revisedPrompt     String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  attachment        Attachment @relation("InlineImageGenOutputToAttachment", fields: [attachmentId], references: [id], onDelete: Cascade)
 
-  @@unique([seriesId, kind, seriesIndex])
-  @@index([seriesId])
+  @@unique([seriesId, seriesOrdinal])
+  @@index([provider, facilitatingModel, generatingModel])
+  @@index([createdAt])
 }
 ```
 
-- `ImageGenOutputKind` is reused, not duplicated: it is the same
-  PARTIAL / FINAL vocabulary.
-- `provider` and `model` are here because there is no job to carry them, and
-  provenance for a one-off should not depend on reading the parent message.
-- No `jobId`, no `jobIndex`: those are job concepts. The unique constraint
-  drops the `jobId` prefix accordingly.
-- All additive: one enum member, two nullable columns, one new table, no
-  backfill. Existing rows untouched. `ImageGenOutput.jobId` stays required.
+- `ImageGenOutputKind` is reused, not duplicated: the same PARTIAL / FINAL
+  vocabulary. There is no `isPartial`; it is `kind === "PARTIAL"`.
+- **`seriesOrdinal` is one counter across kinds**: PARTIALs take 0…n−1 and
+  the FINAL takes n (three partials → the FINAL is 3). Deliberately
+  different from `ImageGenOutput.seriesIndex`, which is per kind (FINAL is
+  0). The unique key is `[seriesId, seriesOrdinal]`; its leading column
+  covers lookups by `seriesId`, so there is no separate `seriesId` index.
+- `facilitatingModel` (the chat model, `grok-4.7`) and `generatingModel`
+  (what drew, `grok-imagine-image-2.0`, §2.6) are both here because there is
+  no job to carry them, and provenance for a one-off must not depend on the
+  parent message. The facilitator → generator mapping is one `as const` per
+  provider in the handler.
+- `width` / `height` / `mime` / `ext` are **required**: the extractor knows
+  all four before the upload, so a nullable column would only encode a bug.
+- `revisedPrompt` is the provider's rewritten prompt (Grok `prompt`, OpenAI
+  `revised_prompt`).
+- No `jobId`, no `jobIndex` (job concepts); no `ordinal`, `messageBlockId`,
+  `aspectRatio` (each one relation hop away).
+- All additive: one enum member, one nullable column on `Attachment` with
+  its index, one new table. No backfill; existing rows untouched;
+  `ImageGenOutput.jobId` stays required.
 - `SetNull` on `Attachment.messageBlockId` so deleting a block leaves its
   attachments on the message; `Cascade` on the lineage row so it dies with
   its attachment, exactly as `ImageGenOutput` does.
@@ -579,7 +646,7 @@ export type ChatChunkAndResMsgBlock = {
   ordinal: number;
   conversationId: string;
   durationMs: number;
-  /** IMAGE_GEN only: the frames this block owns, in seriesIndex order; each carries `inlineImageGenOutput` (§8.4a) */
+  /** IMAGE_GEN only: the frames this block owns, in seriesOrdinal order; each carries `inlineImageGenOutput` (§8.4a) */
   attachments?: AIChatResponseImgGenSubFields[];
 };
 ```
@@ -588,9 +655,10 @@ One optional array, `IMAGE_GEN` only. An `IMAGE_GEN` frame is sent only once
 an S3 url exists, so the array is never empty on the wire. For Grok it holds
 one FINAL; for an OpenAI facilitator it grows as partials land and the same
 ordinal is re-sent (last-wins merge on the client replaces the array). Each
-entry's frame identity (`kind`, `isPartial`, `seriesIndex`, `seriesId`,
-dims, `revisedPrompt`) is on its `inlineImageGenOutput`, mirroring how
-`imageGenOutput` rides on a job's attachments.
+entry's frame identity (`kind`, `seriesOrdinal`, `seriesId`, dims,
+`facilitatingModel`, `generatingModel`, `revisedPrompt`) is on its
+`inlineImageGenOutput`, mirroring how `imageGenOutput` rides on a job's
+attachments.
 
 `AIChatResponseImgGenSubFields` gains `inlineImageGenOutput` beside the
 existing `imageGenOutput`; a given attachment populates exactly one of the
@@ -638,63 +706,43 @@ rows. `messageType` stays whatever the request was (`TEXT` for a chat turn);
 `isImageGen` is left `false` for a one-off, since that flag means "this
 message is an image-gen message", which it is not.
 
-### Step 4 — `responses-api-v2.ts`: the linear rewrite (§6)
+### Step 4 — the image branches in `responses-api-linear.ts` (§6.4)
 
-New file beside `responses-api.ts`. Same method name and signature,
-`handleXAIAiResponsesApiRequest`, on a class the router can swap to.
+The linear file is live (§6.4), so this step is no longer a rewrite. It is
+the image branches, added to that file. `reference/loop-skeleton.md` §4
+shows them in isolation; here is where each slots in.
 
-**The base is the 2026-03-29 version of the handler**, preserved at
-`reference/xai-responses-api-from-2026-03-29.md`: 600 lines, zero closures, six
-`let`s, one `if` chain, frames inline. Everything the current file grew since
-then is either (a) the block contract, which the client now renders by
-ordinal and must be kept, or (b) closure scaffolding that only exists because
-the closures could not see the loop's locals. The rewrite is the March file
-plus (a), with the image branches added.
+| site in `responses-api-linear.ts` | change |
+| --- | --- |
+| state, above the round loop | `const images = Array.of<AIChatResponseImgGenSubFields>()`, `let imageLanded = false`, `let heldText = ""`, `let heldTextItemId = ""` |
+| the `closeBeforeEvent` decision | two guards while the image THINKING is open (`activeBlock.itemIds[0]` starts with `ig_`): an `output_text.delta` must **not** close it (the delta is held), and a reasoning `output_item.done` must **not** close it (§8.4a's unobserved case: hold that too rather than splitting the block) |
+| `output_item.added` handler | `image_generation_call` → the close already happened above; open the THINKING block blank, `startedAt = now`, send its frame inline with `isThinking: true` (the bottom-of-loop thinking frame is gated on `thinkingText`, which is empty here, so the send is explicit) |
+| `output_text.delta` handler | image THINKING open → `heldText += delta`, `heldTextItemId = item_id`, set no `text`; else as today |
+| `output_item.done` handler | `image_generation_call` with `result` → skeleton §4 steps (1)–(6): prompt into the open block and re-send its ordinal; decode, specs, `await` the upload; close with `now − startedAt`; sub-fields (`inlineImageGenOutput` on the chat path, `imageGenOutput` + `jobId` on the job path); push and send the `IMAGE_GEN` block with `attachments: [attachment]` and `imgGenFields`; then `activeBlock = TEXT(heldText)`, `text = heldText`, so the existing bottom-of-loop text frame releases it |
+| persist + `ai_chat_response` | `imgGenEnabled: images.length > 0` (today hard-coded `false`), `imgGenFields: { images, … }` when non-empty, and each `roundTrack` entry for an `IMAGE_GEN` block carries `attachments` |
 
-| grew since March | keep? | how |
-| --- | --- | --- |
-| `messageBlocks` on every frame; `trackedBlocks` → `roundTrack` on persist | yes | wire contract, not elaboration |
-| per-summary-part THINKING blocks with their own clocks (`reasoningPhase*` maps, `reasoningPhaseKey`) | yes, simplified | the March two-variable clock does it: start on `summary_part.added`, settle on `summary_part.done`; the maps existed for the closures |
-| `ENCRYPTED_THINKING` placeholder per item, three dedupe `Set`s | yes, no Sets | March put `encrypted_content` straight into `thinkingText` (leaked ciphertext to the browser); the placeholder is the fix. Emit it in exactly one place — `output_item.done` for a reasoning item that had no summary text — and it fires once per item by construction |
-| second scan of `response.completed.output` for encrypted items | no | every item already had its `done` |
-| local tool bridge | yes | real feature, lives in the tool-round section outside the stream loop |
-| `MAX_TOOL_ROUNDS` 10 → 10,000,000 | keep current | unrelated (memory tools) |
+The progress events and annotations need no code: neither matches a
+`closeBeforeEvent` case nor a handler, and with `thinkingText` and `text`
+unset the frame sites send nothing.
 
-State, in full — the March pair `grokIsCurrentlyThinking` +
-`activeThinkingStartTime` becomes `activeBlock`, which says the same thing
-(`activeBlock?.type === "THINKING"`, `activeBlock.startedAt`) while also
-carrying the content and ordinal the block contract needs:
-
-```ts
-let activeBlock: GrokActiveMessageBlock | undefined = undefined; // { type, content, startedAt, itemId }
-let nextOrdinal = 0;
-const blocks = Array.of<GrokFinalizedMessageBlock>();
-let grokThinkingDuration = 0, grokThinkingAgg = "", grokAgg = "", usage = 0;
-const images = Array.of<AIChatResponseImgGenSubFields>();
-```
-
-One `if / else if` chain over `chunk.event`. Every "close the active block"
-is the six inline lines from §6.2, repeated at each site that closes one.
-Frame literals are named `const`s at the send site, as the March file does.
-
-**The full loop skeleton is in `reference/loop-skeleton.md`** — state,
-round loop, the stream chain branch by branch, and a walk of the probe's
-ten output items through it showing the nine resulting block ordinals.
-
-Branches, in the order they matter:
+The branch-by-branch design, as the skeleton states it (names there are the
+skeleton's; the linear file's are `trackedBlocks`, `grokThinkingDisplayAgg`,
+`roundTrack`):
 
 | event | does |
 | --- | --- |
 | `response.created` | log round start |
 | `output_item.added`, `reasoning` | **no-op** (§2.4: `tco_` items are complete on `added`; act on `done`) |
-| `output_item.added`, `image_generation_call` | close the active block (the TEXT split, §5.3). Nothing else: `done` follows within the same burst (§8.4a) |
+| `output_item.added`, `image_generation_call` | close the active block (the TEXT split, §5.3); **open the image THINKING block here**, blank, send it with `isThinking: true`. The clock starts at `added`, not `done` (§8.4a). `item.type` is the discriminant the typed union narrows on; `item.id` starting with `ig_` is a second check that agrees |
+| `image_generation_call.in_progress` / `.generating` / `.completed` | no-op; the client ticks on its own from the open THINKING |
 | `output_item.added`, `function_call` | register pending call (unchanged) |
 | `output_item.added`, anything else | close the active block |
 | `reasoning_summary_part.added` / `_text.delta` / `_text.done` / `_part.done` | as today, inline; phase maps keyed by `reasoningPhaseKey` |
-| `output_text.delta` | open a TEXT block if `active?.type !== "TEXT"`, append, send the text frame |
+| `output_text.delta` | if the image THINKING is open: append to `heldText`, send nothing (§8.4a). Else open a TEXT block if `active?.type !== "TEXT"`, append, send the text frame |
 | `output_item.done`, `reasoning` with `encrypted_content` | store; if no summary text was seen for this id and no placeholder yet: close active, push an `ENCRYPTED_THINKING` block, send the placeholder frame |
-| `output_item.done`, `image_generation_call` with `result` | (1) close the active block; (2) open a THINKING block, `content = item.prompt`, send its frame with `isThinking: true` — the client's own ticker starts; (3) `const uploadStartedAt = performance.now()`; decode; `getImageSpecsWorkup`; **`await` the S3 upload, plainly**; (4) close the THINKING block with `durationMs = now − uploadStartedAt`, send it with `isThinking: false`; (5) build the sub-fields (minted `seriesId`, `revisedPrompt = item.prompt`; on the job path `jobId` + `imageGenOutput`, on the chat path `inlineImageGenOutput` with `kind: FINAL`, `seriesIndex: 0`, provider + model); push an `IMAGE_GEN` block `{ content: item.prompt, durationMs: 0, attachments: [attachment] }` — the wait was already attributed to the THINKING block; push into `images`; send its frame with `imgGenFields: { images, activeImage }`. No continuation, no second frame per block (§8.4a) |
-| `output_item.done`, `file_search_call` | `parseFileSearchResults` (unchanged) |
+| `output_item.done`, `image_generation_call` with `result` | (1) the THINKING block has been open since `added`; fill `content = item.prompt` and re-send the same ordinal, still `isThinking: true`; (2) decode; `getImageSpecsWorkup`; **`await` the S3 upload, plainly**; (3) close the THINKING block with **one** `durationMs = now − addedAt` (generation + upload), send it with `isThinking: false`; (4) build the sub-fields (minted `seriesId`, `revisedPrompt = item.prompt`; on the job path `jobId` + `imageGenOutput`, on the chat path `inlineImageGenOutput` with `kind: FINAL`, `seriesOrdinal: 0`, `provider`, `facilitatingModel` = the chat model, `generatingModel` = `grok-imagine-image-2.0` (§2.6), dims from the extractor); push an `IMAGE_GEN` block `{ content: item.prompt, durationMs: 0, attachments: [attachment] }`, the wait having been attributed to the THINKING block; push into `images`; send its frame with `imgGenFields: { images, activeImage }`; (5) if `heldText` is non-empty, open a TEXT block with it and send it as one frame. **Runs once per `done`**: with chaining (§2.6) a round can carry several image items, and each gets its own `seriesId`, its own THINKING + `IMAGE_GEN` pair, and its own entry in `images` |
+| `output_item.done`, `file_search_call` | `parseFileSearchResults` (unchanged). A `status: "failed"` item carries `results: []` — nothing to parse, nothing to throw (§2.2) |
+| `output_text.annotation.added` | **no-op**, as in the March file. Annotations can land mid-text (§2.2, run 2) and must never close the TEXT block |
 | `output_item.done`, `function_call` | finalize the pending call (unchanged) |
 | `response.completed` | close the active block; `usage`; collect `function_call`s for the next round. **No second scan for encrypted reasoning** — every item already had its `done` |
 | `response.incomplete` / `response.failed` | throw, as the Meta lane does |
@@ -708,19 +756,33 @@ persist layer (`TEXT` unless the entry was an image job).
 #### 8.4a Where the wait actually is, and how it is shown (Andrew, 2026-09-21)
 
 The five image events — `output_item.added`, `in_progress`, `generating`,
-`completed`, `output_item.done` — arrive as **one consecutive burst**, mid
-text. xAI spends the generation time *before* emitting `added`; from the
-stream's side the image is atomic. So the wait is **ours**: decode → specs →
-S3 upload → CDN url. The wire hands us the bytes instantly; we take seconds.
+`completed`, `output_item.done` — are consecutive in sequence number, mid
+text. The dumps carry no timestamps, so **how much wall-clock passes between
+`added` and `done` is not known**; the progress events exist because the
+generation happens in that window. After `done` the wait is certainly ours:
+decode → specs → S3 upload → CDN url. The design below is correct under
+either reading because the clock starts at `added`.
 
-**Show it as a THINKING block, and await the upload inline.** On the image
-`done`: close the text block, open a THINKING block whose `content` is
-Grok's rewritten `prompt` ("Composing: Cinematic weather-forecast image of…"
-is truthful and more informative than blank), send it with `isThinking:
-true`, and `await` the upload as a plain statement. The client's
-`ThinkingSection` ticks on its own from `isThinking`, exactly as it does for
-Meta. When the url is back, close the THINKING block with the measured upload
-duration and send the `IMAGE_GEN` block with its attachment.
+**One THINKING block from `added` to the CDN url, the upload awaited inline
+(Andrew, 2026-09-22).** On the image `added`: close the text block (the TEXT
+split), open a THINKING block, blank, and send it with `isThinking: true`.
+The client's `ThinkingSection` ticks on its own from there, exactly as it
+does for Meta, and "Grok is using a tool" is visible for the whole of
+generation. On `done`: the rewritten `prompt` is now known, so re-send the
+same ordinal with `content = item.prompt`, still ticking, then `await` the
+upload as a plain statement. When the url is back, close the THINKING block
+with **one** duration, `added` → url, and send the `IMAGE_GEN` block at the
+next ordinal with its attachment.
+
+**The server holds text while the image block is open.** Any
+`output_text.delta` that arrives between `added` and the url is appended to
+`heldText` and not sent (unobserved in both probe runs, where the model was
+blocked on its tool, but the order is never the same twice, §2). After the
+`IMAGE_GEN` frame the held text opens a TEXT block and goes out as one
+frame. Releasing it *over time* is the client's job (step 7): the server
+gates, the client meters. An encrypted reasoning `done` inside that window
+is likewise unobserved; if it ever shows up, hold its id the same way and
+emit the placeholder after the image.
 
 Why this beats the two earlier drafts of this section:
 
@@ -749,12 +811,11 @@ holds more than a few, gives the time-released effect with zero server
 timing, and improves every provider's fast bursts, not just this one. That
 is a step 7 item.
 
-Tool equipping: `resolveResponsesTools` in `stream-workup.ts` adds
-`{ type: "image_generation", action: "auto" }` when
-`imgCtx.grokImgGenFacilitating(model)` (predicate exists in `img-gen`, line
-143). Always on for 4.6 / 4.7 on the chat path (§3).
+Tool equipping: **done (`f6113ea`)**. `resolveResponsesTools` in
+`stream-workup.ts` adds `{ type: "image_generation", action: "auto" }` for
+4.6 / 4.7 on the chat path (§3).
 
-Estimated size: ~650 lines. Typecheck + lint clean before step 5.
+Typecheck + lint clean before step 5.
 
 ### Step 5 — the job entry: `responses-image-api.ts`
 
@@ -792,10 +853,11 @@ first.
   `attachment` through.
 - **New: an inline image-block component** (`apps/web/src/ui/chat/image-gen-block/`
   or similar). Props: the block's `attachments` (never empty). Same logic as
-  `ui/chat/image-gen/index.tsx` uses for a job today — sort by
-  `seriesIndex`, split on `isPartial`, render the FINAL or, until it exists,
-  the latest PARTIAL — but reading `inlineImageGenOutput` instead of
-  `imageGenOutput`. Renders `next/image` with `placeholder="blur"` and
+  `ui/chat/image-gen/index.tsx` uses for a job today — render the FINAL or,
+  until it exists, the latest PARTIAL — but reading `inlineImageGenOutput`
+  and sorting by `seriesOrdinal` (one counter across kinds, step 1), so it
+  does **not** share the job renderer's `seriesIndex` / `isPartial` helper.
+  Renders `next/image` with `placeholder="blur"` and
   `blurDataURL={shimmer([width, height])}` from `@slipstream/ui`'s
   `lib/shimmer.ts`, so nothing flashes between the CDN url arriving and the
   bytes painting. The wait *before* the url is the THINKING block (§8.4a),
@@ -823,7 +885,7 @@ first.
 
 ### Step 8 — cut over
 
-- `xai/index.ts` imports the v2 service.
+- ~~`xai/index.ts` imports the v2 service.~~ Done 2026-09-22: it extends `GrokResponsesApiLinearService`.
 - One live turn per path: plain chat on 4.7 with no image request (expect
   no image, no `IMAGE_GEN` block); chat on 4.7 asking for an image mid-text
   (expect the probe's shape: TEXT / IMAGE_GEN / TEXT); the image job on 4.7
@@ -837,15 +899,16 @@ first.
 | commit | contents |
 | --- | --- |
 | A | step 6 alone (one-line prod fix) |
-| B | step 1 (schema: block type, one-to-many, `InlineImageGenOutput`; migration + rebuilds) |
+| B | step 1 (schema: block type, one-to-many, `InlineImageGenOutput`; migration + rebuilds) — **landed 2026-09-22** (`20260922234809_added_inline_image_gen_output_table`) |
 | C | step 2 + 3 (types, persist link) |
-| D | step 4 (`responses-api-v2.ts`, not yet routed) |
+| L | `responses-api-linear.ts` + cut-over in `xai/index.ts` — **landed 2026-09-22** |
+| D | step 4 (the image branches in `responses-api-linear.ts`) |
 | E | step 5 (job entry) + router |
 | F | step 7 (web) |
 | G | delete `responses-api.ts` |
 
-D is the one that needs a careful diff against the old file. Everything
-before it is additive and everything after it is small.
+L absorbed the risk D used to carry; D is now additive branches in a
+live, tested file. Everything after it is small.
 
 ### Not in scope
 

@@ -4,11 +4,11 @@ import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
-import { GrokResponsesApiService } from "@/xai/responses-api.ts";
+import { GrokResponsesApiLinearService } from "@/xai/responses-api-linear.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 
-export class xAIService extends GrokResponsesApiService {
+export class xAIService extends GrokResponsesApiLinearService {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,

@@ -1,8 +1,8 @@
+import type { xAIResponses } from "@/xai/event-types.ts";
 import type {
   GrokProviderChatRequestEntity,
   GrokReasoningModel
 } from "@/xai/types.ts";
-import { xAIResponses } from "@/xai/event-types.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   CanonicalToolDefinition,
@@ -18,7 +18,7 @@ export interface GrokActiveMessageBlock {
   content: string;
   itemIds: string[];
   startedAt: number;
-  type: "ENCRYPTED_THINKING" | "TEXT" | "THINKING";
+  type: "ENCRYPTED_THINKING" | "TEXT" | "THINKING" | "IMAGE_GEN";
 }
 
 export interface GrokFinalizedMessageBlock {
@@ -243,6 +243,8 @@ export type ContentBlockUnion =
   | FunctionCallOutput
   | FunctionCallContext;
 
+export type ContentBlockRecord = UTR<ContentBlockUnion, "type">;
+
 export type InputReasoningProps<T extends GrokModelIdUnion = "grok-4.7"> =
   T extends Exclude<GrokModelIdUnion, GrokReasoningModel>
     ? undefined
@@ -432,7 +434,7 @@ export type XAIResponsesEvent =
   | xAIResponses.WebSearchCall.Searching
   | xAIResponses.WebSearchCall.Completed
   | xAIResponses.ImageGenerationCall.InProgress
-  | xAIResponses.ImageGenerationCall.Genereating
+  | xAIResponses.ImageGenerationCall.Generating
   | xAIResponses.ImageGenerationCall.Completed
   | xAIResponses.FileSearchCall.InProgress
   | xAIResponses.FileSearchCall.Searching

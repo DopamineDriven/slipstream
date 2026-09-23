@@ -66,6 +66,7 @@ export const ModelName = {
   Dictation: 'Dictation',
   ImageGenJob: 'ImageGenJob',
   ImageGenOutput: 'ImageGenOutput',
+  InlineImageGenOutput: 'InlineImageGenOutput',
   ConversationMemoryStore: 'ConversationMemoryStore',
   ConversationMemoryContext: 'ConversationMemoryContext',
   ConversationMemoryChunk: 'ConversationMemoryChunk',
@@ -183,7 +184,8 @@ export const AttachmentScalarFieldEnum = {
   s3LastModified: 's3LastModified',
   deletedAt: 'deletedAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  messageBlockId: 'messageBlockId'
 } as const
 
 export type AttachmentScalarFieldEnum = (typeof AttachmentScalarFieldEnum)[keyof typeof AttachmentScalarFieldEnum]
@@ -477,6 +479,27 @@ export const ImageGenOutputScalarFieldEnum = {
 } as const
 
 export type ImageGenOutputScalarFieldEnum = (typeof ImageGenOutputScalarFieldEnum)[keyof typeof ImageGenOutputScalarFieldEnum]
+
+
+export const InlineImageGenOutputScalarFieldEnum = {
+  id: 'id',
+  kind: 'kind',
+  provider: 'provider',
+  facilitatingModel: 'facilitatingModel',
+  generatingModel: 'generatingModel',
+  seriesId: 'seriesId',
+  seriesOrdinal: 'seriesOrdinal',
+  attachmentId: 'attachmentId',
+  width: 'width',
+  height: 'height',
+  mime: 'mime',
+  ext: 'ext',
+  revisedPrompt: 'revisedPrompt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InlineImageGenOutputScalarFieldEnum = (typeof InlineImageGenOutputScalarFieldEnum)[keyof typeof InlineImageGenOutputScalarFieldEnum]
 
 
 export const ConversationMemoryStoreScalarFieldEnum = {

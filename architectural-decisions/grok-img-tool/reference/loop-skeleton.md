@@ -1,8 +1,15 @@
 # Appendix — the linear loop skeleton for `responses-api-v2.ts`
 
-Companion to `preliminary.md` §8, step 4. Read with
-`xai-responses-api-from-2026-03-29.md` beside it: this is that file's shape
-with the block contract and the image branch added, and nothing else.
+Companion to `preliminary.md` §8, step 4.
+
+**2026-09-22:** the live handler is now Andrew's
+`apps/ws-server/src/xai/responses-api-linear.ts`, his own linearization of
+the current file (closures dissolved into two inline close sites; per-phase
+clocks, dedupe sets and the `completed` scan kept). It was not rebuilt from
+the March file. What this appendix still owns is **§4's image branches**;
+plan step 4 maps each onto its site in the linear file. §2–3 describe the
+surrounding shape with the skeleton's names (`blocks` is `trackedBlocks`,
+`grokThinkingAgg` is `grokThinkingDisplayAgg`).
 
 The skeleton is deliberately not compilable as-is. Frame bodies are elided
 with `…` where they are identical to the existing ones, and `// →` marks a
@@ -22,6 +29,7 @@ handler
 │    activeBlock, nextOrdinal, blocks[], grokAgg, thinkingAgg, thinkingDuration, usage
 │    images[]                       ← crosses rounds: what to persist
 │    imageLanded = false            ← crosses rounds: the job-path guarantee
+│    heldText = ""                  ← text that arrives while an image block is open; released after it
 │
 ├─ for round …                      ← the ONLY loop that re-enters the provider
 │    ├─ per-round locals: pendingFunctionCalls, functionCalls, roundCompleted
@@ -81,6 +89,9 @@ let responseOutput: string | undefined = undefined;
 // image lane — both cross rounds; neither is touched by the tool loop
 const images = Array.of<AIChatResponseImgGenSubFields>();
 let imageLanded = false;
+// §8.4a: text deltas the server holds while an image THINKING block is open
+let heldText = "";
+let heldTextItemId = "";
 ```
 
 `MAX_TOOL_ROUNDS`, `roundInput`, `forcedLoopStopReason`,
@@ -180,7 +191,21 @@ for await (const chunk of parser) {
         nextOrdinal += 1;
       }
       activeBlock = undefined;
+
+      if (item.type === "image_generation_call") {
+        // §8.4a: the image THINKING block opens HERE, blank — the clock starts
+        // at added, not done. item.type is what the typed union narrows on;
+        // item.id starting with "ig_" is a second check that agrees. The
+        // content (Grok's rewritten prompt) is only known on done.
+        activeBlock = { content: "", itemIds: [item.id], startedAt: performance.now(), type: "THINKING" };
+        const imageOpened = { type: "ai_chat_chunk", …, isThinking: true, messageBlocks: { type: "THINKING", content: "", ordinal: nextOrdinal, conversationId, durationMs: 0 }, done: false } as const satisfies EventTypeMap["ai_chat_chunk"];
+        ws.send(JSON.stringify(imageOpened));
+        void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", imageOpened);
+      }
     }
+
+  } else if (chunk.event === "response.image_generation_call.in_progress" || chunk.event === "response.image_generation_call.generating" || chunk.event === "response.image_generation_call.completed") {
+    // NO-OP. The client ticks on its own from the open THINKING block.
 
   // ── function call arguments ──────────────────────────────────────────
   } else if (supportsFunctionTools && chunk.event === "response.function_call_arguments.delta") {
@@ -227,6 +252,8 @@ for await (const chunk of parser) {
       }
 
     } else if (item.type === "file_search_call") {
+      // a failed item (status: "failed", probe run 2 idx 3) carries
+      // results: [] — the parse is a no-op over it; never throw here
       const { results, ...rest } = item;
       if (results) this.parseFileSearchResults({ ...rest, results });
 
@@ -236,25 +263,32 @@ for await (const chunk of parser) {
     } else if (item.type === "image_generation_call" && item.result) {
       // §8.4a. Everything below is inline and awaited plainly. The socket
       // buffers while we upload; the user sees a ticking THINKING block.
+      // xAI documents chaining (generate, then edit, in one request), so this
+      // branch can run more than once per round. Nothing below is shared
+      // between runs except `images` and `imageLanded`: each run mints its
+      // own seriesId and its own THINKING + IMAGE_GEN pair.
 
-      // (1) open the upload THINKING block; its content is Grok's rewritten prompt
-      activeBlock = { content: item.prompt, itemIds: [item.id], startedAt: performance.now(), type: "THINKING" };
-      const uploadOpened = { type: "ai_chat_chunk", …, isThinking: true, thinkingText: item.prompt, messageBlocks: { type: "THINKING", content: item.prompt, ordinal: nextOrdinal, conversationId, durationMs: 0 }, done: false } as const satisfies EventTypeMap["ai_chat_chunk"];
-      ws.send(JSON.stringify(uploadOpened));
-      void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", uploadOpened);
+      // (1) the THINKING block has been open since this item's added (blank,
+      //     ticking). The prompt is known now: fill it in and re-send the same
+      //     ordinal, still ticking — the upload is about to start.
+      const imageAddedAt = activeBlock?.startedAt ?? performance.now();
+      activeBlock = { content: item.prompt, itemIds: [item.id], startedAt: imageAddedAt, type: "THINKING" };
+      const imagePrompted = { type: "ai_chat_chunk", …, isThinking: true, thinkingText: item.prompt, messageBlocks: { type: "THINKING", content: item.prompt, ordinal: nextOrdinal, conversationId, durationMs: Math.round(performance.now() - imageAddedAt) }, done: false } as const satisfies EventTypeMap["ai_chat_chunk"];
+      ws.send(JSON.stringify(imagePrompted));
+      void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", imagePrompted);
 
-      // (2) the wait — ours, not xAI's
-      const uploadStartedAt = performance.now();
+      // (2) the upload — awaited plainly; the socket buffers meanwhile
       const buffer = Buffer.from(item.result, "base64");
       const specs = this.prisma.extractor.getImageSpecsWorkup(buffer, 4096 * 48);
       const seriesId = await this.generateId("seriesId");
       const rt = await this.s3.uploadGenerated(buffer, this.prisma.isProd, { contentType: specs.contentType ?? `image/${specs.format}`, filename: `${seriesId}-0.${specs.format}`, origin: "GENERATED", userId, size: specs.byteSize ?? buffer.byteLength, conversationId });
-      const uploadDuration = Math.round(performance.now() - uploadStartedAt);
 
-      // (3) close the THINKING block with the measured duration
-      blocks.push({ content: item.prompt, durationMs: uploadDuration, itemIds: [item.id], ordinal: nextOrdinal, previewContent: item.prompt, type: "THINKING" });
-      grokThinkingDuration += uploadDuration;
-      const uploadClosedOrdinal = nextOrdinal;
+      // (3) close the THINKING block: ONE duration, added → cdn url
+      //     (generation + upload; whichever dominated, the clock is honest)
+      const imageDuration = Math.round(performance.now() - imageAddedAt);
+      blocks.push({ content: item.prompt, durationMs: imageDuration, itemIds: [item.id], ordinal: nextOrdinal, previewContent: item.prompt, type: "THINKING" });
+      grokThinkingDuration += imageDuration;
+      const imageThinkingOrdinal = nextOrdinal;
       nextOrdinal += 1;
       activeBlock = undefined;
 
@@ -262,7 +296,7 @@ for await (const chunk of parser) {
       // Grok emits one FINAL, so the array has one entry; the shape is an
       // array because OpenAI facilitators add 0-3 PARTIALs to the same block.
       // Lineage: job path → jobId + imageGenOutput; chat path →
-      // inlineImageGenOutput { kind: FINAL, isPartial: false, seriesIndex: 0, seriesId, provider, model, revisedPrompt: item.prompt }
+      // inlineImageGenOutput { kind: FINAL, seriesOrdinal: 0, seriesId, provider, facilitatingModel: m, generatingModel: "grok-imagine-image-2.0", width, height, mime, ext, revisedPrompt: item.prompt }
       const attachment = { /* → the AIChatResponseImgGenSubFields literal */ } as const satisfies AIChatResponseImgGenSubFields;
       images.push(attachment);
       blocks.push({ content: item.prompt, durationMs: 0, itemIds: [item.id], ordinal: nextOrdinal, previewContent: item.prompt, type: "IMAGE_GEN" });
@@ -271,24 +305,45 @@ for await (const chunk of parser) {
       imageLanded = true;
 
       // (5) two frames: the closed THINKING block, then the IMAGE_GEN block
-      const uploadClosed = { type: "ai_chat_chunk", …, isThinking: false, messageBlocks: { type: "THINKING", content: item.prompt, ordinal: uploadClosedOrdinal, conversationId, durationMs: uploadDuration }, thinkingDuration: grokThinkingDuration, done: false } as const satisfies EventTypeMap["ai_chat_chunk"];
-      ws.send(JSON.stringify(uploadClosed));
-      void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", uploadClosed);
+      const imageClosed = { type: "ai_chat_chunk", …, isThinking: false, messageBlocks: { type: "THINKING", content: item.prompt, ordinal: imageThinkingOrdinal, conversationId, durationMs: imageDuration }, thinkingDuration: grokThinkingDuration, done: false } as const satisfies EventTypeMap["ai_chat_chunk"];
+      ws.send(JSON.stringify(imageClosed));
+      void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", imageClosed);
 
       const imageFrame = { type: "ai_chat_chunk", …, isThinking: false, imgGenEnabled: true, imgGenFields: { images, activeImage: attachment, actualCount: images.length }, messageBlocks: { type: "IMAGE_GEN", content: item.prompt, ordinal: imageBlockOrdinal, conversationId, durationMs: 0, attachments: [attachment] }, done: false } as const satisfies EventTypeMap["ai_chat_chunk"];
       ws.send(JSON.stringify(imageFrame));
       void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", imageFrame);
-      // the text that resumes after this opens a fresh TEXT block in the delta branch
+
+      // (6) release the text the server held while the image block was open:
+      //     one TEXT block, one frame — sent by the frame site at the bottom
+      //     of the loop, after the image frame. The client meters it (step 7).
+      if (heldText.length > 0) {
+        activeBlock = { content: heldText, itemIds: [heldTextItemId], startedAt: performance.now(), type: "TEXT" };
+        text = heldText;
+        heldText = "";
+      }
+      // text that arrives after this appends to that TEXT block, or opens one, in the delta branch
     }
 
   // ── text ─────────────────────────────────────────────────────────────
   } else if (chunk.event === "response.output_text.delta") {
-    if (activeBlock?.type !== "TEXT") {
-      if (activeBlock && activeBlock.content.length > 0) { /* → close it */ }
-      activeBlock = { content: "", itemIds: [chunk.data.item_id], startedAt: performance.now(), type: "TEXT" };
+    if (activeBlock?.type === "THINKING" && activeBlock.itemIds[0]?.startsWith("ig_")) {
+      // §8.4a: an image block is open. The server HOLDS text until the image
+      // has landed; nothing is sent. Unobserved in both probe runs (the model
+      // was blocked on its tool), but the order is never the same twice.
+      heldText += chunk.data.delta;
+      heldTextItemId = chunk.data.item_id;
+    } else {
+      if (activeBlock?.type !== "TEXT") {
+        if (activeBlock && activeBlock.content.length > 0) { /* → close it */ }
+        activeBlock = { content: "", itemIds: [chunk.data.item_id], startedAt: performance.now(), type: "TEXT" };
+      }
+      activeBlock.content += chunk.data.delta;
+      text = chunk.data.delta;
     }
-    activeBlock.content += chunk.data.delta;
-    text = chunk.data.delta;
+
+  } else if (chunk.event === "response.output_text.annotation.added") {
+    // NO-OP, as in the March file. Annotations land mid-text in probe run 2
+    // (seq 429, between two delta runs) and must never close the TEXT block.
 
   // ── terminal ─────────────────────────────────────────────────────────
   } else if (chunk.event === "response.completed" && chunk.data.response.status === "completed") {
@@ -342,8 +397,8 @@ can be checked against §5.3 of the plan:
 | 63, 70, 74 | done, reasoning, encrypted | placeholder | **blocks 1, 2, 3: ENCRYPTED_THINKING** |
 | 75 | added, message (7) | close (nothing open) | |
 | 77–116 | text.delta ×40 | open TEXT, append | |
-| 117 | added, image_generation_call (8) | close | **block 4: TEXT** "…Image incoming with the reading." |
-| 121 | done, image_generation_call | §8.4a | **block 5: THINKING** (upload), **block 6: IMAGE_GEN** |
+| 117 | added, image_generation_call (8) | close; open the image THINKING, blank, ticking | **block 4: TEXT** "…Image incoming with the reading." |
+| 121 | done, image_generation_call | §8.4a: prompt in, await upload, close, push | **block 5: THINKING** (added → url), **block 6: IMAGE_GEN** |
 | 122 | added, reasoning `rs_` (9) | no-op | |
 | 123 | done, reasoning, encrypted | placeholder | **block 7: ENCRYPTED_THINKING** |
 | 124–1125 | text.delta ×1002 | open TEXT, append | |
@@ -357,8 +412,17 @@ placeholder branch. That is the single dedupe set the rewrite keeps (the
 current file has three); it exists because the wire genuinely carries both
 forms on one item.
 
-Result: 9 blocks, ordinals 0–8, the image at 6 with the upload THINKING at
-5 directly before it. Persisted via `handleAiChatResponse` with
+Result: 9 blocks, ordinals 0–8, the image at 6 with its THINKING block at
+5 directly before it.
+
+The same prompt's second run (`grok-4.7-2.txt`) opens with four parallel
+file searches (one fails), then the `tco_`, then the visible summary, and
+walks through the same chain to **7 blocks**: 0 ENCRYPTED_THINKING (`tco_`),
+1 THINKING (summary), 2 TEXT, 3 THINKING (image), 4 IMAGE_GEN, 5
+ENCRYPTED_THINKING (`rs_`), 6 TEXT. Its one mid-text annotation (seq 429)
+hits the no-op branch and the open TEXT block at 6 keeps accumulating. Its
+summarised `rs_` `done` (seq 79) is caught by `summarisedItemIds` exactly
+as run 1's seq 53 is. Nothing in the chain is keyed on item order. Persisted via `handleAiChatResponse` with
 `messageBlocks: blocks` (the `IMAGE_GEN` block carrying its `attachments`),
 `imgGenEnabled: images.length > 0`, `imgGenFields: { images, … }` when
 non-empty; each one-off attachment nests an `inlineImageGenOutput` create.

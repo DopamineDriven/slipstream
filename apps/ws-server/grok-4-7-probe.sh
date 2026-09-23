@@ -2,7 +2,7 @@ curl https://api.x.ai/v1/responses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   --no-buffer \
-  -d @- <<'JSON' > grok-4.7.txt
+  -d @- <<'JSON' > src/test/xai/tooling/grok-4.7-2.txt
 {
   "model": "grok-4.7",
   "stream": true,

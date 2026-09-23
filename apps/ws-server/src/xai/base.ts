@@ -29,6 +29,10 @@ export class GrokBaseService {
     );
   }
 
+  protected isLocalToolName(s: string) {
+    return s === "repo_search" || s === "read_file" || s === "list_directory";
+  }
+
   protected isGrokBuild(m: string) {
     return this.prisma.isGrokBuild(m);
   }

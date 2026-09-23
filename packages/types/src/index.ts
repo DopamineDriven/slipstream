@@ -597,6 +597,7 @@ export type {
   ImageGenJobSingleton,
   ImageGenOutputSingleton,
   ImageSingleton,
+  InlineImageGenOutputSingleton,
   MessageBlockSingleton,
   MessageSingleton,
   ProfileSingleton,

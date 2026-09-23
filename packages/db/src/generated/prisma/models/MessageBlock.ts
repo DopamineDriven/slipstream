@@ -253,6 +253,7 @@ export type MessageBlockWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"MessageBlock"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MessageBlock"> | Date | string
   message?: Prisma.XOR<Prisma.MessageScalarRelationFilter, Prisma.MessageWhereInput>
+  attachments?: Prisma.AttachmentListRelationFilter
 }
 
 export type MessageBlockOrderByWithRelationInput = {
@@ -266,6 +267,7 @@ export type MessageBlockOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   message?: Prisma.MessageOrderByWithRelationInput
+  attachments?: Prisma.AttachmentOrderByRelationAggregateInput
 }
 
 export type MessageBlockWhereUniqueInput = Prisma.AtLeast<{
@@ -283,6 +285,7 @@ export type MessageBlockWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"MessageBlock"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MessageBlock"> | Date | string
   message?: Prisma.XOR<Prisma.MessageScalarRelationFilter, Prisma.MessageWhereInput>
+  attachments?: Prisma.AttachmentListRelationFilter
 }, "id" | "messageId_ordinal">
 
 export type MessageBlockOrderByWithAggregationInput = {
@@ -327,6 +330,7 @@ export type MessageBlockCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   message: Prisma.MessageCreateNestedOneWithoutMessageBlocksInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageBlockInput
 }
 
 export type MessageBlockUncheckedCreateInput = {
@@ -339,6 +343,7 @@ export type MessageBlockUncheckedCreateInput = {
   durationMs?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageBlockInput
 }
 
 export type MessageBlockUpdateInput = {
@@ -351,6 +356,7 @@ export type MessageBlockUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   message?: Prisma.MessageUpdateOneRequiredWithoutMessageBlocksNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutMessageBlockNestedInput
 }
 
 export type MessageBlockUncheckedUpdateInput = {
@@ -363,6 +369,7 @@ export type MessageBlockUncheckedUpdateInput = {
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageBlockNestedInput
 }
 
 export type MessageBlockCreateManyInput = {
@@ -398,6 +405,11 @@ export type MessageBlockUncheckedUpdateManyInput = {
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MessageBlockNullableScalarRelationFilter = {
+  is?: Prisma.MessageBlockWhereInput | null
+  isNot?: Prisma.MessageBlockWhereInput | null
 }
 
 export type MessageBlockListRelationFilter = {
@@ -461,6 +473,22 @@ export type MessageBlockSumOrderByAggregateInput = {
   durationMs?: Prisma.SortOrder
 }
 
+export type MessageBlockCreateNestedOneWithoutAttachmentsInput = {
+  create?: Prisma.XOR<Prisma.MessageBlockCreateWithoutAttachmentsInput, Prisma.MessageBlockUncheckedCreateWithoutAttachmentsInput>
+  connectOrCreate?: Prisma.MessageBlockCreateOrConnectWithoutAttachmentsInput
+  connect?: Prisma.MessageBlockWhereUniqueInput
+}
+
+export type MessageBlockUpdateOneWithoutAttachmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageBlockCreateWithoutAttachmentsInput, Prisma.MessageBlockUncheckedCreateWithoutAttachmentsInput>
+  connectOrCreate?: Prisma.MessageBlockCreateOrConnectWithoutAttachmentsInput
+  upsert?: Prisma.MessageBlockUpsertWithoutAttachmentsInput
+  disconnect?: Prisma.MessageBlockWhereInput | boolean
+  delete?: Prisma.MessageBlockWhereInput | boolean
+  connect?: Prisma.MessageBlockWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MessageBlockUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.MessageBlockUpdateWithoutAttachmentsInput>, Prisma.MessageBlockUncheckedUpdateWithoutAttachmentsInput>
+}
+
 export type MessageBlockCreateNestedManyWithoutMessageInput = {
   create?: Prisma.XOR<Prisma.MessageBlockCreateWithoutMessageInput, Prisma.MessageBlockUncheckedCreateWithoutMessageInput> | Prisma.MessageBlockCreateWithoutMessageInput[] | Prisma.MessageBlockUncheckedCreateWithoutMessageInput[]
   connectOrCreate?: Prisma.MessageBlockCreateOrConnectWithoutMessageInput | Prisma.MessageBlockCreateOrConnectWithoutMessageInput[]
@@ -507,6 +535,70 @@ export type EnumMessageBlockTypeFieldUpdateOperationsInput = {
   set?: $Enums.MessageBlockType
 }
 
+export type MessageBlockCreateWithoutAttachmentsInput = {
+  id?: string
+  conversationId: string
+  ordinal: number
+  content: string
+  type: $Enums.MessageBlockType
+  durationMs?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  message: Prisma.MessageCreateNestedOneWithoutMessageBlocksInput
+}
+
+export type MessageBlockUncheckedCreateWithoutAttachmentsInput = {
+  id?: string
+  conversationId: string
+  messageId: string
+  ordinal: number
+  content: string
+  type: $Enums.MessageBlockType
+  durationMs?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MessageBlockCreateOrConnectWithoutAttachmentsInput = {
+  where: Prisma.MessageBlockWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessageBlockCreateWithoutAttachmentsInput, Prisma.MessageBlockUncheckedCreateWithoutAttachmentsInput>
+}
+
+export type MessageBlockUpsertWithoutAttachmentsInput = {
+  update: Prisma.XOR<Prisma.MessageBlockUpdateWithoutAttachmentsInput, Prisma.MessageBlockUncheckedUpdateWithoutAttachmentsInput>
+  create: Prisma.XOR<Prisma.MessageBlockCreateWithoutAttachmentsInput, Prisma.MessageBlockUncheckedCreateWithoutAttachmentsInput>
+  where?: Prisma.MessageBlockWhereInput
+}
+
+export type MessageBlockUpdateToOneWithWhereWithoutAttachmentsInput = {
+  where?: Prisma.MessageBlockWhereInput
+  data: Prisma.XOR<Prisma.MessageBlockUpdateWithoutAttachmentsInput, Prisma.MessageBlockUncheckedUpdateWithoutAttachmentsInput>
+}
+
+export type MessageBlockUpdateWithoutAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMessageBlockTypeFieldUpdateOperationsInput | $Enums.MessageBlockType
+  durationMs?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  message?: Prisma.MessageUpdateOneRequiredWithoutMessageBlocksNestedInput
+}
+
+export type MessageBlockUncheckedUpdateWithoutAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string
+  ordinal?: Prisma.IntFieldUpdateOperationsInput | number
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMessageBlockTypeFieldUpdateOperationsInput | $Enums.MessageBlockType
+  durationMs?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type MessageBlockCreateWithoutMessageInput = {
   id?: string
   conversationId: string
@@ -516,6 +608,7 @@ export type MessageBlockCreateWithoutMessageInput = {
   durationMs?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageBlockInput
 }
 
 export type MessageBlockUncheckedCreateWithoutMessageInput = {
@@ -527,6 +620,7 @@ export type MessageBlockUncheckedCreateWithoutMessageInput = {
   durationMs?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageBlockInput
 }
 
 export type MessageBlockCreateOrConnectWithoutMessageInput = {
@@ -590,6 +684,7 @@ export type MessageBlockUpdateWithoutMessageInput = {
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachments?: Prisma.AttachmentUpdateManyWithoutMessageBlockNestedInput
 }
 
 export type MessageBlockUncheckedUpdateWithoutMessageInput = {
@@ -601,6 +696,7 @@ export type MessageBlockUncheckedUpdateWithoutMessageInput = {
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageBlockNestedInput
 }
 
 export type MessageBlockUncheckedUpdateManyWithoutMessageInput = {
@@ -615,6 +711,35 @@ export type MessageBlockUncheckedUpdateManyWithoutMessageInput = {
 }
 
 
+/**
+ * Count Type MessageBlockCountOutputType
+ */
+
+export type MessageBlockCountOutputType = {
+  attachments: number
+}
+
+export type MessageBlockCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  attachments?: boolean | MessageBlockCountOutputTypeCountAttachmentsArgs
+}
+
+/**
+ * MessageBlockCountOutputType without action
+ */
+export type MessageBlockCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessageBlockCountOutputType
+   */
+  select?: Prisma.MessageBlockCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * MessageBlockCountOutputType without action
+ */
+export type MessageBlockCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AttachmentWhereInput
+}
+
 
 export type MessageBlockSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -627,6 +752,8 @@ export type MessageBlockSelect<ExtArgs extends runtime.Types.Extensions.Internal
   createdAt?: boolean
   updatedAt?: boolean
   message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  attachments?: boolean | Prisma.MessageBlock$attachmentsArgs<ExtArgs>
+  _count?: boolean | Prisma.MessageBlockCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["messageBlock"]>
 
 export type MessageBlockSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -670,6 +797,8 @@ export type MessageBlockSelectScalar = {
 export type MessageBlockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "messageId" | "ordinal" | "content" | "type" | "durationMs" | "createdAt" | "updatedAt", ExtArgs["result"]["messageBlock"]>
 export type MessageBlockInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  attachments?: boolean | Prisma.MessageBlock$attachmentsArgs<ExtArgs>
+  _count?: boolean | Prisma.MessageBlockCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type MessageBlockIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
@@ -682,6 +811,7 @@ export type $MessageBlockPayload<ExtArgs extends runtime.Types.Extensions.Intern
   name: "MessageBlock"
   objects: {
     message: Prisma.$MessagePayload<ExtArgs>
+    attachments: Prisma.$AttachmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1088,6 +1218,7 @@ readonly fields: MessageBlockFieldRefs;
 export interface Prisma__MessageBlockClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   message<T extends Prisma.MessageDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessageDefaultArgs<ExtArgs>>): Prisma.Prisma__MessageClient<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  attachments<T extends Prisma.MessageBlock$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessageBlock$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1533,6 +1664,30 @@ export type MessageBlockDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many MessageBlocks to delete.
    */
   limit?: number
+}
+
+/**
+ * MessageBlock.attachments
+ */
+export type MessageBlock$attachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Attachment
+   */
+  select?: Prisma.AttachmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Attachment
+   */
+  omit?: Prisma.AttachmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AttachmentInclude<ExtArgs> | null
+  where?: Prisma.AttachmentWhereInput
+  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[]
+  cursor?: Prisma.AttachmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
 }
 
 /**

@@ -101,7 +101,7 @@ export namespace xAIResponses {
        */
       item_id: string;
     }
-    export interface Genereating {
+    export interface Generating {
       type: "response.image_generation_call.generating";
       sequence_number: number;
       output_index: number;
@@ -384,8 +384,13 @@ export namespace xAIResponses {
       export interface FileSearchCall {
         id: string;
         type: "file_search_call";
-        status: "completed";
+        status: "completed" | "failed";
         queries: string[];
+        /**
+         * defined if status = "completed"
+         *
+         * empty [] if status = "failed"
+         */
         results?: FileSearchCall.Results[];
       }
       export namespace WebSearchCall {

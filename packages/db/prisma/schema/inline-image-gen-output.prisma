@@ -1,0 +1,25 @@
+model InlineImageGenOutput {
+  id   String             @id @default(cuid(2))
+  kind ImageGenOutputKind @default(FINAL)
+
+  provider          Provider
+  facilitatingModel String
+  generatingModel   String
+  /// cuid2 (24 chars [a-z0-9]) shared by series ordinals
+  seriesId          String
+  /// 0-based, up to 4 total per series (0 through 3, eg, PARTIAL, PARTIAL, PARTIAL, FINAL)
+  seriesOrdinal     Int
+  attachmentId      String     @unique
+  width             Int
+  height            Int
+  mime              String
+  ext               String
+  revisedPrompt     String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  attachment        Attachment @relation("InlineImageGenOutputToAttachment", fields: [attachmentId], references: [id], onDelete: Cascade)
+
+  @@unique([seriesId, seriesOrdinal])
+  @@index([provider, facilitatingModel, generatingModel])
+  @@index([createdAt])
+}

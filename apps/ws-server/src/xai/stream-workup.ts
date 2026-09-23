@@ -10,6 +10,7 @@ import type {
   FileSearchTool,
   HandleToolUsageParams,
   ImageContentBlock,
+  ImageGenerationTool,
   LocalToolFunctionTool,
   ResponsesApiInputWorkupParams,
   ResponsesComprehensive,
@@ -289,12 +290,14 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         max_num_results: 5
       } satisfies FileSearchTool);
     }
-    if (model === "grok-4.6" || model === "grok-4.7") {
+
+    if (this.prisma.grokFacilitatingImgGenModel(model)) {
       tools.push({
         type: "image_generation",
         action: "auto"
-      });
+      } satisfies ImageGenerationTool);
     }
+
     if (enableWebSearch) {
       tools.push({
         type: "web_search",
@@ -312,7 +315,11 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
       } satisfies XSearchTool);
     }
 
-    if (enableCodeInterpreter || model === "grok-build-0.1") {
+    if (
+      enableCodeInterpreter ||
+      model === "grok-build-0.1" ||
+      this.prisma.grokFacilitatingImgGenModel(model)
+    ) {
       tools.push({ type: "code_interpreter" } satisfies CodeInterpreterTool);
     }
     return tools;
@@ -362,21 +369,21 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     localToolNames = []
   }: HandleToolUsageParams) {
     const tools = Array.of<ToolUnion>();
-    if (this.canUseServerTools(model)) {
-      tools.push(
-        ...this.resolveResponsesTools(model, {
-          collectionId,
-          enableFileSearch,
-          fileSearchMaxResults,
-          enableCodeInterpreter,
-          enableWebSearch,
-          enableXSearch,
-          web_enable_image_understanding,
-          x_enable_image_understanding,
-          x_enable_video_understanding
-        })
-      );
-    }
+    if (!this.canUseServerTools(model)) return;
+
+    tools.push(
+      ...this.resolveResponsesTools(model, {
+        collectionId,
+        enableFileSearch,
+        fileSearchMaxResults,
+        enableCodeInterpreter,
+        enableWebSearch,
+        enableXSearch,
+        web_enable_image_understanding,
+        x_enable_image_understanding,
+        x_enable_video_understanding
+      })
+    );
 
     if (enableUserStoreSearch && this.canUseFunctionTools(model)) {
       tools.push(this.slatherUserStore());

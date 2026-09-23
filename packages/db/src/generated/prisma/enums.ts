@@ -351,7 +351,8 @@ export type SenderType = (typeof SenderType)[keyof typeof SenderType]
 export const MessageBlockType = {
   ENCRYPTED_THINKING: 'ENCRYPTED_THINKING',
   THINKING: 'THINKING',
-  TEXT: 'TEXT'
+  TEXT: 'TEXT',
+  IMAGE_GEN: 'IMAGE_GEN'
 } as const
 
 export type MessageBlockType = (typeof MessageBlockType)[keyof typeof MessageBlockType]
