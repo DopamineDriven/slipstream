@@ -184,6 +184,7 @@ export class ModelServiceChat extends ModelServiceAudio {
 
   public get chatClaude5Anthropic() {
     return [
+      "claude-opus-5-5",
       "claude-fable-5-1",
       "claude-opus-5",
       "claude-sonnet-5",

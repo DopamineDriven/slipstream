@@ -18,6 +18,9 @@ export class ModelServiceWorkup extends ProviderValidation {
   public encodeUTF8(text: string) {
     return ByteCodec.encode(text);
   }
+  public isLocalToolName(s: string) {
+    return s === "repo_search" || s === "read_file" || s === "list_directory";
+  }
 
   public decodeUTF8(bytes: Uint8Array | NodeJS.NonSharedUint8Array) {
     return ByteCodec.decode(bytes);

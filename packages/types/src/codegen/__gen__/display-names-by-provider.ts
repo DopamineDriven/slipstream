@@ -85,6 +85,7 @@ export const displayNameModelsByProvider = {
     "Grok Imagine Video"
   ],
   anthropic: [
+    "Claude Opus 5.5",
     "Claude Fable 5.1",
     "Claude Opus 5",
     "Claude Sonnet 5",

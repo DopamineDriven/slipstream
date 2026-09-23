@@ -223,6 +223,7 @@ export function buildOptimisticAttachment(
     image: null,
     document: null,
     imageGenOutput: null,
+    messageBlockId: null,
     audioGenOutput: null
   } satisfies AttachmentSingleton<true>;
 }

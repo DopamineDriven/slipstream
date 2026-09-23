@@ -88,7 +88,7 @@ export function useSendChat(store: ChatStore, userId?: string) {
   const { getAll } = useCookiesCtx();
   const { sendEvent } = useChatWebSocketContext();
 
-  const { city, country, latlng, postalCode, region, tz, locale, ip, ua } =
+  const { city, country, latlng, postalCode, region, tz, locale, ip, ua, via } =
     getAll();
   const metadata = useMemo(() => {
     const useragent = ua ? decodeURIComponent(ua) : undefined;
@@ -109,9 +109,10 @@ export function useSendChat(store: ChatStore, userId?: string) {
       ua: useragent,
       lat,
       lng,
-      locale
+      locale,
+      via: via ?? "web"
     } satisfies UserMetadata;
-  }, [city, ip, ua, country, latlng, postalCode, region, tz, locale]);
+  }, [city, ip, ua, country, latlng, postalCode, region, tz, locale,via]);
 
   // Dedupe identical sends within 500ms (a stray double-submit), cleared after 2s.
   const recentSendsRef = useRef<Map<string, number>>(new Map());

@@ -86,6 +86,7 @@ export const displayNameToModelId = {
     "Grok Imagine Video": "grok-imagine-video"
   },
   anthropic: {
+    "Claude Opus 5.5": "claude-opus-5-5",
     "Claude Fable 5.1": "claude-fable-5-1",
     "Claude Opus 5": "claude-opus-5",
     "Claude Sonnet 5": "claude-sonnet-5",

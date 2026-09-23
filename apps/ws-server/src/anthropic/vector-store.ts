@@ -223,7 +223,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     return await this.memoryService.getMemoryChunkFromToolInput(userId, parsed);
   }
 
-  protected toolCatalogTool(): Anthropic.Beta.BetaToolUnion {
+  protected toolCatalogTool() {
     return {
       name: "tool_catalog",
       allowed_callers: ["direct", "code_execution_20250825"],
@@ -536,14 +536,12 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     };
   }
 
-  private isAdaptiveCapable(m = "claude-opus-4-6") {
-    return this.supportsAdaptive(m);
-  }
-
   private handleEffort(model: string | null) {
     if (!model) return;
     if (!this.supportsEffort(model)) return;
     if (
+      model === "claude-fable-5-1" ||
+      model === "claude-opus-5-5" ||
       model === "claude-opus-5" ||
       model === "claude-opus-4-8" ||
       model === "claude-opus-4-6" ||
@@ -581,7 +579,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
     const keyFingerprint = keyId ?? "server";
 
-    // Use Files API for PDFs
     const { messages, system } = await this.formatAnthropicHistoryWithFiles(
       msgs,
       model,
@@ -599,8 +596,6 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     const tools = this.tooling(model, user_location, true);
 
     const betas = this.handleBetaHeaders(model, true);
-    this.logger.info(betas, "beta headers");
-    this.logger.info(tools, "tools returned");
     return {
       params: {
         max_tokens: maxTokens,

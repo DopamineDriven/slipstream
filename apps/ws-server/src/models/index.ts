@@ -280,14 +280,15 @@ export class ModelService extends ModelToolDefsService {
   }
   public isAnthropicAdaptiveModel(mod: string) {
     return (
+      mod === "claude-opus-5-5" ||
       mod === "claude-fable-5-1" ||
+      mod === "claude-sonnet-5"||
       mod === "claude-opus-5" ||
+      mod === "claude-fable-5" ||
       mod === "claude-opus-4-8" ||
       mod === "claude-opus-4-7" ||
       mod === "claude-opus-4-6" ||
-      mod === "claude-sonnet-4-6" ||
-      mod === "claude-fable-5" ||
-      mod === "claude-sonnet-5"
+      mod === "claude-sonnet-4-6"
     );
   }
 

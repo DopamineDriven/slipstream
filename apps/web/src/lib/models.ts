@@ -562,7 +562,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "gpt-5.6-sol" as const as NonNullable<K>;
+      } else return "gpt-6-sol" as const as NonNullable<K>;
     }
   }
 };

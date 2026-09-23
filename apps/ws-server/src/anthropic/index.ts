@@ -16,8 +16,7 @@ import type { Anthropic } from "@anthropic-ai/sdk";
 import { AnthropicVectorStoreWorkup } from "@/anthropic/vector-store.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import type { AnthropicModelIdUnion, EventTypeMap } from "@slipstream/types";
-import { isLocalToolName } from "@slipstream/types";
+import type { EventTypeMap } from "@slipstream/types";
 
 interface AnthropicActiveMessageBlock {
   blockIndex: number;
@@ -184,7 +183,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
     apiKey,
     keyId,
     max_tokens,
-    model: m,
+    model: m = "claude-opus-5-5",
     systemPrompt,
     temperature,
     title,
@@ -195,8 +194,13 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
   }: ProviderAnthropicChatRequestEntity) {
     // it's conditional but it's actually always defined
     // incomning user msg request
+    if (!this.prisma.isAnthropicModel(m)) {
+      throw new Error(
+        `non-Anthropic model passed to handleAnthropicAiChatRequest: ${m}`
+      );
+    }
     const reqMsgId = userMsgId ?? "";
-    const model = m as AnthropicModelIdUnion;
+    const model = m;
     const provider = "anthropic" as const;
     let anthropicThinkingDuration = 0,
       anthropicThinkingAgg = "",
@@ -302,31 +306,32 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       topP,
       user_location
     });
-
-    // Local read-only tool bridge (slice 4): capability advertised by the
-    // CLI on this exact turn — absent means zero local definitions attached.
-    // turnId mints once per ATTEMPT; the controller is the future
-    // server-side cancellation hook (calls are awaited sequentially, so
-    // nothing can be pending when this handler throws — the per-call
-    // wall-clock budget is the operative bound).
+    
     const localToolTurn =
-      localTools?.protocolVersion === 1
+      via === "cli" && localTools?.protocolVersion === 1
         ? {
             turnId: await this.localToolBroker.generateTurnId(),
             advertised: new Set<string>(localTools.names),
             controller: new AbortController()
           }
         : undefined;
+
+    const localToolNames = Array.of<
+      "repo_search" | "read_file" | "list_directory"
+    >();
+
     if (localToolTurn) {
-      params = {
-        ...params,
-        tools: [
-          ...(params.tools ?? []),
-          ...this.localToolDefinitions(
-            [...localToolTurn.advertised].filter(isLocalToolName)
-          )
-        ]
-      } satisfies typeof params;
+      for (const name of localToolTurn.advertised) {
+        if (this.prisma.isLocalToolName(name)) {
+          localToolNames.push(name);
+        }
+      }
+
+      params.tools = [
+        ...(params.tools ?? []),
+        ...this.localToolDefinitions(localToolNames)
+      ];
+
       this.logger.info(
         {
           turnId: localToolTurn.turnId,
@@ -366,14 +371,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
           "PTC sending continuation request"
         );
       }
-      const s = msgs.findLastIndex(t => t.senderType === "USER");
-      let userMsgId: string | null = null;
-      if (s !== -1 && msgs?.[s]?.id) {
-        userMsgId = msgs[s]?.id;
-      } else {
-        userMsgId = reqMsgId;
-      }
-      userMsgId;
+      const userMsgId = reqMsgId;
       let stream: CreateMessageStreamRT;
 
       try {
@@ -416,27 +414,6 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       let usage: number | undefined = undefined;
 
       for await (const chunk of stream) {
-        console.info(
-          {
-            event:
-              chunk.type === "content_block_delta"
-                ? chunk.delta.type === "input_json_delta"
-                  ? chunk.delta.partial_json
-                  : chunk.delta.type === "thinking_delta"
-                    ? chunk.delta.thinking
-                    : chunk.delta.type === "signature_delta"
-                      ? chunk.delta.signature
-                      : chunk.delta.type === "text_delta"
-                        ? chunk.delta.text
-                        : chunk.delta.type === "compaction_delta"
-                          ? chunk.delta.content
-                          : chunk.delta.type === "citations_delta"
-                            ? chunk.delta.citation
-                            : ""
-                : ""
-          },
-          `event tracje [${Date.now()}]`
-        );
         let text: string | undefined = undefined,
           thinkingText: string | undefined = undefined,
           webSearchRes: Anthropic.Beta.BetaWebSearchResultBlock | null = null;
@@ -1093,7 +1070,10 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
                   : undefined
             } satisfies FileSearchToolInput;
 
-            const json = await this.userStoreVector.executeFileSearch(userId, input);
+            const json = await this.userStoreVector.executeFileSearch(
+              userId,
+              input
+            );
             this.logger.info(
               { resultLength: json.length },
               "PTC file_search result"
@@ -1162,7 +1142,9 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
                 "conversation_memory_get_chunk",
                 "tool_catalog",
                 ...(localToolTurn
-                  ? [...localToolTurn.advertised].filter(isLocalToolName)
+                  ? [...localToolTurn.advertised].filter(t =>
+                      this.prisma.isLocalToolName(t)
+                    )
                   : [])
               ],
               via
@@ -1198,7 +1180,7 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
               is_error: true
             });
           }
-        } else if (isLocalToolName(acc.name)) {
+        } else if (this.prisma.isLocalToolName(acc.name)) {
           // Local read-only bridge (slice 4): relay to the CLI via the
           // socket-scoped broker and park — the broker ALWAYS resolves
           // (deadline, disconnect, and cancellation become typed is_error

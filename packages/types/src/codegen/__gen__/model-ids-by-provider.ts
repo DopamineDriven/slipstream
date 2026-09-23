@@ -85,6 +85,7 @@ export const modelIdsByProvider = {
     "grok-imagine-video"
   ],
   anthropic: [
+    "claude-opus-5-5",
     "claude-fable-5-1",
     "claude-opus-5",
     "claude-sonnet-5",
