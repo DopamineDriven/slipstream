@@ -10,12 +10,20 @@ import type { ConversationSingleton } from "@/types.ts";
 import type { CTR, DX, Rm, UTR } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 
+export type ChatChunkAndResInlineImageData = {
+  width: number;
+  height: number;
+  cdnUrl: string;
+  kind: $Enums.ImageGenOutputKind;
+};
+
 export type ChatChunkAndResMsgBlock = {
   type: $Enums.MessageBlockType;
   content: string;
   ordinal: number;
   conversationId: string;
   durationMs: number;
+  inlineImageData?: ChatChunkAndResInlineImageData;
 };
 
 export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {

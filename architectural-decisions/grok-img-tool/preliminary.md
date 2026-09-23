@@ -365,14 +365,15 @@ walk through the loop is in `reference/loop-skeleton.md` §5):
 | 1 | ENCRYPTED_THINKING — `tco_` | THINKING — summary |
 | 2 | ENCRYPTED_THINKING — `tco_` | TEXT — "…Image incoming…" |
 | 3 | ENCRYPTED_THINKING — `rs_` | THINKING — the upload, `content` = the 734-char `prompt` |
-| 4 | TEXT — "…Image incoming with the reading." | **IMAGE_GEN** — `content` = the `prompt`, `attachments: [FINAL]` |
+| 4 | TEXT — "…Image incoming with the reading." | **IMAGE_GEN** — `content` = the `prompt`, `inlineImageData` (FINAL) |
 | 5 | THINKING — the upload, `content` = the 799-char `prompt` | ENCRYPTED_THINKING — `rs_` |
-| 6 | **IMAGE_GEN** — `content` = the `prompt`, `attachments: [FINAL]` | TEXT — the rest |
+| 6 | **IMAGE_GEN** — `content` = the `prompt`, `inlineImageData` (FINAL) | TEXT — the rest |
 | 7 | ENCRYPTED_THINKING — `rs_` | |
 | 8 | TEXT — "**CHICAGO, AS READ…**" | |
 
-Grok emits one FINAL per image call; an OpenAI facilitator would put 0–3
-PARTIALs in the same `attachments` array. Nine blocks and seven blocks
+Grok emits one FINAL per image call; an OpenAI facilitator would re-send
+the same ordinal as each PARTIAL lands, and the client's last-wins merge
+keeps the latest. Nine blocks and seven blocks
 from the same prompt: the ordinals follow the wire, whatever order it
 comes in.
 
@@ -399,8 +400,12 @@ Consequences:
 - The bubble's `renderedMessageBlocks` gains an `IMAGE_GEN` case that renders
   the attachment inline at its ordinal, and the trailing attachment group
   must skip attachments a block already claims (or the image shows twice).
-- `ChatChunkAndResMsgBlock` carries the block's attachments (plural) on the
-  block.
+- `ChatChunkAndResMsgBlock` carries `inlineImageData?` — width, height,
+  `cdnUrl`, `kind` — exactly what the renderer paints (Andrew, 2026-09-22:
+  "minimal wire as conditional fields"). `seriesId` is not on the wire
+  because the generated-asset url already encodes it (step 2). The full
+  lineage rides on `imgGenFields.images` as today. No `isInlineImage`
+  boolean: `type === "IMAGE_GEN"` is the discriminant.
 - **The obligatory job path emits the same `IMAGE_GEN` block.** Same wire,
   same persist, same bubble code; the only difference is the message is
   also `messageType: IMAGE_GEN` with a job bound. The loop does not fork.
@@ -635,36 +640,82 @@ Migration + client regenerate + rebuilds of whatever packages re-export
 
 **Ships alone.** Nothing reads the new member yet, so prod is unaffected.
 
-### Step 2 — types package: the block carries its attachment on the wire
+### Step 2 — types package: the minimal wire, as conditional fields
 
 `packages/types/src/contract/ai-chat-events.ts`:
 
+Landed 2026-09-22 (Andrew):
+
 ```ts
+export type ChatChunkAndResInlineImageData = {
+  width: number;
+  height: number;
+  cdnUrl: string;
+  kind: $Enums.ImageGenOutputKind;
+};
+
 export type ChatChunkAndResMsgBlock = {
   type: $Enums.MessageBlockType;
   content: string;
   ordinal: number;
   conversationId: string;
   durationMs: number;
-  /** IMAGE_GEN only: the frames this block owns, in seriesOrdinal order; each carries `inlineImageGenOutput` (§8.4a) */
-  attachments?: AIChatResponseImgGenSubFields[];
+  inlineImageData?: ChatChunkAndResInlineImageData;
 };
 ```
 
-One optional array, `IMAGE_GEN` only. An `IMAGE_GEN` frame is sent only once
-an S3 url exists, so the array is never empty on the wire. For Grok it holds
-one FINAL; for an OpenAI facilitator it grows as partials land and the same
-ordinal is re-sent (last-wins merge on the client replaces the array). Each
-entry's frame identity (`kind`, `seriesOrdinal`, `seriesId`, dims,
-`facilitatingModel`, `generatingModel`, `revisedPrompt`) is on its
-`inlineImageGenOutput`, mirroring how `imageGenOutput` rides on a job's
-attachments.
+One optional object, defined if and only if `type === "IMAGE_GEN"`. It is
+what the client needs to paint the slot (width, height, url, and `kind` for
+the partial-vs-final decision) and nothing else. The full lineage
+(`seriesOrdinal`, the two models, `revisedPrompt`, mime, ext) rides on
+`imgGenFields.images` exactly as a job's does.
+
+**`seriesId` is not on the wire because the url is reproducible (Andrew,
+2026-09-22).** Every generated asset lives at
+
+```
+https://assets[-dev].aicoalesce.com/generated/:userId/:timestampMs-:seriesId-:seriesOrdinal.:ext
+```
+
+`assets-dev` locally, `assets` in production; `userId` a cuid2; the
+timestamp 13 digits; then the series id (nanoid, 21 chars, on the job lane;
+cuid2, 24 chars of `[a-z0-9]`, for inline images); then the 0-based
+ordinal (0–3 at most, with three partials); then the extension. No query
+params, ever. So whoever holds a `cdnUrl` holds the series id:
+
+```ts
+const basename = cdnUrl.slice(cdnUrl.lastIndexOf("/") + 1);        // 1790010492109-cTygUBM6EZ4cHeSElCCJN-0.webp
+const stem = basename.slice(14, basename.lastIndexOf("."));         // cTygUBM6EZ4cHeSElCCJN-0
+const seriesId = stem.slice(0, stem.lastIndexOf("-"));              // cTygUBM6EZ4cHeSElCCJN
+```
+
+Fixed offsets, `lastIndexOf` for the two separators (a nanoid may itself
+contain `-`, a cuid2 cannot), no defensive parsing. `mapImgs` in the
+persist layer already derives the series id from the url path the same
+way.
+
+Why not a discriminated union on `type`, and why no `isInlineImage`
+boolean: nineteen provider handlers build `roundTrack` entries as
+`{ type: $Enums.MessageBlockType, … }`, and a union that requires the field
+when `type` is `IMAGE_GEN` would stop every one of them compiling. The
+optional field is additive. A boolean beside `type` would be a second copy
+of the same fact, and TypeScript cannot couple two independent optionals
+anyway; the client narrows on `inlineImageData !== undefined`.
+
+An `IMAGE_GEN` frame is sent only once the url exists. For Grok that is one
+frame per image. For an OpenAI facilitator later, the same ordinal is
+re-sent as each PARTIAL lands and again for the FINAL; the client's
+last-wins merge by ordinal replaces the object, so "show the FINAL, else
+the latest PARTIAL" is the merge itself. On hydration the same object is
+derived from `MessageBlockSingleton.attachments[]`: FINAL if present, else
+the highest `seriesOrdinal`, with width, height, and kind read off
+`inlineImageGenOutput`. One component prop type, two producers.
 
 `AIChatResponseImgGenSubFields` gains `inlineImageGenOutput` beside the
 existing `imageGenOutput`; a given attachment populates exactly one of the
 two. `content` on that block is the
 provider's rewritten prompt (`item.prompt` for Grok, `revised_prompt` for
-OpenAI), empty on the opening frame.
+OpenAI).
 
 Also, `apps/ws-server/src/xai/event-types.ts` `Usage` gains
 `cost_in_usd_ticks?: number`, and `server_side_tool_usage_details` gains
@@ -681,10 +732,11 @@ Also, `apps/ws-server/src/xai/event-types.ts` `Usage` gains
 block can reference attachments inside that single write. Two options:
 
 - **(a) Two-phase, chosen.** Keep the message create as is. After it
-  returns, for each persisted `IMAGE_GEN` block, `updateMany` the created
-  attachments whose `s3ObjectId` is in the block's wire `attachments` (unique
-  per upload, already on the wire shape) to set `messageBlockId`. One extra
-  statement per image block, inside the existing transaction.
+  returns, for each persisted `IMAGE_GEN` block, `updateMany` the message's
+  attachments whose `seriesId` equals the one derived from the block's
+  `inlineImageData.cdnUrl` (step 2), setting `messageBlockId`. One statement per
+  image block, inside the existing transaction, and it claims every frame
+  of the series (partials included, when OpenAI facilitators get blocks).
 - (b) Create attachments first, then the message with blocks that
   `connect` by id. Larger restructuring of a hot persist path for the same
   result. Rejected.
@@ -700,9 +752,30 @@ nested `imageGenOutput: { create }` when `jobId` is present). The rule:
 | neither | none |
 
 `handleAiChatResponse` needs no signature change: `messageBlocks` already
-flows in, the block's `attachments` ride on each block, and the same
-attachments are **also** in `imgGenFields.images` so `mapImgs` creates the
-rows. `messageType` stays whatever the request was (`TEXT` for a chat turn);
+flows in, `inlineImageData` rides on each `IMAGE_GEN` block, and the
+attachment rows come from `imgGenFields.images` so `mapImgs` creates them
+(with the nested `inlineImageGenOutput` when there is no `jobId`).
+
+Three facts from `chat-response.ts` (read 2026-09-22) the chat path must
+respect:
+
+1. **`imgGenEnabled` decides `messageType` and `isImageGen`** (`IMAGE_GEN`
+   when true). A one-off is a `TEXT` message, so the chat path persists
+   with `imgGenEnabled: false` and still passes `imgGenFields: { images }`;
+   `mapImgs` reads `images` regardless of the flag. Never set
+   `imgGenFields.revisedPrompt` on the chat path: `content` falls back to
+   it before `chunk`, and the message body would become the prompt.
+2. **The link must precede the read.** The message create and the
+   `include` read are one `conversation.update`, and `ai_chat_response.convo`
+   is what the client reconciles from; the hydration mapper derives
+   `inlineImageData` from attachments by `messageBlockId`. So the
+   `updateMany` runs after the create and before whatever read produces
+   `convo` (a re-read of the message inside the same transaction), and the
+   attachments `include` gains `inlineImageGenOutput: true`.
+3. **`AIChatResponseImgGenSubFields.jobId` is required today.** A one-off
+   has none, so it becomes `jobId?: string`. `mapImgs` already falls
+   through to no `imageGenOutput` when both it and the outer `jobId` are
+   absent; the `inlineImageGenOutput: { create }` slots in there. `messageType` stays whatever the request was (`TEXT` for a chat turn);
 `isImageGen` is left `false` for a one-off, since that flag means "this
 message is an image-gen message", which it is not.
 
@@ -718,8 +791,8 @@ shows them in isolation; here is where each slots in.
 | the `closeBeforeEvent` decision | two guards while the image THINKING is open (`activeBlock.itemIds[0]` starts with `ig_`): an `output_text.delta` must **not** close it (the delta is held), and a reasoning `output_item.done` must **not** close it (§8.4a's unobserved case: hold that too rather than splitting the block) |
 | `output_item.added` handler | `image_generation_call` → the close already happened above; open the THINKING block blank, `startedAt = now`, send its frame inline with `isThinking: true` (the bottom-of-loop thinking frame is gated on `thinkingText`, which is empty here, so the send is explicit) |
 | `output_text.delta` handler | image THINKING open → `heldText += delta`, `heldTextItemId = item_id`, set no `text`; else as today |
-| `output_item.done` handler | `image_generation_call` with `result` → skeleton §4 steps (1)–(6): prompt into the open block and re-send its ordinal; decode, specs, `await` the upload; close with `now − startedAt`; sub-fields (`inlineImageGenOutput` on the chat path, `imageGenOutput` + `jobId` on the job path); push and send the `IMAGE_GEN` block with `attachments: [attachment]` and `imgGenFields`; then `activeBlock = TEXT(heldText)`, `text = heldText`, so the existing bottom-of-loop text frame releases it |
-| persist + `ai_chat_response` | `imgGenEnabled: images.length > 0` (today hard-coded `false`), `imgGenFields: { images, … }` when non-empty, and each `roundTrack` entry for an `IMAGE_GEN` block carries `attachments` |
+| `output_item.done` handler | `image_generation_call` with `result` → skeleton §4 steps (1)–(6): prompt into the open block and re-send its ordinal; decode, specs, `await` the upload; close with `now − startedAt`; sub-fields (`inlineImageGenOutput` on the chat path, `imageGenOutput` + `jobId` on the job path); push and send the `IMAGE_GEN` block with `inlineImageData: { width, height, cdnUrl, kind: "FINAL" }` and `imgGenFields`; then `activeBlock = TEXT(heldText)`, `text = heldText`, so the existing bottom-of-loop text frame releases it |
+| persist + `ai_chat_response` | `imgGenEnabled` stays `false` (a one-off is a TEXT message, step 3); `imgGenFields: { images }` on the **persist call only** so `mapImgs` creates the rows, never `revisedPrompt`; each `roundTrack` entry for an `IMAGE_GEN` block carries `inlineImageData` |
 
 The progress events and annotations need no code: neither matches a
 `closeBeforeEvent` case nor a handler, and with `thinkingText` and `text`
@@ -740,7 +813,7 @@ skeleton's; the linear file's are `trackedBlocks`, `grokThinkingDisplayAgg`,
 | `reasoning_summary_part.added` / `_text.delta` / `_text.done` / `_part.done` | as today, inline; phase maps keyed by `reasoningPhaseKey` |
 | `output_text.delta` | if the image THINKING is open: append to `heldText`, send nothing (§8.4a). Else open a TEXT block if `active?.type !== "TEXT"`, append, send the text frame |
 | `output_item.done`, `reasoning` with `encrypted_content` | store; if no summary text was seen for this id and no placeholder yet: close active, push an `ENCRYPTED_THINKING` block, send the placeholder frame |
-| `output_item.done`, `image_generation_call` with `result` | (1) the THINKING block has been open since `added`; fill `content = item.prompt` and re-send the same ordinal, still `isThinking: true`; (2) decode; `getImageSpecsWorkup`; **`await` the S3 upload, plainly**; (3) close the THINKING block with **one** `durationMs = now − addedAt` (generation + upload), send it with `isThinking: false`; (4) build the sub-fields (minted `seriesId`, `revisedPrompt = item.prompt`; on the job path `jobId` + `imageGenOutput`, on the chat path `inlineImageGenOutput` with `kind: FINAL`, `seriesOrdinal: 0`, `provider`, `facilitatingModel` = the chat model, `generatingModel` = `grok-imagine-image-2.0` (§2.6), dims from the extractor); push an `IMAGE_GEN` block `{ content: item.prompt, durationMs: 0, attachments: [attachment] }`, the wait having been attributed to the THINKING block; push into `images`; send its frame with `imgGenFields: { images, activeImage }`; (5) if `heldText` is non-empty, open a TEXT block with it and send it as one frame. **Runs once per `done`**: with chaining (§2.6) a round can carry several image items, and each gets its own `seriesId`, its own THINKING + `IMAGE_GEN` pair, and its own entry in `images` |
+| `output_item.done`, `image_generation_call` with `result` | (1) the THINKING block has been open since `added`; fill `content = item.prompt` and re-send the same ordinal, still `isThinking: true`; (2) decode; `getImageSpecsWorkup`; **`await` the S3 upload, plainly**; (3) close the THINKING block with **one** `durationMs = now − addedAt` (generation + upload), send it with `isThinking: false`; (4) build the sub-fields (minted `seriesId`, `revisedPrompt = item.prompt`; on the job path `jobId` + `imageGenOutput`, on the chat path `inlineImageGenOutput` with `kind: FINAL`, `seriesOrdinal: 0`, `provider`, `facilitatingModel` = the chat model, `generatingModel` = `grok-imagine-image-2.0` (§2.6), dims from the extractor); push an `IMAGE_GEN` block `{ content: item.prompt, durationMs: 0, inlineImageData: { width, height, cdnUrl, kind: "FINAL" } }`, the wait having been attributed to the THINKING block; push into `images`; send its frame with `imgGenEnabled: false` and no `imgGenFields` (the block's `inlineImageData` is the whole client contract; `true` flips the client into the job lane); (5) if `heldText` is non-empty, open a TEXT block with it and send it as one frame. **Runs once per `done`**: with chaining (§2.6) a round can carry several image items, and each gets its own `seriesId`, its own THINKING + `IMAGE_GEN` pair, and its own entry in `images` |
 | `output_item.done`, `file_search_call` | `parseFileSearchResults` (unchanged). A `status: "failed"` item carries `results: []` — nothing to parse, nothing to throw (§2.2) |
 | `output_text.annotation.added` | **no-op**, as in the March file. Annotations can land mid-text (§2.2, run 2) and must never close the TEXT block |
 | `output_item.done`, `function_call` | finalize the pending call (unchanged) |
@@ -749,9 +822,10 @@ skeleton's; the linear file's are `trackedBlocks`, `grokThinkingDisplayAgg`,
 
 After the loop: the existing tool-round continuation, unchanged. After all
 rounds: `handleAiChatResponse` with `messageBlocks` (now including the
-`IMAGE_GEN` blocks with their `attachment`), `imgGenEnabled: images.length >
-0`, `imgGenFields` with `images` when non-empty, `messageType` left to the
-persist layer (`TEXT` unless the entry was an image job).
+`IMAGE_GEN` blocks with their `inlineImageData`), `imgGenEnabled: false`,
+and `imgGenFields: { images }` when non-empty so the attachment rows are
+created (step 3). The message stays `TEXT`; only the job entry (step 5)
+passes `imgGenEnabled: true`.
 
 #### 8.4a Where the wait actually is, and how it is shown (Andrew, 2026-09-21)
 
@@ -846,17 +920,18 @@ first.
 ### Step 7 — web: render the `IMAGE_GEN` block inline
 
 - `apps/web/src/lib/draft-to-message.ts`: `mergeBlock` is already last-wins
-  by ordinal, so the block flows through `deriveDraft` unchanged. Add the
-  block's `attachment` to `imgGenAttachments` so the streaming bubble shows
-  it mid-stream.
-- `apps/web/src/lib/ui-message-helpers.ts` `toMessageBlocks`: carry
-  `attachment` through.
+  by ordinal, so the block flows through `deriveDraft` unchanged, carrying
+  `inlineImageData`.
+- `apps/web/src/lib/ui-message-helpers.ts` `toMessageBlocks`: for a
+  DB-loaded `IMAGE_GEN` block, derive `inlineImageData` from
+  `MessageBlockSingleton.attachments[]` — FINAL if present, else the highest
+  `seriesOrdinal` — reading width, height, and kind off
+  `inlineImageGenOutput`. This is the one place the hydrated shape and the
+  streamed shape meet.
 - **New: an inline image-block component** (`apps/web/src/ui/chat/image-gen-block/`
-  or similar). Props: the block's `attachments` (never empty). Same logic as
-  `ui/chat/image-gen/index.tsx` uses for a job today — render the FINAL or,
-  until it exists, the latest PARTIAL — but reading `inlineImageGenOutput`
-  and sorting by `seriesOrdinal` (one counter across kinds, step 1), so it
-  does **not** share the job renderer's `seriesIndex` / `isPartial` helper.
+  or similar). Props: `InlineImageData`. It renders exactly one frame and
+  never sorts anything; the FINAL-else-latest-PARTIAL decision was made by
+  the producer (the server on the stream, `toMessageBlocks` on hydration).
   Renders `next/image` with `placeholder="blur"` and
   `blurDataURL={shimmer([width, height])}` from `@slipstream/ui`'s
   `lib/shimmer.ts`, so nothing flashes between the CDN url arriving and the
@@ -874,9 +949,10 @@ first.
   at the block's ordinal.
 - **Double-render rule.** The `IMAGE_GEN` attachments are also on the
   message's `attachments` list, so the trailing attachment group must skip
-  any attachment with a `messageBlockId` (committed) or referenced by an
-  `IMAGE_GEN` block's `attachments` (streaming), or the image draws twice —
-  once inline, once below. This is about slot ownership, not loading; both
+  any attachment with a `messageBlockId` (committed) or whose `cdnUrl`
+  derives to the same series id as an `IMAGE_GEN` block's
+  `inlineImageData.cdnUrl` (streaming, step 2's slice), or the image draws
+  twice — once inline, once below. This is about slot ownership, not loading; both
   cases are one filter. The
   trailing group is otherwise unchanged and keeps rendering user uploads
   and pure-image-lane outputs as today (it can adopt the same shimmer

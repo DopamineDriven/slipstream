@@ -292,14 +292,18 @@ for await (const chunk of parser) {
       nextOrdinal += 1;
       activeBlock = undefined;
 
-      // (4) the IMAGE_GEN block, owning its attachments, at the next ordinal.
-      // Grok emits one FINAL, so the array has one entry; the shape is an
-      // array because OpenAI facilitators add 0-3 PARTIALs to the same block.
-      // Lineage: job path → jobId + imageGenOutput; chat path →
+      // (4) the IMAGE_GEN block at the next ordinal, carrying the minimal
+      // wire (inlineImageData: width, height, cdnUrl, kind — the url encodes
+      // userId / timestamp / seriesId / seriesOrdinal / ext, plan step 2). One
+      // frame per image for Grok; an OpenAI facilitator would re-send the
+      // same ordinal per PARTIAL and the client's last-wins merge keeps the
+      // latest. The full sub-fields go into `images` for imgGenFields and
+      // persist. Lineage: job path → jobId + imageGenOutput; chat path →
       // inlineImageGenOutput { kind: FINAL, seriesOrdinal: 0, seriesId, provider, facilitatingModel: m, generatingModel: "grok-imagine-image-2.0", width, height, mime, ext, revisedPrompt: item.prompt }
       const attachment = { /* → the AIChatResponseImgGenSubFields literal */ } as const satisfies AIChatResponseImgGenSubFields;
       images.push(attachment);
-      blocks.push({ content: item.prompt, durationMs: 0, itemIds: [item.id], ordinal: nextOrdinal, previewContent: item.prompt, type: "IMAGE_GEN" });
+      const inlineImageData = { width: specs.width, height: specs.height, cdnUrl: rt.cdnUrl, kind: "FINAL" } as const satisfies ChatChunkAndResInlineImageData;
+      blocks.push({ content: item.prompt, durationMs: 0, itemIds: [item.id], ordinal: nextOrdinal, previewContent: item.prompt, type: "IMAGE_GEN", inlineImageData });
       const imageBlockOrdinal = nextOrdinal;
       nextOrdinal += 1;
       imageLanded = true;
@@ -309,7 +313,10 @@ for await (const chunk of parser) {
       ws.send(JSON.stringify(imageClosed));
       void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", imageClosed);
 
-      const imageFrame = { type: "ai_chat_chunk", …, isThinking: false, imgGenEnabled: true, imgGenFields: { images, activeImage: attachment, actualCount: images.length }, messageBlocks: { type: "IMAGE_GEN", content: item.prompt, ordinal: imageBlockOrdinal, conversationId, durationMs: 0, attachments: [attachment] }, done: false } as const satisfies EventTypeMap["ai_chat_chunk"];
+      // imgGenEnabled stays FALSE on the chat path: true flips the client into
+      // the job lane and persists the message as messageType IMAGE_GEN. The
+      // block's inlineImageData is the whole client contract for the image.
+      const imageFrame = { type: "ai_chat_chunk", …, isThinking: false, imgGenEnabled: false, messageBlocks: { type: "IMAGE_GEN", content: item.prompt, ordinal: imageBlockOrdinal, conversationId, durationMs: 0, inlineImageData }, done: false } as const satisfies EventTypeMap["ai_chat_chunk"];
       ws.send(JSON.stringify(imageFrame));
       void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", imageFrame);
 
@@ -423,9 +430,12 @@ ENCRYPTED_THINKING (`rs_`), 6 TEXT. Its one mid-text annotation (seq 429)
 hits the no-op branch and the open TEXT block at 6 keeps accumulating. Its
 summarised `rs_` `done` (seq 79) is caught by `summarisedItemIds` exactly
 as run 1's seq 53 is. Nothing in the chain is keyed on item order. Persisted via `handleAiChatResponse` with
-`messageBlocks: blocks` (the `IMAGE_GEN` block carrying its `attachments`),
-`imgGenEnabled: images.length > 0`, `imgGenFields: { images, … }` when
-non-empty; each one-off attachment nests an `inlineImageGenOutput` create.
+`messageBlocks: blocks` (the `IMAGE_GEN` block carrying its `inlineImageData`),
+`imgGenEnabled: false` (a one-off is a TEXT message; `true` would persist it
+as `messageType: IMAGE_GEN`), and `imgGenFields: { images }` server-side
+only so `mapImgs` creates the attachment rows — never `revisedPrompt` there,
+it would replace the message content; each one-off attachment nests an
+`inlineImageGenOutput` create (plan step 3).
 
 ---
 

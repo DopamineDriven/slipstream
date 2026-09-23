@@ -104,6 +104,7 @@ export type {
   AIChatResEntity,
   AIChatResponse,
   AIChatResponseDb,
+  ChatChunkAndResInlineImageData,
   ChatChunkAndResMsgBlock
 } from "@/contract/ai-chat-events.ts";
 
