@@ -1,15 +1,23 @@
+import type { S3FinalizePayload } from "@/types/index.ts";
 import type { xAIResponses } from "@/xai/event-types.ts";
 import type {
   GrokProviderChatRequestEntity,
   GrokReasoningModel
 } from "@/xai/types.ts";
+import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
+  AttachmentSingleton,
   CanonicalToolDefinition,
+  CTR,
   DiscriminatedUnionToRecord,
+  DX,
   GrokModelIdUnion,
+  ImageSingleton,
+  InlineImageGenOutputSingleton,
   LocalToolName,
   MessageSingleton,
+  Rm,
   UTR,
   XOR
 } from "@slipstream/types";
@@ -18,9 +26,24 @@ export interface GrokActiveMessageBlock {
   content: string;
   itemIds: string[];
   startedAt: number;
-  type: "ENCRYPTED_THINKING" | "TEXT" | "THINKING" | "IMAGE_GEN";
+  type: $Enums.MessageBlockType;
+  inlineImageData?: BlockImgData;
 }
-
+export type BlockImgData = {
+  width: number;
+  height: number;
+  cdnUrl: string;
+  kind: $Enums.ImageGenOutputKind;
+  seriesId: string;
+  uploadDuration: number;
+  seriesOrdinal: number;
+  mime: string;
+  ext: string;
+  facilitatingModel: string;
+  generatingModel: string;
+  provider: $Enums.Provider;
+  revisedPrompt?: string;
+};
 export interface GrokFinalizedMessageBlock {
   content: string;
   durationMs: number;
@@ -28,6 +51,7 @@ export interface GrokFinalizedMessageBlock {
   ordinal: number;
   previewContent: string;
   type: $Enums.MessageBlockType;
+  inlineImageData?: BlockImgData;
 }
 
 export type ResponsesRole = "user" | "assistant" | "developer" | "system";
@@ -561,4 +585,53 @@ export type FunctionCallOutput<T = string | object> = {
    * JSON stringified output ready for parsing (data returned by the agentic args submitted)
    */
   output: T;
+};
+
+export type InlineImageAggProps = DX<
+  CTR<
+    Rm<
+      AttachmentSingleton<true>,
+      | "id"
+      | "createdAt"
+      | "updatedAt"
+      | "inlineImageGenOutput"
+      | "image"
+      | "imageGenOutput"
+      | "ttsJob"
+      | "userStoreDoc"
+      | "audioGenOutput"
+      | "dictationJobs"
+      | "generationGroupId"
+      | "providerStoreDocs"
+      | "providerLinks"
+      | "messageBlockId"
+      | "messageId"
+    >
+  > & {
+    image: Rm<ImageSingleton, "attachmentId" | "createdAt" | "updatedAt">;
+    inlineImageGenOutput: Rm<
+      InlineImageGenOutputSingleton,
+      "id" | "attachmentId" | "createdAt" | "updatedAt" | "attachment"
+    >;
+  }
+>;
+
+export type InlinePostImageUploadProps = {
+  specs: ExpandedImgSpecs;
+  s3RTHelper: S3FinalizePayload;
+  userId: string;
+  filename: string;
+  format: string;
+  mime: string;
+  cdnUrl: string;
+  generatingModel: string;
+  facilitatingModel: string;
+  provider: $Enums.Provider;
+  conversationId: string;
+  seriesOrdinal: number;
+  sId: string;
+  revisedPrompt: string;
+  kind: $Enums.ImageGenOutputKind;
+  uploadDuration: number;
+  s3LastModified: Date;
 };

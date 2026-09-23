@@ -67,6 +67,8 @@ export class ModelServiceImage {
 
   public get imageFacilitatingOpenAI() {
     return [
+      "gpt-6-sol",
+      "gpt-6-luna",
       "gpt-6-astra",
       "gpt-5.6-sol",
       "gpt-5.6-terra",
@@ -516,6 +518,8 @@ export class ModelServiceNameOverrides extends ModelServiceChat {
   } as const;
 
   public OPENAI_NAME_OVERRIDES = {
+    "gpt-6-sol": "GPT-6 Sol",
+    "gpt-6-luna": "GPT-6 Luna",
     "gpt-6-astra": "GPT-6 Astra",
     "gpt-5.6-sol": "GPT-5.6 Sol",
     "gpt-5.6-terra": "GPT-5.6 Terra",
@@ -678,6 +682,8 @@ export class ModelServiceFilter extends ModelServiceNameOverrides {
 
   public filterForOpenAI(s: string) {
     return (
+      s === "gpt-6-sol" ||
+      s === "gpt-6-luna" ||
       s === "gpt-6-astra" ||
       s === "gpt-5.6-sol" ||
       s === "gpt-5.6-terra" ||

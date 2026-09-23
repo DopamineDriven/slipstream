@@ -300,7 +300,12 @@ for await (const chunk of parser) {
       // latest. The full sub-fields go into `images` for imgGenFields and
       // persist. Lineage: job path → jobId + imageGenOutput; chat path →
       // inlineImageGenOutput { kind: FINAL, seriesOrdinal: 0, seriesId, provider, facilitatingModel: m, generatingModel: "grok-imagine-image-2.0", width, height, mime, ext, revisedPrompt: item.prompt }
-      const attachment = { /* → the AIChatResponseImgGenSubFields literal */ } as const satisfies AIChatResponseImgGenSubFields;
+      // → the AIChatResponseImgGenSubFields literal, built exactly like
+      //   `imgFinal` in openai/responses-img-gen.ts (828–933): seriesId on
+      //   the sub-field, jobId: "" / jobIndex: 0 as that lane does without a
+      //   job, imageGenOutput: null, and the lineage nested as a plain object
+      //   (inlineImageGenOutput: {...}) the persist branch creates the row from
+      const attachment = { /* … */ } as const satisfies AIChatResponseImgGenSubFields;
       images.push(attachment);
       const inlineImageData = { width: specs.width, height: specs.height, cdnUrl: rt.cdnUrl, kind: "FINAL" } as const satisfies ChatChunkAndResInlineImageData;
       blocks.push({ content: item.prompt, durationMs: 0, itemIds: [item.id], ordinal: nextOrdinal, previewContent: item.prompt, type: "IMAGE_GEN", inlineImageData });
@@ -432,10 +437,10 @@ summarised `rs_` `done` (seq 79) is caught by `summarisedItemIds` exactly
 as run 1's seq 53 is. Nothing in the chain is keyed on item order. Persisted via `handleAiChatResponse` with
 `messageBlocks: blocks` (the `IMAGE_GEN` block carrying its `inlineImageData`),
 `imgGenEnabled: false` (a one-off is a TEXT message; `true` would persist it
-as `messageType: IMAGE_GEN`), and `imgGenFields: { images }` server-side
-only so `mapImgs` creates the attachment rows — never `revisedPrompt` there,
-it would replace the message content; each one-off attachment nests an
-`inlineImageGenOutput` create (plan step 3).
+as `messageType: IMAGE_GEN`), no `imgGenFields` (that is the job lane's
+input), and the inline sub-fields for the persist layer's dedicated inline
+`else if` branch, which creates each attachment with its nested
+`inlineImageGenOutput` and links it to its block (plan step 3).
 
 ---
 

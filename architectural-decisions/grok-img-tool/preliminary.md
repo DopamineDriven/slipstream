@@ -761,21 +761,40 @@ respect:
 
 1. **`imgGenEnabled` decides `messageType` and `isImageGen`** (`IMAGE_GEN`
    when true). A one-off is a `TEXT` message, so the chat path persists
-   with `imgGenEnabled: false` and still passes `imgGenFields: { images }`;
-   `mapImgs` reads `images` regardless of the flag. Never set
-   `imgGenFields.revisedPrompt` on the chat path: `content` falls back to
-   it before `chunk`, and the message body would become the prompt.
-2. **The link must precede the read.** The message create and the
-   `include` read are one `conversation.update`, and `ai_chat_response.convo`
-   is what the client reconciles from; the hydration mapper derives
+   with `imgGenEnabled: false`. It does not pass `imgGenFields` at all:
+   that is the job lane's input (and its `revisedPrompt` would replace the
+   message `content`).
+2. **The link must precede the read.** `ai_chat_response.convo` is what the
+   client reconciles from, and the hydration mapper derives
    `inlineImageData` from attachments by `messageBlockId`. So the
-   `updateMany` runs after the create and before whatever read produces
-   `convo` (a re-read of the message inside the same transaction), and the
-   attachments `include` gains `inlineImageGenOutput: true`.
-3. **`AIChatResponseImgGenSubFields.jobId` is required today.** A one-off
-   has none, so it becomes `jobId?: string`. `mapImgs` already falls
-   through to no `imageGenOutput` when both it and the outer `jobId` are
-   absent; the `inlineImageGenOutput: { create }` slots in there. `messageType` stays whatever the request was (`TEXT` for a chat turn);
+   `updateMany` runs after the create and before the read that produces
+   `convo`, inside the same transaction, and the attachments `include`
+   gains `inlineImageGenOutput: true`.
+3. **Inline images get their own `else if` branch in `handleAiChatResponse`**
+   (Andrew, 2026-09-23), beside the audio-job and image-job branches. The
+   job-lane types keep `jobId` required and `mapImgs` is untouched; the
+   inline branch creates the attachment rows with the nested
+   `inlineImageGenOutput`, links them to their `IMAGE_GEN` block by the
+   series id derived from `inlineImageData.cdnUrl`, and does its read. The
+   branch's input shape is Andrew's.
+
+   **The model for the sub-field is `imgFinal` in
+   `apps/ws-server/src/openai/responses-img-gen.ts` (lines 828–933).** The
+   job lane builds one full `AIChatResponseImgGenSubFields` literal per
+   image, `as const satisfies`, with the lineage row as a nested plain
+   object (`imageGenOutput: { ext, height, width, isPartial, jobId,
+   jobIndex, kind, mime, revisedPrompt, seriesId, seriesIndex }`, lines
+   916–932), and `seriesId` on the sub-field itself (line 884). Persist
+   creates the `ImageGenOutput` row from that nested object. The inline
+   lane does exactly the same with `inlineImageGenOutput: { kind, provider,
+   facilitatingModel, generatingModel, seriesId, seriesOrdinal, width,
+   height, mime, ext, revisedPrompt }` nested on the literal and
+   `imageGenOutput: null`. The required `jobId` on the sub-field is not a
+   problem: the job lane itself writes `jobId: jobId ?? ""` (line 882), so
+   the inline literal carries `jobId: ""` and `jobIndex: 0`, and nothing is
+   loosened. Partials, when an OpenAI facilitator gets blocks, follow the
+   same file's `ImageGenPartialArr` tuple (`openai/types.ts` 37–65) →
+   `mapPersistenceImgGenArr` path; Grok has none. `messageType` stays whatever the request was (`TEXT` for a chat turn);
 `isImageGen` is left `false` for a one-off, since that flag means "this
 message is an image-gen message", which it is not.
 
@@ -792,7 +811,7 @@ shows them in isolation; here is where each slots in.
 | `output_item.added` handler | `image_generation_call` → the close already happened above; open the THINKING block blank, `startedAt = now`, send its frame inline with `isThinking: true` (the bottom-of-loop thinking frame is gated on `thinkingText`, which is empty here, so the send is explicit) |
 | `output_text.delta` handler | image THINKING open → `heldText += delta`, `heldTextItemId = item_id`, set no `text`; else as today |
 | `output_item.done` handler | `image_generation_call` with `result` → skeleton §4 steps (1)–(6): prompt into the open block and re-send its ordinal; decode, specs, `await` the upload; close with `now − startedAt`; sub-fields (`inlineImageGenOutput` on the chat path, `imageGenOutput` + `jobId` on the job path); push and send the `IMAGE_GEN` block with `inlineImageData: { width, height, cdnUrl, kind: "FINAL" }` and `imgGenFields`; then `activeBlock = TEXT(heldText)`, `text = heldText`, so the existing bottom-of-loop text frame releases it |
-| persist + `ai_chat_response` | `imgGenEnabled` stays `false` (a one-off is a TEXT message, step 3); `imgGenFields: { images }` on the **persist call only** so `mapImgs` creates the rows, never `revisedPrompt`; each `roundTrack` entry for an `IMAGE_GEN` block carries `inlineImageData` |
+| persist + `ai_chat_response` | `imgGenEnabled` stays `false` (a one-off is a TEXT message, step 3); no `imgGenFields`; the inline sub-fields go to the persist call's dedicated inline branch (input shape Andrew's, step 3); each `roundTrack` entry for an `IMAGE_GEN` block carries `inlineImageData` |
 
 The progress events and annotations need no code: neither matches a
 `closeBeforeEvent` case nor a handler, and with `thinkingText` and `text`
@@ -823,9 +842,9 @@ skeleton's; the linear file's are `trackedBlocks`, `grokThinkingDisplayAgg`,
 After the loop: the existing tool-round continuation, unchanged. After all
 rounds: `handleAiChatResponse` with `messageBlocks` (now including the
 `IMAGE_GEN` blocks with their `inlineImageData`), `imgGenEnabled: false`,
-and `imgGenFields: { images }` when non-empty so the attachment rows are
-created (step 3). The message stays `TEXT`; only the job entry (step 5)
-passes `imgGenEnabled: true`.
+no `imgGenFields`, and the inline sub-fields for the persist layer's inline
+branch (step 3). The message stays `TEXT`; only the job entry (step 5)
+passes `imgGenEnabled: true` and `imgGenFields`.
 
 #### 8.4a Where the wait actually is, and how it is shown (Andrew, 2026-09-21)
 

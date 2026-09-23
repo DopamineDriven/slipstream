@@ -23,6 +23,44 @@ export class ModelServiceWorkup extends ProviderValidation {
     return ByteCodec.decode(bytes);
   }
 
+  public handleImgExtension(
+    ext:
+      | "png"
+      | "jpeg"
+      | "webp"
+      | "apng"
+      | "gif"
+      | "bmp"
+      | "avif"
+      | "heic"
+      | "svg"
+      | "ico"
+      | "tiff"
+      | "unknown"
+      | "jpg"
+  ) {
+    return ext === "png"
+      ? "image/png"
+      : ext === "webp"
+        ? "image/webp"
+        : ext === "jpeg"
+          ? "image/jpeg"
+          : ext === "jpg"
+            ? "image/jpeg"
+            : "application/octet-stream";
+  }
+
+  public getGenMime(target: string) {
+    return target === "jpeg"
+      ? "image/jpeg"
+      : target === "jpg"
+        ? "image/jpeg"
+        : target === "png"
+          ? "image/png"
+          : target === "webp"
+            ? "image/webp"
+            : "application/octet-stream";
+  }
   public get sysNote() {
     return "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.\nOlder messages are made searchable via tooling to keep things light." as const;
   }

@@ -796,7 +796,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
           key: "sol",
           enabled: true,
           provider: "OPENAI",
-          model: "gpt-5.6-sol",
+          model: "gpt-6-sol",
           effort: "xhigh",
           maxOutputTokens: 128_000
         },
@@ -828,7 +828,7 @@ export class ConversationMemoryVectorService extends ConversationMemoryWorkupSer
           key: "kimi",
           enabled: true,
           provider: "MOONSHOTAI",
-          model: "kimi-k2.7-code",
+          model: "kimi-k3",
           maxOutputTokens: undefined
         },
         // gateway probe 2026-07-10: zai/glm-5.2 401'd once then hung 300s+ —

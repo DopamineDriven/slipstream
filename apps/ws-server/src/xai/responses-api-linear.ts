@@ -3,14 +3,18 @@ import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { S3FinalizePayload } from "@/types/index.ts";
 import type {
+  BlockImgData,
   FunctionCallContext,
   FunctionCallOutput,
   GrokActiveMessageBlock,
   GrokFinalizedMessageBlock,
+  InlineImageAggProps,
   ResponsesComprehensive
 } from "@/xai/responses-types.ts";
 import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
+import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import { GrokImgGenService } from "@/xai/img-gen.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
@@ -18,6 +22,7 @@ import type { S3Storage } from "@slipstream/storage-s3";
 import type { EventTypeMap } from "@slipstream/types";
 
 export class GrokResponsesApiLinearService extends GrokImgGenService {
+  protected cuid2: Promise<(typeof import("@paralleldrive/cuid2"))["createId"]>;
   constructor(
     redis: EnhancedRedisPubSub,
     s3: S3Storage,
@@ -41,6 +46,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
       apiKey,
       managementKey
     );
+    this.cuid2 = import("@paralleldrive/cuid2").then(t => t.createId);
   }
   protected encryptedTag = "*encrypted output...*" as const;
   protected async handleXAIAiResponsesApiRequest({
@@ -95,14 +101,24 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
     const reasoningPhaseDurationByKey = new Map<string, number>();
     let activeBlock: GrokActiveMessageBlock | undefined = undefined;
     let activeReasoningPhaseKey: string | undefined = undefined;
+    let inlineImageActive = false;
     let nextOrdinal = 0;
-
+    let seriesOrdinal = -1;
+    const inlineImageGenAgg = Array.of<InlineImageAggProps>();
+    let seriesId: string | undefined = undefined;
+    const seriesIdAgg = Array.of<string>();
+    let inlineImgAggArr:
+        | [number, string, string, string, string, $Enums.ImageGenOutputKind]
+        | undefined = undefined,
+      uploadImgInitial = 0,
+      uploadImgFinal = 0;
     const roundTrack = Array.of<{
       type: $Enums.MessageBlockType;
       content: string;
       durationMs: number;
       ordinal: number;
       conversationId: string;
+      inlineImageData?: BlockImgData;
     }>();
 
     const supportsFunctionTools = this.canUseFunctionTools(m);
@@ -252,6 +268,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                 durationMs: number;
               }
             | undefined = undefined;
+          let s3RTHelper: S3FinalizePayload | undefined = undefined;
 
           // Close the preceding block before consuming an event that changes
           // the active item, phase, or kind of content.
@@ -275,6 +292,136 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                 activeBlock.type !== "THINKING" ||
                 (activeReasoningPhaseKey !== undefined &&
                   activeReasoningPhaseKey !== phaseKey);
+            }
+          }
+          if (activeBlock) {
+            if (chunk.event === "response.output_item.added") {
+              if (chunk.data.item.type === "image_generation_call") {
+                thinkingText = "*Generating Image...*";
+                activeBlock = {
+                  type: "THINKING",
+                  content: thinkingText,
+                  itemIds: [chunk.data.item.id],
+                  startedAt: performance.now()
+                };
+                thinkingChunks.push(thinkingText);
+                grokThinkingDisplayAgg += thinkingText;
+              }
+            } else if (chunk.event === "response.output_item.done") {
+              if (chunk.data.item.type === "image_generation_call") {
+                if (typeof seriesId === "undefined") {
+                  const cuid2 = (await this.cuid2)();
+                  seriesId = cuid2;
+                } else {
+                  /**
+                 * Grok models don't do partial images, so this is safe to do for resetting seriesId
+                 * to a fresh cuid2 value in the event of greater than 1 inline image in a turn
+                 * else we would want to:
+                 * ```ts
+        *           if (inlineImageActive && typeof inlineImgAggArr !== "undefined") {
+                      if (
+                        typeof seriesId !== "undefined" &&
+                        inlineImgAggArr[8] === "FINAL" &&
+                        seriesId === inlineImgAggArr[7]
+                      ) {
+                        seriesId = undefined;
+                      }
+                    }
+                 * ```
+                 */
+                  const gt0 = seriesIdAgg.length > 0;
+                  if (gt0) {
+                    const lastIndex = seriesIdAgg[seriesIdAgg.length - 1];
+                    if (lastIndex && lastIndex === seriesId) {
+                      seriesId = undefined;
+                      const cuid2 = (await this.cuid2)();
+                      seriesId = cuid2;
+                    }
+                  }
+                }
+                if (seriesOrdinal === -1) {
+                  seriesOrdinal += 1;
+                }
+                text = chunk.data.item.prompt;
+                inlineImgAggArr = [
+                  seriesOrdinal,
+                  chunk.data.item.result,
+                  chunk.data.item.id,
+                  chunk.data.item.prompt,
+                  seriesId,
+                  "FINAL"
+                ];
+                inlineImageActive = true;
+                seriesIdAgg.push(seriesId);
+              }
+            }
+          }
+
+          if (inlineImageActive && typeof inlineImgAggArr !== "undefined") {
+            const sOrdinal = inlineImgAggArr[0];
+            const revisedPrompt = inlineImgAggArr[3];
+            const sId = inlineImgAggArr[4];
+            const kind = inlineImgAggArr[5];
+            const b64 = inlineImgAggArr[1];
+
+            const specs = (await this.prisma.extractor.extractRemote(
+              Buffer.from(b64, "base64"),
+              4096 * 48
+            )) as ExpandedImgSpecs;
+            const format = specs.format;
+            const filename = `${sId}-${sOrdinal}.${format}`;
+            const mime = specs.contentType ?? this.prisma.getGenMime(format);
+
+            uploadImgInitial = performance.now();
+
+            s3RTHelper = await this.s3.uploadGenerated(
+              Buffer.from(b64, "base64"),
+              this.prisma.isProd,
+              {
+                contentType:
+                  specs.contentType ?? this.prisma.getGenMime(format),
+                filename,
+                origin: "GENERATED",
+                userId,
+                size: specs.byteSize,
+                conversationId
+              }
+            );
+            const cdnUrl = s3RTHelper.cdnUrl;
+            const uploadDuration = performance.now() - uploadImgInitial;
+
+            const s3LastModified = s3RTHelper.lastModified
+              ? new Date(s3RTHelper.lastModified)
+              : new Date(uploadImgFinal);
+
+            const inlineImgObj = this.inlineImagePostUploadObj({
+              specs,
+              s3RTHelper,
+              userId,
+              filename,
+              format,
+              mime,
+              cdnUrl,
+              generatingModel: "grok-imagine-image-2.0",
+              facilitatingModel: m,
+              provider: "GROK",
+              conversationId,
+              seriesOrdinal: sOrdinal,
+              sId,
+              revisedPrompt,
+              kind,
+              uploadDuration,
+              s3LastModified
+            });
+
+            inlineImageGenAgg.push(inlineImgObj);
+            inlineImageActive = false;
+            inlineImgAggArr = undefined;
+            if (kind === "FINAL" && seriesId) {
+              seriesId = undefined;
+            }
+            if (kind === "FINAL" && seriesOrdinal !== -1) {
+              seriesOrdinal = -1;
             }
           }
 
@@ -991,9 +1138,9 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
         usage,
         chunk: grokAgg,
         conversationId,
-        responseOutput,
         done: true,
         imgGenEnabled: false,
+        audioGenEnabled,
         provider,
         userMsgId,
         title,

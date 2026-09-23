@@ -23,7 +23,7 @@ export type GrokImagineARUnion =
 
 export type GrokImgCapableModels =
   GrokImgGenFacilitatingModels | GrokImgGenModels;
-  
+
 export type GrokImagine2ARUnion = GrokImagineARUnion | "21:9" | "5:2";
 
 export type GrokImagineQualityUnion = "1k" | "2k";

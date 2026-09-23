@@ -94,6 +94,8 @@ export class ModelService extends ModelToolDefsService {
 
   public isOpenAIImgGenFacilitating(m: string) {
     return (
+      m === "gpt-6-sol" ||
+      m === "gpt-6-luna" ||
       m === "gpt-6-astra" ||
       m === "gpt-5.6-sol" ||
       m === "gpt-5.6-terra" ||

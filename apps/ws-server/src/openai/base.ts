@@ -56,33 +56,6 @@ export class OpenAIBaseService {
     return client;
   }
 
-  protected handleImgExtension(
-    ext:
-      | "png"
-      | "jpeg"
-      | "webp"
-      | "apng"
-      | "gif"
-      | "bmp"
-      | "avif"
-      | "heic"
-      | "svg"
-      | "ico"
-      | "tiff"
-      | "unknown"
-      | "jpg"
-  ) {
-    return ext === "png"
-      ? "image/png"
-      : ext === "webp"
-        ? "image/webp"
-        : ext === "jpeg"
-          ? "image/jpeg"
-          : ext === "jpg"
-            ? "image/jpeg"
-            : "application/octet-stream";
-  }
-
   protected async generateId(target: "itemId" | "generationGroupId") {
     const nanoid = await this.nanoId;
     if (target === "generationGroupId") {
@@ -234,7 +207,7 @@ export class OpenAIBaseService {
         compatS3ObjectId: rt.s3ObjectId,
         compatMime:
           rt.contentType ??
-          this.getGenMime(rt.extension ?? t[11] ?? expImg.format),
+          this.prisma.getGenMime(rt.extension ?? t[11] ?? expImg.format),
         compatReadyAt: null,
         compatStatus: "ALIASED",
         compatVersionId: rt.versionId,
@@ -293,7 +266,7 @@ export class OpenAIBaseService {
           isPartial: true,
           jobIndex: 0,
           kind: "PARTIAL",
-          mime: expImg.contentType ?? this.getGenMime(expImg.format),
+          mime: expImg.contentType ?? this.prisma.getGenMime(expImg.format),
           revisedPrompt: null,
           seriesId: t[2],
           seriesIndex: seriesIndex ? Number.parseInt(seriesIndex, 10) : o++
@@ -428,6 +401,8 @@ export class OpenAIBaseService {
           }
         }
       }
+      case "gpt-6-sol":
+      case "gpt-6-luna":
       case "gpt-6-astra":
       case "gpt-5.6-luna":
       case "gpt-5.6-sol":
@@ -463,6 +438,8 @@ export class OpenAIBaseService {
     imgGenEnabled = false
   ) {
     switch (model) {
+      case "gpt-6-sol":
+      case "gpt-6-luna":
       case "gpt-6-astra":
       case "gpt-5.6-luna":
       case "gpt=5.6-sol":

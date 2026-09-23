@@ -171,6 +171,8 @@ export class ProviderValidation {
 
   public openAIFacilitatingImgGenModel(model: string) {
     return (
+      model === "gpt-6-sol" ||
+      model === "gpt-6-luna" ||
       model === "gpt-6-astra" ||
       model === "gpt-5.6-sol" ||
       model === "gpt-5.6-terra" ||
@@ -238,7 +240,7 @@ export class ProviderValidation {
   }
 
   public isImgGenCapableModel<const V extends string = string>(
-    model = "gpt-6-astra" as V
+    model = "gpt-6-sol" as V
   ) {
     if (this.imgGenCapableModel(model)) return true;
     else return false;
@@ -249,7 +251,7 @@ export class ProviderValidation {
     model: Exclude<AllModelsUnion, AllPureImgGenModelsUnion>
   ): false;
   public isPureImgGenModel<const V extends AllModelsUnion = AllModelsUnion>(
-    model = "gpt-6-astra" as V
+    model = "gpt-6-sol" as V
   ) {
     if (!this.imgGenCapableModel(model)) {
       return false;
@@ -287,7 +289,7 @@ export class ProviderValidation {
     data?: { n?: number }
   ): undefined;
   public handleImgGenCount(
-    model: AllModelsUnion = "gpt-6-astra",
+    model: AllModelsUnion = "gpt-6-sol",
     data?: { n?: number }
   ) {
     if (this.grokImgGenCapable(model)) {
@@ -755,7 +757,7 @@ export class ProviderValidation {
         return "grok-imagine-image-2.0" satisfies AllModelsUnion;
       }
       case "openai": {
-        return "gpt-6-astra" satisfies AllModelsUnion;
+        return "gpt-6-sol" satisfies AllModelsUnion;
       }
       case "meta": {
         return "muse-image-1.0" satisfies AllModelsUnion;
@@ -886,7 +888,7 @@ export class ProviderValidation {
   }
 
   public handlePartialImgGen(
-    model: AllModelsUnion = "gpt-6-astra",
+    model: AllModelsUnion = "gpt-6-sol",
     data?: { partialImagesRequested?: number }
   ) {
     if (this.openAIImgGenCapable(model)) {
@@ -908,7 +910,7 @@ export class ProviderValidation {
   }
 
   public handleOutputSize(
-    model: AllModelsUnion = "gpt-6-astra",
+    model: AllModelsUnion = "gpt-6-sol",
     data?: { output_size?: ModelToAspectRatioOpts<typeof model> }
   ) {
     const m = model;
