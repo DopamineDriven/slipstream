@@ -716,6 +716,39 @@ optional field is additive. A boolean beside `type` would be a second copy
 of the same fact, and TypeScript cannot couple two independent optionals
 anyway; the client narrows on `inlineImageData !== undefined`.
 
+**The `IMAGE_GEN` chunk frame also carries the row itself, once (Andrew,
+2026-09-24).** `inlineImagePostUploadObj` already builds the DB-ready
+`InlineImageGenAggProps` from real S3 values for persist; the same object
+rides the chunk frame that carries the `IMAGE_GEN` block, as a frame-level
+field beside `imgGenFields`. One field, cardinality by event, mirroring
+`messageBlocks` exactly (Andrew, 2026-09-24): the singleton on a chunk, the
+aggregate array on the response —
+
+```ts
+// on AIChatResEntity<T>
+inlineImgGenData?: T extends "ai_chat_chunk"
+  ? InlineImageGenAggProps
+  : InlineImageGenAggProps[];
+```
+
+On a chunk: one image per frame, one frame per image under chaining,
+nothing accumulates across frames. On the response: the array the server
+collected, in the create shape, not a re-projection of rows — the persisted
+`AttachmentSingleton<true>` rows are already inside
+`convo.messages[0].attachments`, which is the truth at completion. The
+response-level field has the same standing as response-level
+`messageBlocks`: a mirror of what the server had, which the web store
+ignores and the CLI no longer reads at final state. `inlineImgAttachmentIds`
+remains the light bridge into `convo` for the persisted ids.
+
+Why: the client synthesizes its streaming attachment from a faithful
+template instead of placeholders (§10.11 b), exactly as the job lane does
+from `imgGenFields.images`; nothing new is exposed, since the committed row
+goes to the client wholesale at `applyResponse` anyway; and it is ~1.5 KB
+once per image, never per token — the base64 `result` is the bulk, and it
+stays out. The block's own `inlineImageData` remains the four-field render
+contract for lightweight consumers (the CLI paints from chunk blocks).
+
 An `IMAGE_GEN` frame is sent only once the url exists. For Grok that is one
 frame per image. For an OpenAI facilitator later, the same ordinal is
 re-sent as each PARTIAL lands and again for the FINAL; the client's
@@ -826,7 +859,7 @@ shows them in isolation; here is where each slots in.
 | the `closeBeforeEvent` decision | two guards while the image THINKING is open (`activeBlock.itemIds[0]` starts with `ig_`): an `output_text.delta` must **not** close it (the delta is held), and a reasoning `output_item.done` must **not** close it (§8.4a's unobserved case: hold that too rather than splitting the block) |
 | `output_item.added` handler | `image_generation_call` → the close already happened above; open the THINKING block blank, `startedAt = now`, send its frame inline with `isThinking: true` (the bottom-of-loop thinking frame is gated on `thinkingText`, which is empty here, so the send is explicit) |
 | `output_text.delta` handler | image THINKING open → `heldText += delta`, `heldTextItemId = item_id`, set no `text`; else as today |
-| `output_item.done` handler | `image_generation_call` with `result` → skeleton §4 steps (1)–(6): prompt into the open block and re-send its ordinal; decode, specs, `await` the upload; close with `now − startedAt`; sub-fields (`inlineImageGenOutput` on the chat path, `imageGenOutput` + `jobId` on the job path); push and send the `IMAGE_GEN` block with `inlineImageData: { width, height, cdnUrl, kind: "FINAL" }` and `imgGenFields`; then `activeBlock = TEXT(heldText)`, `text = heldText`, so the existing bottom-of-loop text frame releases it |
+| `output_item.done` handler | `image_generation_call` with `result` → skeleton §4 steps (1)–(6): prompt into the open block and re-send its ordinal; decode, specs, `await` the upload; close with `now − startedAt`; sub-fields (`inlineImageGenOutput` on the chat path, `imageGenOutput` + `jobId` on the job path); push and send the `IMAGE_GEN` block with `inlineImageData: { width, height, cdnUrl, kind: "FINAL" }` and, on the same frame, `inlineImgGenData: inlineImgObj` (the DB-ready row, singular on a chunk, step 2); then `activeBlock = TEXT(heldText)`, `text = heldText`, so the existing bottom-of-loop text frame releases it |
 | persist + `ai_chat_response` | `imgGenEnabled` stays `false` (a one-off is a TEXT message, step 3); no `imgGenFields`; the inline sub-fields go to the persist call's dedicated inline branch (input shape Andrew's, step 3); each `roundTrack` entry for an `IMAGE_GEN` block carries `inlineImageData` |
 
 The progress events and annotations need no code: neither matches a
@@ -1603,19 +1636,20 @@ producers return the same message shape.
               audioGenJob: true,                // ← already present in the web loaders
 ```
 
-**(b) Gap 4, the streaming message synthesizes the attachment.** Blocks stay
-blocks; the image is an attachment, exactly as it is once persisted. The
-builder lives beside the job lane's in `lib/img-gen-to-attachment.ts`, and
-its `messageBlockId` uses the same id scheme `toMessageBlocks` mints for the
-block, so the join holds by construction. This is the only reader of the
-wire block's `inlineImageData`. The synthetic row is display-only; the
-committed row replaces it wholesale at `applyResponse`.
+**(b) Gap 4, the streaming message synthesizes the attachment from the
+frame's template.** Blocks stay blocks; the image is an attachment, exactly
+as it is once persisted. The `IMAGE_GEN` chunk frame carries the DB-ready
+row (`inlineImgGenData`, singular on a chunk, step 2) beside the block, so the client adds only what
+Prisma would mint — temp `id`, `messageBlockId`, `messageId`, timestamps —
+and nothing is placeholdered or parsed from the url. `messageBlockId` uses
+the same id scheme `toMessageBlocks` mints for the block, so the join holds
+by construction. The synthetic row is display-only; the committed row
+replaces it wholesale at `applyResponse`.
 
 The type is the **read** shape, not `InlineImageGenAggProps`. The agg is the
 create shape: it strips `id`, timestamps, `messageId`, `messageBlockId` and
 the relations because Prisma mints or scopes them — and those are exactly
-what the client needs (`id` for keys, `messageBlockId` for the join). Same
-row, other side of persist:
+what the client adds. Same row, other side of persist:
 
 ```ts
 // packages/types (beside InlineImageGenAggProps)
@@ -1636,61 +1670,48 @@ required-nullable (`image`, `document`, `audio`, `imageGenOutput`,
 `CTR` would turn "absent because not included" into "required". The read
 shape above only tightens the two children this row always has.
 
-Because the wire is four fields by design, the row's storage scalars are
-placeholders (`""` for `bucket` / `key`, `null` where the column allows).
-The job lane's builder carries faithful values only because its wire
-sub-fields include `bucket`, `key`, `s3ObjectId`, `etag`; it has placeholders
-of its own (`conversationId: t.compatVersionId`, `messageId:
-t.requestMessageId ?? ""`). Widening the `IMAGE_GEN` frame to the agg entry
-would make the row faithful at the cost of the storage bulk cut from the
-wire; not worth it for a row that lives until `applyResponse`.
-
 ```ts
+// apps/web/src/lib/draft-to-message.ts — in the fold: pair the frame's
+// template with the frame's IMAGE_GEN block (same frame, same ordinal)
+    if (evt.inlineImgGenData && evt.messageBlocks?.type === "IMAGE_GEN") {
+      inlineImages.push({ agg: evt.inlineImgGenData, ordinal: evt.messageBlocks.ordinal });
+    }
+// DraftDerivation gains `inlineImages: { agg: InlineImageGenAggProps; ordinal: number }[]`
+
 // apps/web/src/lib/img-gen-to-attachment.ts (beside imgGenToAttachmentWorkup)
 // `streamingMessageId` is the synthetic `streaming-${conversationId}` that
 // streamingMessageFromDerived mints — the same value it hands toMessageBlocks —
-// known from the first frame. The real AI message id never enters this path;
-// applyResponse replaces the whole synthetic message with the DB rows.
+// known from the first frame. The real AI message id never enters this path.
 export function inlineImageAttachments(
   streamingMessageId: string,
-  conversationId: string,
-  userId: string,
-  blocks: readonly ChatChunkAndResMsgBlock[]
+  items: readonly { agg: InlineImageGenAggProps; ordinal: number }[]
 ) {
-  const out = Array.of<AttachmentSingleton<true>>();
   const now = new Date();
-  for (const block of blocks) {
-    if (block.type !== "IMAGE_GEN" || !block.inlineImageData) continue;
-    const { width, height, cdnUrl, kind } = block.inlineImageData;
-    // apps/web/src/lib/helpers.ts:211 — one derivation for the url anatomy;
-    // `sOrdinal` is already a number, `type` names the attachment relation
-    // the url belongs to ("inlineImageGenOutput" for a 24-char cuid2 series id,
-    // "imageGenOutput" for a 21-char nanoid or an OpenAI `ig_…` item id)
-    const { sId: seriesId, sOrdinal: seriesOrdinal, ext } = toCdnUrlConstituents(cdnUrl);
-    // the temp id is real identity, not an invention: the series id is minted
-    // on the server and `${seriesId}-${seriesOrdinal}` is unique per frame.
-    // Replaced by the cuid2 when `convo` hydrates the store at ai_chat_response.
-    const attachmentId = `${seriesId}-${seriesOrdinal}`;
+  const out = Array.of<InlineImageAttachment>();
+  for (const { agg, ordinal } of items) {
+    const { image, inlineImageGenOutput, ...row } = agg;
+    // the temp id is real identity: `${seriesId}-${seriesOrdinal}` is the
+    // url stem, minted on the server, unique per frame. Replaced by the
+    // cuid2 when `convo` hydrates the store at ai_chat_response.
+    const attachmentId = `${inlineImageGenOutput.seriesId}-${inlineImageGenOutput.seriesOrdinal}`;
     out.push({
+      ...row,
       id: attachmentId,
-      messageBlockId: `${streamingMessageId}-block-${block.ordinal}`, // ← toMessageBlocks' scheme, same input
+      messageBlockId: `${streamingMessageId}-block-${ordinal}`, // ← toMessageBlocks' scheme, same input
       messageId: streamingMessageId,
-      conversationId,
-      userId,
-      cdnUrl,
-      assetType: "IMAGE",
-      origin: "GENERATED",
-      status: "READY",
-      uploadMethod: "SERVER",
-      image: { attachmentId, width, height, format: ext, aspectRatio: width / height, frames: 1, animated: false, /* remaining ImageMetadata columns null */ createdAt: now, updatedAt: now },
-      inlineImageGenOutput: { id: `${attachmentId}-inline`, attachmentId,   // same stem; the real row gets its own cuid2 kind, width, height, seriesId, seriesOrdinal, ext, mime: `image/${ext}`, provider: "GROK", facilitatingModel: "", generatingModel: "", revisedPrompt: block.content, createdAt: now, updatedAt: now },
+      generationGroupId: null,
       imageGenOutput: null,
       audioGenOutput: null,
-      audio: null,
-      document: null,
-      /* every other Attachment column: null, as imgGenToAttachmentWorkup fills them */
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      image: { ...image, attachmentId, createdAt: now, updatedAt: now },
+      inlineImageGenOutput: {
+        ...inlineImageGenOutput,
+        id: `${attachmentId}-inline`,
+        attachmentId,
+        createdAt: now,
+        updatedAt: now
+      }
     } satisfies InlineImageAttachment);
   }
   return out;
@@ -1699,14 +1720,14 @@ export function inlineImageAttachments(
 // apps/web/src/lib/draft-to-message.ts:236 — the streaming message gets both lanes' attachments
     attachments: [
       ...imgGenAttachments(derived.imgGenFields),
-      ...inlineImageAttachments(id, ctx.conversationId, ctx.userId, derived.blocks)
+      ...inlineImageAttachments(id, derived.inlineImages)
     ],
 ```
 
-The two models are `""` on the synthetic row because the four-field wire
-does not carry them; nothing on the client reads them, and the committed
-row has the real values. `satisfies`, not the `as` the job-lane builder
-uses.
+Every field the row carries is the value persist will write, because it is
+the same object. The only things minted here are the ids and timestamps,
+and the two the agg set to `null` because the builder had to
+(`document`, `audio`) come through as-is.
 
 **(c) Gap 2, `toMessageBlocks` becomes a derivation anyway.** Not
 load-bearing for the image now (the attachment carries it), but a

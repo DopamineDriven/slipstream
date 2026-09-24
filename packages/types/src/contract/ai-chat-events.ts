@@ -83,6 +83,9 @@ export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   imgGenFields?: AIChatResponseImgGenFieldsFinal;
   audioGenEnabled?: boolean;
   audioGenFields?: AIChatResponseAudioGenFields;
+  inlineImgGenData?: T extends "ai_chat_chunk"
+    ? InlineImageGenAggProps
+    : InlineImageGenAggProps[];
 }
 
 export type AIChatRequest = {

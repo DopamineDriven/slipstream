@@ -106,6 +106,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
     let inlineImageActive = false;
     let seriesOrdinal = -1;
     const inlineImageGenAgg = Array.of<InlineImageGenAggProps>();
+    let imgGenAggObj: InlineImageGenAggProps | undefined = undefined;
     let seriesId: string | undefined = undefined;
     const seriesIdAgg = Array.of<string>();
     let inlineImgAggArr:
@@ -405,7 +406,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               uploadDuration,
               s3LastModified
             });
-
+            imgGenAggObj=inlineImgObj;
             inlineImageGenAgg.push(inlineImgObj);
 
             // the image lands in the block system, three steps, inline:
@@ -1039,7 +1040,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
         temperature,
         topP
       });
-      
+
       ws.send(
         JSON.stringify({
           type: "ai_chat_response",
