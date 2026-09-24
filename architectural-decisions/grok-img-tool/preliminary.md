@@ -690,9 +690,23 @@ const seriesId = stem.slice(0, stem.lastIndexOf("-"));              // cTygUBM6E
 ```
 
 Fixed offsets, `lastIndexOf` for the two separators (a nanoid may itself
-contain `-`, a cuid2 cannot), no defensive parsing. `mapImgs` in the
-persist layer already derives the series id from the url path the same
-way.
+contain `-`, a cuid2 cannot; the ordinal separator is always the last dash,
+so `lastIndexOf` keeps a dashed nanoid whole), no defensive parsing.
+`mapImgs` in the persist layer already derives the series id from the url
+path the same way, and `apps/web/src/lib/helpers.ts:211`
+`toCdnUrlConstituents(cdnUrl)` is the client's one implementation — it
+returns `{ type, sId, sOrdinal, ext, timestampMs }`, where `type` is the
+attachment relation the url belongs to, decided by the cuid2 shape
+**anchored to the whole id** — `/^[a-z0-9]{24}$/.test(sId)` →
+`"inlineImageGenOutput"`, else `"imageGenOutput"` (a 21-char nanoid from
+Meta / the pure image lanes, or the OpenAI facilitator's item id, which is
+`/^ig_[a-f0-9]{50}$/`, 53 chars, verified across half a dozen). The anchors
+matter: unanchored, fifty contiguous hex chars contain 24-runs of `[a-z0-9]`
+and every OpenAI facilitator output would read as inline. Forward intent:
+inline OpenAI images (a later feature) will mint cuid2 series ids too, so
+"cuid2 ⇒ inline" holds across providers and `ig_` stays a job-lane shape.
+Verified in the TS playground against a live Meta url: `{ type: "imageGenOutput", sId:
+"cTygUBM6EZ4cHeSElCCJN", sOrdinal: 0, ext: "webp", timestampMs: 1790010492109 }`.
 
 Why not a discriminated union on `type`, and why no `isInlineImage`
 boolean: nineteen provider handlers build `roundTrack` entries as
@@ -1633,8 +1647,12 @@ wire; not worth it for a row that lives until `applyResponse`.
 
 ```ts
 // apps/web/src/lib/img-gen-to-attachment.ts (beside imgGenToAttachmentWorkup)
+// `streamingMessageId` is the synthetic `streaming-${conversationId}` that
+// streamingMessageFromDerived mints — the same value it hands toMessageBlocks —
+// known from the first frame. The real AI message id never enters this path;
+// applyResponse replaces the whole synthetic message with the DB rows.
 export function inlineImageAttachments(
-  messageId: string,
+  streamingMessageId: string,
   conversationId: string,
   userId: string,
   blocks: readonly ChatChunkAndResMsgBlock[]
@@ -1644,19 +1662,19 @@ export function inlineImageAttachments(
   for (const block of blocks) {
     if (block.type !== "IMAGE_GEN" || !block.inlineImageData) continue;
     const { width, height, cdnUrl, kind } = block.inlineImageData;
-    const basename = cdnUrl.slice(cdnUrl.lastIndexOf("/") + 1);
-    const stem = basename.slice(14, basename.lastIndexOf("."));   // `${seriesId}-${seriesOrdinal}`
-    const seriesId = stem.slice(0, stem.lastIndexOf("-"));
-    const seriesOrdinal = Number.parseInt(stem.slice(stem.lastIndexOf("-") + 1), 10);
-    const ext = basename.slice(basename.lastIndexOf(".") + 1);
+    // apps/web/src/lib/helpers.ts:211 — one derivation for the url anatomy;
+    // `sOrdinal` is already a number, `type` names the attachment relation
+    // the url belongs to ("inlineImageGenOutput" for a 24-char cuid2 series id,
+    // "imageGenOutput" for a 21-char nanoid or an OpenAI `ig_…` item id)
+    const { sId: seriesId, sOrdinal: seriesOrdinal, ext } = toCdnUrlConstituents(cdnUrl);
     // the temp id is real identity, not an invention: the series id is minted
-    // on the server and the stem is unique per frame. Replaced by the cuid2
-    // when `convo` hydrates the store at ai_chat_response.
-    const attachmentId = stem;
+    // on the server and `${seriesId}-${seriesOrdinal}` is unique per frame.
+    // Replaced by the cuid2 when `convo` hydrates the store at ai_chat_response.
+    const attachmentId = `${seriesId}-${seriesOrdinal}`;
     out.push({
       id: attachmentId,
-      messageBlockId: `${messageId}-block-${block.ordinal}`,   // ← toMessageBlocks' scheme
-      messageId,
+      messageBlockId: `${streamingMessageId}-block-${block.ordinal}`, // ← toMessageBlocks' scheme, same input
+      messageId: streamingMessageId,
       conversationId,
       userId,
       cdnUrl,
@@ -1814,30 +1832,15 @@ with its url; the THINKING block before it owns the wait), but it stays so
 the component is ready for a producer that opens the slot before the first
 frame lands.
 
-**The provider is the tell for partials (Andrew, 2026-09-24).** Only OpenAI
-facilitators emit partial images during streaming; Grok's tool emits one
-FINAL. `kind` says what *this* frame is; the provider says whether another
-frame can follow it. Both paths know it before any frame arrives —
-`message.provider` (`$Enums.Provider`) on a committed message,
-`ctx.provider` in the streaming builder — so the bubble derives one boolean
-and passes it down:
-
-```tsx
-// message-bubble, IMAGE_GEN case
-const expectsPartials = message.provider === "OPENAI";
-<InlineImageBlock … expectsPartials={expectsPartials} />
-
-// InlineImageBlock: `kind` remains the runtime truth; `expectsPartials` is
-// the prior. A Grok frame is complete on arrival, so the "sharpening"
-// affordances never need to arm; for OpenAI a PARTIAL means "more coming".
-```
-
-A single `=== "OPENAI"` check today; if a third provider grows partials it
-becomes a predicate in `@slipstream/img-gen` beside the other facilitator
-predicates, not a second boolean. The surface is small by construction:
-**only Grok (4.6 / 4.7) and the OpenAI facilitators have `image_generation`
-tooling to date** (2026-09-24), so an `IMAGE_GEN` block can only originate
-from those two providers, and of the two only OpenAI streams partials.
+**No provider logic for PARTIAL vs FINAL (Andrew, 2026-09-24).** The canvas
+treats every provider the same way — Meta, Gemini, Grok, OpenAI image jobs
+all render through it flawlessly — because it reacts only to `kind` on the
+frame in hand. The inline component does exactly that. A Grok inline frame
+is FINAL by construction (its tool emits one frame); an OpenAI frame is
+PARTIAL until the FINAL lands; the component never asks who sent it. For
+context, not code: only Grok (4.6 / 4.7) and the OpenAI facilitators have
+`image_generation` tooling to date, and of the two only OpenAI streams
+partials.
 
 ```tsx
 // apps/web/src/ui/chat/inline-image/index.tsx (new)

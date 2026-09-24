@@ -1,8 +1,6 @@
-# Slipstream — Turborepo
+# AI Coalesce Turborepo &mdash; *Slipstream*
 
-
-![Attachment Pipeline Overview](./misc/slipstream-overview-asset-pipeline-update-white.png)
-
+![AI Coalesce](https://assets.aicoalesce.com/generated/nrr6h4r4480f6kviycyo1zhf/1787196875269-ig_0f376ef80c416d25016a86754c92b88191a19a45b016263488-1.png)
 
 ## Typical Flows
 
@@ -18,4 +16,4 @@
 
 Questions or improvements? The WS protocol and flows are defined in `packages/types`—start there for changes.
 
-![AI Coalesce](https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1759131668389-aicoalesce-og-final-1758955992844.png)
+![Attachment Pipeline Overview](./misc/slipstream-overview-asset-pipeline-update-white.png)
