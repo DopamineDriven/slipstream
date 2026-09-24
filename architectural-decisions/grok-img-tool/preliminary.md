@@ -1262,3 +1262,782 @@ carry only the four wire fields, map it there.
   set and `inlineImageGenOutput` populated, from the re-read.
 - **On reload:** the DB block plus its attachments by `messageBlockId`;
   `toMessageBlocks` derives `inlineImageData` from them (step 7).
+
+---
+
+## 10. Web investigation: how the client renders blocks and attachments today
+
+Read-only survey of `apps/web`, `packages/ui`, and `packages/types`,
+2026-09-23, before any web code is written for `IMAGE_GEN`. Findings only;
+the approach is decided after this, and step 7 will be rewritten from it.
+Line numbers are as of commit `d18b555`.
+
+### 10.1 Streaming path (chunk frames → the draft bubble)
+
+- `store-registry.ts:139` routes every `ai_chat_chunk` to
+  `ChatStore.applyChunk` (`state/chat/store.ts:220-229`), which appends the
+  raw frame to `draftSnapshot`. Nothing else happens per frame.
+- `ai-chat-context.tsx:171-174` folds the draft with `deriveDraft` in a
+  `useMemo`. `deriveDraft` (`lib/draft-to-message.ts:94-170`):
+  - `mergeBlock` (36-43) replaces the block at the same ordinal wholesale
+    and re-sorts (`orderBlocks`, 30-31). A later frame for an ordinal wins.
+  - `textFromBlocks` (45-49) keeps `TEXT` only; `thinkingTextFromBlocks`
+    (51-55) and `thinkingDurationFromBlocks` (57-64) keep `THINKING` /
+    `ENCRYPTED_THINKING` only (`isThinkingBlock`, 33-34).
+  - `isThinking` (132-137) takes `evt.isThinking` when it is a boolean, else
+    `isThinkingBlock(latest)`. Every xAI frame sets the boolean, so an
+    `IMAGE_GEN` frame with `isThinking: false` behaves.
+  - `derived.blocks` keeps the wire blocks intact, `inlineImageData`
+    included. The context exposes them as `streamingMessageBlocks`
+    (`ai-chat-context.tsx:213`); **no UI reads that field.**
+- `streamingMessageFromDerived` (`draft-to-message.ts:204-242`) builds the
+  bubble's message: id `streaming-${conversationId}` (208); `messageType`
+  is `IMAGE_GEN` only via the job-lane `imgGenEnabled` flag, else `TEXT`
+  (215-219); `attachments` come from `imgGenAttachments(derived.imgGenFields)`
+  (182-196), job lane only, so an inline turn streams with **no
+  attachments**; `messageBlocks` is `toMessageBlocks(id, [...derived.blocks])`
+  (240).
+- **`toMessageBlocks` drops `inlineImageData`.** `lib/ui-message-helpers.ts:25-35`
+  promotes a wire block by enumerating nine fields; the DB branch (18-23)
+  spreads. So the streaming bubble's blocks carry no url, size, or kind.
+  The promoted type is `MessageBlockSingleton<true>`, which has no image
+  field (`packages/types/src/types.ts:146-151`).
+- `dynamic/index.tsx:119-125` appends the streaming message to the committed
+  list; `chat-feed/index.tsx:190-231` passes the `live*` props only to the
+  bubble whose id starts with `streaming-`.
+
+### 10.2 Committed and hydrated paths
+
+- **Live commit.** `store.ts:239-257` `applyResponse` →
+  `ingestConversation(evt.convo)` (159-173): split, upsert by id,
+  `rebuildCommitted` sorts by `ordinal` (`message-workup.ts:26-31`). The
+  draft is dropped. The AI message is `convo.messages[0]`
+  (`message-workup.ts:55-59`). The response's own `messageBlocks` array is
+  never read (§10.8 rule holds by construction).
+- **What the live commit carries** comes from
+  `apps/ws-server/src/prisma/chat-response.ts:257-277`: `messageBlocks: true`,
+  attachments with `imageGenOutput`, `audioGenOutput`,
+  **`inlineImageGenOutput: true`** (269), `image`, `document`, `audio`; the
+  post-transaction fresh pull uses the same include (§9.5).
+- **SWR hydration** (`hooks/use-hydrate-chat-store.ts:21-27` →
+  `store.hydratePage` → `ingestConversation`). Loader
+  `hooks/use-conversation-messages.ts:68-81`: page 0 hits
+  `app/api/users/[userId]/chat/[conversationId]/route.ts:31`, older pages
+  `messages/[cursorId]/route.ts:45`; both call
+  `PrismaUserMessageService.getConversationMessagesPage` (`orm/index.ts:13`).
+- **The hydration include lacks the lineage relation.**
+  `orm/user-message-service.ts:161-191`: `messageBlocks: { orderBy: { ordinal:
+  "asc" } }` (175); attachments include `audioGenOutput, image, video,
+  document, imageGenOutput, audio` (178-185). **`inlineImageGenOutput` is
+  not there.** `messageBlockId` does come through (a scalar on
+  `Attachment`). Same gap in `getMsgsByCursorId` (113-135) and
+  `getMessagesByConversationIdWithAssets` (237-261);
+  `getMessagesByConversationId` (36-47) loads no attachments at all.
+  `bigIntToIntMsg` (49-84) spreads the attachment, so the relation would
+  pass through once selected. Net: **a live commit and a reload return
+  different attachment shapes today.**
+- **The WS prewarm is a fourth producer** (see
+  `architectural-decisions/2026-06-26/conversation-hydration.md`). Once page 0
+  is visible and has a `nextCursor`, `ConversationHydrationProvider`
+  (`context/convo-hydration-context.tsx`) sends `hydrate_conversation`; the
+  ws-server's `PrismaConvoHydrationService` async generator
+  (`apps/ws-server/src/prisma/convo-hydration.ts:103-127`) yields pages
+  (`ordinal < cursor`, `messageBlocks` ordered asc) that come back on one
+  `hydrate_conversation_ack` and are written straight into SWR cursor keys
+  (`["cursor", userId, conversationId, cursorOrdinal]`, keys from
+  `lib/conversation-pages.ts`) with `revalidate: false`. They never touch the
+  store until `useLoadOlderHistory` bumps SWR `size`; then they flow through
+  `hydratePage` → `ingestConversation` like any fetched page. **Its include
+  (116-122) lists `imageGenOutput, audioGenOutput, image, document, audio`
+  and not `inlineImageGenOutput`**, so the mapper's `inlineImageGenOutput ??
+  undefined` (38-40) always resolves to `undefined`.
+- **Shape parity is a four-producer problem, and the prewarm is the one
+  that carries the volume.** A message can reach the store from the live
+  commit (`chat-response.ts`, has the lineage), the page-0 route, a cursor
+  route, or a prewarmed cursor key (all three missing it). In practice the
+  client fetches only the first page (`CONVERSATION_PAGE_SIZE = 12`), the
+  server then pushes every remaining page within milliseconds, and the
+  viewport observer's upward trigger resolves each older page from the warm
+  key; the cursor route only fires when a key is cold. So **every message
+  beyond page 0 normally arrives through the prewarm generator**, which
+  makes its include the first of the three to fix, not the last. The bubble
+  renders whichever shape it was handed, so the same message can render
+  differently depending on how it arrived.
+- Blocks are never loaded with their `attachments` relation anywhere; the
+  only block → image path is `message.attachments.find(a => a.messageBlockId
+  === block.id)`, and **no such lookup exists in `apps/web`.**
+
+### 10.3 The bubble (`ui/chat/message-bubble/index.tsx`)
+
+- `orderedMessageBlocks` (128-142), AI only, sorted by ordinal;
+  `latestMessageBlock` (145); `blockOrdinalKey` (146).
+- Committed blocks get async markdown (453-516) through
+  `processMarkdownToReact` with no type filter, so an `IMAGE_GEN` block's
+  content (the prompt) is markdown-processed too. Cache key
+  `block-${message.id}-${ordinal}-${type}-${len}` (482).
+- **`renderedMessageBlocks` (518-582) has exactly two branches.**
+  `THINKING` / `ENCRYPTED_THINKING` (538-554) → `<ThinkingSection>` keyed
+  `${message.id}-thinking-${ordinal}`, live only when streaming AND
+  `liveIsThinking === true` AND it is the latest block (532-536).
+  **Everything else** (556-569), which today includes `IMAGE_GEN`, → a
+  `<div>` keyed `${message.id}-text-${ordinal}` with the content as
+  streamed or processed markdown. Empty content is skipped (556-558). So an
+  `IMAGE_GEN` block currently renders its prompt as a paragraph.
+- **Keys include `message.id`** (541, 562). When the `streaming-<id>` message
+  is replaced by the committed row at `applyResponse`, every block remounts.
+  An inline image rendered at its block would remount at that moment and
+  show its placeholder again.
+- **Job-lane image logic** (`imageGenerationData`, 193-336): reads
+  `liveImgGenFields` via `normalizeImgGenFields`; falls back to
+  `message.attachments.filter(att => att.imageGenOutput !== null)` (264-270).
+  Inline rows have `imageGenOutput: null`, so they are excluded from it.
+  Renders `<ImageGenerationCanvasTest>` (679-696); else, when attachments
+  exist AND `messageType === "IMAGE_GEN"`, a second canvas over every
+  attachment url (697-728). Inline turns are committed as `TEXT`, so they
+  miss this too.
+- **The trailing attachment group (730-745) renders nothing visible for AI
+  messages.** The label is `sr-only` for AI (735-738) and
+  `<AttachmentDisplay>` mounts **only for USER** (741-743). There is no
+  filtering because there is nothing to filter. What does happen: the bubble
+  widens to `w-[85%]` whenever `attachments.length > 0` (604-608).
+- Net for a committed inline turn today: the image row is present on the
+  message and **renders nowhere**; the block renders the prompt as text; the
+  bubble is widened.
+- `liveImgGenEnabled` is destructured and unused (39, 67-79).
+  `liveImgGenAttachmentId` reaches any bubble while `imgGenFields` is defined
+  (`chat-feed:194-202`). `MessageBubble` is `memo`'d (776).
+
+### 10.4 The existing image component
+
+- **`ImageGenerationCanvasTest`** (`ui/chat/image-gen/index.tsx`; it lived in
+  `test.tsx` until 2026-09-24, when Andrew moved it into the previously
+  unreferenced `index.tsx`, fixed the bubble's import, and deleted
+  `test.tsx`) is the one the bubble uses. The bubble picks FINAL vs latest PARTIAL, not the
+  component: it sorts by `imageGenOutput.seriesIndex`, dedupes by `cdnUrl`,
+  passes `currentImageIndex = urls.length - 1`; `kind === "FINAL"` ends
+  `isGenerating` (`message-bubble:221-251, 272-294`).
+- Inside: refs + state update the displayed url / width / height / id /
+  kind **only when the new value differs and is truthy** (29-87). The last
+  good image stays on screen between frames. That is the zero-flicker
+  mechanism.
+- One `next/image` `<Image>` with **no `key`**, so it is not remounted when
+  `src` changes (107-117): `width={w} height={h}`, `style={{ aspectRatio: w /
+  h }}`, `object-cover`, `priority`, `placeholder="blur"`,
+  `blurDataURL={shimmer([w, h])}`.
+- The container is a fixed **`aspect-square w-full max-w-3xl rounded-2xl`**
+  (93); the image is `object-cover` inside it, so a 16:9 image is cropped to
+  a square. PARTIAL overlays: `scanning-line`, `animate-pulse-glow` corners
+  (119-128); a `ripple-container` and a "Generating image…" pill with the
+  prompt show until the first url (94-100, 169-183).
+- `ImageGenerationCanvas` (`image-generation-canvas.tsx`) and `series-stack.tsx`
+  are unreferenced today and **stay on purpose**: they are the basis for a
+  future replay of partial-image output. Don't prune. The generic
+  `AttachmentDisplay` image branch
+  (`attachment-display/index.tsx:179-241`) is a fixed `h-64` box with
+  `<Image fill object-contain>`, no placeholder; USER messages only.
+
+### 10.5 Shimmer, image config, sizing
+
+- `packages/ui/src/lib/shimmer.ts`: `shimmer([w, h])` returns a
+  `data:image/svg+xml;base64,…` animated gradient; exported from
+  `packages/ui/src/index.ts:264-265`. Used in the canvas
+  (`image-gen/index.tsx`) and `ui/auth/index.tsx:80` only.
+- `next.config.ts` `images.remotePatterns` lists `assets.aicoalesce.com` and
+  `assets-dev.aicoalesce.com` (https). **`unoptimized: true` is set
+  globally**, so `next/image` serves the CDN url as-is; `placeholder="blur"`
+  with an explicit `blurDataURL` still works.
+- No component sizes an image from its real width and height: both canvases
+  are `aspect-square`, `AttachmentDisplay` is `h-64`.
+  `ui/atoms/aspect-ratio-shape/index.tsx:24-34` computes a w/h fit;
+  `packages/ui/src/lib/scale-ratio.ts` exists (not read).
+
+### 10.6 Thinking UI (`ui/chat/thinking/index.tsx`)
+
+- Props: `thinkingContent`, `isStreaming`, `duration` (ms), `className`,
+  `isThinking` (18-24). While `isThinking`, a `requestAnimationFrame` loop
+  from `performance.now()` drives `displayDuration` at ~10 Hz, 0.1 s
+  precision (45-84); when not thinking, `round(duration / 1000, 1)` (87-106).
+- Header is hard-coded: "Thinking for" / "Thought for" + `<AnimateNumber>`
+  (motion-plus) + "seconds…" (173-190), spinning `Sparkles` while thinking
+  (154-172). Body is a collapsed-by-default Radix `Accordion` (197-216).
+- **No per-type variant.** The image THINKING block would read "Thinking
+  for 4.2 seconds…" with "*Generating Image...*" hidden inside the collapsed
+  accordion.
+
+### 10.7 Types in play
+
+The singleton types preserve the database relations, nothing more, nothing
+less (`packages/db/erd/ERD.mmd` is the source; the one tolerated deviation
+is an omitted back-mapping to `User` where it caused trouble). The edges
+this feature rides on: `Attachment }o--|o MessageBlock` (the block's
+`attachments[]` is the back-relation), `ImageMetadata |o--|| Attachment`,
+`InlineImageGenOutput |o--|| Attachment`. `MessageBlock` has no image-shaped
+edge, so `MessageBlockSingleton` gets no image field — the streaming path
+synthesizes the attachment instead (§10.11 b).
+
+- `MessageBlockSingleton<T>` (`types.ts:146-151`): Prisma `MessageBlock`
+  (`id, conversationId, messageId, ordinal, content, type, durationMs,
+  createdAt, updatedAt`) + `message?` + `attachments?: AttachmentSingleton<T>[]`.
+  No image field.
+- `AttachmentSingleton<T>` (`types.ts:220-234`): includes the
+  `messageBlockId: string | null` scalar, `imageGenOutput: … | null`,
+  `image: … | null`, and `inlineImageGenOutput?: InlineImageGenOutputSingleton<T>`
+  (233, optional).
+- `InlineImageGenOutputSingleton` (`types.ts:84-88`): `kind, provider,
+  facilitatingModel, generatingModel, seriesId, seriesOrdinal, attachmentId,
+  width, height, mime, ext, revisedPrompt?`.
+- `ChatChunkAndResInlineImageData` (`contract/ai-chat-events.ts:47-52`) =
+  `{ width, height, cdnUrl, kind }`; `ChatChunkAndResMsgBlock` (54-61) adds
+  `inlineImageData?`. `$Enums.MessageBlockType` =
+  `ENCRYPTED_THINKING | THINKING | TEXT | IMAGE_GEN`.
+
+### 10.8 Text pacing
+
+- **None exists.** Streaming text re-renders synchronously from
+  `processStreamingMarkdown` (`lib/markdown-streaming.tsx:25`) on every
+  draft change (`message-bubble:159-162, 564-565`). The only frame
+  coalescing is `hooks/use-chat-ws.ts:38-44` (`lastEventCb`, one call per
+  frame), and the chat store bypasses it: `store-registry.ts:139` receives
+  events directly from `addListener`, one `applyChunk` per frame. The only
+  rAF loops in chat UI are the ThinkingSection timer and scroll-to-bottom
+  (`chat-feed:131-153`). `ui/atoms/animated-reveal` is a menu demo, not a
+  text revealer.
+
+### 10.9 Gaps for `IMAGE_GEN`, as they stand
+
+1. `renderedMessageBlocks` has no `IMAGE_GEN` case; the block renders its
+   prompt as text (556-569), and the async markdown pass processes it.
+2. `toMessageBlocks` drops `inlineImageData` (`ui-message-helpers.ts:25-35`),
+   so the streaming bubble has no url, size, or kind for the block.
+3. `MessageBlockSingleton` has no image field **and must not get one**:
+   image data is a child of `Attachment` (`ImageMetadata`,
+   `InlineImageGenOutput`). The block → attachment lookup by
+   `messageBlockId` exists nowhere in the client yet.
+4. The streaming message has no attachments for an inline turn
+   (`imgGenAttachments` covers the job lane only), so nothing on it carries
+   the url. The job lane solves the same problem by synthesizing
+   committed-shaped attachments from the wire (`lib/img-gen-to-attachment.ts`);
+   the inline lane can do the same from the block's `inlineImageData`, keyed
+   to the block by the synthetic id `toMessageBlocks` mints, so committed and
+   streaming resolve through one path.
+5. Four producers, one with the lineage: the live commit includes
+   `inlineImageGenOutput`; the web page-0 loader, the cursor loader, and the
+   ws-server prewarm generator (`convo-hydration.ts:116-122`) do not. One
+   include line in each of the three (plus `getMsgsByCursorId` and
+   `getMessagesByConversationIdWithAssets` if they stay in use).
+6. The feed keys every bubble by `message.id` (`chat-feed/index.tsx:207`),
+   so the streaming → committed swap remounts the whole bubble; block keys
+   are irrelevant to it and nothing inside the bubble can prevent it. It
+   does not need preventing: the committed image has the same `src`, the
+   browser has it cached from the streaming paint, and `next/image` removes
+   the blur placeholder as soon as the mounted `img` reports `complete`.
+   The job lane's canvas remounts the same way today with no visible flash.
+7. The trailing group renders nothing for AI messages, so there is no
+   double render to filter; the plan's step 7 premise is inverted. The
+   bubble does widen to `w-[85%]` when the message has attachments.
+8. The only image canvas is `aspect-square` with `object-cover`; a
+   non-square inline image would be cropped.
+9. ~~`ThinkingSection` has one label~~ — not a gap; the component stays untouched by design (§10.11 g).
+10. There is no client-side text pacing; the post-upload burst lands as one
+    synchronous re-render.
+
+### 10.10 Corrections this makes to step 7
+
+- Drop the "double-render rule" bullet: nothing renders in the AI trailing
+  group. Replace with the `w-[85%]` observation.
+- `toMessageBlocks` is a projection, not a derivation (§10.1); the fix is
+  the derived `UIMessageBlock` spread, not a field added to the enumeration.
+- Add: every producer of message rows needs `inlineImageGenOutput: true` —
+  the two web loaders AND the ws-server prewarm generator, or prewarmed
+  pages render the image differently from fetched ones.
+- Add: the streaming → committed remount is at the feed level and is
+  harmless for a cached `src`; no key gymnastics.
+- Add: `unoptimized: true` is global, so `next/image` sizing comes entirely
+  from the props we pass.
+- The client-side text pacing item stays open; there is no existing hook to
+  attach it to.
+
+### 10.11 Targeted changes, one snippet per gap
+
+Proposals against the code as read in §10.1–10.9. Nothing here is applied.
+Each is the smallest change that closes its gap; together they are step 7.
+
+**(a) Gap 5, shape parity — one line in each producer. Done 2026-09-24
+(Andrew).** Prewarm first, since it carries every page beyond page 0. And the mirror-image gap while
+in there: the web loaders include `audioGenJob` beside `imageGenJob` (the
+ERD gives both the same `|o--|| Message : requestMessage` edge), but the
+live commit (`chat-response.ts:264`, `:505`) and the prewarm generator's
+include (`convo-hydration.ts:112`) carry `imageGenJob` only. Nothing reads
+`message.audioGenJob` on the client yet; the point is that all four
+producers return the same message shape.
+
+```ts
+// apps/ws-server/src/prisma/convo-hydration.ts:116   (prewarm generator)
+// apps/web/src/orm/user-message-service.ts:178        (page 0)
+// apps/web/src/orm/user-message-service.ts:124, 247   (cursor fallback, with-assets)
+                include: {
+                  imageGenOutput: true,
+                  audioGenOutput: true,
+                  inlineImageGenOutput: true,   // ← the one line
+                  image: true,
+                  document: true,
+                  audio: true
+                }
+
+// and on the message include of the live commit + prewarm generator:
+              imageGenJob: true,
+              audioGenJob: true,                // ← already present in the web loaders
+```
+
+**(b) Gap 4, the streaming message synthesizes the attachment.** Blocks stay
+blocks; the image is an attachment, exactly as it is once persisted. The
+builder lives beside the job lane's in `lib/img-gen-to-attachment.ts`, and
+its `messageBlockId` uses the same id scheme `toMessageBlocks` mints for the
+block, so the join holds by construction. This is the only reader of the
+wire block's `inlineImageData`. The synthetic row is display-only; the
+committed row replaces it wholesale at `applyResponse`.
+
+The type is the **read** shape, not `InlineImageGenAggProps`. The agg is the
+create shape: it strips `id`, timestamps, `messageId`, `messageBlockId` and
+the relations because Prisma mints or scopes them — and those are exactly
+what the client needs (`id` for keys, `messageBlockId` for the join). Same
+row, other side of persist:
+
+```ts
+// packages/types (beside InlineImageGenAggProps)
+export type InlineImageAttachment = DX<
+  Rm<AttachmentSingleton<true>, "image" | "inlineImageGenOutput"> & {
+    image: ImageSingleton;
+    inlineImageGenOutput: InlineImageGenOutputSingleton<true>;
+  }
+>;
+```
+
+Why the agg can `Rm` what it does: on `AttachmentSingleton` the relations
+whose presence depends on the query's include are optional (`providerLinks?`,
+`providerStoreDocs?`, `userStoreDoc?`, `ttsJob?`, `dictationJobs?`,
+`inlineImageGenOutput?`), and the five every standard include selects are
+required-nullable (`image`, `document`, `audio`, `imageGenOutput`,
+`audioGenOutput`). The agg removes the conditional ones *before* `CTR`, or
+`CTR` would turn "absent because not included" into "required". The read
+shape above only tightens the two children this row always has.
+
+Because the wire is four fields by design, the row's storage scalars are
+placeholders (`""` for `bucket` / `key`, `null` where the column allows).
+The job lane's builder carries faithful values only because its wire
+sub-fields include `bucket`, `key`, `s3ObjectId`, `etag`; it has placeholders
+of its own (`conversationId: t.compatVersionId`, `messageId:
+t.requestMessageId ?? ""`). Widening the `IMAGE_GEN` frame to the agg entry
+would make the row faithful at the cost of the storage bulk cut from the
+wire; not worth it for a row that lives until `applyResponse`.
+
+```ts
+// apps/web/src/lib/img-gen-to-attachment.ts (beside imgGenToAttachmentWorkup)
+export function inlineImageAttachments(
+  messageId: string,
+  conversationId: string,
+  userId: string,
+  blocks: readonly ChatChunkAndResMsgBlock[]
+) {
+  const out = Array.of<AttachmentSingleton<true>>();
+  const now = new Date();
+  for (const block of blocks) {
+    if (block.type !== "IMAGE_GEN" || !block.inlineImageData) continue;
+    const { width, height, cdnUrl, kind } = block.inlineImageData;
+    const basename = cdnUrl.slice(cdnUrl.lastIndexOf("/") + 1);
+    const stem = basename.slice(14, basename.lastIndexOf("."));   // `${seriesId}-${seriesOrdinal}`
+    const seriesId = stem.slice(0, stem.lastIndexOf("-"));
+    const seriesOrdinal = Number.parseInt(stem.slice(stem.lastIndexOf("-") + 1), 10);
+    const ext = basename.slice(basename.lastIndexOf(".") + 1);
+    // the temp id is real identity, not an invention: the series id is minted
+    // on the server and the stem is unique per frame. Replaced by the cuid2
+    // when `convo` hydrates the store at ai_chat_response.
+    const attachmentId = stem;
+    out.push({
+      id: attachmentId,
+      messageBlockId: `${messageId}-block-${block.ordinal}`,   // ← toMessageBlocks' scheme
+      messageId,
+      conversationId,
+      userId,
+      cdnUrl,
+      assetType: "IMAGE",
+      origin: "GENERATED",
+      status: "READY",
+      uploadMethod: "SERVER",
+      image: { attachmentId, width, height, format: ext, aspectRatio: width / height, frames: 1, animated: false, /* remaining ImageMetadata columns null */ createdAt: now, updatedAt: now },
+      inlineImageGenOutput: { id: `${attachmentId}-inline`, attachmentId,   // same stem; the real row gets its own cuid2 kind, width, height, seriesId, seriesOrdinal, ext, mime: `image/${ext}`, provider: "GROK", facilitatingModel: "", generatingModel: "", revisedPrompt: block.content, createdAt: now, updatedAt: now },
+      imageGenOutput: null,
+      audioGenOutput: null,
+      audio: null,
+      document: null,
+      /* every other Attachment column: null, as imgGenToAttachmentWorkup fills them */
+      createdAt: now,
+      updatedAt: now
+    } satisfies InlineImageAttachment);
+  }
+  return out;
+}
+
+// apps/web/src/lib/draft-to-message.ts:236 — the streaming message gets both lanes' attachments
+    attachments: [
+      ...imgGenAttachments(derived.imgGenFields),
+      ...inlineImageAttachments(id, ctx.conversationId, ctx.userId, derived.blocks)
+    ],
+```
+
+The two models are `""` on the synthetic row because the four-field wire
+does not carry them; nothing on the client reads them, and the committed
+row has the real values. `satisfies`, not the `as` the job-lane builder
+uses.
+
+**(c) Gap 2, `toMessageBlocks` becomes a derivation anyway.** Not
+load-bearing for the image now (the attachment carries it), but a
+projection that predates a field will drop the next one too. Spread
+properties are not excess-checked, so nothing is added to the singleton.
+
+```ts
+// apps/web/src/lib/ui-message-helpers.ts:25-35
+    return {
+      ...block,
+      id: `${messageId}-block-${block.ordinal}`,
+      messageId,
+      createdAt: now,
+      updatedAt: now
+    } satisfies MessageBlockSingleton<true>;
+```
+
+**(d) Gap 3, one resolver, one path.** Streaming and committed messages
+both answer through the attachments the block owns: FINAL if present, else
+the highest `seriesOrdinal`. The block itself is never consulted for image
+data.
+
+```ts
+// apps/web/src/lib/inline-image.ts (new)
+export function inlineImageFor(
+  block: MessageBlockSingleton<true>,
+  attachments: AttachmentSingleton<true>[]
+) {
+  let pick: AttachmentSingleton<true> | undefined = undefined;
+  for (const a of attachments) {
+    if (a.messageBlockId !== block.id || !a.inlineImageGenOutput || !a.cdnUrl) continue;
+    if (a.inlineImageGenOutput.kind === "FINAL") {
+      pick = a;
+      break;
+    }
+    if (
+      !pick?.inlineImageGenOutput ||
+      a.inlineImageGenOutput.seriesOrdinal > pick.inlineImageGenOutput.seriesOrdinal
+    ) {
+      pick = a;
+    }
+  }
+  if (!pick?.inlineImageGenOutput || !pick.cdnUrl) return undefined;
+  const { width, height, kind } = pick.inlineImageGenOutput;
+  return {
+    attachmentId: pick.id, // synthetic while streaming, the cuid2 after applyResponse
+    width,
+    height,
+    kind,
+    cdnUrl: pick.cdnUrl
+  } as const;
+}
+```
+
+`attachmentId` rides with the four render fields because the component
+needs a DOM anchor (below), and the row is the only honest source of it:
+the url stem (`${seriesId}-${seriesOrdinal}`) while streaming, the cuid2 once
+the persisted row replaces it.
+
+**(e) Gap 1, the bubble's `IMAGE_GEN` case.** Goes before the
+`if (!blockContent) continue;` fallback at `message-bubble/index.tsx:556`,
+and `message.attachments` joins the memo deps. `blockContent` is the prompt,
+rendered as the subcaption **through the same two markdown renderers TEXT
+uses** (Andrew, 2026-09-24): `processStreamingMarkdown` while streaming, and
+the lazy-loaded `processMarkdownToReact` (`lib/processor.tsx`) once
+committed — the async pass at 472-493 already processes every block with
+content, `IMAGE_GEN` included, so nothing changes in either renderer. The
+raw `block.content` is kept for the image's `alt`. The React `key` is the
+block ordinal, never the attachment id: the id changes per frame
+(`…-0`, `…-1`, the FINAL) and again at commit (stem → cuid2), while the
+slot's ordinal is stable for its whole life, so partial → final updates in
+place — the same reason the job lane keys the canvas by slot and lets the
+id and src move underneath it.
+
+```tsx
+      if (block.type === "IMAGE_GEN") {
+        const image = inlineImageFor(block, message.attachments);
+        if (!image) continue; // an IMAGE_GEN block is only ever sent with its url
+        rendered.push(
+          <InlineImageBlock
+            key={`${message.id}-image-${block.ordinal}`}
+            attachmentId={image.attachmentId}
+            image={image}
+            alt={block.content}
+            caption={
+              isStreaming
+                ? processStreamingMarkdown(blockContent)
+                : (renderedBlockContent[blockOrdinalKey(block.ordinal)] ??
+                  blockContent)
+            }
+          />
+        );
+        continue;
+      }
+```
+
+**(f) Gap 8, the component: the canvas, made interleavable.** Andrew,
+2026-09-24: "we should almost mimic all of it but it will be an
+interleavable component like thinking block is." So `InlineImageBlock` is
+`ImageGenerationCanvasTest` (`ui/chat/image-gen/index.tsx`) carried over
+nearly whole — ref-gated display state (url, width, height, id, kind update
+only on a truthy, changed value, so the last good frame stays up and a
+PARTIAL → FINAL swap is an in-place `src` change), no `key` on `<Image>`,
+the `ripple-container` and "Generating image…" pill for the no-url state,
+the PARTIAL `scanning-line` and `animate-pulse-glow` corners, the FINAL-only
+hover overlay with view / download, `placeholder="blur"` with
+`shimmer([w, h])`, the `attachment-${id}` anchor — with three deliberate
+differences:
+
+1. **It is a block-level leaf, rendered at its ordinal** by the bubble's
+   `IMAGE_GEN` case, interleaved between TEXT and THINKING blocks exactly as
+   `ThinkingSection` is. Not the message-level canvas slot.
+2. **Its caption arrives already rendered** (`caption: ReactNode`), like
+   `ThinkingSection`'s `thinkingContent`; the bubble owns both markdown
+   processors. The raw prompt is kept for `alt`.
+3. **The container is sized from the real dimensions**, `aspectRatio:
+   width / height` with `object-contain`, not `aspect-square` /
+   `object-cover` (gap 8). `next/image` is globally `unoptimized`, so the
+   props are for layout only.
+
+The no-url state is inert for Grok today (an `IMAGE_GEN` block is only sent
+with its url; the THINKING block before it owns the wait), but it stays so
+the component is ready for a producer that opens the slot before the first
+frame lands.
+
+**The provider is the tell for partials (Andrew, 2026-09-24).** Only OpenAI
+facilitators emit partial images during streaming; Grok's tool emits one
+FINAL. `kind` says what *this* frame is; the provider says whether another
+frame can follow it. Both paths know it before any frame arrives —
+`message.provider` (`$Enums.Provider`) on a committed message,
+`ctx.provider` in the streaming builder — so the bubble derives one boolean
+and passes it down:
+
+```tsx
+// message-bubble, IMAGE_GEN case
+const expectsPartials = message.provider === "OPENAI";
+<InlineImageBlock … expectsPartials={expectsPartials} />
+
+// InlineImageBlock: `kind` remains the runtime truth; `expectsPartials` is
+// the prior. A Grok frame is complete on arrival, so the "sharpening"
+// affordances never need to arm; for OpenAI a PARTIAL means "more coming".
+```
+
+A single `=== "OPENAI"` check today; if a third provider grows partials it
+becomes a predicate in `@slipstream/img-gen` beside the other facilitator
+predicates, not a second boolean. The surface is small by construction:
+**only Grok (4.6 / 4.7) and the OpenAI facilitators have `image_generation`
+tooling to date** (2026-09-24), so an `IMAGE_GEN` block can only originate
+from those two providers, and of the two only OpenAI streams partials.
+
+```tsx
+// apps/web/src/ui/chat/inline-image/index.tsx (new)
+"use client";
+
+import type { ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import type { $Enums } from "@slipstream/db/node/generated/client";
+import { Button, Download, Eye, shimmer } from "@slipstream/ui";
+import type { ChatChunkAndResInlineImageData } from "@slipstream/types";
+
+interface InlineImageBlockProps {
+  attachmentId: string;
+  image: ChatChunkAndResInlineImageData;
+  alt: string;
+  caption: ReactNode; // already markdown-processed by the bubble's renderer of the moment
+}
+
+export function InlineImageBlock({ attachmentId, image, alt, caption }: InlineImageBlockProps) {
+  const urlRef = useRef<string | null>(null);
+  const kindRef = useRef<$Enums.ImageGenOutputKind | null>(null);
+  const idRef = useRef<string | null>(null);
+  const widthRef = useRef<number | null>(null);
+  const heightRef = useRef<number | null>(null);
+  const [displayUrl, setDisplayUrl] = useState<string | null>(null);
+  const [displayKind, setDisplayKind] = useState<$Enums.ImageGenOutputKind | null>(null);
+  const [displayId, setDisplayId] = useState<string | undefined>(undefined);
+  const [w, setW] = useState<number | null>(null);
+  const [h, setH] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (image.height !== 0 && heightRef.current !== image.height) {
+      heightRef.current = image.height;
+      setH(image.height);
+    }
+  }, [image.height]);
+  useEffect(() => {
+    if (image.width !== 0 && widthRef.current !== image.width) {
+      widthRef.current = image.width;
+      setW(image.width);
+    }
+  }, [image.width]);
+  useEffect(() => {
+    if (image.cdnUrl && urlRef.current !== image.cdnUrl) {
+      urlRef.current = image.cdnUrl;
+      setDisplayUrl(image.cdnUrl);
+    }
+  }, [image.cdnUrl]);
+  useEffect(() => {
+    if (attachmentId && idRef.current !== attachmentId) {
+      idRef.current = attachmentId;
+      setDisplayId(attachmentId);
+    }
+  }, [attachmentId]);
+  useEffect(() => {
+    if (kindRef.current !== image.kind) {
+      kindRef.current = image.kind;
+      setDisplayKind(image.kind);
+    }
+  }, [image.kind]);
+
+  const isFinal = displayKind === "FINAL";
+  const isGenerating = !displayUrl;
+
+  return (
+    <figure
+      id={displayId ? `attachment-${displayId}` : undefined}
+      data-attachment-id={displayId ?? undefined}
+      className="my-3 w-full max-w-3xl">
+      <div
+        className="bg-muted group relative mx-auto w-full overflow-hidden rounded-2xl"
+        style={w && h ? { aspectRatio: w / h } : undefined}>
+        <div
+          className={cn(
+            "absolute inset-0 transition-opacity duration-500",
+            isGenerating ? "opacity-100" : "opacity-0"
+          )}>
+          <div className="ripple-container" />
+        </div>
+
+        {displayUrl && w && h && (
+          <div className="absolute inset-0 scale-100 opacity-100 transition-all duration-700 ease-out">
+            <Image
+              src={displayUrl}
+              alt={alt}
+              width={w}
+              height={h}
+              style={{ aspectRatio: w / h }}
+              className="h-full w-full object-contain"
+              priority
+              placeholder="blur"
+              blurDataURL={shimmer([w, h])}
+            />
+            {displayKind === "PARTIAL" && (
+              <>
+                <div className="scanning-line" />
+                <div className="border-primary/30 animate-pulse-glow absolute inset-0 border-2" />
+                <div className="border-primary animate-pulse-glow absolute top-2 left-2 h-8 w-8 border-t-2 border-l-2" />
+                <div className="border-primary animate-pulse-glow absolute top-2 right-2 h-8 w-8 border-t-2 border-r-2" />
+                <div className="border-primary animate-pulse-glow absolute bottom-2 left-2 h-8 w-8 border-b-2 border-l-2" />
+                <div className="border-primary animate-pulse-glow absolute right-2 bottom-2 h-8 w-8 border-r-2 border-b-2" />
+              </>
+            )}
+          </div>
+        )}
+
+        <div
+          className={cn(
+            "absolute inset-0 bg-black/0 transition-colors duration-300 hover:bg-black/20",
+            (isGenerating || !isFinal) && "pointer-events-none"
+          )}>
+          <div
+            className={cn(
+              "absolute top-4 right-4 flex gap-2 opacity-30 transition-opacity duration-300",
+              !isGenerating && isFinal && "group-hover:opacity-100 focus:opacity-100"
+            )}>
+            <Button size="icon" variant="ghost" className="bg-foreground/90 text-background hover:foreground backdrop-blur-sm">
+              <Eye className="size-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="bg-foreground/90 text-background hover:foreground backdrop-blur-sm"
+              onClick={() => {
+                if (!displayUrl) return;
+                const link = document.createElement("a");
+                link.href = displayUrl;
+                link.target = "_blank";
+                link.rel = "noreferrer noopener";
+                link.download = displayUrl.slice(displayUrl.lastIndexOf("/") + 1);
+                link.click();
+              }}>
+              <Download className="size-4" />
+            </Button>
+          </div>
+        </div>
+
+        {isGenerating && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="animate-fade-in space-y-4 text-center">
+              <div className="bg-background/80 border-border inline-flex items-center gap-2 rounded-full border px-4 py-2 backdrop-blur-sm">
+                <div className="bg-primary h-2 w-2 animate-pulse rounded-full" />
+                <span className="text-sm font-medium">Generating image...</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      <figcaption className="text-muted-foreground mt-2 text-xs">{caption}</figcaption>
+    </figure>
+  );
+}
+```
+
+The download filename is the url's basename (`<ms>-<seriesId>-<ordinal>.<ext>`),
+which beats the canvas's `generated-<Date.now()>`. The pill's prompt line is
+gone because the caption below the figure is the prompt.
+
+**(g) Gap 9 — closed, not a gap.** `ThinkingSection` is not touched, props
+or otherwise (Andrew, 2026-09-24): it works, it is fully interleaved, and
+only THINKING blocks drive it. The image's THINKING block is an ordinary
+THINKING block and renders through it exactly as any other, "Thinking for
+4.2 seconds…" with `*Generating Image...*` inside. The inline image is its
+own interleaved component (f), rendered from the `IMAGE_GEN` block that
+follows.
+
+**(h) Gap 7, the trailing group.** Nothing to change: it renders no image
+for AI messages. The `w-[85%]` widening at 604-608 applies to an inline
+turn because it has attachments, and the image wants the width anyway.
+
+**(i) Gap 6, the remount.** Nothing to change; see the corrected gap 6.
+
+**(j) Gap 10, text pacing — the first, cheap step.** `applyChunk` notifies
+once per frame instead of once per token; a burst of buffered deltas then
+costs one fold and one paint per animation frame rather than one per
+delta. This is coalescing, not metering; releasing the backlog *over time*
+(a release cursor advanced by N frames per tick while the backlog is deep)
+is the follow-on, and there is no existing hook to hang it on (§10.8).
+
+```ts
+// apps/web/src/state/chat/store.ts:220-229
+  private draftNotifyHandle: number | undefined = undefined;
+
+  public applyChunk(evt: AIChatChunk) {
+    this.draftSnapshot =
+      this.draftSnapshot !== undefined ? [...this.draftSnapshot, evt] : [evt];
+    if (this.draftNotifyHandle === undefined) {
+      this.draftNotifyHandle = requestAnimationFrame(() => {
+        this.draftNotifyHandle = undefined;
+        this.notify(this.draftListeners);
+      });
+    }
+    if (this.phase === "awaiting-id") this.phase = "streaming";
+    if (!this.isStreaming) this.isStreaming = true;
+    if (typeof evt.title === "string") this.title = evt.title;
+    this.commitStatus();
+  }
+```
+
+Order that keeps prod unchanged until the last step: (a) → (c) → (b) → (d)
+→ (f) → (e) → (j). Everything before (e) is invisible to a user.

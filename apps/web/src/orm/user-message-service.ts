@@ -115,7 +115,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
       cursor,
       take,
       skip,
-      orderBy: { createdAt: "desc" },
+      orderBy: { ordinal: "desc" },
       include: {
         ttsJob: true,
         audioGenJob: true,
@@ -126,6 +126,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
           include: {
             image: true,
             audioGenOutput: true,
+            inlineImageGenOutput: true,
             document: true,
             imageGenOutput: true,
             audio: true
@@ -133,13 +134,29 @@ export class PrismaUserMessageService extends ErrorHelperService {
         }
       }
     });
-    const msgs = getMany.map(t => {
+    const s = getMany.map(p => {
+      const { attachments, ttsJob, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      const tts = ttsJob
+        ? {
+            ...ttsJob,
+            sizeBytes: ttsJob?.sizeBytes ? Number(ttsJob.sizeBytes) : null
+          }
+        : undefined;
       return {
-        ...t,
-        ttsJob: t.ttsJob ?? undefined
+        ...rest,
+        attachments: att,
+        ttsJob: tts
       };
     });
-    return this.bigIntToIntMsg(msgs) satisfies MessageSingleton<true>[];
+    return s satisfies MessageSingleton<true>[];
   }
 
   /**
@@ -179,6 +196,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
                 audioGenOutput: true,
                 image: true,
                 video: true,
+                inlineImageGenOutput: true,
                 document: true,
                 imageGenOutput: true,
                 audio: true
@@ -190,21 +208,35 @@ export class PrismaUserMessageService extends ErrorHelperService {
       }
     });
     const { messages, ...rest } = convo;
-    const msgs = messages.map(t => {
+    const s = messages.map(p => {
+      const { attachments, ttsJob, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      const tts = ttsJob
+        ? {
+            ...ttsJob,
+            sizeBytes: ttsJob?.sizeBytes ? Number(ttsJob.sizeBytes) : null
+          }
+        : undefined;
       return {
-        ...t,
-        ttsJob: t.ttsJob ?? undefined
+        ...rest,
+        attachments: att,
+        ttsJob: tts
       };
     });
 
+    const conversation = { ...rest, messages: s };
     // Ordered desc, so the last element is the smallest (oldest) ordinal in this page.
-    const oldestOrdinal = msgs.at(-1)?.ordinal ?? 0;
+    const oldestOrdinal = messages.at(-1)?.ordinal ?? 0;
     const hasMore = oldestOrdinal > 0;
     return {
-      convo: this.bigintToInt({
-        ...rest,
-        messages: msgs
-      }) satisfies ConversationSingleton<true>,
+      convo: conversation satisfies ConversationSingleton<true>,
       nextCursor: hasMore ? oldestOrdinal : null,
       hasMore
     };
@@ -249,6 +281,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
               include: {
                 image: true,
                 document: true,
+                inlineImageGenOutput: true,
                 audioGenOutput: true,
                 imageGenOutput: true,
                 audio: true
@@ -260,15 +293,30 @@ export class PrismaUserMessageService extends ErrorHelperService {
       }
     });
     const { messages, ...rest } = convo;
-    const msgs = messages.map(t => {
+    const s = messages.map(p => {
+      const { attachments, ttsJob, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      const tts = ttsJob
+        ? {
+            ...ttsJob,
+            sizeBytes: ttsJob?.sizeBytes ? Number(ttsJob.sizeBytes) : null
+          }
+        : undefined;
       return {
-        ...t,
-        ttsJob: t.ttsJob ?? undefined
+        ...rest,
+        attachments: att,
+        ttsJob: tts
       };
     });
-
-    const c = { ...rest, messages: msgs };
-    return this.bigintToInt(c) satisfies ConversationSingleton<true>;
+    const conversation = { ...rest, messages: s };
+    return conversation satisfies ConversationSingleton<true>;
   }
 
   public async getTitleByConversationId(conversationId: string) {

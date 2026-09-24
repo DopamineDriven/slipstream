@@ -11,7 +11,7 @@ import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentDisplay } from "@/ui/chat/attachment-display";
 import { AudioPlayer } from "@/ui/chat/audio-player";
-import { ImageGenerationCanvasTest } from "@/ui/chat/image-gen/test";
+import { ImageGenerationCanvasTest } from "@/ui/chat/image-gen/index";
 import { MessageIcons } from "@/ui/chat/message-bubble/message-icons";
 import { ThinkingSection } from "@/ui/chat/thinking";
 import { useTheme } from "next-themes";

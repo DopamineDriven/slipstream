@@ -142,6 +142,7 @@ catalogs:
     "@prisma/client-runtime-utils": ^7.10.0
     "@prisma/extension-accelerate": ^3.0.1
     prisma: ^7.10.0
+    prisma-erd-generator: ^3.2.1
   py:
     pythonia: ^1.2.6
   radix:
