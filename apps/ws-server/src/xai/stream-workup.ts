@@ -271,11 +271,9 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     model: GrokModelIdUnion,
     {
       collectionId,
-      enableFileSearch: _xx,
       enableWebSearch = true,
       enableXSearch = true,
-      enableCodeInterpreter = false,
-      fileSearchMaxResults: _x = 5,
+      enableCodeInterpreter = true,
       web_enable_image_understanding = true,
       x_enable_image_understanding = true,
       x_enable_video_understanding = true
@@ -417,7 +415,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     managementKey = this.xaiManagementKey,
     collectionId = undefined,
     hasUserStoreDocs,
-    enableFileSearch = false,
+    enableFileSearch = this.prisma.isGrokMultiAgentModel(model),
     enableUserStoreSearch,
     fileSearchMaxResults = 5,
     enableCodeInterpreter = true,
@@ -528,8 +526,8 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
       collectionId,
       round_input,
       tool_choice_input = "auto",
-      logprobs,
-      imgDetail = "auto",
+      logprobs = false,
+      imgDetail = "high",
       enableFileSearch = true,
       fileSearchMaxResults = 5,
       enableCodeInterpreter = true,
@@ -544,7 +542,6 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
     }
   }: CreateResponseStreamProps) {
     const key = apiKey ?? this.xaiKey;
-
     const mgmtApiKey = management_api_key ?? this.xaiManagementKey;
     const collection_id = this.collectionRegistry.get(userId);
     const cId = collection_id ?? collectionId;
@@ -553,7 +550,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
       instructions,
       reasoning = this.reasoningByModel(m),
       max_output_tokens,
-      model,
+      model = m && this.prisma.isGrokModel(m) ? m : "grok-4.7",
       parallel_tool_calls = parallel_tool_calling,
       tool_choice,
       store = false,
@@ -566,13 +563,13 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
           instructions: this.prisma.formatSysNote(systemPrompt),
           reasoning: this.reasoningByModel(m),
           max_output_tokens: max_tokens,
-          model: (m ?? "grok-4.7") as GrokModelIdUnion,
+          model: m && this.prisma.isGrokModel(m) ? m : "grok-4.7",
           parallel_tool_calls: parallel_tool_calling,
           tool_choice: tool_choice_input,
           store: false,
           stream,
           tools: this.handleTooling({
-            model: (m ?? "grok-4.7") as GrokModelIdUnion,
+            model: m && this.prisma.isGrokModel(m) ? m : "grok-4.7",
             collectionId: cId,
             enableFileSearch,
             enableUserStoreSearch: hasUserStoreDocs,
@@ -589,7 +586,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         }
       : await this.getResponsesApiInputWorkup({
           isNewChat,
-          model: (m ?? "grok-4.7") as GrokModelIdUnion,
+          model: m && this.prisma.isGrokModel(m) ? m : "grok-4.7",
           userId,
           msgs,
           keyFingerprint: keyId ?? "server",

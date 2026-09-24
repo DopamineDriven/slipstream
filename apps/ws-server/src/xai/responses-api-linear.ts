@@ -32,8 +32,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
     memoryService: ConversationMemoryVectorService,
     apiKey: string,
     managementKey: string,
-    // local tool bridge ownership STARTS here — the img-gen/workup
-    // ancestors never see it, mirroring the openai responses-chat pattern
+    // gate ussing the `via ==="cli"` prop in handleXAIAiResponseApiRequest
     protected localToolBroker: LocalToolBroker
   ) {
     super(
@@ -106,7 +105,6 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
     let inlineImageActive = false;
     let seriesOrdinal = -1;
     const inlineImageGenAgg = Array.of<InlineImageGenAggProps>();
-    let imgGenAggObj: InlineImageGenAggProps | undefined = undefined;
     let seriesId: string | undefined = undefined;
     const seriesIdAgg = Array.of<string>();
     let inlineImgAggArr:
@@ -215,6 +213,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
           via,
           userMsgId,
           ws,
+          localTools,
           streamChannel,
           chunks,
           thinkingChunks,
@@ -230,12 +229,12 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
             enableWebSearch: true,
             enableXSearch: true,
             fileSearchMaxResults: 10,
-            imgDetail: "auto",
+            imgDetail: "high",
             store: false,
             stream: true,
             user: userId,
             parallel_tool_calls: true,
-            logprobs: true,
+            logprobs: false,
             tool_choice_input: "auto",
             web_enable_image_understanding: true,
             x_enable_image_understanding: true,
@@ -406,7 +405,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               uploadDuration,
               s3LastModified
             });
-            imgGenAggObj=inlineImgObj;
+
             inlineImageGenAgg.push(inlineImgObj);
 
             // the image lands in the block system, three steps, inline:
@@ -457,12 +456,16 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               userMsgId,
               imgGenEnabled: false,
               provider,
+              chunk: revisedPrompt,
               systemPrompt,
               temperature,
               topP,
               model: m,
               isThinking: false,
               messageBlocks: imageBlock,
+              // the DB-ready row, once, on the frame that carries its block:
+              // the client synthesizes its streaming attachment from it
+              inlineImgGenData: inlineImgObj,
               done: false
             } as const satisfies EventTypeMap["ai_chat_chunk"];
             ws.send(JSON.stringify(imageFrame));
@@ -1065,6 +1068,8 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
           model: m,
           chunk: grokAgg,
           messageBlocks: trackedBlocks.length > 0 ? trackedBlocks : undefined,
+          inlineImgGenData:
+            inlineImageGenAgg.length > 0 ? inlineImageGenAgg : undefined,
           done: true
         } satisfies EventTypeMap["ai_chat_response"])
       );
@@ -1088,6 +1093,8 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
             ? grokThinkingDisplayAgg
             : undefined,
         messageBlocks: trackedBlocks.length > 0 ? trackedBlocks : undefined,
+        inlineImgGenData:
+          inlineImageGenAgg.length > 0 ? inlineImageGenAgg : undefined,
         topP,
         provider,
         model: m,
