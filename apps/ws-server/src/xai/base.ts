@@ -1,12 +1,14 @@
 import type { PrismaService } from "@/prisma/index.ts";
 import type {
-  InlineImageAggProps,
   InlinePostImageUploadProps,
   InputReasoningProps
 } from "@/xai/responses-types.ts";
 import type { DocumentStatus } from "@/xai/types.ts";
 import type { ProviderDocState } from "@slipstream/db/enums-node";
-import type { GrokModelIdUnion } from "@slipstream/types";
+import type {
+  GrokModelIdUnion,
+  InlineImageGenAggProps
+} from "@slipstream/types";
 
 export class GrokBaseService {
   constructor(protected prisma: PrismaService) {}
@@ -186,6 +188,6 @@ export class GrokBaseService {
         seriesId,
         seriesOrdinal
       }
-    } satisfies InlineImageAggProps;
+    } satisfies InlineImageGenAggProps;
   }
 }

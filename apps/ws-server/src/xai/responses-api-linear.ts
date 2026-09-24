@@ -9,7 +9,6 @@ import type {
   FunctionCallOutput,
   GrokActiveMessageBlock,
   GrokFinalizedMessageBlock,
-  InlineImageAggProps,
   ResponsesComprehensive
 } from "@/xai/responses-types.ts";
 import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
@@ -18,7 +17,7 @@ import { GrokImgGenService } from "@/xai/img-gen.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type { EventTypeMap } from "@slipstream/types";
+import type { EventTypeMap, InlineImageGenAggProps } from "@slipstream/types";
 
 export class GrokResponsesApiLinearService extends GrokImgGenService {
   protected cuid2: Promise<() => string>;
@@ -102,7 +101,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
     const reasoningItemsWithSummaryText = new Set<string>();
     let inlineImageActive = false;
     let seriesOrdinal = -1;
-    const inlineImageGenAgg = Array.of<InlineImageAggProps>();
+    const inlineImageGenAgg = Array.of<InlineImageGenAggProps>();
     let seriesId: string | undefined = undefined;
     const seriesIdAgg = Array.of<string>();
     let inlineImgAggArr:
@@ -976,7 +975,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
         conversationId,
         done: true,
         imgGenEnabled: false,
-        audioGenEnabled,
+        audioGenEnabled,inlineImageGenAgg,
         provider,
         userMsgId,
         title,
@@ -993,7 +992,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
         temperature,
         topP
       });
-
+      
       ws.send(
         JSON.stringify({
           type: "ai_chat_response",

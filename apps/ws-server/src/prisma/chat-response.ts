@@ -1,17 +1,17 @@
 import type { ExtractService } from "@/extract/index.ts";
 import type { LoggerService } from "@/logger/index.ts";
+import type { InlineImageGenAggWorkupRT } from "@/prisma/types.ts";
 import { PrismaChatRequestService } from "@/prisma/chat-request.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
-import type { ImageGenOutputCreateNestedOneWithoutAttachmentInput } from "@slipstream/db/node/generated/models";
+import type {
+  AttachmentUncheckedCreateWithoutMessageInput,
+  ImageGenOutputCreateNestedOneWithoutAttachmentInput
+} from "@slipstream/db/node/generated/models";
 import type {
   AIChatResponse,
   AIChatResponseDb,
-  AttachmentSingleton,
-  ConversationSingleton,
   CTR,
-  MessageSingleton,
-  Rm,
-  TTSJobSingleton
+  Rm
 } from "@slipstream/types";
 
 export class PrismaChatResponseService extends PrismaChatRequestService {
@@ -23,51 +23,53 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
   ) {
     super(prisma, extractor, logger, isProd);
   }
-  private bigIntToIntMsg(
-    messages: Rm<MessageSingleton<true | false>, "userKey">[]
-  ) {
-    return messages.map(msg => {
-      let t: TTSJobSingleton<true | false> | undefined;
-      const { attachments, ttsJob, ...rest } = msg;
-      if (ttsJob) {
-        t = ttsJob;
-      } else {
-        t = undefined;
-      }
-      const atts = attachments.map(att => {
-        const { size, ...attRest } = att;
-        return {
-          ttsJob: t
-            ? ({
-                ...t,
-                sizeBytes: t?.sizeBytes ? Number(t.sizeBytes) : null
-              } as const)
-            : undefined,
-          ...attRest,
-          size: size ? Number(size) : null
-        } as Rm<AttachmentSingleton<true>, "providerLinks">;
-      });
-      return {
-        ttsJob: t
-          ? ({
-              ...t,
-              sizeBytes: t?.sizeBytes ? Number(t.sizeBytes) : null
-            } as const)
-          : undefined,
-        ...rest,
-        attachments: atts
-      } as Rm<MessageSingleton<true>, "userKey">;
-    });
-  }
 
-  public bigintToInt({
-    messages,
-    ...rest
-  }: ConversationSingleton<false | true>) {
-    return {
-      ...rest,
-      messages: this.bigIntToIntMsg(messages)
-    } as ConversationSingleton<true>;
+  protected inlineImageGenAggWorkup({
+    inlineImageGenAgg,
+    messageBlocks
+  }: {
+    inlineImageGenAgg?: AIChatResponseDb["inlineImageGenAgg"];
+    messageBlocks: AIChatResponseDb["messageBlocks"];
+  }) {
+    const createArr = Array.of<AttachmentUncheckedCreateWithoutMessageInput>();
+    const links = Array.of<{ cdnUrl: string; ordinal: number }>();
+    if (!inlineImageGenAgg || !messageBlocks) return;
+    for (const inlineGen of inlineImageGenAgg) {
+      const {
+        image,
+        inlineImageGenOutput,
+        size,
+        audio: _a,
+        document: _d,
+        ...rest
+      } = inlineGen;
+
+      createArr.push({
+        ...rest,
+        size: size ? BigInt(size) : undefined,
+        image: { create: image },
+        inlineImageGenOutput: { create: inlineImageGenOutput }
+      } as const satisfies AttachmentUncheckedCreateWithoutMessageInput);
+
+      for (const block of messageBlocks) {
+        if (block.type !== "IMAGE_GEN" || !block.inlineImageData) continue;
+        const { cdnUrl } = block.inlineImageData;
+        const base = cdnUrl.slice(cdnUrl.lastIndexOf("/") + 1);
+        const seriesIdDashOrdinal = base.slice(14, base.lastIndexOf("."));
+        const [blockSId, blockSOrdinal] = [
+          seriesIdDashOrdinal.slice(0, seriesIdDashOrdinal.lastIndexOf("-")),
+          seriesIdDashOrdinal.slice(seriesIdDashOrdinal.lastIndexOf("-") + 1)
+        ];
+        if (
+          inlineGen.seriesId === blockSId &&
+          Number.parseInt(blockSOrdinal) ===
+            inlineGen.inlineImageGenOutput.seriesOrdinal
+        ) {
+          links.push({ cdnUrl, ordinal: block.ordinal });
+        }
+      }
+    }
+    return { creates: createArr, links };
   }
 
   public async handleAiChatResponse({
@@ -82,6 +84,16 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
     jobId?: string;
     mime?: string;
   }) {
+    let inline: InlineImageGenAggWorkupRT | undefined;
+    if (data.inlineImageGenAgg && data.inlineImageGenAgg.length > 0) {
+      inline = this.inlineImageGenAggWorkup({
+        messageBlocks: data.messageBlocks,
+        inlineImageGenAgg: data.inlineImageGenAgg
+      });
+    } else {
+      inline = undefined;
+    }
+
     const { keyId } = await this.handleApiKeyLookup(provider, userId);
     const persistedThinkingDuration =
       typeof data.thinkingDuration === "number"
@@ -244,7 +256,7 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
       const persist = await t.conversation.update({
         include: {
           messages: {
-            orderBy: { createdAt: "desc" },
+            orderBy: { ordinal: "desc" },
             take: 2,
             include: {
               ttsJob: true,
@@ -254,6 +266,7 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
                 include: {
                   imageGenOutput: true,
                   audioGenOutput: true,
+                  inlineImageGenOutput: true,
                   image: true,
                   document: true,
                   audio: true
@@ -277,7 +290,9 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
                 ? { create: mapImgs }
                 : mapAudio
                   ? { create: [mapAudio] }
-                  : undefined,
+                  : inline
+                    ? { create: inline.creates }
+                    : undefined,
               ordinal,
               messageBlocks:
                 persistedMessageBlocks && persistedMessageBlocks.length > 0
@@ -302,19 +317,30 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
         }
       });
       const { messages, ...c } = persist;
-      const ttv = messages.map(t => {
-        const { ttsJob, ...rest } = t;
+      const s = messages.map(p => {
+        const { attachments, ttsJob, ...rest } = p;
+        const att = attachments.map(v => {
+          return {
+            ...v,
+            size: v.size ? Number(v.size) : null,
+            inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+          };
+        });
+
+        const tts = ttsJob
+          ? {
+              ...ttsJob,
+              sizeBytes: ttsJob?.sizeBytes ? Number(ttsJob.sizeBytes) : null
+            }
+          : undefined;
         return {
-          ttsJob: ttsJob
-            ? {
-                ...ttsJob,
-                sizeBytes: ttsJob?.sizeBytes ? Number(ttsJob.sizeBytes) : null
-              }
-            : undefined,
-          ...rest
+          ...rest,
+          attachments: att,
+          ttsJob: tts
         };
       });
-      const convo = this.bigintToInt({ ...c, messages: ttv });
+
+      const convo = { ...c, messages: s };
       const msg = persist.messages[0];
       if (!msg) throw new Error("AIChatResponse Message was not created");
       const aiMsgId = msg?.id;
@@ -356,6 +382,7 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
           persist: cleaned,
           imgGenAttachmentId: undefined,
           audioGenAttachmentId,
+          inlineImgAttachmentIds: undefined,
           convo: convo satisfies AIChatResponse["convo"]
         };
       }
@@ -422,6 +449,7 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
           aiMsgId,
           persist: cleaned,
           imgGenAttachmentId,
+          inlineImgAttachmentIds: undefined,
           audioGenAttachmentId: undefined,
           convo: convo satisfies AIChatResponse["convo"]
         };
@@ -442,13 +470,96 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
         return {
           aiMsgId,
           persist: cleaned,
+          inlineImgAttachmentIds: undefined,
           imgGenAttachmentId: undefined,
           audioGenAttachmentId: undefined,
           convo: convo satisfies AIChatResponse["convo"]
         };
       }
     });
+    if (inline && inline.links.length > 0) {
+      const inlineImgAttachmentIds = Array.of<string>();
+      const msg = transaction.convo.messages.find(
+        c => c.id === transaction.aiMsgId
+      );
 
+      for (const link of inline.links) {
+        if (!msg) continue;
+        const msgBlock = msg.messageBlocks.find(
+          v => v.ordinal === link.ordinal
+        );
+        if (!msgBlock) continue;
+        await this.prismaClient.attachment.updateMany({
+          where: { messageId: transaction.aiMsgId, cdnUrl: link.cdnUrl },
+          data: { messageBlockId: msgBlock.id }
+        });
+      }
+      const fresh = await this.prismaClient.conversation.findUniqueOrThrow({
+        include: {
+          messages: {
+            orderBy: { ordinal: "desc" },
+            take: 2,
+            include: {
+              ttsJob: true,
+              messageBlocks: true,
+              imageGenJob: true,
+              attachments: {
+                include: {
+                  imageGenOutput: true,
+                  audioGenOutput: true,
+                  inlineImageGenOutput: true,
+                  image: true,
+                  document: true,
+                  audio: true
+                }
+              }
+            }
+          },
+          conversationSettings: true
+        },
+        where: { id: data.conversationId }
+      });
+      const { messages, ...c } = fresh;
+      const s = messages.map(p => {
+        const { attachments, ttsJob, ...rest } = p;
+        const att = attachments.map(v => {
+          return {
+            ...v,
+            size: v.size ? Number(v.size) : null,
+            inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+          };
+        });
+
+        const tts = ttsJob
+          ? {
+              ...ttsJob,
+              sizeBytes: ttsJob?.sizeBytes ? Number(ttsJob.sizeBytes) : null
+            }
+          : undefined;
+        return {
+          ...rest,
+          attachments: att,
+          ttsJob: tts
+        };
+      });
+
+      const convo = { ...c, messages: s } satisfies AIChatResponse["convo"];
+      const updatedMsg = s.find(t => t.id === transaction.aiMsgId);
+      for (const m of updatedMsg?.attachments ?? []) {
+        if (m.inlineImageGenOutput) inlineImgAttachmentIds.push(m.id);
+      }
+
+      const {
+        convo: _convo,
+        inlineImgAttachmentIds: _i,
+        ...rest
+      } = transaction;
+      return {
+        ...rest,
+        inlineImgAttachmentIds,
+        convo
+      };
+    }
     return transaction;
   }
 }

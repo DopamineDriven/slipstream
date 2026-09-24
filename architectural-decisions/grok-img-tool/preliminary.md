@@ -775,8 +775,10 @@ respect:
    job-lane types keep `jobId` required and `mapImgs` is untouched; the
    inline branch creates the attachment rows with the nested
    `inlineImageGenOutput`, links them to their `IMAGE_GEN` block by the
-   series id derived from `inlineImageData.cdnUrl`, and does its read. The
-   branch's input shape is Andrew's.
+   series id derived from `inlineImageData.cdnUrl`, and does its read. Its
+   input is `AIChatResponseDb.inlineImageGenAgg?: InlineImageGenAggProps[]`,
+   the DB-ready object `inlineImagePostUploadObj` builds. **The splice is
+   written out in §9.**
 
    **The model for the sub-field is `imgFinal` in
    `apps/ws-server/src/openai/responses-img-gen.ts` (lines 828–933).** The
@@ -1019,3 +1021,244 @@ live, tested file. Everything after it is small.
 - `IMAGE_GEN` blocks for the pure-image lanes (`grok-imagine-*`,
   `gpt-image-*`, `muse-image-1.0`): those messages are `messageType:
   IMAGE_GEN` with no text; a block adds nothing. Leave as attachments.
+
+---
+
+## 9. Persist splice: `inlineImageGenAgg` → `handleAiChatResponse`
+
+State on 2026-09-23: `AIChatResponseDb` carries
+`inlineImageGenAgg?: InlineImageGenAggProps[]` (the DB-ready attachment shape
+from `inlineImagePostUploadObj`, now exported by `@slipstream/types`), and
+`apps/ws-server/src/prisma/chat-response.ts` has an empty
+`inlineImageGenAggWorkup` stub plus a `const xox = data.inlineImageGenAgg`
+placeholder. Six cuts, in file order. Nothing in the job-lane path moves.
+
+### 9.1 The helper: rows to create, and which block each row belongs to
+
+The agg entry is already the attachment row. Two things stand between it and
+Prisma: `size` is a number and the column is `BigInt`, and the two children
+ride as plain objects where Prisma wants `{ create }`. `audio` and `document`
+are `null` on the entry and are relations on the input, so they come off.
+
+The pairing uses the url anatomy (step 2): the block's wire `cdnUrl` encodes
+the series id, the entry carries `seriesId` as a column. Matching on the
+series rather than the exact url means partials pair to their block too,
+when an OpenAI facilitator gets blocks.
+
+```ts
+import type { AttachmentUncheckedCreateWithoutMessageInput } from "@slipstream/db/node/generated/models";
+import type { InlineImageGenAggProps } from "@slipstream/types";
+
+  protected inlineImageGenAggWorkup({
+    inlineImageGenAgg,
+    messageBlocks
+  }: {
+    inlineImageGenAgg: InlineImageGenAggProps[];
+    messageBlocks: AIChatResponseDb["messageBlocks"];
+  }) {
+    const creates = Array.of<AttachmentUncheckedCreateWithoutMessageInput>();
+    const links = Array.of<{ cdnUrl: string; ordinal: number }>();
+
+    for (const entry of inlineImageGenAgg) {
+      const {
+        audio: _audio,
+        document: _document,
+        image,
+        inlineImageGenOutput,
+        size,
+        ...scalars
+      } = entry;
+
+      creates.push({
+        ...scalars,
+        size: size != null ? BigInt(size) : undefined,
+        image: { create: image },
+        inlineImageGenOutput: { create: inlineImageGenOutput }
+      } satisfies AttachmentUncheckedCreateWithoutMessageInput);
+
+      for (const block of messageBlocks ?? []) {
+        if (block.type !== "IMAGE_GEN" || !block.inlineImageData) continue;
+        const url = block.inlineImageData.cdnUrl;
+        const basename = url.slice(url.lastIndexOf("/") + 1);
+        const stem = basename.slice(14, basename.lastIndexOf("."));
+        const blockSeriesId = stem.slice(0, stem.lastIndexOf("-"));
+        if (entry.seriesId === blockSeriesId && entry.cdnUrl) {
+          links.push({ cdnUrl: entry.cdnUrl, ordinal: block.ordinal });
+        }
+      }
+    }
+
+    return { creates, links };
+  }
+```
+
+`userId` and `conversationId` are already scalars on the entry, so the stub's
+two extra params go. The unchecked input is the right one here: the entry
+carries FK scalars, exactly as the builder wrote them (the job lane's
+`mapImgs` uses the checked form with `user: { connect }`; both are fine per
+element, and this branch has its own `create` array anyway).
+
+### 9.2 Call site, replacing `const xox`
+
+```ts
+    const inline =
+      data.inlineImageGenAgg && data.inlineImageGenAgg.length > 0
+        ? this.inlineImageGenAggWorkup({
+            inlineImageGenAgg: data.inlineImageGenAgg,
+            messageBlocks: data.messageBlocks
+          })
+        : undefined;
+```
+
+### 9.3 The nested create gains a third arm
+
+```ts
+              attachments: mapImgs
+                ? { create: mapImgs }
+                : mapAudio
+                  ? { create: [mapAudio] }
+                  : inline
+                    ? { create: inline.creates }
+                    : undefined,
+```
+
+`messageType` and `isImageGen` stay driven by `imgGenEnabled`, which the
+chat path sends as `false`, so this is a `TEXT` message. `content` falls to
+`data.chunk` because the chat path sends no `imgGenFields`.
+
+### 9.4 The include: one more relation, ordered by `ordinal`
+
+In the `conversation.update` include, under `attachments.include`, add
+`inlineImageGenOutput: true` (additive; `AttachmentSingleton` already has
+the optional field). And order the tandem by `ordinal`, not `createdAt`:
+`Message` has `@@unique([conversationId, ordinal])`, so it is indexed and
+deterministic, and it is the column that defines message order.
+
+```ts
+          messages: {
+            orderBy: { ordinal: "desc" },
+            take: 2,
+            include: {
+              …
+              attachments: {
+                include: {
+                  imageGenOutput: true,
+                  audioGenOutput: true,
+                  inlineImageGenOutput: true,
+                  image: true,
+                  document: true,
+                  audio: true
+                }
+              }
+            }
+          },
+```
+
+The same include is written out again in 9.5. Two copies; it becomes a
+getter only if a third reader appears.
+
+### 9.5 After the transaction: claim the rows, pull a fresh tandem
+
+Andrew's form (2026-09-23). The transaction is untouched; the inline `else
+if` arm in its return chain goes, so an inline turn returns through the
+existing `TEXT` branch. After the transaction resolves, and only when there
+are links: set `messageBlockId` on each row, then read the conversation
+again with the same include and return the result with `convo` replaced.
+
+Why the second read is required and not cosmetic: `applyResponse` on the
+client calls `ingestConversation(evt.convo)` and drops the draft. From then
+on the committed AI message renders from `convo.messages[0]` alone; the
+response's wire `messageBlocks` array is not read by the store. A DB
+`IMAGE_GEN` block carries no url, so the client finds the image only through
+the attachment's `messageBlockId`. A `convo` read before the link would
+render the slot empty and the image in the trailing group until reload.
+
+```ts
+    const transaction = await this.prismaClient.$transaction(async t => {
+      …unchanged…
+    });
+
+    if (inline && inline.links.length > 0) {
+      const aiMsg = transaction.convo.messages.find(
+        m => m.id === transaction.aiMsgId
+      );
+      for (const link of inline.links) {
+        const msgBlock = aiMsg?.messageBlocks?.find(
+          v => v.ordinal === link.ordinal
+        );
+        if (!msgBlock) continue;
+        await this.prismaClient.attachment.updateMany({
+          where: { messageId: transaction.aiMsgId, cdnUrl: link.cdnUrl },
+          data: { messageBlockId: msgBlock.id }
+        });
+      }
+
+      const fresh = await this.prismaClient.conversation.findUniqueOrThrow({
+        where: { id: transaction.convo.id },
+        include: { /* the 9.4 include, copied */ }
+      });
+      const { messages, ...c } = fresh;
+      const s = messages.map(p => { /* the bigint → number mapping, copied */ });
+      return { ...transaction, convo: { ...c, messages: s } };
+    }
+
+    return transaction;
+```
+
+`updateMany` by `messageId` + `cdnUrl` needs no null guard on the nullable
+column and touches only rows this create made. One `updateMany` per image
+and one read, on image turns only; text-only turns never enter the `if`.
+
+**The mapping and the include are copied, not extracted.** Two call sites;
+a helper would need a Prisma include-payload type in its signature with
+bigint conversions inside, and that costs more than the duplication. It
+gets a method at the third site.
+
+**The cost, named:** the link runs after the commit. If the process dies
+between the two, the message exists with unlinked rows and that turn's
+image renders in the trailing group until something re-links it (the url
+anatomy makes that recoverable). Accepted for a one-off image turn in
+exchange for keeping the transaction body untouched; the inside-the-
+transaction form with a re-read closes the window if it ever matters.
+
+### 9.6 The xAI handler feeds it: two lines
+
+In `responses-api-linear.ts`, the `roundTrack` push carries the block's
+image data, and the persist call passes the agg:
+
+```ts
+      for (const block of trackedBlocks) {
+        roundTrack.push({
+          type: block.type,
+          content: block.content,
+          durationMs: block.durationMs,
+          ordinal: block.ordinal,
+          conversationId,
+          inlineImageData: block.inlineImageData
+        });
+      }
+
+      const d = await this.prisma.handleAiChatResponse({
+        …,
+        imgGenEnabled: false,
+        inlineImageGenAgg:
+          inlineImageGenAgg.length > 0 ? inlineImageGenAgg : undefined,
+        messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
+        …
+      });
+```
+
+`roundTrack`'s `inlineImageData` is the server-side `BlockImgData`, a
+superset of the four wire fields, so it assigns without a cast. It also
+rides on the `ai_chat_response` frames as-is; if you want the final frame to
+carry only the four wire fields, map it there.
+
+### 9.7 What the client then has
+
+- **Streaming:** the `IMAGE_GEN` chunk frame with `inlineImageData` (four
+  fields) at its ordinal.
+- **At completion:** `ai_chat_response.messageBlocks` (the `IMAGE_GEN` block
+  with its data) and `convo.messages[0].attachments[]` with `messageBlockId`
+  set and `inlineImageGenOutput` populated, from the re-read.
+- **On reload:** the DB block plus its attachments by `messageBlockId`;
+  `toMessageBlocks` derives `inlineImageData` from them (step 7).

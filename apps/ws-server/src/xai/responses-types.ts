@@ -7,17 +7,11 @@ import type {
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
-  AttachmentSingleton,
   CanonicalToolDefinition,
-  CTR,
   DiscriminatedUnionToRecord,
-  DX,
   GrokModelIdUnion,
-  ImageSingleton,
-  InlineImageGenOutputSingleton,
   LocalToolName,
   MessageSingleton,
-  Rm,
   UTR,
   XOR
 } from "@slipstream/types";
@@ -586,35 +580,6 @@ export type FunctionCallOutput<T = string | object> = {
    */
   output: T;
 };
-
-export type InlineImageAggProps = DX<
-  CTR<
-    Rm<
-      AttachmentSingleton<true>,
-      | "id"
-      | "createdAt"
-      | "updatedAt"
-      | "inlineImageGenOutput"
-      | "image"
-      | "imageGenOutput"
-      | "ttsJob"
-      | "userStoreDoc"
-      | "audioGenOutput"
-      | "dictationJobs"
-      | "generationGroupId"
-      | "providerStoreDocs"
-      | "providerLinks"
-      | "messageBlockId"
-      | "messageId"
-    >
-  > & {
-    image: Rm<ImageSingleton, "attachmentId" | "createdAt" | "updatedAt">;
-    inlineImageGenOutput: Rm<
-      InlineImageGenOutputSingleton<true>,
-      "id" | "attachmentId" | "createdAt" | "updatedAt" | "attachment"
-    >;
-  }
->;
 
 export type InlinePostImageUploadProps = {
   specs: ExpandedImgSpecs;

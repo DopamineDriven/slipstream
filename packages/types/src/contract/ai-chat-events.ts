@@ -6,9 +6,43 @@ import type {
   AIChatResponseImgGenFieldsFinal
 } from "@/image-gen/index.ts";
 import type { AllModelsUnion, Provider } from "@/models.ts";
-import type { ConversationSingleton } from "@/types.ts";
+import type {
+  AttachmentSingleton,
+  ConversationSingleton,
+  ImageSingleton,
+  InlineImageGenOutputSingleton
+} from "@/types.ts";
 import type { CTR, DX, Rm, UTR } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
+
+export type InlineImageGenAggProps = DX<
+  CTR<
+    Rm<
+      AttachmentSingleton<true>,
+      | "id"
+      | "createdAt"
+      | "updatedAt"
+      | "inlineImageGenOutput"
+      | "image"
+      | "imageGenOutput"
+      | "ttsJob"
+      | "userStoreDoc"
+      | "audioGenOutput"
+      | "dictationJobs"
+      | "generationGroupId"
+      | "providerStoreDocs"
+      | "providerLinks"
+      | "messageBlockId"
+      | "messageId"
+    >
+  > & {
+    image: Rm<ImageSingleton, "attachmentId" | "createdAt" | "updatedAt">;
+    inlineImageGenOutput: Rm<
+      InlineImageGenOutputSingleton<true>,
+      "id" | "attachmentId" | "createdAt" | "updatedAt" | "attachment"
+    >;
+  }
+>;
 
 export type ChatChunkAndResInlineImageData = {
   width: number;
@@ -106,6 +140,7 @@ export type AIChatResponseDb = DX<
     responseOutput?: string;
     imgGenFields?: AIChatResponseImgGenFieldsFinal;
     audioGenFields?: AIChatResponseAudioGenFields;
+    inlineImageGenAgg?: InlineImageGenAggProps[];
   }
 >;
 

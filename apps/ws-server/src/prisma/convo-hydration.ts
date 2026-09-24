@@ -4,7 +4,10 @@ import { PrismaChatResponseService } from "@/prisma/chat-response.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type {
   ConversationSingleton,
-  HydrateConversationPage
+  HydrateConversationPage,
+  MessageSingleton,
+  Rm,
+  TTSJobSingleton
 } from "@slipstream/types";
 import type { LoggerService } from "@/logger/index.ts";
 const CONVERSATION_PAGE_SIZE = 12;
@@ -19,6 +22,53 @@ export class PrismaConvoHydrationService extends PrismaChatResponseService {
     isProd: boolean
   ) {
     super(prisma, extractor, logger, isProd);
+  }
+  private bigIntToIntMsg(
+    messages: (Rm<MessageSingleton<false>, "userKey">)[]
+  ) {
+    return messages.map(msg => {
+      let t: TTSJobSingleton<true | false> | undefined;
+      const { attachments, ttsJob, ...rest } = msg;
+      if (ttsJob) {
+        t = ttsJob;
+      } else {
+        t = undefined;
+      }
+      const atts = attachments.map(att => {
+        const { size,inlineImageGenOutput, ...attRest } = att;
+        return {
+          inlineImageGenOutput: inlineImageGenOutput ?? undefined,
+          ttsJob: t
+            ? ({
+                ...t,
+                sizeBytes: t?.sizeBytes ? Number(t.sizeBytes) : null
+              } as const)
+            : undefined,
+          ...attRest,
+          size: size ? Number(size) : null
+        }
+      });
+      return {
+        ttsJob: t
+          ? ({
+              ...t,
+              sizeBytes: t?.sizeBytes ? Number(t.sizeBytes) : null
+            } as const)
+          : undefined,
+        ...rest,
+        attachments: atts
+      }
+    });
+  }
+
+  public bigintToInt({
+    messages,
+    ...rest
+  }: ConversationSingleton<false | true>) {
+    return {
+      ...rest,
+      messages: this.bigIntToIntMsg(messages)
+    } as ConversationSingleton<true>;
   }
 
   public async *getConversationHydrationPages({
