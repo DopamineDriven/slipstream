@@ -106,12 +106,16 @@ export class CliRendererService extends ModelPickerService {
     // reconcile: print any authoritative block content the live stream never
     // showed. The shared watermark makes this zero-duplication — a fully
     // streamed block slices to empty; a dropped block prints in full.
-    if (data.messageBlocks) {
-      for (const block of [...data.messageBlocks].sort(
-        (a, b) => a.ordinal - b.ordinal
-      )) {
-        this.renderBlock(block);
-      }
+    // Final state comes from the persisted AI message inside `convo`, never
+    // from the tracked-blocks array on the frame (ai_chat_chunk is the only
+    // place wire blocks are consumed). ENCRYPTED_THINKING rows hold the
+    // store-only ciphertext as content; the chunk path already showed the tag.
+    const aiMsg = data.convo.messages.find(m => m.id === data.aiMsgId);
+    for (const block of [...(aiMsg?.messageBlocks ?? [])].sort(
+      (a, b) => a.ordinal - b.ordinal
+    )) {
+      if (block.type === "ENCRYPTED_THINKING") continue;
+      this.renderBlock(block);
     }
     // the final answer line rarely ends with \n — land it before the meta rule
     const pendingText = this.mdStream.flush();

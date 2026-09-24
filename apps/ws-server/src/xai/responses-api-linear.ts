@@ -4,11 +4,9 @@ import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type {
-  BlockImgData,
   FunctionCallContext,
   FunctionCallOutput,
   GrokActiveMessageBlock,
-  GrokFinalizedMessageBlock,
   ResponsesComprehensive
 } from "@/xai/responses-types.ts";
 import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
@@ -17,7 +15,11 @@ import { GrokImgGenService } from "@/xai/img-gen.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type { EventTypeMap, InlineImageGenAggProps } from "@slipstream/types";
+import type {
+  ChatChunkAndResMsgBlock,
+  EventTypeMap,
+  InlineImageGenAggProps
+} from "@slipstream/types";
 
 export class GrokResponsesApiLinearService extends GrokImgGenService {
   protected cuid2: Promise<() => string>;
@@ -93,8 +95,10 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
       usage = 0;
     // block accounting: the closed blocks (ordinal === index) and the one
     // being written. Closing is written out inline wherever the wire ends an
-    // item or phase, or a different kind of content starts.
-    const trackedBlocks = Array.of<GrokFinalizedMessageBlock>();
+    // item or phase, or a different kind of content starts. The closed block
+    // IS the wire/persist shape — the same object rides the frame, the
+    // ai_chat_response array, and handleAiChatResponse.
+    const trackedBlocks = Array.of<ChatChunkAndResMsgBlock>();
     let activeBlock: GrokActiveMessageBlock | undefined = undefined;
     // a summarised reasoning item's `done` also carries encrypted_content;
     // this is how the placeholder branch knows a summary already streamed
@@ -107,14 +111,6 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
     let inlineImgAggArr:
       | [number, string, string, string, string, $Enums.ImageGenOutputKind]
       | undefined = undefined;
-    const roundTrack = Array.of<{
-      type: $Enums.MessageBlockType;
-      content: string;
-      durationMs: number;
-      ordinal: number;
-      conversationId: string;
-      inlineImageData?: BlockImgData;
-    }>();
 
     const supportsFunctionTools = this.canUseFunctionTools(m);
     const collectionId = await this.getUserCollectionIdWithFallback(
@@ -257,7 +253,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
           // a THINKING / ENCRYPTED_THINKING block that closed during this
           // chunk; the thinking frame below carries it (final duration at its
           // ordinal) in place of the active block
-          let closedBlock: GrokFinalizedMessageBlock | undefined = undefined;
+          let closedBlock: ChatChunkAndResMsgBlock | undefined = undefined;
 
           if (chunk.event === "response.output_item.added") {
             if (chunk.data.item.type !== "reasoning") {
@@ -265,15 +261,14 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               if (activeBlock && activeBlock.content.length > 0) {
                 const closed = {
                   content: activeBlock.content,
+                  conversationId,
                   durationMs: Math.max(
                     0,
                     performance.now() - activeBlock.startedAt
                   ),
-                  itemIds: activeBlock.itemIds,
                   ordinal: trackedBlocks.length,
-                  previewContent: activeBlock.content,
                   type: activeBlock.type
-                } satisfies GrokFinalizedMessageBlock;
+                } satisfies ChatChunkAndResMsgBlock;
                 trackedBlocks.push(closed);
                 if (closed.type === "THINKING") {
                   grokThinkingDuration += closed.durationMs;
@@ -412,6 +407,70 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
             });
 
             inlineImageGenAgg.push(inlineImgObj);
+
+            // the image lands in the block system, three steps, inline:
+            // (1) close the image THINKING block — one duration, added → cdn url
+            if (activeBlock && activeBlock.content.length > 0) {
+              const closed = {
+                content: activeBlock.content,
+                conversationId,
+                durationMs: Math.max(
+                  0,
+                  performance.now() - activeBlock.startedAt
+                ),
+                ordinal: trackedBlocks.length,
+                type: activeBlock.type
+              } satisfies ChatChunkAndResMsgBlock;
+              trackedBlocks.push(closed);
+              if (closed.type === "THINKING") {
+                grokThinkingDuration += closed.durationMs;
+                closedBlock = closed;
+              }
+            }
+            activeBlock = undefined;
+
+            // (2) the IMAGE_GEN block at the next ordinal: the prompt is its
+            //     content (the subcaption), the four wire fields ride with it
+            const imageBlock = {
+              content: revisedPrompt,
+              conversationId,
+              durationMs: 0,
+              ordinal: trackedBlocks.length,
+              type: "IMAGE_GEN",
+              inlineImageData: {
+                width: specs.width,
+                height: specs.height,
+                cdnUrl,
+                kind
+              }
+            } satisfies ChatChunkAndResMsgBlock;
+            trackedBlocks.push(imageBlock);
+
+            // (3) one frame for it. imgGenEnabled stays false: a one-off is a
+            //     TEXT message, and `true` flips the client into the job lane.
+            const imageFrame = {
+              type: "ai_chat_chunk",
+              conversationId,
+              userId,
+              title,
+              userMsgId,
+              imgGenEnabled: false,
+              provider,
+              systemPrompt,
+              temperature,
+              topP,
+              model: m,
+              isThinking: false,
+              messageBlocks: imageBlock,
+              done: false
+            } as const satisfies EventTypeMap["ai_chat_chunk"];
+            ws.send(JSON.stringify(imageFrame));
+            void this.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              imageFrame
+            );
+
             if (kind === "FINAL" && seriesId) {
               seriesId = undefined;
             }
@@ -463,15 +522,14 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               if (activeBlock && activeBlock.content.length > 0) {
                 const closed = {
                   content: activeBlock.content,
+                  conversationId,
                   durationMs: Math.max(
                     0,
                     performance.now() - activeBlock.startedAt
                   ),
-                  itemIds: activeBlock.itemIds,
                   ordinal: trackedBlocks.length,
-                  previewContent: activeBlock.content,
                   type: activeBlock.type
-                } satisfies GrokFinalizedMessageBlock;
+                } satisfies ChatChunkAndResMsgBlock;
                 trackedBlocks.push(closed);
                 if (closed.type === "THINKING") {
                   grokThinkingDuration += closed.durationMs;
@@ -479,14 +537,15 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               }
               activeBlock = undefined;
 
+              // content is the ciphertext (persisted, store-only); the frame
+              // site swaps in the tag for the wire
               const encryptedBlock = {
                 content: chunk.data.item.encrypted_content,
+                conversationId,
                 durationMs: 0,
-                itemIds: [chunk.data.item.id],
                 ordinal: trackedBlocks.length,
-                previewContent: this.encryptedTag,
                 type: "ENCRYPTED_THINKING"
-              } satisfies GrokFinalizedMessageBlock;
+              } satisfies ChatChunkAndResMsgBlock;
               trackedBlocks.push(encryptedBlock);
               closedBlock = encryptedBlock;
               grokThinkingDisplayAgg =
@@ -535,15 +594,14 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
             if (activeBlock && activeBlock.content.length > 0) {
               const closed = {
                 content: activeBlock.content,
+                conversationId,
                 durationMs: Math.max(
                   0,
                   performance.now() - activeBlock.startedAt
                 ),
-                itemIds: activeBlock.itemIds,
                 ordinal: trackedBlocks.length,
-                previewContent: activeBlock.content,
                 type: activeBlock.type
-              } satisfies GrokFinalizedMessageBlock;
+              } satisfies ChatChunkAndResMsgBlock;
               trackedBlocks.push(closed);
               if (closed.type === "THINKING") {
                 grokThinkingDuration += closed.durationMs;
@@ -564,15 +622,14 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               if (activeBlock && activeBlock.content.length > 0) {
                 const closed = {
                   content: activeBlock.content,
+                  conversationId,
                   durationMs: Math.max(
                     0,
                     performance.now() - activeBlock.startedAt
                   ),
-                  itemIds: activeBlock.itemIds,
                   ordinal: trackedBlocks.length,
-                  previewContent: activeBlock.content,
                   type: activeBlock.type
-                } satisfies GrokFinalizedMessageBlock;
+                } satisfies ChatChunkAndResMsgBlock;
                 trackedBlocks.push(closed);
               }
               activeBlock = {
@@ -594,15 +651,14 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
             if (activeBlock && activeBlock.content.length > 0) {
               const closed = {
                 content: activeBlock.content,
+                conversationId,
                 durationMs: Math.max(
                   0,
                   performance.now() - activeBlock.startedAt
                 ),
-                itemIds: activeBlock.itemIds,
                 ordinal: trackedBlocks.length,
-                previewContent: activeBlock.content,
                 type: activeBlock.type
-              } satisfies GrokFinalizedMessageBlock;
+              } satisfies ChatChunkAndResMsgBlock;
               trackedBlocks.push(closed);
               if (closed.type === "THINKING") {
                 grokThinkingDuration += closed.durationMs;
@@ -618,15 +674,14 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               if (activeBlock && activeBlock.content.length > 0) {
                 const closed = {
                   content: activeBlock.content,
+                  conversationId,
                   durationMs: Math.max(
                     0,
                     performance.now() - activeBlock.startedAt
                   ),
-                  itemIds: activeBlock.itemIds,
                   ordinal: trackedBlocks.length,
-                  previewContent: activeBlock.content,
                   type: activeBlock.type
-                } satisfies GrokFinalizedMessageBlock;
+                } satisfies ChatChunkAndResMsgBlock;
                 trackedBlocks.push(closed);
                 if (closed.type === "THINKING") {
                   grokThinkingDuration += closed.durationMs;
@@ -665,15 +720,14 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
             if (activeBlock && activeBlock.content.length > 0) {
               const closed = {
                 content: activeBlock.content,
+                conversationId,
                 durationMs: Math.max(
                   0,
                   performance.now() - activeBlock.startedAt
                 ),
-                itemIds: activeBlock.itemIds,
                 ordinal: trackedBlocks.length,
-                previewContent: activeBlock.content,
                 type: activeBlock.type
-              } satisfies GrokFinalizedMessageBlock;
+              } satisfies ChatChunkAndResMsgBlock;
               trackedBlocks.push(closed);
               if (closed.type === "THINKING") {
                 grokThinkingDuration += closed.durationMs;
@@ -717,11 +771,12 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
             : undefined;
           const closedFrameBlock = closedBlock
             ? {
-                type: closedBlock.type,
-                content: closedBlock.previewContent,
-                ordinal: closedBlock.ordinal,
-                conversationId,
-                durationMs: closedBlock.durationMs
+                ...closedBlock,
+                // the wire gets the tag; the block keeps the ciphertext
+                content:
+                  closedBlock.type === "ENCRYPTED_THINKING"
+                    ? this.encryptedTag
+                    : closedBlock.content
               }
             : undefined;
           const thinkingDuration =
@@ -870,6 +925,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
           // loop); every other tool takes the existing server-side path.
           const toolName = call.name;
           if (
+            via === "cli" &&
             this.isLocalToolName(toolName) &&
             localToolTurn?.advertised.has(toolName)
           ) {
@@ -949,21 +1005,10 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
           "Please rephrase with a narrower query, such as an exact filename or section title, and I will retry.";
         trackedBlocks.push({
           content: grokAgg,
+          conversationId,
           durationMs: 0,
-          itemIds: Array.of<string>(),
           ordinal: trackedBlocks.length,
-          previewContent: grokAgg,
           type: "TEXT"
-        });
-      }
-
-      for (const block of trackedBlocks) {
-        roundTrack.push({
-          type: block.type,
-          content: block.content,
-          durationMs: block.durationMs,
-          ordinal: block.ordinal,
-          conversationId
         });
       }
 
@@ -975,7 +1020,9 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
         conversationId,
         done: true,
         imgGenEnabled: false,
-        audioGenEnabled,inlineImageGenAgg,
+        audioGenEnabled,
+        inlineImageGenAgg:
+          inlineImageGenAgg.length > 0 ? inlineImageGenAgg : undefined,
         provider,
         userMsgId,
         title,
@@ -988,7 +1035,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
           grokThinkingDisplayAgg.length > 0
             ? grokThinkingDisplayAgg
             : undefined,
-        messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
+        messageBlocks: trackedBlocks.length > 0 ? trackedBlocks : undefined,
         temperature,
         topP
       });
@@ -1016,7 +1063,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
           topP,
           model: m,
           chunk: grokAgg,
-          messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
+          messageBlocks: trackedBlocks.length > 0 ? trackedBlocks : undefined,
           done: true
         } satisfies EventTypeMap["ai_chat_response"])
       );
@@ -1039,7 +1086,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
           grokThinkingDisplayAgg.length > 0
             ? grokThinkingDisplayAgg
             : undefined,
-        messageBlocks: roundTrack.length > 0 ? roundTrack : undefined,
+        messageBlocks: trackedBlocks.length > 0 ? trackedBlocks : undefined,
         topP,
         provider,
         model: m,
