@@ -1076,7 +1076,7 @@ export class ProviderValidation {
         content: prompt,
         provider: this.providerToPrismaFormat(provider),
         senderType: "USER",
-        model: model ?? "gpt-image-2",
+        model: model ?? "gpt-image-2.5-sunburst",
         messageType: "IMAGE_GEN",
         userId,
         userKeyId,
@@ -1102,6 +1102,12 @@ export class ProviderValidation {
                       { origin: "GENERATED" },
                       { imageGenOutput: { kind: "FINAL" } }
                     ]
+                  },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { inlineImageGenOutput: { kind: "FINAL" } }
+                    ]
                   }
                 ]
               },
@@ -1111,7 +1117,9 @@ export class ProviderValidation {
                 document: true,
                 audio: true,
                 imageGenOutput: true,
-                audioGenOutput: true
+                audioGenOutput: true,
+                inlineImageGenOutput: true,
+                messageBlock: true
               }
             }
           }
@@ -1135,6 +1143,12 @@ export class ProviderValidation {
                       { origin: "GENERATED" },
                       { imageGenOutput: { kind: "FINAL" } }
                     ]
+                  },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { inlineImageGenOutput: { kind: "FINAL" } }
+                    ]
                   }
                 ]
               },
@@ -1144,7 +1158,9 @@ export class ProviderValidation {
                 document: true,
                 audio: true,
                 imageGenOutput: true,
-                audioGenOutput: true
+                audioGenOutput: true,
+                inlineImageGenOutput: true,
+                messageBlock: true
               }
             }
           }

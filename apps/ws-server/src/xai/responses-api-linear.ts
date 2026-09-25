@@ -16,7 +16,7 @@ import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
-  ChatChunkAndResMsgBlock,
+  ChatChunkAndResBlock,
   EventTypeMap,
   InlineImageGenAggProps
 } from "@slipstream/types";
@@ -32,7 +32,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
     memoryService: ConversationMemoryVectorService,
     apiKey: string,
     managementKey: string,
-    // gate ussing the `via ==="cli"` prop in handleXAIAiResponseApiRequest
+    // gate ussing the `via ==="cli"` prop in handleGrokResponsesApiRequest
     protected localToolBroker: LocalToolBroker
   ) {
     super(
@@ -48,7 +48,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
     this.cuid2 = import("@paralleldrive/cuid2").then(t => t.createId);
   }
   protected encryptedTag = "*encrypted output...*" as const;
-  protected async handleXAIAiResponsesApiRequest({
+  protected async handleGrokResponsesApiRequest({
     chunks,
     conversationId,
     streamChannel,
@@ -97,7 +97,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
     // item or phase, or a different kind of content starts. The closed block
     // IS the wire/persist shape — the same object rides the frame, the
     // ai_chat_response array, and handleAiChatResponse.
-    const trackedBlocks = Array.of<ChatChunkAndResMsgBlock>();
+    const trackedBlocks = Array.of<ChatChunkAndResBlock>();
     let activeBlock: GrokActiveMessageBlock | undefined = undefined;
     // a summarised reasoning item's `done` also carries encrypted_content;
     // this is how the placeholder branch knows a summary already streamed
@@ -117,11 +117,6 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
       management_api_key
     );
 
-    // Local read-only tool bridge — capability advertised by the CLI on
-    // this exact turn; absent means zero local definitions attached.
-    // turnId mints once per ATTEMPT; the controller is the future
-    // cancellation hook (calls await sequentially, so nothing is pending
-    // when this throws).
     const localToolTurn =
       localTools?.protocolVersion === 1 && supportsFunctionTools
         ? {
@@ -253,7 +248,12 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
           // a THINKING / ENCRYPTED_THINKING block that closed during this
           // chunk; the thinking frame below carries it (final duration at its
           // ordinal) in place of the active block
-          let closedBlock: ChatChunkAndResMsgBlock | undefined = undefined;
+          let closedBlock: ChatChunkAndResBlock | undefined = undefined;
+          // an IMAGE_GEN frame built this chunk. Sent after the thinking frame
+          // below, so the closed image THINKING block (ordinal N) precedes the
+          // image (ordinal N+1) on the wire in the same order as trackedBlocks
+          let pendingImageFrame: EventTypeMap["ai_chat_chunk"] | undefined =
+            undefined;
 
           if (chunk.event === "response.output_item.added") {
             if (chunk.data.item.type !== "reasoning") {
@@ -268,7 +268,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                   ),
                   ordinal: trackedBlocks.length,
                   type: activeBlock.type
-                } satisfies ChatChunkAndResMsgBlock;
+                } satisfies ChatChunkAndResBlock;
                 trackedBlocks.push(closed);
                 if (closed.type === "THINKING") {
                   grokThinkingDuration += closed.durationMs;
@@ -420,7 +420,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                 ),
                 ordinal: trackedBlocks.length,
                 type: activeBlock.type
-              } satisfies ChatChunkAndResMsgBlock;
+              } satisfies ChatChunkAndResBlock;
               trackedBlocks.push(closed);
               if (closed.type === "THINKING") {
                 grokThinkingDuration += closed.durationMs;
@@ -443,11 +443,13 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                 cdnUrl,
                 kind
               }
-            } satisfies ChatChunkAndResMsgBlock;
+            } satisfies ChatChunkAndResBlock<"IMAGE_GEN">;
             trackedBlocks.push(imageBlock);
 
-            // (3) one frame for it. imgGenEnabled stays false: a one-off is a
-            //     TEXT message, and `true` flips the client into the job lane.
+            // (3) one frame for it, held until after the thinking frame below
+            //     so its THINKING block goes out first. imgGenEnabled stays
+            //     false: a one-off is a TEXT message, and `true` flips the
+            //     client into the job lane.
             const imageFrame = {
               type: "ai_chat_chunk",
               conversationId,
@@ -468,12 +470,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               inlineImgGenData: inlineImgObj,
               done: false
             } as const satisfies EventTypeMap["ai_chat_chunk"];
-            ws.send(JSON.stringify(imageFrame));
-            void this.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              imageFrame
-            );
+            pendingImageFrame = imageFrame;
 
             if (kind === "FINAL" && seriesId) {
               seriesId = undefined;
@@ -533,7 +530,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                   ),
                   ordinal: trackedBlocks.length,
                   type: activeBlock.type
-                } satisfies ChatChunkAndResMsgBlock;
+                } satisfies ChatChunkAndResBlock;
                 trackedBlocks.push(closed);
                 if (closed.type === "THINKING") {
                   grokThinkingDuration += closed.durationMs;
@@ -549,7 +546,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                 durationMs: 0,
                 ordinal: trackedBlocks.length,
                 type: "ENCRYPTED_THINKING"
-              } satisfies ChatChunkAndResMsgBlock;
+              } satisfies ChatChunkAndResBlock;
               trackedBlocks.push(encryptedBlock);
               closedBlock = encryptedBlock;
               grokThinkingDisplayAgg =
@@ -605,7 +602,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                 ),
                 ordinal: trackedBlocks.length,
                 type: activeBlock.type
-              } satisfies ChatChunkAndResMsgBlock;
+              } satisfies ChatChunkAndResBlock;
               trackedBlocks.push(closed);
               if (closed.type === "THINKING") {
                 grokThinkingDuration += closed.durationMs;
@@ -633,7 +630,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                   ),
                   ordinal: trackedBlocks.length,
                   type: activeBlock.type
-                } satisfies ChatChunkAndResMsgBlock;
+                } satisfies ChatChunkAndResBlock;
                 trackedBlocks.push(closed);
               }
               activeBlock = {
@@ -662,7 +659,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                 ),
                 ordinal: trackedBlocks.length,
                 type: activeBlock.type
-              } satisfies ChatChunkAndResMsgBlock;
+              } satisfies ChatChunkAndResBlock;
               trackedBlocks.push(closed);
               if (closed.type === "THINKING") {
                 grokThinkingDuration += closed.durationMs;
@@ -685,7 +682,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                   ),
                   ordinal: trackedBlocks.length,
                   type: activeBlock.type
-                } satisfies ChatChunkAndResMsgBlock;
+                } satisfies ChatChunkAndResBlock;
                 trackedBlocks.push(closed);
                 if (closed.type === "THINKING") {
                   grokThinkingDuration += closed.durationMs;
@@ -731,7 +728,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                 ),
                 ordinal: trackedBlocks.length,
                 type: activeBlock.type
-              } satisfies ChatChunkAndResMsgBlock;
+              } satisfies ChatChunkAndResBlock;
               trackedBlocks.push(closed);
               if (closed.type === "THINKING") {
                 grokThinkingDuration += closed.durationMs;
@@ -829,6 +826,16 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               provider,
               done: false
             });
+          }
+
+          // the image frame goes out after its THINKING block, never before
+          if (pendingImageFrame) {
+            ws.send(JSON.stringify(pendingImageFrame));
+            void this.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              pendingImageFrame
+            );
           }
 
           if (text) {

@@ -41,9 +41,9 @@ export class xAIService extends GrokResponsesApiLinearService {
       );
     }
     if (this.prisma.isGrokImgModel(model)) {
-      return this.handleXAIAiImageGenRequest({ model, ...rest });
+      return this.handleGrokImageGenRequest({ model, ...rest });
     } else {
-      return this.handleXAIAiResponsesApiRequest({
+      return this.handleGrokResponsesApiRequest({
         management_api_key: this.xaiManagementKey,
         model,
         ...rest

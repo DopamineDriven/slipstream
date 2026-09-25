@@ -34,6 +34,7 @@ export type InlineImageGenAggProps = DX<
       | "providerLinks"
       | "messageBlockId"
       | "messageId"
+      | "messageBlock"
     >
   > & {
     image: Rm<ImageSingleton, "attachmentId" | "createdAt" | "updatedAt">;
@@ -51,14 +52,28 @@ export type ChatChunkAndResInlineImageData = {
   kind: $Enums.ImageGenOutputKind;
 };
 
-export type ChatChunkAndResMsgBlock = {
-  type: $Enums.MessageBlockType;
+export type ChatChunkAndResMsgBlock<
+  T extends $Enums.MessageBlockType = $Enums.MessageBlockType
+> = {
+  type: T;
   content: string;
   ordinal: number;
   conversationId: string;
   durationMs: number;
   inlineImageData?: ChatChunkAndResInlineImageData;
 };
+
+export type ChatChunkAndResBlock<
+  T extends $Enums.MessageBlockType = $Enums.MessageBlockType
+> = T extends "IMAGE_GEN"
+  ? {
+      [
+        Q in keyof ChatChunkAndResMsgBlock<"IMAGE_GEN">
+      ]-?: ChatChunkAndResMsgBlock<"IMAGE_GEN">[Q];
+    }
+  : {
+      [Q in keyof ChatChunkAndResMsgBlock<T>]: ChatChunkAndResMsgBlock<T>[Q];
+    };
 
 export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   type: T;

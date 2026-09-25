@@ -637,6 +637,9 @@ export const MessageBlockScalarFieldEnum = {
   content: 'content',
   type: 'type',
   durationMs: 'durationMs',
+  cdnUrl: 'cdnUrl',
+  width: 'width',
+  height: 'height',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

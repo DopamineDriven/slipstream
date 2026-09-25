@@ -94,12 +94,31 @@ export type IncludeCreateConvoWithImgGenOrAudioGenProps = {
       imageGenJob: true;
       messageBlocks: { orderBy: { ordinal: "asc" } };
       attachments: {
+        where: {
+          OR: [
+            { origin: { not: "GENERATED" } },
+            {
+              AND: [
+                { origin: "GENERATED" },
+                { imageGenOutput: { kind: "FINAL" } }
+              ];
+            },
+            {
+              AND: [
+                { origin: "GENERATED" },
+                { inlineImageGenOutput: { kind: "FINAL" } }
+              ];
+            }
+          ];
+        };
         orderBy: {
           createdAt: "asc";
         };
         include: {
+          messageBlock: true;
           image: true;
           document: true;
+          inlineImageGenOutput: true;
           audio: true;
           audioGenOutput: true;
           imageGenOutput: true;

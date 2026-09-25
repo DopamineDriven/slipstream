@@ -51,6 +51,11 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         if (block.type === "TEXT") {
           textBlocks.push(block.content);
         }
+        if (block.type === "IMAGE_GEN" && block.cdnUrl) {
+          textBlocks.push(
+            `![[${msg.provider}/${msg.model}]](${block.cdnUrl})\n\n${block.content}`
+          );
+        }
       }
     }
     if (textBlocks.length > 0) {
@@ -108,6 +113,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
             let currentUserFileCount = 0;
 
             for (const attachment of msg.attachments) {
+              if (attachment.messageBlock) continue;
               const {
                 cdnUrl,
                 mime: ogMime,
@@ -117,7 +123,6 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
               } = attachment;
               const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
               const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
-
               if (url && mime) {
                 const [filename, ext] = this.prisma.filenameToHexExtTuple(
                   url,
@@ -201,6 +206,7 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         try {
           if (msg.attachments && msg.attachments.length > 0) {
             for (const att of msg.attachments) {
+              if (att.messageBlock) continue;
               const {
                 cdnUrl,
                 mime: ogMime,

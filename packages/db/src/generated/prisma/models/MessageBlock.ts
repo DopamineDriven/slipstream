@@ -29,11 +29,15 @@ export type AggregateMessageBlock = {
 export type MessageBlockAvgAggregateOutputType = {
   ordinal: number | null
   durationMs: number | null
+  width: number | null
+  height: number | null
 }
 
 export type MessageBlockSumAggregateOutputType = {
   ordinal: number | null
   durationMs: number | null
+  width: number | null
+  height: number | null
 }
 
 export type MessageBlockMinAggregateOutputType = {
@@ -44,6 +48,9 @@ export type MessageBlockMinAggregateOutputType = {
   content: string | null
   type: $Enums.MessageBlockType | null
   durationMs: number | null
+  cdnUrl: string | null
+  width: number | null
+  height: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +63,9 @@ export type MessageBlockMaxAggregateOutputType = {
   content: string | null
   type: $Enums.MessageBlockType | null
   durationMs: number | null
+  cdnUrl: string | null
+  width: number | null
+  height: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -68,6 +78,9 @@ export type MessageBlockCountAggregateOutputType = {
   content: number
   type: number
   durationMs: number
+  cdnUrl: number
+  width: number
+  height: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -77,11 +90,15 @@ export type MessageBlockCountAggregateOutputType = {
 export type MessageBlockAvgAggregateInputType = {
   ordinal?: true
   durationMs?: true
+  width?: true
+  height?: true
 }
 
 export type MessageBlockSumAggregateInputType = {
   ordinal?: true
   durationMs?: true
+  width?: true
+  height?: true
 }
 
 export type MessageBlockMinAggregateInputType = {
@@ -92,6 +109,9 @@ export type MessageBlockMinAggregateInputType = {
   content?: true
   type?: true
   durationMs?: true
+  cdnUrl?: true
+  width?: true
+  height?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -104,6 +124,9 @@ export type MessageBlockMaxAggregateInputType = {
   content?: true
   type?: true
   durationMs?: true
+  cdnUrl?: true
+  width?: true
+  height?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -116,6 +139,9 @@ export type MessageBlockCountAggregateInputType = {
   content?: true
   type?: true
   durationMs?: true
+  cdnUrl?: true
+  width?: true
+  height?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -215,6 +241,9 @@ export type MessageBlockGroupByOutputType = {
   content: string
   type: $Enums.MessageBlockType
   durationMs: number
+  cdnUrl: string | null
+  width: number | null
+  height: number | null
   createdAt: Date
   updatedAt: Date
   _count: MessageBlockCountAggregateOutputType | null
@@ -250,6 +279,9 @@ export type MessageBlockWhereInput = {
   content?: Prisma.StringFilter<"MessageBlock"> | string
   type?: Prisma.EnumMessageBlockTypeFilter<"MessageBlock"> | $Enums.MessageBlockType
   durationMs?: Prisma.IntFilter<"MessageBlock"> | number
+  cdnUrl?: Prisma.StringNullableFilter<"MessageBlock"> | string | null
+  width?: Prisma.IntNullableFilter<"MessageBlock"> | number | null
+  height?: Prisma.IntNullableFilter<"MessageBlock"> | number | null
   createdAt?: Prisma.DateTimeFilter<"MessageBlock"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MessageBlock"> | Date | string
   message?: Prisma.XOR<Prisma.MessageScalarRelationFilter, Prisma.MessageWhereInput>
@@ -264,6 +296,9 @@ export type MessageBlockOrderByWithRelationInput = {
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
   durationMs?: Prisma.SortOrder
+  cdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  width?: Prisma.SortOrderInput | Prisma.SortOrder
+  height?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   message?: Prisma.MessageOrderByWithRelationInput
@@ -282,6 +317,9 @@ export type MessageBlockWhereUniqueInput = Prisma.AtLeast<{
   content?: Prisma.StringFilter<"MessageBlock"> | string
   type?: Prisma.EnumMessageBlockTypeFilter<"MessageBlock"> | $Enums.MessageBlockType
   durationMs?: Prisma.IntFilter<"MessageBlock"> | number
+  cdnUrl?: Prisma.StringNullableFilter<"MessageBlock"> | string | null
+  width?: Prisma.IntNullableFilter<"MessageBlock"> | number | null
+  height?: Prisma.IntNullableFilter<"MessageBlock"> | number | null
   createdAt?: Prisma.DateTimeFilter<"MessageBlock"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MessageBlock"> | Date | string
   message?: Prisma.XOR<Prisma.MessageScalarRelationFilter, Prisma.MessageWhereInput>
@@ -296,6 +334,9 @@ export type MessageBlockOrderByWithAggregationInput = {
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
   durationMs?: Prisma.SortOrder
+  cdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  width?: Prisma.SortOrderInput | Prisma.SortOrder
+  height?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.MessageBlockCountOrderByAggregateInput
@@ -316,6 +357,9 @@ export type MessageBlockScalarWhereWithAggregatesInput = {
   content?: Prisma.StringWithAggregatesFilter<"MessageBlock"> | string
   type?: Prisma.EnumMessageBlockTypeWithAggregatesFilter<"MessageBlock"> | $Enums.MessageBlockType
   durationMs?: Prisma.IntWithAggregatesFilter<"MessageBlock"> | number
+  cdnUrl?: Prisma.StringNullableWithAggregatesFilter<"MessageBlock"> | string | null
+  width?: Prisma.IntNullableWithAggregatesFilter<"MessageBlock"> | number | null
+  height?: Prisma.IntNullableWithAggregatesFilter<"MessageBlock"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"MessageBlock"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"MessageBlock"> | Date | string
 }
@@ -327,6 +371,9 @@ export type MessageBlockCreateInput = {
   content: string
   type: $Enums.MessageBlockType
   durationMs?: number
+  cdnUrl?: string | null
+  width?: number | null
+  height?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   message: Prisma.MessageCreateNestedOneWithoutMessageBlocksInput
@@ -341,6 +388,9 @@ export type MessageBlockUncheckedCreateInput = {
   content: string
   type: $Enums.MessageBlockType
   durationMs?: number
+  cdnUrl?: string | null
+  width?: number | null
+  height?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageBlockInput
@@ -353,6 +403,9 @@ export type MessageBlockUpdateInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMessageBlockTypeFieldUpdateOperationsInput | $Enums.MessageBlockType
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   message?: Prisma.MessageUpdateOneRequiredWithoutMessageBlocksNestedInput
@@ -367,6 +420,9 @@ export type MessageBlockUncheckedUpdateInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMessageBlockTypeFieldUpdateOperationsInput | $Enums.MessageBlockType
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageBlockNestedInput
@@ -380,6 +436,9 @@ export type MessageBlockCreateManyInput = {
   content: string
   type: $Enums.MessageBlockType
   durationMs?: number
+  cdnUrl?: string | null
+  width?: number | null
+  height?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -391,6 +450,9 @@ export type MessageBlockUpdateManyMutationInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMessageBlockTypeFieldUpdateOperationsInput | $Enums.MessageBlockType
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -403,6 +465,9 @@ export type MessageBlockUncheckedUpdateManyInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMessageBlockTypeFieldUpdateOperationsInput | $Enums.MessageBlockType
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -435,6 +500,9 @@ export type MessageBlockCountOrderByAggregateInput = {
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
   durationMs?: Prisma.SortOrder
+  cdnUrl?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -442,6 +510,8 @@ export type MessageBlockCountOrderByAggregateInput = {
 export type MessageBlockAvgOrderByAggregateInput = {
   ordinal?: Prisma.SortOrder
   durationMs?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
 }
 
 export type MessageBlockMaxOrderByAggregateInput = {
@@ -452,6 +522,9 @@ export type MessageBlockMaxOrderByAggregateInput = {
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
   durationMs?: Prisma.SortOrder
+  cdnUrl?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -464,6 +537,9 @@ export type MessageBlockMinOrderByAggregateInput = {
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
   durationMs?: Prisma.SortOrder
+  cdnUrl?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -471,6 +547,8 @@ export type MessageBlockMinOrderByAggregateInput = {
 export type MessageBlockSumOrderByAggregateInput = {
   ordinal?: Prisma.SortOrder
   durationMs?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
 }
 
 export type MessageBlockCreateNestedOneWithoutAttachmentsInput = {
@@ -542,6 +620,9 @@ export type MessageBlockCreateWithoutAttachmentsInput = {
   content: string
   type: $Enums.MessageBlockType
   durationMs?: number
+  cdnUrl?: string | null
+  width?: number | null
+  height?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   message: Prisma.MessageCreateNestedOneWithoutMessageBlocksInput
@@ -555,6 +636,9 @@ export type MessageBlockUncheckedCreateWithoutAttachmentsInput = {
   content: string
   type: $Enums.MessageBlockType
   durationMs?: number
+  cdnUrl?: string | null
+  width?: number | null
+  height?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -582,6 +666,9 @@ export type MessageBlockUpdateWithoutAttachmentsInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMessageBlockTypeFieldUpdateOperationsInput | $Enums.MessageBlockType
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   message?: Prisma.MessageUpdateOneRequiredWithoutMessageBlocksNestedInput
@@ -595,6 +682,9 @@ export type MessageBlockUncheckedUpdateWithoutAttachmentsInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMessageBlockTypeFieldUpdateOperationsInput | $Enums.MessageBlockType
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -606,6 +696,9 @@ export type MessageBlockCreateWithoutMessageInput = {
   content: string
   type: $Enums.MessageBlockType
   durationMs?: number
+  cdnUrl?: string | null
+  width?: number | null
+  height?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageBlockInput
@@ -618,6 +711,9 @@ export type MessageBlockUncheckedCreateWithoutMessageInput = {
   content: string
   type: $Enums.MessageBlockType
   durationMs?: number
+  cdnUrl?: string | null
+  width?: number | null
+  height?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageBlockInput
@@ -660,6 +756,9 @@ export type MessageBlockScalarWhereInput = {
   content?: Prisma.StringFilter<"MessageBlock"> | string
   type?: Prisma.EnumMessageBlockTypeFilter<"MessageBlock"> | $Enums.MessageBlockType
   durationMs?: Prisma.IntFilter<"MessageBlock"> | number
+  cdnUrl?: Prisma.StringNullableFilter<"MessageBlock"> | string | null
+  width?: Prisma.IntNullableFilter<"MessageBlock"> | number | null
+  height?: Prisma.IntNullableFilter<"MessageBlock"> | number | null
   createdAt?: Prisma.DateTimeFilter<"MessageBlock"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MessageBlock"> | Date | string
 }
@@ -671,6 +770,9 @@ export type MessageBlockCreateManyMessageInput = {
   content: string
   type: $Enums.MessageBlockType
   durationMs?: number
+  cdnUrl?: string | null
+  width?: number | null
+  height?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -682,6 +784,9 @@ export type MessageBlockUpdateWithoutMessageInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMessageBlockTypeFieldUpdateOperationsInput | $Enums.MessageBlockType
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageBlockNestedInput
@@ -694,6 +799,9 @@ export type MessageBlockUncheckedUpdateWithoutMessageInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMessageBlockTypeFieldUpdateOperationsInput | $Enums.MessageBlockType
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageBlockNestedInput
@@ -706,6 +814,9 @@ export type MessageBlockUncheckedUpdateManyWithoutMessageInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumMessageBlockTypeFieldUpdateOperationsInput | $Enums.MessageBlockType
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -749,6 +860,9 @@ export type MessageBlockSelect<ExtArgs extends runtime.Types.Extensions.Internal
   content?: boolean
   type?: boolean
   durationMs?: boolean
+  cdnUrl?: boolean
+  width?: boolean
+  height?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
@@ -764,6 +878,9 @@ export type MessageBlockSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   content?: boolean
   type?: boolean
   durationMs?: boolean
+  cdnUrl?: boolean
+  width?: boolean
+  height?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
@@ -777,6 +894,9 @@ export type MessageBlockSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   content?: boolean
   type?: boolean
   durationMs?: boolean
+  cdnUrl?: boolean
+  width?: boolean
+  height?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
@@ -790,11 +910,14 @@ export type MessageBlockSelectScalar = {
   content?: boolean
   type?: boolean
   durationMs?: boolean
+  cdnUrl?: boolean
+  width?: boolean
+  height?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type MessageBlockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "messageId" | "ordinal" | "content" | "type" | "durationMs" | "createdAt" | "updatedAt", ExtArgs["result"]["messageBlock"]>
+export type MessageBlockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "messageId" | "ordinal" | "content" | "type" | "durationMs" | "cdnUrl" | "width" | "height" | "createdAt" | "updatedAt", ExtArgs["result"]["messageBlock"]>
 export type MessageBlockInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
   attachments?: boolean | Prisma.MessageBlock$attachmentsArgs<ExtArgs>
@@ -821,6 +944,12 @@ export type $MessageBlockPayload<ExtArgs extends runtime.Types.Extensions.Intern
     content: string
     type: $Enums.MessageBlockType
     durationMs: number
+    /**
+     * type="IMAGE_GEN" only where InlineImageGenOutput.kind="FINAL"
+     */
+    cdnUrl: string | null
+    width: number | null
+    height: number | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["messageBlock"]>
@@ -1255,6 +1384,9 @@ export interface MessageBlockFieldRefs {
   readonly content: Prisma.FieldRef<"MessageBlock", 'String'>
   readonly type: Prisma.FieldRef<"MessageBlock", 'MessageBlockType'>
   readonly durationMs: Prisma.FieldRef<"MessageBlock", 'Int'>
+  readonly cdnUrl: Prisma.FieldRef<"MessageBlock", 'String'>
+  readonly width: Prisma.FieldRef<"MessageBlock", 'Int'>
+  readonly height: Prisma.FieldRef<"MessageBlock", 'Int'>
   readonly createdAt: Prisma.FieldRef<"MessageBlock", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"MessageBlock", 'DateTime'>
 }

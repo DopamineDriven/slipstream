@@ -20,7 +20,8 @@ export interface GrokActiveMessageBlock {
   content: string;
   itemIds: string[];
   startedAt: number;
-  type: $Enums.MessageBlockType;
+  // an open block is never IMAGE_GEN — the image block is pushed closed
+  type: Exclude<$Enums.MessageBlockType, "IMAGE_GEN">;
   inlineImageData?: BlockImgData;
 }
 export type BlockImgData = {

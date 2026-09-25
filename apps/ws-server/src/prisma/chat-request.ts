@@ -18,7 +18,11 @@ import type {
 import { PrismaAttachmentService } from "@/prisma/attachment.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { AIChatRequest, Rm } from "@slipstream/types";
+import type {
+  AIChatRequest,
+  ConversationSingletonOneOff,
+  Rm
+} from "@slipstream/types";
 
 export class PrismaChatRequestService extends PrismaAttachmentService {
   constructor(
@@ -37,7 +41,9 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         audioGenOutput: true,
         document: true,
         audio: true,
-        imageGenOutput: true
+        imageGenOutput: true,
+        inlineImageGenOutput: true,
+        messageBlock: true
       }
     } as const;
   }
@@ -71,7 +77,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         where: { batchId, userId },
         take: 10,
         orderBy: [{ createdAt: "desc" }],
-        include: { image: true, document: true, audio: true }
+        include: this.includeGamma.include
       });
       const connectById = attachments.map(({ id }) => ({ id }));
       const extended = attachments.map(t => {
@@ -107,7 +113,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       where: { batchId, userId, conversationId, messageId: null },
       take: 10,
       orderBy: [{ createdAt: "desc" }],
-      include: { image: true, document: true, audio: true }
+      include: this.includeGamma.include
     });
     const extended = attachments.map(t => {
       const { compatStatus, assetType, compatCdnUrl, compatMime, compatExt } =
@@ -171,21 +177,37 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       }
     });
 
-    const lastMsg = createConvo.messages.at(-1);
+    const { messages, ...c } = createConvo;
+    const s = messages.map(p => {
+      const { attachments, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      return {
+        ...rest,
+        attachments: att
+      };
+    });
+
+    const conversation = {
+      ...c,
+      messages: s,
+      apiKey
+    } satisfies ConversationSingletonOneOff<true>;
+
+    const lastMsg = conversation.messages.at(-1);
     if (!lastMsg) throw new Error("no last message found");
 
-    return this.toCompatPropsExtened(
-      "image_gen_request",
-      this.bigintToNumber("image_gen_request", {
-        apiKey,
-        ...createConvo
-      }),
-      {
-        jobId: lastMsg?.imageGenJob?.id,
-        requestMessageId: lastMsg?.id,
-        ...withAssetInfo
-      }
-    );
+    return this.toCompatPropsExtened("image_gen_request", conversation, {
+      jobId: lastMsg?.imageGenJob?.id,
+      requestMessageId: lastMsg?.id,
+      ...withAssetInfo
+    });
   }
 
   private async handleAiChatReqCreateSansAttachmentsWithAudioGen({
@@ -226,18 +248,36 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       }
     });
 
-    const apiKeyAndRes = { apiKey, ...p };
-    const lastMsg = apiKeyAndRes.messages.at(-1);
-    return this.toCompatPropsExtened(
-      "audio_gen_request",
-      this.bigintToNumber("audio_gen_request", apiKeyAndRes),
-      {
-        jobId: lastMsg?.audioGenJob?.id,
-        requestMessageId: lastMsg?.id,
-        assetCounts: 0,
-        assets: undefined
-      }
-    );
+    const { messages, ...c } = p;
+    const s = messages.map(p => {
+      const { attachments, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      return {
+        ...rest,
+        attachments: att
+      };
+    });
+
+    const conversation = {
+      ...c,
+      messages: s,
+      apiKey
+    } satisfies ConversationSingletonOneOff<true>;
+
+    const lastMsg = conversation.messages.at(-1);
+    return this.toCompatPropsExtened("audio_gen_request", conversation, {
+      jobId: lastMsg?.audioGenJob?.id,
+      requestMessageId: lastMsg?.id,
+      assetCounts: 0,
+      assets: undefined
+    });
   }
 
   private async handleAiChatReqCreateWithAttachmentsWithAudioGen({
@@ -282,21 +322,36 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       }
     });
 
-    const lastMsg = createConvo.messages.at(-1);
-    if (!lastMsg) throw new Error("no last message found");
+    const { messages, ...c } = createConvo;
+    const s = messages.map(p => {
+      const { attachments, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
 
-    return this.toCompatPropsExtened(
-      "audio_gen_request",
-      this.bigintToNumber("audio_gen_request", {
-        apiKey,
-        ...createConvo
-      }),
-      {
-        jobId: lastMsg?.audioGenJob?.id,
-        requestMessageId: lastMsg?.id,
-        ...withAssetInfo
-      }
-    );
+      return {
+        ...rest,
+        attachments: att
+      };
+    });
+
+    const conversation = {
+      ...c,
+      messages: s,
+      apiKey
+    } satisfies ConversationSingletonOneOff<true>;
+
+    const lastMsg = conversation.messages.at(-1);
+    if (!lastMsg) throw new Error("no last message found");
+    return this.toCompatPropsExtened("audio_gen_request", conversation, {
+      jobId: lastMsg?.audioGenJob?.id,
+      requestMessageId: lastMsg?.id,
+      ...withAssetInfo
+    });
   }
 
   private async handleAiChatReqCreateSansAttachmentsWithImgGen({
@@ -337,18 +392,36 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       }
     });
 
-    const apiKeyAndRes = { apiKey, ...p };
-    const lastMsg = apiKeyAndRes.messages.at(-1);
-    return this.toCompatPropsExtened(
-      "image_gen_request",
-      this.bigintToNumber("image_gen_request", apiKeyAndRes),
-      {
-        jobId: lastMsg?.imageGenJob?.id,
-        requestMessageId: lastMsg?.id,
-        assetCounts: 0,
-        assets: undefined
-      }
-    );
+    const { messages, ...c } = p;
+    const s = messages.map(p => {
+      const { attachments, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      return {
+        ...rest,
+        attachments: att
+      };
+    });
+
+    const conversation = {
+      ...c,
+      messages: s,
+      apiKey
+    } satisfies ConversationSingletonOneOff<true>;
+
+    const lastMsg = conversation.messages.at(-1);
+    return this.toCompatPropsExtened("image_gen_request", conversation, {
+      jobId: lastMsg?.imageGenJob?.id,
+      requestMessageId: lastMsg?.id,
+      assetCounts: 0,
+      assets: undefined
+    });
   }
 
   private async handleAiChatReqCreateSansAssetGenSansAttachments({
@@ -377,7 +450,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
           include: {
             imageGenJob: true,
             audioGenJob: true,
-            messageBlocks: true,
+            messageBlocks: { orderBy: { ordinal: "asc" } },
             attachments: {
               where: {
                 OR: [
@@ -386,6 +459,12 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                     AND: [
                       { origin: "GENERATED" },
                       { imageGenOutput: { kind: "FINAL" } }
+                    ]
+                  },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { inlineImageGenOutput: { kind: "FINAL" } }
                     ]
                   }
                 ]
@@ -419,17 +498,35 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       }
     });
     const apiKeyAndRes = { apiKey, ...p };
+    const { messages, ...c } = p;
+    const s = messages.map(p => {
+      const { attachments, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      return {
+        ...rest,
+        attachments: att
+      };
+    });
+
+    const conversation = {
+      ...c,
+      messages: s,
+      apiKey
+    } satisfies ConversationSingletonOneOff<true>;
     const lastMsg = apiKeyAndRes.messages.at(-1);
-    return this.toCompatPropsExtened(
-      "ai_chat_request",
-      this.bigintToNumber("ai_chat_request", apiKeyAndRes),
-      {
-        jobId: lastMsg?.imageGenJob?.id ?? undefined,
-        requestMessageId: lastMsg?.id,
-        assetCounts: 0,
-        assets: undefined
-      }
-    );
+    return this.toCompatPropsExtened("ai_chat_request", conversation, {
+      jobId: lastMsg?.imageGenJob?.id ?? undefined,
+      requestMessageId: lastMsg?.id,
+      assetCounts: 0,
+      assets: undefined
+    });
   }
 
   private async handleAiChatReqCreateWithAttachmentsSansAssetGen({
@@ -461,7 +558,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
           orderBy: { ordinal: "asc" },
           include: {
             imageGenJob: true,
-            messageBlocks: true,
+            messageBlocks: { orderBy: { ordinal: "asc" } },
             audioGenJob: true,
             attachments: {
               where: {
@@ -471,6 +568,12 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                     AND: [
                       { origin: "GENERATED" },
                       { imageGenOutput: { kind: "FINAL" } }
+                    ]
+                  },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { inlineImageGenOutput: { kind: "FINAL" } }
                     ]
                   }
                 ]
@@ -505,13 +608,32 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         }
       }
     });
+    const { messages, ...c } = dat;
+    const s = messages.map(p => {
+      const { attachments, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      return {
+        ...rest,
+        attachments: att
+      };
+    });
+
+    const conversation = {
+      ...c,
+      messages: s,
+      apiKey
+    } satisfies ConversationSingletonOneOff<true>;
     const lastMsg = dat.messages.at(-1);
     return this.toCompatPropsExtened(
       "ai_chat_request",
-      this.bigintToNumber("ai_chat_request", {
-        apiKey,
-        ...dat
-      }),
+      conversation,
 
       {
         jobId: lastMsg?.imageGenJob?.id,
@@ -549,7 +671,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
           include: {
             imageGenJob: true,
             audioGenJob: true,
-            messageBlocks: true,
+            messageBlocks: { orderBy: { ordinal: "asc" } },
             attachments: {
               where: {
                 OR: [
@@ -558,6 +680,12 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                     AND: [
                       { origin: "GENERATED" },
                       { imageGenOutput: { kind: "FINAL" } }
+                    ]
+                  },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { inlineImageGenOutput: { kind: "FINAL" } }
                     ]
                   }
                 ]
@@ -598,19 +726,34 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         userKeyId: keyId
       }
     });
+    const { messages, ...c } = d;
+    const s = messages.map(p => {
+      const { attachments, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      return {
+        ...rest,
+        attachments: att
+      };
+    });
+
+    const convo = {
+      ...c,
+      messages: s,
+      apiKey
+    } satisfies ConversationSingletonOneOff<true>;
     const lastMsg = d.messages.at(-1);
-    return this.toCompatPropsExtened(
-      "ai_chat_request",
-      this.bigintToNumber("ai_chat_request", {
-        apiKey,
-        ...d
-      }),
-      {
-        jobId: lastMsg?.imageGenJob?.id,
-        requestMessageId: lastMsg?.id,
-        ...withAssetInfo
-      }
-    );
+    return this.toCompatPropsExtened("ai_chat_request", convo, {
+      jobId: lastMsg?.imageGenJob?.id,
+      requestMessageId: lastMsg?.id,
+      ...withAssetInfo
+    });
   }
   private async handleAiChatReqUpdateWithAttachmentsWithAudioGen({
     apiKey,
@@ -651,6 +794,12 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                       { origin: "GENERATED" },
                       { imageGenOutput: { kind: "FINAL" } }
                     ]
+                  },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { inlineImageGenOutput: { kind: "FINAL" } }
+                    ]
                   }
                 ]
               },
@@ -684,19 +833,34 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       }
     });
 
+    const { messages, ...c } = updateConvo;
+    const s = messages.map(p => {
+      const { attachments, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      return {
+        ...rest,
+        attachments: att
+      };
+    });
+
+    const convo = {
+      ...c,
+      messages: s,
+      apiKey
+    } satisfies ConversationSingletonOneOff<true>;
     const lastMsg = updateConvo.messages.at(-1);
-    return this.toCompatPropsExtened(
-      "audio_gen_request",
-      this.bigintToNumber("audio_gen_request", {
-        apiKey,
-        ...updateConvo
-      }),
-      {
-        jobId: lastMsg?.audioGenJob?.id,
-        requestMessageId: lastMsg?.id,
-        ...withAssetInfo
-      }
-    );
+    return this.toCompatPropsExtened("audio_gen_request", convo, {
+      jobId: lastMsg?.audioGenJob?.id,
+      requestMessageId: lastMsg?.id,
+      ...withAssetInfo
+    });
   }
   private async handleAiChatReqUpdateWithAttachmentsWithImageGen({
     apiKey,
@@ -745,19 +909,35 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       }
     });
 
-    const lastMsg = updateConvo.messages.at(-1);
-    return this.toCompatPropsExtened(
-      "image_gen_request",
-      this.bigintToNumber("image_gen_request", {
-        apiKey,
-        ...updateConvo
-      }),
-      {
-        jobId: lastMsg?.imageGenJob?.id,
-        requestMessageId: lastMsg?.id,
-        ...withAssetInfo
-      }
-    );
+    const { messages, ...c } = updateConvo;
+    const s = messages.map(p => {
+      const { attachments, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      return {
+        ...rest,
+        attachments: att
+      };
+    });
+
+    const conversation = {
+      ...c,
+      messages: s,
+      apiKey
+    } satisfies ConversationSingletonOneOff<true>;
+
+    const lastMsg = conversation.messages.at(-1);
+    return this.toCompatPropsExtened("image_gen_request", conversation, {
+      jobId: lastMsg?.imageGenJob?.id,
+      requestMessageId: lastMsg?.id,
+      ...withAssetInfo
+    });
   }
 
   private async handleAiChatReqUpdateSansAttachmentsWithImageGen({
@@ -775,7 +955,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
 
     const ordinal = await this.convoCount(conversationId);
     const pr = await this.prismaClient.conversation.update({
-      include: includeSansAttachments,
+      include: { ...includeSansAttachments },
       where: { id: conversationId },
       data: {
         messages: {
@@ -797,18 +977,35 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         userKeyId: keyId
       }
     });
-    const apiKeyAndRes = { apiKey, ...pr };
-    const lastMsg = apiKeyAndRes.messages.at(-1);
-    return this.toCompatPropsExtened(
-      "image_gen_request",
-      this.bigintToNumber("image_gen_request", apiKeyAndRes),
-      {
-        jobId: lastMsg?.imageGenJob?.id,
-        requestMessageId: lastMsg?.id,
-        assetCounts: 0,
-        assets: undefined
-      }
-    );
+    const { messages, ...c } = pr;
+    const s = messages.map(p => {
+      const { attachments, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      return {
+        ...rest,
+        attachments: att
+      };
+    });
+
+    const conversation = {
+      ...c,
+      messages: s,
+      apiKey
+    } satisfies ConversationSingletonOneOff<true>;
+    const lastMsg = conversation.messages.at(-1);
+    return this.toCompatPropsExtened("image_gen_request", conversation, {
+      jobId: lastMsg?.imageGenJob?.id,
+      requestMessageId: lastMsg?.id,
+      assetCounts: 0,
+      assets: undefined
+    });
   }
 
   private async handleAiChatReqUpdateSansAttachmentsWithAudioGen({
@@ -828,12 +1025,13 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       include: {
         conversationSettings: true,
         messages: {
-          // ordinal is the authoritative dense sequence — createdAt can tie
           orderBy: { ordinal: "asc" },
           include: {
             imageGenJob: true,
             audioGenJob: true,
-            messageBlocks: { orderBy: { ordinal: "asc" } },
+            messageBlocks: {
+              orderBy: { ordinal: "asc" }
+            },
             attachments: {
               where: {
                 OR: [
@@ -842,6 +1040,12 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                     AND: [
                       { origin: "GENERATED" },
                       { imageGenOutput: { kind: "FINAL" } }
+                    ]
+                  },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { inlineImageGenOutput: { kind: "FINAL" } }
                     ]
                   }
                 ]
@@ -873,18 +1077,36 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         userKeyId: keyId
       }
     });
-    const apiKeyAndRes = { apiKey, ...pr };
-    const lastMsg = apiKeyAndRes.messages.at(-1);
-    return this.toCompatPropsExtened(
-      "audio_gen_request",
-      this.bigintToNumber("audio_gen_request", apiKeyAndRes),
-      {
-        jobId: lastMsg?.audioGenJob?.id,
-        requestMessageId: lastMsg?.id,
-        assetCounts: 0,
-        assets: undefined
-      }
-    );
+
+    const { messages, ...c } = pr;
+    const s = messages.map(p => {
+      const { attachments, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      return {
+        ...rest,
+        attachments: att
+      };
+    });
+
+    const conversation = {
+      ...c,
+      messages: s,
+      apiKey
+    } satisfies ConversationSingletonOneOff<true>;
+    const lastMsg = conversation.messages.at(-1);
+    return this.toCompatPropsExtened("audio_gen_request", conversation, {
+      jobId: lastMsg?.audioGenJob?.id,
+      requestMessageId: lastMsg?.id,
+      assetCounts: 0,
+      assets: undefined
+    });
   }
 
   private async handleAiChatReqUpdateSansAttachmentsSansAssetGen({
@@ -902,11 +1124,10 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       include: {
         conversationSettings: true,
         messages: {
-          // ordinal is the authoritative dense sequence — createdAt can tie
           orderBy: { ordinal: "asc" },
           include: {
             audioGenJob: true,
-            messageBlocks: true,
+            messageBlocks: { orderBy: { ordinal: "asc" } },
             imageGenJob: true,
             attachments: {
               where: {
@@ -916,6 +1137,12 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                     AND: [
                       { origin: "GENERATED" },
                       { imageGenOutput: { kind: "FINAL" } }
+                    ]
+                  },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { inlineImageGenOutput: { kind: "FINAL" } }
                     ]
                   }
                 ]
@@ -954,18 +1181,35 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         userKeyId: keyId
       }
     });
-    const apiKeyAndRes = { apiKey, ...pr };
-    const lastMsg = apiKeyAndRes.messages.at(-1);
-    return this.toCompatPropsExtened(
-      "ai_chat_request",
-      this.bigintToNumber("ai_chat_request", apiKeyAndRes),
-      {
-        jobId: lastMsg?.imageGenJob?.id,
-        requestMessageId: lastMsg?.id,
-        assetCounts: 0,
-        assets: undefined
-      }
-    );
+    const { messages, ...c } = pr;
+    const s = messages.map(p => {
+      const { attachments, ...rest } = p;
+      const att = attachments.map(v => {
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null,
+          inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+        };
+      });
+
+      return {
+        ...rest,
+        attachments: att
+      };
+    });
+
+    const conversation = {
+      ...c,
+      messages: s,
+      apiKey
+    } satisfies ConversationSingletonOneOff<true>;
+    const lastMsg = conversation.messages.at(-1);
+    return this.toCompatPropsExtened("ai_chat_request", conversation, {
+      jobId: lastMsg?.imageGenJob?.id,
+      requestMessageId: lastMsg?.id,
+      assetCounts: 0,
+      assets: undefined
+    });
   }
 
   private isAudioGenModel(m: string) {
@@ -1022,6 +1266,23 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                   audioGenJob: true,
                   messageBlocks: { orderBy: { ordinal: "asc" } },
                   attachments: {
+                    where: {
+                      OR: [
+                        { origin: { not: "GENERATED" } },
+                        {
+                          AND: [
+                            { origin: "GENERATED" },
+                            { imageGenOutput: { kind: "FINAL" } }
+                          ]
+                        },
+                        {
+                          AND: [
+                            { origin: "GENERATED" },
+                            { inlineImageGenOutput: { kind: "FINAL" } }
+                          ]
+                        }
+                      ]
+                    },
                     orderBy: { createdAt: "asc" },
                     include: this.includeGamma.include
                   } as const
@@ -1066,6 +1327,23 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                   audioGenJob: true,
                   messageBlocks: { orderBy: { ordinal: "asc" } },
                   attachments: {
+                    where: {
+                      OR: [
+                        { origin: { not: "GENERATED" } },
+                        {
+                          AND: [
+                            { origin: "GENERATED" },
+                            { imageGenOutput: { kind: "FINAL" } }
+                          ]
+                        },
+                        {
+                          AND: [
+                            { origin: "GENERATED" },
+                            { inlineImageGenOutput: { kind: "FINAL" } }
+                          ]
+                        }
+                      ]
+                    },
                     orderBy: { createdAt: "asc" },
                     include: this.includeGamma.include
                   }
@@ -1182,21 +1460,19 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
           ? this.fallbackImgGenModelByProvider(provider)
           : data?.model;
 
-      const { includeSansAttachments, includeWithAttachments, messageData } =
-        this.handleAiChatRequestImgGenWorkup({
-          userId: userId,
-          batchId,
-          prompt,
-          conversationId,
-          imgGenEnabled: data.imgGenEnabled,
-          provider,
-          model: model,
-          hasProviderConfigured: data.hasProviderConfigured,
-          apiKey,
-          keyId,
-          ...data
-        });
-
+      const { messageData } = this.handleAiChatRequestImgGenWorkup({
+        userId: userId,
+        batchId,
+        prompt,
+        conversationId,
+        imgGenEnabled: data.imgGenEnabled,
+        provider,
+        model: model,
+        hasProviderConfigured: data.hasProviderConfigured,
+        apiKey,
+        keyId,
+        ...data
+      });
       /** CREATE */
       if (this.isNewChat(conversationId)) {
         /** CREATE, WITH ATTACHMENTS */
@@ -1213,7 +1489,38 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                 temperature
               },
               apiKey,
-              includeWithAttachments,
+              includeWithAttachments: {
+                conversationSettings: true,
+                messages: {
+                  orderBy: { ordinal: "asc" },
+                  include: {
+                    audioGenJob: true,
+                    imageGenJob: true,
+                    messageBlocks: { orderBy: { ordinal: "asc" } },
+                    attachments: {
+                      where: {
+                        OR: [
+                          { origin: { not: "GENERATED" } },
+                          {
+                            AND: [
+                              { origin: "GENERATED" },
+                              { imageGenOutput: { kind: "FINAL" } }
+                            ]
+                          },
+                          {
+                            AND: [
+                              { origin: "GENERATED" },
+                              { inlineImageGenOutput: { kind: "FINAL" } }
+                            ]
+                          }
+                        ]
+                      },
+                      include: this.includeGamma.include,
+                      orderBy: { createdAt: "asc" }
+                    }
+                  }
+                }
+              },
               keyId,
               messageData,
               userId
@@ -1243,7 +1550,38 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                 temperature,
                 topP
               },
-              includeSansAttachments,
+              includeSansAttachments: {
+                conversationSettings: true,
+                messages: {
+                  orderBy: { ordinal: "asc" },
+                  include: {
+                    audioGenJob: true,
+                    imageGenJob: true,
+                    messageBlocks: { orderBy: { ordinal: "asc" } },
+                    attachments: {
+                      include: this.includeGamma.include,
+                      orderBy: { createdAt: "asc" },
+                      where: {
+                        OR: [
+                          { origin: { not: "GENERATED" } },
+                          {
+                            AND: [
+                              { origin: "GENERATED" },
+                              { imageGenOutput: { kind: "FINAL" } }
+                            ]
+                          },
+                          {
+                            AND: [
+                              { origin: "GENERATED" },
+                              { inlineImageGenOutput: { kind: "FINAL" } }
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
               keyId,
               messageData,
               userId
@@ -1276,7 +1614,38 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                 temperature,
                 topP
               },
-              includeWithAttachments,
+              includeWithAttachments: {
+                conversationSettings: true,
+                messages: {
+                  orderBy: { ordinal: "asc" },
+                  include: {
+                    audioGenJob: true,
+                    imageGenJob: true,
+                    messageBlocks: { orderBy: { ordinal: "asc" } },
+                    attachments: {
+                      where: {
+                        OR: [
+                          { origin: { not: "GENERATED" } },
+                          {
+                            AND: [
+                              { origin: "GENERATED" },
+                              { imageGenOutput: { kind: "FINAL" } }
+                            ]
+                          },
+                          {
+                            AND: [
+                              { origin: "GENERATED" },
+                              { inlineImageGenOutput: { kind: "FINAL" } }
+                            ]
+                          }
+                        ]
+                      },
+                      include: this.includeGamma.include,
+                      orderBy: { createdAt: "asc" }
+                    }
+                  }
+                }
+              },
               keyId,
               messageData,
               userId
@@ -1300,7 +1669,38 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
           return await this.handleAiChatReqUpdateSansAttachmentsWithImageGen({
             apiKey,
             conversationId,
-            includeSansAttachments,
+            includeSansAttachments: {
+              conversationSettings: true,
+              messages: {
+                orderBy: { ordinal: "asc" },
+                include: {
+                  audioGenJob: true,
+                  imageGenJob: true,
+                  messageBlocks: { orderBy: { ordinal: "asc" } },
+                  attachments: {
+                    where: {
+                      OR: [
+                        { origin: { not: "GENERATED" } },
+                        {
+                          AND: [
+                            { origin: "GENERATED" },
+                            { imageGenOutput: { kind: "FINAL" } }
+                          ]
+                        },
+                        {
+                          AND: [
+                            { origin: "GENERATED" },
+                            { inlineImageGenOutput: { kind: "FINAL" } }
+                          ]
+                        }
+                      ]
+                    },
+                    include: this.includeGamma.include,
+                    orderBy: { createdAt: "asc" }
+                  }
+                }
+              }
+            },
             keyId,
             messageData,
             update: {

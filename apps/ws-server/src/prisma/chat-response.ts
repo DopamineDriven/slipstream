@@ -104,7 +104,11 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
       conversationId: data.conversationId,
       durationMs: Math.round(block.durationMs),
       ordinal: block.ordinal,
-      type: block.type
+      type: block.type,
+      // IMAGE_GEN only — the FINAL frame's paint facts, copied onto the row
+      cdnUrl: block.inlineImageData?.cdnUrl,
+      width: block.inlineImageData?.width,
+      height: block.inlineImageData?.height
     }));
 
     const mapImgs = data.imgGenFields?.images

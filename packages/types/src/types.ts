@@ -231,6 +231,7 @@ export interface AttachmentSingleton<
   ttsJob?: TTSJobSingleton<T>;
   dictationJobs?: DictationSingleton<T>[];
   inlineImageGenOutput?: InlineImageGenOutputSingleton<T>;
+  messageBlock?: MessageBlockSingleton<T>;
 }
 
 export interface UserKeySingleton<T extends boolean = false> extends UserKey {

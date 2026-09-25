@@ -104,6 +104,7 @@ export type {
   AIChatResEntity,
   AIChatResponse,
   AIChatResponseDb,
+  ChatChunkAndResBlock,
   ChatChunkAndResInlineImageData,
   ChatChunkAndResMsgBlock,
   InlineImageGenAggProps

@@ -432,7 +432,7 @@ export class GrokImgGenService extends GrokStreamWorkupService {
     });
   }
 
-  protected async handleXAIAiImageGenRequest({
+  protected async handleGrokImageGenRequest({
     conversationId,
     streamChannel,
     msgs,
