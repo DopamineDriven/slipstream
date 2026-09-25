@@ -209,7 +209,11 @@ export function ChatFeed({
                 key={message.id}
                 message={message}
                 user={user}
-                inlineImgGenData={inlineImgGenData}
+                // streaming bubble only — committed bubbles read message.attachments; an
+                // ungated array would be a fresh reference per token for every memoised row
+                inlineImgGenData={
+                  isStreamingMessage ? inlineImgGenData : undefined
+                }
                 onUpdateMessage={onUpdateMessage}
                 isStreaming={isStreamingMessage}
                 liveThinkingText={isStreamingMessage ? thinkingText : undefined}

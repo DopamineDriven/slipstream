@@ -51,9 +51,9 @@ export class GrokStreamWorkupService extends GrokUserStoreService {
         if (block.type === "TEXT") {
           textBlocks.push(block.content);
         }
-        if (block.type === "IMAGE_GEN" && block.cdnUrl) {
+        if (block.type === "IMAGE_GEN" && block.cdnUrl && block.width && block.height) {
           textBlocks.push(
-            `![[${msg.provider}/${msg.model}]](${block.cdnUrl})\n\n${block.content}`
+            `![[${msg.provider}/${msg.model}]-${block.width}x${block.height}](${block.cdnUrl})\n\n${block.content}`
           );
         }
       }

@@ -4,6 +4,7 @@ import type { ProviderAR, Ratio } from "@/lib/image-aspect";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { toCdnUrlConstituents } from "@/lib/helpers";
 import { parseAspect } from "@/lib/image-aspect";
 import { cn } from "@/lib/utils";
 import type { $Enums } from "@slipstream/db/node/generated/client";
@@ -152,7 +153,7 @@ export function InlineImageGen({
           )}>
           <Image
             src={displayImageUrl ?? "/placeholder.svg"}
-            alt={"Image Gen"}
+            alt={prompt ?? "Generated image"}
             fill
             sizes="(min-width: 48rem) 48rem, 100vw"
             className="object-cover"
@@ -213,8 +214,11 @@ export function InlineImageGen({
               link.href = displayImageUrl;
               link.target = "_blank";
               link.rel = "noreferrer noopener";
-              const ext = displayImageUrl.split(/\./g).at(-1) ?? "png";
-              link.download = `generated-${Date.now()}.${ext}`;
+              // the real name: <ms>-<seriesId>-<ordinal>.<ext>
+              const { ext, sId, sOrdinal } =
+                toCdnUrlConstituents(displayImageUrl);
+              const filename = `${sId}-${sOrdinal}.${ext}`;
+              link.download = filename;
               link.click();
             }}>
             <Download className="size-4" />

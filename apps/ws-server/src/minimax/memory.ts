@@ -15,7 +15,7 @@ import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { MessageSingleton } from "@slipstream/types";
-import { MiniMaxWorkupService } from "./workup.ts";
+import { MiniMaxWorkupService } from "@/minimax/workup.ts";
 
 export class MiniMaxMemoryService extends MiniMaxWorkupService {
   constructor(
@@ -64,6 +64,7 @@ export class MiniMaxMemoryService extends MiniMaxWorkupService {
         try {
           if (msg.attachments && msg.attachments.length > 0) {
             for (const att of msg.attachments) {
+              if (att.messageBlock) continue;
               const {
                 cdnUrl,
                 mime: ogMime,
@@ -107,6 +108,11 @@ export class MiniMaxMemoryService extends MiniMaxWorkupService {
               if (x.type === "TEXT") {
                 textBlocks.push(x.content);
               }
+              if (x.type === "IMAGE_GEN" && x.cdnUrl && x.width && x.height) {
+                textBlocks.push(
+                  `![[${msg.provider}/${msg.model}]-${x.width}x${x.height}](${x.cdnUrl})\n\n${x.content}`
+                );
+              }
             }
             textParts.push(textBlocks.join(`\n`));
           } else {
@@ -130,6 +136,7 @@ export class MiniMaxMemoryService extends MiniMaxWorkupService {
         try {
           if (msg.attachments && msg.attachments.length > 0) {
             for (const att of msg.attachments) {
+              if (att.messageBlock) continue;
               const {
                 cdnUrl,
                 mime: ogMime,
@@ -165,6 +172,11 @@ export class MiniMaxMemoryService extends MiniMaxWorkupService {
             for (const x of msg.messageBlocks) {
               if (x.type === "TEXT") {
                 textBlocks.push(x.content);
+              }
+              if (x.type === "IMAGE_GEN" && x.cdnUrl && x.width && x.height) {
+                textBlocks.push(
+                  `![[${msg.provider}/${msg.model}]-${x.width}x${x.height}](${x.cdnUrl})\n\n${x.content}`
+                );
               }
             }
             textParts.push(`${modelIdentifier}\n\n${textBlocks.join(`\n\n`)}`);

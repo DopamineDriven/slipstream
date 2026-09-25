@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { AttachmentDisplay } from "@/ui/chat/attachment-display";
 import { AudioPlayer } from "@/ui/chat/audio-player";
 import { ImageGenerationCanvasTest } from "@/ui/chat/image-gen/index";
+import { InlineImageGen } from "@/ui/chat/inline-image-gen";
 import { MessageIcons } from "@/ui/chat/message-bubble/message-icons";
 import { ThinkingSection } from "@/ui/chat/thinking";
 import { useTheme } from "next-themes";
@@ -77,6 +78,7 @@ function MessageBubbleImpl({
   liveImgGenFields,
   liveImgGenAttachmentId,
   liveAudioGenFields,
+  inlineImgGenData,
   liveHasLyrics
 }: ChatMessageProps) {
   useEffect(() => {
@@ -555,6 +557,43 @@ function MessageBubbleImpl({
         continue;
       }
 
+      if (block.type === "IMAGE_GEN") {
+        // an IMAGE_GEN block is only ever sent once its url exists, and the
+        // persisted row carries the same three columns
+        if (!block.cdnUrl || !block.width || !block.height) continue;
+        // the attachment row for the frame this block shows: the frame's
+        // DB-ready template while streaming, the persisted row after commit.
+        // The url is the join in both paths.
+        const row = (inlineImgGenData ?? message.attachments).find(
+          a => a.cdnUrl === block.cdnUrl
+        );
+        const kind = row?.inlineImageGenOutput?.kind ?? "FINAL";
+        const attachmentId = row && "id" in row ? row.id : undefined;
+        rendered.push(
+          <figure
+            key={`${message.id}-image-${block.ordinal}`}
+            className="my-3 flex flex-col gap-2">
+            <InlineImageGen
+              isGenerating={kind === "PARTIAL"}
+              images={[block.cdnUrl]}
+              currentImageIndex={0}
+              width={block.width}
+              height={block.height}
+              prompt={block.content}
+              kind={kind}
+              {...(attachmentId ? { attachmentId } : {})}
+            />
+            <figcaption className="text-xs opacity-80">
+              {isStreaming
+                ? processStreamingMarkdown(blockContent)
+                : (renderedBlockContent[blockOrdinalKey(block.ordinal)] ??
+                  blockContent)}
+            </figcaption>
+          </figure>
+        );
+        continue;
+      }
+
       if (!blockContent) {
         continue;
       }
@@ -578,6 +617,8 @@ function MessageBubbleImpl({
     latestMessageBlock?.ordinal,
     liveIsThinking,
     message.id,
+    message.attachments,
+    inlineImgGenData,
     blockOrdinalKey,
     orderedMessageBlocks,
     renderedBlockContent
@@ -605,7 +646,10 @@ function MessageBubbleImpl({
             "group relative max-w-[85%] min-w-0 rounded-2xl px-4 py-3 text-sm",
             liveImgGenFields && message.senderType !== "USER" && isStreaming
               ? "w-[85%]"
-              : message.attachments.length > 0
+              : message.attachments.length > 0 ||
+                  // an inline turn has no attachments while streaming; the
+                  // block claims the width from its first frame, not at commit
+                  orderedMessageBlocks.some(b => b.type === "IMAGE_GEN")
                 ? "w-[85%]"
                 : "",
             message.senderType === "USER"

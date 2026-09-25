@@ -69,6 +69,7 @@ export class KimiMemoryService extends KimiWorkupService {
         try {
           if (msg.attachments && msg.attachments.length > 0) {
             for (const att of msg.attachments) {
+              if (att.messageBlock) continue;
               const {
                 cdnUrl,
                 mime: ogMime,
@@ -112,6 +113,11 @@ export class KimiMemoryService extends KimiWorkupService {
               if (x.type === "TEXT") {
                 textBlocks.push(x.content);
               }
+              if (x.type === "IMAGE_GEN" && x.cdnUrl && x.width && x.height) {
+                textBlocks.push(
+                  `![[${msg.provider}/${msg.model}]-${x.width}x${x.height}](${x.cdnUrl})\n\n${x.content}`
+                );
+              }
             }
             textParts.push(textBlocks.join(`\n`));
           } else {
@@ -135,6 +141,7 @@ export class KimiMemoryService extends KimiWorkupService {
         try {
           if (msg.attachments && msg.attachments.length > 0) {
             for (const att of msg.attachments) {
+              if (att.messageBlock) continue;
               const {
                 cdnUrl,
                 mime: ogMime,
@@ -171,6 +178,11 @@ export class KimiMemoryService extends KimiWorkupService {
               if (x.type === "TEXT") {
                 textBlocks.push(x.content);
               }
+              if (x.type === "IMAGE_GEN" && x.cdnUrl && x.width && x.height) {
+                textBlocks.push(
+                  `![[${msg.provider}/${msg.model}]-${x.width}x${x.height}](${x.cdnUrl})\n\n${x.content}`
+                );
+              }
             }
             textParts.push(`${modelIdentifier}\n\n${textBlocks.join(`\n\n`)}`);
           } else {
@@ -196,8 +208,14 @@ export class KimiMemoryService extends KimiWorkupService {
     const toolName = toolCall.function.name;
     try {
       if (toolName === "file_search") {
-        const input = this.userStoreVector.parseUserStoreInput(toolCall.function.arguments, toolName);
-        const output = await this.userStoreVector.executeFileSearch(userId, input);
+        const input = this.userStoreVector.parseUserStoreInput(
+          toolCall.function.arguments,
+          toolName
+        );
+        const output = await this.userStoreVector.executeFileSearch(
+          userId,
+          input
+        );
         return {
           role: "tool",
           tool_call_id: toolCall.id,

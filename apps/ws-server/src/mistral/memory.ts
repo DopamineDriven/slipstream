@@ -87,6 +87,7 @@ export class MistralMemoryService extends MistralWorkupService {
         try {
           if (msg.attachments && msg.attachments.length > 0) {
             for (const att of msg.attachments) {
+              if (att.messageBlock) continue;
               const {
                 cdnUrl,
                 mime: ogMime,
@@ -145,9 +146,19 @@ export class MistralMemoryService extends MistralWorkupService {
         } finally {
           if (msg.messageBlocks && msg.messageBlocks.length > 0) {
             const textBlocks = Array.of<string>();
-            for (const x of msg.messageBlocks) {
-              if (x.type === "TEXT") {
-                textBlocks.push(x.content);
+            for (const block of msg.messageBlocks) {
+              if (block.type === "TEXT") {
+                textBlocks.push(block.content);
+              }
+              if (
+                block.type === "IMAGE_GEN" &&
+                block.cdnUrl &&
+                block.width &&
+                block.height
+              ) {
+                textBlocks.push(
+                  `![[${msg.provider}/${msg.model}]-${block.width}x${block.height}](${block.cdnUrl})\n\n${block.content}`
+                );
               }
             }
             textParts.push(textBlocks.join(`\n`));
@@ -165,6 +176,7 @@ export class MistralMemoryService extends MistralWorkupService {
         try {
           if (msg.attachments && msg.attachments.length > 0) {
             for (const att of msg.attachments) {
+              if (att.messageBlock) continue;
               const {
                 cdnUrl,
                 mime: ogMime,
@@ -202,6 +214,11 @@ export class MistralMemoryService extends MistralWorkupService {
               if (x.type === "TEXT") {
                 textBlocks.push(x.content);
               }
+              if (x.type === "IMAGE_GEN" && x.cdnUrl && x.width && x.height) {
+                textBlocks.push(
+                  `![[${msg.provider}/${msg.model}]-${x.width}x${x.height}](${x.cdnUrl})\n\n${x.content}`
+                );
+              }
             }
             textParts.push(textBlocks.join(`\n\n`));
           } else {
@@ -230,7 +247,10 @@ export class MistralMemoryService extends MistralWorkupService {
           toolCall.function.arguments,
           toolName
         );
-        const output = await this.userStoreVector.executeFileSearch(userId, input);
+        const output = await this.userStoreVector.executeFileSearch(
+          userId,
+          input
+        );
         return {
           role: "tool",
           toolCallId: toolCall.id,

@@ -184,6 +184,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         return {
           ...v,
           size: v.size ? Number(v.size) : null,
+          messageBlock: v.messageBlock ?? undefined,
           inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
         };
       });
@@ -255,6 +256,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         return {
           ...v,
           size: v.size ? Number(v.size) : null,
+          messageBlock: v.messageBlock ?? undefined,
           inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
         };
       });
@@ -329,6 +331,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         return {
           ...v,
           size: v.size ? Number(v.size) : null,
+          messageBlock: v.messageBlock ?? undefined,
           inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
         };
       });
@@ -399,6 +402,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         return {
           ...v,
           size: v.size ? Number(v.size) : null,
+          messageBlock: v.messageBlock ?? undefined,
           inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
         };
       });
@@ -505,6 +509,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         return {
           ...v,
           size: v.size ? Number(v.size) : null,
+          messageBlock: v.messageBlock ?? undefined,
           inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
         };
       });
@@ -615,6 +620,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         return {
           ...v,
           size: v.size ? Number(v.size) : null,
+          messageBlock: v.messageBlock ?? undefined,
           inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
         };
       });
@@ -732,6 +738,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       const att = attachments.map(v => {
         return {
           ...v,
+          messageBlock: v.messageBlock ?? undefined,
           size: v.size ? Number(v.size) : null,
           inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
         };
@@ -839,6 +846,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       const att = attachments.map(v => {
         return {
           ...v,
+          messageBlock: v.messageBlock ?? undefined,
           size: v.size ? Number(v.size) : null,
           inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
         };
@@ -915,6 +923,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       const att = attachments.map(v => {
         return {
           ...v,
+          messageBlock: v.messageBlock ?? undefined,
           size: v.size ? Number(v.size) : null,
           inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
         };
@@ -983,6 +992,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       const att = attachments.map(v => {
         return {
           ...v,
+          messageBlock: v.messageBlock ?? undefined,
           size: v.size ? Number(v.size) : null,
           inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
         };
@@ -1084,6 +1094,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       const att = attachments.map(v => {
         return {
           ...v,
+          messageBlock: v.messageBlock ?? undefined,
           size: v.size ? Number(v.size) : null,
           inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
         };
@@ -1187,6 +1198,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
       const att = attachments.map(v => {
         return {
           ...v,
+          messageBlock: v.messageBlock ?? undefined,
           size: v.size ? Number(v.size) : null,
           inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
         };

@@ -376,6 +376,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
         if (msg.attachments && msg.attachments.length > 0) {
           for (const attachment of msg.attachments) {
+            if (attachment.messageBlock) continue;
             const url =
               attachment.compatStatus === "ACTIVE"
                 ? attachment.compatCdnUrl
@@ -456,6 +457,16 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
             if (block.type === "TEXT") {
               blockAgg.push(block.content);
             }
+            if (
+              block.type === "IMAGE_GEN" &&
+              block.cdnUrl &&
+              block.width &&
+              block.height
+            ) {
+              blockAgg.push(
+                `![[${msg.provider}/${msg.model}]-${block.width}x${block.height}](${block.cdnUrl})\n\n${block.content}`
+              );
+            }
           }
         }
         if (blockAgg.length > 0) {
@@ -477,6 +488,16 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
             if (block.type === "TEXT") {
               blockAgg.push(block.content);
             }
+            if (
+              block.type === "IMAGE_GEN" &&
+              block.cdnUrl &&
+              block.width &&
+              block.height
+            ) {
+              blockAgg.push(
+                `![[${msg.provider}/${msg.model}]-${block.width}x${block.height}](${block.cdnUrl})\n\n${block.content}`
+              );
+            }
           }
         }
         if (blockAgg.length > 0) {
@@ -486,6 +507,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
         }
         if (msg.attachments && msg.attachments.length > 0) {
           for (const attachment of msg.attachments) {
+            if (attachment.messageBlock) continue;
             const url =
               attachment.compatStatus === "ACTIVE"
                 ? attachment.compatCdnUrl
