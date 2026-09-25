@@ -600,4 +600,5 @@ export type InlinePostImageUploadProps = {
   kind: $Enums.ImageGenOutputKind;
   uploadDuration: number;
   s3LastModified: Date;
+  size: number;
 };

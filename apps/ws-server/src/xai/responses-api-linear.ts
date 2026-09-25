@@ -32,7 +32,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
     memoryService: ConversationMemoryVectorService,
     apiKey: string,
     managementKey: string,
-    // gate ussing the `via ==="cli"` prop in handleGrokResponsesApiRequest
+    // gate using the `via ==="cli"` prop in handleGrokResponsesApiRequest
     protected localToolBroker: LocalToolBroker
   ) {
     super(
@@ -355,9 +355,10 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
             const sId = inlineImgAggArr[4];
             const kind = inlineImgAggArr[5];
             const b64 = inlineImgAggArr[1];
+            const b64Buff = Buffer.from(b64, "base64");
 
             const specs = (await this.prisma.extractor.extractRemote(
-              Buffer.from(b64, "base64"),
+              b64Buff,
               4096 * 48
             )) as ExpandedImgSpecs;
             const format = specs.format;
@@ -367,7 +368,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
             const uploadImgInitial = performance.now();
 
             const s3RTHelper = await this.s3.uploadGenerated(
-              Buffer.from(b64, "base64"),
+              b64Buff,
               this.prisma.isProd,
               {
                 contentType:
@@ -375,7 +376,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
                 filename,
                 origin: "GENERATED",
                 userId,
-                size: specs.byteSize,
+                size: specs.byteSize ?? b64Buff.byteLength,
                 conversationId
               }
             );
@@ -393,6 +394,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               filename,
               format,
               mime,
+              size: b64Buff.byteLength,
               cdnUrl,
               generatingModel: "grok-imagine-image-2.0",
               facilitatingModel: m,

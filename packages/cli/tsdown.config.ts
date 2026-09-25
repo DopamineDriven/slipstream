@@ -14,6 +14,7 @@ const path = resolve(
     `../../node_modules/@typescript/${dirname}/lib/${executable}`
   )
 );
+
 export default defineConfig(
   options =>
     ({

@@ -16,13 +16,13 @@ catalogs:
   anthropic:
     "@anthropic-ai/sdk": ^0.128.0
   auth:
-    better-auth: ^1.7.5
+    better-auth: ^1.7.6
   aws:
-    "@aws-sdk/client-s3": ^3.1138.0
-    "@aws-sdk/client-secrets-manager": ^3.1138.0
-    "@aws-sdk/credential-providers": ^3.1138.0
-    "@aws-sdk/lib-storage": ^3.1138.0
-    "@aws-sdk/s3-request-presigner": ^3.1138.0
+    "@aws-sdk/client-s3": ^3.1140.0
+    "@aws-sdk/client-secrets-manager": ^3.1140.0
+    "@aws-sdk/credential-providers": ^3.1140.0
+    "@aws-sdk/lib-storage": ^3.1140.0
+    "@aws-sdk/s3-request-presigner": ^3.1140.0
     "@aws-sdk/types": ^3.974.6
   babel:
     babel-plugin-react-compiler: ^1.0.0
@@ -88,11 +88,11 @@ catalogs:
     jsdom: ^30.1.1
   katex:
     "@types/katex": ^0.16.8
-    katex: ^0.18.7
+    katex: ^0.18.9
   lightningcss:
     unplugin-lightningcss: ^0.5.0
   mcp:
-    "@modelcontextprotocol/sdk": ^1.30.0
+    "@modelcontextprotocol/sdk": ^1.30.1
   mdast:
     "@types/mdast": ^4.0.4
   mistral:
@@ -118,7 +118,7 @@ catalogs:
   nyc:
     nyc: ^18.0.0
   openai:
-    openai: ^7.22.0
+    openai: ^7.23.0
   p-limit:
     p-limit: ^7.3.3
   pg:
@@ -134,7 +134,7 @@ catalogs:
     urlpattern-polyfill: ^10.1.0
   prettier:
     "@ianvs/prettier-plugin-sort-imports": ^4.7.1
-    prettier: ^3.9.8
+    prettier: ^3.9.9
     prettier-plugin-tailwindcss: ^0.8.1
   prisma:
     "@prisma/adapter-pg": ^7.10.0
@@ -175,7 +175,7 @@ catalogs:
     "@types/react-dom": ^19.3.0
     react: ^19.3.0
     react-dom: ^19.3.0
-    react-resizable-panels: ^4.13.2
+    react-resizable-panels: ^4.13.3
     vaul: ^1.1.2
   redis:
     redis: ^6.2.1
@@ -192,7 +192,7 @@ catalogs:
     remark-parse: ^11.0.0
     remark-rehype: ^11.1.2
   rolldown:
-    rolldown: ^1.2.9
+    rolldown: ^1.2.11
     rolldown-plugin-dts: ^0.28.6
     rolldown-plugin-wasm: ^0.3.2
   sharp:
@@ -231,9 +231,9 @@ catalogs:
   tsx:
     tsx: ^4.23.15
   turbo:
-    eslint-config-turbo: ^2.11.3
-    eslint-plugin-turbo: ^2.11.3
-    turbo: ^2.11.3
+    eslint-config-turbo: ^2.11.4
+    eslint-plugin-turbo: ^2.11.4
+    turbo: ^2.11.4
   tw:
     "@tailwindcss/forms": ^0.5.11
     "@tailwindcss/postcss": ^4.3.3
@@ -259,7 +259,7 @@ catalogs:
     vfile: ^6.0.3
   vite:
     "@vitejs/plugin-react": ^6.1.1
-    vite: ^8.3.0
+    vite: ^8.3.1
   vitest:
     "@vitest/coverage-istanbul": ^5.0.1
     "@vitest/ui": ^5.0.1

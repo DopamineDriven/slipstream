@@ -43,6 +43,13 @@ Commits this session (newest first): `da2a87e` inlineImgGenData sends · `679d1c
 
 ## 3. What REMAINS — the web client (§10.11, landing order)
 
+**Superseded 2026-09-24 (later the same day) by `preliminary.md` §11:**
+`MessageBlock` now carries `cdnUrl` / `width` / `height`, so (b) and (d)
+are dropped, (c) is done (Andrew's three `?? null` lines in
+`toMessageBlocks`), and what remains is (f) the component, (e) the bubble
+case, and a bubble-width disjunct. Read §11 first; the list below is the
+pre-column plan.
+
 (a) include parity — **done**. Then: **(c)** `toMessageBlocks` as a spread derivation (`ui-message-helpers.ts:25-35`) → **(b)** streaming attachment synthesized from the frame's `inlineImgGenData` (read shape `InlineImageAttachment`; temp id = `${seriesId}-${seriesOrdinal}` url stem; `messageBlockId` = `${streamingMessageId}-block-${ordinal}` matching toMessageBlocks; fold pairs `evt.inlineImgGenData` with the frame's IMAGE_GEN block ordinal; appended to the streaming message's `attachments` beside `imgGenAttachments`) → **(d)** one resolver `inlineImageFor(block, attachments)` (attachments only, FINAL else highest seriesOrdinal, returns `attachmentId` + four fields) → **(f)** `InlineImageBlock` component (`ui/chat/inline-image/`): the job canvas made interleavable — ref-gated state, no key on `<Image>`, ripple/pill for no-url, PARTIAL scanner/corners, FINAL hover overlay, shimmer blur, `attachment-${id}` anchor; real aspect ratio + object-contain; `caption: ReactNode` already processed; `alt` raw prompt; reacts to `kind` only (no provider logic) → **(e)** bubble `IMAGE_GEN` case before the text fallback (`message-bubble/index.tsx:556`), key by block ordinal, caption through the bubble's two markdown processors (stream `processStreamingMarkdown`, committed `processMarkdownToReact` — neither file touched) → **(j)** rAF-coalesced `applyChunk` (first pacing step; metering is a follow-on).
 - Andrew wants ALL of it visual/snippet-driven; **do not touch** `ThinkingSection`, `lib/processor.tsx`, `lib/markdown-streaming.tsx`.
 - Open from Sol's review (owner's call): `responseOutput` sentinel (stringifies image b64 per round → boolean), double base64 decode, `controller.abort()` in finally, `TOOL_DEADLINE_MS` (time-bound only — CLAUDE.md forbids token/cost caps), `chunk: revisedPrompt` on the image frame (inert but contradicts "prompt is block content"), orphaned S3 object on mid-stream failure (cleanup policy, not provisional persistence).

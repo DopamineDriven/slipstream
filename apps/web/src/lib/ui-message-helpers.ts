@@ -30,6 +30,9 @@ export function toMessageBlocks(
       content: block.content,
       type: block.type,
       durationMs: block.durationMs,
+      cdnUrl: block.inlineImageData?.cdnUrl ?? null,
+      width: block.inlineImageData?.width ?? null,
+      height: block.inlineImageData?.height ?? null,
       createdAt: now,
       updatedAt: now
     } satisfies MessageBlockSingleton<true>;

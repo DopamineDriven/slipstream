@@ -392,8 +392,8 @@
     background: linear-gradient(
       90deg,
       transparent,
-      oklch(var(--color-primary)) 20%,
-      oklch(var(--color-primary)) 80%,
+      var(--color-primary) 20%,
+      var(--color-primary) 80%,
       transparent
     );
     box-shadow: 0 0 20px 4px oklch(var(--color-primary) / 0.5);
@@ -639,8 +639,6 @@ code:not(figure[data-rehype-pretty-code-figure] code) {
   box-decoration-break: clone;
 }
 
-
-
 pre .token.comment,
 pre .token.prolog,
 pre .token.doctype,
@@ -812,11 +810,11 @@ select {
     background: linear-gradient(
       90deg,
       transparent,
-      oklch(var(--color-primary)) 20%,
-      oklch(var(--color-primary)) 80%,
+      var(--color-primary) 20%,
+      var(--color-primary) 80%,
       transparent
     );
-    box-shadow: 0 0 20px 4px oklch(var(--color-primary) / 0.5);
+    box-shadow: 0 0 20px 4px color-mix(in oklab, var(--color-primary) 50%, transparent);
     animation: scan 2s ease-in-out infinite;
     z-index: 10;
   }

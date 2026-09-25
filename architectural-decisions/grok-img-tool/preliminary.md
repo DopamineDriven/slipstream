@@ -2065,3 +2065,304 @@ is the follow-on, and there is no existing hook to hang it on (§10.8).
 
 Order that keeps prod unchanged until the last step: (a) → (c) → (b) → (d)
 → (f) → (e) → (j). Everything before (e) is invisible to a user.
+
+---
+
+## 11. Web investigation, second pass — after the block columns (2026-09-24)
+
+Read-only, against the tree at `6156d37` plus Andrew's `toMessageBlocks`
+edit. Everything in §10 that described *how the client is wired* still
+holds; what changed is the data: `MessageBlock` now carries `cdnUrl`,
+`width`, `height` (§7–8 of `example-follow-up.md`), so an `IMAGE_GEN` block
+is self-rendering and §10.11's (b) and (d) are no longer needed. This
+section supersedes §10.11 (b)–(f). No code is applied here.
+
+### 11.1 What the client already has right
+
+1. **One block shape at the bubble.** The draft is `AIChatChunk[]`
+   (`store.ts` L220-229); `deriveDraft` folds frames into wire blocks
+   (`draft-to-message.ts` L126-139, last-wins by ordinal); the *only* wire →
+   singleton conversion is `toMessageBlocks` (`ui-message-helpers.ts`
+   L25-38). Andrew's edit maps the nested `inlineImageData` onto the three
+   columns with `?? null` there. The DB branch (L18-23) spreads the row, so
+   hydrated blocks carry the columns natively. The bubble sees
+   `block.cdnUrl / width / height` in both paths, and the nested wire field
+   never reaches a singleton because the projection enumerates.
+2. **No double render.** The job canvas gate (`message-bubble/index.tsx`
+   L264-265) filters `att.imageGenOutput !== null`; inline rows have
+   `imageGenOutput: null` and the message is `TEXT`, so
+   `imageGenerationData` is `null` and neither canvas branch (L680-729)
+   mounts. The trailing group renders `AttachmentDisplay` for USER only
+   (L741). Nothing else paints an AI attachment.
+3. **The image THINKING block behaves.** During the server's upload await no
+   frames arrive; the last frame was the `added` frame (`isThinking: true`),
+   `ThinkingSection` ticks on its own rAF (`thinking/index.tsx` L45-84).
+   The close frame lands with the final duration, then the `IMAGE_GEN`
+   frame (`isThinking: false`, higher ordinal) — `latestMessageBlock` moves
+   on, `isActiveThinkingBlock` flips false (L532-536). Untouched.
+4. **Caption processing already exists.** The committed pass (L472-493)
+   runs `processMarkdownToReact` over every block with content, `IMAGE_GEN`
+   included (the cache key carries `block.type`), into
+   `renderedBlockContent[ordinal]`; streaming uses `processStreamingMarkdown`
+   inline. The `IMAGE_GEN` case reads the same two sources TEXT does.
+5. **Remount at commit is harmless.** The feed keys bubbles by `message.id`
+   (`chat-feed/index.tsx` L206); `streaming-<id>` → real id remounts the
+   bubble, the `<Image>` src is the same CDN url and cached. Same as §10.10.
+6. **Include parity is done** across the four producers, and the web bigint
+   mapper spreads `messageBlocks` untouched (`user-message-service.ts`
+   L49-84), so the columns flow through every loader.
+7. **Assets.** `next.config` has `images.unoptimized: true` and the assets
+   hosts in `remotePatterns` (the job canvas already renders them);
+   `shimmer` is exported from `@slipstream/ui`; `ripple-container`,
+   `scanning-line`, `animate-pulse-glow`, `animate-fade-in` are defined in
+   `globals.css`.
+
+### 11.2 What is still missing (three things, one of them cosmetic)
+
+**Gap A — the bubble has no `IMAGE_GEN` case.** `renderedMessageBlocks`
+(L525-570) routes THINKING / ENCRYPTED to `ThinkingSection` and everything
+else to the text div, so today an `IMAGE_GEN` block renders its prompt as
+a paragraph, streaming and committed. This is the one functional gap.
+
+**Gap B — no inline component.** `ImageGenerationCanvasTest`
+(`image-gen/index.tsx`) is message-level, `aspect-square`, `object-cover`,
+takes an `images[]` + index, and its prompt is the in-pill text. The inline
+slot needs the same ref-gated paint with real aspect ratio, a `caption`
+node, and one url.
+
+**Gap C — bubble width.** The bubble is `max-w-[85%] min-w-0` and only
+becomes `w-[85%]` when `liveImgGenFields` is set (job lane, streaming) or
+`message.attachments.length > 0` (L603-608). An inline turn has **no
+attachments while streaming** (`imgGenAttachments(undefined)` is `[]`) and
+one after commit. So the streaming bubble shrink-wraps to its text, the
+figure inside it is as wide as the longest text line, and at commit the
+bubble jumps to 85%. One more disjunct on that class — "has an `IMAGE_GEN`
+block" — makes the width stable from the first image frame.
+
+### 11.3 What is no longer needed
+
+| §10.11 step | status |
+| --- | --- |
+| (a) include parity | done |
+| (b) `inlineImageAttachments(...)` synthesized from `inlineImgGenData`, `InlineImageAttachment` read type, `DraftDerivation.inlineImages` | **dropped** — the block carries the paint facts; `inlineImgGenData` stays on the frame for anything that wants lineage later |
+| (c) `toMessageBlocks` | **done (Andrew)**, as the three `?? null` lines |
+| (d) `inlineImageFor(block, attachments)` | **dropped** — no join; `block.cdnUrl` is the source in both paths |
+| (e) bubble `IMAGE_GEN` case | still needed — reads the block, not a resolver (11.4) |
+| (f) `InlineImageBlock` | still needed — props from the block (11.4) |
+| (g) (h) (i) | unchanged: ThinkingSection untouched, trailing group untouched, remount harmless |
+| (j) rAF-coalesced `applyChunk` | optional follow-on; not required for the live test |
+| `toCdnUrlConstituents` | no longer on the render path; stays as the url-anatomy utility |
+
+`kind` is not on the block (no DB home; committed ⇒ FINAL; Grok never
+emits PARTIAL). The component takes it as an optional prop defaulting to
+`"FINAL"`; when the OpenAI inline lane needs partial styling the wire's
+`inlineImageData.kind` (or a wire-only `kind` on the arm) feeds it. No
+provider logic, same as the job canvas.
+
+### 11.4 Targeted changes, revised
+
+**(f) `apps/web/src/ui/chat/inline-image/index.tsx` (new).** The canvas made
+a block-level leaf: one url, real aspect ratio with `object-contain`,
+caption as a node, ref-gated so a later frame for the same ordinal swaps
+`src` in place. The no-url state is inert for Grok (an `IMAGE_GEN` block is
+only sent with its url) and stays for a producer that opens the slot early.
+
+```tsx
+"use client";
+
+import type { ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import type { $Enums } from "@slipstream/db/node/generated/client";
+import { Button, Download, Eye, shimmer } from "@slipstream/ui";
+
+interface InlineImageBlockProps {
+  cdnUrl: string;
+  width: number;
+  height: number;
+  /** the raw prompt — the caption below is the processed version */
+  alt: string;
+  caption: ReactNode;
+  /** DOM anchor: the block id (`<messageId>-block-<ordinal>` streaming, the cuid2 committed) */
+  blockId: string;
+  kind?: $Enums.ImageGenOutputKind;
+}
+
+export function InlineImageBlock({
+  cdnUrl,
+  width,
+  height,
+  alt,
+  caption,
+  blockId,
+  kind = "FINAL"
+}: InlineImageBlockProps) {
+  const urlRef = useRef<string | null>(null);
+  const [displayUrl, setDisplayUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (cdnUrl && urlRef.current !== cdnUrl) {
+      urlRef.current = cdnUrl;
+      setDisplayUrl(cdnUrl);
+    }
+  }, [cdnUrl]);
+
+  const isFinal = kind === "FINAL";
+  const isGenerating = !displayUrl;
+
+  return (
+    <figure
+      id={`block-${blockId}`}
+      data-block-id={blockId}
+      className="my-3 w-full">
+      <div
+        className="bg-muted group relative w-full overflow-hidden rounded-2xl"
+        style={{ aspectRatio: width / height }}>
+        <div
+          className={cn(
+            "absolute inset-0 transition-opacity duration-500",
+            isGenerating ? "opacity-100" : "opacity-0"
+          )}>
+          <div className="ripple-container" />
+        </div>
+
+        {displayUrl && (
+          <div className="absolute inset-0 transition-opacity duration-700 ease-out">
+            <Image
+              src={displayUrl}
+              alt={alt}
+              width={width}
+              height={height}
+              className="h-full w-full object-contain"
+              priority
+              placeholder="blur"
+              blurDataURL={shimmer([width, height])}
+            />
+            {!isFinal && (
+              <>
+                <div className="scanning-line" />
+                <div className="border-primary/30 animate-pulse-glow absolute inset-0 border-2" />
+                <div className="border-primary animate-pulse-glow absolute top-2 left-2 h-8 w-8 border-t-2 border-l-2" />
+                <div className="border-primary animate-pulse-glow absolute top-2 right-2 h-8 w-8 border-t-2 border-r-2" />
+                <div className="border-primary animate-pulse-glow absolute bottom-2 left-2 h-8 w-8 border-b-2 border-l-2" />
+                <div className="border-primary animate-pulse-glow absolute right-2 bottom-2 h-8 w-8 border-r-2 border-b-2" />
+              </>
+            )}
+          </div>
+        )}
+
+        <div
+          className={cn(
+            "absolute inset-0 bg-black/0 transition-colors duration-300 hover:bg-black/20",
+            (isGenerating || !isFinal) && "pointer-events-none"
+          )}>
+          <div
+            className={cn(
+              "absolute top-4 right-4 flex gap-2 opacity-30 transition-opacity duration-300",
+              !isGenerating && isFinal && "group-hover:opacity-100 focus:opacity-100"
+            )}>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="bg-foreground/90 text-background hover:foreground backdrop-blur-sm">
+              <Eye className="size-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="bg-foreground/90 text-background hover:foreground backdrop-blur-sm"
+              onClick={() => {
+                if (!displayUrl) return;
+                const link = document.createElement("a");
+                link.href = displayUrl;
+                link.target = "_blank";
+                link.rel = "noreferrer noopener";
+                link.download = displayUrl.slice(displayUrl.lastIndexOf("/") + 1);
+                link.click();
+              }}>
+              <Download className="size-4" />
+            </Button>
+          </div>
+        </div>
+
+        {isGenerating && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="bg-background/80 border-border animate-fade-in inline-flex items-center gap-2 rounded-full border px-4 py-2 backdrop-blur-sm">
+              <div className="bg-primary h-2 w-2 animate-pulse rounded-full" />
+              <span className="text-sm font-medium">Generating image...</span>
+            </div>
+          </div>
+        )}
+      </div>
+      <figcaption className="mt-2 text-xs opacity-80">{caption}</figcaption>
+    </figure>
+  );
+}
+```
+
+Differences from the canvas, all deliberate: `width`/`height` are required
+numbers (the block has them or the case does not render), so the four
+ref-gated dimension effects collapse to one url gate; the container is
+`aspectRatio: width / height` + `object-contain`, not `aspect-square` +
+`object-cover`; the anchor is the block id (`block-…`), not an attachment
+id, because the block is the slot and its id is stable per ordinal in each
+path; the download filename is the url basename; the pill's prompt line is
+gone because the caption is the prompt.
+
+**(e) the bubble's `IMAGE_GEN` case** — `message-bubble/index.tsx`, inside
+the loop at L525, after the thinking branch (L538-554) and before the
+`if (!blockContent) continue;` fallback (L556). Keyed by ordinal, like the
+thinking branch:
+
+```tsx
+      if (block.type === "IMAGE_GEN") {
+        if (!block.cdnUrl || !block.width || !block.height) continue; // sent only with its url
+        rendered.push(
+          <InlineImageBlock
+            key={`${message.id}-image-${block.ordinal}`}
+            blockId={block.id}
+            cdnUrl={block.cdnUrl}
+            width={block.width}
+            height={block.height}
+            alt={block.content}
+            caption={
+              isStreaming
+                ? processStreamingMarkdown(blockContent)
+                : (renderedBlockContent[blockOrdinalKey(block.ordinal)] ??
+                  blockContent)
+            }
+          />
+        );
+        continue;
+      }
+```
+
+Plus the import (`import { InlineImageBlock } from "@/ui/chat/inline-image";`).
+The memo's dependency list (L573-582) already covers everything the case
+reads: `orderedMessageBlocks`, `isStreaming`, `renderedBlockContent`,
+`blockOrdinalKey`, `message.id`.
+
+**(C) bubble width** — the class at L603-608 gains the block disjunct so the
+inline turn is 85% from its first image frame instead of at commit:
+
+```tsx
+            liveImgGenFields && message.senderType !== "USER" && isStreaming
+              ? "w-[85%]"
+              : message.attachments.length > 0 ||
+                  orderedMessageBlocks.some(b => b.type === "IMAGE_GEN")
+                ? "w-[85%]"
+                : "",
+```
+
+**Nothing else.** `deriveDraft`, `streamingMessageFromDerived`,
+`img-gen-to-attachment.ts`, `ThinkingSection`, `processor.tsx`,
+`markdown-streaming.tsx`, the store, the feed, and the CLI are untouched.
+The `image-gen/` directory is untouched (`index.tsx` stays the job canvas;
+the two unreferenced files stay for partial replay).
+
+### 11.5 Landing order
+
+(f) the component (invisible until referenced) → (e) + (C) in the bubble,
+one edit → `pnpm -C apps/web typecheck` → live test per §8 step 8, four
+turns. (j) after, if the buffered-delta wall is visible.
