@@ -2366,3 +2366,65 @@ the two unreferenced files stay for partial replay).
 (f) the component (invisible until referenced) → (e) + (C) in the bubble,
 one edit → `pnpm -C apps/web typecheck` → live test per §8 step 8, four
 turns. (j) after, if the buffered-delta wall is visible.
+
+### 11.6 Refinements after the v0 frame (`inline-image-gen/index.tsx`, 2026-09-24)
+
+The v0 component supersedes the 11.4 (f) sketch. It keeps the job canvas's
+API (`isGenerating`, `images[]`, `currentImageIndex`, `width`, `height`,
+`prompt`, `attachmentId`, `kind`) plus `ar` for ratio-only requests, and
+adds `frameStyle`: `aspect-ratio` from the real pixels and
+`width: min(100%, <w>px)`, so the frame is never upscaled past native and
+still shrinks on a narrow column; the footprint is reserved on the first
+paint so text beneath never reflows. All imports resolve (`@/lib/image-aspect`,
+`BaseButton` from `@slipstream/ui`). The block lane is a one-frame series:
+the bubble passes `images={[block.cdnUrl]}`, `currentImageIndex={0}`.
+
+**The wrapper pattern (notes.md) is the bubble's case.** The parent owns
+`<figure>` / `<figcaption>`, the component is the frame — `ThinkingSection`'s
+contract. The figcaption is the processed prompt.
+
+**`kind` is dynamic, never a literal (Andrew).** The component gates its
+hover overlay on `displayKind === "FINAL"`, so the bubble must supply it in
+both paths. Source: the attachment row — `inlineImgGenData` on the chunk
+frame before persist, `message.attachments[i]` after. Both carry
+`inlineImageGenOutput.kind`; both carry `cdnUrl`; the block's `cdnUrl` is
+the frame it shows. So the join is the url, in both paths, one `find`:
+
+```ts
+const row = (liveInlineImages ?? message.attachments).find(
+  a => a.cdnUrl === block.cdnUrl
+);
+const kind = row?.inlineImageGenOutput?.kind ?? "FINAL"; // hydrated-block invariant
+const attachmentId = row && "id" in row ? row.id : undefined; // committed anchor
+```
+
+An OpenAI PARTIAL frame carries its own row and url with `kind: "PARTIAL"`;
+the block's url moves to it; the find matches; the scanner shows; the url
+ref-gate swaps `src` in place. `isGenerating={kind === "PARTIAL"}`.
+
+**The fold (first half of the old 11.11 (b), resurrected):** `deriveDraft`
+pushes `evt.inlineImgGenData` into `inlineImages: InlineImageGenAggProps[]`
+on `DraftDerivation` (keep every row — at most four per image — so a
+partial's row is still there when the block points at it); the context
+exposes it beside `streamingMessageBlocks`; it reaches the streaming bubble
+only, as `liveInlineImages`, through `dynamic` → `ChatFeed` →
+`MessageBubble`, the same path as the seven live props. The bubble must not
+read the context itself (memoised committed bubbles would re-render per
+token). The synthesized attachment stays dropped: the block paints itself;
+the row is consulted for lineage.
+
+**Three in-file changes to the v0 frame:** `alt={prompt ?? "Generated image"}`
+instead of the literal; download filename = the url basename; nothing else
+— the `attachment-…` anchor stays honest because the bubble passes the
+real row id post-commit and nothing while streaming.
+
+**Revised landing list:** (1) the fold + `DraftDerivation.inlineImages` +
+context field; (2) `liveInlineImages` prop through `dynamic` → `ChatFeed`
+→ `MessageBubble`; (3) the three in-file changes; (4) the bubble
+`IMAGE_GEN` case — figure, `InlineImageGen`, figcaption, the url-join
+lookup — after the thinking branch, before the `!blockContent` fallback,
+keyed by ordinal, `liveInlineImages` + `message.attachments` in the memo
+deps; (5) the bubble-width disjunct (11.2 Gap C: `min(100%, <w>px)` inside
+a shrink-wrapped flex child resolves against the text width, so without
+`w-[85%]` the frame is as wide as the longest line and jumps at commit);
+(6) `pnpm -C apps/web typecheck`; (7) the four-turn live test (§8 step 8).

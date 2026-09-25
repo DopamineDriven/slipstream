@@ -20,6 +20,7 @@ import type {
   AIChatResponseAudioGenFields,
   AIChatResponseImgGenFieldsFinal,
   AttachmentSingleton,
+  InlineImageGenAggProps,
   MessageSingleton,
   Provider
 } from "@slipstream/types";
@@ -40,6 +41,7 @@ interface ChatMessageProps {
   liveImgGenFields?: AIChatResponseImgGenFieldsFinal;
   liveImgGenAttachmentId?: string;
   liveAudioGenFields?: AIChatResponseAudioGenFields;
+  inlineImgGenData?: InlineImageGenAggProps[];
   /** per-turn AudioGenCtx milestone — lyrics landed (audio may still be compiling) */
   liveHasLyrics?: boolean;
 }

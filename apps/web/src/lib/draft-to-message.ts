@@ -19,6 +19,7 @@ import type {
   AIChatResponseImgGenFieldsFinal,
   AttachmentSingleton,
   ChatChunkAndResMsgBlock,
+  InlineImageGenAggProps,
   MessageSingleton,
   Provider
 } from "@slipstream/types";
@@ -88,6 +89,12 @@ export interface DraftDerivation {
   readonly userMsgId: string | undefined;
   readonly aiMsgId: string | undefined;
   readonly imgGenAttachmentId: string | undefined;
+  /**
+   * The DB-ready attachment row each IMAGE_GEN frame carried (`inlineImgGenData` is a singleton on
+   * `ai_chat_chunk`). Accumulated, never last-wins: one row per frame per image, so a PARTIAL's row is still
+   * here when the block points at it. The `ai_chat_response` array is the same rows, rebuilt server-side.
+   */
+  readonly inlineImgGenData: InlineImageGenAggProps[];
 }
 
 /** Fold the raw chunk frames into the legacy streaming fields the façade exposes. */
@@ -104,11 +111,13 @@ export function deriveDraft(draft: ChatDraft): DraftDerivation {
   let userMsgId: string | undefined;
   let aiMsgId: string | undefined;
   let imgGenAttachmentId: string | undefined;
+  const inlineImgGenData = Array.of<InlineImageGenAggProps>();
 
   for (const evt of draft) {
     if (evt.userMsgId) userMsgId = evt.userMsgId;
     if (evt.aiMsgId) aiMsgId = evt.aiMsgId;
     if (evt.imgGenAttachmentId) imgGenAttachmentId = evt.imgGenAttachmentId;
+    if (evt.inlineImgGenData) inlineImgGenData.push(evt.inlineImgGenData);
 
     if (evt.imgGenEnabled) imgGenEnabled = true;
     if (evt.imgGenFields) {
@@ -165,7 +174,8 @@ export function deriveDraft(draft: ChatDraft): DraftDerivation {
     audioGenFields,
     userMsgId,
     aiMsgId,
-    imgGenAttachmentId
+    imgGenAttachmentId,
+    inlineImgGenData
   };
 }
 

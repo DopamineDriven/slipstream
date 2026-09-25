@@ -30,6 +30,7 @@ import type {
   AIChatResponseAudioGenFields,
   AIChatResponseImgGenFieldsFinal,
   ChatChunkAndResMsgBlock,
+  InlineImageGenAggProps,
   MessageSingleton
 } from "@slipstream/types";
 
@@ -51,6 +52,8 @@ interface AIChatContextValue {
   // Live message tracking. `currentStreamingMessage` is the synthetic `streaming-<id>` bubble the feed renders.
   currentStreamingMessage: MessageSingleton<true> | null;
   streamingMessageBlocks: readonly ChatChunkAndResMsgBlock[];
+  /** the wire field, verbatim: the `ai_chat_chunk` singletons collected across this turn, one per image frame */
+  inlineImgGenData: InlineImageGenAggProps[];
   currentUserMsgId: string | null;
   currentAiMsgId: string | null;
   currentImgGenAttachmentId: string | null;
@@ -89,6 +92,8 @@ const AIChatContext = createContext<AIChatContextValue | undefined>(undefined);
 const ssrPlaceholderStore = new ChatStore("new-chat");
 
 const EMPTY_BLOCKS = Object.freeze(Array.of<ChatChunkAndResMsgBlock>());
+const EMPTY_INLINE_IMG_GEN_DATA =(
+  Array.of<InlineImageGenAggProps>());
 
 export function AIChatProvider({
   children,
@@ -211,6 +216,7 @@ export function AIChatProvider({
         thinkingDuration: derived?.thinkingDuration ?? null,
         currentStreamingMessage,
         streamingMessageBlocks: derived?.blocks ?? EMPTY_BLOCKS,
+        inlineImgGenData: derived?.inlineImgGenData ?? EMPTY_INLINE_IMG_GEN_DATA,
         currentUserMsgId: derived?.userMsgId ?? null,
         currentAiMsgId: derived?.aiMsgId ?? null,
         currentImgGenAttachmentId: derived?.imgGenAttachmentId ?? null,
