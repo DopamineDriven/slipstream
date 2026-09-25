@@ -1,28 +1,31 @@
 export const displayNameModelsByProvider = {
   openai: [
+    "GPT-6 Sol",
+    "GPT-6 Luna",
     "GPT-6 Astra",
     "GPT-5.6 Sol",
     "GPT-5.6 Terra",
     "GPT-5.6 Luna",
     "GPT-5.5",
+    "GPT-5.5 Pro",
     "GPT-5.4",
     "GPT-5.4 Mini",
     "GPT-5.4 nano",
+    "GPT-5.4 Pro",
     "GPT-5.2",
+    "GPT-5.2 Pro",
     "GPT-5.1",
     "GPT-5",
     "GPT-5 Mini",
     "GPT-5 nano",
-    "GPT-5.3-Codex",
-    "GPT-5.5 Pro",
-    "GPT-5.4 Pro",
-    "GPT-5.2 Pro",
     "GPT-5 Pro",
     "GPT-4.1",
     "GPT-4.1 Mini",
     "GPT-4.1 nano",
     "GPT-4o",
     "GPT-4o Mini",
+    "o3",
+    "GPT-5.3-Codex",
     "GPT-Image-2.5 Sunburst",
     "GPT-Image-2.5 Flare",
     "GPT-Image-2",
@@ -30,7 +33,6 @@ export const displayNameModelsByProvider = {
     "GPT-Image-1",
     "GPT-Image-1 mini",
     "o4-mini",
-    "o3",
     "o3-pro",
     "o3-mini",
     "o1",
@@ -49,8 +51,8 @@ export const displayNameModelsByProvider = {
     "Gemini 3.1 Pro Preview Custom Tools",
     "Gemini 3.1 Flash Lite Preview",
     "Gemini 3 Flash Preview",
-    "Nano Banana 2",
     "Nano Banana 2 Lite",
+    "Nano Banana 2",
     "Nano Banana Pro",
     "Nano Banana",
     "Lyria 3.5",
@@ -68,6 +70,7 @@ export const displayNameModelsByProvider = {
     "Deep Research Preview (Apr-21-2026)"
   ],
   grok: [
+    "Grok 4.7",
     "Grok 4.6",
     "Grok 4.5",
     "Grok 4.3",
@@ -78,10 +81,11 @@ export const displayNameModelsByProvider = {
     "Grok Imagine Image 2.0",
     "Grok Imagine Image",
     "Grok Imagine Image Quality",
-    "Grok Imagine Video",
-    "Grok Imagine Video 1.5"
+    "Grok Imagine Video 1.5",
+    "Grok Imagine Video"
   ],
   anthropic: [
+    "Claude Opus 5.5",
     "Claude Fable 5.1",
     "Claude Opus 5",
     "Claude Sonnet 5",
@@ -94,7 +98,12 @@ export const displayNameModelsByProvider = {
     "Claude Opus 4.5",
     "Claude Haiku 4.5"
   ],
-  meta: ["Muse Spark 1.3", "Muse Spark 1.2", "Muse Spark 1.1"],
+  meta: [
+    "Muse Spark 1.3",
+    "Muse Spark 1.2",
+    "Muse Spark 1.1",
+    "Muse Image 1.0"
+  ],
   vercel: ["v0 medium", "v0 medium (legacy)"],
   mistral: [
     "Mistral Small 4",
@@ -113,6 +122,7 @@ export const displayNameModelsByProvider = {
     "Kimi K2 Thinking"
   ],
   deepseek: [
+    "DeepSeek V4.1 Flash",
     "DeepSeek V4 Pro 0813",
     "DeepSeek V4 Pro",
     "DeepSeek V4 Flash 0731",
@@ -123,6 +133,7 @@ export const displayNameModelsByProvider = {
     "GLM 5.3",
     "GLM 5.3 Fast",
     "GLM 5.3 Flash",
+    "GLM 5.3 FlashX",
     "GLM 5.2",
     "GLM 5.2 Fast",
     "GLM 5.1",
@@ -144,5 +155,5 @@ export const displayNameModelsByProvider = {
     "Qwen 3.5 Flash"
   ],
   minimax: ["MiniMax-M3", "MiniMax-M2.7", "MiniMax-M2.5", "MiniMax-M2.1"],
-  sakana: ["Fugu Ultra", "Fugu", "Fugu Cyber", "Sakana Namazu"]
+  sakana: ["Fugu Max", "Fugu Ultra", "Fugu", "Fugu Cyber", "Sakana Namazu"]
 } as const;

@@ -26,7 +26,9 @@ function ImageGenSettingsForm() {
           ariaLabel="Select image aspect ratio"
           items={imgGen.aspectRatios}
           value={imgGen.settings.aspectRatio}
-          onValueChangeAction={value => imgGen.updateSettings({ aspectRatio: value })}
+          onValueChangeAction={value =>
+            imgGen.updateSettings({ aspectRatio: value })
+          }
           triggerClassName="w-full"
           contentClassName="w-full"
           renderItemAction={(item, isSelected) => (
@@ -49,19 +51,24 @@ function ImageGenSettingsForm() {
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <span className="text-muted-foreground text-sm font-medium">
-          Quality
-        </span>
-        <AnimatedSelect
-          ariaLabel="Select image quality"
-          items={imgGen.qualities}
-          value={imgGen.settings.quality}
-          onValueChangeAction={value => imgGen.updateSettings({ quality: value })}
-          triggerClassName="w-full"
-          contentClassName="w-full"
-        />
-      </div>
+      {/* a provider with no quality tiers (meta) has neither options nor a value */}
+      {imgGen.qualities.length > 0 && imgGen.settings.quality ? (
+        <div className="flex flex-col gap-2">
+          <span className="text-muted-foreground text-sm font-medium">
+            Quality
+          </span>
+          <AnimatedSelect
+            ariaLabel="Select image quality"
+            items={imgGen.qualities}
+            value={imgGen.settings.quality}
+            onValueChangeAction={value =>
+              imgGen.updateSettings({ quality: value })
+            }
+            triggerClassName="w-full"
+            contentClassName="w-full"
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

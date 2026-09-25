@@ -1,3 +1,4 @@
+import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import { WebSocket } from "ws";
 import type { $Enums, Attachment } from "@slipstream/db/node/generated/client";
 import type {
@@ -11,6 +12,7 @@ import type {
   EventTypeMap,
   GetModelUtilRT,
   ImageSingleton,
+  ImgMetadataEntity,
   LocalToolCapabilities,
   MessageSingleton,
   Provider,
@@ -92,12 +94,31 @@ export type IncludeCreateConvoWithImgGenOrAudioGenProps = {
       imageGenJob: true;
       messageBlocks: { orderBy: { ordinal: "asc" } };
       attachments: {
+        where: {
+          OR: [
+            { origin: { not: "GENERATED" } },
+            {
+              AND: [
+                { origin: "GENERATED" },
+                { imageGenOutput: { kind: "FINAL" } }
+              ];
+            },
+            {
+              AND: [
+                { origin: "GENERATED" },
+                { inlineImageGenOutput: { kind: "FINAL" } }
+              ];
+            }
+          ];
+        };
         orderBy: {
           createdAt: "asc";
         };
         include: {
+          messageBlock: true;
           image: true;
           document: true;
+          inlineImageGenOutput: true;
           audio: true;
           audioGenOutput: true;
           imageGenOutput: true;
@@ -496,3 +517,32 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
     }[];
   };
 }
+
+export type ImageGenPostS3Arr = [
+  number, // ordinal
+  string, // cdnUrl
+  string, // itemId
+  number, // width
+  number, // height
+  string, // mime type
+  string, // s3 bucket
+  string, // s3 key
+  string, // s3 versionId
+  string, // s3ObjectId
+  string, // filename
+  string, // extension
+  string | undefined, // etag
+  number, // size
+  string | undefined, // s3 last modified
+  string | undefined, // content disposition
+  string | undefined, // cache control
+  $Enums.ChecksumAlgo, // s3 checksum={checksumSha256, checksumAlgo}
+  S3StorageClass, // s3 storage class
+  string, // seriesId
+  ImgMetadataEntity, // ImageMetadata via extractor package
+  number, // upload duration
+  string | undefined, // requestMessageId
+  string | undefined, // revised_prompt
+  S3FinalizePayload,
+  ExpandedImgSpecs
+];

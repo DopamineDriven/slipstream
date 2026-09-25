@@ -1,5 +1,6 @@
 import type { Voyage } from "@/voyage/types.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
+import type { AttachmentUncheckedCreateWithoutMessageInput } from "@slipstream/db/node/generated/models";
 import type { XOR } from "@slipstream/types";
 
 export interface CreateUserStoreChunkParams {
@@ -271,3 +272,11 @@ export type ToDraftIdProps =
       batchId: string;
       dictationOrdinal: number;
     };
+
+export type InlineImageGenAggWorkupRT = {
+  creates: AttachmentUncheckedCreateWithoutMessageInput[];
+  links: {
+    cdnUrl: string;
+    ordinal: number;
+  }[];
+};

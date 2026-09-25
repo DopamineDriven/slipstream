@@ -13,6 +13,11 @@ generator client {
   previewFeatures        = ["typedSql", "relationJoins"]
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+  output="../../erd/ERD.mmd"
+}
+
 enum Provider {
   ALIBABA
   ANTHROPIC

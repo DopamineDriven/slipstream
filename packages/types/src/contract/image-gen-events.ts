@@ -1,5 +1,5 @@
 import type { UserMetadata } from "@/contract/workup.ts";
-import type { ImgGenStage } from "@/contract/images.ts";
+import type { ImgGenStage } from "@/image-gen/index.ts";
 import type {
   AllImgGenFacilitatingModelsUnion,
   AllImgGenModelsUnion,

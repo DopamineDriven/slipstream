@@ -117,6 +117,11 @@ export type ImageGenJob = Prisma.ImageGenJobModel
  */
 export type ImageGenOutput = Prisma.ImageGenOutputModel
 /**
+ * Model InlineImageGenOutput
+ * 
+ */
+export type InlineImageGenOutput = Prisma.InlineImageGenOutputModel
+/**
  * Model ConversationMemoryStore
  * 
  */

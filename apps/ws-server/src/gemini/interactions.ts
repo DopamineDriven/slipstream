@@ -61,6 +61,7 @@ export class GeminiInteractionsService extends GeminiWorkupService {
         const textParts = Array.of<string>();
         if (msg.attachments.length > 0) {
           for (const attachment of msg.attachments) {
+            if (attachment.messageBlock) continue;
             try {
               if (
                 attachment?.compatCdnUrl &&
@@ -156,6 +157,16 @@ export class GeminiInteractionsService extends GeminiWorkupService {
             if (block.type === "TEXT") {
               blockAgg.push(block.content);
             }
+            if (
+              block.type === "IMAGE_GEN" &&
+              block.cdnUrl &&
+              block.width &&
+              block.height
+            ) {
+              blockAgg.push(
+                `![[${msg.provider}/${msg.model}]-${block.width}x${block.height}](${block.cdnUrl})\n\n${block.content}`
+              );
+            }
           }
         }
         if (blockAgg.length > 0) {
@@ -181,6 +192,7 @@ export class GeminiInteractionsService extends GeminiWorkupService {
           msg.senderType === "AI"
         ) {
           for (const attachment of msg.attachments) {
+            if (attachment.messageBlock) continue;
             try {
               // AI-generated assets should have these fields populated
               if (
@@ -282,6 +294,16 @@ export class GeminiInteractionsService extends GeminiWorkupService {
           for (const block of msg.messageBlocks) {
             if (block.type === "TEXT") {
               blockAgg.push(block.content);
+            }
+            if (
+              block.type === "IMAGE_GEN" &&
+              block.cdnUrl &&
+              block.width &&
+              block.height
+            ) {
+              blockAgg.push(
+                `![[${msg.provider}/${msg.model}]-${block.width}x${block.height}](${block.cdnUrl})\n\n${block.content}`
+              );
             }
           }
         }

@@ -1,28 +1,31 @@
 export const modelIdsByProvider = {
   openai: [
+    "gpt-6-sol",
+    "gpt-6-luna",
     "gpt-6-astra",
     "gpt-5.6-sol",
     "gpt-5.6-terra",
     "gpt-5.6-luna",
     "gpt-5.5",
+    "gpt-5.5-pro",
     "gpt-5.4",
     "gpt-5.4-mini",
     "gpt-5.4-nano",
+    "gpt-5.4-pro",
     "gpt-5.2",
+    "gpt-5.2-pro",
     "gpt-5.1",
     "gpt-5",
     "gpt-5-mini",
     "gpt-5-nano",
-    "gpt-5.3-codex",
-    "gpt-5.5-pro",
-    "gpt-5.4-pro",
-    "gpt-5.2-pro",
     "gpt-5-pro",
     "gpt-4.1",
     "gpt-4.1-mini",
     "gpt-4.1-nano",
     "gpt-4o",
     "gpt-4o-mini",
+    "o3",
+    "gpt-5.3-codex",
     "gpt-image-2.5-sunburst",
     "gpt-image-2.5-flare",
     "gpt-image-2",
@@ -30,7 +33,6 @@ export const modelIdsByProvider = {
     "gpt-image-1",
     "gpt-image-1-mini",
     "o4-mini",
-    "o3",
     "o3-pro",
     "o3-mini",
     "o1",
@@ -49,8 +51,8 @@ export const modelIdsByProvider = {
     "gemini-3.1-pro-preview-customtools",
     "gemini-3.1-flash-lite-preview",
     "gemini-3-flash-preview",
-    "gemini-3.1-flash-image-preview",
     "gemini-3.1-flash-lite-image",
+    "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
     "lyria-3.5",
@@ -68,6 +70,7 @@ export const modelIdsByProvider = {
     "deep-research-preview-04-2026"
   ],
   grok: [
+    "grok-4.7",
     "grok-4.6",
     "grok-4.5",
     "grok-4.3",
@@ -78,10 +81,11 @@ export const modelIdsByProvider = {
     "grok-imagine-image-2.0",
     "grok-imagine-image",
     "grok-imagine-image-quality",
-    "grok-imagine-video",
-    "grok-imagine-video-1.5"
+    "grok-imagine-video-1.5",
+    "grok-imagine-video"
   ],
   anthropic: [
+    "claude-opus-5-5",
     "claude-fable-5-1",
     "claude-opus-5",
     "claude-sonnet-5",
@@ -94,7 +98,12 @@ export const modelIdsByProvider = {
     "claude-opus-4-5-20251101",
     "claude-haiku-4-5-20251001"
   ],
-  meta: ["muse-spark-1.3", "muse-spark-1.2", "muse-spark-1.1"],
+  meta: [
+    "muse-spark-1.3",
+    "muse-spark-1.2",
+    "muse-spark-1.1",
+    "muse-image-1.0"
+  ],
   vercel: ["v0-1.5-md", "v0-1.0-md"],
   mistral: [
     "mistral-small-latest",
@@ -117,6 +126,7 @@ export const modelIdsByProvider = {
     "kimi-k2-thinking"
   ],
   deepseek: [
+    "deepseek-v4.1-flash",
     "deepseek-v4-pro-0813",
     "deepseek-v4-pro",
     "deepseek-v4-flash-0731",
@@ -127,6 +137,7 @@ export const modelIdsByProvider = {
     "glm-5.3",
     "glm-5.3-fast",
     "glm-5.3-flash",
+    "glm-5.3-flashx",
     "glm-5.2",
     "glm-5.2-fast",
     "glm-5.1",
@@ -148,5 +159,5 @@ export const modelIdsByProvider = {
     "qwen3.5-flash"
   ],
   minimax: ["minimax-m3", "minimax-m2.7", "minimax-m2.5", "minimax-m2.1"],
-  sakana: ["fugu-ultra", "fugu", "fugu-cyber", "sakana-namazu"]
+  sakana: ["fugu-max", "fugu-ultra", "fugu", "fugu-cyber", "sakana-namazu"]
 } as const;

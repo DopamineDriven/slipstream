@@ -47,7 +47,7 @@ export class MetaChatService extends MetaWorkupService {
     apiKey,
     jobId,
     requestMessageId,
-    model = "muse-spark-1.1" satisfies MetaModelIdUnion,
+    model = "muse-spark-1.3" satisfies MetaModelIdUnion,
     systemPrompt,
     temperature,
     title,
@@ -290,7 +290,7 @@ export class MetaChatService extends MetaWorkupService {
             // pools reasoning + visible output under one cap — muse-spark's
             // reasoning is encrypted like fugu-ultra's, and any cap starves
             // thinking FIRST, surfacing as response.incomplete with zero text
-            reasoning: this.handleReasoning(model, "high"),
+            reasoning: this.handleReasoning(model, "xhigh"),
             parallel_tool_calls: true,
             tools
           },

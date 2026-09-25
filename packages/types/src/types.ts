@@ -18,6 +18,7 @@ import type {
   ImageGenJob,
   ImageGenOutput,
   ImageMetadata,
+  InlineImageGenOutput,
   Message,
   MessageBlock,
   Profile,
@@ -80,6 +81,12 @@ export interface SettingsSingleton<T extends boolean = false> extends Settings {
   user?: UserSingleton<T>;
 }
 
+export interface InlineImageGenOutputSingleton<
+  T extends boolean = false
+> extends InlineImageGenOutput {
+  attachment?: AttachmentSingleton<T>;
+}
+
 export interface DictationSingleton<
   T extends boolean = false
 > extends Dictation {
@@ -140,6 +147,7 @@ export interface MessageBlockSingleton<
   T extends boolean = false
 > extends MessageBlock {
   message?: MessageSingleton<T>;
+  attachments?: AttachmentSingleton<T>[];
 }
 
 export interface ProviderStoreSingleton<
@@ -222,6 +230,8 @@ export interface AttachmentSingleton<
   userStoreDoc?: UserStoreDocSingleton<T>;
   ttsJob?: TTSJobSingleton<T>;
   dictationJobs?: DictationSingleton<T>[];
+  inlineImageGenOutput?: InlineImageGenOutputSingleton<T>;
+  messageBlock?: MessageBlockSingleton<T>;
 }
 
 export interface UserKeySingleton<T extends boolean = false> extends UserKey {

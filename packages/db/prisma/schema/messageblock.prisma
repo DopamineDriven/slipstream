@@ -2,6 +2,8 @@ enum MessageBlockType {
   ENCRYPTED_THINKING
   THINKING
   TEXT
+  /// a spontaneous image_generation tool call, no ImageGenJob bound
+  IMAGE_GEN
 }
 
 model MessageBlock {
@@ -12,10 +14,17 @@ model MessageBlock {
   content        String
   type           MessageBlockType
   durationMs     Int              @default(0)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
 
-  message Message @relation("MessageBlocks", fields: [messageId], references: [id], onDelete: Cascade)
+  /// type="IMAGE_GEN" only where InlineImageGenOutput.kind="FINAL"
+  cdnUrl String?
+  width  Int?
+  height Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  message   Message  @relation("MessageBlocks", fields: [messageId], references: [id], onDelete: Cascade)
+
+  attachments Attachment[] @relation("MessageBlockAttachments")
 
   @@unique([messageId, ordinal])
   @@index([messageId, ordinal])

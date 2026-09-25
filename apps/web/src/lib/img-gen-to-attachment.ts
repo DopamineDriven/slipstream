@@ -1,7 +1,8 @@
 import type {
   AIChatResponseImgGenFieldsFinal,
   AIChatResponseImgGenSubFields,
-  AttachmentSingleton
+  AttachmentSingleton,
+  ChatChunkAndResMsgBlock
 } from "@slipstream/types";
 
 function imgGenToAttachmentWorkup(
@@ -39,6 +40,7 @@ function imgGenToAttachmentWorkup(
         compatVersionId: t.versionId,
         contentDisposition: t.contentDisposition,
         contentEncoding: t.contentEncoding,
+        messageBlockId: null,
         conversationId: t.compatVersionId,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -101,6 +103,7 @@ function imgGenToAttachmentWorkup(
       compatMime: t.compatMime,
       compatReadyAt: t.compatReadyAt,
       compatS3ObjectId: t.s3ObjectId,
+      messageBlockId: null,
       s3LastModified: t.s3LastModified,
       compatStatus: "ALIASED",
       compatVersionId: t.versionId,

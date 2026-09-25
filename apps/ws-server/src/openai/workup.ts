@@ -127,7 +127,10 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
   }
 
   protected messageText(
-    msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
+    msg: Pick<
+      MessageSingleton<true>,
+      "content" | "messageBlocks" | "provider" | "model"
+    >
   ) {
     const textBlocks = Array.of<string>();
 
@@ -135,6 +138,16 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
       for (const block of msg.messageBlocks) {
         if (block.type === "TEXT") {
           textBlocks.push(block.content);
+        }
+        if (
+          block.type === "IMAGE_GEN" &&
+          block.cdnUrl &&
+          block.width &&
+          block.height
+        ) {
+          textBlocks.push(
+            `![[${msg.provider}/${msg.model}]-${block.width}x${block.height}](${block.cdnUrl})\n\n${block.content}`
+          );
         }
       }
     }

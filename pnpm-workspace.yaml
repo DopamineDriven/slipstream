@@ -14,16 +14,16 @@ dangerouslyAllowAllBuilds: true
 
 catalogs:
   anthropic:
-    "@anthropic-ai/sdk": ^0.126.0
+    "@anthropic-ai/sdk": ^0.128.0
   auth:
-    better-auth: ^1.7.5
+    better-auth: ^1.7.6
   aws:
-    "@aws-sdk/client-s3": ^3.1134.0
-    "@aws-sdk/client-secrets-manager": ^3.1134.0
-    "@aws-sdk/credential-providers": ^3.1134.0
-    "@aws-sdk/lib-storage": ^3.1134.0
-    "@aws-sdk/s3-request-presigner": ^3.1134.0
-    "@aws-sdk/types": ^3.974.5
+    "@aws-sdk/client-s3": ^3.1140.0
+    "@aws-sdk/client-secrets-manager": ^3.1140.0
+    "@aws-sdk/credential-providers": ^3.1140.0
+    "@aws-sdk/lib-storage": ^3.1140.0
+    "@aws-sdk/s3-request-presigner": ^3.1140.0
+    "@aws-sdk/types": ^3.974.6
   babel:
     babel-plugin-react-compiler: ^1.0.0
   biome:
@@ -56,14 +56,14 @@ catalogs:
   decimal:
     "decimal.js": ^10.6.0
   dotenv:
-    dotenv: ^17.4.2
+    dotenv: ^18.0.3
     dotenv-cli: ^11.0.0
     dotenv-expand: ^1000.0.0
   eslint:
     "@eslint/compat": ^2.1.1
     "@eslint/config-helpers": ^0.7.0
     "@eslint/js": ^10.0.1
-    eslint: ^10.10.0
+    eslint: ^10.11.0
     eslint-plugin-import: ^2.32.0
     eslint-plugin-import-x: ^4.17.1
     eslint-plugin-jsx-a11y: ^6.10.2
@@ -76,7 +76,7 @@ catalogs:
   glob:
     glob: ^13.0.6
   google:
-    "@google/genai": ^2.23.0
+    "@google/genai": ^2.24.0
   gtag:
     "@types/gtag.js": ^0.0.20
   jiti:
@@ -85,14 +85,14 @@ catalogs:
     jose: ^6.2.12
   jsdom:
     "@types/jsdom": ^30.0.0
-    jsdom: ^30.1.0
+    jsdom: ^30.1.1
   katex:
     "@types/katex": ^0.16.8
-    katex: ^0.18.7
+    katex: ^0.18.9
   lightningcss:
     unplugin-lightningcss: ^0.5.0
   mcp:
-    "@modelcontextprotocol/sdk": ^1.30.0
+    "@modelcontextprotocol/sdk": ^1.30.1
   mdast:
     "@types/mdast": ^4.0.4
   mistral:
@@ -107,20 +107,20 @@ catalogs:
   napi:
     "@napi-rs/canvas": ^1.0.9
   next:
-    "@next/eslint-plugin-next": ^16.3.5
-    eslint-config-next: ^16.3.5
-    next: ^16.3.5
+    "@next/eslint-plugin-next": ^16.3.6
+    eslint-config-next: ^16.3.6
+    next: ^16.3.6
     next-themes: ^0.4.6
   node:
-    "@types/node": ^26.4.1
+    "@types/node": ^26.6.2
     node-html-parser: ^9.0.4
     nodemon: ^3.1.14
   nyc:
     nyc: ^18.0.0
   openai:
-    openai: ^7.17.0
+    openai: ^7.23.0
   p-limit:
-    p-limit: ^7.3.2
+    p-limit: ^7.3.3
   pg:
     "@types/pg": ^8.23.1
     pg: ^8.23.0
@@ -134,7 +134,7 @@ catalogs:
     urlpattern-polyfill: ^10.1.0
   prettier:
     "@ianvs/prettier-plugin-sort-imports": ^4.7.1
-    prettier: ^3.9.7
+    prettier: ^3.9.9
     prettier-plugin-tailwindcss: ^0.8.1
   prisma:
     "@prisma/adapter-pg": ^7.10.0
@@ -142,6 +142,7 @@ catalogs:
     "@prisma/client-runtime-utils": ^7.10.0
     "@prisma/extension-accelerate": ^3.0.1
     prisma: ^7.10.0
+    prisma-erd-generator: ^3.2.1
   py:
     pythonia: ^1.2.6
   radix:
@@ -174,7 +175,7 @@ catalogs:
     "@types/react-dom": ^19.3.0
     react: ^19.3.0
     react-dom: ^19.3.0
-    react-resizable-panels: ^4.12.4
+    react-resizable-panels: ^4.13.3
     vaul: ^1.1.2
   redis:
     redis: ^6.2.1
@@ -191,7 +192,7 @@ catalogs:
     remark-parse: ^11.0.0
     remark-rehype: ^11.1.2
   rolldown:
-    rolldown: ^1.2.9
+    rolldown: ^1.2.11
     rolldown-plugin-dts: ^0.28.6
     rolldown-plugin-wasm: ^0.3.2
   sharp:
@@ -222,17 +223,17 @@ catalogs:
     tsdown: ^0.23.0
     "@tsdown/css": ^0.23.0
   tseslint:
-    typescript-eslint: ^8.70.0
+    typescript-eslint: ^8.70.1
   tsgo:
     "@typescript/native-preview": ^7.0.0-dev.20260707.2
   tslib:
     tslib: ^2.8.1
   tsx:
-    tsx: ^4.23.13
+    tsx: ^4.23.15
   turbo:
-    eslint-config-turbo: ^2.10.13
-    eslint-plugin-turbo: ^2.10.13
-    turbo: ^2.10.13
+    eslint-config-turbo: ^2.11.4
+    eslint-plugin-turbo: ^2.11.4
+    turbo: ^2.11.4
   tw:
     "@tailwindcss/forms": ^0.5.11
     "@tailwindcss/postcss": ^4.3.3
@@ -253,12 +254,12 @@ catalogs:
     wait-on: ^9.1.0
   vercel:
     "@vercel/analytics": ^2.0.1
-    "@vercel/functions": ^3.9.8
+    "@vercel/functions": ^3.9.9
   vfile:
     vfile: ^6.0.3
   vite:
     "@vitejs/plugin-react": ^6.1.1
-    vite: ^8.3.0
+    vite: ^8.3.1
   vitest:
     "@vitest/coverage-istanbul": ^5.0.1
     "@vitest/ui": ^5.0.1

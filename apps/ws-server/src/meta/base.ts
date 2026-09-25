@@ -1,12 +1,18 @@
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
+import type { MetaReasoningEffort } from "@/meta/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
+import type { Reasoning } from "openai/resources/shared";
 import type { Logger as PinoLogger } from "pino";
-import type { MetaReasoningEffort } from "@/meta/types.ts";
 import { OpenAI } from "openai";
 import type { S3Storage } from "@slipstream/storage-s3";
 
+/**
+ *video/mp4, audio/mpeg, audio/wav
+ *
+ * https://dev.meta.ai/docs/video-understanding#supported-formats
+ */
 export class MetaBaseService {
   protected baseUrl = "https://api.meta.ai/v1";
   protected defaultClient: OpenAI;
@@ -40,20 +46,38 @@ export class MetaBaseService {
     }
     return client;
   }
+  private normalizeEffort(effort: string) {
+    return effort === "none" || effort === "low" || effort === "minimal";
+  }
 
+  /**
+   * only muse-spark-1.3 accepts max reasoning
+   *
+   * https://dev.meta.ai/docs/reasoning#summaries
+   */
   protected handleReasoning(
     model: string,
     effort?: MetaReasoningEffort["effort"]
   ) {
     if (!this.prisma.isMetaModel(model)) return;
-    else {
+    else if (!(model === "muse-spark-1.3")) {
       const normalizedEffort =
-        effort === "none" || effort === "low" || effort === "minimal"
+        effort && this.normalizeEffort(effort)
           ? "medium"
-          : effort;
-        return {
-          effort: normalizedEffort ?? "xhigh"
-        } as const satisfies MetaReasoningEffort;
+          : effort === "max"
+            ? "xhigh"
+            : effort;
+      return {
+        effort: normalizedEffort ?? "xhigh",
+        summary: "detailed"
+      } as const satisfies Reasoning;
+    } else {
+      const normalizedEffort =
+        effort && this.normalizeEffort(effort) ? "xhigh" : "max";
+      return {
+        effort: normalizedEffort,
+        summary: "detailed"
+      } as const satisfies Reasoning;
     }
   }
 }

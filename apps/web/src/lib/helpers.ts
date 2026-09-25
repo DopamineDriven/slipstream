@@ -65,7 +65,8 @@ export const isPureImageModel = (m: string) => {
     m === "gpt-image-2.5-flare" ||
     m === "grok-imagine-image" ||
     m === "grok-imagine-image-2.0" ||
-    m === "grok-imagine-image-quality"
+    m === "grok-imagine-image-quality" ||
+    m === "muse-image-1.0"
   );
 };
 
@@ -205,4 +206,32 @@ export function draftIdEpimerize(
   } else {
     return toDraftId(d);
   }
+}
+
+export function toCdnUrlConstituents(cdnUrl: string) {
+  const base = cdnUrl.slice(cdnUrl.lastIndexOf("/") + 1);
+  const [seriesIdDashOrdinal, ext, timestampMs] = [
+    base.slice(14, base.lastIndexOf(".")),
+    base.slice(base.lastIndexOf(".") + 1),
+    base.slice(0, 13)
+  ];
+  const [sId, sOrdinal] = [
+    seriesIdDashOrdinal.slice(0, seriesIdDashOrdinal.lastIndexOf("-")),
+    seriesIdDashOrdinal.slice(seriesIdDashOrdinal.lastIndexOf("-") + 1)
+  ];
+  const generatedType = /^[a-z0-9]{24}$/.test(sId)
+    ? "inlineImageGenOutput"
+    : "imageGenOutput";
+  return {
+    /**
+     * "inlineImageGenOutput" uses cuid2 `/^[a-z0-9]{24}$/`
+     *
+     * "imageGenOutput" uses nanoid `/^[A-Za-z0-9]{21}$/` | /^ig_[0-9a-z]$/
+     */
+    type: generatedType,
+    sId,
+    sOrdinal: Number.parseInt(sOrdinal),
+    ext,
+    timestampMs: Number.parseInt(timestampMs)
+  } as const;
 }

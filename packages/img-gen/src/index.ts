@@ -4,7 +4,6 @@ export type {
   AllNonImgGenCapableUnion,
   AllPureImgGenModelsUnion,
   BackgroundFormattingOpts,
-  GrokQualityUnion,
   ModelToAspectRatioOpts,
   ModelToBackgroundFormatOpts,
   ModelToOutputFormatOpts,

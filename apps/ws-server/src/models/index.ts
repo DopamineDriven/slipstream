@@ -94,6 +94,8 @@ export class ModelService extends ModelToolDefsService {
 
   public isOpenAIImgGenFacilitating(m: string) {
     return (
+      m === "gpt-6-sol" ||
+      m === "gpt-6-luna" ||
       m === "gpt-6-astra" ||
       m === "gpt-5.6-sol" ||
       m === "gpt-5.6-terra" ||
@@ -247,9 +249,24 @@ export class ModelService extends ModelToolDefsService {
     return m === "grok-build-0.1";
   }
 
-  public isGrokReasoningEffortModel(m: string) {
-    return m === "grok-4.6" || m === "grok-4.5" || m === "grok-4.3";
+  public isGrokImgFacilitatingModel(m: string) {
+    return m === "grok-4.7" || m === "grok-4.6";
   }
+
+  public isGrokImgCapableModel(m: string) {
+    return this.isGrokImgFacilitatingModel(m) || this.isGrokImgModel(m);
+  }
+
+  public isGrokReasoningEffortModel(m: string) {
+    return (
+      m === "grok-4.7" ||
+      m === "grok-4.6" ||
+      m === "grok-4.5" ||
+      m === "grok-4.3" ||
+      m === "grok-4.20-multi-agent-0309"
+    );
+  }
+
   public isGrokModel(m: string) {
     return (
       this.isGrokVideoModel(m) ||
@@ -263,14 +280,15 @@ export class ModelService extends ModelToolDefsService {
   }
   public isAnthropicAdaptiveModel(mod: string) {
     return (
+      mod === "claude-opus-5-5" ||
       mod === "claude-fable-5-1" ||
+      mod === "claude-sonnet-5"||
       mod === "claude-opus-5" ||
+      mod === "claude-fable-5" ||
       mod === "claude-opus-4-8" ||
       mod === "claude-opus-4-7" ||
       mod === "claude-opus-4-6" ||
-      mod === "claude-sonnet-4-6" ||
-      mod === "claude-fable-5" ||
-      mod === "claude-sonnet-5"
+      mod === "claude-sonnet-4-6"
     );
   }
 
@@ -287,9 +305,16 @@ export class ModelService extends ModelToolDefsService {
     );
   }
 
+  public isMetaImgModel(m: string) {
+    return m === "muse-image-1.0";
+  }
+
   public isMetaModel(m: string) {
     return (
-      m === "muse-spark-1.1" || m === "muse-spark-1.2" || m === "muse-spark-1.3"
+      this.isMetaImgModel(m) ||
+      m === "muse-spark-1.1" ||
+      m === "muse-spark-1.2" ||
+      m === "muse-spark-1.3"
     );
   }
 
@@ -335,7 +360,8 @@ export class ModelService extends ModelToolDefsService {
       m === "deepseek-v4-pro" ||
       m === "deepseek-v4-pro-0813" ||
       m === "deepseek-v4-flash" ||
-      m === "deepseek-v4-flash-0731"
+      m === "deepseek-v4-flash-0731" ||
+      m === "deepseek-v4.1-flash"
     );
   }
 
@@ -344,6 +370,7 @@ export class ModelService extends ModelToolDefsService {
       m === "glm-5.3" ||
       m === "glm-5.3-fast" ||
       m === "glm-5.3-flash" ||
+      m === "glm-5.3-flashx" ||
       m === "glm-5.2" ||
       m === "glm-5.2-fast" ||
       m === "glm-5.1" ||
@@ -357,7 +384,7 @@ export class ModelService extends ModelToolDefsService {
   public isQwenModel(m: string) {
     return (
       m === "qwen3.8-max-0902" ||
-      m === "qwen3.8-flash" ||
+      m === "qwen3.8-flash-next" ||
       m === "qwen3.8-flash" ||
       m === "qwen3.8-max" ||
       m === "qwen3.7-max" ||
@@ -381,6 +408,7 @@ export class ModelService extends ModelToolDefsService {
   public isSakanaModel(m: string) {
     return (
       m === "fugu" ||
+      m === "fugu-max" ||
       m === "fugu-ultra" ||
       m === "fugu-cyber" ||
       m === "sakana-namazu"

@@ -21,6 +21,7 @@ testing.sh
 src/test/anthropic/*
 src/test/xai/**/*
 src/test/google/**/*
+src/test/meta/**/*
 logs/
 shell-scripts/*
 

@@ -64,6 +64,7 @@ export class ZaiMemoryService extends ZaiWorkupService {
         try {
           if (msg.attachments && msg.attachments.length > 0) {
             for (const att of msg.attachments) {
+              if (att.messageBlock) continue;
               const {
                 cdnUrl,
                 mime: ogMime,
@@ -103,9 +104,19 @@ export class ZaiMemoryService extends ZaiWorkupService {
         } finally {
           if (msg.messageBlocks && msg.messageBlocks.length > 0) {
             const textBlocks = Array.of<string>();
-            for (const x of msg.messageBlocks) {
-              if (x.type === "TEXT") {
-                textBlocks.push(x.content);
+            for (const block of msg.messageBlocks) {
+              if (block.type === "TEXT") {
+                textBlocks.push(block.content);
+              }
+              if (
+                block.type === "IMAGE_GEN" &&
+                block.cdnUrl &&
+                block.width &&
+                block.height
+              ) {
+                textBlocks.push(
+                  `![[${msg.provider}/${msg.model}]-${block.width}x${block.height}](${block.cdnUrl})\n\n${block.content}`
+                );
               }
             }
             textParts.push(textBlocks.join(`\n`));
@@ -130,6 +141,7 @@ export class ZaiMemoryService extends ZaiWorkupService {
         try {
           if (msg.attachments && msg.attachments.length > 0) {
             for (const att of msg.attachments) {
+              if (att.messageBlock) continue;
               const {
                 cdnUrl,
                 mime: ogMime,
@@ -162,9 +174,19 @@ export class ZaiMemoryService extends ZaiWorkupService {
         } finally {
           if (msg.messageBlocks && msg.messageBlocks.length > 0) {
             const textBlocks = Array.of<string>();
-            for (const x of msg.messageBlocks) {
-              if (x.type === "TEXT") {
-                textBlocks.push(x.content);
+            for (const block of msg.messageBlocks) {
+              if (block.type === "TEXT") {
+                textBlocks.push(block.content);
+              }
+              if (
+                block.type === "IMAGE_GEN" &&
+                block.cdnUrl &&
+                block.width &&
+                block.height
+              ) {
+                textBlocks.push(
+                  `![[${msg.provider}/${msg.model}]-${block.width}x${block.height}](${block.cdnUrl})\n\n${block.content}`
+                );
               }
             }
             textParts.push(`${modelIdentifier}\n\n${textBlocks.join(`\n\n`)}`);
@@ -191,8 +213,14 @@ export class ZaiMemoryService extends ZaiWorkupService {
     const toolName = toolCall.function.name;
     try {
       if (toolName === "file_search") {
-      const input = this.userStoreVector.parseUserStoreInput(toolCall.function.arguments, toolName);
-        const output = await this.userStoreVector.executeFileSearch(userId, input);
+        const input = this.userStoreVector.parseUserStoreInput(
+          toolCall.function.arguments,
+          toolName
+        );
+        const output = await this.userStoreVector.executeFileSearch(
+          userId,
+          input
+        );
         return {
           role: "tool",
           tool_call_id: toolCall.id,

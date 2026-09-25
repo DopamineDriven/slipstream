@@ -137,6 +137,7 @@ export class v0Service {
         try {
           if (msg.attachments && msg.attachments.length > 0) {
             for (const att of msg.attachments) {
+              if (att.messageBlock) continue;
               const {
                 cdnUrl,
                 mime: ogMime,
@@ -179,6 +180,11 @@ export class v0Service {
               if (x.type === "TEXT") {
                 textBlocks.push(x.content);
               }
+              if (x.type === "IMAGE_GEN" && x.cdnUrl && x.width && x.height) {
+                textBlocks.push(
+                  `![[${msg.provider}/${msg.model}]-${x.width}x${x.height}](${x.cdnUrl})\n\n${x.content}`
+                );
+              }
             }
             textParts.push(textBlocks.join(`\n`));
           } else {
@@ -205,6 +211,7 @@ export class v0Service {
         try {
           if (msg.attachments && msg.attachments.length > 0) {
             for (const att of msg.attachments) {
+              if (att.messageBlock) continue;
               const {
                 cdnUrl,
                 mime: ogMime,
@@ -240,6 +247,11 @@ export class v0Service {
             for (const x of msg.messageBlocks) {
               if (x.type === "TEXT") {
                 textBlocks.push(x.content);
+              }
+              if (x.type === "IMAGE_GEN" && x.cdnUrl && x.width && x.height) {
+                textBlocks.push(
+                  `![[${msg.provider}/${msg.model}]-${x.width}x${x.height}](${x.cdnUrl})\n\n${x.content}`
+                );
               }
             }
             textParts.push(`${modelIdentifier}\n\n${textBlocks.join(`\n\n`)}`);

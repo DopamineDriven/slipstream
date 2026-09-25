@@ -1,5 +1,10 @@
-import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
-import { xAIResponses } from "@/xai/event-types.ts";
+import type { S3FinalizePayload } from "@/types/index.ts";
+import type { xAIResponses } from "@/xai/event-types.ts";
+import type {
+  GrokProviderChatRequestEntity,
+  GrokReasoningModel
+} from "@/xai/types.ts";
+import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   CanonicalToolDefinition,
@@ -7,6 +12,7 @@ import type {
   GrokModelIdUnion,
   LocalToolName,
   MessageSingleton,
+  UTR,
   XOR
 } from "@slipstream/types";
 
@@ -14,9 +20,25 @@ export interface GrokActiveMessageBlock {
   content: string;
   itemIds: string[];
   startedAt: number;
-  type: "ENCRYPTED_THINKING" | "TEXT" | "THINKING";
+  // an open block is never IMAGE_GEN — the image block is pushed closed
+  type: Exclude<$Enums.MessageBlockType, "IMAGE_GEN">;
+  inlineImageData?: BlockImgData;
 }
-
+export type BlockImgData = {
+  width: number;
+  height: number;
+  cdnUrl: string;
+  kind: $Enums.ImageGenOutputKind;
+  seriesId: string;
+  uploadDuration: number;
+  seriesOrdinal: number;
+  mime: string;
+  ext: string;
+  facilitatingModel: string;
+  generatingModel: string;
+  provider: $Enums.Provider;
+  revisedPrompt?: string;
+};
 export interface GrokFinalizedMessageBlock {
   content: string;
   durationMs: number;
@@ -24,6 +46,7 @@ export interface GrokFinalizedMessageBlock {
   ordinal: number;
   previewContent: string;
   type: $Enums.MessageBlockType;
+  inlineImageData?: BlockImgData;
 }
 
 export type ResponsesRole = "user" | "assistant" | "developer" | "system";
@@ -60,6 +83,15 @@ export type XSearchTool = {
       to_date?: string;
     }
   >;
+};
+
+export type ImageGenerationAction = "auto" | "generate" | "edit";
+/**
+ * grok 4.6 and grok 4.7 only
+ */
+export type ImageGenerationTool = {
+  type: "image_generation";
+  action?: ImageGenerationAction;
 };
 
 export type SlatherUserStoreTool = {
@@ -160,8 +192,26 @@ export type ToolUnion =
   | FileSearchTool
   | CodeInterpreterTool
   | SlatherUserStoreTool
+  | ImageGenerationTool
   | MemoryFunctionTool
   | LocalToolFunctionTool;
+
+export type ToolUnionRecord = UTR<ToolUnion, "type">;
+
+export type ToolUnionGrok4_6_Grok4_7 =
+  | WebSearchTool
+  | XSearchTool
+  | FileSearchTool
+  | CodeInterpreterTool
+  | SlatherUserStoreTool
+  | MemoryFunctionTool
+  | LocalToolFunctionTool
+  | ImageGenerationTool;
+
+export type ToolUnionGrok4_6_Grok4_7Record = UTR<
+  ToolUnionGrok4_6_Grok4_7,
+  "type"
+>;
 
 /**
  * Controls which (if any) tool is called by the model
@@ -182,8 +232,7 @@ export type ToolChoiceUnion =
   | "none"
   | "auto"
   | "required"
-  | { function: { name: string }; type: "function" }
-  | null;
+  | { function: { name: string }; type: "function" };
 
 export type ImageContentBlock = {
   type: "input_image";
@@ -213,18 +262,23 @@ export type ContentBlockUnion =
   | FunctionCallOutput
   | FunctionCallContext;
 
-export type InputReasoningProps = {
-  /**
-   * `grok-4.3` accepts `"none" | "low" | "medium" | "high"`
-   *
-   * `grok-4.20-multiagent` accepts `"low" | "medium" | "high" | "xhigh"`
-   */
-  effort: ReasoningEffort | ReasoningEffortGrok4_3 | null;
-  /**
-   * A summary of the model's reasoning process. Possible values are auto, concise and detailed. Only included for compatibility. The model shall always return detailed.
-   */
-  summary: "auto" | "concise" | "detailed" | null;
-};
+export type ContentBlockRecord = UTR<ContentBlockUnion, "type">;
+
+export type InputReasoningProps<T extends GrokModelIdUnion = "grok-4.7"> =
+  T extends Exclude<GrokModelIdUnion, GrokReasoningModel>
+    ? undefined
+    : {
+        /**
+         * grok-4.3 accepts `"none" | "low" | "medium" | "high"`
+         *
+         * grok-4.20-multiagent, grok-4.5, grok-4.6, and grok-4.7: accept `"low" | "medium" | "high" | "xhigh"`
+         */
+        effort?: T extends "grok-4.3"
+          ? ReasoningEffortGrok4_3
+          : T extends "grok-4.5"
+            ? Exclude<ReasoningEffort, "xhigh">
+            : ReasoningEffort;
+      };
 
 export type TextFormat = {
   format: { type: "text" | "json_object" | "json_schema" };
@@ -398,6 +452,9 @@ export type XAIResponsesEvent =
   | xAIResponses.WebSearchCall.InProgress
   | xAIResponses.WebSearchCall.Searching
   | xAIResponses.WebSearchCall.Completed
+  | xAIResponses.ImageGenerationCall.InProgress
+  | xAIResponses.ImageGenerationCall.Generating
+  | xAIResponses.ImageGenerationCall.Completed
   | xAIResponses.FileSearchCall.InProgress
   | xAIResponses.FileSearchCall.Searching
   | xAIResponses.FileSearchCall.Completed
@@ -405,6 +462,8 @@ export type XAIResponsesEvent =
   | xAIResponses.FunctionCallArguments.Done
   | xAIResponses.CustomToolCallInput.Delta
   | xAIResponses.CustomToolCallInput.Done;
+
+export type XAIResponsesRecord = UTR<XAIResponsesEvent, "type">;
 
 export type XAIResponsesEventTypes = XAIResponsesEvent["type"];
 
@@ -446,7 +505,7 @@ export interface HandleToolUsageParams extends ResponsesToolsParams {
   localToolNames?: readonly LocalToolName[];
 }
 
-export interface MultiAgentReasoningEffort {
+export interface ReasoningEffortEntity {
   effort: ReasoningEffort;
 }
 
@@ -475,7 +534,7 @@ export interface ResponsesApiInputWorkupParams {
   x_enable_image_understanding?: boolean;
   x_enable_video_understanding?: boolean;
   parallel_tool_calls?: boolean;
-  reasoning?: MultiAgentReasoningEffort;
+  reasoning?: ReasoningEffortEntity;
   hasUserStoreDocs: boolean;
   localToolNames?: readonly LocalToolName[];
 }
@@ -521,4 +580,25 @@ export type FunctionCallOutput<T = string | object> = {
    * JSON stringified output ready for parsing (data returned by the agentic args submitted)
    */
   output: T;
+};
+
+export type InlinePostImageUploadProps = {
+  specs: ExpandedImgSpecs;
+  s3RTHelper: S3FinalizePayload;
+  userId: string;
+  filename: string;
+  format: string;
+  mime: string;
+  cdnUrl: string;
+  generatingModel: string;
+  facilitatingModel: string;
+  provider: $Enums.Provider;
+  conversationId: string;
+  seriesOrdinal: number;
+  seriesId: string;
+  revisedPrompt: string;
+  kind: $Enums.ImageGenOutputKind;
+  uploadDuration: number;
+  s3LastModified: Date;
+  size: number;
 };

@@ -4,11 +4,11 @@ import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { MetaRouteRequestEntity } from "@/meta/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
-import { MetaChatService } from "@/meta/chat.ts";
+import { MetaResponsesImageService } from "@/meta/responses-image.ts";
 import type { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import type { S3Storage } from "@slipstream/storage-s3";
 
-export class MetaService extends MetaChatService {
+export class MetaService extends MetaResponsesImageService {
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
@@ -36,6 +36,10 @@ export class MetaService extends MetaChatService {
     ...rest
   }: MetaRouteRequestEntity) {
     if (!model || !this.prisma.isMetaModel(model)) return;
+    // a pure image model: routed on the model alone, like OpenAI's gpt-image-*
+    if (this.prisma.isMetaImgModel(model)) {
+      return await this.handleMetaResponsesImageRequest({ model, ...rest });
+    }
     return await this.handleMetaResponsesApiRequest({ model, ...rest });
   }
 }

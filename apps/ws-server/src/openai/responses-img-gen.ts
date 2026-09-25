@@ -140,7 +140,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     const mod =
       model && this.prisma.isOpenAIImgGenFacilitating(model)
         ? model
-        : "gpt-5.6-sol";
+        : "gpt-6-sol";
 
     const provider = "openai" as const;
 
@@ -461,7 +461,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
 
             const ext = partialImgAgg[5] as ExpandedImgSpecs["format"] | "jpg";
 
-            const mimeType = this.handleImgExtension(ext);
+            const mimeType = this.prisma.handleImgExtension(ext);
 
             const filename = itemId
               .concat("-")

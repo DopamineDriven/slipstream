@@ -1,21 +1,13 @@
 import type { LoggerService } from "@/logger/index.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
 import type { PrismaService } from "@/prisma/index.ts";
-import type {
-  SakanaAttachmentRef,
-  SakanaFreshAssetSelection,
-  SakanaUserLocation
-} from "@/sakana/types.ts";
+import type { SakanaUserLocation } from "@/sakana/types.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { OpenAI } from "openai";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import { SakanaStoreService } from "@/sakana/store.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type {
-  AttachmentSingleton,
-  LocalToolName,
-  MessageSingleton
-} from "@slipstream/types";
+import type { LocalToolName, MessageSingleton } from "@slipstream/types";
 import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
 
 export class SakanaWorkupService extends SakanaStoreService {
@@ -47,7 +39,10 @@ export class SakanaWorkupService extends SakanaStoreService {
   }
 
   protected messageText(
-    msg: Pick<MessageSingleton<true>, "content" | "messageBlocks">
+    msg: Pick<
+      MessageSingleton<true>,
+      "content" | "messageBlocks" | "provider" | "model"
+    >
   ) {
     const textBlocks = Array.of<string>();
 
@@ -55,6 +50,16 @@ export class SakanaWorkupService extends SakanaStoreService {
       for (const block of msg.messageBlocks) {
         if (block.type === "TEXT") {
           textBlocks.push(block.content);
+        }
+        if (
+          block.type === "IMAGE_GEN" &&
+          block.cdnUrl &&
+          block.width &&
+          block.height
+        ) {
+          textBlocks.push(
+            `![[${msg.provider}/${msg.model}]-${block.width}x${block.height}](${block.cdnUrl})\n\n${block.content}`
+          );
         }
       }
     }
@@ -66,84 +71,39 @@ export class SakanaWorkupService extends SakanaStoreService {
     return msg.content;
   }
 
-  private sakanaAttachmentRef(attachment: AttachmentSingleton<true>) {
-    const activeCompat = attachment.compatStatus === "ACTIVE";
-    const url =
-      activeCompat && attachment.compatCdnUrl
-        ? attachment.compatCdnUrl
-        : (attachment.cdnUrl ?? attachment.sourceUrl);
-    const mime =
-      activeCompat && attachment.compatMime
-        ? attachment.compatMime
-        : (attachment.mime ?? attachment.compatMime);
-
-    if (!url || !mime) {
-      return;
+  protected async formatSakanaInput(msgs: MessageSingleton<true>[]) {
+    if (msgs.length === 0) {
+      return [{ role: "user", content: "" }] as const satisfies ResponseInput;
     }
 
-    return {
-      attachment,
-      filename: attachment.filename ?? "attachment",
-      mime,
-      url
-    } satisfies SakanaAttachmentRef;
-  }
-
-  private isSakanaDocument(ref: SakanaAttachmentRef) {
-    return (
-      ref.attachment.assetType === "DOCUMENT" && ref.mime === "application/pdf"
+    // HMEM substitution assembly (Part II §2) — msgs arrive ordinal-sorted
+    // from resolver/chat.ts
+    const memoryView = await this.memoryService.getHistoryAssemblyView(
+      msgs[0]?.conversationId,
+      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
     );
-  }
+    const input = Array.of<OpenAI.Responses.ResponseInputItem>();
 
-  private isSakanaImage(ref: SakanaAttachmentRef) {
-    return (
-      ref.attachment.assetType === "IMAGE" &&
-      (ref.mime === "image/jpeg" ||
-        ref.mime === "image/png" ||
-        ref.mime === "image/webp")
-    );
-  }
-
-  private markdownLabel(filename: string) {
-    return filename.replaceAll("[", "\\[").replaceAll("]", "\\]");
-  }
-
-  private attachmentMarkdown(ref: SakanaAttachmentRef) {
-    const label = this.markdownLabel(ref.filename);
-    if (ref.attachment.assetType === "IMAGE") {
-      return `![${label}](${ref.url})`;
-    }
-
-    return `[${label}](${ref.url})`;
-  }
-
-  private attachmentOccurrenceKey(
-    msg: MessageSingleton<true>,
-    attachment: AttachmentSingleton<true>
-  ) {
-    return `${msg.id}:${attachment.id}`;
-  }
-
-  private selectFreshAssets(
-    msgs: MessageSingleton<true>[]
-  ): SakanaFreshAssetSelection {
+    // fresh assets: user attachments that arrived after the last Sakana turn
+    // and were never seen up to it, newest first, at most one pdf as
+    // input_file and three images as input_image. Everything else rides as
+    // a markdown link inside the text. Keyed per occurrence (`msgId:attId`)
+    // so the same attachment on an older message stays a link.
     const lastSakanaIndex = msgs.findLastIndex(
-      msg => msg.provider === "SAKANA" && msg.senderType === "AI"
+      m => m.provider === "SAKANA" && m.senderType === "AI"
     );
     const previouslySeenAttachmentIds = new Set<string>();
-
-    if (lastSakanaIndex !== -1) {
-      for (const msg of msgs.slice(0, lastSakanaIndex + 1)) {
-        for (const attachment of msg.attachments) {
-          previouslySeenAttachmentIds.add(attachment.id);
-        }
+    for (const [msgIndex, msg] of msgs.entries()) {
+      if (msgIndex > lastSakanaIndex) break;
+      for (const att of msg.attachments) {
+        previouslySeenAttachmentIds.add(att.id);
       }
     }
 
-    const inlineAttachmentKeys = new Set<string>();
+    const inlineKeys = new Set<string>();
     const selectedAttachmentIds = new Set<string>();
-    let documentCount = 0;
-    let imageCount = 0;
+    let documentCount = 0,
+      imageCount = 0;
 
     for (
       let msgIndex = msgs.length - 1;
@@ -151,137 +111,46 @@ export class SakanaWorkupService extends SakanaStoreService {
       msgIndex--
     ) {
       const msg = msgs[msgIndex];
-      if (!msg?.senderType || msg.senderType !== "USER") continue;
+      if (msg?.senderType !== "USER") continue;
 
-      for (
-        let attachmentIndex = msg.attachments.length - 1;
-        attachmentIndex >= 0;
-        attachmentIndex--
-      ) {
-        const attachment = msg.attachments[attachmentIndex];
-        if (!attachment) continue;
-        if (previouslySeenAttachmentIds.has(attachment.id)) continue;
-        if (selectedAttachmentIds.has(attachment.id)) continue;
+      for (let attIndex = msg.attachments.length - 1; attIndex >= 0; attIndex--) {
+        const att = msg.attachments[attIndex];
+        if (!att) continue;
+        if (previouslySeenAttachmentIds.has(att.id)) continue;
+        if (selectedAttachmentIds.has(att.id)) continue;
 
-        const ref = this.sakanaAttachmentRef(attachment);
-        if (!ref) continue;
+        const url =
+          att.compatStatus === "ACTIVE" && att.compatCdnUrl
+            ? att.compatCdnUrl
+            : (att.cdnUrl ?? att.sourceUrl);
+        const mime =
+          att.compatStatus === "ACTIVE" && att.compatMime
+            ? att.compatMime
+            : (att.mime ?? att.compatMime);
+        if (!url || !mime) continue;
 
-        if (this.isSakanaDocument(ref) && documentCount < 1) {
-          inlineAttachmentKeys.add(
-            this.attachmentOccurrenceKey(msg, attachment)
-          );
-          selectedAttachmentIds.add(attachment.id);
+        const isPdf =
+          att.assetType === "DOCUMENT" && mime === "application/pdf";
+        const isImage =
+          att.assetType === "IMAGE" &&
+          (mime === "image/jpeg" ||
+            mime === "image/png" ||
+            mime === "image/webp");
+
+        if (isPdf && documentCount < 1) {
+          inlineKeys.add(`${msg.id}:${att.id}`);
+          selectedAttachmentIds.add(att.id);
           documentCount += 1;
-        } else if (this.isSakanaImage(ref) && imageCount < 3) {
-          inlineAttachmentKeys.add(
-            this.attachmentOccurrenceKey(msg, attachment)
-          );
-          selectedAttachmentIds.add(attachment.id);
+        } else if (isImage && imageCount < 3) {
+          inlineKeys.add(`${msg.id}:${att.id}`);
+          selectedAttachmentIds.add(att.id);
           imageCount += 1;
         }
 
-        if (documentCount === 1 && imageCount === 3) {
-          return { inlineAttachmentKeys } satisfies SakanaFreshAssetSelection;
-        }
+        if (documentCount === 1 && imageCount === 3) break;
       }
+      if (documentCount === 1 && imageCount === 3) break;
     }
-
-    return { inlineAttachmentKeys } satisfies SakanaFreshAssetSelection;
-  }
-
-  private shouldInlineAttachment(
-    msg: MessageSingleton<true>,
-    attachment: AttachmentSingleton<true>,
-    selection: SakanaFreshAssetSelection
-  ) {
-    return selection.inlineAttachmentKeys.has(
-      this.attachmentOccurrenceKey(msg, attachment)
-    );
-  }
-
-  private formatAssistantMessage(msg: MessageSingleton<true>) {
-    const textParts = Array.of<string>();
-    const text = this.messageText(msg);
-    const provider = msg.provider.toLowerCase();
-    const model = msg.model ?? "unknown";
-
-    textParts.push(`[${provider}/${model}]\n${text}`);
-
-    for (const attachment of msg.attachments) {
-      const ref = this.sakanaAttachmentRef(attachment);
-      if (!ref) continue;
-      textParts.push(this.attachmentMarkdown(ref));
-    }
-
-    return {
-      role: "assistant",
-      content: textParts.join("\n\n")
-    } as const satisfies OpenAI.Responses.EasyInputMessage;
-  }
-
-  private formatUserMessage(
-    msg: MessageSingleton<true>,
-    selection: SakanaFreshAssetSelection
-  ) {
-    const content = Array.of<OpenAI.Responses.ResponseInputContent>();
-    const textParts = Array.of<string>();
-
-    for (const attachment of msg.attachments) {
-      const ref = this.sakanaAttachmentRef(attachment);
-      if (!ref) continue;
-
-      if (this.shouldInlineAttachment(msg, attachment, selection)) {
-        if (this.isSakanaDocument(ref)) {
-          content.push({
-            type: "input_file",
-            file_url: ref.url,
-            filename: ref.filename,
-            detail: "high"
-          } satisfies OpenAI.Responses.ResponseInputFile);
-          continue;
-        }
-
-        if (this.isSakanaImage(ref)) {
-          content.push({
-            type: "input_image",
-            image_url: ref.url,
-            detail: "high"
-          } satisfies OpenAI.Responses.ResponseInputImage);
-          continue;
-        }
-      }
-
-      textParts.push(this.attachmentMarkdown(ref));
-    }
-
-    const text = this.messageText(msg);
-    if (text.length > 0) {
-      textParts.push(text);
-    }
-
-    content.push({
-      type: "input_text",
-      text: textParts.join("\n\n")
-    } satisfies OpenAI.Responses.ResponseInputText);
-
-    return {
-      role: "user",
-      content
-    } satisfies OpenAI.Responses.EasyInputMessage;
-  }
-
-  protected async formatSakanaInput(msgs: MessageSingleton<true>[]) {
-    if (msgs.length === 0) {
-      return [{ role: "user", content: "" }] as const satisfies ResponseInput;
-    }
-
-    // HMEM substitution assembly (Part II §2)
-    const memoryView = await this.memoryService.getHistoryAssemblyView(
-      msgs[0]?.conversationId,
-      msgs.reduce((max, m) => (m.ordinal >= max ? m.ordinal + 1 : max), 0)
-    );
-    const selection = this.selectFreshAssets(msgs);
-    const input = Array.of<OpenAI.Responses.ResponseInputItem>();
 
     for (const msg of msgs) {
       const claim = memoryView?.claim(msg.ordinal);
@@ -294,10 +163,104 @@ export class SakanaWorkupService extends SakanaStoreService {
         }
         continue;
       }
+
       if (msg.senderType === "USER") {
-        input.push(this.formatUserMessage(msg, selection));
+        const content = Array.of<OpenAI.Responses.ResponseInputContent>();
+        const textParts = Array.of<string>();
+
+        for (const att of msg.attachments) {
+          if (att.messageBlock) continue;
+          const url =
+            att.compatStatus === "ACTIVE" && att.compatCdnUrl
+              ? att.compatCdnUrl
+              : (att.cdnUrl ?? att.sourceUrl);
+          const mime =
+            att.compatStatus === "ACTIVE" && att.compatMime
+              ? att.compatMime
+              : (att.mime ?? att.compatMime);
+          if (!url || !mime) continue;
+
+          const filename = att.filename ?? "attachment";
+          const label = filename.replaceAll("[", "\\[").replaceAll("]", "\\]");
+
+          if (inlineKeys.has(`${msg.id}:${att.id}`)) {
+            if (att.assetType === "DOCUMENT" && mime === "application/pdf") {
+              content.push({
+                type: "input_file",
+                file_url: url,
+                filename,
+                detail: "high"
+              } satisfies OpenAI.Responses.ResponseInputFile);
+              continue;
+            }
+            if (
+              att.assetType === "IMAGE" &&
+              (mime === "image/jpeg" ||
+                mime === "image/png" ||
+                mime === "image/webp")
+            ) {
+              content.push({
+                type: "input_image",
+                image_url: url,
+                detail: "high"
+              } satisfies OpenAI.Responses.ResponseInputImage);
+              continue;
+            }
+          }
+
+          textParts.push(
+            att.assetType === "IMAGE"
+              ? `![${label}](${url})`
+              : `[${label}](${url})`
+          );
+        }
+
+        const text = this.messageText(msg);
+        if (text.length > 0) {
+          textParts.push(text);
+        }
+
+        content.push({
+          type: "input_text",
+          text: textParts.join("\n\n")
+        } satisfies OpenAI.Responses.ResponseInputText);
+
+        input.push({
+          role: "user",
+          content
+        } satisfies OpenAI.Responses.EasyInputMessage);
       } else {
-        input.push(this.formatAssistantMessage(msg));
+        const textParts = Array.of<string>();
+        const modelIdentifier = `[${msg.provider.toLowerCase()}/${msg.model ?? "unknown"}]`;
+
+        textParts.push(`${modelIdentifier}\n${this.messageText(msg)}`);
+
+        for (const att of msg.attachments) {
+          // owned by an IMAGE_GEN block — messageText places it at its ordinal
+          if (att.messageBlock) continue;
+          const url =
+            att.compatStatus === "ACTIVE" && att.compatCdnUrl
+              ? att.compatCdnUrl
+              : (att.cdnUrl ?? att.sourceUrl);
+          const mime =
+            att.compatStatus === "ACTIVE" && att.compatMime
+              ? att.compatMime
+              : (att.mime ?? att.compatMime);
+          if (!url || !mime) continue;
+
+          const filename = att.filename ?? "attachment";
+          const label = filename.replaceAll("[", "\\[").replaceAll("]", "\\]");
+          textParts.push(
+            att.assetType === "IMAGE"
+              ? `![${label}](${url})`
+              : `[${label}](${url})`
+          );
+        }
+
+        input.push({
+          role: "assistant",
+          content: textParts.join("\n\n")
+        } as const satisfies OpenAI.Responses.EasyInputMessage);
       }
     }
 

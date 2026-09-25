@@ -30,10 +30,11 @@ export type ImageGenModels =
   | "gemini-2.5-flash-image"
   | "gemini-3-pro-image-preview"
   | "gemini-3.1-flash-image-preview"
-  | "gemini-3.1-flash-lite-image";
+  | "gemini-3.1-flash-lite-image"
+  | "muse-image-1.0";
 
 export type PureImageGenModelsByProvider<
-  P extends "gpt" | "gemini" | "grok",
+  P extends "gpt" | "gemini" | "grok" | "meta",
   T = string
 > = P extends "gpt"
   ? T extends `${P}-${infer U}`
@@ -47,7 +48,11 @@ export type PureImageGenModelsByProvider<
       ? T extends `${P}-${infer U}`
         ? `${P}-${U}`
         : never
-      : never;
+      : P extends "meta"
+        ? T extends `${P}-${infer U}`
+          ? `${P}-${U}`
+          : never
+        : never;
 
 export type OpenAIPureImageGenModels = PureImageGenModelsByProvider<
   "gpt",
@@ -62,6 +67,12 @@ export type GrokPureImageGenModels = PureImageGenModelsByProvider<
   "grok",
   ImageGenModels
 >;
+
+export type MetaPureImageGenModels = PureImageGenModelsByProvider<
+  "meta",
+  ImageGenModels
+>;
+
 export const providerModelImageGenApi = {
   openai: [
     "gpt-image-2.5-sunburst",
@@ -83,13 +94,15 @@ export const providerModelImageGenApi = {
     "grok-imagine-image-2.0",
     "grok-imagine-image-quality",
     "grok-imagine-image"
-  ]
+  ],
+  meta: ["muse-image-1.0"]
 } as const;
 
 export const allImgSupportingProviderModels = {
   openai: modelIdsByProviderImgGen.openai,
   gemini: modelIdsByProviderImgGen.gemini,
-  grok: modelIdsByProviderImgGen.grok
+  grok: modelIdsByProviderImgGen.grok,
+  meta: modelIdsByProviderImgGen.meta
 } as const;
 
 export function isProvider(s: string) {
@@ -113,6 +126,8 @@ export function isProvider(s: string) {
 
 export const providerModelImageGenFacilitatingApi = {
   openai: [
+    "gpt-6-sol",
+    "gpt-6-luna",
     "gpt-6-astra",
     "gpt-5.6-sol",
     "gpt-5.6-terra",
@@ -144,17 +159,20 @@ export const providerModelImageGenFacilitatingApi = {
     "gemini-3-pro-image-preview",
     "deep-research-max-preview-04-2026",
     "deep-research-preview-04-2026"
-  ]
+  ],
+  grok: ["grok-4.7", "grok-4.6"]
 } as const;
 
 export const imageModelSets = {
   gemini: new Set(providerModelImageGenApi.gemini),
   grok: new Set(providerModelImageGenApi.grok),
-  openai: new Set(providerModelImageGenApi.openai)
+  openai: new Set(providerModelImageGenApi.openai),
+  meta: new Set(providerModelImageGenApi.meta)
 } as const;
 
 export const imageModelFacilitatorSets = {
   gemini: new Set(providerModelImageGenFacilitatingApi.gemini),
+  grok: new Set(providerModelImageGenFacilitatingApi.grok),
   openai: new Set(providerModelImageGenFacilitatingApi.openai)
 } as const;
 
@@ -162,8 +180,12 @@ export type AllImgGenProviderModels<
   T extends keyof typeof allImgSupportingProviderModels
 > = Unenumerate<(typeof allImgSupportingProviderModels)[T]>;
 
-export const imageGenProviders = ["grok", "gemini", "openai"] as const;
-export const imageGenFacilitatingProviders = ["gemini", "openai"] as const;
+export const imageGenProviders = ["grok", "gemini", "meta", "openai"] as const;
+export const imageGenFacilitatingProviders = [
+  "gemini",
+  "grok",
+  "openai"
+] as const;
 export type ImageGenProviders = keyof typeof providerModelImageGenApi;
 export type ImageGenFacilitatingProviders =
   keyof typeof providerModelImageGenFacilitatingApi;
@@ -195,11 +217,15 @@ export type ImgGenFacilitatingModelMap = {
 
 export type OpenAIImgGenModels = ImgGenModelMap["openai"];
 
+export type MetaImgGenModels = ImgGenModelMap["meta"];
+
 export type OpenAIImgGenFacilitatingModels =
   ImgGenFacilitatingModelMap["openai"];
 
 export type GeminiImgGenFacilitatingModels =
   ImgGenFacilitatingModelMap["gemini"];
+
+export type GrokImgGenFacilitatingModels = ImgGenFacilitatingModelMap["grok"];
 
 export type GeminiImgGenModels = ImgGenModelMap["gemini"];
 
@@ -216,7 +242,9 @@ export type GetImgModelUtilRT<T = ImageGenProviders> = T extends "openai"
     ? GeminiImgGenModels
     : T extends "grok"
       ? GrokImgGenModels
-      : never;
+      : T extends "meta"
+        ? MetaImgGenModels
+        : never;
 
 export type GetImgGenFacilitatingModelUtilRT<
   T = ImageGenFacilitatingProviders
@@ -224,7 +252,9 @@ export type GetImgGenFacilitatingModelUtilRT<
   ? OpenAIImgGenFacilitatingModels
   : T extends "gemini"
     ? GeminiImgGenFacilitatingModels
-    : never;
+    : T extends "grok"
+      ? GrokImgGenFacilitatingModels
+      : never;
 
 export type GetAllImgGenModelUtilRt<T = ImageGenProviders> = T extends "grok"
   ? GetImgModelUtilRT<"grok">
@@ -232,7 +262,9 @@ export type GetAllImgGenModelUtilRt<T = ImageGenProviders> = T extends "grok"
     ? GetImgModelUtilRT<"gemini">
     : T extends "openai"
       ? GetImgModelUtilRT<"openai">
-      : never;
+      : T extends "meta"
+        ? GetImgModelUtilRT<"meta">
+        : never;
 
 export type VideoGenProviders = keyof typeof modelIdsByProviderVideoGen;
 
@@ -643,8 +675,8 @@ export const getDisplayNameByModelId = <
 export const defaultModelDisplayNameByProvider = {
   openai: "GPT-5.6 Sol" satisfies OpenAiDisplayNameUnion,
   gemini: "Gemini 3.1 Pro Preview" satisfies GeminiDisplayNameUnion,
-  grok: "Grok 4.6" satisfies GrokDisplayNameUnion,
-  anthropic: "Claude Opus 5" satisfies AnthropicDisplayNameUnion,
+  grok: "Grok 4.7" satisfies GrokDisplayNameUnion,
+  anthropic: "Claude Opus 4.6" satisfies AnthropicDisplayNameUnion,
   meta: "Muse Spark 1.3" satisfies MetaDisplayNameUnion,
   vercel: "v0 medium" satisfies VercelDisplayNameUnion,
   mistral: "Mistral Small 4" satisfies MistralDisplayNameUnion,
@@ -660,8 +692,8 @@ export const defaultModelDisplayNameByProvider = {
 export const defaultModelIdByProvider = {
   openai: "gpt-5.6-sol" satisfies OpenAiModelIdUnion,
   gemini: "gemini-3.1-pro-preview" satisfies GeminiModelIdUnion,
-  grok: "grok-4.6" satisfies GrokModelIdUnion,
-  anthropic: "claude-opus-5" satisfies AnthropicModelIdUnion,
+  grok: "grok-4.7" satisfies GrokModelIdUnion,
+  anthropic: "claude-opus-4-6" satisfies AnthropicModelIdUnion,
   meta: "muse-spark-1.3" satisfies MetaModelIdUnion,
   vercel: "v0-1.5-md" satisfies VercelModelIdUnion,
   mistral: "mistral-small-latest" satisfies MistralModelIdUnion,
@@ -737,6 +769,11 @@ export type GeminiDisplayNameUnionImgGen =
  */
 export type GrokDisplayNameUnionImgGen =
   ModelDisplayNameToModelIdImgGen<"grok">;
+/**
+ * valid image gen meta model display names
+ */
+export type MetaDisplayNameUnionImgGen =
+  ModelDisplayNameToModelIdImgGen<"meta">;
 
 /**
  * valid sakana model display names
@@ -801,6 +838,12 @@ export type MistralDisplayNameUnion = ModelDisplayNameToModelId<"mistral">;
  * valid grok img models to call
  */
 export type GrokModelIdUnionImgGen = ModelIdToModelDisplayNameImgGen<"grok">;
+
+/**
+ * valid meta img models to call
+ */
+export type MetaModelIdUnionImgGen = ModelIdToModelDisplayNameImgGen<"meta">;
+
 /**
  * valid openai img models to call
  */
@@ -856,8 +899,13 @@ export type CohereModelIdUnion = ModelIdToModelDisplayName<"cohere">;
 export type GrokModelIdUnion = ModelIdToModelDisplayName<"grok">;
 /**
  * valid openai models to call
+ * @deprecated
  */
 export type OpenAiModelIdUnion = ModelIdToModelDisplayName<"openai">;
+/**
+ * valid openai models to call
+ */
+export type OpenAIModelIdUnion = ModelIdToModelDisplayName<"openai">;
 /**
  * valid gemini models to call
  */
@@ -937,9 +985,9 @@ export type GetModelsForProviderRTImgGen<T extends Provider> =
       ? GrokModelIdUnionImgGen
       : T extends "openai"
         ? OpenAiModelIdUnionImgGen
-        : T extends "anthropic"
-          ? undefined
-          : T extends "meta"
+        : T extends "meta"
+          ? MetaModelIdUnionImgGen
+          : T extends "anthropic"
             ? undefined
             : T extends "vercel"
               ? undefined
@@ -1028,9 +1076,9 @@ export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
       ? GrokDisplayNameUnionImgGen
       : T extends "openai"
         ? OpenAiDisplayNameUnionImgGen
-        : T extends "anthropic"
-          ? undefined
-          : T extends "meta"
+        : T extends "meta"
+          ? MetaDisplayNameUnionImgGen
+          : T extends "anthropic"
             ? undefined
             : T extends "vercel"
               ? undefined
@@ -1059,7 +1107,7 @@ export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
     : T extends "grok"
       ? GrokModelIdUnion
       : T extends "openai"
-        ? OpenAiModelIdUnion
+        ? OpenAIModelIdUnion
         : T extends "vercel"
           ? VercelModelIdUnion
           : T extends "meta"
@@ -1155,7 +1203,12 @@ export function getModelsForProvider<const T extends Provider>(provider: T) {
 export function getModelsForProviderImgGen<const T extends Provider>(
   provider: T
 ) {
-  if (!(provider === "gemini" || provider === "openai" || provider === "grok"))
+  if (!(
+    provider === "gemini" ||
+    provider === "openai" ||
+    provider === "grok" ||
+    provider === "meta"
+  ))
     return undefined;
   const p = provider satisfies ImageGenProviders;
   return Object.entries(displayNameToModelIdImgGen[p])
@@ -1214,7 +1267,12 @@ export function getDisplayNamesForProviderAudioGen<const T extends Provider>(
 export function getDisplayNamesForProviderImgGen<
   const V extends Provider = Provider
 >(provider: V) {
-  if (!(provider === "gemini" || provider === "openai" || provider === "grok"))
+  if (!(
+    provider === "gemini" ||
+    provider === "openai" ||
+    provider === "grok" ||
+    provider === "meta"
+  ))
     return undefined;
   const p = provider as ImageGenProviders;
   return Object.entries(modelIdToDisplayNameImgGen[p])
@@ -1313,7 +1371,7 @@ export const docMimeSupportByProvider = {
 } as const;
 
 export const audioMimeSupportByProvider = {
-  meta: [],
+  meta: ["audio/wav", "audio/mpeg"],
   grok: [],
   openai: [],
   vercel: [],
@@ -1340,7 +1398,7 @@ export const audioMimeSupportByProvider = {
 } as const;
 
 export const videoMimeSupportByProvider = {
-  meta: [],
+  meta: ["video/mp4"],
   grok: [],
   mistral: [],
   cohere: [],

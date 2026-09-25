@@ -10,6 +10,14 @@ import type {
   S3StorageClass
 } from "@slipstream/types";
 
+export type GrokReasoningSharedOpts =
+  "grok-4.5" | "grok-4.6" | "grok-4.7" | "grok-4.20-multi-agent-0309";
+
+export type GrokReasoningNonSharedOpts = "grok-4.3";
+
+export type GrokReasoningModel =
+  GrokReasoningSharedOpts | GrokReasoningNonSharedOpts;
+
 export type MaybePromise<T> = T | Promise<T>;
 
 export type XAIReturnedDocMetadata = {

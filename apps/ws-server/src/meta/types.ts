@@ -1,10 +1,15 @@
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
-import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { AttachmentSingleton, MetaModelIdUnion, UTR } from "@slipstream/types";
 import { OpenAI } from "openai";
+import type { $Enums } from "@slipstream/db/node/generated/client";
+import type {
+  AttachmentSingleton,
+  MetaModelIdUnion,
+  ToolEnablementProps,
+  UTR
+} from "@slipstream/types";
 
 export interface MetaReasoningEffort {
-  effort: "none" | "minimal" | "low" | "medium" | "high" | "xhigh";
+  effort: "none" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max"
 }
 
 export interface MetaUserLocation {
@@ -51,6 +56,35 @@ export interface MetaRouteRequestEntity extends ProviderChatRequestEntity {
   user_location?: MetaUserLocation;
 }
 
-export type MetaStreamEvents = UTR<OpenAI.Responses.ResponseStreamEvent, "type">;
+/**
+ * muse-image-1.0's only tool. The SDK's image_generation shape plus what Meta
+ * documents flat on the tool: the planner switches and `reasoning_strength`
+ */
+export type MetaImageGenerationTool = Pick<
+  OpenAI.Responses.Tool.ImageGeneration,
+  "type" | "size" | "output_format" | "moderation"
+> &
+  ToolEnablementProps & {
+    reasoning_strength?: "low" | "high";
+  };
+
+
+
+export interface PersistMetaImageParams {
+  b64: string;
+  /** 0..n-1 across the images one response returned */
+  index: number;
+  userId: string;
+  conversationId: string;
+  /** Meta's `resp_` id */
+  generationGroupId: string;
+  requestMessageId?: string;
+  jobId?: string;
+}
+
+export type MetaStreamEvents = UTR<
+  OpenAI.Responses.ResponseStreamEvent,
+  "type"
+>;
 
 export type MetaStreamEventTypeUnion = keyof MetaStreamEvents;

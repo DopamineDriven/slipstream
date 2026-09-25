@@ -412,6 +412,7 @@ export const ModelName = {
   Dictation: 'Dictation',
   ImageGenJob: 'ImageGenJob',
   ImageGenOutput: 'ImageGenOutput',
+  InlineImageGenOutput: 'InlineImageGenOutput',
   ConversationMemoryStore: 'ConversationMemoryStore',
   ConversationMemoryContext: 'ConversationMemoryContext',
   ConversationMemoryChunk: 'ConversationMemoryChunk',
@@ -446,7 +447,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "audioGenJob" | "audioGenOutput" | "cliConfig" | "cliConversationActivity" | "conversation" | "conversationSettings" | "dictation" | "imageGenJob" | "imageGenOutput" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "messageBlock" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
+    modelProps: "account" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "audioGenJob" | "audioGenOutput" | "cliConfig" | "cliConversationActivity" | "conversation" | "conversationSettings" | "dictation" | "imageGenJob" | "imageGenOutput" | "inlineImageGenOutput" | "conversationMemoryStore" | "conversationMemoryContext" | "conversationMemoryChunk" | "message" | "messageBlock" | "profile" | "attachmentProvider" | "providerStore" | "providerStoreDocument" | "user" | "session" | "tTSJob" | "userKey" | "settings" | "userStore" | "userStoreDoc" | "userStoreDocAnnot" | "userStoreDocChunk" | "verification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1557,6 +1558,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ImageGenOutputCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ImageGenOutputCountAggregateOutputType> | number
+        }
+      }
+    }
+    InlineImageGenOutput: {
+      payload: Prisma.$InlineImageGenOutputPayload<ExtArgs>
+      fields: Prisma.InlineImageGenOutputFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InlineImageGenOutputFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InlineImageGenOutputPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InlineImageGenOutputFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InlineImageGenOutputPayload>
+        }
+        findFirst: {
+          args: Prisma.InlineImageGenOutputFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InlineImageGenOutputPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InlineImageGenOutputFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InlineImageGenOutputPayload>
+        }
+        findMany: {
+          args: Prisma.InlineImageGenOutputFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InlineImageGenOutputPayload>[]
+        }
+        create: {
+          args: Prisma.InlineImageGenOutputCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InlineImageGenOutputPayload>
+        }
+        createMany: {
+          args: Prisma.InlineImageGenOutputCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InlineImageGenOutputCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InlineImageGenOutputPayload>[]
+        }
+        delete: {
+          args: Prisma.InlineImageGenOutputDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InlineImageGenOutputPayload>
+        }
+        update: {
+          args: Prisma.InlineImageGenOutputUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InlineImageGenOutputPayload>
+        }
+        deleteMany: {
+          args: Prisma.InlineImageGenOutputDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InlineImageGenOutputUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InlineImageGenOutputUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InlineImageGenOutputPayload>[]
+        }
+        upsert: {
+          args: Prisma.InlineImageGenOutputUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InlineImageGenOutputPayload>
+        }
+        aggregate: {
+          args: Prisma.InlineImageGenOutputAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInlineImageGenOutput>
+        }
+        groupBy: {
+          args: Prisma.InlineImageGenOutputGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InlineImageGenOutputGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InlineImageGenOutputCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InlineImageGenOutputCountAggregateOutputType> | number
         }
       }
     }
@@ -3089,7 +3164,8 @@ export const AttachmentScalarFieldEnum = {
   s3LastModified: 's3LastModified',
   deletedAt: 'deletedAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  messageBlockId: 'messageBlockId'
 } as const
 
 export type AttachmentScalarFieldEnum = (typeof AttachmentScalarFieldEnum)[keyof typeof AttachmentScalarFieldEnum]
@@ -3385,6 +3461,27 @@ export const ImageGenOutputScalarFieldEnum = {
 export type ImageGenOutputScalarFieldEnum = (typeof ImageGenOutputScalarFieldEnum)[keyof typeof ImageGenOutputScalarFieldEnum]
 
 
+export const InlineImageGenOutputScalarFieldEnum = {
+  id: 'id',
+  kind: 'kind',
+  provider: 'provider',
+  facilitatingModel: 'facilitatingModel',
+  generatingModel: 'generatingModel',
+  seriesId: 'seriesId',
+  seriesOrdinal: 'seriesOrdinal',
+  attachmentId: 'attachmentId',
+  width: 'width',
+  height: 'height',
+  mime: 'mime',
+  ext: 'ext',
+  revisedPrompt: 'revisedPrompt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InlineImageGenOutputScalarFieldEnum = (typeof InlineImageGenOutputScalarFieldEnum)[keyof typeof InlineImageGenOutputScalarFieldEnum]
+
+
 export const ConversationMemoryStoreScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -3520,6 +3617,9 @@ export const MessageBlockScalarFieldEnum = {
   content: 'content',
   type: 'type',
   durationMs: 'durationMs',
+  cdnUrl: 'cdnUrl',
+  width: 'width',
+  height: 'height',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -4654,6 +4754,7 @@ export type GlobalOmitConfig = {
   dictation?: Prisma.DictationOmit
   imageGenJob?: Prisma.ImageGenJobOmit
   imageGenOutput?: Prisma.ImageGenOutputOmit
+  inlineImageGenOutput?: Prisma.InlineImageGenOutputOmit
   conversationMemoryStore?: Prisma.ConversationMemoryStoreOmit
   conversationMemoryContext?: Prisma.ConversationMemoryContextOmit
   conversationMemoryChunk?: Prisma.ConversationMemoryChunkOmit

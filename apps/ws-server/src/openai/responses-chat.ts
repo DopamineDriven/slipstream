@@ -43,6 +43,8 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
 
   private reasoningByModel(m: string) {
     if (
+      m === "gpt-6-sol" ||
+      m === "gpt-6-luna" ||
       m === "gpt-6-astra" ||
       m === "gpt-5.6=sol" ||
       m === "gpt-5.6-terra" ||
@@ -98,7 +100,7 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
       this.prisma.isOpenAIModel(model) &&
       !this.prisma.isOpenAIImgModel(model)
         ? model
-        : "gpt-5.6-sol";
+        : "gpt-6-sol";
 
     const provider = "openai" as const;
 

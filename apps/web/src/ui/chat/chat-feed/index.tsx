@@ -13,6 +13,7 @@ import { motion } from "motion/react";
 import type {
   AIChatResponseAudioGenFields,
   AIChatResponseImgGenFieldsFinal,
+  InlineImageGenAggProps,
   MessageSingleton
 } from "@slipstream/types";
 import { useScrollObserver } from "@slipstream/ui";
@@ -34,6 +35,7 @@ interface ChatFeedProps {
   activeConversationId?: string;
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatResponseImgGenFieldsFinal;
+  inlineImgGenData?: InlineImageGenAggProps[];
   audioGenFields?: AIChatResponseAudioGenFields;
   /** per-turn milestone from AudioGenCtx — lyrics landed, audio still compiling */
   audioGenHasLyrics?: boolean;
@@ -62,6 +64,7 @@ export function ChatFeed({
   imgGenEnabled,
   imgGenFields,
   audioGenFields,
+  inlineImgGenData,
   audioGenHasLyrics,
   imgGenAttachmentId,
   currentAiMsgId,
@@ -206,6 +209,11 @@ export function ChatFeed({
                 key={message.id}
                 message={message}
                 user={user}
+                // streaming bubble only — committed bubbles read message.attachments; an
+                // ungated array would be a fresh reference per token for every memoised row
+                inlineImgGenData={
+                  isStreamingMessage ? inlineImgGenData : undefined
+                }
                 onUpdateMessage={onUpdateMessage}
                 isStreaming={isStreamingMessage}
                 liveThinkingText={isStreamingMessage ? thinkingText : undefined}

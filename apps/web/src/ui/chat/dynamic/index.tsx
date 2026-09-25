@@ -54,7 +54,7 @@ export function ChatInterface({
     isConnected,
     isThinking,
     thinkingText,
-    thinkingDuration,
+    thinkingDuration,inlineImgGenData,
     imgGenEnabled,
     imgGenFields,
     audioGenFields,
@@ -242,7 +242,7 @@ export function ChatInterface({
             isHome={isHome}
             thinkingText={thinkingText}
             thinkingDuration={thinkingDuration ?? undefined}
-            imgGenEnabled={imgGenEnabled}
+            imgGenEnabled={imgGenEnabled}inlineImgGenData={inlineImgGenData}
             imgGenFields={imgGenFields}
             audioGenFields={audioGenFields}
             audioGenHasLyrics={hasLyrics}

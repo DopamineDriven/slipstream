@@ -1,4 +1,5 @@
 import type { ExtractService } from "@/extract/index.ts";
+import type { LoggerService } from "@/logger/index.ts";
 import type { GetConversationHydrationPagesParams } from "@/prisma/types.ts";
 import { PrismaChatResponseService } from "@/prisma/chat-response.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
@@ -6,10 +7,6 @@ import type {
   ConversationSingleton,
   HydrateConversationPage
 } from "@slipstream/types";
-import type { LoggerService } from "@/logger/index.ts";
-const CONVERSATION_PAGE_SIZE = 12;
-const MAX_CONVERSATION_HYDRATE_PAGES = 4;
-const MAX_CONVERSATION_HYDRATE_TAKE = 50;
 
 export class PrismaConvoHydrationService extends PrismaChatResponseService {
   constructor(
@@ -20,13 +17,16 @@ export class PrismaConvoHydrationService extends PrismaChatResponseService {
   ) {
     super(prisma, extractor, logger, isProd);
   }
+  protected CONVERSATION_PAGE_SIZE = 12;
+  protected MAX_CONVERSATION_HYDRATE_PAGES = 4;
+  protected MAX_CONVERSATION_HYDRATE_TAKE = 50;
 
   public async *getConversationHydrationPages({
     userId,
     conversationId,
     lowestLoadedOrdinal,
-    take = CONVERSATION_PAGE_SIZE,
-    maxPages = MAX_CONVERSATION_HYDRATE_PAGES
+    take = this.CONVERSATION_PAGE_SIZE,
+    maxPages = this.MAX_CONVERSATION_HYDRATE_PAGES
   }: GetConversationHydrationPagesParams) {
     if (!Number.isInteger(lowestLoadedOrdinal) || lowestLoadedOrdinal <= 0) {
       return;
@@ -34,14 +34,14 @@ export class PrismaConvoHydrationService extends PrismaChatResponseService {
 
     const requestedTake = Number.isInteger(take)
       ? take
-      : CONVERSATION_PAGE_SIZE;
+      : this.CONVERSATION_PAGE_SIZE;
     const clampedTake = Math.max(
       1,
-      Math.min(requestedTake, MAX_CONVERSATION_HYDRATE_TAKE)
+      Math.min(requestedTake, this.MAX_CONVERSATION_HYDRATE_TAKE)
     );
     const requestedMaxPages = Number.isInteger(maxPages)
       ? maxPages
-      : MAX_CONVERSATION_HYDRATE_PAGES;
+      : this.MAX_CONVERSATION_HYDRATE_PAGES;
     const clampedMaxPages = Math.max(1, requestedMaxPages);
     const seenCursors = new Set<number>();
     let cursor = lowestLoadedOrdinal;
@@ -61,12 +61,14 @@ export class PrismaConvoHydrationService extends PrismaChatResponseService {
               ttsJob: true,
               messageBlocks: { orderBy: { ordinal: "asc" } },
               imageGenJob: true,
+              audioGenJob: true,
               attachments: {
                 orderBy: { createdAt: "asc" },
                 include: {
                   imageGenOutput: true,
                   audioGenOutput: true,
                   image: true,
+                  inlineImageGenOutput: true,
                   document: true,
                   audio: true
                 }
@@ -81,19 +83,29 @@ export class PrismaConvoHydrationService extends PrismaChatResponseService {
       const firstMessage = messages[0];
       const lastMessage = messages.at(-1);
       if (!firstMessage || !lastMessage) break;
+      const s = messages.map(p => {
+        const { attachments, ttsJob, ...rest } = p;
+        const att = attachments.map(v => {
+          return {
+            ...v,
+            size: v.size ? Number(v.size) : null,
+            inlineImageGenOutput: v.inlineImageGenOutput ?? undefined
+          };
+        });
 
-      const ttv = messages.map(t => {
-        const { ttsJob, ...rest } = t;
+        const tts = ttsJob
+          ? {
+              ...ttsJob,
+              sizeBytes: ttsJob?.sizeBytes ? Number(ttsJob.sizeBytes) : null
+            }
+          : undefined;
         return {
-          ttsJob: ttsJob
-            ? {
-                ...ttsJob,
-                sizeBytes: ttsJob?.sizeBytes ? Number(ttsJob.sizeBytes) : null
-              }
-            : undefined,
-          ...rest
+          ...rest,
+          attachments: att,
+          ttsJob: tts
         };
       });
+      const c = { ...rest, messages: s } satisfies ConversationSingleton<true>;
       const firstOrdinal = firstMessage.ordinal;
       const lastOrdinal = lastMessage.ordinal;
       const hasMore = lastOrdinal > 0;
@@ -101,10 +113,7 @@ export class PrismaConvoHydrationService extends PrismaChatResponseService {
         cursor,
         firstOrdinal,
         lastOrdinal,
-        convo: this.bigintToInt({
-          messages: ttv,
-          ...rest
-        }) satisfies ConversationSingleton<true>,
+        convo: c,
         hasMore
       } satisfies HydrateConversationPage;
 

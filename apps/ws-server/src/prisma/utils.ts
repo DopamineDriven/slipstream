@@ -53,42 +53,6 @@ export class PrismaUtilsService extends ModelService {
     return counts?._count.messages ?? 0;
   }
 
-  protected bigintToNumber<
-    const T extends AiChatRequestType = AiChatRequestType
-  >(
-    _target: T,
-    props: BigIntToCompatProps<T>["props"]
-  ): BigIntToCompatProps<T>["rt"] {
-    const { messages, ...rest } = props;
-    const msgArr = messages.map(t => {
-      const { attachments, ...rest } = t;
-
-      const cleanAttachments = attachments.map(att => {
-        const cleanLinks = att?.providerLinks?.map(v => {
-          return {
-            ...v,
-            size: v.size ? Number(v.size) : null
-          };
-        });
-        const size =
-          typeof att.size === "bigint"
-            ? att.size === 0n
-              ? 0
-              : Number(att.size)
-            : null;
-        const cleaned = {
-          ...att,
-          size,
-          providerLinks: cleanLinks ?? undefined
-        };
-
-        return cleaned;
-      });
-      return { attachments: cleanAttachments, ...rest };
-    });
-    return { messages: msgArr, ...rest } as BigIntToCompatProps<T>["rt"];
-  }
-
   protected toCompatPropsExtened<
     const T extends AiChatRequestType = AiChatRequestType
   >(

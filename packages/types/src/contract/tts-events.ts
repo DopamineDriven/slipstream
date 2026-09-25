@@ -78,4 +78,8 @@ export type UserTTSEventUnion =
   | UserTTSResponse
   | UserTTSResponsePreexisting;
 
-export type UserTTSEventRecord<T extends boolean = false>  = UTR<UserTTSEventUnion, "type", T>;
+export type UserTTSEventRecord<T extends boolean = false> = UTR<
+  UserTTSEventUnion,
+  "type",
+  T
+>;

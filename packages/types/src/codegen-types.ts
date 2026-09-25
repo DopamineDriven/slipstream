@@ -83,6 +83,7 @@ export type MultimodalRT = XOR<
         openai: string[];
         gemini: string[];
         grok: string[];
+        meta: string[];
       }
     | {
         openai: {
@@ -92,6 +93,9 @@ export type MultimodalRT = XOR<
           [k: string]: string;
         };
         grok: {
+          [k: string]: string;
+        };
+        meta: {
           [k: string]: string;
         };
       },
@@ -145,3 +149,7 @@ export type MultimodalRT = XOR<
       }
   >
 >;
+
+export type OmniMapperRT = MultimodalRT;
+
+export type ModeUnion = "default" | "img" | "video" | "audio";

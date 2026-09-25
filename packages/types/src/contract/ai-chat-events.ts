@@ -1,22 +1,79 @@
 import type { AIChatResponseAudioGenFields } from "@/contract/audio.ts";
+import type { LocalToolCapabilities } from "@/contract/local-tool-events.ts";
+import type { AIChatEventTypeUnion, UserMetadata } from "@/contract/workup.ts";
 import type {
   AIChatRequestImgGenFields,
   AIChatResponseImgGenFieldsFinal
-} from "@/contract/images.ts";
-import type { LocalToolCapabilities } from "@/contract/local-tool-events.ts";
-import type { AIChatEventTypeUnion, UserMetadata } from "@/contract/workup.ts";
+} from "@/image-gen/index.ts";
 import type { AllModelsUnion, Provider } from "@/models.ts";
-import type { ConversationSingleton } from "@/types.ts";
+import type {
+  AttachmentSingleton,
+  ConversationSingleton,
+  ImageSingleton,
+  InlineImageGenOutputSingleton
+} from "@/types.ts";
 import type { CTR, DX, Rm, UTR } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 
-export type ChatChunkAndResMsgBlock = {
-  type: $Enums.MessageBlockType;
+export type InlineImageGenAggProps = DX<
+  CTR<
+    Rm<
+      AttachmentSingleton<true>,
+      | "id"
+      | "createdAt"
+      | "updatedAt"
+      | "inlineImageGenOutput"
+      | "image"
+      | "imageGenOutput"
+      | "ttsJob"
+      | "userStoreDoc"
+      | "audioGenOutput"
+      | "dictationJobs"
+      | "generationGroupId"
+      | "providerStoreDocs"
+      | "providerLinks"
+      | "messageBlockId"
+      | "messageId"
+      | "messageBlock"
+    >
+  > & {
+    image: Rm<ImageSingleton, "attachmentId" | "createdAt" | "updatedAt">;
+    inlineImageGenOutput: Rm<
+      InlineImageGenOutputSingleton<true>,
+      "id" | "attachmentId" | "createdAt" | "updatedAt" | "attachment"
+    >;
+  }
+>;
+
+export type ChatChunkAndResInlineImageData = {
+  width: number;
+  height: number;
+  cdnUrl: string;
+  kind: $Enums.ImageGenOutputKind;
+};
+
+export type ChatChunkAndResMsgBlock<
+  T extends $Enums.MessageBlockType = $Enums.MessageBlockType
+> = {
+  type: T;
   content: string;
   ordinal: number;
   conversationId: string;
   durationMs: number;
+  inlineImageData?: ChatChunkAndResInlineImageData;
 };
+
+export type ChatChunkAndResBlock<
+  T extends $Enums.MessageBlockType = $Enums.MessageBlockType
+> = T extends "IMAGE_GEN"
+  ? {
+      [
+        Q in keyof ChatChunkAndResMsgBlock<"IMAGE_GEN">
+      ]-?: ChatChunkAndResMsgBlock<"IMAGE_GEN">[Q];
+    }
+  : {
+      [Q in keyof ChatChunkAndResMsgBlock<T>]: ChatChunkAndResMsgBlock<T>[Q];
+    };
 
 export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   type: T;
@@ -41,6 +98,9 @@ export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   imgGenFields?: AIChatResponseImgGenFieldsFinal;
   audioGenEnabled?: boolean;
   audioGenFields?: AIChatResponseAudioGenFields;
+  inlineImgGenData?: T extends "ai_chat_chunk"
+    ? InlineImageGenAggProps
+    : InlineImageGenAggProps[];
 }
 
 export type AIChatRequest = {
@@ -98,6 +158,7 @@ export type AIChatResponseDb = DX<
     responseOutput?: string;
     imgGenFields?: AIChatResponseImgGenFieldsFinal;
     audioGenFields?: AIChatResponseAudioGenFields;
+    inlineImageGenAgg?: InlineImageGenAggProps[];
   }
 >;
 

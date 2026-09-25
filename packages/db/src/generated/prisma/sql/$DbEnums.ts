@@ -33,7 +33,7 @@ export interface $DbEnums {
   MemoryRollingSummaryReasoningVersion: "v1_0"
   MessageType: "AUDIO_GEN" | "COMPUTER_USE" | "IMAGE_GEN" | "DOC_GEN" | "DEEP_RESEARCH" | "TEXT" | "VIDEO_GEN"
   SenderType: "USER" | "AI" | "SYSTEM"
-  MessageBlockType: "ENCRYPTED_THINKING" | "THINKING" | "TEXT"
+  MessageBlockType: "ENCRYPTED_THINKING" | "THINKING" | "TEXT" | "IMAGE_GEN"
   ProviderAssetState: "PENDING" | "ACTIVE" | "EXPIRED" | "FAILED" | "DELETED"
   ProviderDocState: "PENDING" | "PROCESSING" | "ACTIVE" | "FAILED"
   Provider: "ALIBABA" | "ANTHROPIC" | "COHERE" | "DEEPSEEK" | "GEMINI" | "GROK" | "META" | "MINIMAX" | "MISTRAL" | "MOONSHOTAI" | "OPENAI" | "SAKANA" | "VERCEL" | "ZAI"

@@ -20,6 +20,7 @@ export interface AttachmentPreview {
   width?: number;
   height?: number;
   metadata?: ExpandedImgSpecs | ExpandedDocSpecs;
+  messageBlockId?: string;
 }
 
 export interface AttachmentPreviewProps {

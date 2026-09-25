@@ -24,6 +24,7 @@ export class PrismaUserKeyService extends ErrorHelperService {
     );
     return { isSet, isDefault } as ClientContextWorkupProps;
   }
+  
   public handleExistingKeysForClient(props: UserKey[]) {
     const initialProps = {
       isSet: {
@@ -66,10 +67,6 @@ export class PrismaUserKeyService extends ErrorHelperService {
       initialProps.isDefault[provider] += isDefault ? 1 : 0;
     });
     return this.formatProps(initialProps) satisfies ClientContextWorkupProps;
-  }
-
-  public apiKeysCacheTag(userId: string) {
-    return [`user_api_keys_${userId}`] as const;
   }
 
   public async getClientApiKeys(userId: string) {

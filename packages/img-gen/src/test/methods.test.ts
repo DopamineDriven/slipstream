@@ -23,6 +23,13 @@ describe("handleOutputSize", () => {
     }
   );
   it(
+    "should return auto for model muse-image-1.0 with no output size set",
+    {},
+    () => {
+      assert.equal(p.handleOutputSize("muse-image-1.0"), "auto");
+    }
+  );
+  it(
     "should return 19.5:9 for model grok-imagine-image, with 19.5:9 size set",
     {},
     () => {
@@ -86,7 +93,10 @@ describe("handleOutputSize", () => {
 
 describe("handleImgGenOutputQuality", () => {
   it("should return 'auto' for gpt-5.4 provdier with no model set", {}, () => {
-    assert.equal(p.handleImgGenOutputQuality("gpt-image-2", {output_quality: "high"}), "high");
+    assert.equal(
+      p.handleImgGenOutputQuality("gpt-image-2", { output_quality: "high" }),
+      "high"
+    );
   });
   it(
     "should return 2K for gemini-3.1-flash-image-preview when no arg passed in",
@@ -126,12 +136,22 @@ describe("handleImgGenOutputQuality", () => {
     assert.equal(p.handleImgGenOutputQuality("grok-imagine-image"), "1k");
   });
   it(
-    "should return 2k for grok-imagine-image-quality and no args passed in",
+    "should return 1k for grok-imagine-image-quality and no args passed in",
     {},
     () => {
       assert.equal(
         p.handleImgGenOutputQuality("grok-imagine-image-quality"),
-        "2k"
+        "1.5k"
+      );
+    }
+  );
+  it(
+    "should return 1.5k for grok-imagine-image-2.0 and no args passed in",
+    {},
+    () => {
+      assert.equal(
+        p.handleImgGenOutputQuality("grok-imagine-image-2.0"),
+        "1.5k"
       );
     }
   );
@@ -431,16 +451,9 @@ describe("isPureImgGenModel", () => {
   it("should return false for v0-1.5-md", {}, () => {
     assert.equal(p.isPureImgGenModel("v0-1.5-md"), false);
   });
-  it(
-    "should return false for Meta's muse-spark-1.2",
-    {},
-    () => {
-      assert.equal(
-        p.isPureImgGenModel("muse-spark-1.2"),
-        false
-      );
-    }
-  );
+  it("should return false for Meta's muse-spark-1.2", {}, () => {
+    assert.equal(p.isPureImgGenModel("muse-spark-1.2"), false);
+  });
 });
 
 describe("handleImgGenBg", () => {

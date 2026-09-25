@@ -1,6 +1,6 @@
 import type { BaseSVGProps } from "@/icons/index";
 
-export function Download({ role = "button", ...svg }: BaseSVGProps) {
+export function Download({ role = "button",strokeWidth="2", ...svg }: BaseSVGProps) {
   return (
     <svg
       role={role}
@@ -8,7 +8,7 @@ export function Download({ role = "button", ...svg }: BaseSVGProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
       {...svg}>

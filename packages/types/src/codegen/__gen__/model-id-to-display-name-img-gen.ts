@@ -1,5 +1,7 @@
 export const modelIdToDisplayNameImgGen = {
   openai: {
+    "gpt-6-sol": "GPT-6 Sol",
+    "gpt-6-luna": "GPT-6 Luna",
     "gpt-6-astra": "GPT-6 Astra",
     "gpt-5.6-sol": "GPT-5.6 Sol",
     "gpt-5.6-terra": "GPT-5.6 Terra",
@@ -31,17 +33,22 @@ export const modelIdToDisplayNameImgGen = {
     "gpt-image-1-mini": "GPT-Image-1 mini"
   },
   gemini: {
-    "deep-research-max-preview-04-2026":
-      "Deep Research Max Preview (Apr-21-2026)",
-    "deep-research-preview-04-2026": "Deep Research Preview (Apr-21-2026)",
     "gemini-3.1-flash-lite-image": "Nano Banana 2 Lite",
     "gemini-3.1-flash-image-preview": "Nano Banana 2",
     "gemini-3-pro-image-preview": "Nano Banana Pro",
-    "gemini-2.5-flash-image": "Nano Banana"
+    "gemini-2.5-flash-image": "Nano Banana",
+    "deep-research-max-preview-04-2026":
+      "Deep Research Max Preview (Apr-21-2026)",
+    "deep-research-preview-04-2026": "Deep Research Preview (Apr-21-2026)"
   },
   grok: {
+    "grok-4.7": "Grok 4.7",
+    "grok-4.6": "Grok 4.6",
     "grok-imagine-image-2.0": "Grok Imagine Image 2.0",
     "grok-imagine-image": "Grok Imagine Image",
     "grok-imagine-image-quality": "Grok Imagine Image Quality"
+  },
+  meta: {
+    "muse-image-1.0": "Muse Image 1.0"
   }
 } as const;
