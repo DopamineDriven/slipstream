@@ -4,11 +4,18 @@ import type { ProviderAR, Ratio } from "@/lib/image-aspect";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { toCdnUrlConstituents } from "@/lib/helpers";
 import { parseAspect } from "@/lib/image-aspect";
 import { cn } from "@/lib/utils";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import { BaseButton as Button, Download, Eye, shimmer } from "@slipstream/ui";
+import {
+  baseButtonVariants,
+  BaseButton as Button,
+  Download,
+  Eye,
+  shimmer
+} from "@slipstream/ui";
 
 interface InlineImageGenProps {
   isGenerating: boolean;
@@ -198,12 +205,27 @@ export function InlineImageGen({
             displayKind === "FINAL" &&
               "group-hover:opacity-100 focus:opacity-100"
           )}>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="bg-foreground/90 text-background hover:foreground backdrop-blur-sm">
-            <Eye className="size-4" />
-          </Button>
+          {displayKind === "FINAL" && displayAttachmentId ? (
+            <Link
+              href={`/attachment/${displayAttachmentId}`}
+              scroll={false}
+              aria-label="View full size"
+              className={cn(
+                baseButtonVariants({ variant: "ghost", size: "icon" }),
+                "bg-foreground/90 text-background hover:bg-foreground hover:text-background backdrop-blur-sm"
+              )}>
+              <Eye className="size-4" />
+            </Link>
+          ) : (
+            <Button
+              size="icon"
+              variant="ghost"
+              disabled
+              aria-label="View full size"
+              className="bg-foreground/90 text-background hover:foreground backdrop-blur-sm">
+              <Eye className="size-4" />
+            </Button>
+          )}
           <Button
             size="icon"
             variant="ghost"
@@ -218,6 +240,7 @@ export function InlineImageGen({
               const { ext, sId, sOrdinal } =
                 toCdnUrlConstituents(displayImageUrl);
               const filename = `${sId}-${sOrdinal}.${ext}`;
+              link.title=filename
               link.download = filename;
               link.click();
             }}>

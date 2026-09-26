@@ -83,6 +83,51 @@ export class PrismaUserMessageService extends ErrorHelperService {
     });
   }
 
+  public async inlineImageGenSpecsByAttachmentId(
+    attachmentId: string
+    // target: "InlineImageGenOutput" | "ImageGenOutput"
+  ) {
+    const data = await this.prismaClient.attachment.findUnique({
+      where: { id: attachmentId },
+      select: {
+        cdnUrl: true,
+        conversationId: true,
+        inlineImageGenOutput: {
+          select: {
+            width: true,
+            height: true,
+            ext: true,
+            revisedPrompt: true,
+            facilitatingModel: true,
+            generatingModel: true,
+            provider: true
+          }
+        }
+      }
+    });
+    if (!data?.cdnUrl || !data.inlineImageGenOutput || !data.conversationId) {
+      return;
+    }
+    const attr = {
+      facilitatingModel: data.inlineImageGenOutput.facilitatingModel,
+
+      generatingModel: data.inlineImageGenOutput.generatingModel,
+      provider: data.inlineImageGenOutput.provider
+    };
+    const img = {
+      src: data.cdnUrl,
+      width: data.inlineImageGenOutput.width,
+      height: data.inlineImageGenOutput.height,
+      caption: data.inlineImageGenOutput.revisedPrompt ?? undefined,
+      format: data.inlineImageGenOutput.ext,
+      alt: ""
+    };
+    return {
+      img,attr,
+      conversationId: data.conversationId ?? "new-chat"
+    };
+  }
+
   public bigintToInt({
     messages,
     ...rest

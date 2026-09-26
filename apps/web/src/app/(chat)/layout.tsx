@@ -14,9 +14,11 @@ import { TTSProvider } from "@/context/tts-context";
 import { getSession } from "@/utils/auth";
 
 export default async function AuthedLayout({
-  children
+  children,
+  modal
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   const session = await getSession();
   if (!session?.user) redirect("/auth/login");
@@ -33,6 +35,7 @@ export default async function AuthedLayout({
                       <ConversationHydrationProvider userId={session.user.id}>
                         <AIChatProvider userId={session.user.id}>
                           {children}
+                          {modal}
                         </AIChatProvider>
                       </ConversationHydrationProvider>
                     </TTSProvider>
