@@ -155,9 +155,6 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
     // image api doesn't return a resp_id like responses api does:
     const generationGroupId = await this.generateId("generationGroupId");
     const itemId = await this.generateId("itemId");
-    const _hasImages = this.hasImages(formatted);
-
-    const _hasFiles = this.hasFiles(formatted);
 
     const fileIds = this.fileIds(formatted);
 

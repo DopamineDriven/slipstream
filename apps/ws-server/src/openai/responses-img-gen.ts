@@ -118,7 +118,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     conversationId,
     isNewChat,
     msgs,
-    streamChannel,
+    streamChannel,docCounts,
     thinkingChunks,
     userId,
     ws,
@@ -274,7 +274,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
 
     const loc = this.normalizeLocation(user_location);
 
-    const hasFiles = this.hasFiles(formatted);
+    const hasFiles = docCounts > 0;
     const hasExistingOpenAIAssets =
       hasFiles || (await this.prisma.hasProviderMessages(userId, "OPENAI"));
 

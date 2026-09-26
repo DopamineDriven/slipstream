@@ -226,7 +226,7 @@ export function toCdnUrlConstituents(cdnUrl: string) {
     /**
      * "inlineImageGenOutput" uses cuid2 `/^[a-z0-9]{24}$/`
      *
-     * "imageGenOutput" uses nanoid `/^[A-Za-z0-9]{21}$/` | /^ig_[0-9a-z]$/
+     * "imageGenOutput" uses nanoid `/^[A-Za-z0-9]{21}$/` | `/^ig_[0-9a-f]{50}$/`
      */
     type: generatedType,
     sId,

@@ -493,6 +493,22 @@ export interface ImageGenReqDbRes<
   apiKey?: string | null;
 }
 
+export type MessageBoundAssets = {
+  /**
+   * count of assets bound to the current user messsage
+   */
+  jobId?: string;
+  requestMessageId?: string;
+  assetCounts: number;
+  assets?: {
+    type: $Enums.AssetType;
+    compatStatus: $Enums.CompatStatus;
+    url: string;
+    mime: string;
+    ext: string;
+  }[];
+};
+
 export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
   user_location?: {
     type: "approximate";
@@ -501,21 +517,7 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
     country?: string;
     tz?: string;
   };
-  currentMsgBoundAssets?: {
-    /**
-     * count of assets bound to the current user messsage
-     */
-    jobId?: string;
-    requestMessageId?: string;
-    assetCounts: number;
-    assets?: {
-      type: $Enums.AssetType;
-      compatStatus: $Enums.CompatStatus;
-      url: string;
-      mime: string;
-      ext: string;
-    }[];
-  };
+  currentMsgBoundAssets?: MessageBoundAssets;
 }
 
 export type ImageGenPostS3Arr = [

@@ -1,6 +1,7 @@
 import type { LoggerService } from "@/logger/index.ts";
 import type { MemoryAssemblyView } from "@/memory/types.ts";
 import type { ConversationMemoryVectorService } from "@/memory/vector-store.ts";
+import type { OpenAIInputItemUnion } from "@/openai/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
 import type { InferPromiseRT } from "@/types/index.ts";
@@ -46,7 +47,10 @@ export class OpenAIMemoryService extends OpenAIServiceWorkup {
         ? ([
             {
               role: "user",
-              content: [...attContent, { type: "input_text", text: firstText }]
+              content: [
+                ...attContent,
+                { type: "input_text", text: firstText }
+              ] satisfies OpenAIInputItemUnion[]
             }
           ] as const satisfies ResponseInput)
         : ([
@@ -112,15 +116,7 @@ export class OpenAIMemoryService extends OpenAIServiceWorkup {
   }
 
   private prependProviderModelTag(
-    msgs: Pick<
-      MessageSingleton<true>,
-      | "senderType"
-      | "provider"
-      | "model"
-      | "content"
-      | "messageBlocks"
-      | "ordinal"
-    >[],
+    msgs: MessageSingleton<true>[],
     memoryView: MemoryAssemblyView | null
   ) {
     return msgs.flatMap<
@@ -152,34 +148,6 @@ export class OpenAIMemoryService extends OpenAIServiceWorkup {
     }) satisfies ResponseInput;
   }
 
-  protected hasFiles(
-    formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
-  ) {
-    return formatted.some(m => {
-      if (typeof m.content === "string") return false;
-      if (m.role !== "user") return false;
-      return m.content.some(
-        t =>
-          t.type === "input_file" &&
-          (typeof t?.file_id !== "undefined" ||
-            typeof t?.file_data !== "undefined")
-      );
-    });
-  }
-  protected hasImages(
-    formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
-  ) {
-    return formatted.some(m => {
-      if (typeof m.content === "string") return false;
-      if (m.role !== "user") return false;
-      return m.content.some(
-        t =>
-          t.type === "input_image" &&
-          (typeof t?.image_url !== "undefined" ||
-            typeof t?.file_id !== "undefined")
-      );
-    });
-  }
   protected fileIds(
     formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
   ) {
@@ -206,8 +174,14 @@ export class OpenAIMemoryService extends OpenAIServiceWorkup {
     const toolName = toolCall.name;
     try {
       if (toolName === "user_store_search") {
-        const input = this.userStoreVector.parseUserStoreInput(toolCall.arguments, toolName);
-        const output = await this.userStoreVector.executeFileSearch(userId, input);
+        const input = this.userStoreVector.parseUserStoreInput(
+          toolCall.arguments,
+          toolName
+        );
+        const output = await this.userStoreVector.executeFileSearch(
+          userId,
+          input
+        );
         return {
           type: "function_call_output",
           call_id: toolCall.call_id,
