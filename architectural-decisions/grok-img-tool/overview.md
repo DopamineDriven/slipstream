@@ -541,6 +541,77 @@ pull), drops the draft, then flips status — one synchronous method, one
 batched render, and the streaming (`streaming-<id>`) and committed (real id)
 bubbles are different component instances. No hydration flag is needed.
 
+### 9.1 The lightbox — `/attachment/[id]` (live 2026-09-26, `83afe1b`)
+
+The frame's Eye is a `<Link href="/attachment/[id]" scroll={false}>` once the
+block is FINAL **and** the committed attachment id is known — i.e. after
+`ai_chat_response` ingested the row. Until then it is a disabled button.
+
+```
+ soft navigation (Eye click)                         hard load / shared link
+ ────────────────────────────                        ────────────────────────
+ app/(chat)/@modal/(.)attachment/[id]/page.tsx       app/(chat)/attachment/[id]/page.tsx
+   intercepts the route, URL becomes /attachment/…     generateMetadata (title, OG image)
+   <LightboxRoute image> over the conversation         back link → /chat/<conversationId>
+   close = router.back() → history pop
+   (@modal/default.tsx and [...catchAll] render null;
+    the slot sits beside {children} INSIDE AIChatProvider)
+
+ ui/chat/inline-image-gen/lightbox.tsx — native <dialog>, transition-discrete fade
+   Fit:  width = min(<w>px, 100vw − inset, (100dvh − inset) × w/h)   never upscaled, ratio-safe height cap
+   100%: width = <w>px, scroll to pan
+   download = `<seriesId>-<ordinal>.<ext>` (toCdnUrlConstituents) · caption line-clamped · dims · format
+```
+
+**What is temporary.** Both pages call
+`prismaConversationService.inlineImageGenSpecsByAttachmentId(id)` today. For
+the hard-load page that is correct (there is no client state to read). For the
+intercept it is a stopgap Andrew added to see the lane working; it is a DB
+query per open, a second `userId` check, and a dynamic segment that cannot be
+prefetched.
+
+**Where to go from here (v0's read, `notes.md`, agreed).** The intercept
+should read the row from the store, not Prisma:
+
+- *The data is guaranteed to be there.* The bubble only mints the link when
+  `"id" in row`, which only happens for `message.attachments[i]` after
+  `applyResponse`. So "link exists ⇒ row is in `ChatStore.committed`" is a
+  tautology inside a conversation, and the row is self-sufficient: `cdnUrl`,
+  `image.{width,height}`, `inlineImageGenOutput.{revisedPrompt,ext}`. No join,
+  no fetch.
+- *Shape.* The intercept page becomes `export default function Page() { return
+  <AttachmentLightbox /> }` — no `params`, no I/O, an RSC payload identical for
+  every id, so under `cacheComponents` it is a static shell `<Link>` can
+  prefetch and the modal opens with zero network. `AttachmentLightbox` reads
+  `useParams().id`, selects the row, and hands `LightboxRoute` the same
+  `LightboxImage` the Prisma path builds today. This is invariant 6 applied to
+  the lightbox: it reads `convo`, never a wire mirror.
+- *The selector, not the context value.* Subscribe with
+  `useSyncExternalStore(store.subscribeCommitted, () =>
+  store.getCommittedSnapshot()…find(a => a.id === id))` — the committed rows
+  are re-pinned by identity, so the selected row is referentially stable and
+  an open lightbox does **not** re-render per token of the next turn streaming
+  beneath it. The store itself comes off `useAIChatContext().store`; read it in
+  a thin parent and pass it to a memoised child that does the subscribing, so
+  the per-token context churn touches one trivial render, not the dialog.
+- *The miss path.* Soft-navigating to `/attachment/[id]` from a place the
+  conversation is not loaded (settings, a future gallery) selects nothing;
+  `window.location.replace(pathname)` hands off to the full page, which stays
+  on Prisma (scoped `where: { id, userId }`, `include: { image,
+  inlineImageGenOutput, message: { select: { conversationId } } }` for the
+  back link). If `AssetProvider` ever indexes the user's attachments across
+  conversations, check it first and the miss becomes rare.
+- *Pre-commit, optional.* The Eye is dead from FINAL until `ai_chat_response`
+  — usually under a second, longer when a lot of text follows the image. If
+  that ever matters, key the route by the url stem instead,
+  `/attachment/[seriesId]/[ordinal]`: the streaming row already carries
+  `cdnUrl`, `toCdnUrlConstituents` parses it, and `InlineImageGenOutput` is
+  unique on `[seriesId, seriesOrdinal]` so the full page resolves it too. The
+  link would then work the instant the frame lands, on both paths.
+
+After the move, `inlineImageGenSpecsByAttachmentId` has one caller: the
+hard-load page.
+
 ---
 
 ## 10. Invariants, in one place
@@ -585,6 +656,9 @@ bubbles are different component instances. No hydration flag is needed.
 | The seam | `apps/web/src/lib/ui-message-helpers.ts` (`toMessageBlocks`) |
 | Context → feed → bubble | `apps/web/src/context/ai-chat-context.tsx`, `ui/chat/dynamic/index.tsx`, `ui/chat/chat-feed/index.tsx`, `ui/chat/message-bubble/index.tsx` |
 | The frame | `apps/web/src/ui/chat/inline-image-gen/index.tsx` (+ `notes.md`, the figure/figcaption pattern) |
+| Lightbox | `apps/web/src/ui/chat/inline-image-gen/lightbox.tsx` (`Lightbox`, `LightboxImage`), `lightbox-route.tsx` (`LightboxRoute`) |
+| Lightbox routes | `apps/web/src/app/(chat)/@modal/(.)attachment/[id]/page.tsx` (intercept), `@modal/default.tsx` + `[...catchAll]/page.tsx` (null), `app/(chat)/attachment/[id]/page.tsx` (hard load + metadata), `{modal}` slot in `app/(chat)/layout.tsx` |
+| Lightbox row (temporary for the intercept) | `apps/web/src/orm/user-message-service.ts` (`inlineImageGenSpecsByAttachmentId`) |
 | URL anatomy (client) | `apps/web/src/lib/helpers.ts` (`toCdnUrlConstituents`) |
 | Job canvas (untouched) | `apps/web/src/ui/chat/image-gen/index.tsx` (+ `image-generation-canvas.tsx`, `series-stack.tsx` kept for partial replay) |
 | CLI | `packages/cli/src/render.ts` (`renderResponse` reconciles from `convo`) |
@@ -655,8 +729,10 @@ bubbles are different component instances. No hydration flag is needed.
   `GrokFinalizedMessageBlock` (unreachable now that the active type excludes
   `IMAGE_GEN`); `MetaAttachmentRef` / `MetaFreshAssetSelection` /
   `SakanaAttachmentRef` / `SakanaFreshAssetSelection` exports with no readers.
-- **The frame's Eye button** has no handler (inherited from the canvas); a
-  lightbox is a later feature.
+- **The lightbox intercept still queries Prisma.** §9.1: move it to a
+  `useSyncExternalStore` selector over `ChatStore.committed`, keep Prisma for
+  the hard-load page only, hand a miss off to the full page. Optional after
+  that: key the route by url stem so the Eye works pre-commit.
 - **HMEM never sees the image.** Memory indexing reads `msg.content`; whether a
   fold should carry "an image of X was generated here" is a separate decision.
 - **Alt text names the facilitator.** `messageText` writes

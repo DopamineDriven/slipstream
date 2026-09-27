@@ -127,12 +127,7 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
       userId,
       { onlyMostRecentUser: true }
     );
-    const imgOnly = Array.of<{
-      type: "input_image";
-      image_url?: string | undefined;
-      file_id?: string | undefined;
-      detail: "auto" | "low" | "high";
-    }>();
+    const imgOnly = Array.of<OpenAI.Responses.ResponseInputImage>();
 
     const promptOnly = {
       text: ""
@@ -140,7 +135,7 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
     for (const f of formatted) {
       if (f.role === "user") {
         for (const c of f.content) {
-          if (typeof c !== "string") {
+          if (typeof c==="object") {
             if (c.type === "input_image") {
               imgOnly.push(c);
             }

@@ -186,7 +186,9 @@ export class ResolverAssetAttachOrPasteService extends ResolverAssetCompatServic
         assetType: this.wsServer.prisma.handleAssetType(mimeType),
         ext: extension === "md" ? "txt" : extension,
         bucket: presignedData.bucket,
-        cdnUrl: presignedData.publicUrl,
+        // INIT: the object does not exist yet — cdnUrl is written by
+        // s3 finalize on upload_complete, never here
+        publicUrl: presignedData.publicUrl,
         sourceUrl: presignedData.uploadUrl,
         key: presignedData.key,
         size: BigInt(size),
@@ -399,7 +401,9 @@ export class ResolverAssetAttachOrPasteService extends ResolverAssetCompatServic
         ext: extension,
         draftId,
         bucket: presignedData.bucket,
-        cdnUrl: presignedData.publicUrl,
+        // INIT: the object does not exist yet — cdnUrl is written by
+        // s3 finalize on upload_complete, never here
+        publicUrl: presignedData.publicUrl,
         sourceUrl: presignedData.uploadUrl,
         key: presignedData.key,
         size: BigInt(size),

@@ -124,6 +124,12 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
           versionId: t.versionId,
           s3ObjectId: t.s3ObjectId,
           cdnUrl: t.cdnUrl,
+          // every builder (meta, openai, gemini, grok) carries these off the
+          // upload result; the enumeration here was dropping them for the
+          // whole job lane
+          publicUrl: t.publicUrl,
+          sourceUrl: t.sourceUrl,
+          expiresAt: t.expiresAt,
           assetType: "IMAGE",
           storageClass: t.storageClass ?? undefined,
           origin: "GENERATED",
@@ -205,6 +211,9 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
           versionId: a.versionId,
           s3ObjectId: a.s3ObjectId,
           cdnUrl: a.cdnUrl,
+          publicUrl: a.publicUrl,
+          sourceUrl: a.sourceUrl,
+          expiresAt: a.expiresAt,
           assetType: "AUDIO",
           storageClass: a.storageClass ?? undefined,
           origin: "GENERATED",

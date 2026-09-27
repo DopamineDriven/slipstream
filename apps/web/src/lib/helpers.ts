@@ -208,20 +208,153 @@ export function draftIdEpimerize(
   }
 }
 
+
+export function getCdnUrlBase(isProd?: string) {
+  if (!isProd) return "https://assets.aicoalesce.com";
+  else return "https://assets-dev.aicoalesce.com";
+}
+
+export function assetOriginAI(s: string) {
+  return s === "generated";
+}
+
+export function assetOriginUser(s: string) {
+  return s === "pasted" || s === "upload";
+}
+
+export function assetOrigin(s: string) {
+  return assetOriginAI(s) || assetOriginUser(s);
+}
+/**
+ * all images normalized to jpg (or jpeg), webp, or png via post-upload compat pipeline
+ */
+export function isImage(s: string) {
+  return s === "jpg" || s === "jpeg" || s === "webp" || s === "png";
+}
+
+export function userCdnUrlConstituents(cdnUrl: string) {
+  let assetOrigin: "pasted" | "upload";
+  const [base, top] = [
+    cdnUrl.slice(0, cdnUrl.lastIndexOf("/")),
+    cdnUrl.slice(cdnUrl.lastIndexOf("/") + 1)
+  ];
+  // CompatStatus is "ACTIVE"
+  // has the following shape: "https://assets.aicoalesce.com/pasted/converted/att_vz4h0zfw5w3cli5gn2dj91gp.png" (or upload, no userId, but attachmentId)
+  if (top.startsWith("att_")) {
+    const [attachmentId, ext, _convertedLiteral, toType] = [
+      top.slice(4, top.lastIndexOf(".")),
+      top.slice(top.lastIndexOf(".") + 1),
+      base.slice(base.lastIndexOf("/") + 1),
+      base.slice(0, base.lastIndexOf("/"))
+    ];
+    const urlOrigin = toType.slice(toType.lastIndexOf("/") + 1);
+
+    if (assetOriginUser(urlOrigin)) {
+      assetOrigin = urlOrigin;
+    } else {
+      assetOrigin = "upload";
+    }
+
+    if (isImage(ext)) {
+      return {
+        attachmentId,
+        ext,
+        compatStatus: "ACTIVE",
+        assetOrigin,
+        assetType: "IMAGE",
+        filename: `att_${attachmentId}`
+      } as const;
+    } else {
+      // all docs currently normalized to pdf
+      return {
+        attachmentId,
+        ext: "pdf",
+        compatStatus: "ACTIVE",
+        assetOrigin,
+        assetType: "DOCUMENT",
+        filename: `att_${attachmentId}`
+      } as const;
+    }
+  }
+  const [userId, toType, ext, timestampMs, filename] = [
+    base.slice(base.lastIndexOf("/") + 1),
+    base.slice(0, base.lastIndexOf("/")),
+    top.slice(top.lastIndexOf(".") + 1),
+    Number.parseInt(top.slice(0, 13), 10),
+    top.slice(14, top.lastIndexOf("."))
+  ];
+  const urlOrigin = toType.slice(toType.lastIndexOf("/") + 1);
+  if (assetOriginUser(urlOrigin)) {
+    assetOrigin = urlOrigin;
+  } else {
+    assetOrigin = "upload";
+  }
+
+  if (isImage(ext)) {
+    return {
+      userId,
+      timestampMs,
+      filename,
+      compatStatus: "ALIASED",
+      ext,
+      assetType: "IMAGE",
+      assetOrigin
+    } as const;
+  } else {
+    return {
+      userId,
+      timestampMs,
+      filename,
+      compatStatus: "ALIASED",
+      assetType: "DOCUMENT",
+      ext: "pdf",
+      assetOrigin
+    } as const;
+  }
+}
+
 export function toCdnUrlConstituents(cdnUrl: string) {
-  const base = cdnUrl.slice(cdnUrl.lastIndexOf("/") + 1);
-  const [seriesIdDashOrdinal, ext, timestampMs] = [
-    base.slice(14, base.lastIndexOf(".")),
-    base.slice(base.lastIndexOf(".") + 1),
-    base.slice(0, 13)
+  const baseAlpha = cdnUrl.slice(0, cdnUrl.lastIndexOf("/"));
+  const top = cdnUrl.slice(cdnUrl.lastIndexOf("/") + 1);
+
+  const [seriesIdDashOrdinal, ext, timestampMs, userId, baseBeta] = [
+    top.slice(14, top.lastIndexOf(".")),
+    top.slice(top.lastIndexOf(".") + 1),
+    Number.parseInt(top.slice(0, 13), 10),
+    baseAlpha.slice(baseAlpha.lastIndexOf("/") + 1),
+    baseAlpha.slice(0, baseAlpha.lastIndexOf("/"))
   ];
-  const [sId, sOrdinal] = [
+
+  const [sId, sOrdinal, assetOrigin] = [
     seriesIdDashOrdinal.slice(0, seriesIdDashOrdinal.lastIndexOf("-")),
-    seriesIdDashOrdinal.slice(seriesIdDashOrdinal.lastIndexOf("-") + 1)
+    seriesIdDashOrdinal.slice(seriesIdDashOrdinal.lastIndexOf("-") + 1),
+    baseBeta.slice(baseBeta.lastIndexOf("/") + 1)
   ];
+  if (!assetOriginAI(assetOrigin)) {
+    throw new Error("assetOrigin should always be generated for AI!");
+  }
   const generatedType = /^[a-z0-9]{24}$/.test(sId)
-    ? "inlineImageGenOutput"
-    : "imageGenOutput";
+    ? "InlineImageGenOutput"
+    : "ImageGenOutput";
+
+  if (isImage(ext)) {
+    return {
+      /**
+       * "inlineImageGenOutput" uses cuid2 `/^[a-z0-9]{24}$/`
+       *
+       * "imageGenOutput" uses nanoid `/^[A-Za-z0-9]{21}$/` | `/^ig_[0-9a-f]{50}$/`
+       */
+      type: generatedType,
+      sId,
+      sOrdinal: Number.parseInt(sOrdinal, 10),
+      ext,
+      timestampMs,
+      userId,
+      assetOrigin,
+      assetType: "IMAGE",
+      compatStatus: "ALIASED"
+    } as const;
+  }
   return {
     /**
      * "inlineImageGenOutput" uses cuid2 `/^[a-z0-9]{24}$/`
@@ -230,8 +363,12 @@ export function toCdnUrlConstituents(cdnUrl: string) {
      */
     type: generatedType,
     sId,
-    sOrdinal: Number.parseInt(sOrdinal),
-    ext,
-    timestampMs: Number.parseInt(timestampMs)
+    sOrdinal: Number.parseInt(sOrdinal, 10),
+    ext: "pdf",
+    timestampMs,
+    assetType: "DOCUMENT",
+    userId,
+    assetOrigin,
+    compatStatus: "ALIASED"
   } as const;
 }
