@@ -48,6 +48,12 @@ class EventHandlerRegistry {
     "connection_established",
     "conversation_list",
     "conversation_list_ack",
+    "hydrate_attachment_by_id",
+    "hydrate_attachment_by_id_ack",
+    "hydrate_attachments",
+    "hydrate_attachments_ack",
+    "hydrate_attachments_by_conversation_id",
+    "hydrate_attachments_by_conversation_id_ack",
     "hydrate_conversation",
     "hydrate_conversation_ack",
     "image_gen_error",
@@ -355,6 +361,49 @@ class EventHandlerRegistry {
       conversation_list_ack: () => {
         const handler = this.handlers.conversation_list_ack;
         if (handler && event.type === "conversation_list_ack") {
+          handler(event, socket);
+        }
+      },
+      hydrate_attachment_by_id: () => {
+        const handler = this.handlers["hydrate_attachment_by_id"];
+        if (handler && event.type === "hydrate_attachment_by_id") {
+          handler(event, socket);
+        }
+      },
+      hydrate_attachment_by_id_ack: () => {
+        const handler = this.handlers["hydrate_attachment_by_id_ack"];
+        if (handler && event.type === "hydrate_attachment_by_id_ack") {
+          handler(event, socket);
+        }
+      },
+      hydrate_attachments: () => {
+        const handler = this.handlers["hydrate_attachments"];
+        if (handler && event.type === "hydrate_attachments") {
+          handler(event, socket);
+        }
+      },
+      hydrate_attachments_ack: () => {
+        const handler = this.handlers["hydrate_attachments_ack"];
+        if (handler && event.type === "hydrate_attachments_ack") {
+          handler(event, socket);
+        }
+      },
+      hydrate_attachments_by_conversation_id: () => {
+        const handler = this.handlers["hydrate_attachments_by_conversation_id"];
+        if (
+          handler &&
+          event.type === "hydrate_attachments_by_conversation_id"
+        ) {
+          handler(event, socket);
+        }
+      },
+      hydrate_attachments_by_conversation_id_ack: () => {
+        const handler =
+          this.handlers["hydrate_attachments_by_conversation_id_ack"];
+        if (
+          handler &&
+          event.type === "hydrate_attachments_by_conversation_id_ack"
+        ) {
           handler(event, socket);
         }
       },

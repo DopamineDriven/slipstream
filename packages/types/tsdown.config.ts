@@ -44,6 +44,7 @@ export default defineConfig(
         "src/contract/audio.ts",
         "src/contract/cli-events.ts",
         "src/contract/conversation-list-events.ts",
+        "src/contract/hydrate-attachments.ts",
         "src/contract/hydrate-conversation.ts",
         "src/contract/image-gen-events.ts",
         "src/contract/index.ts",

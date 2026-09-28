@@ -6,7 +6,7 @@ import type { TTSService } from "@/tts/index.ts";
 import type { UserData } from "@/types/index.ts";
 import type { WSServer } from "@/ws-server/index.ts";
 import type { WebSocket } from "ws";
-import { ResolverAssetCompatService } from "@/resolver/asset-compat.ts";
+import { ResolverAttachmentHydrationService } from "@/resolver/attachment-hydration.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
   DocumentSingleton,
@@ -15,7 +15,7 @@ import type {
   RTC
 } from "@slipstream/types";
 
-export class ResolverAssetAttachOrPasteService extends ResolverAssetCompatService {
+export class ResolverAssetAttachOrPasteService extends ResolverAttachmentHydrationService {
   constructor(
     wsServer: WSServer,
     providers: ProviderService,

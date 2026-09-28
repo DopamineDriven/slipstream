@@ -25,18 +25,32 @@ lane) and `2026-09-22/…`. This one covers 2026-09-25 → 27 and supersedes whe
 
 ---
 
-## 1. State of the tree
+## 1. State of the tree — where we left off (updated 2026-09-28)
 
-Last commit **`b0ff55f`** ("fix: attachment url hygiene …"). Working tree at that point: clean.
+Last commit **`aec9b79`**, working tree clean. That commit carried Andrew's xAI MCP event types
+(`response.mcp_call.*`, `response.mcp_call_arguments.*`, `mcp_call` output items, `RemoteMCPTool` in
+the tool unions, status-generic `OutputItem.Done<T>` + `ResponsesStreamParser<T>`) — **typed only,
+not wired, explicitly low priority**; `inlineImagePostUploadObj` + `InlinePostImageUploadProps`
+hoisted from `xai/base.ts` to `PrismaUtilsService` / `@/types` so every inline lane can reach them;
+the linear handler guards `item.result` before building the agg tuple (a failed image call has
+`result: null`); the grok probe script renamed to `grok-probe.sh` and gitignored; plus my test edits
+(both `never`-typed comparisons removed — typecheck, eslint and 13/13 tests clean).
 
-**Uncommitted at compaction (one file):** `apps/web/src/tests/cdn-url-constituents.test.ts` —
-I removed the `never`-typed comparisons Andrew flagged (lint `no-unnecessary-condition`):
-- L93 `if (c.assetOrigin !== "generated")` → removed (return type is the literal `"generated"`; the throw guard is tested separately). **Done.**
-- L169 `if (c.assetOrigin === "upload" || …) byOrigin[…]` → `byOrigin[c.assetOrigin] += 1;`. **Done.**
-- L106 `if (c.compatStatus !== "ALIASED") problems.push(…)` (+ the comment line above it) → **my Edit FAILED** because Andrew had modified the file on disk. **Re-read the file, then remove that comparison if it is still there**, then `pnpm -C apps/web typecheck` and
-  `cd apps/web && node --test --import tsx --test-reporter spec src/tests/cdn-url-constituents.test.ts` (was 13/13 before the edits).
+**Recent cdnUrl helper work (all landed):** `apps/web/src/lib/helpers.ts` `toCdnUrlConstituents`
+now derives `userId` and parses `sOrdinal` once (`Number.parseInt` inside the destructure);
+`userCdnUrlConstituents` handles ACTIVE (`/converted/att_<id>.<ext>`) and ALIASED shapes;
+`getCdnUrlBase(IS_PROD)` — IS_PROD is a LOCAL marker (set ⇒ dev host, unset ⇒ prod; memory
+`project_is_prod_local_marker`); `isImage` doc says why (provider compat for vision models). Tests
+round-trip both normalised fixtures (§3).
 
-Commits this session (newest first): `b0ff55f` url hygiene + bulk-attachments modes + tests + docs · `83afe1b` lightbox + overview.md · `c7506b0` openai Pick cleanup + motion catalogs split · `28f1020` next-env · `1dc8590` bubble IMAGE_GEN case + all provider histories linearised · `87f5632` inlineImgGenData → bubble · `65aef25` toMessageBlocks columns + InlineImageGen frame · `6156d37` MessageBlock cdnUrl/width/height + history formatters.
+**Next task (Andrew's pick): finalize the lightbox on the client.** Goal in his words: the shallow
+path acquires its data client-side only; the `{modal}` slot sits under every provider in
+`app/(chat)/layout.tsx` so any of them can be the source. Full regroup, provider survey, selector
+snippet and landing order live in **`architectural-decisions/grok-img-tool/lightbox.md`** — start
+there, not here. Still queued after it: the compatCdnUrl pairing test (row fixture; Andrew decides
+where the export lives) and the two dev-DB residue rows in §3.
+
+Commits this session (newest first): `aec9b79` (above) · `b0ff55f` url hygiene + bulk-attachments modes + tests + docs · `83afe1b` lightbox + overview.md · `c7506b0` openai Pick cleanup + motion catalogs split · `28f1020` next-env · `1dc8590` bubble IMAGE_GEN case + all provider histories linearised · `87f5632` inlineImgGenData → bubble · `65aef25` toMessageBlocks columns + InlineImageGen frame · `6156d37` MessageBlock cdnUrl/width/height + history formatters.
 
 ---
 

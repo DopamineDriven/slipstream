@@ -153,6 +153,15 @@ export type {
 } from "@/contract/conversation-list-events.ts";
 
 export type {
+  HydrateAttachmentById,
+  HydrateAttachmentByIdAck,
+  HydrateAttachments,
+  HydrateAttachmentsAck,
+  HydrateAttachmentsByConversationId,
+  HydrateAttachmentsByConversationIdAck
+} from "@/contract/hydrate-attachments.ts";
+
+export type {
   HydrateConversation,
   HydrateConversationAck,
   HydrateConversationPage

@@ -39,6 +39,14 @@ import type {
   ConversationListAck
 } from "@/contract/conversation-list-events.ts";
 import type {
+  HydrateAttachmentById,
+  HydrateAttachmentByIdAck,
+  HydrateAttachments,
+  HydrateAttachmentsAck,
+  HydrateAttachmentsByConversationId,
+  HydrateAttachmentsByConversationIdAck
+} from "@/contract/hydrate-attachments.ts";
+import type {
   HydrateConversation,
   HydrateConversationAck
 } from "@/contract/hydrate-conversation.ts";
@@ -123,6 +131,12 @@ export type AnyEvent =
   | ConnectionEstablished
   | ConversationList
   | ConversationListAck
+  | HydrateAttachmentById
+  | HydrateAttachmentByIdAck
+  | HydrateAttachments
+  | HydrateAttachmentsAck
+  | HydrateAttachmentsByConversationId
+  | HydrateAttachmentsByConversationIdAck
   | HydrateConversation
   | HydrateConversationAck
   | ImageGenError
