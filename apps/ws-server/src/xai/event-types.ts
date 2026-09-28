@@ -91,6 +91,65 @@ export namespace xAIResponses {
     }
   }
 
+  export namespace MCP {
+    export namespace Call {
+      // 1st in MCP events
+      export interface InProgress {
+        type: "response.mcp_call.in_progress";
+        sequence_number: number;
+        /**
+         * starts with "mcp_"
+         */
+        item_id: string;
+        output_index: number;
+      }
+      // 4th in MCP events
+      export interface Completed {
+        type: "response.mcp_call.completed";
+        sequence_number: number;
+        /**
+         * starts with "mcp_"
+         */
+        item_id: string;
+        output_index: number;
+      }
+    }
+    export type Call = Call.Completed | Call.InProgress;
+    export namespace Arguments {
+      // 2nd in MCP events
+      export interface Delta {
+        type: "response.mcp_call_arguments.delta";
+        sequence_number: number;
+        /**
+         * starts with "mcp_"
+         */
+        item_id: string;
+        output_index: number;
+        /**
+         * stringified object such as `'{"repoName":"facebook/react"}'`
+         */
+        delta: string;
+      }
+      // 3rd in MCP events
+      export interface Done {
+        type: "response.mcp_call_arguments.done";
+        sequence_number: number;
+        /**
+         * starts with "mcp_"
+         */
+        item_id: string;
+        output_index: number;
+        /**
+         * stringified object such as `'{"repoName":"facebook/react"}'`
+         */
+        delta: string;
+      }
+    }
+    export type Arguments = Arguments.Delta | Arguments.Done;
+  }
+  export type MCP =
+    | MCP.Arguments
+    | MCP.Call;
   export namespace ImageGenerationCall {
     export interface InProgress {
       type: "response.image_generation_call.in_progress";
@@ -248,6 +307,19 @@ export namespace xAIResponses {
         status: "in_progress";
         result: null;
       }
+      export interface MCPCall {
+        /**
+         * id starts with `mcp_`
+         */
+        id: string;
+        type: "mcp_call";
+        status: "in_progress";
+        name: string;
+        server_label: string;
+        error?: string;
+        arguments?: string;
+        output?: string;
+      }
       export namespace WebSearchCall {
         export namespace Action {
           export interface Search {
@@ -305,6 +377,7 @@ export namespace xAIResponses {
         | Added.WebSearchCall
         | Added.CustomToolCall
         | Added.ImageGenerationCall
+        | Added.MCPCall
         | Added.FunctionCall;
       output_index: number;
     }
@@ -329,18 +402,42 @@ export namespace xAIResponses {
         status: "completed";
       }
 
-      export interface ImageGenerationCall {
+      export interface ImageGenerationCall<
+        T extends "completed" | "failed" = "completed" | "failed"
+      > {
         /**
          * id starts with `ig_`
          */
         id: string;
         type: "image_generation_call";
-        status: "completed";
+        status: T;
         prompt: string;
         /**
          * b64 encoded img buffer
          */
-        result: string;
+        result: T extends "failed" ? null : string;
+      }
+
+      export interface MCPCall<
+        T extends "completed" | "failed" = "completed" | "failed"
+      > {
+        /**
+         * id starts with `mcp_`
+         */
+        id: string;
+        type: "mcp_call";
+        status: T;
+        name: string;
+        server_label: string;
+        error?: string;
+        /**
+         * stringified object such as `'{"repoName":"facebook/react"}'` | ""
+         */
+        arguments: string;
+        /**
+         * stringified object, use `JSON.parse<T>(output)`
+         */
+        output: T extends "failed" ? null : string;
       }
       export namespace Reasoning {
         export interface SummaryText {
@@ -381,17 +478,19 @@ export namespace xAIResponses {
           text: string;
         }
       }
-      export interface FileSearchCall {
+      export interface FileSearchCall<
+        T extends "completed" | "failed" = "completed" | "failed"
+      > {
         id: string;
         type: "file_search_call";
-        status: "completed" | "failed";
+        status: T;
         queries: string[];
         /**
          * defined if status = "completed"
          *
          * empty [] if status = "failed"
          */
-        results?: FileSearchCall.Results[];
+        results?: T extends "failed" ? [] : FileSearchCall.Results[];
       }
       export namespace WebSearchCall {
         export interface Action {
@@ -400,10 +499,12 @@ export namespace xAIResponses {
           sources: never[] | unknown[];
         }
       }
-      export interface WebSearchCall {
+      export interface WebSearchCall<
+        T extends "completed" | "failed" = "completed" | "failed"
+      > {
         id: string;
         type: "web_search_call";
-        status: "completed" | "failed";
+        status: T;
         action: WebSearchCall.Action;
       }
       export namespace CustomToolCall {
@@ -415,9 +516,11 @@ export namespace xAIResponses {
           | "x_user_search"
           | (string & {});
       }
-      export interface CustomToolCall {
+      export interface CustomToolCall<
+        T extends "completed" | "failed" = "completed" | "failed"
+      > {
         type: "custom_tool_call";
-        status: "completed";
+        status: T;
         /**
          * id starts with `ctc_`
          */
@@ -439,16 +542,19 @@ export namespace xAIResponses {
         name: CustomToolCall.Name;
       }
     }
-    export interface Done {
+    export interface Done<
+      T extends "completed" | "failed" = "completed" | "failed"
+    > {
       sequence_number: number;
       type: "response.output_item.done";
       item:
-        | Done.ImageGenerationCall
+        | Done.MCPCall<T>
+        | Done.ImageGenerationCall<T>
         | Done.Reasoning
         | Done.Message
-        | Done.FileSearchCall
-        | Done.WebSearchCall
-        | Done.CustomToolCall
+        | Done.FileSearchCall<T>
+        | Done.WebSearchCall<T>
+        | Done.CustomToolCall<T>
         | Done.FunctionCall;
       output_index: number;
     }

@@ -87,10 +87,12 @@ for (const [env, { host, urls }] of Object.entries(FIXTURES)) {
           const c = toCdnUrlConstituents(u);
           byType[c.type] += 1;
 
+          // assetOrigin ("generated") and compatStatus ("ALIASED") are literal
+          // in the return type — the guard throws for anything else (tested
+          // below), so there is nothing to compare; the rebuilt url covers them
           const rebuilt = `${host}/${c.assetOrigin}/${c.userId}/${c.timestampMs}-${c.sId}-${c.sOrdinal}.${urlExt}`;
           const problems = Array.of<string>();
           if (rebuilt !== u) problems.push(`rebuilt ${rebuilt}`);
-          if (c.assetOrigin !== "generated") problems.push(`assetOrigin ${c.assetOrigin}`);
           if (c.userId !== userId) problems.push(`userId ${c.userId} ≠ ${userId}`);
           if (c.timestampMs !== Number.parseInt(ms, 10)) problems.push(`timestampMs ${c.timestampMs}`);
           if (c.sId !== sId) problems.push(`sId ${c.sId} ≠ ${sId}`);
@@ -102,8 +104,6 @@ for (const [env, { host, urls }] of Object.entries(FIXTURES)) {
           if (c.ext !== expectedExt) problems.push(`ext ${c.ext} ≠ ${expectedExt}`);
           if (c.assetType !== (isImage(urlExt) ? "IMAGE" : "DOCUMENT"))
             problems.push(`assetType ${c.assetType}`);
-          // it's only possible for it to be ALIASED or ACTIVE...thsoe are the only two terminal states
-          if (c.compatStatus !== "ALIASED") problems.push(`compatStatus ${c.compatStatus}`);
           if (problems.length > 0) failures.push(`${u}\n    ${problems.join(" · ")}`);
         }
 
@@ -156,7 +156,7 @@ for (const [env, { host, urls }] of Object.entries(FIXTURES)) {
         for (const u of active) {
           const { origin, basename } = segments(u);
           const m = ACTIVE_BASENAME.exec(basename);
-          if (!m || !m[1] || !m[2]) {
+          if (!m?.[1] || !m?.[2]) {
             failures.push(`${u}\n    basename did not match att_<id>.<ext>`);
             continue;
           }
@@ -166,7 +166,7 @@ for (const [env, { host, urls }] of Object.entries(FIXTURES)) {
           if (c.compatStatus !== "ACTIVE") {
             problems.push(`compatStatus ${c.compatStatus}`);
           } else {
-            if (c.assetOrigin === "upload" || c.assetOrigin === "pasted") byOrigin[c.assetOrigin] += 1;
+            byOrigin[c.assetOrigin] += 1;
             if (c.assetOrigin !== origin) problems.push(`assetOrigin ${c.assetOrigin} ≠ ${origin}`);
             if (c.attachmentId !== attachmentId) problems.push(`attachmentId ${c.attachmentId}`);
             if (c.filename !== `att_${attachmentId}`) problems.push(`filename ${c.filename}`);
@@ -188,7 +188,7 @@ for (const [env, { host, urls }] of Object.entries(FIXTURES)) {
         for (const u of aliased) {
           const { origin, second: userId, basename } = segments(u);
           const m = ALIASED_BASENAME.exec(basename);
-          if (!m || !m[1] || !m[2] || !m[3]) {
+          if (!m?.[1] || !m?.[2] || !m?.[3]) {
             failures.push(`${u}\n    basename did not match <ms>-<filename>.<ext>`);
             continue;
           }

@@ -4,7 +4,9 @@ import type {
 } from "@/xai/responses-types.ts";
 
 export class ResponseSSEWorkupService {
-  protected xaiResponsesSSETransformer(chunk: string) {
+  protected xaiResponsesSSETransformer<
+    const T extends "completed" | "failed" = "completed" | "failed"
+  >(chunk: string) {
     let eventType: string | undefined = undefined;
     const dataLines = Array.of<string>();
 
@@ -33,12 +35,12 @@ export class ResponseSSEWorkupService {
     if (dataLines.length > 0 && eventType) {
       try {
         const jsonStr = dataLines.join("\n");
-        const parsedData = JSON.parse<XAIResponsesEvent>(jsonStr);
+        const parsedData = JSON.parse<XAIResponsesEvent<T>>(jsonStr);
         // event and data.type are always identical from xAI API
         return {
           event: parsedData.type,
           data: parsedData
-        } as XAIResponsesSSEEvent;
+        } as XAIResponsesSSEEvent<T>;
       } catch (error) {
         console.error("Failed to parse xAI Responses SSE data:", error);
         return null;
@@ -49,11 +51,13 @@ export class ResponseSSEWorkupService {
   }
 }
 
-export class ResponsesStreamParser
+export class ResponsesStreamParser<
+  T extends "completed" | "failed" = "completed" | "failed"
+>
   extends ResponseSSEWorkupService
-  implements AsyncIterable<XAIResponsesSSEEvent>
+  implements AsyncIterable<XAIResponsesSSEEvent<T>>
 {
-  private readonly readable: ReadableStream<XAIResponsesSSEEvent>;
+  private readonly readable: ReadableStream<XAIResponsesSSEEvent<T>>;
   constructor(sourceStream: ReadableStream<Uint8Array>) {
     super();
     const decoder = new TextDecoder();
@@ -62,7 +66,7 @@ export class ResponsesStreamParser
 
     const transformStream = new TransformStream<
       Uint8Array,
-      XAIResponsesSSEEvent
+      XAIResponsesSSEEvent<T>
     >({
       transform: (chunk, controller) => {
         buffer += decoder.decode(chunk, { stream: true });
@@ -74,7 +78,7 @@ export class ResponsesStreamParser
           const rawChunk = buffer.slice(0, match.index);
           buffer = buffer.slice(match.index + match[0].length);
 
-          const parsed = this.xaiResponsesSSETransformer(rawChunk);
+          const parsed = this.xaiResponsesSSETransformer<T>(rawChunk);
           if (parsed) {
             controller.enqueue(parsed);
           }
@@ -83,7 +87,7 @@ export class ResponsesStreamParser
 
       flush: controller => {
         if (buffer.trim()) {
-          const parsed = this.xaiResponsesSSETransformer(buffer);
+          const parsed = this.xaiResponsesSSETransformer<T>(buffer);
           if (parsed) {
             controller.enqueue(parsed);
           }
@@ -95,7 +99,7 @@ export class ResponsesStreamParser
   }
 
   public async *[Symbol.asyncIterator](): AsyncGenerator<
-    XAIResponsesSSEEvent,
+    XAIResponsesSSEEvent<T>,
     void,
     unknown
   > {

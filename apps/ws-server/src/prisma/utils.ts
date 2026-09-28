@@ -2,11 +2,18 @@ import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import type { ExtractService } from "@/extract/index.ts";
 import type { LoggerService } from "@/logger/index.ts";
-import type { AiChatRequestType, BigIntToCompatProps } from "@/types/index.ts";
+import type {
+  AiChatRequestType,
+  BigIntToCompatProps,
+  InlinePostImageUploadProps
+} from "@/types/index.ts";
 import type { Logger as PinoLogger } from "pino";
 import { ModelService } from "@/models/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { AttachmentSingleton } from "@slipstream/types";
+import type {
+  AttachmentSingleton,
+  InlineImageGenAggProps
+} from "@slipstream/types";
 import { PrismaClient, PrismaDbService } from "@slipstream/db/factory";
 
 export class PrismaUtilsService extends ModelService {
@@ -573,5 +580,112 @@ export class PrismaUtilsService extends ModelService {
       extension,
       chunkNum
     };
+  }
+
+  public inlineImagePostUploadObj({
+    cdnUrl,
+    conversationId,
+    facilitatingModel,
+    filename,
+    format,
+    generatingModel,
+    mime,
+    kind,
+    size,
+    provider,
+    revisedPrompt,
+    s3LastModified,
+    s3RTHelper,
+    seriesId,
+    seriesOrdinal,
+    specs,
+    uploadDuration,
+    userId
+  }: InlinePostImageUploadProps) {
+    return {
+      assetType: specs.type,
+      audio: null,
+      batchId: null,
+      bucket: s3RTHelper.bucket,
+      cacheControl: s3RTHelper.cacheControl ?? null,
+      cdnUrl,
+      checksumAlgo: s3RTHelper.checksum?.algo ?? "CRC32",
+      checksumSha256: s3RTHelper.checksum?.value ?? null,
+      compatCdnUrl: cdnUrl,
+      compatExt: specs.format,
+      compatKey: s3RTHelper.key,
+      compatMime: mime,
+      compatReadyAt: null,
+      compatS3ObjectId: s3RTHelper.s3ObjectId,
+      compatStatus: "ALIASED",
+      compatVersionId: s3RTHelper.versionId,
+      contentDisposition: s3RTHelper.contentDisposition ?? null,
+      contentEncoding: null,
+      conversationId,
+      deletedAt: null,
+      document: null,
+      draftId: null,
+      etag: s3RTHelper.etag ?? null,
+      expiresAt: s3RTHelper.expires,
+      ext: format,
+      filename,
+      key: s3RTHelper.key,
+      mime,
+      origin: "GENERATED",
+      publicUrl: s3RTHelper.publicUrl,
+      region: "us-east-1",
+      s3LastModified,
+      s3ObjectId: s3RTHelper.s3ObjectId,
+      seriesId,
+      size,
+      sourceUrl: "buffer",
+      sseAlgorithm: null,
+      sseKmsKeyId: null,
+      status: "READY",
+      storageClass: s3RTHelper.storageClass ?? null,
+      uploadDuration,
+      thumbnailKey: null,
+      uploadMethod: "SERVER",
+      userId,
+      versionId: s3RTHelper.versionId,
+      image: {
+        animated: specs.animated,
+        width: specs.width,
+        height: specs.height,
+        aspectRatio: specs.width / specs.height,
+        cameraMake: null,
+        cameraModel: null,
+        colorSpace: specs.colorSpace,
+        colorModel:
+          specs.colorModel === "grayscale-alpha"
+            ? "grayscale_alpha"
+            : specs.colorModel,
+        dominantColorHex: null,
+        exifDateTimeOriginal: specs.exifDateTimeOriginal
+          ? new Date(specs.exifDateTimeOriginal)
+          : null,
+        format: specs.format,
+        frames: specs.frames,
+        gpsLat: null,
+        gpsLon: null,
+        hasAlpha: specs.hasAlpha,
+        iccProfile: specs.iccProfile,
+        lensModel: null,
+        orientation: specs.orientation
+      },
+      inlineImageGenOutput: {
+        ext: format,
+        mime,
+        facilitatingModel,
+        generatingModel,
+        width: specs.width,
+        height: specs.height,
+        kind,
+        provider,
+        revisedPrompt,
+        seriesId,
+        seriesOrdinal
+      }
+    } satisfies InlineImageGenAggProps;
   }
 }

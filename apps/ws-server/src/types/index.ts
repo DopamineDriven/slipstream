@@ -21,6 +21,26 @@ import type {
 } from "@slipstream/types";
 
 export type Include<T, U extends T> = Exclude<T, Exclude<T, U>>;
+export type InlinePostImageUploadProps = {
+  specs: ExpandedImgSpecs;
+  s3RTHelper: S3FinalizePayload;
+  userId: string;
+  filename: string;
+  format: string;
+  mime: string;
+  cdnUrl: string;
+  generatingModel: string;
+  facilitatingModel: string;
+  provider: $Enums.Provider;
+  conversationId: string;
+  seriesOrdinal: number;
+  seriesId: string;
+  revisedPrompt: string;
+  kind: $Enums.ImageGenOutputKind;
+  uploadDuration: number;
+  s3LastModified: Date;
+  size: number;
+};
 
 export type S3FinalizePayload = {
   bucket: string;

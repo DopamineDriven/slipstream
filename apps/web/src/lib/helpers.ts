@@ -226,7 +226,8 @@ export function assetOrigin(s: string) {
   return assetOriginAI(s) || assetOriginUser(s);
 }
 /**
- * all images normalized to jpg (or jpeg), webp, or png via post-upload compat pipeline
+ * all images normalized to jpg (or jpeg), webp, or png via a post-upload compat pipeline
+ * for universal provider compatibility when passed off to vision-capable models
  */
 export function isImage(s: string) {
   return s === "jpg" || s === "jpeg" || s === "webp" || s === "png";
@@ -327,7 +328,7 @@ export function toCdnUrlConstituents(cdnUrl: string) {
 
   const [sId, sOrdinal, assetOrigin] = [
     seriesIdDashOrdinal.slice(0, seriesIdDashOrdinal.lastIndexOf("-")),
-    seriesIdDashOrdinal.slice(seriesIdDashOrdinal.lastIndexOf("-") + 1),
+    Number.parseInt(seriesIdDashOrdinal.slice(seriesIdDashOrdinal.lastIndexOf("-") + 1), 10),
     baseBeta.slice(baseBeta.lastIndexOf("/") + 1)
   ];
   if (!assetOriginAI(assetOrigin)) {
@@ -346,7 +347,7 @@ export function toCdnUrlConstituents(cdnUrl: string) {
        */
       type: generatedType,
       sId,
-      sOrdinal: Number.parseInt(sOrdinal, 10),
+      sOrdinal,
       ext,
       timestampMs,
       userId,
@@ -363,7 +364,7 @@ export function toCdnUrlConstituents(cdnUrl: string) {
      */
     type: generatedType,
     sId,
-    sOrdinal: Number.parseInt(sOrdinal, 10),
+    sOrdinal,
     ext: "pdf",
     timestampMs,
     assetType: "DOCUMENT",

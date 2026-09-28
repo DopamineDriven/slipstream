@@ -334,14 +334,16 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               if (seriesOrdinal === -1) {
                 seriesOrdinal += 1;
               }
-              inlineImgAggArr = [
-                seriesOrdinal,
-                chunk.data.item.result,
-                chunk.data.item.id,
-                chunk.data.item.prompt,
-                seriesId,
-                "FINAL"
-              ];
+              if (chunk.data.item.result) {
+                inlineImgAggArr = [
+                  seriesOrdinal,
+                  chunk.data.item.result,
+                  chunk.data.item.id,
+                  chunk.data.item.prompt,
+                  seriesId,
+                  "FINAL"
+                ];
+              }
               inlineImageActive = true;
               if (!seriesIdAgg.includes(seriesId)) {
                 seriesIdAgg.push(seriesId);
@@ -387,7 +389,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               ? new Date(s3RTHelper.lastModified)
               : new Date(Date.now());
 
-            const inlineImgObj = this.inlineImagePostUploadObj({
+            const inlineImgObj = this.prisma.inlineImagePostUploadObj({
               specs,
               s3RTHelper,
               userId,
