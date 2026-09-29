@@ -47,8 +47,9 @@ export class PrismaAttachmentHydrationService extends PrismaUserMetaService {
    * Bucket order is decided up front by one metadata query — conversation
    * ids most-recently-active first with their attachment counts — so the
    * on-screen conversation lands first and every yield is a whole bucket
-   * (or, past the page size, a known-count slice of one; the consumer
-   * upserts). The new-chat bucket (`conversationId: null`, unsent uploads)
+   * (or, past the page size, a known-count slice of one — the resolver's
+   * populate merges slices into its Map; the client only ever sees whole
+   * buckets). The new-chat bucket (`conversationId: null`, unsent uploads)
    * is yielded before any conversation. Attachments have no ordinal column,
    * so within a bucket this is offset paging over createdAt asc — only rows
    * of one batch are ever created concurrently, so nothing else is needed. Feeds the

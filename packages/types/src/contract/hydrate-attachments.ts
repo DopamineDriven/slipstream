@@ -40,6 +40,7 @@ export type HydrateAttachmentsByConversationIdAck = {
 
 export type HydrateAttachmentById = {
   type: "hydrate_attachment_by_id";
+  conversationId: string;
   attachmentId: string;
 };
 

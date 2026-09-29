@@ -171,9 +171,9 @@ same `subscribe` / `getSnapshot` surface `ChatStore` exposes, so consumers subsc
 
 - sends `hydrate_attachments` once `connection_established` lands, once per connection, and again on
   reconnect (the `rehydrateKeyRef` posture in `stt-context.tsx` L1072–1083);
-- ingests `hydrate_attachments_ack` (**upsert** into the bucket — a bucket past the page size arrives
-  as several known-count slices) and `hydrate_attachment_by_id_ack` (set one row; if the id was in
-  another bucket, move it — that is the rekey arriving);
+- ingests `hydrate_attachments_ack` (the whole bucket, **replaced wholesale** — the client merges
+  nothing) and `hydrate_attachment_by_id_ack` (set one row; if the id was under another key, drop it
+  there — that is the rekey arriving); see `attachment-registry-blueprint.md` for the code;
 - drops a row on `asset_deleted`.
 
 Hooks: `useAttachment(attachmentId)` → the row or `undefined`; `useConversationAttachments(conversationId)`
