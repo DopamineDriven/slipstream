@@ -562,6 +562,13 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
         if (m.inlineImageGenOutput) inlineImgAttachmentIds.push(m.id);
       }
 
+      // registry write-through — the AI message's generated rows, born here
+      // with the real conversationId; every provider's persist funnels through
+      // this method, so this is the one write site
+      for (const att of updatedMsg?.attachments ?? []) {
+        this.setRegistryAttachment(userId, att);
+      }
+
       const {
         convo: _convo,
         inlineImgAttachmentIds: _i,
@@ -572,6 +579,12 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
         inlineImgAttachmentIds,
         convo
       };
+    }
+    const aiMsg = transaction.convo.messages.find(
+      c => c.id === transaction.aiMsgId
+    );
+    for (const att of aiMsg?.attachments ?? []) {
+      this.setRegistryAttachment(userId, att);
     }
     return transaction;
   }

@@ -208,11 +208,11 @@ client component. No dynamic API in either segment → static shells, `<Link>` p
 
 ## Landing order
 
-1. Contract file (four events) + union + re-exports; rebuild types.
-2. Registry Map + methods on `ResolverAttachmentHydrationService`; populate/evict in the post-connection job; evict on last close (`ws-server/index.ts` close hook reaches it via `this.resolver`).
-3. Fill the three stubbed handlers; write-through and push at finalize / request rekey / response persist (handlers return `convo`) / compat completion.
-4. Web: ws-client slots → `AttachmentRegistryProvider` (+ hooks) → two client components → two pages.
-5. Delete the ORM temp method.
+1. ~~Contract file + union + re-exports; rebuild types.~~ **landed** `80e8071` (+ `conversationId` on the by-id request, `3e27eb0`).
+2. ~~Registry Map + methods on `ResolverAttachmentHydrationService`; three handlers.~~ **landed** `3e27eb0`. No evict anywhere — the registry lives for the process (Andrew, 2026-09-29).
+3. Write-through: ~~post-connection push (`connection.ts`)~~, ~~finalize set + inline by-id ack (`asset-complete.ts`)~~, ~~new-chat rekey + per-row ack (`chat.ts`)~~ **landed 2026-09-29**. Still open: the post-provider `set` of generated rows (needs handlers to return the persisted `convo`), and compat completion's registry refresh (the DB update lives inside `imgCompatService` / `pdfService`, outside the resolver chain — registry-only, no frame).
+4. Web: ~~`AttachmentRegistryStore` + `AttachmentRegistryProvider` + `useAttachment` / `useConversationAttachments`, mounted in `(chat)/layout.tsx` inside `ConversationHydrationProvider`, wrapping `AIChatProvider`~~ **landed 2026-09-29**. Open: `ShallowLightbox` + the two pages — **Andrew's** (his lightbox files).
+5. Delete the ORM temp method once both pages are off it.
 
 Typecheck `pnpm -C apps/ws-server typecheck` and `pnpm -C apps/web typecheck`. Live: open an inline
 image from a conversation (modal, no network); reload on `/attachment/[id]` (full page from the

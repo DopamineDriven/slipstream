@@ -34,84 +34,20 @@ export class ResolverAttachmentHydrationService extends ResolverAssetCompatServi
       ttsService
     );
   }
-  protected attachmentRegistry = new Map<
-    string,
-    Map<string, Map<string, AttachmentSingleton<true>>>
-  >();
-  protected NEW_CHAT = "new-chat" as const;
-
-  protected async populateAttachmentRegistry(userId: string) {
-    if (this.attachmentRegistry.has(userId)) return;
-    const user = new Map<string, Map<string, AttachmentSingleton<true>>>();
-    this.attachmentRegistry.set(userId, user);
-    for await (const {
-      conversationId,
-      attachments
-    } of this.wsServer.prisma.attachmentHydrationGenerator(userId)) {
-      // the thunk allocates only on a miss (getOrInsert would allocate on every call)
-      const bucket = user.getOrInsertComputed(
-        conversationId,
-        () => new Map<string, AttachmentSingleton<true>>()
-      );
-      for (const att of attachments) bucket.set(att.id, att);
-    }
-  }
-
-  protected setRegistryAttachment(
-    userId: string,
-    attachment: AttachmentSingleton<true>
-  ) {
-    const key = attachment.conversationId ?? this.NEW_CHAT;
-    this.attachmentRegistry
-      .getOrInsertComputed(
-        userId,
-        () => new Map<string, Map<string, AttachmentSingleton<true>>>()
-      )
-      .getOrInsertComputed(
-        key,
-        () => new Map<string, AttachmentSingleton<true>>()
-      )
-      .set(attachment.id, attachment);
-    return key;
-  }
-
-  protected rekeyRegistryAttachments(
-    userId: string,
-    rows: AttachmentSingleton<true>[]
-  ) {
-    const user = this.attachmentRegistry.get(userId);
-    const unbound = user?.get(this.NEW_CHAT);
-    for (const att of rows) {
-      unbound?.delete(att.id);
-      this.setRegistryAttachment(userId, att);
-    }
-    if (unbound?.size === 0) user?.delete(this.NEW_CHAT);
-  }
-
-  protected registryAttachmentById(userId: string, attachmentId: string) {
-    const user = this.attachmentRegistry.get(userId);
-    if (!user) return;
-    for (const [conversationId, bucket] of user) {
-      const attachment = bucket.get(attachmentId);
-      if (attachment) return { conversationId, attachment } as const;
-    }
-    return;
-  }
-
+  /** the dormant whole-user lane — kept for a future gallery */
   protected async hydrateAttachments(
     _event: EventTypeMap["hydrate_attachments"],
     ws: WebSocket,
     userId: string,
     _userData?: UserData
   ) {
-    await this.populateAttachmentRegistry(userId);
-    const user = this.attachmentRegistry.get(userId);
+    await this.wsServer.prisma.populateAttachmentRegistry(userId);
+    const user = this.wsServer.prisma.attachmentRegistry.get(userId);
     if (!user) return;
     for (const [conversationId, bucket] of user) {
       ws.send(
         JSON.stringify({
           type: "hydrate_attachments_ack",
-          userId,
           conversationId,
           attachments: Array.from(bucket.values())
         } satisfies EventTypeMap["hydrate_attachments_ack"])
@@ -119,25 +55,41 @@ export class ResolverAttachmentHydrationService extends ResolverAssetCompatServi
     }
   }
 
+  /**
+   * requested key → real key elsewhere → one findFirst (set under its real
+   * key) → INVALID_ID echoing the requested key. Also the frame every write
+   * site sends (finalize, rekey).
+   */
   protected async hydrateAttachmentById(
     event: EventTypeMap["hydrate_attachment_by_id"],
     ws: WebSocket,
     userId: string,
     _userData?: UserData
   ) {
-    await this.populateAttachmentRegistry(userId);
-    const user = this.attachmentRegistry.get(userId);
-    const inRequested = user
+    const inRequested = this.wsServer.prisma.attachmentRegistry
+      .get(userId)
       ?.get(event.conversationId)
       ?.get(event.attachmentId);
-    const hit = inRequested
+    let hit = inRequested
       ? { conversationId: event.conversationId, attachment: inRequested }
-      : this.registryAttachmentById(userId, event.attachmentId);
+      : this.wsServer.prisma.registryAttachmentById(userId, event.attachmentId);
+    if (!hit) {
+      const row = await this.wsServer.prisma.attachmentById(
+        userId,
+        event.attachmentId
+      );
+      if (row) {
+        const conversationId = this.wsServer.prisma.setRegistryAttachment(
+          userId,
+          row
+        );
+        hit = { conversationId, attachment: row };
+      }
+    }
     if (hit) {
       ws.send(
         JSON.stringify({
           type: "hydrate_attachment_by_id_ack",
-          userId,
           conversationId: hit.conversationId,
           attachment: hit.attachment
         } satisfies EventTypeMap["hydrate_attachment_by_id_ack"])
@@ -146,7 +98,6 @@ export class ResolverAttachmentHydrationService extends ResolverAssetCompatServi
       ws.send(
         JSON.stringify({
           type: "hydrate_attachment_by_id_ack",
-          userId,
           conversationId: event.conversationId,
           reason: "INVALID_ID"
         } satisfies EventTypeMap["hydrate_attachment_by_id_ack"])
@@ -154,22 +105,37 @@ export class ResolverAttachmentHydrationService extends ResolverAssetCompatServi
     }
   }
 
+  /**
+   * The primary lane. Registry hit → answer from memory. Miss → one query for
+   * exactly this key, set, answer. "new-chat" selects the unbound rows.
+   */
   protected async hydrateAttachmentByConversationId(
     event: EventTypeMap["hydrate_attachments_by_conversation_id"],
     ws: WebSocket,
     userId: string,
     _userData?: UserData
   ) {
-    await this.populateAttachmentRegistry(userId);
-    const bucket = this.attachmentRegistry
-      .get(userId)
-      ?.get(event.conversationId);
+    const user = this.wsServer.prisma.attachmentRegistry.getOrInsertComputed(
+      userId,
+      () => new Map<string, Map<string, AttachmentSingleton<true>>>()
+    );
+    let bucket = user.get(event.conversationId);
+    if (!bucket) {
+      const rows = await this.wsServer.prisma.attachmentsByConversation(
+        userId,
+        event.conversationId === this.wsServer.prisma.NEW_CHAT
+          ? null
+          : event.conversationId
+      );
+      bucket = new Map<string, AttachmentSingleton<true>>();
+      for (const att of rows) bucket.set(att.id, att);
+      user.set(event.conversationId, bucket);
+    }
     ws.send(
       JSON.stringify({
         type: "hydrate_attachments_by_conversation_id_ack",
-        userId,
         conversationId: event.conversationId,
-        attachments: bucket ? Array.from(bucket.values()) : []
+        attachments: Array.from(bucket.values())
       } satisfies EventTypeMap["hydrate_attachments_by_conversation_id_ack"])
     );
   }

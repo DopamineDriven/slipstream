@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AIChatProvider } from "@/context/ai-chat-context";
 import { ApiKeysProvider } from "@/context/api-keys-context";
 import { AssetProvider } from "@/context/asset-context";
+import { AttachmentRegistryProvider } from "@/context/attachment-registry-context";
 import { AudioGenProvider } from "@/context/audio-gen-context";
 import { ChatWebSocketProvider } from "@/context/chat-ws-context";
 import { ConversationHydrationProvider } from "@/context/convo-hydration-context";
@@ -33,10 +34,12 @@ export default async function AuthedLayout({
                   <ImageGenProvider>
                     <TTSProvider>
                       <ConversationHydrationProvider userId={session.user.id}>
-                        <AIChatProvider userId={session.user.id}>
-                          {children}
-                          {modal}
-                        </AIChatProvider>
+                        <AttachmentRegistryProvider>
+                          <AIChatProvider userId={session.user.id}>
+                            {children}
+                            {modal}
+                          </AIChatProvider>
+                        </AttachmentRegistryProvider>
                       </ConversationHydrationProvider>
                     </TTSProvider>
                   </ImageGenProvider>

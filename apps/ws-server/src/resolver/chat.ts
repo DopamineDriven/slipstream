@@ -176,6 +176,24 @@ export class ResolverChatService extends ResolverTTSService {
       existingState = await this.wsServer.redis.getStreamState(conversationId),
       createdAt = res.createdAt;
 
+    // new-chat rekey: the user message's attachments ARE the batch, now
+    // connected to the real conversation by the request-side persist — move
+    // them out of the registry's "new-chat" key and tell the client where
+    // they went. An existing conversation needs nothing (keyed at finalize).
+    if (isNewChat && typeof batchId !== "undefined") {
+      const rekeyed = res.messages.at(-1)?.attachments ?? [];
+      this.wsServer.prisma.rekeyRegistryAttachments(userId, rekeyed);
+      for (const attachment of rekeyed) {
+        ws.send(
+          JSON.stringify({
+            type: "hydrate_attachment_by_id_ack",
+            conversationId,
+            attachment
+          } satisfies EventTypeMap["hydrate_attachment_by_id_ack"])
+        );
+      }
+    }
+
     void this.coupleDictations({
       conversationId,
       messageOrdinal,

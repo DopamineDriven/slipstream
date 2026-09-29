@@ -7,7 +7,8 @@ export default {
   experimental: {
     serverActions: { bodySizeLimit: `50mb` },
     authInterrupts: true,
-    globalNotFound: true
+    globalNotFound: true,
+    
   },
   async headers() {
     return [

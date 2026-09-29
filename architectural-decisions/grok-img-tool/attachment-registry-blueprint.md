@@ -438,7 +438,7 @@ export class AttachmentRegistryStore {
     const bucket = this.buckets.get(bucketKey);
     bucket?.delete(attachmentId);
     this.bucketOf.delete(attachmentId);
-    if (bucket && bucket.size === 0) {
+    if (bucket?.size === 0) {
       this.buckets.delete(bucketKey);
       this.snapshots.delete(bucketKey);
     } else this.rebuild(bucketKey);

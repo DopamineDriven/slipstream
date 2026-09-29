@@ -7,7 +7,6 @@ export type HydrateAttachments = {
 
 export type HydrateAttachmentsAck = {
   type: "hydrate_attachments_ack";
-  userId: string;
   conversationId: string;
   attachments: AttachmentSingleton<true>[];
 };
@@ -33,7 +32,6 @@ export type HydrateAttachmentsByConversationId = {
 
 export type HydrateAttachmentsByConversationIdAck = {
   type: "hydrate_attachments_by_conversation_id_ack";
-  userId: string;
   conversationId: string;
   attachments: AttachmentSingleton<true>[];
 };
@@ -46,7 +44,6 @@ export type HydrateAttachmentById = {
 
 export type HydrateAttachmentByIdAck = {
   type: "hydrate_attachment_by_id_ack";
-  userId: string;
   conversationId: string;
   attachment?: AttachmentSingleton<true>;
   reason?: "INVALID_ID" | (string & {});

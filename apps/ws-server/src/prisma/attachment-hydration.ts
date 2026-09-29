@@ -18,8 +18,132 @@ export class PrismaAttachmentHydrationService extends PrismaUserMetaService {
 
   protected ATTACHMENT_HYDRATION_PAGE_SIZE = 50;
   protected MAX_ATTACHMENT_HYDRATION_PAGE_SIZE = 200;
-  /** the bucket key for uploads not yet bound to a conversation */
-  protected NEW_CHAT_BUCKET = "new-chat" as const;
+  public NEW_CHAT = "new-chat" as const;
+
+  /**
+   * userId → (conversationId | "new-chat") → attachmentId → row. Lives for the
+   * process (no evict); filled per key on demand by the resolver's
+   * by-conversation / by-id lanes, written through at finalize, at the
+   * new-chat rekey, and at the tail of handleAiChatResponse (every provider's
+   * persist funnels there — one write site instead of thirteen).
+   */
+  public attachmentRegistry = new Map<
+    string,
+    Map<string, Map<string, AttachmentSingleton<true>>>
+  >();
+
+  /** whole-user populate-if-absent — the dormant `hydrate_attachments` lane only */
+  public async populateAttachmentRegistry(userId: string) {
+    if (this.attachmentRegistry.has(userId)) return;
+    const user = new Map<string, Map<string, AttachmentSingleton<true>>>();
+    this.attachmentRegistry.set(userId, user);
+    for await (const {
+      conversationId,
+      attachments
+    } of this.attachmentHydrationGenerator(userId)) {
+      const bucket = user.getOrInsertComputed(
+        conversationId,
+        () => new Map<string, AttachmentSingleton<true>>()
+      );
+      for (const att of attachments) bucket.set(att.id, att);
+    }
+  }
+
+  /** set; returns the key (row.conversationId ?? "new-chat") for the caller's frame */
+  public setRegistryAttachment(
+    userId: string,
+    attachment: AttachmentSingleton<true>
+  ) {
+    const key = attachment.conversationId ?? this.NEW_CHAT;
+    this.attachmentRegistry
+      .getOrInsertComputed(
+        userId,
+        () => new Map<string, Map<string, AttachmentSingleton<true>>>()
+      )
+      .getOrInsertComputed(
+        key,
+        () => new Map<string, AttachmentSingleton<true>>()
+      )
+      .set(attachment.id, attachment);
+    return key;
+  }
+
+  /** new-chat rekey: delete from the sentinel key, set under the real one */
+  public rekeyRegistryAttachments(
+    userId: string,
+    rows: AttachmentSingleton<true>[]
+  ) {
+    const user = this.attachmentRegistry.get(userId);
+    const unbound = user?.get(this.NEW_CHAT);
+    for (const att of rows) {
+      unbound?.delete(att.id);
+      this.setRegistryAttachment(userId, att);
+    }
+    if (unbound?.size === 0) user?.delete(this.NEW_CHAT);
+  }
+
+  public registryAttachmentById(userId: string, attachmentId: string) {
+    const user = this.attachmentRegistry.get(userId);
+    if (!user) return;
+    for (const [conversationId, bucket] of user) {
+      const attachment = bucket.get(attachmentId);
+      if (attachment) return { conversationId, attachment } as const;
+    }
+    return;
+  }
+
+  /** one key on demand — `conversationId: null` selects the new-chat (unbound) rows */
+  public async attachmentsByConversation(
+    userId: string,
+    conversationId: string | null
+  ) {
+    const rows = await this.prismaClient.attachment.findMany({
+      where: { userId, conversationId, ...this.attachmentFilter },
+      orderBy: { createdAt: "asc" },
+      include: {
+        image: true,
+        audioGenOutput: true,
+        document: true,
+        audio: true,
+        imageGenOutput: true,
+        inlineImageGenOutput: true,
+        messageBlock: true
+      }
+    });
+    return rows.map(
+      ({ inlineImageGenOutput, messageBlock, size, ...rest }) =>
+        ({
+          ...rest,
+          size: size ? Number(size) : null,
+          inlineImageGenOutput: inlineImageGenOutput ?? undefined,
+          messageBlock: messageBlock ?? undefined
+        }) satisfies AttachmentSingleton<true>
+    );
+  }
+
+  /** one row on demand — the by-id miss path; user-scoped, same filter */
+  public async attachmentById(userId: string, attachmentId: string) {
+    const row = await this.prismaClient.attachment.findFirst({
+      where: { id: attachmentId, userId, ...this.attachmentFilter },
+      include: {
+        image: true,
+        audioGenOutput: true,
+        document: true,
+        audio: true,
+        imageGenOutput: true,
+        inlineImageGenOutput: true,
+        messageBlock: true
+      }
+    });
+    if (!row) return;
+    const { inlineImageGenOutput, messageBlock, size, ...rest } = row;
+    return {
+      ...rest,
+      size: size ? Number(size) : null,
+      inlineImageGenOutput: inlineImageGenOutput ?? undefined,
+      messageBlock: messageBlock ?? undefined
+    } satisfies AttachmentSingleton<true>;
+  }
 
   private get attachmentFilter() {
     return {
@@ -116,7 +240,7 @@ export class PrismaAttachmentHydrationService extends PrismaUserMetaService {
             }) satisfies AttachmentSingleton<true>
         );
         yield {
-          conversationId: conversationId ?? this.NEW_CHAT_BUCKET,
+          conversationId: conversationId ?? this.NEW_CHAT,
           attachments: attachments satisfies AttachmentSingleton<true>[]
         };
 
