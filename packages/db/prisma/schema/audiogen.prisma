@@ -1,3 +1,8 @@
+enum AudioGenOutputKind {
+  PARTIAL
+  FINAL
+}
+
 enum AudioGenStage {
   QUEUED
   PROCESSING
@@ -46,13 +51,14 @@ model AudioGenJob {
 }
 
 model AudioGenOutput {
-  id           String   @id @default(cuid(2))
-  jobId        String   @unique // n=1, no partials — output:job is strictly 1:1
-  attachmentId String   @unique
+  id           String             @id @default(cuid(2))
+  jobId        String             @unique // n=1, no partials — output:job is strictly 1:1
+  attachmentId String             @unique
   mime         String? // "audio/mpeg" — what actually came back, not what was asked for
   ext          String? // "mp3"
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  kind         AudioGenOutputKind @default(FINAL)
 
   job        AudioGenJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
   attachment Attachment  @relation("AudioGenOutputToAttachment", fields: [attachmentId], references: [id], onDelete: Cascade)

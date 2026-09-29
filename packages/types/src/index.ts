@@ -155,6 +155,8 @@ export type {
 export type {
   HydrateAttachmentById,
   HydrateAttachmentByIdAck,
+  HydrateAttachmentEventRecord,
+  HydrateAttachmentEventUnion,
   HydrateAttachments,
   HydrateAttachmentsAck,
   HydrateAttachmentsByConversationId,

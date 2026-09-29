@@ -3296,7 +3296,8 @@ export const AudioGenOutputScalarFieldEnum = {
   mime: 'mime',
   ext: 'ext',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  kind: 'kind'
 } as const
 
 export type AudioGenOutputScalarFieldEnum = (typeof AudioGenOutputScalarFieldEnum)[keyof typeof AudioGenOutputScalarFieldEnum]
@@ -4166,6 +4167,20 @@ export type EnumAudioGenStageFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'AudioGenStage[]'
  */
 export type ListEnumAudioGenStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AudioGenStage[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AudioGenOutputKind'
+ */
+export type EnumAudioGenOutputKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AudioGenOutputKind'>
+    
+
+
+/**
+ * Reference to a field of type 'AudioGenOutputKind[]'
+ */
+export type ListEnumAudioGenOutputKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AudioGenOutputKind[]'>
     
 
 

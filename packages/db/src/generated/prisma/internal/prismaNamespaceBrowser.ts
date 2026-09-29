@@ -316,7 +316,8 @@ export const AudioGenOutputScalarFieldEnum = {
   mime: 'mime',
   ext: 'ext',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  kind: 'kind'
 } as const
 
 export type AudioGenOutputScalarFieldEnum = (typeof AudioGenOutputScalarFieldEnum)[keyof typeof AudioGenOutputScalarFieldEnum]

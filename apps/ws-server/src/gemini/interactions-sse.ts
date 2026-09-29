@@ -1075,7 +1075,7 @@ export class GeminiInteractionsSseService extends GeminiInteractionsService {
               waveformPeaks: []
             }
           : null,
-        audioGenOutput: jobId ? { jobId, mime, ext } : null,
+        audioGenOutput: jobId ? { jobId, mime, ext, kind: "FINAL" } : null,
         generationGroupId: seriesId,
         requestMessageId,
         createdAt: new Date(Date.now()),

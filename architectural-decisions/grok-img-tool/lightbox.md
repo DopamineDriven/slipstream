@@ -32,7 +32,14 @@ Prisma is touched once per user per connection (populate), never per open.
    vocabulary — USER vs AI, inline vs job vs audio, is read-time narrowing on fields already present
    (`draftId`/`batchId` only ever set for user uploads; `seriesId` + exactly one of
    `inlineImageGenOutput` / `imageGenOutput` / `audioGenOutput` for generated; `ttsJob` for TTS).
-3. **Populate predicate: `{ userId, status: "READY" }` — the direct `Attachment → User` relation.**
+3. **Populate predicate — the direct `Attachment → User` relation.** As landed 2026-09-28
+   (`prisma/attachment-hydration.ts`): `status != FAILED`, and `OR` of: any non-GENERATED row
+   (user uploads of every type — audio included, providers take mp3/wav natively); GENERATED with
+   `imageGenOutput.kind = FINAL`; GENERATED with `inlineImageGenOutput.kind = FINAL`; GENERATED with
+   `audioGenOutput.kind = FINAL` (new `AudioGenOutputKind` enum + column, `@default(FINAL)`, so the
+   migration backfilled every lyria row). PARTIALs of any lane never enter the registry until the
+   partial replay lane exists; TTS rides its own job lane and stays out. Originally drafted as
+   `status: "READY"`; Andrew widened it to `!= FAILED`.
    `attachment.prisma`: `userId String` (required) + `user User @relation(… onDelete: Cascade)` L61/L116,
    so the outer key IS the FK and populate is one query with no join through conversations or
    messages. `conversationId String?` (L56/L111, cascade) supplies the inner key. **Conversation scope
@@ -87,16 +94,22 @@ The `{modal}` slot sits beside `{children}` inside every provider in `app/(chat)
 
 ## Server — the registry
 
-**Where it lives.** A dedicated `AttachmentRegistryService` (`apps/ws-server/src/attachment/registry.ts`
-or wherever the domain belongs), constructed in the `exe()` composition root and constructor-injected
-into the resolver chain **and** every service that persists or finalizes attachments. Not a field on
-the Prisma service: a CRUD class must not hide a cache (CLAUDE.md, registry pattern).
+**Where it lives (Andrew, 2026-09-28): on `ResolverAttachmentHydrationService` itself.** The link
+sits at the bottom of the resolver ladder (`resolver/index.ts` JSDoc: `utils.ts` is the base,
+`asset-compat.ts` above it, then `attachment-hydration.ts`, and everything else stacks on top), so a
+`protected` registry there is reachable by every link that writes through — `asset-complete.ts`
+(finalize), `chat.ts` (rekey), `connection.ts` (populate / evict) — and by its own three handlers.
+No separate service, no composition-root injection. It is still not on the Prisma service: a CRUD
+class must not hide a cache (CLAUDE.md, registry pattern).
 
 ```ts
-class AttachmentRegistryService {
-  protected registry = new Map<string, Map<string, Map<string, AttachmentSingleton<true>>>>();
-  // populate(userId)                      — one findMany, where { userId, status: "READY" }, include: includeGamma
-  // *buckets(userId)                      — async generator, one [conversationId, rows[]] per inner Map ("new-chat" included)
+class ResolverAttachmentHydrationService extends ResolverAssetCompatService {
+  protected attachmentRegistry = new Map<string, Map<string, Map<string, AttachmentSingleton<true>>>>();
+  // populate(userId)                      — consumes prisma.attachmentHydrationGenerator(userId): one yield per bucket,
+  //                                          new-chat first, then conversations most-recently-active first (landed 2026-09-28,
+  //                                          prisma/attachment-hydration.ts — metadata query for ordered ids + counts up front,
+  //                                          then known-count offset slices per bucket; predicate status != FAILED)
+  // *buckets(userId)                      — iterate the inner Maps for the hydrate_attachments ack stream
   // byAttachment(userId, attachmentId)     — scan the user's inner maps (small) → the row
   // set(userId, row)                       — write-through; inner key = row.conversationId ?? "new-chat"
   // rekey(userId, batchId, conversationId) — move the batch's rows out of the "new-chat" bucket
@@ -117,7 +130,7 @@ lazy per-conversation populate if a user ever outgrows one `findMany`.
 |---|---|---|
 | `resolver/asset-complete.ts`, after `finalize()` | alongside `asset_ready` | `set` — always; bucket = `conversationId ?? "new-chat"` (the thumbnail → full-size UX) |
 | `resolver/chat.ts`, after `handleAiChatRequest` returns `res: HandleAiChatRequestRT` (L119/L125) | before the first `ai_chat_chunk` | `isNewChat` only → `rekey(userId, batchId, res.id)`; an existing conversation needs nothing |
-| every provider handler, after `handleAiChatResponse` returns `convo` (14 sites, one line each; or one shared post-persist step on the provider base — not in the Prisma service) | before the `ai_chat_response` send | `set` the generated rows — born at persist with the real `conversationId`, never pass through finalize |
+| `resolver/chat.ts` `handleAIChat`, after the awaited provider call (`await svc.routeXai(commonProps)` etc., L319–L389) | after the handler has sent `ai_chat_response` | `set` the generated rows — born at persist with the real `conversationId`, never pass through finalize. The provider services sit outside the chain, so the handlers **return the persisted `convo`** they already hold (additive `return`, 14 signatures, void today) and the resolver writes once. Alternative: a redis subscriber on the published `ai_chat_response` — nothing observes it today (`dispatch.ts` allow-list only), heavier |
 | the compat completion path (image compat / Adobe webhook) | — | `set` the row with its new `compatStatus` / `compatCdnUrl` |
 | asset delete | `asset_deleted` | `delete` (the client drops it on the existing `asset_deleted` frame — no new push needed) |
 
@@ -158,8 +171,9 @@ same `subscribe` / `getSnapshot` surface `ChatStore` exposes, so consumers subsc
 
 - sends `hydrate_attachments` once `connection_established` lands, once per connection, and again on
   reconnect (the `rehydrateKeyRef` posture in `stt-context.tsx` L1072–1083);
-- ingests `hydrate_attachments_ack` (replace the bucket) and `hydrate_att_by_id_ack` (set one row;
-  if the id was in another bucket, move it — that is the rekey arriving);
+- ingests `hydrate_attachments_ack` (**upsert** into the bucket — a bucket past the page size arrives
+  as several known-count slices) and `hydrate_attachment_by_id_ack` (set one row; if the id was in
+  another bucket, move it — that is the rekey arriving);
 - drops a row on `asset_deleted`.
 
 Hooks: `useAttachment(attachmentId)` → the row or `undefined`; `useConversationAttachments(conversationId)`
@@ -182,8 +196,9 @@ client component. No dynamic API in either segment → static shells, `<Link>` p
 
 ## Open (Andrew's calls)
 
-- **Persist write-through placement** — 14 one-liners in the handlers, or one post-persist step on
-  the provider base class.
+- **Response-persist write-through** — handlers `return` the persisted `convo` and `handleAIChat`
+  sets once (recommended; follows from the chain placement), or a redis subscriber on
+  `ai_chat_response`.
 - **OG metadata** — the only thing the client path cannot do. Drop now; an `opengraph-image` route
   later if shared links matter.
 - **Delete `inlineImageGenSpecsByAttachmentId`** once both pages are off it.
@@ -194,8 +209,8 @@ client component. No dynamic API in either segment → static shells, `<Link>` p
 ## Landing order
 
 1. Contract file (four events) + union + re-exports; rebuild types.
-2. `AttachmentRegistryService` + composition root + populate/evict in the post-connection job + evict on last close.
-3. Resolver link + dispatch wiring + write-through and push at finalize / request rekey / response persist / compat completion.
+2. Registry Map + methods on `ResolverAttachmentHydrationService`; populate/evict in the post-connection job; evict on last close (`ws-server/index.ts` close hook reaches it via `this.resolver`).
+3. Fill the three stubbed handlers; write-through and push at finalize / request rekey / response persist (handlers return `convo`) / compat completion.
 4. Web: ws-client slots → `AttachmentRegistryProvider` (+ hooks) → two client components → two pages.
 5. Delete the ORM temp method.
 

@@ -1,4 +1,5 @@
 import type { AttachmentSingleton } from "@/types.ts";
+import type { UTR } from "@/utils.ts";
 
 export type HydrateAttachments = {
   type: "hydrate_attachments";
@@ -49,3 +50,17 @@ export type HydrateAttachmentByIdAck = {
   attachment?: AttachmentSingleton<true>;
   reason?: "INVALID_ID" | (string & {});
 };
+
+export type HydrateAttachmentEventUnion =
+  | HydrateAttachmentById
+  | HydrateAttachmentByIdAck
+  | HydrateAttachments
+  | HydrateAttachmentsAck
+  | HydrateAttachmentsByConversationId
+  | HydrateAttachmentsByConversationIdAck;
+
+export type HydrateAttachmentEventRecord<T extends boolean = false> = UTR<
+  HydrateAttachmentEventUnion,
+  "type",
+  T
+>;

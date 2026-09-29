@@ -120,6 +120,12 @@ export type IncludeCreateConvoWithImgGenOrAudioGenProps = {
             {
               AND: [
                 { origin: "GENERATED" },
+                { audioGenOutput: { kind: "FINAL" } }
+              ];
+            },
+            {
+              AND: [
+                { origin: "GENERATED" },
                 { imageGenOutput: { kind: "FINAL" } }
               ];
             },
