@@ -501,3 +501,134 @@ deception.
 4. Web: `instrumentation-client.ts`, `transition-store.ts`, `attachment-routes.ts`, provider `warm` / `warmAttachment`, `NavigationSync` leaves, layout mount.
 5. Verify the `RouterTransition*` type exports from the installed `next` (16.3.6) — first thing, since the store imports them.
 6. Later: bucket-level LRU on the client store; server per-user eviction.
+
+---
+
+## 5. Your side — the three lightbox files (sketch, 2026-09-29)
+
+Everything below reads `useAttachment(id)` from `@/hooks/use-attachment`. `NavigationSync` already
+fires the by-id ask for `/attachment/[id]` on both the transition and the committed leaf, so these
+components only render what lands. **Restart the dev server once** — `src/instrumentation-client.ts`
+is picked up at boot, not by HMR.
+
+### 5.1 `ui/chat/inline-image-gen/shallow-lightbox.tsx` — replace the stub
+
+```tsx
+"use client";
+
+import { useParams } from "next/navigation";
+import { useAttachment } from "@/hooks/use-attachment";
+import { LightboxRoute } from "@/ui/chat/inline-image-gen/lightbox-route";
+
+export function ShallowLightbox() {
+  const { id } = useParams<{ id: string }>();
+  const row = useAttachment(id);
+  if (!row) return null; // by-id ack not landed yet
+
+  // images only this pass: inline / job lineage first, then a user upload's ImageMetadata
+  const out = row.inlineImageGenOutput ?? row.imageGenOutput;
+  const width = out?.width ?? row.image?.width;
+  const height = out?.height ?? row.image?.height;
+  if (!row.cdnUrl || !width || !height) return null;
+
+  return (
+    <LightboxRoute
+      image={{
+        src: row.cdnUrl, // the original — compat is for models, not users
+        width,
+        height,
+        alt: out?.revisedPrompt ?? row.filename ?? "",
+        caption: out?.revisedPrompt ?? undefined,
+        format: out?.ext ?? row.ext ?? undefined
+      }}
+    />
+  );
+}
+```
+
+### 5.2 `app/(chat)/@modal/(.)attachment/[id]/page.tsx` — no params, no I/O
+
+```tsx
+import { ShallowLightbox } from "@/ui/chat/inline-image-gen/shallow-lightbox";
+
+export default function InterceptedAttachmentPage() {
+  return <ShallowLightbox />;
+}
+```
+
+(delete the `prismaClient` / `ormHandler` / `notFound` imports and the `params` prop.)
+
+### 5.3 `app/(chat)/attachment/[id]/page.tsx` — the hard load, same source
+
+Drop `generateMetadata` and the Prisma calls; the page becomes a one-line shell around a client
+view that keeps your existing figure + back link:
+
+```tsx
+// page.tsx
+import { AttachmentPageView } from "@/ui/chat/inline-image-gen/attachment-page-view";
+
+export default function AttachmentPage() {
+  return <AttachmentPageView />;
+}
+```
+
+```tsx
+// ui/chat/inline-image-gen/attachment-page-view.tsx
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useAttachment } from "@/hooks/use-attachment";
+
+export function AttachmentPageView() {
+  const { id } = useParams<{ id: string }>();
+  const row = useAttachment(id);
+  if (!row) return null;
+  const out = row.inlineImageGenOutput ?? row.imageGenOutput;
+  const width = out?.width ?? row.image?.width;
+  const height = out?.height ?? row.image?.height;
+  if (!row.cdnUrl || !width || !height) return null;
+  const caption = out?.revisedPrompt ?? row.filename ?? "";
+
+  return (
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-6 py-10">
+      <Link
+        href={row.conversationId ? `/chat/${row.conversationId}` : "/"}
+        className="text-muted-foreground hover:text-foreground w-fit text-sm transition-colors">
+        &larr; Back to conversation
+      </Link>
+      <figure className="flex flex-col gap-3">
+        <div
+          className="bg-muted relative overflow-hidden rounded-2xl"
+          style={{ aspectRatio: `${width} / ${height}`, width: `min(100%, ${width}px)` }}>
+          <Image src={row.cdnUrl} alt={caption} fill sizes="(min-width: 64rem) 64rem, 100vw" className="object-cover" priority />
+        </div>
+        <figcaption className="flex flex-col gap-1">
+          <span className="text-muted-foreground font-mono text-xs">
+            {width} × {height} · {out?.ext ?? row.ext}
+          </span>
+          <span className="text-muted-foreground max-w-3xl text-sm leading-relaxed text-pretty">{caption}</span>
+        </figcaption>
+      </figure>
+    </main>
+  );
+}
+```
+
+OG metadata goes with `generateMetadata` (decided: drop now, `opengraph-image` route later if shared
+links matter).
+
+### 5.4 Then delete
+
+`inlineImageGenSpecsByAttachmentId` in `orm/user-message-service.ts` — nothing calls it once 5.2 and
+5.3 are in.
+
+### 5.5 Test pass
+
+1. `pnpm -C apps/web typecheck`, restart the dev server (instrumentation-client), ws-server up.
+2. Open a conversation with an inline image. Devtools WS frames: one `hydrate_attachments_by_conversation_id` at the click, one ack with the bucket. Click the Eye → modal opens, **no** Prisma, no further frames.
+3. Reload on `/attachment/[id]`: `hydrate_attachment_by_id` with `conversationId: "new-chat"` (the believed key on a cold mirror) → ack carries the real key → full page renders. Back → conversation; forward → modal again (traverse fires the transition).
+4. Upload an image in an existing conversation: `hydrate_attachment_by_id_ack` beside `asset_ready`; the Eye on the thumbnail opens it before send.
+5. New chat: upload, send. Rekey acks arrive before the first chunk with the real `conversationId`; the Eye still opens the same row after the url flips at completion.
+6. A second navigation into the same conversation inside five minutes sends nothing (TTL); after five minutes it re-asks and the bucket is replaced wholesale.

@@ -11,6 +11,7 @@ trustPolicy: "off"
 trustLockfile: true
 blockExoticSubdeps: false
 dangerouslyAllowAllBuilds: true
+pmOnFail: ignore
 
 catalogs:
   anthropic:

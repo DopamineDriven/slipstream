@@ -4,6 +4,7 @@ import { AIChatProvider } from "@/context/ai-chat-context";
 import { ApiKeysProvider } from "@/context/api-keys-context";
 import { AssetProvider } from "@/context/asset-context";
 import { AttachmentRegistryProvider } from "@/context/attachment-registry-context";
+import { NavigationSync } from "@/ui/navigation-sync";
 import { AudioGenProvider } from "@/context/audio-gen-context";
 import { ChatWebSocketProvider } from "@/context/chat-ws-context";
 import { ConversationHydrationProvider } from "@/context/convo-hydration-context";
@@ -35,6 +36,7 @@ export default async function AuthedLayout({
                     <TTSProvider>
                       <ConversationHydrationProvider userId={session.user.id}>
                         <AttachmentRegistryProvider>
+                          <NavigationSync />
                           <AIChatProvider userId={session.user.id}>
                             {children}
                             {modal}
