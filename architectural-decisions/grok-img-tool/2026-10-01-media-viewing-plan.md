@@ -31,7 +31,7 @@ AttachmentSingleton<true> ──toAssetView──▶ ImageAsset | AudioAsset | D
 | `components/lyrics-panel.tsx` | **in** | `src/ui/chat/lightbox/lyrics-panel.tsx` |
 | `components/document-embed.tsx` | **in** | `src/ui/chat/lightbox/document-embed.tsx` |
 | `components/playback-provider.tsx` | port | `src/playback/provider.tsx` — beside the store; mounts the one `<audio>` |
-| `components/waveform-scrubber.tsx` | port | `src/ui/chat/playback/waveform-scrubber.tsx` |
+| `components/waveform-scrubber.tsx` | **in** | `src/ui/chat/waveform/index.tsx` — `WaveformScrubber`, local `WAVEFORM_PEAK_SCALE = 100` until §4 hoists it |
 | `components/audio-player.tsx` | port **+ parity** (§3) | `src/ui/chat/playback/audio-player.tsx` |
 | `lib/asset-view.ts` | port **+ adapt** (§2) | `src/lib/asset-view.ts` |
 | `components/asset-meta.tsx` | port (needs 5 icons, §7) | `src/ui/chat/lightbox/asset-meta.tsx` |
@@ -44,8 +44,16 @@ AttachmentSingleton<true> ──toAssetView──▶ ImageAsset | AudioAsset | D
 | `lib/audio-ingest.ts` | **not ported** — `quantizePeaks` already lives server-side in `waveformPeaksColumn`; only the two constants matter (§4) | — |
 | `lib/cdn-url.ts`, `img-ctx.ts`, `models.ts`, `db.ts`, `demo-*`, `generated/*`, `stream-demo.tsx`, `inline-image-gen.tsx` | **not ported** — ours exist or demo-only | — |
 
-`@d0paminedriven/audiodown` is in `apps/web/package.json` already. The web app must only ever
-`import type { AudioSpecs }` from it — a value import drags a native addon into the Next bundle.
+`@d0paminedriven/audiodown` is in `apps/web/package.json` already. Its `browser` field points at
+`browser.js`, the `wasm32-wasip1-threads` build via emnapi, so a value import in client code resolves
+to wasm, not the native addon (corrected 2026-10-01). The catch is `-threads`: it needs
+`SharedArrayBuffer`, which browsers expose only under cross-origin isolation (COOP `same-origin` +
+COEP `require-corp` / `credentialless`), and `require-corp` then wants CORP headers or `crossorigin`
+on every CDN image and track the app paints. So client-side decode is a deliberate opt-in, not a
+default: the server path (`analyzeBuffer` at persist, the peaks backfill for history) stays primary,
+and the one place the wasm build would earn its keep — a waveform preview for a user's own audio
+upload before send — is also solvable by running `analyzeBuffer` at finalize, where `asset-complete`
+today writes the `[0]` placeholder. Until that choice is made, keep the web imports type-only.
 
 ---
 
@@ -186,6 +194,17 @@ Lyria rows first; TTS is a separate call.
 
 ---
 
+## 8a. Two waveforms, on purpose
+
+`ui/chat/stt/speech-waveform.tsx` already draws bars during dictation: live RMS from the
+`PcmCapture` AudioWorklet (`onLevel`), a scrolling 48ms history, motion-value `scaleY` per bar at
+7px slots, a primary→foreground `color-mix` across the track, reduced-motion fallback,
+`aria-hidden`. The scrubber (`ui/chat/waveform/index.tsx`) is the other thing: a persisted 1024-bucket
+envelope reduced to one SVG bar per 3px, with a transparent native range input on top as the real
+control and the played portion clipped in `primary`. Live signal vs stored envelope, decoration vs
+seek control — they do not merge. What should match is the vocabulary: rounded bar caps, the
+`muted-foreground` rest tone, `primary` for the active part, so a user reads both as "sound".
+
 ## 9. Out of scope, named
 
 - **TTS** rows: not in the registry (no FINAL arm), own `<audio>` in `tts-context.tsx`, own cache.
@@ -197,8 +216,8 @@ Lyria rows first; TTS is a separate call.
 
 ## 10. Landing order
 
-1. **Playback foundation**: `playback/provider.tsx`; `ui/chat/playback/waveform-scrubber.tsx`,
-   `audio-player.tsx` with the parity items from §3; `lib/download.ts`, `lib/format.ts`; the two
+1. **Playback foundation**: `playback/provider.tsx`; `ui/chat/playback/audio-player.tsx` with the
+   parity items from §3, composing the ported `ui/chat/waveform/index.tsx` scrubber; `lib/download.ts`, `lib/format.ts`; the two
    constants in `@slipstream/types`; `track.id = cdnUrl`; mount `PlaybackProvider` in
    `(chat)/layout.tsx` directly around `{children}{modal}`. Typecheck.
 2. **Adapter**: `lib/asset-view.ts` with the §2 adaptations.
