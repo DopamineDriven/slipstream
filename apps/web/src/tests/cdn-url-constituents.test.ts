@@ -97,7 +97,6 @@ for (const [env, { host, isProd, urls }] of Object.entries(FIXTURES)) {
           `${misrouted.length} user urls routed to the generated parser:\n${misrouted.slice(0, 8).join("\n")}`
         );
       });
-
     });
 
     describe("cdnUrlHandler — generated assets", () => {
@@ -109,7 +108,12 @@ for (const [env, { host, isProd, urls }] of Object.entries(FIXTURES)) {
 
       it(`rebuilds every current-anatomy url from its constituents (${current.length})`, t => {
         const failures = Array.of<string>();
-        const byType = { InlineImageGenOutput: 0, ImageGenOutput: 0 };
+        const byType = {
+          InlineImageGenOutput: 0,
+          ImageGenOutput: 0,
+          AudioGenOutput: 0,
+          TTSJob: 0
+        };
 
         for (const u of current) {
           const { second: userId, basename } = segments(u);
@@ -132,22 +136,36 @@ for (const [env, { host, isProd, urls }] of Object.entries(FIXTURES)) {
           const rebuilt = `${host}/${c.assetOrigin.toLowerCase()}/${c.userId}/${c.timestampMs}-${c.sId}-${c.sOrdinal}.${urlExt}`;
           const problems = Array.of<string>();
           if (rebuilt !== u) problems.push(`rebuilt ${rebuilt}`);
-          if (c.userId !== userId) problems.push(`userId ${c.userId} ≠ ${userId}`);
-          if (c.timestampMs !== Number.parseInt(ms, 10)) problems.push(`timestampMs ${c.timestampMs}`);
+          if (c.userId !== userId)
+            problems.push(`userId ${c.userId} ≠ ${userId}`);
+          if (c.timestampMs !== Number.parseInt(ms, 10))
+            problems.push(`timestampMs ${c.timestampMs}`);
           if (c.sId !== sId) problems.push(`sId ${c.sId} ≠ ${sId}`);
-          if (c.sOrdinal !== Number.parseInt(ordinal, 10)) problems.push(`sOrdinal ${c.sOrdinal}`);
-          if (c.type !== (CUID2.test(sId) ? "InlineImageGenOutput" : "ImageGenOutput"))
+          if (c.sOrdinal !== Number.parseInt(ordinal, 10))
+            problems.push(`sOrdinal ${c.sOrdinal}`);
+          if (
+            c.type !==
+            (CUID2.test(sId) ? "InlineImageGenOutput" : "ImageGenOutput")
+          )
             problems.push(`type ${c.type} for ${sId}`);
           // images keep their extension; anything else is reported as pdf by contract
           const expectedExt = isImage(urlExt) ? urlExt : "pdf";
-          if (c.ext !== expectedExt) problems.push(`ext ${c.ext} ≠ ${expectedExt}`);
+          if (c.ext !== expectedExt)
+            problems.push(`ext ${c.ext} ≠ ${expectedExt}`);
           if (c.assetType !== (isImage(urlExt) ? "IMAGE" : "DOCUMENT"))
             problems.push(`assetType ${c.assetType}`);
-          if (problems.length > 0) failures.push(`${u}\n    ${problems.join(" · ")}`);
+          if (problems.length > 0)
+            failures.push(`${u}\n    ${problems.join(" · ")}`);
         }
 
-        t.diagnostic(`${env}: ${byType.InlineImageGenOutput} inline (cuid2) · ${byType.ImageGenOutput} job (ig_ / nanoid)`);
-        assert.equal(failures.length, 0, `${failures.length} failures:\n${failures.slice(0, 8).join("\n")}`);
+        t.diagnostic(
+          `${env}: ${byType.InlineImageGenOutput} inline (cuid2) · ${byType.ImageGenOutput} job (ig_ / nanoid)`
+        );
+        assert.equal(
+          failures.length,
+          0,
+          `${failures.length} failures:\n${failures.slice(0, 8).join("\n")}`
+        );
       });
 
       it(`census: legacy generated urls without a series ordinal (${legacy.length}) — not a contract`, t => {
@@ -202,19 +220,31 @@ for (const [env, { host, isProd, urls }] of Object.entries(FIXTURES)) {
             problems.push(`compatStatus ${c.compatStatus}`);
           } else {
             byOrigin[c.assetOrigin] += 1;
-            if (c.assetOrigin.toLowerCase() !== origin) problems.push(`assetOrigin ${c.assetOrigin} ≠ ${origin}`);
-            if (c.attachmentId !== attachmentId) problems.push(`attachmentId ${c.attachmentId}`);
-            if (c.filename !== `att_${attachmentId}`) problems.push(`filename ${c.filename}`);
+            if (c.assetOrigin.toLowerCase() !== origin)
+              problems.push(`assetOrigin ${c.assetOrigin} ≠ ${origin}`);
+            if (c.attachmentId !== attachmentId)
+              problems.push(`attachmentId ${c.attachmentId}`);
+            if (c.filename !== `att_${attachmentId}`)
+              problems.push(`filename ${c.filename}`);
             const expectedExt = isImage(urlExt) ? urlExt : "pdf";
-            if (c.ext !== expectedExt) problems.push(`ext ${c.ext} ≠ ${expectedExt}`);
-            if (c.assetType !== (isImage(urlExt) ? "IMAGE" : "DOCUMENT")) problems.push(`assetType ${c.assetType}`);
+            if (c.ext !== expectedExt)
+              problems.push(`ext ${c.ext} ≠ ${expectedExt}`);
+            if (c.assetType !== (isImage(urlExt) ? "IMAGE" : "DOCUMENT"))
+              problems.push(`assetType ${c.assetType}`);
             const rebuilt = `${host}/${c.assetOrigin.toLowerCase()}/converted/att_${c.attachmentId}.${urlExt}`;
             if (rebuilt !== u) problems.push(`rebuilt ${rebuilt}`);
           }
-          if (problems.length > 0) failures.push(`${u}\n    ${problems.join(" · ")}`);
+          if (problems.length > 0)
+            failures.push(`${u}\n    ${problems.join(" · ")}`);
         }
-        t.diagnostic(`${env}: ${byOrigin.UPLOAD} upload · ${byOrigin.PASTED} pasted (ACTIVE)`);
-        assert.equal(failures.length, 0, `${failures.length} failures:\n${failures.slice(0, 8).join("\n")}`);
+        t.diagnostic(
+          `${env}: ${byOrigin.UPLOAD} upload · ${byOrigin.PASTED} pasted (ACTIVE)`
+        );
+        assert.equal(
+          failures.length,
+          0,
+          `${failures.length} failures:\n${failures.slice(0, 8).join("\n")}`
+        );
       });
 
       it(`rebuilds every ALIASED (original) url (${aliased.length})`, t => {
@@ -224,7 +254,9 @@ for (const [env, { host, isProd, urls }] of Object.entries(FIXTURES)) {
           const { origin, second: userId, basename } = segments(u);
           const m = ALIASED_BASENAME.exec(basename);
           if (!m?.[1] || !m?.[2] || !m?.[3]) {
-            failures.push(`${u}\n    basename did not match <ms>-<filename>.<ext>`);
+            failures.push(
+              `${u}\n    basename did not match <ms>-<filename>.<ext>`
+            );
             continue;
           }
           const [, ms, filename, urlExt] = m;
@@ -236,20 +268,27 @@ for (const [env, { host, isProd, urls }] of Object.entries(FIXTURES)) {
           } else if (c.compatStatus !== "ALIASED") {
             problems.push(`compatStatus ${c.compatStatus}`);
           } else {
-            if (c.assetOrigin.toLowerCase() !== origin) problems.push(`assetOrigin ${c.assetOrigin} ≠ ${origin}`);
-            if (c.userId !== userId) problems.push(`userId ${c.userId} ≠ ${userId}`);
-            if (c.timestampMs !== Number.parseInt(ms, 10)) problems.push(`timestampMs ${c.timestampMs}`);
-            if (c.filename !== filename) problems.push(`filename ${c.filename} ≠ ${filename}`);
+            if (c.assetOrigin.toLowerCase() !== origin)
+              problems.push(`assetOrigin ${c.assetOrigin} ≠ ${origin}`);
+            if (c.userId !== userId)
+              problems.push(`userId ${c.userId} ≠ ${userId}`);
+            if (c.timestampMs !== Number.parseInt(ms, 10))
+              problems.push(`timestampMs ${c.timestampMs}`);
+            if (c.filename !== filename)
+              problems.push(`filename ${c.filename} ≠ ${filename}`);
             // an ALIASED original keeps whatever image extension the user
             // uploaded (isUserImage); only the compat-converted lanes are
             // narrowed to png/webp/jpg/jpeg (isImage)
             const expectedExt = isUserImage(urlExt) ? urlExt : "pdf";
-            if (c.ext !== expectedExt) problems.push(`ext ${c.ext} ≠ ${expectedExt}`);
-            if (c.assetType !== (isUserImage(urlExt) ? "IMAGE" : "DOCUMENT")) problems.push(`assetType ${c.assetType}`);
+            if (c.ext !== expectedExt)
+              problems.push(`ext ${c.ext} ≠ ${expectedExt}`);
+            if (c.assetType !== (isUserImage(urlExt) ? "IMAGE" : "DOCUMENT"))
+              problems.push(`assetType ${c.assetType}`);
             const rebuilt = `${host}/${c.assetOrigin.toLowerCase()}/${c.userId}/${c.timestampMs}-${c.filename}.${urlExt}`;
             if (rebuilt !== u) problems.push(`rebuilt ${rebuilt}`);
           }
-          if (problems.length > 0) failures.push(`${u}\n    ${problems.join(" · ")}`);
+          if (problems.length > 0)
+            failures.push(`${u}\n    ${problems.join(" · ")}`);
         }
         t.diagnostic(
           `${env}: ALIASED extensions → ${[...byExt]
@@ -257,7 +296,11 @@ for (const [env, { host, isProd, urls }] of Object.entries(FIXTURES)) {
             .map(([e, n]) => `${e}:${n}`)
             .join(" ")}`
         );
-        assert.equal(failures.length, 0, `${failures.length} failures:\n${failures.slice(0, 8).join("\n")}`);
+        assert.equal(
+          failures.length,
+          0,
+          `${failures.length} failures:\n${failures.slice(0, 8).join("\n")}`
+        );
       });
     });
   });
