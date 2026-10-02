@@ -1,7 +1,8 @@
 "use client";
 
 import type { ChangeEvent } from "react";
-import { useCallback, useId, useMemo, useState } from "react";
+import { useId, useMemo } from "react";
+import { useMeasure } from "@/hooks/use-measure";
 import { cn } from "@/lib/utils";
 import { WAVEFORM_PEAK_SCALE } from "@slipstream/types";
 
@@ -9,6 +10,17 @@ import { WAVEFORM_PEAK_SCALE } from "@slipstream/types";
 const BAR_PITCH = 3;
 const BAR_STROKE = 2;
 const MIN_BARS = 24;
+
+interface WaveFormScrubberProps {
+  peaks: readonly number[];
+  value: number;
+  max: number | undefined;
+  disabled: boolean;
+  label: string;
+  valueText: string;
+  onChangeAction: (e: ChangeEvent<HTMLInputElement>) => void;
+  height: number;
+}
 
 /**
  * The seek control. A native range input stays the interactive element (keyboard,
@@ -26,29 +38,12 @@ export function WaveformScrubber({
   valueText,
   onChangeAction,
   height
-}: {
-  peaks: readonly number[];
-  value: number;
-  max: number | undefined;
-  disabled: boolean;
-  label: string;
-  valueText: string;
-  onChangeAction: (e: ChangeEvent<HTMLInputElement>) => void;
-  height: number;
-}) {
-  const [width, setWidth] = useState(0);
+}: WaveFormScrubberProps) {
   const clipId = `clip-${useId().replace(/\W/g, "")}`;
 
-  const measure = useCallback((node: HTMLDivElement | null) => {
-    if (!node) return;
-    setWidth(Math.floor(node.getBoundingClientRect().width));
-    const observer = new ResizeObserver(entries => {
-      for (const entry of entries)
-        setWidth(Math.floor(entry.contentRect.width));
-    });
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
+  const { measure, width: measuredWidth } = useMeasure();
+
+  const width = Math.floor(measuredWidth);
 
   const bars =
     width > 0 ? Math.max(MIN_BARS, Math.floor(width / BAR_PITCH)) : 0;
@@ -58,7 +53,7 @@ export function WaveformScrubber({
     const mid = height / 2;
     const reach = mid - BAR_STROKE / 2;
     const pitch = width / bars;
-    const parts: string[] = [];
+    const parts = Array.of<string>();
     for (let i = 0; i < bars; i++) {
       const from = Math.floor((i * peaks.length) / bars);
       const to = Math.max(

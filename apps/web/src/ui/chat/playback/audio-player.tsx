@@ -1,7 +1,7 @@
 "use client";
 
 import type { PlaybackTrack } from "@/playback/store";
-import type { ChangeEvent } from "react";
+import type { ChangeEvent, ReactNode } from "react";
 import { usePlaybackContext } from "@/context/playback-context";
 import { usePlaybackValue } from "@/hooks/use-playback-value";
 import { useTrackPlayback } from "@/hooks/use-track-playback";
@@ -35,6 +35,7 @@ export interface AudioPlayerProps {
   pendingLabel?: string;
   size?: "sm" | "lg";
   className?: string;
+  accessory?: ReactNode;
 }
 
 /**
@@ -49,7 +50,8 @@ export function AudioPlayer({
   subtitle,
   pendingLabel = "",
   size = "lg",
-  className
+  className,
+  accessory
 }: AudioPlayerProps) {
   const { toggle, seek, stop, setVolume, toggleMute } = usePlaybackContext();
   const { status, time, duration } = useTrackPlayback(track?.id);
@@ -223,12 +225,12 @@ export function AudioPlayer({
             </span>
           </div>
         </div>
-
-        <div className="text-muted-foreground flex justify-between font-mono text-[11px] tabular-nums">
+        <div className="text-muted-foreground grid grid-cols-[1fr_auto_1fr] items-center font-mono text-[11px] tabular-nums">
           <span className={cn(pending && "opacity-50")}>
             {formatDuration(time)}
           </span>
-          <span className={cn(pending && "opacity-50")}>
+          <div className="flex justify-center">{accessory}</div>
+          <span className={cn("justify-self-end", pending && "opacity-50")}>
             {status === "error" ? "unavailable" : formatDuration(total)}
           </span>
         </div>

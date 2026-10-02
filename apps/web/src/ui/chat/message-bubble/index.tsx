@@ -1,16 +1,24 @@
 "use client";
 
+import type { PlaybackTrack } from "@/playback/store";
 import type { User } from "@/utils/auth-client";
 import type { ReactNode } from "react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useCookiesCtx } from "@/context/cookie-context";
+import {
+  audioSubtitle,
+  audioTitle,
+  modelDisplayName,
+  playbackTrack,
+  toAssetView
+} from "@/lib/asset-view";
 import { getInitials } from "@/lib/helpers";
 import { normalizeImgGenFields } from "@/lib/img-gen-to-attachment";
 import { processStreamingMarkdown } from "@/lib/markdown-streaming";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentDisplay } from "@/ui/chat/attachment-display";
-import { AudioPlayer } from "@/ui/chat/audio-player";
+import { InlineAudioGen } from "@/ui/chat/audio-gen/inline-audio-gen";
 import { ImageGenerationCanvasTest } from "@/ui/chat/image-gen/index";
 import { InlineImageGen } from "@/ui/chat/inline-image-gen";
 import { MessageIcons } from "@/ui/chat/message-bubble/message-icons";
@@ -166,25 +174,44 @@ function MessageBubbleImpl({
   );
 
   // lyria playback source — the live envelope while streaming, the committed
-  // attachment (audioGenOutput != null) thereafter; durationMs is the exact
-  // server-side frame-walk value so the timeline pre-paints before metadata
-  const audioGenPlayback = useMemo(() => {
+  // attachment (audioGenOutput != null) thereafter; the track is keyed by
+  // cdnUrl on both so the loaded sound survives the commit, and the title is
+  // built the same way on both so it never flips
+  const audioGen = useMemo(() => {
     if (message.messageType !== "AUDIO_GEN" || message.senderType !== "AI") {
       return undefined;
     }
     const live = liveAudioGenFields?.audio;
     if (live?.cdnUrl) {
+      const out = live.audioGenOutput;
+      const content = out?.content ?? undefined;
       return {
-        src: live.cdnUrl,
-        durationMs: live.audio?.duration ?? undefined
-      } as const;
+        track: {
+          id: live.cdnUrl,
+          src: live.cdnUrl,
+          title: audioTitle(
+            modelDisplayName(out?.generatingModel, out?.provider),
+            content
+          ),
+          duration:
+            live.audio && live.audio.duration > 0
+              ? live.audio.duration / 1000
+              : undefined
+        } satisfies PlaybackTrack,
+        peaks: live.audio?.waveformPeaks ?? [],
+        subtitle: undefined,
+        attachmentId: undefined
+      };
     }
     const att = message.attachments.find(a => a.audioGenOutput != null);
-    if (att?.cdnUrl) {
+    const asset = att ? toAssetView(att) : null;
+    if (asset?.kind === "AUDIO") {
       return {
-        src: att.cdnUrl,
-        durationMs: att.audio?.duration ?? undefined
-      } as const;
+        track: playbackTrack(asset),
+        peaks: asset.peaks,
+        subtitle: audioSubtitle(asset),
+        attachmentId: asset.id
+      };
     }
     return undefined;
   }, [
@@ -659,13 +686,11 @@ function MessageBubbleImpl({
                 : "bg-[#0d2a6b] text-[#fafafa]"
           )}>
           {message.messageType === "AUDIO_GEN" &&
-          message.senderType === "AI" ? (
-            // lyria lyrics render as a plain txt block — the [[A0]]/[25.6:]
-            // structural notation is markdown-hostile, so no processor pass
-            <pre className="mt-1 overflow-x-auto rounded-lg bg-black/25 p-3 font-mono text-xs leading-relaxed whitespace-pre">
-              {message.content}
-            </pre>
-          ) : hasRenderableMessageBlocks ? (
+          message.senderType ===
+            "AI" ? // a lyria turn's text is the lyric sheet and nothing else, and
+          // it lives in the card's drawer below — never the markdown pass,
+          // which would paint the [[A0]] / [:] notation raw
+          null : hasRenderableMessageBlocks ? (
             renderedMessageBlocks
           ) : (
             <>
@@ -711,14 +736,18 @@ function MessageBubbleImpl({
           )}
           {message.messageType === "AUDIO_GEN" &&
             message.senderType === "AI" &&
-            (audioGenPlayback !== undefined || liveHasLyrics === true) && (
-              // ONE mounted player for the whole turn: it appears in its
+            (audioGen !== undefined || liveHasLyrics === true) && (
+              // ONE mounted card for the whole turn: it appears in its
               // compiling state once lyrics start landing (hasLyrics) and
               // morphs in place — no remount, no replayed entrance — when
-              // the cdnUrl arrives (src flips defined)
-              <AudioPlayer
-                src={audioGenPlayback?.src}
-                durationMs={audioGenPlayback?.durationMs}
+              // the cdnUrl arrives (track flips defined); the Eye waits for
+              // the committed row's id
+              <InlineAudioGen
+                track={audioGen?.track}
+                peaks={audioGen?.peaks}
+                subtitle={audioGen?.subtitle}
+                attachmentId={audioGen?.attachmentId}
+                lyrics={message.content}
                 className="mt-3"
               />
             )}

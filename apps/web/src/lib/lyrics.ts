@@ -62,3 +62,13 @@ export function parseLyrics(text: string): LyricSection[] {
 
   return sections;
 }
+/** The lyrics as the panel reads them, for the clipboard. */
+export function formatLyrics(sections: readonly LyricSection[]): string {
+  return sections
+    .map(({ code, role, lines }) => {
+      const heading = role ? `${code} · ${role}` : code;
+      const body = lines.length ? lines.join("\n") : "(Instrumental)";
+      return heading ? `${heading}\n${body}` : body;
+    })
+    .join("\n\n");
+}
