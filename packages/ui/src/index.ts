@@ -168,6 +168,7 @@ export { EditIcon } from "@/icons/edit-icon";
 export { EllipsisHorizontal } from "@/icons/ellipsis-horizontal";
 export { EmptyChatHistory } from "@/icons/empty-chat-history";
 export { Expand } from "@/icons/expand";
+export { ExternalLink } from "@/icons/external-link";
 export { EyeClosed } from "@/icons/eye-closed";
 export { EyeOff } from "@/icons/eye-off";
 export { Eye } from "@/icons/eye";

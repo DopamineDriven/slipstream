@@ -463,6 +463,13 @@ export type EnumAudioGenOutputKindFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumAudioGenOutputKindFilter<$PrismaModel> | $Enums.AudioGenOutputKind
 }
 
+export type EnumProviderNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel> | null
+  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel> | $Enums.Provider | null
+}
+
 export type EnumAudioGenOutputKindWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.AudioGenOutputKind | Prisma.EnumAudioGenOutputKindFieldRefInput<$PrismaModel>
   in?: $Enums.AudioGenOutputKind[] | Prisma.ListEnumAudioGenOutputKindFieldRefInput<$PrismaModel>
@@ -471,6 +478,16 @@ export type EnumAudioGenOutputKindWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAudioGenOutputKindFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAudioGenOutputKindFilter<$PrismaModel>
+}
+
+export type EnumProviderNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel> | null
+  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumProviderNullableWithAggregatesFilter<$PrismaModel> | $Enums.Provider | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
 }
 
 export type EnumCliConfigSchemaVersionFilter<$PrismaModel = never> = {
@@ -714,13 +731,6 @@ export type EnumMemorySchemaVersionWithAggregatesFilter<$PrismaModel = never> = 
   _max?: Prisma.NestedEnumMemorySchemaVersionFilter<$PrismaModel>
 }
 
-export type EnumProviderNullableFilter<$PrismaModel = never> = {
-  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel> | null
-  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
-  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel> | $Enums.Provider | null
-}
-
 export type EnumMemorySummaryStateFilter<$PrismaModel = never> = {
   equals?: $Enums.MemorySummaryState | Prisma.EnumMemorySummaryStateFieldRefInput<$PrismaModel>
   in?: $Enums.MemorySummaryState[] | Prisma.ListEnumMemorySummaryStateFieldRefInput<$PrismaModel>
@@ -733,16 +743,6 @@ export type EnumMemoryRollingSummaryReasoningVersionFilter<$PrismaModel = never>
   in?: $Enums.MemoryRollingSummaryReasoningVersion[] | Prisma.ListEnumMemoryRollingSummaryReasoningVersionFieldRefInput<$PrismaModel>
   notIn?: $Enums.MemoryRollingSummaryReasoningVersion[] | Prisma.ListEnumMemoryRollingSummaryReasoningVersionFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumMemoryRollingSummaryReasoningVersionFilter<$PrismaModel> | $Enums.MemoryRollingSummaryReasoningVersion
-}
-
-export type EnumProviderNullableWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel> | null
-  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
-  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedEnumProviderNullableWithAggregatesFilter<$PrismaModel> | $Enums.Provider | null
-  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
 }
 
 export type EnumMemorySummaryStateWithAggregatesFilter<$PrismaModel = never> = {
@@ -1505,6 +1505,13 @@ export type NestedEnumAudioGenOutputKindFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumAudioGenOutputKindFilter<$PrismaModel> | $Enums.AudioGenOutputKind
 }
 
+export type NestedEnumProviderNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel> | null
+  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel> | $Enums.Provider | null
+}
+
 export type NestedEnumAudioGenOutputKindWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.AudioGenOutputKind | Prisma.EnumAudioGenOutputKindFieldRefInput<$PrismaModel>
   in?: $Enums.AudioGenOutputKind[] | Prisma.ListEnumAudioGenOutputKindFieldRefInput<$PrismaModel>
@@ -1513,6 +1520,16 @@ export type NestedEnumAudioGenOutputKindWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAudioGenOutputKindFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAudioGenOutputKindFilter<$PrismaModel>
+}
+
+export type NestedEnumProviderNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel> | null
+  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumProviderNullableWithAggregatesFilter<$PrismaModel> | $Enums.Provider | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumCliConfigSchemaVersionFilter<$PrismaModel = never> = {
@@ -1745,13 +1762,6 @@ export type NestedEnumMemorySchemaVersionWithAggregatesFilter<$PrismaModel = nev
   _max?: Prisma.NestedEnumMemorySchemaVersionFilter<$PrismaModel>
 }
 
-export type NestedEnumProviderNullableFilter<$PrismaModel = never> = {
-  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel> | null
-  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
-  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel> | $Enums.Provider | null
-}
-
 export type NestedEnumMemorySummaryStateFilter<$PrismaModel = never> = {
   equals?: $Enums.MemorySummaryState | Prisma.EnumMemorySummaryStateFieldRefInput<$PrismaModel>
   in?: $Enums.MemorySummaryState[] | Prisma.ListEnumMemorySummaryStateFieldRefInput<$PrismaModel>
@@ -1764,16 +1774,6 @@ export type NestedEnumMemoryRollingSummaryReasoningVersionFilter<$PrismaModel = 
   in?: $Enums.MemoryRollingSummaryReasoningVersion[] | Prisma.ListEnumMemoryRollingSummaryReasoningVersionFieldRefInput<$PrismaModel>
   notIn?: $Enums.MemoryRollingSummaryReasoningVersion[] | Prisma.ListEnumMemoryRollingSummaryReasoningVersionFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumMemoryRollingSummaryReasoningVersionFilter<$PrismaModel> | $Enums.MemoryRollingSummaryReasoningVersion
-}
-
-export type NestedEnumProviderNullableWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.Provider | Prisma.EnumProviderFieldRefInput<$PrismaModel> | null
-  in?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
-  notIn?: $Enums.Provider[] | Prisma.ListEnumProviderFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedEnumProviderNullableWithAggregatesFilter<$PrismaModel> | $Enums.Provider | null
-  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumMemorySummaryStateWithAggregatesFilter<$PrismaModel = never> = {

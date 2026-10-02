@@ -2,8 +2,8 @@ import { createReadStream } from "node:fs";
 import type { LoggerService } from "@/logger/index.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { CollectionDocument, UploadFileRT } from "@/xai/types.ts";
+import { GrokApiWorkupService } from "@/xai/api-workup.ts";
 import type { AttachmentSingleton } from "@slipstream/types";
-import { GrokApiWorkupService } from "./api-workup.ts";
 
 export class GrokApiMethodsService extends GrokApiWorkupService {
   constructor(

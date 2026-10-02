@@ -51,6 +51,9 @@ export type ImageGenOutputMinAggregateOutputType = {
   attachmentId: string | null
   width: number | null
   height: number | null
+  generatingModel: string | null
+  facilitatingModel: string | null
+  provider: $Enums.Provider | null
   mime: string | null
   ext: string | null
   revisedPrompt: string | null
@@ -69,6 +72,9 @@ export type ImageGenOutputMaxAggregateOutputType = {
   attachmentId: string | null
   width: number | null
   height: number | null
+  generatingModel: string | null
+  facilitatingModel: string | null
+  provider: $Enums.Provider | null
   mime: string | null
   ext: string | null
   revisedPrompt: string | null
@@ -87,6 +93,9 @@ export type ImageGenOutputCountAggregateOutputType = {
   attachmentId: number
   width: number
   height: number
+  generatingModel: number
+  facilitatingModel: number
+  provider: number
   mime: number
   ext: number
   revisedPrompt: number
@@ -121,6 +130,9 @@ export type ImageGenOutputMinAggregateInputType = {
   attachmentId?: true
   width?: true
   height?: true
+  generatingModel?: true
+  facilitatingModel?: true
+  provider?: true
   mime?: true
   ext?: true
   revisedPrompt?: true
@@ -139,6 +151,9 @@ export type ImageGenOutputMaxAggregateInputType = {
   attachmentId?: true
   width?: true
   height?: true
+  generatingModel?: true
+  facilitatingModel?: true
+  provider?: true
   mime?: true
   ext?: true
   revisedPrompt?: true
@@ -157,6 +172,9 @@ export type ImageGenOutputCountAggregateInputType = {
   attachmentId?: true
   width?: true
   height?: true
+  generatingModel?: true
+  facilitatingModel?: true
+  provider?: true
   mime?: true
   ext?: true
   revisedPrompt?: true
@@ -262,6 +280,9 @@ export type ImageGenOutputGroupByOutputType = {
   attachmentId: string
   width: number | null
   height: number | null
+  generatingModel: string | null
+  facilitatingModel: string | null
+  provider: $Enums.Provider | null
   mime: string | null
   ext: string | null
   revisedPrompt: string | null
@@ -303,6 +324,9 @@ export type ImageGenOutputWhereInput = {
   attachmentId?: Prisma.StringFilter<"ImageGenOutput"> | string
   width?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null
   height?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null
+  generatingModel?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  facilitatingModel?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  provider?: Prisma.EnumProviderNullableFilter<"ImageGenOutput"> | $Enums.Provider | null
   mime?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
   ext?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
   revisedPrompt?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
@@ -323,6 +347,9 @@ export type ImageGenOutputOrderByWithRelationInput = {
   attachmentId?: Prisma.SortOrder
   width?: Prisma.SortOrderInput | Prisma.SortOrder
   height?: Prisma.SortOrderInput | Prisma.SortOrder
+  generatingModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  facilitatingModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  provider?: Prisma.SortOrderInput | Prisma.SortOrder
   mime?: Prisma.SortOrderInput | Prisma.SortOrder
   ext?: Prisma.SortOrderInput | Prisma.SortOrder
   revisedPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -347,6 +374,9 @@ export type ImageGenOutputWhereUniqueInput = Prisma.AtLeast<{
   isPartial?: Prisma.BoolFilter<"ImageGenOutput"> | boolean
   width?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null
   height?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null
+  generatingModel?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  facilitatingModel?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  provider?: Prisma.EnumProviderNullableFilter<"ImageGenOutput"> | $Enums.Provider | null
   mime?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
   ext?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
   revisedPrompt?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
@@ -367,6 +397,9 @@ export type ImageGenOutputOrderByWithAggregationInput = {
   attachmentId?: Prisma.SortOrder
   width?: Prisma.SortOrderInput | Prisma.SortOrder
   height?: Prisma.SortOrderInput | Prisma.SortOrder
+  generatingModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  facilitatingModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  provider?: Prisma.SortOrderInput | Prisma.SortOrder
   mime?: Prisma.SortOrderInput | Prisma.SortOrder
   ext?: Prisma.SortOrderInput | Prisma.SortOrder
   revisedPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -393,6 +426,9 @@ export type ImageGenOutputScalarWhereWithAggregatesInput = {
   attachmentId?: Prisma.StringWithAggregatesFilter<"ImageGenOutput"> | string
   width?: Prisma.IntNullableWithAggregatesFilter<"ImageGenOutput"> | number | null
   height?: Prisma.IntNullableWithAggregatesFilter<"ImageGenOutput"> | number | null
+  generatingModel?: Prisma.StringNullableWithAggregatesFilter<"ImageGenOutput"> | string | null
+  facilitatingModel?: Prisma.StringNullableWithAggregatesFilter<"ImageGenOutput"> | string | null
+  provider?: Prisma.EnumProviderNullableWithAggregatesFilter<"ImageGenOutput"> | $Enums.Provider | null
   mime?: Prisma.StringNullableWithAggregatesFilter<"ImageGenOutput"> | string | null
   ext?: Prisma.StringNullableWithAggregatesFilter<"ImageGenOutput"> | string | null
   revisedPrompt?: Prisma.StringNullableWithAggregatesFilter<"ImageGenOutput"> | string | null
@@ -409,6 +445,9 @@ export type ImageGenOutputCreateInput = {
   isPartial: boolean
   width?: number | null
   height?: number | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
+  provider?: $Enums.Provider | null
   mime?: string | null
   ext?: string | null
   revisedPrompt?: string | null
@@ -429,6 +468,9 @@ export type ImageGenOutputUncheckedCreateInput = {
   attachmentId: string
   width?: number | null
   height?: number | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
+  provider?: $Enums.Provider | null
   mime?: string | null
   ext?: string | null
   revisedPrompt?: string | null
@@ -445,6 +487,9 @@ export type ImageGenOutputUpdateInput = {
   isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -465,6 +510,9 @@ export type ImageGenOutputUncheckedUpdateInput = {
   attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -483,6 +531,9 @@ export type ImageGenOutputCreateManyInput = {
   attachmentId: string
   width?: number | null
   height?: number | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
+  provider?: $Enums.Provider | null
   mime?: string | null
   ext?: string | null
   revisedPrompt?: string | null
@@ -499,6 +550,9 @@ export type ImageGenOutputUpdateManyMutationInput = {
   isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -517,6 +571,9 @@ export type ImageGenOutputUncheckedUpdateManyInput = {
   attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -557,6 +614,9 @@ export type ImageGenOutputCountOrderByAggregateInput = {
   attachmentId?: Prisma.SortOrder
   width?: Prisma.SortOrder
   height?: Prisma.SortOrder
+  generatingModel?: Prisma.SortOrder
+  facilitatingModel?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
   mime?: Prisma.SortOrder
   ext?: Prisma.SortOrder
   revisedPrompt?: Prisma.SortOrder
@@ -582,6 +642,9 @@ export type ImageGenOutputMaxOrderByAggregateInput = {
   attachmentId?: Prisma.SortOrder
   width?: Prisma.SortOrder
   height?: Prisma.SortOrder
+  generatingModel?: Prisma.SortOrder
+  facilitatingModel?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
   mime?: Prisma.SortOrder
   ext?: Prisma.SortOrder
   revisedPrompt?: Prisma.SortOrder
@@ -600,6 +663,9 @@ export type ImageGenOutputMinOrderByAggregateInput = {
   attachmentId?: Prisma.SortOrder
   width?: Prisma.SortOrder
   height?: Prisma.SortOrder
+  generatingModel?: Prisma.SortOrder
+  facilitatingModel?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
   mime?: Prisma.SortOrder
   ext?: Prisma.SortOrder
   revisedPrompt?: Prisma.SortOrder
@@ -701,6 +767,9 @@ export type ImageGenOutputCreateWithoutAttachmentInput = {
   isPartial: boolean
   width?: number | null
   height?: number | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
+  provider?: $Enums.Provider | null
   mime?: string | null
   ext?: string | null
   revisedPrompt?: string | null
@@ -719,6 +788,9 @@ export type ImageGenOutputUncheckedCreateWithoutAttachmentInput = {
   isPartial: boolean
   width?: number | null
   height?: number | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
+  provider?: $Enums.Provider | null
   mime?: string | null
   ext?: string | null
   revisedPrompt?: string | null
@@ -751,6 +823,9 @@ export type ImageGenOutputUpdateWithoutAttachmentInput = {
   isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -769,6 +844,9 @@ export type ImageGenOutputUncheckedUpdateWithoutAttachmentInput = {
   isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -785,6 +863,9 @@ export type ImageGenOutputCreateWithoutJobInput = {
   isPartial: boolean
   width?: number | null
   height?: number | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
+  provider?: $Enums.Provider | null
   mime?: string | null
   ext?: string | null
   revisedPrompt?: string | null
@@ -803,6 +884,9 @@ export type ImageGenOutputUncheckedCreateWithoutJobInput = {
   attachmentId: string
   width?: number | null
   height?: number | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
+  provider?: $Enums.Provider | null
   mime?: string | null
   ext?: string | null
   revisedPrompt?: string | null
@@ -850,6 +934,9 @@ export type ImageGenOutputScalarWhereInput = {
   attachmentId?: Prisma.StringFilter<"ImageGenOutput"> | string
   width?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null
   height?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null
+  generatingModel?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  facilitatingModel?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  provider?: Prisma.EnumProviderNullableFilter<"ImageGenOutput"> | $Enums.Provider | null
   mime?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
   ext?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
   revisedPrompt?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
@@ -867,6 +954,9 @@ export type ImageGenOutputCreateManyJobInput = {
   attachmentId: string
   width?: number | null
   height?: number | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
+  provider?: $Enums.Provider | null
   mime?: string | null
   ext?: string | null
   revisedPrompt?: string | null
@@ -883,6 +973,9 @@ export type ImageGenOutputUpdateWithoutJobInput = {
   isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -901,6 +994,9 @@ export type ImageGenOutputUncheckedUpdateWithoutJobInput = {
   attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -918,6 +1014,9 @@ export type ImageGenOutputUncheckedUpdateManyWithoutJobInput = {
   attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -938,6 +1037,9 @@ export type ImageGenOutputSelect<ExtArgs extends runtime.Types.Extensions.Intern
   attachmentId?: boolean
   width?: boolean
   height?: boolean
+  generatingModel?: boolean
+  facilitatingModel?: boolean
+  provider?: boolean
   mime?: boolean
   ext?: boolean
   revisedPrompt?: boolean
@@ -958,6 +1060,9 @@ export type ImageGenOutputSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   attachmentId?: boolean
   width?: boolean
   height?: boolean
+  generatingModel?: boolean
+  facilitatingModel?: boolean
+  provider?: boolean
   mime?: boolean
   ext?: boolean
   revisedPrompt?: boolean
@@ -978,6 +1083,9 @@ export type ImageGenOutputSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   attachmentId?: boolean
   width?: boolean
   height?: boolean
+  generatingModel?: boolean
+  facilitatingModel?: boolean
+  provider?: boolean
   mime?: boolean
   ext?: boolean
   revisedPrompt?: boolean
@@ -998,6 +1106,9 @@ export type ImageGenOutputSelectScalar = {
   attachmentId?: boolean
   width?: boolean
   height?: boolean
+  generatingModel?: boolean
+  facilitatingModel?: boolean
+  provider?: boolean
   mime?: boolean
   ext?: boolean
   revisedPrompt?: boolean
@@ -1005,7 +1116,7 @@ export type ImageGenOutputSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ImageGenOutputOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "jobIndex" | "kind" | "seriesIndex" | "seriesId" | "isPartial" | "attachmentId" | "width" | "height" | "mime" | "ext" | "revisedPrompt" | "createdAt" | "updatedAt", ExtArgs["result"]["imageGenOutput"]>
+export type ImageGenOutputOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "jobIndex" | "kind" | "seriesIndex" | "seriesId" | "isPartial" | "attachmentId" | "width" | "height" | "generatingModel" | "facilitatingModel" | "provider" | "mime" | "ext" | "revisedPrompt" | "createdAt" | "updatedAt", ExtArgs["result"]["imageGenOutput"]>
 export type ImageGenOutputInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs>
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
@@ -1036,6 +1147,9 @@ export type $ImageGenOutputPayload<ExtArgs extends runtime.Types.Extensions.Inte
     attachmentId: string
     width: number | null
     height: number | null
+    generatingModel: string | null
+    facilitatingModel: string | null
+    provider: $Enums.Provider | null
     mime: string | null
     ext: string | null
     revisedPrompt: string | null
@@ -1476,6 +1590,9 @@ export interface ImageGenOutputFieldRefs {
   readonly attachmentId: Prisma.FieldRef<"ImageGenOutput", 'String'>
   readonly width: Prisma.FieldRef<"ImageGenOutput", 'Int'>
   readonly height: Prisma.FieldRef<"ImageGenOutput", 'Int'>
+  readonly generatingModel: Prisma.FieldRef<"ImageGenOutput", 'String'>
+  readonly facilitatingModel: Prisma.FieldRef<"ImageGenOutput", 'String'>
+  readonly provider: Prisma.FieldRef<"ImageGenOutput", 'Provider'>
   readonly mime: Prisma.FieldRef<"ImageGenOutput", 'String'>
   readonly ext: Prisma.FieldRef<"ImageGenOutput", 'String'>
   readonly revisedPrompt: Prisma.FieldRef<"ImageGenOutput", 'String'>

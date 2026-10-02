@@ -1,3 +1,4 @@
+import { AudioService } from "@d0paminedriven/audiodown";
 import type { MemorySectionDraft } from "@/memory/types.ts";
 import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
@@ -77,7 +78,7 @@ async function dryRun(
     logLevel: "info",
     isProd
   });
-  const extract = new ExtractService();
+  const extract = new ExtractService(new AudioService());
   const db = new PrismaDbService({
     connectionString: databaseUrl,
     poolMax: 5,

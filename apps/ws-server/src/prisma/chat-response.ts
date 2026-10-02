@@ -5,6 +5,8 @@ import { PrismaChatRequestService } from "@/prisma/chat-request.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type {
   AttachmentUncheckedCreateWithoutMessageInput,
+  AudioGenOutputCreateNestedOneWithoutAttachmentInput,
+  AudioMetadataCreateNestedOneWithoutAttachmentInput,
   ImageGenOutputCreateNestedOneWithoutAttachmentInput
 } from "@slipstream/db/node/generated/models";
 import type {
@@ -168,6 +170,9 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
                   kind: t.kind,
                   ext: t.ext,
                   height: t.image?.height,
+                  facilitatingModel: t.imageGenOutput?.facilitatingModel,
+                  generatingModel: t.imageGenOutput?.generatingModel,
+                  provider: t.imageGenOutput?.provider,
                   width: t.image?.width,
                   jobId: t.jobId,
                   isPartial: t.kind === "FINAL" ? false : true,
@@ -180,6 +185,9 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
               ? ({
                   create: {
                     mime: t.mime,
+                    facilitatingModel: t.imageGenOutput?.facilitatingModel,
+                    generatingModel: t.imageGenOutput?.generatingModel,
+                    provider: t.imageGenOutput?.provider,
                     revisedPrompt: data.imgGenFields?.revisedPrompt,
                     kind: t.kind,
                     ext: t.ext,
@@ -243,24 +251,25 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
           compatReadyAt: new Date(Date.now()),
           checksumAlgo: a.checksumAlgo,
           checksumSha256: a.checksumSha256,
-          audio: a.audio ? { create: a.audio } : undefined,
+          audio: a.audio
+            ? ({
+                create: a.audio
+              } satisfies AudioMetadataCreateNestedOneWithoutAttachmentInput)
+            : undefined,
           audioGenOutput: a.audioGenOutput
-            ? {
+            ? ({
                 create: {
+                  provider: a.audioGenOutput.provider,
+                  kind: a.audioGenOutput.kind,
+                  content: a.audioGenOutput.content,
+                  facilitatingModel: a.audioGenOutput.facilitatingModel,
+                  generatingModel: a.audioGenOutput.generatingModel,
                   mime: a.audioGenOutput.mime,
                   ext: a.audioGenOutput.ext,
                   jobId: a.audioGenOutput.jobId
                 }
-              }
-            : jobId
-              ? {
-                  create: {
-                    mime: a.mime,
-                    ext: a.ext,
-                    jobId
-                  }
-                }
-              : undefined,
+              } satisfies AudioGenOutputCreateNestedOneWithoutAttachmentInput)
+            : undefined,
           user: { connect: { id: userId } }
         } as const)
       : undefined;

@@ -3297,7 +3297,11 @@ export const AudioGenOutputScalarFieldEnum = {
   ext: 'ext',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  kind: 'kind'
+  kind: 'kind',
+  content: 'content',
+  provider: 'provider',
+  generatingModel: 'generatingModel',
+  facilitatingModel: 'facilitatingModel'
 } as const
 
 export type AudioGenOutputScalarFieldEnum = (typeof AudioGenOutputScalarFieldEnum)[keyof typeof AudioGenOutputScalarFieldEnum]
@@ -3452,6 +3456,9 @@ export const ImageGenOutputScalarFieldEnum = {
   attachmentId: 'attachmentId',
   width: 'width',
   height: 'height',
+  generatingModel: 'generatingModel',
+  facilitatingModel: 'facilitatingModel',
+  provider: 'provider',
   mime: 'mime',
   ext: 'ext',
   revisedPrompt: 'revisedPrompt',

@@ -993,14 +993,19 @@ export class GeminiInteractionsSseService extends GeminiInteractionsService {
       const audioBuffer = Buffer.concat(
         audioFragments.map(f => Buffer.from(f, "base64"))
       );
-      const specs = this.prisma.extractor.mp3Specs(audioBuffer);
+      // one snapshot: header specs + decoded waveform (rust, off the event
+      // loop); falls back to header-only specs if the stream will not decode
+      const { specs, waveform } = await this.prisma.extractor.analyzeBuffer(
+        audioBuffer,
+        { peakCount: 1024 }
+      );
       // store:false interactions report an empty id, so || (not ??) is the
       // fallback that actually mints a series id
       const seriesId =
         interactionId ?? (await this.generateId("generationGroupId"));
       const duration = performance.now() - tInitial;
-      const mime = specs?.mime ?? audioMime ?? "audio/mpeg";
-      const ext = specs?.ext ?? "mp3";
+      const mime = audioMime ?? specs.mime;
+      const ext = specs.ext;
       const filename = `${jobId ?? seriesId}.${ext}`;
 
       uploadtInitial = performance.now();
@@ -1059,23 +1064,38 @@ export class GeminiInteractionsSseService extends GeminiInteractionsService {
         sseKmsKeyId: null,
         s3LastModified: rt?.lastModified ? new Date(rt.lastModified) : null,
         deletedAt: null,
-        audio: specs
+        audio: {
+          // AudioMetadata.format is the extension, not the mime
+          format: specs.format,
+          // AudioMetadata.duration is milliseconds; decoded frames win over
+          // the header walk when the stream decoded
+          duration:
+            (waveform ? Math.round(waveform.durationSec * 1000) : null) ??
+            specs.durationMs ??
+            0,
+          bitrate: specs.bitrateKbps,
+          sampleRate: specs.sampleRate ?? waveform?.sampleRate ?? 0,
+          channels: specs.channels ?? waveform?.channelCount ?? 1,
+          codec: specs.codec,
+          title: specs.title,
+          artist: specs.artist,
+          album: specs.album,
+          year: specs.year,
+          genre: specs.genre,
+          waveformPeaks: this.prisma.extractor.waveformPeaksColumn(waveform)
+        },
+        audioGenOutput: jobId
           ? {
-              format: mime,
-              duration: specs.durationMs,
-              bitrate: specs.bitrate,
-              sampleRate: specs.sampleRate,
-              channels: specs.channels,
-              codec: specs.codec,
-              title: null,
-              artist: null,
-              album: null,
-              year: null,
-              genre: null,
-              waveformPeaks: []
+              jobId,
+              mime,
+              ext,
+              kind: "FINAL",
+              content: geminiAgg,
+              facilitatingModel: model,
+              generatingModel: model,
+              provider: "GEMINI"
             }
           : null,
-        audioGenOutput: jobId ? { jobId, mime, ext, kind: "FINAL" } : null,
         generationGroupId: seriesId,
         requestMessageId,
         createdAt: new Date(Date.now()),
@@ -1336,6 +1356,9 @@ export class GeminiInteractionsSseService extends GeminiInteractionsService {
         draftId: null,
         expiresAt: rt.expires,
         imageGenOutput: {
+          facilitatingModel: model,
+          generatingModel: model,
+          provider: "GEMINI",
           ext: getIt.format,
           height: getIt.height,
           width: getIt.width,

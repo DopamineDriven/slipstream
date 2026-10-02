@@ -1,0 +1,78 @@
+{
+  "name": "@slipstream/audio-metadata",
+  "version": "1.0.1",
+  "description": "convenient audio metadata extractor",
+  "publishConfig": {
+    "access": "public",
+    "typesVersions": {
+      "*": {
+        "*": [
+          "dist/index.d.ts"
+        ],
+        "audio": [
+          "dist/audio/*.d.ts"
+        ],
+        "types": [
+          "dist/types/*.d.ts"
+        ]
+      }
+    }
+  },
+  "license": "BUSL-1.1",
+  "source": "src/index.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/index.d.ts"
+      ],
+      "audio": [
+        "dist/audio/*.d.ts"
+      ],
+      "types": [
+        "dist/types/*.d.ts"
+      ]
+    }
+  },
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist/**/*.{js,cjs,mjs,d.ts,d.cts,d.mts}"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./audio": "./dist/audio/*.js",
+    "./types": "./dist/types/*.js"
+  },
+  "scripts": {
+    "prebuild": "pnpm gen:tsdown",
+    "gen:tsdown": "tsx src/services/automate-tsdown.ts --target gen",
+    "postgen:tsdown": "prettier --write tsdown.config.ts --ignore-unknown --cache",
+    "build": "tsdown",
+    "dev": "pnpm build",
+    "test": "node --test --import tsx --test-reporter spec",
+    "lint": "eslint",
+    "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml}\" --ignore-unknown --cache",
+    "clean": "git clean -xdf .turbo dist node_modules",
+    "typecheck": "tsgo --noEmit"
+  },
+  "devDependencies": {
+    "@d0paminedriven/fs": "catalog:dd",
+    "@slipstream/eslint-config": "workspace:*",
+    "@slipstream/prettier-config": "workspace:*",
+    "@slipstream/tsconfig": "workspace:*",
+    "@types/node": "catalog:node",
+    "@typescript/native-preview": "catalog:tsgo",
+    "dotenv-expand": "catalog:dotenv",
+    "eslint": "catalog:eslint",
+    "jiti": "catalog:jiti",
+    "prettier": "catalog:prettier",
+    "tsdown": "catalog:tsdown",
+    "tslib": "catalog:tslib",
+    "tsx": "catalog:tsx",
+    "typescript": "catalog:ts",
+    "typescript-eslint": "catalog:tseslint"
+  },
+  "prettier": "@slipstream/prettier-config"
+}

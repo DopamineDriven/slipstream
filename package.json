@@ -5,6 +5,7 @@
   "packageManager": "pnpm@11.21.0+sha512.521705bce689924eac72f5a3587122f362689ef6571e55ba80076fd637c11132ecffada26fad4ea79c485bfddbfd3d5a2a5b05805a77e893de71ec8a6cca3bb1",
   "scripts": {
     "build:about": "turbo build --filter=@slipstream/about",
+    "build:audio-metadata": "turbo build --filter=@slipstream/audio-metadata",
     "build:cli": "turbo build --filter=@slipstream/cli",
     "build:credentials": "turbo build --filter=@slipstream/credentials",
     "build:db": "turbo build --filter=@slipstream/db",
@@ -16,7 +17,7 @@
     "build:redis-service": "turbo build --filter=@slipstream/redis-service",
     "build:storage-s3": "turbo build --filter=@slipstream/storage-s3",
     "build:stt-worklet": "turbo build --filter=@slipstream/stt-worklet",
-    "build:targeted": "pnpm install && pnpm build:eslint && pnpm build:prettier && pnpm build:vitest && pnpm build:ui && pnpm build:redis-service && pnpm build:credentials && pnpm build:img-gen && pnpm build:cli && pnpm build:encryption && pnpm build:stt-worklet && pnpm build:key-validator && pnpm build:types && pnpm build:storage-s3 && pnpm build:ws-server && pnpm build:web && pnpm build:about",
+    "build:targeted": "pnpm install && pnpm build:eslint && pnpm build:prettier && pnpm build:vitest && pnpm build:ui && pnpm build:redis-service && pnpm build:credentials && pnpm build:img-gen && pnpm build:audio-metadata && pnpm build:cli && pnpm build:encryption && pnpm build:stt-worklet && pnpm build:key-validator && pnpm build:types && pnpm build:storage-s3 && pnpm build:ws-server && pnpm build:web && pnpm build:about",
     "build:types": "turbo build --filter=@slipstream/types",
     "build:vitest": "turbo build --filter=@slipstream/vitest-config",
     "build:ui": "turbo build --filter=@slipstream/ui",

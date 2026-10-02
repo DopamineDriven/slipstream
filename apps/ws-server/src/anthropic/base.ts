@@ -48,6 +48,7 @@ export class AnthropicBaseService {
        * Avoid paying the prompt-cache cost twice when you retry a refused Claude Fable 5 request on another model.
        * https://platform.claude.com/docs/en/build-with-claude/fallback-credit
        */
+      case "claude-sonnet-5-5":
       case "claude-opus-5-5":
       case "claude-fable-5-1":
       case "claude-opus-5":
@@ -124,6 +125,7 @@ export class AnthropicBaseService {
   }
 
   protected outputTokenCeilingByModel = {
+    "claude-sonnet-5-5": 128000,
     "claude-opus-5-5": 128000,
     "claude-fable-5-1": 128000,
     "claude-opus-5": 128000,
@@ -139,6 +141,7 @@ export class AnthropicBaseService {
   } as const;
 
   protected inputTokenCeilingByModel = {
+    "claude-sonnet-5-5": 1000000,
     "claude-opus-5-5": 1000000,
     "claude-fable-5-1": 1000000,
     "claude-opus-5": 1000000,
@@ -156,7 +159,7 @@ export class AnthropicBaseService {
   protected getMaxTokens = <const T extends AnthropicModelIdUnion>(
     model: T
   ) => {
-    return this.outputTokenCeilingByModel[model];
+    return this.outputTokenCeilingByModel[model]
   };
 
   protected handleMaxTokens(mod: AnthropicModelIdUnion, max_tokens?: number) {

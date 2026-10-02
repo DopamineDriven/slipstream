@@ -141,6 +141,7 @@ build_targeted() {
         "@slipstream/stt-worklet"
         "@slipstream/key-validator"
         "@slipstream/types"
+        "@slipstream/audio-metadata"
         "@slipstream/cli"
         "@slipstream/img-gen"
         "@slipstream/storage-s3"

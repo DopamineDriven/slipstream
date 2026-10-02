@@ -51,15 +51,19 @@ model AudioGenJob {
 }
 
 model AudioGenOutput {
-  id           String             @id @default(cuid(2))
-  jobId        String             @unique // n=1, no partials — output:job is strictly 1:1
-  attachmentId String             @unique
-  mime         String? // "audio/mpeg" — what actually came back, not what was asked for
-  ext          String? // "mp3"
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  kind         AudioGenOutputKind @default(FINAL)
-
+  id                String             @id @default(cuid(2))
+  jobId             String             @unique // n=1, no partials — output:job is strictly 1:1
+  attachmentId      String             @unique
+  mime              String? // "audio/mpeg" — what actually came back, not what was asked for
+  ext               String? // "mp3"
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  kind              AudioGenOutputKind @default(FINAL)
+  content           String?
+  provider          Provider?
+  generatingModel   String?
+  facilitatingModel String?
+  
   job        AudioGenJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
   attachment Attachment  @relation("AudioGenOutputToAttachment", fields: [attachmentId], references: [id], onDelete: Cascade)
 }

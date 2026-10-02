@@ -73,6 +73,7 @@
     "dotenv": "catalog:dotenv"
   },
   "devDependencies": {
+    "@d0paminedriven/audiodown": "catalog:dd",
     "@d0paminedriven/fs": "catalog:dd",
     "@paralleldrive/cuid2": "catalog:cuid2",
     "@slipstream/credentials": "workspace:*",

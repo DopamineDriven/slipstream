@@ -20,6 +20,7 @@ export class OpenAIBaseService {
   protected readonly vsCache = new Map<string, string>();
   protected readonly inflightVS = new Map<string, Promise<string>>();
   protected nanoId: Promise<<Type extends string>(size?: number) => Type>;
+  protected generatingModel = "gpt-image-2.5-suburst" as const;
   protected assetCache = new Map<
     string,
     { fileId: string; dbRecordId: string; lastCheckedAt: Date | null }
@@ -175,7 +176,9 @@ export class OpenAIBaseService {
   }
   protected mapPersistenceImgGenArr(
     userId: string,
-    props: ImageGenPartialArr[]
+    props: ImageGenPartialArr[],
+    facilitatingModel: string,
+    generatingModel: string=this.generatingModel
   ) {
     return props.map((t, o) => {
       const rt = t[25];
@@ -260,6 +263,9 @@ export class OpenAIBaseService {
           orientation: expImg.orientation
         },
         imageGenOutput: {
+          generatingModel,
+          provider: "OPENAI",
+          facilitatingModel,
           ext: expImg.format,
           height: expImg.height,
           width: expImg.width,
@@ -402,6 +408,7 @@ export class OpenAIBaseService {
           }
         }
       }
+      case "gpt-6.1-sol":
       case "gpt-6-sol":
       case "gpt-6-luna":
       case "gpt-6-astra":
@@ -439,6 +446,7 @@ export class OpenAIBaseService {
     imgGenEnabled = false
   ) {
     switch (model) {
+      case "gpt-6.1-sol":
       case "gpt-6-sol":
       case "gpt-6-luna":
       case "gpt-6-astra":

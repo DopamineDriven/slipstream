@@ -1,8 +1,7 @@
 import type {
   AIChatResponseImgGenFieldsFinal,
   AIChatResponseImgGenSubFields,
-  AttachmentSingleton,
-  ChatChunkAndResMsgBlock
+  AttachmentSingleton
 } from "@slipstream/types";
 
 function imgGenToAttachmentWorkup(

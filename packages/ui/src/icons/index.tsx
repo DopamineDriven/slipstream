@@ -28,6 +28,7 @@ import { EditIcon } from "@/icons/edit-icon";
 import { EllipsisHorizontal } from "@/icons/ellipsis-horizontal";
 import { EmptyChatHistory } from "@/icons/empty-chat-history";
 import { Expand } from "@/icons/expand";
+import { ExternalLink } from "@/icons/external-link";
 import { Eye } from "@/icons/eye";
 import { EyeClosed } from "@/icons/eye-closed";
 import { EyeOff } from "@/icons/eye-off";
@@ -137,6 +138,7 @@ const IconComponents = {
   EllipsisHorizontal,
   EmptyChatHistory,
   Expand,
+  ExternalLink,
   Eye,
   EyeClosed,
   EyeOff,
@@ -274,6 +276,7 @@ export {
   EllipsisHorizontal,
   EmptyChatHistory,
   Expand,
+  ExternalLink,
   Eye,
   EyeClosed,
   EyeOff,

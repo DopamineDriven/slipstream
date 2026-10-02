@@ -168,9 +168,61 @@ export class ProviderValidation {
       this.gptImg2dot5Model(m)
     );
   }
+  public isPureImageGenModel(m: string) {
+    return (
+      m === "muse-image-1.0" ||
+      m === "grok-imagine-image-quality" ||
+      m === "grok-imagine-image-2.0" ||
+      m === "grok-imagine-image" ||
+      m === "gpt-image-2.5-sunburst" ||
+      m === "gpt-image-2.5-flare" ||
+      m === "gpt-image-2" ||
+      m === "gpt-image-1.5" ||
+      m === "gpt-image-1" ||
+      m === "gpt-image-1-mini" ||
+      m === "gemini-2.5-flash-image" ||
+      m === "gemini-3-pro-image-preview" ||
+      m === "gemini-3.1-flash-image-preview" ||
+      m === "gemini-3.1-flash-lite-image"
+    );
+  }
+
+  public isPureImageGenModelHistoric(m: string) {
+    return (
+      this.isPureImageGenModel(m) ||
+      m === "grok-2-image-1212" ||
+      m === "grok-imagine-image-pro" ||
+      m === "dall-e-2" ||
+      m === "dall-e-3"
+    );
+  }
+
+  public get pureImageGenDisplayNameMap() {
+    return {
+      "grok-imagine-image-2.0": "Grok Imagine Image 2.0",
+      "grok-imagine-image-quality": "Grok Imagine Image Quality",
+      "grok-imagine-image-pro": "Grok Imagine Image Pro",
+      "grok-imagine-image": "Grok Imagine Image",
+      "grok-2-image-1212": "Grok-2 Image 1212",
+      "muse-image-1.0": "Muse Image 1.0",
+      "gpt-image-2.5-sunburst": "GPT-Image-2.5 Sunburst",
+      "gpt-image-2.5-flare": "GPT-Image-2.5 Flare",
+      "gpt-image-1": "GPT-Image-1",
+      "gpt-image-1-mini": "GPT-Image-1 mini",
+      "gpt-image-1.5": "GPT-Image-1.5",
+      "gpt-image-2": "GPT-Image-2",
+      "dall-e-3": "DALL·E 3",
+      "dall-e-2": "DALL·E 2",
+      "gemini-3.1-flash-image-preview": "Nano Banana 2",
+      "gemini-3.1-flash-lite-image": "Nano Banana 2 Lite",
+      "gemini-3-pro-image-preview": "Nano Banana Pro",
+      "gemini-2.5-flash-image": "Nano Banana"
+    } as const;
+  }
 
   public openAIFacilitatingImgGenModel(model: string) {
     return (
+      model === "gpt-6.1-sol" ||
       model === "gpt-6-sol" ||
       model === "gpt-6-luna" ||
       model === "gpt-6-astra" ||
@@ -289,7 +341,7 @@ export class ProviderValidation {
     data?: { n?: number }
   ): undefined;
   public handleImgGenCount(
-    model: AllModelsUnion = "gpt-6-sol",
+    model: AllModelsUnion = "gpt-6.1-sol",
     data?: { n?: number }
   ) {
     if (this.grokImgGenCapable(model)) {
@@ -757,7 +809,7 @@ export class ProviderValidation {
         return "grok-imagine-image-2.0" satisfies AllModelsUnion;
       }
       case "openai": {
-        return "gpt-6-sol" satisfies AllModelsUnion;
+        return "gpt-6.1-sol" satisfies AllModelsUnion;
       }
       case "meta": {
         return "muse-image-1.0" satisfies AllModelsUnion;
@@ -888,7 +940,7 @@ export class ProviderValidation {
   }
 
   public handlePartialImgGen(
-    model: AllModelsUnion = "gpt-6-sol",
+    model: AllModelsUnion = "gpt-6.1-sol",
     data?: { partialImagesRequested?: number }
   ) {
     if (this.openAIImgGenCapable(model)) {
@@ -910,7 +962,7 @@ export class ProviderValidation {
   }
 
   public handleOutputSize(
-    model: AllModelsUnion = "gpt-6-sol",
+    model: AllModelsUnion = "gpt-6.1-sol",
     data?: { output_size?: ModelToAspectRatioOpts<typeof model> }
   ) {
     const m = model;

@@ -968,10 +968,6 @@ export type ConversationMemoryContextUncheckedUpdateManyWithoutMemoryStoreNested
   deleteMany?: Prisma.ConversationMemoryContextScalarWhereInput | Prisma.ConversationMemoryContextScalarWhereInput[]
 }
 
-export type NullableEnumProviderFieldUpdateOperationsInput = {
-  set?: $Enums.Provider | null
-}
-
 export type EnumMemorySummaryStateFieldUpdateOperationsInput = {
   set?: $Enums.MemorySummaryState
 }

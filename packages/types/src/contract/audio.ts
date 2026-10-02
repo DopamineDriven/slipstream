@@ -25,7 +25,30 @@ export const grokVoiceIdsTTS = [
   "rex",
   "sal",
   "leo",
-  "una"
+  "una",
+  "liora",
+  "aurora",
+  "atlas",
+  "nakash",
+  "castor",
+  "lumen",
+  "sirius",
+  "ursa",
+  "celeste",
+  "cosmo",
+  "zigel",
+  "kepler",
+  "lux",
+  "helios",
+  "perseus",
+  "zenith",
+  "altair",
+  "iris",
+  "luna",
+  "orion",
+  "helix",
+  "zagan",
+  "carina"
 ] as const;
 
 export const grokVoiceDisplayNamesTTS = [
@@ -34,17 +57,202 @@ export const grokVoiceDisplayNamesTTS = [
   "Rex",
   "Sal",
   "Leo",
-  "Una"
+  "Una",
+  "Liora",
+  "Aurora",
+  "Atlas",
+  "Nakash",
+  "Castor",
+  "Lumen",
+  "Sirius",
+  "Ursa",
+  "Celeste",
+  "Cosmo",
+  "Zigel",
+  "Kepler",
+  "Lux",
+  "Helios",
+  "Perseus",
+  "Zenith",
+  "Altair",
+  "Iris",
+  "Luna",
+  "Orion",
+  "Helix",
+  "Zagan",
+  "Carina"
 ] as const;
 
 export const grokVoices = {
   voices: [
-    { voice_id: "ara", name: "Ara", language: "multilingual" },
-    { voice_id: "eve", name: "Eve", language: "multilingual" },
-    { voice_id: "leo", name: "Leo", language: "multilingual" },
-    { voice_id: "rex", name: "Rex", language: "multilingual" },
-    { voice_id: "sal", name: "Sal", language: "multilingual" },
-    { voice_id: "una", name: "Una", language: "multilingual" }
+    {
+      voice_id: "altair",
+      name: "Altair",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "ara",
+      name: "Ara",
+      language: "multilingual",
+      gender: "female"
+    },
+    {
+      voice_id: "atlas",
+      name: "Atlas",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "aurora",
+      name: "Aurora",
+      language: "multilingual",
+      gender: "female"
+    },
+    {
+      voice_id: "carina",
+      name: "Carina",
+      language: "multilingual",
+      gender: "female"
+    },
+    {
+      voice_id: "castor",
+      name: "Castor",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "celeste",
+      name: "Celeste",
+      language: "multilingual",
+      gender: "female"
+    },
+    {
+      voice_id: "cosmo",
+      name: "Cosmo",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "eve",
+      name: "Eve",
+      language: "multilingual",
+      gender: "female"
+    },
+    {
+      voice_id: "helios",
+      name: "Helios",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "helix",
+      name: "Helix",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "iris",
+      name: "Iris",
+      language: "multilingual",
+      gender: "female"
+    },
+    {
+      voice_id: "kepler",
+      name: "Kepler",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "leo",
+      name: "Leo",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "liora",
+      name: "Liora",
+      language: "multilingual",
+      gender: "female"
+    },
+    {
+      voice_id: "lumen",
+      name: "Lumen",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "luna",
+      name: "Luna",
+      language: "multilingual",
+      gender: "female"
+    },
+    {
+      voice_id: "lux",
+      name: "Lux",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "naksh",
+      name: "Naksh",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "orion",
+      name: "Orion",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "perseus",
+      name: "Perseus",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "rex",
+      name: "Rex",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "rigel",
+      name: "Rigel",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "sal",
+      name: "Sal",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "sirius",
+      name: "Sirius",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "ursa",
+      name: "Ursa",
+      language: "multilingual",
+      gender: "female"
+    },
+    {
+      voice_id: "zagan",
+      name: "Zagan",
+      language: "multilingual",
+      gender: "male"
+    },
+    {
+      voice_id: "zenith",
+      name: "Zenith",
+      language: "multilingual",
+      gender: "male"
+    }
   ]
 } as const;
 
@@ -54,7 +262,30 @@ export const grokVoiceIdToDisplayNameTTS = {
   rex: "Rex",
   sal: "Sal",
   leo: "Leo",
-  una: "Una"
+  una: "Una",
+  liora: "Liora",
+  aurora: "Aurora",
+  atlas: "Atlas",
+  nakash: "Nakash",
+  castor: "Castor",
+  lumen: "Lumen",
+  sirius: "Sirius",
+  ursa: "Ursa",
+  celeste: "Celeste",
+  cosmo: "Cosmo",
+  zigel: "Zigel",
+  kepler: "Kepler",
+  lux: "Lux",
+  helios: "Helios",
+  perseus: "Perseus",
+  zenith: "Zenith",
+  altair: "Altair",
+  iris: "Iris",
+  luna: "Luna",
+  orion: "Orion",
+  helix: "Helix",
+  zagan: "Zagan",
+  carina: "Carina"
 } as const;
 
 export const grokVoiceDisplayNameToIdTTS = {
@@ -63,7 +294,30 @@ export const grokVoiceDisplayNameToIdTTS = {
   Rex: "rex",
   Sal: "sal",
   Leo: "leo",
-  Una: "una"
+  Una: "una",
+  Liora: "liora",
+  Aurora: "aurora",
+  Atlas: "atlas",
+  Nakash: "nakash",
+  Castor: "castor",
+  Lumen: "lumen",
+  Sirius: "sirius",
+  Ursa: "ursa",
+  Celeste: "celeste",
+  Cosmo: "cosmo",
+  Zigel: "zigel",
+  Kepler: "kepler",
+  Lux: "lux",
+  Helios: "helios",
+  Perseus: "perseus",
+  Zenith: "zenith",
+  Altair: "altair",
+  Iris: "iris",
+  Luna: "luna",
+  Orion: "orion",
+  Helix: "helix",
+  Zagan: "zagan",
+  Carina: "carina"
 } as const;
 
 export type GrokLanguageTTS = TTSTypes.Language;

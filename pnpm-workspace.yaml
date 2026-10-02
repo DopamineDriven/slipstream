@@ -49,6 +49,7 @@ catalogs:
   cva:
     class-variance-authority: ^0.7.1
   dd:
+    "@d0paminedriven/audiodown": ^0.1.0
     "@d0paminedriven/fs": ^11.0.0
     "@d0paminedriven/iso-3166-1": ^1.4.0
     "@d0paminedriven/metadata": ^6.0.1

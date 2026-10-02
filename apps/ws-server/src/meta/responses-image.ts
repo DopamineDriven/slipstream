@@ -79,6 +79,9 @@ export class MetaResponsesImageService extends MetaChatService {
     userId,
     conversationId,
     generationGroupId,
+    facilitatingModel,
+    generatingModel,
+    provider,
     requestMessageId,
     jobId
   }: PersistMetaImageParams) {
@@ -189,6 +192,9 @@ export class MetaResponsesImageService extends MetaChatService {
       draftId: null,
       expiresAt: rt.expires,
       imageGenOutput: {
+        provider,
+        facilitatingModel,
+        generatingModel,
         ext: specs.format,
         height: specs.height,
         width: specs.width,
@@ -286,7 +292,7 @@ export class MetaResponsesImageService extends MetaChatService {
           input,
           tools: [
             {
-...imageTool
+              ...imageTool
             }
           ],
           safety_identifier: userId
@@ -387,7 +393,10 @@ export class MetaResponsesImageService extends MetaChatService {
           conversationId,
           generationGroupId,
           requestMessageId,
-          jobId
+          jobId,
+          facilitatingModel: model,
+          generatingModel: model,
+          provider: "META"
         })
       )
     );

@@ -33,6 +33,10 @@ export type AudioGenOutputMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   kind: $Enums.AudioGenOutputKind | null
+  content: string | null
+  provider: $Enums.Provider | null
+  generatingModel: string | null
+  facilitatingModel: string | null
 }
 
 export type AudioGenOutputMaxAggregateOutputType = {
@@ -44,6 +48,10 @@ export type AudioGenOutputMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   kind: $Enums.AudioGenOutputKind | null
+  content: string | null
+  provider: $Enums.Provider | null
+  generatingModel: string | null
+  facilitatingModel: string | null
 }
 
 export type AudioGenOutputCountAggregateOutputType = {
@@ -55,6 +63,10 @@ export type AudioGenOutputCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   kind: number
+  content: number
+  provider: number
+  generatingModel: number
+  facilitatingModel: number
   _all: number
 }
 
@@ -68,6 +80,10 @@ export type AudioGenOutputMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   kind?: true
+  content?: true
+  provider?: true
+  generatingModel?: true
+  facilitatingModel?: true
 }
 
 export type AudioGenOutputMaxAggregateInputType = {
@@ -79,6 +95,10 @@ export type AudioGenOutputMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   kind?: true
+  content?: true
+  provider?: true
+  generatingModel?: true
+  facilitatingModel?: true
 }
 
 export type AudioGenOutputCountAggregateInputType = {
@@ -90,6 +110,10 @@ export type AudioGenOutputCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   kind?: true
+  content?: true
+  provider?: true
+  generatingModel?: true
+  facilitatingModel?: true
   _all?: true
 }
 
@@ -174,6 +198,10 @@ export type AudioGenOutputGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   kind: $Enums.AudioGenOutputKind
+  content: string | null
+  provider: $Enums.Provider | null
+  generatingModel: string | null
+  facilitatingModel: string | null
   _count: AudioGenOutputCountAggregateOutputType | null
   _min: AudioGenOutputMinAggregateOutputType | null
   _max: AudioGenOutputMaxAggregateOutputType | null
@@ -206,6 +234,10 @@ export type AudioGenOutputWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"AudioGenOutput"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AudioGenOutput"> | Date | string
   kind?: Prisma.EnumAudioGenOutputKindFilter<"AudioGenOutput"> | $Enums.AudioGenOutputKind
+  content?: Prisma.StringNullableFilter<"AudioGenOutput"> | string | null
+  provider?: Prisma.EnumProviderNullableFilter<"AudioGenOutput"> | $Enums.Provider | null
+  generatingModel?: Prisma.StringNullableFilter<"AudioGenOutput"> | string | null
+  facilitatingModel?: Prisma.StringNullableFilter<"AudioGenOutput"> | string | null
   job?: Prisma.XOR<Prisma.AudioGenJobScalarRelationFilter, Prisma.AudioGenJobWhereInput>
   attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
 }
@@ -219,6 +251,10 @@ export type AudioGenOutputOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   kind?: Prisma.SortOrder
+  content?: Prisma.SortOrderInput | Prisma.SortOrder
+  provider?: Prisma.SortOrderInput | Prisma.SortOrder
+  generatingModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  facilitatingModel?: Prisma.SortOrderInput | Prisma.SortOrder
   job?: Prisma.AudioGenJobOrderByWithRelationInput
   attachment?: Prisma.AttachmentOrderByWithRelationInput
 }
@@ -235,6 +271,10 @@ export type AudioGenOutputWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"AudioGenOutput"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AudioGenOutput"> | Date | string
   kind?: Prisma.EnumAudioGenOutputKindFilter<"AudioGenOutput"> | $Enums.AudioGenOutputKind
+  content?: Prisma.StringNullableFilter<"AudioGenOutput"> | string | null
+  provider?: Prisma.EnumProviderNullableFilter<"AudioGenOutput"> | $Enums.Provider | null
+  generatingModel?: Prisma.StringNullableFilter<"AudioGenOutput"> | string | null
+  facilitatingModel?: Prisma.StringNullableFilter<"AudioGenOutput"> | string | null
   job?: Prisma.XOR<Prisma.AudioGenJobScalarRelationFilter, Prisma.AudioGenJobWhereInput>
   attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
 }, "id" | "jobId" | "attachmentId">
@@ -248,6 +288,10 @@ export type AudioGenOutputOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   kind?: Prisma.SortOrder
+  content?: Prisma.SortOrderInput | Prisma.SortOrder
+  provider?: Prisma.SortOrderInput | Prisma.SortOrder
+  generatingModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  facilitatingModel?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AudioGenOutputCountOrderByAggregateInput
   _max?: Prisma.AudioGenOutputMaxOrderByAggregateInput
   _min?: Prisma.AudioGenOutputMinOrderByAggregateInput
@@ -265,6 +309,10 @@ export type AudioGenOutputScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AudioGenOutput"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AudioGenOutput"> | Date | string
   kind?: Prisma.EnumAudioGenOutputKindWithAggregatesFilter<"AudioGenOutput"> | $Enums.AudioGenOutputKind
+  content?: Prisma.StringNullableWithAggregatesFilter<"AudioGenOutput"> | string | null
+  provider?: Prisma.EnumProviderNullableWithAggregatesFilter<"AudioGenOutput"> | $Enums.Provider | null
+  generatingModel?: Prisma.StringNullableWithAggregatesFilter<"AudioGenOutput"> | string | null
+  facilitatingModel?: Prisma.StringNullableWithAggregatesFilter<"AudioGenOutput"> | string | null
 }
 
 export type AudioGenOutputCreateInput = {
@@ -274,6 +322,10 @@ export type AudioGenOutputCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   kind?: $Enums.AudioGenOutputKind
+  content?: string | null
+  provider?: $Enums.Provider | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
   job: Prisma.AudioGenJobCreateNestedOneWithoutOutputInput
   attachment: Prisma.AttachmentCreateNestedOneWithoutAudioGenOutputInput
 }
@@ -287,6 +339,10 @@ export type AudioGenOutputUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   kind?: $Enums.AudioGenOutputKind
+  content?: string | null
+  provider?: $Enums.Provider | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
 }
 
 export type AudioGenOutputUpdateInput = {
@@ -296,6 +352,10 @@ export type AudioGenOutputUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kind?: Prisma.EnumAudioGenOutputKindFieldUpdateOperationsInput | $Enums.AudioGenOutputKind
+  content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   job?: Prisma.AudioGenJobUpdateOneRequiredWithoutOutputNestedInput
   attachment?: Prisma.AttachmentUpdateOneRequiredWithoutAudioGenOutputNestedInput
 }
@@ -309,6 +369,10 @@ export type AudioGenOutputUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kind?: Prisma.EnumAudioGenOutputKindFieldUpdateOperationsInput | $Enums.AudioGenOutputKind
+  content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AudioGenOutputCreateManyInput = {
@@ -320,6 +384,10 @@ export type AudioGenOutputCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   kind?: $Enums.AudioGenOutputKind
+  content?: string | null
+  provider?: $Enums.Provider | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
 }
 
 export type AudioGenOutputUpdateManyMutationInput = {
@@ -329,6 +397,10 @@ export type AudioGenOutputUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kind?: Prisma.EnumAudioGenOutputKindFieldUpdateOperationsInput | $Enums.AudioGenOutputKind
+  content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AudioGenOutputUncheckedUpdateManyInput = {
@@ -340,6 +412,10 @@ export type AudioGenOutputUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kind?: Prisma.EnumAudioGenOutputKindFieldUpdateOperationsInput | $Enums.AudioGenOutputKind
+  content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AudioGenOutputNullableScalarRelationFilter = {
@@ -356,6 +432,10 @@ export type AudioGenOutputCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   kind?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  generatingModel?: Prisma.SortOrder
+  facilitatingModel?: Prisma.SortOrder
 }
 
 export type AudioGenOutputMaxOrderByAggregateInput = {
@@ -367,6 +447,10 @@ export type AudioGenOutputMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   kind?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  generatingModel?: Prisma.SortOrder
+  facilitatingModel?: Prisma.SortOrder
 }
 
 export type AudioGenOutputMinOrderByAggregateInput = {
@@ -378,6 +462,10 @@ export type AudioGenOutputMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   kind?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  generatingModel?: Prisma.SortOrder
+  facilitatingModel?: Prisma.SortOrder
 }
 
 export type AudioGenOutputCreateNestedOneWithoutAttachmentInput = {
@@ -448,6 +536,10 @@ export type EnumAudioGenOutputKindFieldUpdateOperationsInput = {
   set?: $Enums.AudioGenOutputKind
 }
 
+export type NullableEnumProviderFieldUpdateOperationsInput = {
+  set?: $Enums.Provider | null
+}
+
 export type AudioGenOutputCreateWithoutAttachmentInput = {
   id?: string
   mime?: string | null
@@ -455,6 +547,10 @@ export type AudioGenOutputCreateWithoutAttachmentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   kind?: $Enums.AudioGenOutputKind
+  content?: string | null
+  provider?: $Enums.Provider | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
   job: Prisma.AudioGenJobCreateNestedOneWithoutOutputInput
 }
 
@@ -466,6 +562,10 @@ export type AudioGenOutputUncheckedCreateWithoutAttachmentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   kind?: $Enums.AudioGenOutputKind
+  content?: string | null
+  provider?: $Enums.Provider | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
 }
 
 export type AudioGenOutputCreateOrConnectWithoutAttachmentInput = {
@@ -491,6 +591,10 @@ export type AudioGenOutputUpdateWithoutAttachmentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kind?: Prisma.EnumAudioGenOutputKindFieldUpdateOperationsInput | $Enums.AudioGenOutputKind
+  content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   job?: Prisma.AudioGenJobUpdateOneRequiredWithoutOutputNestedInput
 }
 
@@ -502,6 +606,10 @@ export type AudioGenOutputUncheckedUpdateWithoutAttachmentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kind?: Prisma.EnumAudioGenOutputKindFieldUpdateOperationsInput | $Enums.AudioGenOutputKind
+  content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AudioGenOutputCreateWithoutJobInput = {
@@ -511,6 +619,10 @@ export type AudioGenOutputCreateWithoutJobInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   kind?: $Enums.AudioGenOutputKind
+  content?: string | null
+  provider?: $Enums.Provider | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
   attachment: Prisma.AttachmentCreateNestedOneWithoutAudioGenOutputInput
 }
 
@@ -522,6 +634,10 @@ export type AudioGenOutputUncheckedCreateWithoutJobInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   kind?: $Enums.AudioGenOutputKind
+  content?: string | null
+  provider?: $Enums.Provider | null
+  generatingModel?: string | null
+  facilitatingModel?: string | null
 }
 
 export type AudioGenOutputCreateOrConnectWithoutJobInput = {
@@ -547,6 +663,10 @@ export type AudioGenOutputUpdateWithoutJobInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kind?: Prisma.EnumAudioGenOutputKindFieldUpdateOperationsInput | $Enums.AudioGenOutputKind
+  content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   attachment?: Prisma.AttachmentUpdateOneRequiredWithoutAudioGenOutputNestedInput
 }
 
@@ -558,6 +678,10 @@ export type AudioGenOutputUncheckedUpdateWithoutJobInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kind?: Prisma.EnumAudioGenOutputKindFieldUpdateOperationsInput | $Enums.AudioGenOutputKind
+  content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  generatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facilitatingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -571,6 +695,10 @@ export type AudioGenOutputSelect<ExtArgs extends runtime.Types.Extensions.Intern
   createdAt?: boolean
   updatedAt?: boolean
   kind?: boolean
+  content?: boolean
+  provider?: boolean
+  generatingModel?: boolean
+  facilitatingModel?: boolean
   job?: boolean | Prisma.AudioGenJobDefaultArgs<ExtArgs>
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["audioGenOutput"]>
@@ -584,6 +712,10 @@ export type AudioGenOutputSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   createdAt?: boolean
   updatedAt?: boolean
   kind?: boolean
+  content?: boolean
+  provider?: boolean
+  generatingModel?: boolean
+  facilitatingModel?: boolean
   job?: boolean | Prisma.AudioGenJobDefaultArgs<ExtArgs>
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["audioGenOutput"]>
@@ -597,6 +729,10 @@ export type AudioGenOutputSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   createdAt?: boolean
   updatedAt?: boolean
   kind?: boolean
+  content?: boolean
+  provider?: boolean
+  generatingModel?: boolean
+  facilitatingModel?: boolean
   job?: boolean | Prisma.AudioGenJobDefaultArgs<ExtArgs>
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["audioGenOutput"]>
@@ -610,9 +746,13 @@ export type AudioGenOutputSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   kind?: boolean
+  content?: boolean
+  provider?: boolean
+  generatingModel?: boolean
+  facilitatingModel?: boolean
 }
 
-export type AudioGenOutputOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "attachmentId" | "mime" | "ext" | "createdAt" | "updatedAt" | "kind", ExtArgs["result"]["audioGenOutput"]>
+export type AudioGenOutputOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "attachmentId" | "mime" | "ext" | "createdAt" | "updatedAt" | "kind" | "content" | "provider" | "generatingModel" | "facilitatingModel", ExtArgs["result"]["audioGenOutput"]>
 export type AudioGenOutputInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   job?: boolean | Prisma.AudioGenJobDefaultArgs<ExtArgs>
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
@@ -641,6 +781,10 @@ export type $AudioGenOutputPayload<ExtArgs extends runtime.Types.Extensions.Inte
     createdAt: Date
     updatedAt: Date
     kind: $Enums.AudioGenOutputKind
+    content: string | null
+    provider: $Enums.Provider | null
+    generatingModel: string | null
+    facilitatingModel: string | null
   }, ExtArgs["result"]["audioGenOutput"]>
   composites: {}
 }
@@ -1074,6 +1218,10 @@ export interface AudioGenOutputFieldRefs {
   readonly createdAt: Prisma.FieldRef<"AudioGenOutput", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"AudioGenOutput", 'DateTime'>
   readonly kind: Prisma.FieldRef<"AudioGenOutput", 'AudioGenOutputKind'>
+  readonly content: Prisma.FieldRef<"AudioGenOutput", 'String'>
+  readonly provider: Prisma.FieldRef<"AudioGenOutput", 'Provider'>
+  readonly generatingModel: Prisma.FieldRef<"AudioGenOutput", 'String'>
+  readonly facilitatingModel: Prisma.FieldRef<"AudioGenOutput", 'String'>
 }
     
 

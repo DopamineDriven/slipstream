@@ -391,12 +391,13 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
                 seed: undefined,
                 partialImages: this.mapPersistenceImgGenArr(
                   userId,
-                  partialImgArr
+                  partialImgArr,
+                  m, m
                 ),
                 images: undefined,
                 activeImage: this.mapPersistenceImgGenArr(
                   userId,
-                  partialImgArr
+                  partialImgArr,m, m
                 ).find(t => t.index === partialImgArr.length - 1)
               },
               systemPrompt,
@@ -437,12 +438,12 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
               seed: undefined,
               partialImages: this.mapPersistenceImgGenArr(
                 userId,
-                partialImgArr
+                partialImgArr,m, m
               ),
               images: undefined,
               activeImage: this.mapPersistenceImgGenArr(
                 userId,
-                partialImgArr
+                partialImgArr, m, m
               ).find(t => t.index === partialImgArr.length - 1)
             },
             temperature,
@@ -486,11 +487,11 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
                 partialImagesActual: partialImgArr.length,
                 partialImages: this.mapPersistenceImgGenArr(
                   userId,
-                  partialImgArr
+                  partialImgArr, m, m
                 ),
                 activeImage: this.mapPersistenceImgGenArr(
                   userId,
-                  partialImgArr
+                  partialImgArr, m, m
                 ).find(t => t.index === partialImgArr.length - 1)
               },
               temperature,
@@ -519,11 +520,11 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
               partialImagesActual: partialImgArr.length,
               partialImages: this.mapPersistenceImgGenArr(
                 userId,
-                partialImgArr
+                partialImgArr, m, m
               ),
               activeImage: this.mapPersistenceImgGenArr(
                 userId,
-                partialImgArr
+                partialImgArr, m, m
               ).find(t => t.index === partialImgArr.length - 1)
             },
             provider,
@@ -671,7 +672,7 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
             imageGenOutput: {
               ext: getIt.format ?? finalImgObj.output_format,
               height: getIt.height,
-              width: getIt.width,
+              width: getIt.width,facilitatingModel: m,generatingModel: m,provider: "OPENAI",
               isPartial: false,
               jobId: jobId ?? "",
               jobIndex: 0,
@@ -689,7 +690,7 @@ export class OpenAIGPTImageService extends OpenAIMemoryService {
 
           const remapPartials = this.mapPersistenceImgGenArr(
             userId,
-            partialImgArr
+            partialImgArr,m, m
           ).map(v => {
             const {
               generationGroupId: _placeholder,

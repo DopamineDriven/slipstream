@@ -9,7 +9,7 @@ import type {
 } from "@slipstream/types";
 
 export interface MetaReasoningEffort {
-  effort: "none" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max"
+  effort: "none" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max";
 }
 
 export interface MetaUserLocation {
@@ -68,8 +68,6 @@ export type MetaImageGenerationTool = Pick<
     reasoning_strength?: "low" | "high";
   };
 
-
-
 export interface PersistMetaImageParams {
   b64: string;
   /** 0..n-1 across the images one response returned */
@@ -80,6 +78,9 @@ export interface PersistMetaImageParams {
   generationGroupId: string;
   requestMessageId?: string;
   jobId?: string;
+  generatingModel: string;
+  facilitatingModel: string;
+  provider: $Enums.Provider;
 }
 
 export type MetaStreamEvents = UTR<

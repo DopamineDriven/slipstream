@@ -24,7 +24,36 @@ export namespace TTSTypes {
     | "tr"
     | "vi";
 
-  export type Voice = "eve" | "ara" | "rex" | "sal" | "leo" | "una";
+  export type Voice =
+    | "altair"
+    | "ara"
+    | "atlas"
+    | "aurora"
+    | "carina"
+    | "castor"
+    | "celeste"
+    | "cosmo"
+    | "eve"
+    | "helios"
+    | "helix"
+    | "iris"
+    | "kepler"
+    | "leo"
+    | "liora"
+    | "lumen"
+    | "luna"
+    | "lux"
+    | "nakash"
+    | "orion"
+    | "perseus"
+    | "rex"
+    | "sal"
+    | "sirius"
+    | "una"
+    | "ursa"
+    | "zagan"
+    | "zenith"
+    | "zigel";
 
   export type Codec = "wav" | "mp3" | "pcm" | "mulaw" | "alaw";
 

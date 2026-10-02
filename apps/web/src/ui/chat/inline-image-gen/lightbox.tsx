@@ -3,7 +3,7 @@
 import type { CSSProperties, MouseEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { toCdnUrlConstituents } from "@/lib/helpers";
+import { fileDownloadName } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
 import { BaseButton as Button, Download, X } from "@slipstream/ui";
 
@@ -33,11 +33,6 @@ function frameStyle(w: number, h: number, fit: boolean) {
       ? `min(${w}px, calc(100vw - ${INSET_X}), calc((100dvh - ${INSET_Y}) * ${w} / ${h}))`
       : `${w}px`
   } satisfies CSSProperties;
-}
-
-function downloadName(cdnUrl: string) {
-  const { ext, sId, sOrdinal } = toCdnUrlConstituents(cdnUrl);
-  return `${sId}-${sOrdinal}.${ext}`;
 }
 
 export function Lightbox({
@@ -111,7 +106,7 @@ export function Lightbox({
             onClick={() => {
               const link = document.createElement("a");
               link.href = image.src;
-              link.download = downloadName(image.src);
+              link.download = fileDownloadName(image.src);
               link.click();
             }}>
             <Download className="size-4" />

@@ -238,6 +238,9 @@ catalogs:
       specifier: ^0.7.1
       version: 0.7.1
   dd:
+    '@d0paminedriven/audiodown':
+      specifier: ^0.1.0
+      version: 0.1.0
     '@d0paminedriven/fs':
       specifier: ^11.0.0
       version: 11.0.0
@@ -990,6 +993,9 @@ importers:
       '@base-ui/react':
         specifier: catalog:bui
         version: 1.8.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@d0paminedriven/audiodown':
+        specifier: catalog:dd
+        version: 0.1.0
       '@d0paminedriven/iso-3166-1':
         specifier: catalog:dd
         version: 1.4.0
@@ -1050,6 +1056,9 @@ importers:
       '@shikijs/transformers':
         specifier: catalog:shiki
         version: 4.4.3
+      '@slipstream/audio-metadata':
+        specifier: workspace:*
+        version: link:../../packages/audio-metadata
       '@slipstream/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -1348,6 +1357,9 @@ importers:
       '@aws-sdk/types':
         specifier: catalog:aws
         version: 3.974.6
+      '@d0paminedriven/audiodown':
+        specifier: catalog:dd
+        version: 0.1.0
       '@d0paminedriven/fs':
         specifier: catalog:dd
         version: 11.0.0
@@ -1506,6 +1518,54 @@ importers:
         specifier: catalog:utils
         version: 9.1.0(debug@4.4.3(supports-color@5.5.0))(supports-color@5.5.0)
 
+  packages/audio-metadata:
+    devDependencies:
+      '@d0paminedriven/fs':
+        specifier: catalog:dd
+        version: 11.0.0
+      '@slipstream/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint
+      '@slipstream/prettier-config':
+        specifier: workspace:*
+        version: link:../../tooling/prettier
+      '@slipstream/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
+      '@types/node':
+        specifier: catalog:node
+        version: 26.6.3
+      '@typescript/native-preview':
+        specifier: catalog:tsgo
+        version: 7.0.0-dev.20260707.2
+      dotenv-expand:
+        specifier: catalog:dotenv
+        version: 1000.0.0
+      eslint:
+        specifier: catalog:eslint
+        version: 10.11.0(jiti@2.7.0)(supports-color@7.2.0)
+      jiti:
+        specifier: catalog:jiti
+        version: 2.7.0
+      prettier:
+        specifier: catalog:prettier
+        version: 3.9.9
+      tsdown:
+        specifier: catalog:tsdown
+        version: 0.23.0(@tsdown/css@0.23.0)(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(tsx@4.23.15)(typescript@6.0.3)
+      tslib:
+        specifier: catalog:tslib
+        version: 2.8.1
+      tsx:
+        specifier: catalog:tsx
+        version: 4.23.15
+      typescript:
+        specifier: catalog:ts
+        version: 6.0.3
+      typescript-eslint:
+        specifier: catalog:tseslint
+        version: 8.70.1(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+
   packages/cli:
     dependencies:
       '@d0paminedriven/fs':
@@ -1658,6 +1718,9 @@ importers:
         specifier: catalog:dotenv
         version: 18.0.4
     devDependencies:
+      '@d0paminedriven/audiodown':
+        specifier: catalog:dd
+        version: 0.1.0
       '@d0paminedriven/fs':
         specifier: catalog:dd
         version: 11.0.0
@@ -3010,6 +3073,92 @@ packages:
   '@csstools/css-tokenizer@4.0.0':
     resolution: {integrity: sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA==}
     engines: {node: '>=20.19.0'}
+
+  '@d0paminedriven/audiodown-android-arm-eabi@0.1.0':
+    resolution: {integrity: sha512-tw7JCa7FTtjIpcRRTY1D7fFIpr8hGJhVpkGhxKXQ9OsTnhAogCGf+grjlQbhSdWj5dtUckLxPCn5IQXbJd62CA==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [arm]
+    os: [android]
+
+  '@d0paminedriven/audiodown-android-arm64@0.1.0':
+    resolution: {integrity: sha512-l3Rx2b/VB2sgh9ug89o8OmYWwQo6gRlxk1is0lMYGmnPAgKWseuKBxGoHbjinom0MHe3AlEbSqAnZ4Pt0Kmscg==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [arm64]
+    os: [android]
+
+  '@d0paminedriven/audiodown-darwin-arm64@0.1.0':
+    resolution: {integrity: sha512-2ikcNQbnhrclsjbScbAhgXu3aAH/nWIhZpP9J3S8ZnXz/5WWEgBBsTdh4+5QhtgTtd04WhgnnL4BZjOJCvSCzA==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@d0paminedriven/audiodown-darwin-x64@0.1.0':
+    resolution: {integrity: sha512-Ew5HKfRKozYbLyI2Qknpb5g9DWOkXuNJu7ydKqrXGc2E3xTAgMigHztBKoxQa0LuMW6+6C57MxZs5VgyZ7TLIQ==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@d0paminedriven/audiodown-freebsd-x64@0.1.0':
+    resolution: {integrity: sha512-oq5b/7oS0VmTh4AswD6DbadKrlhxcqEy7i3/tbXSvkj6fZ+bIEW90/iHT36F0Sv5fLljTocFsQoOu90XNfYhRQ==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@d0paminedriven/audiodown-linux-arm-gnueabihf@0.1.0':
+    resolution: {integrity: sha512-VEh/5h3aJW7ofy3cTahAS76RoAgEwcGHluSqCMz5U60w9aHmHhh4qEDTI0dYd7Am1N+GXr70L5UM/eT4idhr5A==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [arm]
+    os: [linux]
+
+  '@d0paminedriven/audiodown-linux-arm64-gnu@0.1.0':
+    resolution: {integrity: sha512-k8DUNQx/TE7OeLf9n5CSVl4XOZATIytm6fUEqqrPdoNjv3Z1lWF55nnBV3m0PyH9r0asNZaTZthOVM5GaHhU4Q==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@d0paminedriven/audiodown-linux-arm64-musl@0.1.0':
+    resolution: {integrity: sha512-3vjpi7DebSeXtGKpdmCICHLEEDAxKPyEU0ME/CbC8abODHaEZNpURjvhlngZ679tb/yTwjBXRtyWe5Pm1IQ6nw==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@d0paminedriven/audiodown-linux-x64-gnu@0.1.0':
+    resolution: {integrity: sha512-7e762nKUlVtJUQvCZ2QOHH7UbBgv+kyAYzZ6j0DX4LVluzY1/0McJWJBEWpU1T7ZCzOq26xoJqWFGfm7x6D58A==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@d0paminedriven/audiodown-linux-x64-musl@0.1.0':
+    resolution: {integrity: sha512-Iz40cLa2aP5liABsCgAKGIuOh3Xv4B/LeutPQQsfNitrOXLO0zyl60gsJCjcpPFvpm07kL/bYAWO95g+4yHusw==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@d0paminedriven/audiodown-win32-arm64-msvc@0.1.0':
+    resolution: {integrity: sha512-qtln0RbdtbLnP6ro6KcjQwWEUN3AVFwNOVK72YPWTitrb96+hDGKRyPytvgRLGffNIeX9xpUN+Xpkmhi8rws4w==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@d0paminedriven/audiodown-win32-ia32-msvc@0.1.0':
+    resolution: {integrity: sha512-GGXYOxM8b75pUQiCUuPidIyTVb3DuBaklb0VIkPjS5Jj0GJXh3G9YLFqm6r6ajIPLRNwzA/d0gsZdPd60K08Iw==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [ia32]
+    os: [win32]
+
+  '@d0paminedriven/audiodown-win32-x64-msvc@0.1.0':
+    resolution: {integrity: sha512-SNerYqajuzn7XlN57gkDI8Oao+ViUu04JH3NqDkDUML8q6s3zqYpl7GKUlG7ME4Vr7+9AMcAvORsSE4i1vxqBA==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
+    cpu: [x64]
+    os: [win32]
+
+  '@d0paminedriven/audiodown@0.1.0':
+    resolution: {integrity: sha512-RgvNfw3sw2bsL49vTdC6XvHAKpaKK3yOi/EkKpzYvX2jFzNSgl1MWdYTONHwfQR/kXCB55FazG+2x51lF+KmXQ==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
 
   '@d0paminedriven/fs@11.0.0':
     resolution: {integrity: sha512-eB5jYfokk6aUrUNepy+e+hnHQCgEHrc3osf4RjQriMO05y/Lyw2A21DK04FG+VVOmDM1thB4U8YB2lr1a+Aewg==}
@@ -10849,6 +10998,61 @@ snapshots:
       css-tree: 3.2.1
 
   '@csstools/css-tokenizer@4.0.0': {}
+
+  '@d0paminedriven/audiodown-android-arm-eabi@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown-android-arm64@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown-darwin-arm64@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown-darwin-x64@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown-freebsd-x64@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown-linux-arm-gnueabihf@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown-linux-arm64-gnu@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown-linux-arm64-musl@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown-linux-x64-gnu@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown-linux-x64-musl@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown-win32-arm64-msvc@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown-win32-ia32-msvc@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown-win32-x64-msvc@0.1.0':
+    optional: true
+
+  '@d0paminedriven/audiodown@0.1.0':
+    optionalDependencies:
+      '@d0paminedriven/audiodown-android-arm-eabi': 0.1.0
+      '@d0paminedriven/audiodown-android-arm64': 0.1.0
+      '@d0paminedriven/audiodown-darwin-arm64': 0.1.0
+      '@d0paminedriven/audiodown-darwin-x64': 0.1.0
+      '@d0paminedriven/audiodown-freebsd-x64': 0.1.0
+      '@d0paminedriven/audiodown-linux-arm-gnueabihf': 0.1.0
+      '@d0paminedriven/audiodown-linux-arm64-gnu': 0.1.0
+      '@d0paminedriven/audiodown-linux-arm64-musl': 0.1.0
+      '@d0paminedriven/audiodown-linux-x64-gnu': 0.1.0
+      '@d0paminedriven/audiodown-linux-x64-musl': 0.1.0
+      '@d0paminedriven/audiodown-win32-arm64-msvc': 0.1.0
+      '@d0paminedriven/audiodown-win32-ia32-msvc': 0.1.0
+      '@d0paminedriven/audiodown-win32-x64-msvc': 0.1.0
 
   '@d0paminedriven/fs@11.0.0':
     dependencies:
