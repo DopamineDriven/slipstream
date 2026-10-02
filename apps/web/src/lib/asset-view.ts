@@ -62,8 +62,9 @@ type AssetBase = {
 
 export type ImageAsset = AssetBase & {
   kind: "IMAGE";
-  width: number;
-  height: number;
+  /** Unknown when no relation carries them (extraction failed, legacy gen row); the chip and frame fill without them. */
+  width: number | undefined;
+  height: number | undefined;
   alt: string;
   caption: string | undefined;
   hasAlpha: boolean | null;
@@ -168,18 +169,23 @@ function joinPresent(
 }
 
 export function imageCompatibility(
-  width: number,
-  height: number,
+  width: number | undefined,
+  height: number | undefined,
   format: string
 ): Compatibility {
   const reasons = Array.of<string>();
   if (!PROVIDER_FORMATS.has(format.toLowerCase())) {
     reasons.push(`${format.toUpperCase()} is outside JPEG / PNG / WEBP`);
   }
-  if (width > PROVIDER_MAX_EDGE)
-    reasons.push(`${width}px wide exceeds ${PROVIDER_MAX_EDGE}px`);
-  if (height > PROVIDER_MAX_EDGE)
-    reasons.push(`${height}px tall exceeds ${PROVIDER_MAX_EDGE}px`);
+  // unknown edges cannot be vouched for, so they read as a reason, not a pass
+  if (width === undefined || height === undefined) {
+    reasons.push("dimensions unknown");
+  } else {
+    if (width > PROVIDER_MAX_EDGE)
+      reasons.push(`${width}px wide exceeds ${PROVIDER_MAX_EDGE}px`);
+    if (height > PROVIDER_MAX_EDGE)
+      reasons.push(`${height}px tall exceeds ${PROVIDER_MAX_EDGE}px`);
+  }
   return reasons.length > 0
     ? { ready: false, reasons }
     : { ready: true, via: "original" };
@@ -188,10 +194,11 @@ export function imageCompatibility(
 /* -------------------------------- adapter -------------------------------- */
 
 /**
- * Builds the viewer's model from a registry row. `null` when there is nothing
- * to show: soft-deleted, no CDN object yet, a video (no lane), or an image with
- * no dimensions on any relation. Pure — called at render on the row the
- * registry hands back, memoised by the consumer on that row's reference.
+ * Builds the viewer's model from a registry row. `null` only when there is
+ * nothing to show: soft-deleted, no CDN object yet, or a video (no lane). An
+ * image with no dimensions on any relation still renders; its edges read as
+ * unknown. Pure — called at render on the row the registry hands back,
+ * memoised by the consumer on that row's reference.
  */
 export function toAssetView(row: AttachmentSingleton<true>): AssetView | null {
   if (row.deletedAt !== null) return null;
@@ -318,7 +325,6 @@ export function toAssetView(row: AttachmentSingleton<true>): AssetView | null {
   if (row.assetType === "IMAGE") {
     const width = row.image?.width ?? inline?.width ?? nonNull(gen?.width);
     const height = row.image?.height ?? inline?.height ?? nonNull(gen?.height);
-    if (!width || !height) return null;
     const caption = nonNull(inline?.revisedPrompt ?? gen?.revisedPrompt);
     const title =
       sender === "AI"

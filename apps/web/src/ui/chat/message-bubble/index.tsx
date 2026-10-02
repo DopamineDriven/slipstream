@@ -1,5 +1,6 @@
 "use client";
 
+import type { AssetView } from "@/lib/asset-view";
 import type { PlaybackTrack } from "@/playback/store";
 import type { User } from "@/utils/auth-client";
 import type { ReactNode } from "react";
@@ -17,10 +18,10 @@ import { normalizeImgGenFields } from "@/lib/img-gen-to-attachment";
 import { processStreamingMarkdown } from "@/lib/markdown-streaming";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
-import { AttachmentDisplay } from "@/ui/chat/attachment-display";
 import { InlineAudioGen } from "@/ui/chat/audio-gen/inline-audio-gen";
 import { ImageGenerationCanvasTest } from "@/ui/chat/image-gen/index";
 import { InlineImageGen } from "@/ui/chat/inline-image-gen";
+import { AttachmentChips } from "@/ui/chat/message-bubble/attachment-chips";
 import { MessageIcons } from "@/ui/chat/message-bubble/message-icons";
 import { ThinkingSection } from "@/ui/chat/thinking";
 import { useTheme } from "next-themes";
@@ -220,6 +221,18 @@ function MessageBubbleImpl({
     message.attachments,
     liveAudioGenFields
   ]);
+
+  // a user message's assets through the one adapter; rows with nothing to
+  // show (no CDN object yet, soft-deleted) drop out
+  const userAssets = useMemo(
+    () =>
+      message.senderType === "USER"
+        ? message.attachments
+            .map(toAssetView)
+            .filter((a): a is AssetView => a !== null)
+        : [],
+    [message.senderType, message.attachments]
+  );
 
   const imageGenerationData = useMemo(() => {
     const imageUrls = Array.of<string>();
@@ -687,8 +700,7 @@ function MessageBubbleImpl({
           )}>
           {message.messageType === "AUDIO_GEN" &&
           message.senderType ===
-            "AI" ? // a lyria turn's text is the lyric sheet and nothing else, and
-          // it lives in the card's drawer below — never the markdown pass,
+            "AI" ? // it lives in the card's drawer below — never the markdown pass, // a lyria turn's text is the lyric sheet and nothing else, and
           // which would paint the [[A0]] / [:] notation raw
           null : hasRenderableMessageBlocks ? (
             renderedMessageBlocks
@@ -814,7 +826,7 @@ function MessageBubbleImpl({
                 {formatAttmntLabel(message)}
               </div>
               {message.senderType === "USER" && (
-                <AttachmentDisplay attachments={message.attachments} />
+                <AttachmentChips assets={userAssets} />
               )}
             </div>
           )}
