@@ -187,7 +187,7 @@ export function draftIdEpimerize(
   }
 }
 
-export function getCdnUrlBase(isProd = process.env.IS_PROD) {
+export function getCdnUrlBase(isProd = process.env.NEXT_PUBLIC_IS_PROD) {
   if (!isProd) return "https://assets.aicoalesce.com";
   else return "https://assets-dev.aicoalesce.com";
 }
@@ -492,7 +492,6 @@ export async function downloadAsset(src: string, name: string) {
     window.open(src, "_blank", "noopener,noreferrer");
   }
 }
-
 
 export function formatDuration(seconds: number | undefined) {
   if (seconds === undefined || !Number.isFinite(seconds)) return "–:––";

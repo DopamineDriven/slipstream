@@ -146,8 +146,10 @@ not ws-server — stale key until restart, accepted). No connection push (remove
 - `apps/web/src/lib/helpers.ts`: `isUserImage` (jpg/jpeg/webp/png + avif heic tif tiff bmp svg ico gif
   apng — missing by evidence: `jfif` (1 prod row), `heif`; used on ALIASED originals only), `cdnUrlHandler(cdnUrl, isProd?)`
   → `toCdnUrlConstituents | userCdnUrlConstituents` via `trimBase(cdnUrl, isProd)` (**env-dependent**:
-  `getCdnUrlBase(isProd = process.env.IS_PROD)`; `undefined` ⇒ default param ⇒ env; in the browser
-  `IS_PROD` is always undefined ⇒ prod base — Andrew accepted; pass `"abc123"` for dev in tests).
+  `getCdnUrlBase(isProd = process.env.NEXT_PUBLIC_IS_PROD)` since 2026-10-02 — the web marker was
+  renamed so Next inlines it into the client bundle (the parser now runs in client components:
+  adapter, chips, caption); absent on Vercel ⇒ prod; pass `"abc123"` for dev in tests, which run
+  under tsx with nothing set).
   `assetOrigin` literals are now UPPERCASE (`GENERATED|UPLOAD|PASTED`). Generated `type` union now
   includes `AudioGenOutput`, `TTSJob`.
 - `apps/web/src/tests/cdn-url-constituents.test.ts`: routes every fixture url through `cdnUrlHandler`,
@@ -224,6 +226,6 @@ copy is a secondary artifact a gallery may show alongside).
   deletions of his lines explicitly; propose edits to his in-flight files, don't apply unasked.
 - Contract files stay terse; acks are one field set; `userId` never on acks; events named in his
   tokens (`hydrate_attachment_by_id`).
-- `IS_PROD` set ⇒ dev. `trimBase`/`cdnUrlHandler` take `isProd?` explicitly.
+- `IS_PROD` (ws-server/db) / `NEXT_PUBLIC_IS_PROD` (web) set ⇒ dev. `trimBase`/`cdnUrlHandler` take `isProd?` explicitly.
 - `@d0paminedriven/audiodown`: `browser` field → wasm (`wasm32-wasip1-threads`) build; needs
   cross-origin isolation (COOP/COEP) in the browser — server path stays primary; web imports type-only.
