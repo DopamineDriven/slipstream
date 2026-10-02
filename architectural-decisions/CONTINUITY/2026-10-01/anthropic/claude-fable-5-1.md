@@ -135,8 +135,9 @@ not ws-server — stale key until restart, accepted). No connection push (remove
   `waveformPeaksColumn`, `analyzeBuffer` on `@d0paminedriven/audiodown` — Rust/napi port of
   `packages/audio-metadata`, which entered the repo in `621b40e` with two changesets). Backfill
   `backfill-waveform-peaks.ts` (gen-rows → analyze → exe → cross-check; `audiodown` is a db devDep) —
-  **not yet run**; the two dev lyria rows (2026-09-07, 09-29) have `[]` peaks. User audio uploads get
-  the `[0]` placeholder at `asset-complete` (no decode there yet — candidate improvement).
+  **ran on dev and prod 2026-10-02**. The `[0]` placeholder arm at `asset-complete` is unreachable:
+  users upload images and documents only; when audio uploads open, that arm calls
+  `this.wsServer.prisma.extractor.analyzeRemote` (server decodes, never the client).
 - `ExtractService` constructor now takes the addon (`new ExtractService(new AudioService())`); I fixed
   `src/test/memory-section-dryrun.ts` to match.
 
@@ -180,9 +181,17 @@ Landing order (plan §10):
 3. **Feed**: `InlineAudioGen` replaces the per-bubble player at `message-bubble/index.tsx` ~L719 (keep
    the compiling window); AUDIO_GEN bubble renders `message.content` via `LyricsPanel` not markdown;
    `AttachmentChips` on USER messages; delete old `ui/chat/audio-player` when unreferenced.
-4. **Lightbox + page** (Andrew): asset-model bodies, `asset-meta`, downloads. **Five icons missing** in
-   `@slipstream/ui`: `Clipboard`, `ShieldCheck`, `TriangleAlert`, `Upload`, `AudioLines`.
-5. Run `backfill-waveform-peaks.ts` on dev (then prod post-deploy).
+4. **Lightbox + page** (Andrew): asset-model bodies, `asset-meta`, downloads. The five icons
+   (`Clipboard`, `ShieldCheck`, `TriangleAlert`, `Upload`, `AudioLines`) landed 2026-10-02.
+5. ~~Run `backfill-waveform-peaks.ts`~~ done dev + prod 2026-10-02. Prod still owes, in order:
+   deploy → prod `migrate` (lineage columns `20260929230533` + `20261002024519`) →
+   `backfill-imagegen-models.ts` → `backfill-audiogen-models.ts` (both ran on dev). Andrew runs
+   migrations and backfills himself — never prisma CLI from here.
+   2026-10-02 state: `WAVEFORM_PEAK_COUNT` / `WAVEFORM_PEAK_SCALE` live in `@slipstream/types`
+   `contract/audio.ts`; playback store has parity (`stop`/`setVolume`/`toggleMute`, `volume`+`muted`),
+   `useTrackPlayback(string | undefined)`, `PlaybackProvider` mounted inside `AIChatProvider`,
+   `ui/chat/playback/audio-player.tsx` written on `BaseButton` + native volume range — unreferenced
+   until step 3 swaps the bubble; `engine` dropped from the asset model (lineage columns do it).
 6. Later: bucket-level LRU on the client mirror (user-driven admission ≠ bounded growth).
 
 Out of scope: TTS in the registry/lightbox (own `<audio>` in `tts-context.tsx`), video, eviction.

@@ -1,7 +1,10 @@
-import type { CTR, RTC } from "@slipstream/types";
+import type { CTR, Rm, RTC } from "@slipstream/types";
 
 export type PlaybackTrack = {
-  /** The attachment id; equality decides whether a control targets the loaded track. */
+  /**
+   * The cdnUrl — the identity of the CDN object, equal on the live envelope and
+   * the committed row; equality decides whether a control targets the loaded track.
+   */
   id: string;
   src: string;
   title: string;
@@ -19,15 +22,25 @@ export type PlaybackSnapshot = {
   currentTime: number;
   /** The element's reported seconds once known, else the track's own; absent while idle. */
   duration?: number | undefined;
+  /** Element-level, so they outlive any one track: `0..1`, and the mute flag beside it. */
+  volume: number;
+  muted: boolean;
 };
 
 /** What every `track?.id` check in the store leans on: once loaded, the track is there. */
 export type LoadedPlayback = CTR<PlaybackSnapshot, "track">;
 
+/** No track loaded; volume and mute ride along because they belong to the element, not the track. */
+export type IdlePlayback = Rm<PlaybackSnapshot, "track" | "duration"> & {
+  status: "idle";
+};
+
 export const IDLE_PLAYBACK = {
   status: "idle",
-  currentTime: 0
-} satisfies PlaybackSnapshot;
+  currentTime: 0,
+  volume: 1,
+  muted: false
+} satisfies IdlePlayback;
 
 export type PlaybackStore = ReturnType<typeof createPlaybackStore>;
 
@@ -62,7 +75,7 @@ export function createPlaybackStore() {
   };
 
   /** The only whole-state jumps: back to idle, or onto a freshly loaded track. */
-  const replace = (next: typeof IDLE_PLAYBACK | LoadedPlayback) => {
+  const replace = (next: IdlePlayback | LoadedPlayback) => {
     snapshot = next;
     publish();
   };
@@ -109,6 +122,12 @@ export function createPlaybackStore() {
       patch({ duration: elementDuration() ?? snapshot.duration }),
     durationchange: () =>
       patch({ duration: elementDuration() ?? snapshot.duration }),
+    // the element is the source of truth for both; `setVolume` / `toggleMute`
+    // write the element and this writes the snapshot (iOS ignores `volume`
+    // writes and fires nothing, so the snapshot stays honest there too)
+    volumechange: () => {
+      if (element) patch({ volume: element.volume, muted: element.muted });
+    },
     error: () => {
       cancelAnimationFrame(frame);
       patch({ status: "error" });
@@ -119,6 +138,9 @@ export function createPlaybackStore() {
   const attach = (el: HTMLAudioElement | null) => {
     element = el;
     if (!el) return;
+    // volume and mute survive a remount: the snapshot's values go onto the new element
+    el.volume = snapshot.volume;
+    el.muted = snapshot.muted;
     for (const [type, handler] of Object.entries(handlers))
       el.addEventListener(type, handler);
     return () => {
@@ -129,7 +151,11 @@ export function createPlaybackStore() {
       el.removeAttribute("src");
       el.load();
       element = null;
-      replace(IDLE_PLAYBACK);
+      replace({
+        ...IDLE_PLAYBACK,
+        volume: snapshot.volume,
+        muted: snapshot.muted
+      });
     };
   };
 
@@ -142,7 +168,9 @@ export function createPlaybackStore() {
       track,
       status: "loading",
       currentTime: 0,
-      duration: track.duration
+      duration: track.duration,
+      volume: snapshot.volume,
+      muted: snapshot.muted
     });
   };
 
@@ -175,6 +203,26 @@ export function createPlaybackStore() {
     patch({ currentTime: time });
   };
 
+  /** Pause and rewind the loaded track; a no-op for any other. */
+  const stop = (track: PlaybackTrack) => {
+    if (!element || snapshot.track?.id !== track.id) return;
+    cancelAnimationFrame(frame);
+    element.pause();
+    element.currentTime = 0;
+    patch({ status: "paused", currentTime: 0 });
+  };
+
+  /** Writes the element; `volumechange` writes the snapshot. Raising it past 0 unmutes. */
+  const setVolume = (volume: number) => {
+    if (!element) return;
+    element.volume = Math.min(1, Math.max(0, volume));
+    if (volume > 0) element.muted = false;
+  };
+
+  const toggleMute = () => {
+    if (element) element.muted = !element.muted;
+  };
+
   return {
     attach,
     subscribe: (listener: () => void) => {
@@ -187,6 +235,9 @@ export function createPlaybackStore() {
     play,
     pause,
     toggle,
-    seek
+    seek,
+    stop,
+    setVolume,
+    toggleMute
   };
 }

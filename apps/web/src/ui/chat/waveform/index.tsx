@@ -3,8 +3,8 @@
 import type { ChangeEvent } from "react";
 import { useCallback, useId, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
+import { WAVEFORM_PEAK_SCALE } from "@slipstream/types";
 
-const WAVEFORM_PEAK_SCALE = 100;
 /** 2px bar + 1px gap. */
 const BAR_PITCH = 3;
 const BAR_STROKE = 2;

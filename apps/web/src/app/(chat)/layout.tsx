@@ -4,15 +4,16 @@ import { AIChatProvider } from "@/context/ai-chat-context";
 import { ApiKeysProvider } from "@/context/api-keys-context";
 import { AssetProvider } from "@/context/asset-context";
 import { AttachmentRegistryProvider } from "@/context/attachment-registry-context";
-import { NavigationSync } from "@/ui/navigation-sync";
 import { AudioGenProvider } from "@/context/audio-gen-context";
 import { ChatWebSocketProvider } from "@/context/chat-ws-context";
 import { ConversationHydrationProvider } from "@/context/convo-hydration-context";
 import { ImageGenProvider } from "@/context/image-gen-context";
 import { ModelSelectionProvider } from "@/context/model-selection-context";
+import { PlaybackProvider } from "@/context/playback-context";
 import { SettingsDrawerProvider } from "@/context/settings-drawer-context";
 import { STTProvider } from "@/context/stt-context";
 import { TTSProvider } from "@/context/tts-context";
+import { NavigationSync } from "@/ui/navigation-sync";
 import { getSession } from "@/utils/auth";
 
 export default async function AuthedLayout({
@@ -38,8 +39,10 @@ export default async function AuthedLayout({
                         <AttachmentRegistryProvider>
                           <NavigationSync />
                           <AIChatProvider userId={session.user.id}>
-                            {children}
-                            {modal}
+                            <PlaybackProvider>
+                              {children}
+                              {modal}
+                            </PlaybackProvider>
                           </AIChatProvider>
                         </AttachmentRegistryProvider>
                       </ConversationHydrationProvider>

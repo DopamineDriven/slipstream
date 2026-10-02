@@ -6,6 +6,7 @@ import type {
 import { AudioService as AudioDownService } from "@d0paminedriven/audiodown";
 import { Fs } from "@d0paminedriven/fs";
 import type { $Enums } from "@slipstream/db/node/generated/client";
+import { WAVEFORM_PEAK_SCALE } from "@slipstream/types";
 
 export class ExtractService extends Fs {
   constructor(public audiodown: AudioDownService) {
@@ -204,7 +205,7 @@ export class ExtractService extends Fs {
   public waveformPeaksColumn(waveform: WaveformPeaks | null) {
     return waveform
       ? Array.from(waveform.envelope, v =>
-          Math.round(Math.min(1, Math.max(0, v)) * 100)
+          Math.round(Math.min(1, Math.max(0, v)) * WAVEFORM_PEAK_SCALE)
         )
       : [];
   }

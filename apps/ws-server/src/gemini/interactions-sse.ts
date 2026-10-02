@@ -18,7 +18,7 @@ import type {
   EventTypeMap,
   GeminiModelIdUnion
 } from "@slipstream/types";
-import { isLocalToolName } from "@slipstream/types";
+import { WAVEFORM_PEAK_COUNT } from "@slipstream/types";
 
 interface InteractionsActiveMessageBlock {
   content: string;
@@ -848,7 +848,7 @@ export class GeminiInteractionsSseService extends GeminiInteractionsService {
         // every other tool takes the server-side path untouched.
         const toolName = functionCall.name;
         if (
-          isLocalToolName(toolName) &&
+          this.prisma.isLocalToolName(toolName) &&
           localToolTurn?.advertised.has(toolName)
         ) {
           const localResult = await this.localToolBroker.request(
@@ -997,7 +997,7 @@ export class GeminiInteractionsSseService extends GeminiInteractionsService {
       // loop); falls back to header-only specs if the stream will not decode
       const { specs, waveform } = await this.prisma.extractor.analyzeBuffer(
         audioBuffer,
-        { peakCount: 1024 }
+        { peakCount: WAVEFORM_PEAK_COUNT }
       );
       // store:false interactions report an empty id, so || (not ??) is the
       // fallback that actually mints a series id

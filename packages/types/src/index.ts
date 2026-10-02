@@ -43,7 +43,9 @@ export {
   grokVoiceDisplayNamesTTS,
   grokVoiceIdToDisplayNameTTS,
   grokVoiceIdsTTS,
-  grokVoices
+  grokVoices,
+  WAVEFORM_PEAK_COUNT,
+  WAVEFORM_PEAK_SCALE
 } from "@/contract/audio.ts";
 
 export type {

@@ -30,7 +30,7 @@ AttachmentSingleton<true> ──toAssetView──▶ ImageAsset | AudioAsset | D
 | `lib/lyrics.ts` | **in** | `src/lib/lyrics.ts` |
 | `components/lyrics-panel.tsx` | **in** | `src/ui/chat/lightbox/lyrics-panel.tsx` |
 | `components/document-embed.tsx` | **in** | `src/ui/chat/lightbox/document-embed.tsx` |
-| `components/playback-provider.tsx` | port | `src/playback/provider.tsx` — beside the store; mounts the one `<audio>` |
+| `components/playback-provider.tsx` | **in** | `src/context/playback-context.tsx` — `PlaybackProvider` mounts the one `<audio>`, `usePlaybackContext`; the two hooks split out to `src/hooks/use-playback-value.ts` (`useSyncExternalStore` selector) and `src/hooks/use-track-playback.ts` (one track's view) |
 | `components/waveform-scrubber.tsx` | **in** | `src/ui/chat/waveform/index.tsx` — `WaveformScrubber`, local `WAVEFORM_PEAK_SCALE = 100` until §4 hoists it |
 | `components/audio-player.tsx` | port **+ parity** (§3) | `src/ui/chat/playback/audio-player.tsx` |
 | `lib/asset-view.ts` | port **+ adapt** (§2) | `src/lib/asset-view.ts` |
@@ -50,10 +50,10 @@ to wasm, not the native addon (corrected 2026-10-01). The catch is `-threads`: i
 `SharedArrayBuffer`, which browsers expose only under cross-origin isolation (COOP `same-origin` +
 COEP `require-corp` / `credentialless`), and `require-corp` then wants CORP headers or `crossorigin`
 on every CDN image and track the app paints. So client-side decode is a deliberate opt-in, not a
-default: the server path (`analyzeBuffer` at persist, the peaks backfill for history) stays primary,
-and the one place the wasm build would earn its keep — a waveform preview for a user's own audio
-upload before send — is also solvable by running `analyzeBuffer` at finalize, where `asset-complete`
-today writes the `[0]` placeholder. Until that choice is made, keep the web imports type-only.
+default: the server path (`analyzeBuffer` at persist, the peaks backfill for history) is the path, and
+there is no client-side case to make — users cannot upload audio today (the chat input accepts
+images and documents only), and when they can, finalize decodes the object server-side (§4). Keep the
+web imports type-only.
 
 ---
 
@@ -61,7 +61,7 @@ today writes the `[0]` placeholder. Until that choice is made, keep the web impo
 
 v0's `asset-view.ts` is the right shape: one function from the row to a discriminated
 `ImageAsset | AudioAsset | DocumentAsset`, provenance (sender, origin, compat, series, generatedBy,
-facilitatedBy, engine) computed once, `original` and `compatCopy` as two `FileRef`s, and the
+facilitatedBy) computed once, `original` and `compatCopy` as two `FileRef`s, and the
 "preview the compat copy only when the browser cannot render the original" rule — Office docs as
 PDF, HEIC/TIFF as PNG/JPEG. That rule is the client-side expression of "a gallery shows both".
 
@@ -69,9 +69,16 @@ Adaptations to our types:
 
 - Input is `AttachmentSingleton<true>` only — `size` is already `number | null`, so `toBytes`'s
   bigint branch goes.
-- `tryCdnUrlHandler` → our `cdnUrlHandler`. Our parser has no `AudioGenOutput` / `TTSJob` url types,
-  so `engine` comes from the relations alone: `row.audioGenOutput` → `"Lyria"`, `row.ttsJob` →
-  `${titleCase(provider)} TTS`.
+- `tryCdnUrlHandler` → our `cdnUrlHandler`. It classifies `AudioGenOutput` / `TTSJob` urls now, and
+  the lyria object is named by `AudioGenJob.id`, so `series` for audio is `{ id: sId }` with no ordinal
+  — the same provenance slot images fill.
+- **`engine` is not ported.** It was v0's stand-in for lineage on audio rows that had none: a label
+  ("Lyria", "Grok TTS") keyed on which relation or url type was present — a table name dressed up as a
+  credit. `AudioGenOutput` carries `generatingModel` / `facilitatingModel` / `provider` since
+  `20261002024519`, so audio resolves `generatedBy` through the same `modelIdToDisplayName` path as
+  images ("Lyria 3.5", "Lyria 3 Pro Preview"). `modelLine` becomes `generatedBy ?? facilitatedBy`,
+  the audio title fallback and `audioSubtitle` read it, and `asset-meta`'s "Engine" term goes. TTS is
+  out of the registry (§9); if it ever comes in, `TTSJob` has provider, model and voice of its own.
 - `getModelDisplayName(PROVIDER_SLUG[provider], model)` → ours takes the lowercase provider the same
   way; `imgCtx.pureImageGenDisplayNameMap` is a getter now (no call parentheses).
 - **`row.audioGenOutput?.lyrics` does not exist.** See §6 — it becomes `audioGenOutput.content`,
@@ -115,19 +122,24 @@ requires. The cassette primer in `message-icons.tsx` is the TTS lane's concern a
 ## 4. The waveform contract, in one place
 
 Server writes `peakCount: 1024` and quantises to `0..100`; the scrubber divides by the scale and
-reduces 1024 buckets to one bar per 3px. Today the two numbers live only as literals in
-`extract/index.ts` and the ws-server call site, and v0 names them `WAVEFORM_PEAK_COUNT` /
-`WAVEFORM_PEAK_SCALE`. Put both in `@slipstream/types` (`contract/audio.ts` already exists) and
-import them in the extractor and the scrubber. The scrubber treats `peaks.length <= 1` as "no
-envelope" and falls back to the plain range input — that covers both `[]` and the `[0]` placeholder
-`asset-complete.ts` writes for user audio uploads.
+reduces 1024 buckets to one bar per 3px. Both numbers live in `@slipstream/types` as
+`WAVEFORM_PEAK_COUNT = 1024` / `WAVEFORM_PEAK_SCALE = 100` (`contract/audio.ts`, 2026-10-02), imported
+at the extractor, the lyria call site and the scrubber; the finished waveform backfill keeps its own
+literal since it will not run again. The scrubber's only fallback is `peaks.length === 0`
+(no envelope → plain range input); it does not special-case placeholders. The `AUDIO` arm of
+`asset-complete.ts` finalize (the `waveformPeaks: [0]`, `duration: 0` branch) is unreachable today —
+users upload images and documents only — and when audio uploads open up, that arm calls
+`this.wsServer.prisma.extractor.analyzeRemote(cdnUrl, { peakCount })` (the extractor is already on that
+chain — finalize reaches `extractRemote` through it today) and writes `waveformPeaksColumn(waveform)` plus the
+decoded specs, the same way the lyria lane does at persist. The envelope is the server's to write,
+never the client's to paper over.
 
 ---
 
 ## 5. The three surfaces
 
 **Feed card** — `InlineAudioGen` for the AI bubble: the small player, the subtitle (credit or
-engine), and the Eye to `/attachment/[id]`. It replaces the current `<AudioPlayer src durationMs>`
+model line), and the Eye to `/attachment/[id]`. It replaces the current `<AudioPlayer src durationMs>`
 at `message-bubble/index.tsx` L719 and keeps the compiling window: `track` undefined while
 `liveHasLyrics && !audioGenPlayback`, defined from the envelope's `cdnUrl` the moment it lands,
 unchanged at commit because the key is the url. Because a lyria turn's text is the lyric sheet and
@@ -135,8 +147,16 @@ nothing else (§6), the AUDIO_GEN bubble renders `message.content` through `Lyri
 the markdown path, which today paints the raw `[[A0]]` / `[:]` markers. Streaming text still lands
 line by line, so the panel parses whatever has arrived.
 
-**User message assets** — `AttachmentChips` on USER messages: an 80px image chip, or a card with
-`AudioLines` / `FileText`, format and bytes; every chip links to `/attachment/[id]`. This is "viewing
+**User message assets** — `AttachmentChips` replaces `AttachmentDisplay` on USER messages
+(`ui/chat/attachment-display/index.tsx`, the thing the bubble mounts under the "Attachment" label
+today: a 256px-tall full-width image frame with an Eye/Download overlay, or a `Card` row per document,
+each with its own in-component preview path and a plain-anchor download). The chips are the small
+form of the same thing: an 80px image chip, or a 240px card with `AudioLines` / `FileText`, format
+and bytes; every chip is a `Link scroll={false}` to `/attachment/[id]`, so the intercept opens the
+shared lightbox and the page is one hard load away. The audio arm stays in place — it is a kind
+switch, the way `getFileIcon` already carries an `AUDIO` case — even though users upload images and
+documents only today. `AttachmentDisplay` goes once the bubble stops referencing it;
+`AttachmentPreviewComponent` in the chat input is the pre-send preview and is untouched. This is "viewing
 for user assets" — the same lightbox and page, fed by the same registry mirror.
 
 **Lightbox** (Andrew's `lightbox.tsx`): prop becomes `asset: AssetView`; the header gains
@@ -168,21 +188,21 @@ costs one nullable column, and makes `toAssetView` complete from the row alone. 
 **Named `content`, not `lyrics`** (Andrew, 2026-10-01): it is the model's text output alongside the
 audio — the same vocabulary as `Message.content` / `MessageBlock.content` — so a future speech model
 whose text is a transcript or script fits the column without renaming it. The interpretation is the
-reader's: `toAssetView` hands it to `LyricsPanel` only when the engine is lyria or `parseLyrics`
-finds a section marker, so prose from a speech model is never sliced into verses.
+reader's: `toAssetView` hands it to `LyricsPanel` only when `generatingModel` is a lyria id (`isAudioGenModel`) or
+`parseLyrics` finds a section marker, so prose from a speech model is never sliced into verses.
 
 ---
 
 ## 7. Five icons the ui package does not have
 
-`Clipboard`, `ShieldCheck`, `TriangleAlert`, `Upload`, `AudioLines` — used by `asset-meta.tsx` and
+~~`Clipboard`~~, ~~`ShieldCheck`~~, ~~`TriangleAlert`~~, ~~`Upload`~~, ~~`AudioLines`~~ — used by `asset-meta.tsx` and
 `attachment-chips.tsx`. Present already: `Eye`, `Download`, `X`, `Pause`, `Play`, `FileText`,
 `ExternalLink`, `Sparkles`, `ArrowLeft`. Add the five to `packages/ui/src/icons/` or substitute;
 `CompatibilityBadge` (ShieldCheck / TriangleAlert) is the only one that is more than decoration.
 
 ---
 
-## 8. Backfill: waveform peaks for rows that predate the addon
+~~## 8. Backfill: waveform peaks for rows that predate the addon~~
 
 Both dev lyria tracks (2026-09-07, 2026-09-29) have `waveformPeaks = []`; they were persisted before
 the Rust extractor. Prod's legacy audio census is 145 `.wav` + 13 `.mp3` generated rows, mostly TTS.
@@ -191,6 +211,8 @@ A `backfill-waveform-peaks` in the established pattern: select audio rows with `
 (and `duration` where it is `0`). The addon is a ws-server dependency, so the script lives in
 `apps/ws-server/src/test/` beside `bulk-attachments.ts`, dry-run by default, `apply` to write.
 Lyria rows first; TTS is a separate call.
+
+**Done 2026-10-02**: `packages/db/src/test/backfill-waveform-peaks.ts` ran on dev and prod.
 
 ---
 
@@ -216,16 +238,22 @@ seek control — they do not merge. What should match is the vocabulary: rounded
 
 ## 10. Landing order
 
-1. **Playback foundation**: `playback/provider.tsx`; `ui/chat/playback/audio-player.tsx` with the
-   parity items from §3, composing the ported `ui/chat/waveform/index.tsx` scrubber; `lib/download.ts`, `lib/format.ts`; the two
-   constants in `@slipstream/types`; `track.id = cdnUrl`; mount `PlaybackProvider` in
-   `(chat)/layout.tsx` directly around `{children}{modal}`. Typecheck.
+1. **Playback foundation**: `ui/chat/playback/audio-player.tsx` with the parity items from §3,
+   composing the ported `ui/chat/waveform/index.tsx` scrubber and the `context/playback-context.tsx` hooks; `lib/format.ts` (`lib/download.ts` is
+   already covered by `downloadAsset` / `fileDownloadName` in `lib/helpers.ts`). Done: the two
+   constants in `@slipstream/types`, `track.id = cdnUrl`, `PlaybackProvider` mounted inside
+   `AIChatProvider` around `{children}{modal}`, store parity (`stop` / `setVolume` / `toggleMute`,
+   `volume` + `muted` on the snapshot), `useTrackPlayback(string | undefined)`, and the player itself
+   on `BaseButton` with a native volume range (no Radix).
 2. **Adapter**: `lib/asset-view.ts` with the §2 adaptations.
-3. **Feed**: `InlineAudioGen` replaces the per-bubble player at L719; `AttachmentChips` on USER
-   messages; the old `ui/chat/audio-player/index.tsx` goes once unreferenced.
+3. **Feed**: `InlineAudioGen` replaces the per-bubble player at L719; `AttachmentChips` replaces
+   `AttachmentDisplay` on USER messages; the old `ui/chat/audio-player/index.tsx` and
+   `ui/chat/attachment-display/index.tsx` go once unreferenced.
 4. **Lightbox + page** (Andrew): asset-model bodies, `asset-meta`, the five icons, downloads.
 5. **`AudioGenOutput.content`** (Andrew): schema, persist line, backfill from `Message.content`.
-6. **Peaks backfill** in ws-server; run on dev, then prod after deploy.
+6. ~~**Peaks backfill**~~ — done on dev and prod (2026-10-02). Still pending on prod, in order: deploy → prod
+   `migrate` (the lineage columns `20260929230533` + `20261002024519` must exist first) →
+   `backfill-imagegen-models.ts` → `backfill-audiogen-models.ts` (both ran on dev).
 
 Verify live: start a track in the feed, open the lightbox mid-song — same position, no restart;
 close it — still playing; navigate to another conversation and back — still playing; hard load
