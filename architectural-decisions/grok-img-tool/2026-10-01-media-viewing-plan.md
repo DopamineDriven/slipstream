@@ -101,7 +101,7 @@ What the existing player has that v0's lacks, to carry over so nothing regresses
 | feature | existing player | v0 player | plan |
 |---|---|---|---|
 | compiling state (`src` undefined: lyrics landed, audio still uploading) | shimmer over the seek lane, `pendingLabel` | — | `track?: PlaybackTrack` optional; undefined renders the pending row |
-| stop | `Stop` | — | `stop(track)` on the store = pause + seek 0 |
+| stop | `Stop` | — | ~~`stop(track)` on the store~~ dropped 2026-10-03: play and pause only, as media controls are expected to be; rewinding is the scrubber's job |
 | volume + mute cluster | hover-expanding slider | — | `volume` / `muted` on the snapshot, `setVolume` / `toggleMute` on the store — element-level, so they belong to the one element |
 | download | blob-first, anchor fallback | `downloadAsset` in `lib/download.ts` (same strategy) | port `lib/download.ts`, drop the inline copy |
 | waveform scrubber | plain `Slider` | SVG envelope over a transparent range input | v0's, fed by `audio.waveformPeaks` |

@@ -689,7 +689,11 @@ function MessageBubbleImpl({
               : message.attachments.length > 0 ||
                   // an inline turn has no attachments while streaming; the
                   // block claims the width from its first frame, not at commit
-                  orderedMessageBlocks.some(b => b.type === "IMAGE_GEN")
+                  orderedMessageBlocks.some(b => b.type === "IMAGE_GEN") ||
+                  // a lyria turn is the same: the card exists before any
+                  // attachment does, so it claims the width up front
+                  (message.messageType === "AUDIO_GEN" &&
+                    message.senderType === "AI")
                 ? "w-[85%]"
                 : "",
             message.senderType === "USER"
@@ -700,8 +704,7 @@ function MessageBubbleImpl({
           )}>
           {message.messageType === "AUDIO_GEN" &&
           message.senderType ===
-            "AI" ? // it lives in the card's drawer below — never the markdown pass, // a lyria turn's text is the lyric sheet and nothing else, and
-          // which would paint the [[A0]] / [:] notation raw
+            "AI" ? // which would paint the [[A0]] / [:] notation raw // it lives in the card's drawer below — never the markdown pass, // a lyria turn's text is the lyric sheet and nothing else, and
           null : hasRenderableMessageBlocks ? (
             renderedMessageBlocks
           ) : (

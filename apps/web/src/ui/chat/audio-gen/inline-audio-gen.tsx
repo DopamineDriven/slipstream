@@ -5,7 +5,11 @@ import { useId, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { LyricsDrawer, LyricsToggle } from "@/ui/chat/lightbox/lyrics-reveal";
-import { AudioPlayer } from "@/ui/chat/playback/audio-player";
+import {
+  AudioPlayer,
+  TrackDownload,
+  VolumeControl
+} from "@/ui/chat/playback/audio-player";
 import { motion } from "motion/react";
 import { Eye } from "@slipstream/ui";
 
@@ -55,6 +59,10 @@ export function InlineAudioGen({
             peaks={peaks}
             subtitle={subtitle}
             pendingLabel={pendingLabel}
+            // with a drawer the title row stays clean and the drawer carries
+            // volume + download; without one they stay beside the title so
+            // neither becomes unreachable
+            controls={!lyrics}
             accessory={
               lyrics ? (
                 <LyricsToggle
@@ -79,7 +87,23 @@ export function InlineAudioGen({
         ) : null}
       </div>
       {lyrics ? (
-        <LyricsDrawer id={drawerId} open={lyricsOpen} lyrics={lyrics} />
+        <LyricsDrawer
+          id={drawerId}
+          open={lyricsOpen}
+          lyrics={lyrics}
+          actions={
+            <>
+              <TrackDownload
+                track={track}
+                className="text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+              />
+              <VolumeControl
+                placement="float"
+                className="text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+              />
+            </>
+          }
+        />
       ) : null}
     </motion.div>
   );

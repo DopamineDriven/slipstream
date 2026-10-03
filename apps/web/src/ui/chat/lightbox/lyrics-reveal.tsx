@@ -1,6 +1,7 @@
 "use client";
 
 import type { Transition } from "motion/react";
+import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { formatLyrics, parseLyrics } from "@/lib/lyrics";
 import { cn } from "@/lib/utils";
@@ -54,11 +55,14 @@ export function LyricsToggle({
 export function LyricsDrawer({
   id,
   open,
-  lyrics
+  lyrics,
+  actions
 }: {
   id: string;
   open: boolean;
   lyrics: string;
+  /** Stacked under the copy button, in the column beside the sheet. */
+  actions?: ReactNode;
 }) {
   return (
     <AnimatePresence initial={false}>
@@ -81,7 +85,10 @@ export function LyricsDrawer({
               lyrics={lyrics}
               className="max-h-[60dvh] min-w-0 flex-1 gap-5 overflow-y-auto overscroll-contain"
             />
-            <CopyLyrics text={formatLyrics(parseLyrics(lyrics))} />
+            <div className="-mt-2 -mr-2 flex shrink-0 flex-col items-center gap-1">
+              <CopyLyrics text={formatLyrics(parseLyrics(lyrics))} />
+              {actions}
+            </div>
           </motion.div>
         </motion.div>
       ) : null}
@@ -89,7 +96,8 @@ export function LyricsDrawer({
   );
 }
 
-function CopyLyrics({ text }: { text: string }) {
+/** Copies the sheet as displayed (headings, no `[[A0]]` / `[:]` markers); pinned beside the text wherever the sheet renders. */
+export function CopyLyrics({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   const reset = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -111,7 +119,7 @@ function CopyLyrics({ text }: { text: string }) {
       type="button"
       onClick={copy}
       aria-label={copied ? "Lyrics copied" : "Copy lyrics"}
-      className="text-muted-foreground hover:text-foreground hover:bg-secondary/60 focus-visible:ring-ring/50 -mt-2 -mr-2 flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors outline-none focus-visible:ring-3">
+      className="text-muted-foreground hover:text-foreground hover:bg-secondary/60 focus-visible:ring-ring/50 flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors outline-none focus-visible:ring-3">
       <AnimatePresence initial={false} mode="wait">
         <motion.span
           key={copied ? "check" : "copy"}

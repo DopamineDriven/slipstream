@@ -12,7 +12,11 @@ export function formatBytes(bytes: number | undefined) {
   return `${value.toFixed(digits)} ${UNITS[unit]}`;
 }
 
-/** The viewer's locale and tz come from the cookie context, as `formatTime` in helpers takes them. */
+/**
+ * The viewer's locale and tz come from the cookie context, as `formatTime` in
+ * helpers takes them. Rows reach the client as JSON, so a `Date`-typed field is
+ * a string at runtime; `new Date(date)` covers both, as `formatTime` does.
+ */
 export function formatDate(date: Date | undefined, locale: string, tz: string) {
   if (!date) return undefined;
   return new Intl.DateTimeFormat(locale, {
@@ -20,7 +24,7 @@ export function formatDate(date: Date | undefined, locale: string, tz: string) {
     day: "numeric",
     year: "numeric",
     timeZone: decodeURIComponent(tz)
-  }).format(date);
+  }).format(new Date(date));
 }
 
 export function formatDateTime(
@@ -37,7 +41,7 @@ export function formatDateTime(
     minute: "2-digit",
     timeZone: decodeURIComponent(tz),
     timeZoneName: "short"
-  }).format(date);
+  }).format(new Date(date));
 }
 
 export function truncateMiddle(value: string, keep = 10) {

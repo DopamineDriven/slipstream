@@ -128,7 +128,7 @@ export function WaveformScrubber({
             strokeWidth={BAR_STROKE}
             strokeLinecap="round"
             clipPath={`url(#${clipId})`}
-            className="stroke-primary"
+            className="stroke-foreground"
           />
         </svg>
       ) : null}

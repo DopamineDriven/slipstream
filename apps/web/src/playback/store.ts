@@ -203,15 +203,6 @@ export function createPlaybackStore() {
     patch({ currentTime: time });
   };
 
-  /** Pause and rewind the loaded track; a no-op for any other. */
-  const stop = (track: PlaybackTrack) => {
-    if (!element || snapshot.track?.id !== track.id) return;
-    cancelAnimationFrame(frame);
-    element.pause();
-    element.currentTime = 0;
-    patch({ status: "paused", currentTime: 0 });
-  };
-
   /** Writes the element; `volumechange` writes the snapshot. Raising it past 0 unmutes. */
   const setVolume = (volume: number) => {
     if (!element) return;
@@ -236,7 +227,6 @@ export function createPlaybackStore() {
     pause,
     toggle,
     seek,
-    stop,
     setVolume,
     toggleMute
   };
