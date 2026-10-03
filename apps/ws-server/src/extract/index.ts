@@ -1,155 +1,213 @@
+import type {
+  AudioSpecs,
+  WaveformOptions,
+  WaveformPeaks
+} from "@d0paminedriven/audiodown";
+import { AudioService as AudioDownService } from "@d0paminedriven/audiodown";
 import { Fs } from "@d0paminedriven/fs";
 import type { $Enums } from "@slipstream/db/node/generated/client";
+import { WAVEFORM_PEAK_SCALE } from "@slipstream/types";
 
 export class ExtractService extends Fs {
-  constructor() {
+  constructor(public audiodown: AudioDownService) {
     super(process.cwd());
   }
+  private parseTotalContentRange(value: string | null) {
+    if (value === null) {
+      return;
+    }
 
-  private isValidUrl(ss: string) {
-    return /(https?|s3|collection)/g.test(ss) && URL.canParse(ss);
+    // bytes 0-65535/123456
+    const match = value.match(/\/(\d+)$/);
+    const match1 = match?.[1];
+    if (typeof match1 === "undefined") {
+      return;
+    }
+
+    const total = Number.parseInt(match1, 10);
+
+    return Number.isFinite(total) ? total : undefined;
   }
-  /**
-   * MP3 signature + frame walk — the audio twin of the image/doc sniffers.
-   * Skips a leading ID3v2 tag (lyria fronts one carrying Google's C2PA
-   * manifest in a GEOB frame), then hops frame-to-frame on header
-   * arithmetic alone — no decoding — so duration is exact for CBR and VBR
-   * alike (probe-validated against lyria output: 4389 contiguous frames,
-   * zero resyncs, 114.651s vs the lyrics' final [110.4:] cue).
-   * Returns undefined when the buffer contains no parseable MPEG frames.
-   * bitrate is reported in bps, matching the TTS persist's de-facto
-   * convention for AudioMetadata.bitrate (the column comment says kbps;
-   * the stored data has always been bps).
-   */
-  public mp3Specs(buf: Buffer) {
-    let offset = 0;
-    let id3TagBytes = 0;
-    if (
-      buf.length >= 10 &&
-      buf[0] === 0x49 &&
-      buf[1] === 0x44 &&
-      buf[2] === 0x33
-    ) {
-      const tagSize =
-        (((buf[6] ?? 0) & 0x7f) << 21) |
-        (((buf[7] ?? 0) & 0x7f) << 14) |
-        (((buf[8] ?? 0) & 0x7f) << 7) |
-        ((buf[9] ?? 0) & 0x7f);
-      const footer = (((buf[5] ?? 0) & 0x10) !== 0 ? 10 : 0) as 10 | 0;
-      id3TagBytes = 10 + tagSize + footer;
-      offset = id3TagBytes;
+  private async readAtMost(response: Response, maxBytes: number) {
+    if (response.body === null) {
+      return new Uint8Array();
     }
 
-    let frames = 0,
-      samples = 0,
-      sampleRate = 0,
-      bytesWalked = 0,
-      channels = 2;
-    const bitrateVariants = new Set<number>();
+    const reader = response.body.getReader();
+    const chunks = Array.of<Uint8Array>();
 
-    while (offset + 4 <= buf.length) {
-      if (buf[offset] !== 0xff || ((buf[offset + 1] ?? 0) & 0xe0) !== 0xe0) {
-        offset++;
-        continue;
+    let totalBytes = 0;
+
+    try {
+      while (totalBytes < maxBytes) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          break;
+        }
+
+        const remaining = maxBytes - totalBytes;
+
+        const take = Math.min(value.byteLength, remaining);
+
+        chunks.push(value.subarray(0, take));
+
+        totalBytes += take;
+
+        if (take < value.byteLength) {
+          break;
+        }
       }
-      const b1 = buf[offset + 1] ?? 0,
-        b2 = buf[offset + 2] ?? 0,
-        b3 = buf[offset + 3] ?? 0;
-      // 0=MPEG2.5, 1=reserved, 2=MPEG2, 3=MPEG1
-      const verBits = (b1 >> 3) & 0x3;
-      // 1=Layer III, 2=Layer II, 3=Layer I
-      const layerBits = (b1 >> 1) & 0x3;
-      if (verBits === 1 || layerBits === 0) {
-        offset++;
-        continue;
-      }
-      const brIdx = (b2 >> 4) & 0xf,
-        srIdx = (b2 >> 2) & 0x3,
-        pad = (b2 >> 1) & 0x1;
-      if (brIdx === 0 || brIdx === 15 || srIdx === 3) {
-        offset++;
-        continue;
-      }
-      const srTable =
-        verBits === 3
-          ? ([44100, 48000, 32000] as const)
-          : verBits === 2
-            ? ([22050, 24000, 16000] as const)
-            : ([11025, 12000, 8000] as const);
-      const rate = srTable[srIdx] ?? 0;
-      const brTable =
-        verBits === 3
-          ? layerBits === 1
-            ? ([
-                0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320
-              ] as const)
-            : layerBits === 2
-              ? ([
-                  0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320,
-                  384
-                ] as const)
-              : ([
-                  0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384,
-                  416, 448
-                ] as const)
-          : layerBits === 3
-            ? ([
-                0, 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224,
-                256
-              ] as const)
-            : ([
-                0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160
-              ] as const);
-      const kbps = brTable[brIdx] ?? 0;
-      if (rate === 0 || kbps === 0) {
-        offset++;
-        continue;
-      }
-      const samplesPerFrame =
-        layerBits === 3
-          ? 384
-          : layerBits === 2
-            ? 1152
-            : verBits === 3
-              ? 1152
-              : 576;
-      const frameLength =
-        layerBits === 3
-          ? (Math.floor((12 * kbps * 1000) / rate) + pad) * 4
-          : Math.floor(((samplesPerFrame / 8) * kbps * 1000) / rate) + pad;
-      if (frameLength < 4) {
-        offset++;
-        continue;
-      }
-      frames++;
-      samples += samplesPerFrame;
-      sampleRate = rate;
-      bytesWalked += frameLength;
-      bitrateVariants.add(kbps);
-      channels = ((b3 >> 6) & 0x3) === 3 ? 1 : 2;
-      offset += frameLength;
+    } finally {
+      await reader.cancel().catch(() => undefined);
     }
 
-    if (frames === 0 || sampleRate === 0) return undefined;
+    return this.concatUint8(chunks, totalBytes);
+  }
+  public async fetchAudio(url: string, maxBytes?: number, timeoutMs = 15000) {
+    if (maxBytes !== undefined && maxBytes <= 0) {
+      throw new RangeError(
+        `maxBytes must be greater than 0; received ${maxBytes}`
+      );
+    }
+    const headers = new Headers({
+      "Accept-Encoding": "identity"
+    });
 
-    const durationMs = Math.round((samples / sampleRate) * 1000);
-    const bitrate =
-      durationMs > 0 ? Math.round((bytesWalked * 8 * 1000) / durationMs) : 0;
+    if (maxBytes !== undefined) {
+      headers.set("Range", `bytes=0-${maxBytes - 1}`);
+    }
+
+    const response = await fetch(url, {
+      headers,
+      signal: AbortSignal.timeout(timeoutMs)
+    });
+
+    if (!response.ok && response.status !== 206) {
+      throw new Error(`audio fetch failed with HTTP ${response.status}`);
+    }
+
+    const contentType =
+      response.headers.get("content-type")?.split(";", 1)[0]?.trim() ?? null;
+
+    const rangeTotal = this.parseTotalContentRange(
+      response.headers.get("content-range")
+    );
+
+    const contentLengthHeader = response.headers.get("content-length");
+
+    const contentLength =
+      contentLengthHeader !== null
+        ? Number.parseInt(contentLengthHeader, 10)
+        : null;
+
+    const reportedTotalBytes =
+      rangeTotal ??
+      (contentLength !== null && Number.isFinite(contentLength)
+        ? contentLength
+        : null);
+
+    /*
+     * No cap:
+     *
+     * This is your normal background-task path.
+     * Read the entire resource.
+     */
+    if (maxBytes === undefined) {
+      const bytes = new Uint8Array(await response.arrayBuffer());
+
+      return {
+        bytes,
+        fetchedBytes: bytes.byteLength,
+        reportedTotalBytes,
+        contentType,
+        partial: false
+      };
+    }
+
+    /*
+     * Explicit cap:
+     *
+     * Stream instead of arrayBuffer() so that even if the origin
+     * ignores Range and responds 200 with the entire object,
+     * we still consume at most maxBytes.
+     */
+    const bytes = await this.readAtMost(response, maxBytes);
 
     return {
-      mime: "audio/mpeg",
-      ext: "mp3",
-      codec: "mp3",
-      size: buf.byteLength,
-      durationMs,
-      /** bps — average across walked frames; equals the nominal rate for CBR */
-      bitrate,
-      cbr: bitrateVariants.size === 1,
-      sampleRate,
-      channels,
-      frames,
-      id3TagBytes
-    } as const;
+      bytes,
+      fetchedBytes: bytes.byteLength,
+      reportedTotalBytes,
+      contentType,
+
+      partial:
+        reportedTotalBytes !== null
+          ? bytes.byteLength < reportedTotalBytes
+          : response.status === 206
+    };
+  }
+
+  private concatUint8(chunks: readonly Uint8Array[], totalBytes: number) {
+    const output = new Uint8Array(totalBytes);
+
+    let offset = 0;
+
+    for (const chunk of chunks) {
+      output.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+
+    return output;
+  }
+
+  /**
+   * Header-level specs (no decoding). Safe on a ranged prefix: `truncated`
+   * and `durationSource` on the result say how much to trust `durationSec`.
+   */
+  public async parseRemote(url: string, maxBytes?: number, timeoutMs = 15000) {
+    const { bytes } = await this.fetchAudio(url, maxBytes, timeoutMs);
+
+    return this.audiodown.parseAudioAsync(bytes, url);
+  }
+
+  /**
+   * Specs plus a decoded waveform from one snapshot. If the stream will not
+   * decode (truncated or corrupt), falls back to header-only specs with no
+   * waveform instead of failing the whole persist.
+   */
+  public async analyzeBuffer(
+    bytes: Uint8Array,
+    options?: WaveformOptions,
+    source?: string
+  ): Promise<{ specs: AudioSpecs; waveform: WaveformPeaks | null }> {
+    try {
+      return await this.audiodown.analyzeAudioAsync(bytes, options, source);
+    } catch {
+      return {
+        specs: await this.audiodown.parseAudioAsync(bytes, source),
+        waveform: null
+      };
+    }
+  }
+
+  /** Full fetch, then `analyzeBuffer`. Decoding needs the whole file. */
+  public async analyzeRemote(
+    url: string,
+    options?: WaveformOptions,
+    timeoutMs = 15000
+  ) {
+    const { bytes } = await this.fetchAudio(url, undefined, timeoutMs);
+
+    return this.analyzeBuffer(bytes, options, url);
+  }
+
+  /** Prisma `AudioMetadata.waveformPeaks` wants `Int[]`: 0..100 per bucket. */
+  public waveformPeaksColumn(waveform: WaveformPeaks | null) {
+    return waveform
+      ? Array.from(waveform.envelope, v =>
+          Math.round(Math.min(1, Math.max(0, v)) * WAVEFORM_PEAK_SCALE)
+        )
+      : [];
   }
 
   public handleCompatStatus(assetType: $Enums.AssetType, ext: string | null) {
@@ -172,7 +230,7 @@ export class ExtractService extends Fs {
         } else return "PENDING" as const satisfies $Enums.CompatStatus;
       }
       case "AUDIO": {
-        if (ext === "mp3") {
+        if (ext === "mp3" || ext === "wav") {
           return "ALIASED" as const satisfies $Enums.CompatStatus;
         } else return "PENDING" as const satisfies $Enums.CompatStatus;
       }

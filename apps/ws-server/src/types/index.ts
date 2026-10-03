@@ -21,6 +21,26 @@ import type {
 } from "@slipstream/types";
 
 export type Include<T, U extends T> = Exclude<T, Exclude<T, U>>;
+export type InlinePostImageUploadProps = {
+  specs: ExpandedImgSpecs;
+  s3RTHelper: S3FinalizePayload;
+  userId: string;
+  filename: string;
+  format: string;
+  mime: string;
+  cdnUrl: string;
+  generatingModel: string;
+  facilitatingModel: string;
+  provider: $Enums.Provider;
+  conversationId: string;
+  seriesOrdinal: number;
+  seriesId: string;
+  revisedPrompt: string;
+  kind: $Enums.ImageGenOutputKind;
+  uploadDuration: number;
+  s3LastModified: Date;
+  size: number;
+};
 
 export type S3FinalizePayload = {
   bucket: string;
@@ -97,6 +117,12 @@ export type IncludeCreateConvoWithImgGenOrAudioGenProps = {
         where: {
           OR: [
             { origin: { not: "GENERATED" } },
+            {
+              AND: [
+                { origin: "GENERATED" },
+                { audioGenOutput: { kind: "FINAL" } }
+              ];
+            },
             {
               AND: [
                 { origin: "GENERATED" },
@@ -493,6 +519,22 @@ export interface ImageGenReqDbRes<
   apiKey?: string | null;
 }
 
+export type MessageBoundAssets = {
+  /**
+   * count of assets bound to the current user messsage
+   */
+  jobId?: string;
+  requestMessageId?: string;
+  assetCounts: number;
+  assets?: {
+    type: $Enums.AssetType;
+    compatStatus: $Enums.CompatStatus;
+    url: string;
+    mime: string;
+    ext: string;
+  }[];
+};
+
 export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
   user_location?: {
     type: "approximate";
@@ -501,21 +543,7 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
     country?: string;
     tz?: string;
   };
-  currentMsgBoundAssets?: {
-    /**
-     * count of assets bound to the current user messsage
-     */
-    jobId?: string;
-    requestMessageId?: string;
-    assetCounts: number;
-    assets?: {
-      type: $Enums.AssetType;
-      compatStatus: $Enums.CompatStatus;
-      url: string;
-      mime: string;
-      ext: string;
-    }[];
-  };
+  currentMsgBoundAssets?: MessageBoundAssets;
 }
 
 export type ImageGenPostS3Arr = [

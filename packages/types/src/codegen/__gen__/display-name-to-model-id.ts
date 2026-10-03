@@ -1,5 +1,6 @@
 export const displayNameToModelId = {
   openai: {
+    "GPT-6.1 Sol": "gpt-6.1-sol",
     "GPT-6 Sol": "gpt-6-sol",
     "GPT-6 Luna": "gpt-6-luna",
     "GPT-6 Astra": "gpt-6-astra",
@@ -86,6 +87,7 @@ export const displayNameToModelId = {
     "Grok Imagine Video": "grok-imagine-video"
   },
   anthropic: {
+    "Claude Sonnet 5.5": "claude-sonnet-5-5",
     "Claude Opus 5.5": "claude-opus-5-5",
     "Claude Fable 5.1": "claude-fable-5-1",
     "Claude Opus 5": "claude-opus-5",

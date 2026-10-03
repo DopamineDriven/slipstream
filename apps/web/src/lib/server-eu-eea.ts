@@ -3,8 +3,10 @@ import { NextResponse } from "next/server";
 
 const EU_EEA_COUNTRY_CODES = [
   "AT",
+  "AX",
   "BE",
   "BG",
+  "CH",
   "CY",
   "CZ",
   "DE",
@@ -13,31 +15,36 @@ const EU_EEA_COUNTRY_CODES = [
   "ES",
   "FI",
   "FR",
+  "GB",
+  "GF",
+  "GG",
+  "GI",
+  "GP",
   "GR",
   "HR",
   "HU",
   "IE",
+  "IM",
+  "IS",
   "IT",
+  "JE",
+  "LI",
   "LT",
   "LU",
   "LV",
+  "MF",
   "MT",
   "NL",
+  "NO",
   "PL",
   "PT",
+  "RE",
   "RO",
   "SE",
   "SI",
   "SK",
-  "IS",
-  "LI",
-  "NO",
-  "GF",
-  "GP",
   "MQ",
-  "YT",
-  "RE",
-  "MF"
+  "YT"
 ] as const;
 
 const UNSUPPORTED_SET = new Set<string>(EU_EEA_COUNTRY_CODES);
@@ -60,7 +67,7 @@ export function resolveResponse(req: NextRequest) {
     pathname.startsWith(`${UNSUPPORTED_PATH}/`);
   const blocked = isUnsupportedCountry(country);
 
-  // Visitors from EU/EEA regions get sent to the unsupported page.
+  // Visitors from EU/EEA regions (as well as GB and CH) get sent to the unsupported page.
   if (blocked && !onUnsupportedPath) {
     const url = req.nextUrl.clone();
     url.pathname = UNSUPPORTED_PATH;

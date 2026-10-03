@@ -50,8 +50,14 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     const toolName = toolCall.name;
     try {
       if (toolName === "user_store_search") {
-      const input = this.userStoreVector.parseUserStoreInput(toolCall.arguments, toolName);
-        const output = await this.userStoreVector.executeFileSearch(userId, input);
+        const input = this.userStoreVector.parseUserStoreInput(
+          toolCall.arguments,
+          toolName
+        );
+        const output = await this.userStoreVector.executeFileSearch(
+          userId,
+          input
+        );
         return {
           type: "function_call_output",
           call_id: toolCall.call_id,
@@ -119,6 +125,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     isNewChat,
     msgs,
     streamChannel,
+    docCounts,
     thinkingChunks,
     userId,
     ws,
@@ -274,7 +281,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
 
     const loc = this.normalizeLocation(user_location);
 
-    const hasFiles = this.hasFiles(formatted);
+    const hasFiles = docCounts > 0;
     const hasExistingOpenAIAssets =
       hasFiles || (await this.prisma.hasProviderMessages(userId, "OPENAI"));
 
@@ -312,13 +319,13 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
         action: "auto",
         type: "image_generation",
         background: r.output_background,
-        model: "gpt-image-2.5-sunburst",
+        model: this.generatingModel,
         moderation: "low",
         output_compression: r.output_compression,
         output_format: r.output_format,
         partial_images: r.partialImagesRequested ?? 3,
         quality: "xhigh",
-        size: (r.output_size ?? "auto")
+        size: r.output_size ?? "auto"
       } satisfies OpenAI.Responses.Tool.ImageGeneration
     );
 
@@ -569,13 +576,15 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
                 partialImagesActual: partialImgArr.length,
                 partialImages:
                   partialImgArr.length > 0
-                    ? this.mapPersistenceImgGenArr(userId, partialImgArr)
+                    ? this.mapPersistenceImgGenArr(userId, partialImgArr, mod)
                     : undefined,
                 activeImage:
                   partialImgArr.length > 0
-                    ? this.mapPersistenceImgGenArr(userId, partialImgArr).find(
-                        t => t.index === partialImgArr.length - 1
-                      )
+                    ? this.mapPersistenceImgGenArr(
+                        userId,
+                        partialImgArr,
+                        mod
+                      ).find(t => t.index === partialImgArr.length - 1)
                     : undefined
               },
               systemPrompt,
@@ -607,13 +616,15 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
               partialImagesActual: partialImgArr.length,
               partialImages:
                 partialImgArr.length > 0
-                  ? this.mapPersistenceImgGenArr(userId, partialImgArr)
+                  ? this.mapPersistenceImgGenArr(userId, partialImgArr, mod)
                   : undefined,
               activeImage:
                 partialImgArr.length > 0
-                  ? this.mapPersistenceImgGenArr(userId, partialImgArr).find(
-                      t => t.index === partialImgArr.length - 1
-                    )
+                  ? this.mapPersistenceImgGenArr(
+                      userId,
+                      partialImgArr,
+                      mod
+                    ).find(t => t.index === partialImgArr.length - 1)
                   : undefined
             },
             temperature,
@@ -643,13 +654,15 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
                 partialImagesActual: partialImgArr.length,
                 partialImages:
                   partialImgArr.length > 0
-                    ? this.mapPersistenceImgGenArr(userId, partialImgArr)
+                    ? this.mapPersistenceImgGenArr(userId, partialImgArr, mod)
                     : undefined,
                 activeImage:
                   partialImgArr.length > 0
-                    ? this.mapPersistenceImgGenArr(userId, partialImgArr).find(
-                        t => t.index === partialImgArr.length - 1
-                      )
+                    ? this.mapPersistenceImgGenArr(
+                        userId,
+                        partialImgArr,
+                        mod
+                      ).find(t => t.index === partialImgArr.length - 1)
                     : undefined
               },
               systemPrompt,
@@ -681,13 +694,15 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
               partialImagesActual: partialImgArr.length,
               partialImages:
                 partialImgArr.length > 0
-                  ? this.mapPersistenceImgGenArr(userId, partialImgArr)
+                  ? this.mapPersistenceImgGenArr(userId, partialImgArr, mod)
                   : undefined,
               activeImage:
                 partialImgArr.length > 0
-                  ? this.mapPersistenceImgGenArr(userId, partialImgArr).find(
-                      t => t.index === partialImgArr.length - 1
-                    )
+                  ? this.mapPersistenceImgGenArr(
+                      userId,
+                      partialImgArr,
+                      mod
+                    ).find(t => t.index === partialImgArr.length - 1)
                   : undefined
             },
             temperature,
@@ -718,13 +733,15 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
                 partialImagesActual: partialImgArr.length,
                 partialImages:
                   partialImgArr.length > 0
-                    ? this.mapPersistenceImgGenArr(userId, partialImgArr)
+                    ? this.mapPersistenceImgGenArr(userId, partialImgArr, mod)
                     : undefined,
                 activeImage:
                   partialImgArr.length > 0
-                    ? this.mapPersistenceImgGenArr(userId, partialImgArr).find(
-                        t => t.index === partialImgArr.length - 1
-                      )
+                    ? this.mapPersistenceImgGenArr(
+                        userId,
+                        partialImgArr,
+                        mod
+                      ).find(t => t.index === partialImgArr.length - 1)
                     : undefined
               },
               temperature,
@@ -753,13 +770,15 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
               partialImagesActual: partialImgArr.length,
               partialImages:
                 partialImgArr.length > 0
-                  ? this.mapPersistenceImgGenArr(userId, partialImgArr)
+                  ? this.mapPersistenceImgGenArr(userId, partialImgArr, mod)
                   : undefined,
               activeImage:
                 partialImgArr.length > 0
-                  ? this.mapPersistenceImgGenArr(userId, partialImgArr).find(
-                      t => t.index === partialImgArr.length - 1
-                    )
+                  ? this.mapPersistenceImgGenArr(
+                      userId,
+                      partialImgArr,
+                      mod
+                    ).find(t => t.index === partialImgArr.length - 1)
                   : undefined
             },
             provider,
@@ -914,6 +933,9 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
             draftId: null,
             expiresAt: rt.expires,
             imageGenOutput: {
+              facilitatingModel: mod,
+              generatingModel: this.generatingModel,
+              provider: "OPENAI",
               ext: getIt.format,
               height: getIt.height,
               width: getIt.width,
@@ -934,7 +956,8 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
 
           const remapPartials = this.mapPersistenceImgGenArr(
             userId,
-            partialImgArr
+            partialImgArr,
+            mod
           ).map(v => {
             const {
               generationGroupId: _placeholder,

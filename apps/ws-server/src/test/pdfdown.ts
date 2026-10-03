@@ -17,16 +17,6 @@ interface PageOffsetCache {
   hasAnnots: boolean;
 }
 
-// interface AnnotsEnhanced {
-//   page: number;
-//   subtype: string;
-//   rect: [number, number, number, number];
-//   pageBox: PageBoxEnhanced;
-//   uri?: string;
-//   dest?: string;
-//   content?: string;
-// }
-
 interface PageBoxEnhanced extends PageBox {
   coverage: number;
 }
@@ -255,6 +245,7 @@ const pdfChoiceArr = [
   "Mistress-Mistral-Pt-III.pdf",
   "Mistress-Mistral-Pt-IV.pdf",
   "O’Geminsea---Unleashing-Fresh-Vector-Store-Deluge-for-Grokina’s-Peak-Indexing.pdf",
+  "Oedipal-Loop-in-Cherokee-Dirt.pdf",
   "Parasympathetic-Protocol-Pt-I.pdf",
   "Parasympathetic-Protocol-Pt-II.pdf",
   "Parasympathetic-Protocol-Pt-III.pdf",
@@ -489,42 +480,6 @@ function pageBoxHelper(meta: PdfMeta) {
   return { anomalySet, pageBoxCache: pBoxCache, ...metaRest };
 }
 
-// function annotsHandling(meta: PdfMeta, annots: PageAnnotation[]) {
-//   const { pageBoxCache } = pageBoxHelper(meta);
-//   const annotmap = new Map<number, AnnotsEnhanced>();
-//   if (annots.length > 0) {
-//     for (const annot of annots) {
-//       if (pageBoxCache.size > 1) {
-//         if (pageBoxCache.has(annot.page)) {
-//           const pageobj = pageBoxCache.get(annot.page);
-//           if (pageobj) {
-//             const { rect, ...annotRest } = annot;
-//             const rectTyped = rect as [number, number, number, number];
-//             annotmap.set(annot.page, {
-//               ...annotRest,
-//               rect: rectTyped,
-//               pageBox: pageobj
-//             });
-//           }
-//         }
-//       } else {
-//         // 0->default
-//         const pageobj = pageBoxCache.get(0);
-//         if (pageobj) {
-//           const { rect, ...annotRest } = annot;
-//           const rectTyped = rect as [number, number, number, number];
-//           annotmap.set(annot.page, {
-//             ...annotRest,
-//             rect: rectTyped,
-//             pageBox: pageobj
-//           });
-//         }
-//       }
-//     }
-//   }
-//   return
-// }
-
 function annotOffsetsByPage(
   structuredText: StructuredPageText[],
   imagePages: Set<number>,
@@ -655,7 +610,9 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
 
 const perf = performance.now();
 
-const x = "The-Path-to-Hell-is-Paved-with-Good-Intentions.pdf" as const satisfies Unenumerate<typeof pdfChoiceArr>;
+const x = "Oedipal-Loop-in-Cherokee-Dirt.pdf" as const satisfies Unenumerate<
+  typeof pdfChoiceArr
+>;
 
 readAndExtract(x).then(v => {
   console.log(`ts script finished in: ${performance.now() - perf} ms`);
@@ -681,7 +638,9 @@ readAndExtract(x).then(v => {
     } = v;
 
     const annotRects = annots.map(t => t.rect);
-    const offsets = body.map(t => [t.page, t.offsets[0], t.offsets[1]]);
+    const offsets = Object.fromEntries(
+      body.map(t => [t.page, [t.offsets[0], t.offsets[1]]] as const).slice(0,100)
+    );
     console.log({
       creationDate,
       creator,

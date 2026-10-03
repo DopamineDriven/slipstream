@@ -3,14 +3,14 @@ import type { LoggerService } from "@/logger/index.ts";
 import type { ImageGenPartialArr } from "@/openai/types.ts";
 import type { PrismaService } from "@/prisma/index.ts";
 import type { UserStoreVectorService } from "@/store/vector-store.ts";
-import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
+import type { MessageBoundAssets } from "@/types/index.ts";
 import type { ResponseTextConfig } from "openai/resources/responses/responses.mjs";
 import type { Reasoning, ReasoningEffort } from "openai/resources/shared.mjs";
 import type { Logger as PinoLogger } from "pino";
 import { OpenAI } from "openai";
 import type { S3Storage } from "@slipstream/storage-s3";
 import type {
-  AIChatRequest,
+  AIChatRequestImgGenFields,
   AIChatResponseImgGenSubFields,
   AttachmentSingleton,
   ImgGenWorkupResRT
@@ -19,7 +19,8 @@ import type {
 export class OpenAIBaseService {
   protected readonly vsCache = new Map<string, string>();
   protected readonly inflightVS = new Map<string, Promise<string>>();
-  protected nanoId: Promise<(typeof import("nanoid"))["nanoid"]>;
+  protected nanoId: Promise<<Type extends string>(size?: number) => Type>;
+  protected generatingModel = "gpt-image-2.5-suburst" as const;
   protected assetCache = new Map<
     string,
     { fileId: string; dbRecordId: string; lastCheckedAt: Date | null }
@@ -92,12 +93,12 @@ export class OpenAIBaseService {
             : "application/octet-stream";
   }
   protected responsesImgGen(
-    imgGenEnabled: AIChatRequest["imgGenEnabled"],
-    mo: AIChatRequest["model"] = "gpt-5.4",
-    imgFields?: AIChatRequest["imgGenFields"],
-    currentMsgBoundAssets?: ProviderOpenaiRequestEntity["currentMsgBoundAssets"]
+    imgGenEnabled?: boolean,
+    mo?: string,
+    imgFields?: AIChatRequestImgGenFields,
+    currentMsgBoundAssets?: MessageBoundAssets
   ) {
-    const model = mo;
+    const model = mo ?? "gpt-6-sol";
     if (imgGenEnabled === false) return undefined;
     if (!imgFields) return undefined;
     if (!this.prisma.openAIImgGenCapable(model)) {
@@ -128,8 +129,9 @@ export class OpenAIBaseService {
 
     const moderate = (moderation as "low" | "auto" | undefined) ?? "low";
     const outputFormat =
-      (output_format as "jpeg" | "webp" | "png" | undefined) ??
-      ("png" as const);
+      output_format && this.prisma.isValidOpenAIOutputFormat(output_format)
+        ? output_format
+        : ("png" as const);
     const bg = this.prisma.handleImgGenBg(model, {
       background: output_background,
       format: outputFormat
@@ -174,7 +176,9 @@ export class OpenAIBaseService {
   }
   protected mapPersistenceImgGenArr(
     userId: string,
-    props: ImageGenPartialArr[]
+    props: ImageGenPartialArr[],
+    facilitatingModel: string,
+    generatingModel: string=this.generatingModel
   ) {
     return props.map((t, o) => {
       const rt = t[25];
@@ -259,6 +263,9 @@ export class OpenAIBaseService {
           orientation: expImg.orientation
         },
         imageGenOutput: {
+          generatingModel,
+          provider: "OPENAI",
+          facilitatingModel,
           ext: expImg.format,
           height: expImg.height,
           width: expImg.width,
@@ -401,6 +408,7 @@ export class OpenAIBaseService {
           }
         }
       }
+      case "gpt-6.1-sol":
       case "gpt-6-sol":
       case "gpt-6-luna":
       case "gpt-6-astra":
@@ -438,6 +446,7 @@ export class OpenAIBaseService {
     imgGenEnabled = false
   ) {
     switch (model) {
+      case "gpt-6.1-sol":
       case "gpt-6-sol":
       case "gpt-6-luna":
       case "gpt-6-astra":
@@ -456,20 +465,20 @@ export class OpenAIBaseService {
       case "gpt-5.2-pro":
       case "gpt-5":
       case "gpt-5-pro": {
-        return { verbosity: "high" } as const;
+        return { verbosity: "high" } as const satisfies ResponseTextConfig;
       }
       case "gpt-5-mini":
       case "gpt-5-nano": {
         if (imgGenEnabled) {
-          return { verbosity: "low" } satisfies ResponseTextConfig;
+          return { verbosity: "low" } as const satisfies ResponseTextConfig;
         }
-        return { verbosity } satisfies ResponseTextConfig;
+        return { verbosity } as const satisfies ResponseTextConfig;
       }
       case "gpt-image-2.5-flare":
       case "gpt-image-2.5-sunburst":
       case "gpt-image-2":
       case "gpt-image-1.5": {
-        return { verbosity } satisfies ResponseTextConfig;
+        return { verbosity } as const satisfies ResponseTextConfig;
       }
       case "o3":
       case "o3-mini":

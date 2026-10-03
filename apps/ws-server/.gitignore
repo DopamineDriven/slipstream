@@ -31,3 +31,4 @@ no-over-abstractions.md
 src/tests/fixtures/*
 
 src/tests/sakana/stream
+grok-probe.sh

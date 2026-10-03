@@ -1,9 +1,11 @@
 import type { S3FinalizePayload } from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
+import type { OpenAI } from "openai";
 import type {
   ImgMetadataEntity,
   S3Checksum,
-  S3StorageClass
+  S3StorageClass,
+  UTR
 } from "@slipstream/types";
 
 export type OpenAIImgApiStreamPartial = {
@@ -106,3 +108,10 @@ export type OpenAIFileSearchToolInput =
       filename?: string;
       search_terms?: string;
     };
+
+export type OpenAIInputItemUnion =
+  | OpenAI.Responses.ResponseInputFile
+  | OpenAI.Responses.ResponseInputImage
+  | OpenAI.Responses.ResponseInputText;
+
+export type OpenAIResponsesInputRecord = UTR<OpenAIInputItemUnion, "type">;

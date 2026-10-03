@@ -102,6 +102,20 @@ export class ResolverDispatchService extends ResolverConnectionService {
       case "conversation_list":
         await this.conversationList(event, ws, userId, userData);
         break;
+      case "hydrate_attachment_by_id":
+        await this.hydrateAttachmentById(event, ws, userId, userData);
+        break;
+      case "hydrate_attachments":
+        await this.hydrateAttachments(event, ws, userId, userData);
+        break;
+      case "hydrate_attachments_by_conversation_id":
+        await this.hydrateAttachmentByConversationId(
+          event,
+          ws,
+          userId,
+          userData
+        );
+        break;
       case "hydrate_conversation":
         await this.hydrateConversationAck(event, ws, userId, userData);
         break;
@@ -189,6 +203,12 @@ export class ResolverDispatchService extends ResolverConnectionService {
     "connection_established",
     "conversation_list",
     "conversation_list_ack",
+    "hydrate_attachment_by_id",
+    "hydrate_attachment_by_id_ack",
+    "hydrate_attachments",
+    "hydrate_attachments_ack",
+    "hydrate_attachments_by_conversation_id",
+    "hydrate_attachments_by_conversation_id_ack",
     "hydrate_conversation",
     "hydrate_conversation_ack",
     "image_gen_error",
@@ -366,5 +386,14 @@ export class ResolverDispatchService extends ResolverConnectionService {
     this.wsServer.on("stt_user_recover", this.sttUserRecover.bind(this));
     this.wsServer.on("stt_user_rehydrate", this.sttUserRehydrate.bind(this));
     this.wsServer.on("stt_user_restore", this.sttUserRestore.bind(this));
+    this.wsServer.on(
+      "hydrate_attachment_by_id",
+      this.hydrateAttachmentById.bind(this)
+    );
+    this.wsServer.on("hydrate_attachments", this.hydrateAttachments.bind(this));
+    this.wsServer.on(
+      "hydrate_attachments_by_conversation_id",
+      this.hydrateAttachmentByConversationId.bind(this)
+    );
   }
 }

@@ -931,6 +931,9 @@ export class GeminiChatService extends GeminiWorkupService {
         draftId: null,
         expiresAt: rt.expires,
         imageGenOutput: {
+          facilitatingModel: model,
+          generatingModel: model,
+          provider: "GEMINI",
           ext: getIt.format,
           height: getIt.height,
           width: getIt.width,

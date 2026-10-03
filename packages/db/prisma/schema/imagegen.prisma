@@ -69,21 +69,24 @@ model ImageGenJob {
 }
 
 model ImageGenOutput {
-  id            String             @id @default(cuid(2))
-  jobId         String
-  jobIndex      Int // 0..n-1 -- 0..0 (dall-e-3, n=1) -- 0..3 (all imagen- models, n <= 4) -- 0..9 (all other models, n <=10)
-  kind          ImageGenOutputKind @default(FINAL)
-  seriesIndex   Int
-  seriesId      String // mirror per-call lineage
-  isPartial     Boolean
-  attachmentId  String             @unique
-  width         Int?
-  height        Int?
-  mime          String?
-  ext           String?
-  revisedPrompt String?
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  id                String             @id @default(cuid(2))
+  jobId             String
+  jobIndex          Int // 0..n-1 -- 0..0 (dall-e-3, n=1) -- 0..3 (all imagen- models, n <= 4) -- 0..9 (all other models, n <=10)
+  kind              ImageGenOutputKind @default(FINAL)
+  seriesIndex       Int
+  seriesId          String // mirror per-call lineage
+  isPartial         Boolean
+  attachmentId      String             @unique
+  width             Int?
+  height            Int?
+  generatingModel   String?
+  facilitatingModel String?
+  provider          Provider?
+  mime              String?
+  ext               String?
+  revisedPrompt     String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 
   job        ImageGenJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
   attachment Attachment  @relation("ImageGenOutputToAttachment", fields: [attachmentId], references: [id], onDelete: Cascade)

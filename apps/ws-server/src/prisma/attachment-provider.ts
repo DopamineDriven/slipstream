@@ -1,11 +1,11 @@
 import type { ExtractService } from "@/extract/index.ts";
 import type { LoggerService } from "@/logger/index.ts";
-import { PrismaUserMetaService } from "@/prisma/user-meta.ts";
+import { PrismaAttachmentHydrationService } from "@/prisma/attachment-hydration.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { AttachmentProviderSingleton } from "@slipstream/types";
 
-export class PrismaAttachmentProviderService extends PrismaUserMetaService {
+export class PrismaAttachmentProviderService extends PrismaAttachmentHydrationService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,

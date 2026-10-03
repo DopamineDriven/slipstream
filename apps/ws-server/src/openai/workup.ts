@@ -11,9 +11,10 @@ import type {
   AttachmentSingleton,
   LocalToolName,
   MessageSingleton,
-  OpenAiModelIdUnion
+  OpenAIModelIdUnion
 } from "@slipstream/types";
 import { LOCAL_TOOL_DEFINITIONS } from "@slipstream/types";
+import type { OpenAIInputItemUnion } from "@/openai/types.ts";
 
 export class OpenAIServiceWorkup extends OpenAIBaseService {
   constructor(
@@ -69,24 +70,11 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
     }
   }
   protected async buildAttachmentContentAsync(
-    attachments?: MessageSingleton<true>["attachments"],
+    attachments?: AttachmentSingleton<true>[],
     client?: OpenAI,
     keyFingerprint = "server"
   ) {
-    const content = Array.of<
-      | {
-          type: "input_image";
-          image_url?: string;
-          file_id?: string;
-          detail: "auto" | "low" | "high";
-        }
-      | {
-          type: "input_file";
-          file_id?: string;
-          filename?: string;
-          file_data?: string;
-        }
-    >();
+    const content = Array.of<OpenAIInputItemUnion>();
     if (!attachments || attachments.length === 0) return content;
     if (!client) return content;
 
@@ -102,7 +90,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
             client,
             keyFingerprint
           );
-          content.push({ type: "input_image", file_id, detail: "high" });
+          content.push({ type: "input_image", file_id, detail: "original" });
           continue;
         } catch (error) {
           this.logger.warn(
@@ -110,7 +98,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
             "Failed to upload image to OpenAI, falling back to base64 data URL"
           );
           const image_url = await this.encodeImageAsDataUrl(att);
-          content.push({ type: "input_image", image_url, detail: "high" });
+          content.push({ type: "input_image", image_url, detail: "original" });
           continue;
         }
       } else {
@@ -120,18 +108,13 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
           keyFingerprint
         );
 
-        content.push({ type: "input_file", file_id });
+        content.push({ type: "input_file", file_id, detail: "high" });
       }
     }
     return content;
   }
 
-  protected messageText(
-    msg: Pick<
-      MessageSingleton<true>,
-      "content" | "messageBlocks" | "provider" | "model"
-    >
-  ) {
+  protected messageText(msg: MessageSingleton<true>) {
     const textBlocks = Array.of<string>();
 
     if (msg.messageBlocks && msg.messageBlocks.length > 0) {
@@ -269,7 +252,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
   }
 
   protected handleTooling(
-    model: OpenAiModelIdUnion,
+    model: OpenAIModelIdUnion,
     fileSearchEnabled: boolean,
     user_location?: OpenAI.Responses.WebSearchPreviewTool.UserLocation,
     vector_store_ids?: string[],
@@ -281,7 +264,7 @@ export class OpenAIServiceWorkup extends OpenAIBaseService {
      * orthogonal to every branch below, appended last so they compose with
      * whatever tool set the branch selects
      */
-    localToolNames: readonly LocalToolName[] = []
+    localToolNames = Object.freeze(Array.of<LocalToolName>())
   ) {
     const localTools = this.localToolFunctionTools(localToolNames);
     const withLocal = (tools: OpenAI.Responses.Tool[]) =>

@@ -1,4 +1,5 @@
 import type { $Enums } from "@slipstream/db/node/generated/client";
+import { imgCtx } from "./img-ctx";
 
 export const getInitials = (name?: string | null) => {
   if (!name) return "U";
@@ -44,30 +45,8 @@ export const isAudioGenModel = (m: string) => {
   );
 };
 
-/**
- * automatically toggle the image gen to active for these pure image generation models.
- * it remains toggleable for a number of openai models (gpt-5.6-sol, gpt-5.5, etc) that have
- * internal image_generation tooling where they can invoke gpt-image-2 when the image generation
- * toggle is turned on by a user. but for pure image gen models, it should be auto-toggled whenever
- * they're targeted. use model-selection-context to access the currently targeted model id.
- */
 export const isPureImageModel = (m: string) => {
-  return (
-    m === "gemini-2.5-flash-image" ||
-    m === "gemini-3-pro-image-preview" ||
-    m === "gemini-3.1-flash-image-preview" ||
-    m === "gemini-3.1-flash-lite-image" ||
-    m === "gpt-image-1" ||
-    m === "gpt-image-1-mini" ||
-    m === "gpt-image-1.5" ||
-    m === "gpt-image-2" ||
-    m === "gpt-image-2.5-sunburst" ||
-    m === "gpt-image-2.5-flare" ||
-    m === "grok-imagine-image" ||
-    m === "grok-imagine-image-2.0" ||
-    m === "grok-imagine-image-quality" ||
-    m === "muse-image-1.0"
-  );
+  return imgCtx.isPureImageGenModel(m);
 };
 
 export function isValidLangSTT(l: string) {
@@ -208,30 +187,316 @@ export function draftIdEpimerize(
   }
 }
 
-export function toCdnUrlConstituents(cdnUrl: string) {
-  const base = cdnUrl.slice(cdnUrl.lastIndexOf("/") + 1);
-  const [seriesIdDashOrdinal, ext, timestampMs] = [
-    base.slice(14, base.lastIndexOf(".")),
-    base.slice(base.lastIndexOf(".") + 1),
-    base.slice(0, 13)
+export function getCdnUrlBase(isProd = process.env.NEXT_PUBLIC_IS_PROD) {
+  if (!isProd) return "https://assets.aicoalesce.com";
+  else return "https://assets-dev.aicoalesce.com";
+}
+
+export function assetOriginAI(s: string) {
+  return s === "generated";
+}
+
+export function assetOriginUser(s: string) {
+  return s === "pasted" || s === "upload";
+}
+
+export function assetOriginToUppercase<
+  const T extends "pasted" | "upload" | "generated" =
+    "pasted" | "upload" | "generated"
+>(m: T) {
+  return m.toUpperCase() as Uppercase<T>;
+}
+
+export function assetOrigin(s: string) {
+  return assetOriginAI(s) || assetOriginUser(s);
+}
+/**
+ * all images normalized to jpg (or jpeg), webp, or png via a post-upload compat pipeline
+ * for universal provider compatibility when passed off to vision-capable models
+ */
+export function isImage(s: string) {
+  return s === "jpg" || s === "jpeg" || s === "webp" || s === "png";
+}
+
+export function isAudio(s: string) {
+  return s === "mp3" || s === "wav";
+}
+
+export function isUserImage(s: string) {
+  return (
+    isImage(s) ||
+    s === "avif" ||
+    s === "heic" ||
+    s === "tif" ||
+    s === "tiff" ||
+    s === "bmp" ||
+    s === "svg" ||
+    s === "ico" ||
+    s === "gif" ||
+    s === "apng" ||
+    s === "jxl" ||
+    s === "jp2" ||
+    s === "jpx" ||
+    s === "jxr" ||
+    s === "jls" ||
+    s === "raw" ||
+    s === "dng" ||
+    s === "cr2" ||
+    s === "nef" ||
+    s === "arw" ||
+    s === "hdr" ||
+    s === "pic" ||
+    s === "rgbe" ||
+    s === "xyze" ||
+    s === "jfif" ||
+    s === "heif"
+  );
+}
+
+export function userCdnUrlConstituents(cdnUrl: string) {
+  let assetOrigin: "pasted" | "upload";
+  const senderType = "USER" as const;
+  const type = "UserAttachment" as const;
+  const [base, top] = [
+    cdnUrl.slice(0, cdnUrl.lastIndexOf("/")),
+    cdnUrl.slice(cdnUrl.lastIndexOf("/") + 1)
   ];
+  // CompatStatus is "ACTIVE"
+  // has the following shape: "https://assets.aicoalesce.com/pasted/converted/att_vz4h0zfw5w3cli5gn2dj91gp.png" (or upload, no userId, but attachmentId)
+  if (top.startsWith("att_")) {
+    const [attachmentId, ext, _convertedLiteral, toType] = [
+      top.slice(4, top.lastIndexOf(".")),
+      top.slice(top.lastIndexOf(".") + 1),
+      base.slice(base.lastIndexOf("/") + 1),
+      base.slice(0, base.lastIndexOf("/"))
+    ];
+    const urlOrigin = toType.slice(toType.lastIndexOf("/") + 1);
+
+    if (assetOriginUser(urlOrigin)) {
+      assetOrigin = urlOrigin;
+    } else {
+      assetOrigin = "upload";
+    }
+
+    if (isImage(ext)) {
+      return {
+        attachmentId,
+        type,
+        ext,
+        senderType,
+        compatStatus: "ACTIVE",
+        assetOrigin: assetOriginToUppercase(assetOrigin),
+        assetType: "IMAGE",
+        filename: `att_${attachmentId}`
+      } as const;
+    } else {
+      // all docs currently normalized to pdf
+      return {
+        attachmentId,
+        type,
+        ext: "pdf",
+        senderType,
+        compatStatus: "ACTIVE",
+        assetOrigin: assetOriginToUppercase(assetOrigin),
+        assetType: "DOCUMENT",
+        filename: `att_${attachmentId}`
+      } as const;
+    }
+  }
+  const [userId, toType, ext, timestampMs, filename] = [
+    base.slice(base.lastIndexOf("/") + 1),
+    base.slice(0, base.lastIndexOf("/")),
+    top.slice(top.lastIndexOf(".") + 1),
+    Number.parseInt(top.slice(0, 13), 10),
+    top.slice(14, top.lastIndexOf("."))
+  ];
+  const urlOrigin = toType.slice(toType.lastIndexOf("/") + 1);
+  if (assetOriginUser(urlOrigin)) {
+    assetOrigin = urlOrigin;
+  } else {
+    assetOrigin = "upload";
+  }
+
+  if (isUserImage(ext)) {
+    return {
+      userId,
+      timestampMs,
+      senderType,
+      type,
+      filename,
+      compatStatus: "ALIASED",
+      ext,
+      assetType: "IMAGE",
+      assetOrigin: assetOriginToUppercase(assetOrigin)
+    } as const;
+  } else {
+    return {
+      userId,
+      timestampMs,
+      type,
+      senderType,
+      filename,
+      compatStatus: "ALIASED",
+      assetType: "DOCUMENT",
+      ext: "pdf",
+      assetOrigin: assetOriginToUppercase(assetOrigin)
+    } as const;
+  }
+}
+
+export function toCdnUrlConstituents(cdnUrl: string) {
+  const baseAlpha = cdnUrl.slice(0, cdnUrl.lastIndexOf("/"));
+  const top = cdnUrl.slice(cdnUrl.lastIndexOf("/") + 1);
+  const senderType = "AI" as const;
+  const [filename, ext, timestampMs, userId, baseBeta] = [
+    top.slice(14, top.lastIndexOf(".")),
+    top.slice(top.lastIndexOf(".") + 1),
+    Number.parseInt(top.slice(0, 13), 10),
+    baseAlpha.slice(baseAlpha.lastIndexOf("/") + 1),
+    baseAlpha.slice(0, baseAlpha.lastIndexOf("/"))
+  ];
+  const assetOrigin = baseBeta.slice(baseBeta.lastIndexOf("/") + 1);
+  if (!assetOriginAI(assetOrigin)) {
+    throw new Error("assetOrigin should always be generated for AI!");
+  }
+  /**
+   *
+   * "TTSJob" --> Grok TTS models output this (wav)
+   *
+   * example: https://assets-dev.aicoalesce.com/generated/nrr6h4r4480f6kviycyo1zhf/1775719777708-c7f00rus0uow8ufpa5uf92g2.wav
+   *
+   * "AudioGenOutput" --> Lyria models output this (mp3)
+   *
+   * example: https://assets-dev.aicoalesce.com/generated/nrr6h4r4480f6kviycyo1zhf/1774776422885-pbfi70ff932yljphxoo7pxo9.mp3
+   *
+   */
+  if (/[a-z0-9]{24}/.test(filename) && isAudio(ext)) {
+    if (ext === "mp3") {
+      // "AudioGenOutput"
+
+      return {
+        type: "AudioGenOutput",
+        senderType,
+        ext,
+        timestampMs,
+        sId: filename,
+        userId,
+        assetOrigin: assetOriginToUppercase(assetOrigin),
+        assetType: "AUDIO",
+        compatStatus: "ALIASED"
+      } as const;
+    } else {
+      return {
+        type: "TTSJob",
+        senderType,
+        ext,
+        timestampMs,
+        sId: filename,
+        userId,
+        assetOrigin: assetOriginToUppercase(assetOrigin),
+        assetType: "AUDIO",
+        compatStatus: "ALIASED"
+      } as const;
+    }
+  }
+
   const [sId, sOrdinal] = [
-    seriesIdDashOrdinal.slice(0, seriesIdDashOrdinal.lastIndexOf("-")),
-    seriesIdDashOrdinal.slice(seriesIdDashOrdinal.lastIndexOf("-") + 1)
+    filename.slice(0, filename.lastIndexOf("-")),
+    Number.parseInt(filename.slice(filename.lastIndexOf("-") + 1), 10)
   ];
   const generatedType = /^[a-z0-9]{24}$/.test(sId)
-    ? "inlineImageGenOutput"
-    : "imageGenOutput";
+    ? "InlineImageGenOutput"
+    : "ImageGenOutput";
+
+  if (isImage(ext)) {
+    return {
+      /**
+       * "inlineImageGenOutput" uses cuid2 `/^[a-z0-9]{24}$/`
+       *
+       * "imageGenOutput" uses nanoid `/^[A-Za-z0-9]{21}$/` | `/^ig_[0-9a-f]{50}$/`
+       */
+      type: generatedType,
+      senderType,
+      sId,
+      sOrdinal,
+      ext,
+      timestampMs,
+      userId,
+      assetOrigin: assetOriginToUppercase(assetOrigin),
+      assetType: "IMAGE",
+      compatStatus: "ALIASED"
+    } as const;
+  }
   return {
     /**
+     *
      * "inlineImageGenOutput" uses cuid2 `/^[a-z0-9]{24}$/`
      *
-     * "imageGenOutput" uses nanoid `/^[A-Za-z0-9]{21}$/` | /^ig_[0-9a-z]$/
+     * "imageGenOutput" uses nanoid `/^[A-Za-z0-9]{21}$/` | `/^ig_[0-9a-f]{50}$/`
      */
     type: generatedType,
+    senderType,
     sId,
-    sOrdinal: Number.parseInt(sOrdinal),
-    ext,
-    timestampMs: Number.parseInt(timestampMs)
+    sOrdinal,
+    ext: "pdf",
+    timestampMs,
+    assetType: "DOCUMENT",
+    userId,
+    assetOrigin: assetOriginToUppercase(assetOrigin),
+    compatStatus: "ALIASED"
   } as const;
+}
+
+export function trimBase(cdnUrl: string, isProd?: string) {
+  const base = `${getCdnUrlBase(isProd)}/` as const;
+  return cdnUrl.replace(base, "");
+}
+
+export function cdnUrlHandler(cdnUrl: string, isProd?: string) {
+  const origin = trimBase(cdnUrl, isProd);
+  if (origin.startsWith("generated")) return toCdnUrlConstituents(cdnUrl);
+  else {
+    return userCdnUrlConstituents(cdnUrl);
+  }
+}
+
+export function fileDownloadName(cdnUrl: string) {
+  const d = cdnUrlHandler(cdnUrl);
+  if (d.senderType === "AI") {
+    if (d.assetType === "IMAGE") {
+      return `${d.sId}-${d.sOrdinal}.${d.ext}`;
+    } else if (d.assetType === "AUDIO") {
+      return `${d.sId}.${d.ext}`;
+    } else {
+      return `${d.sId}.${d.ext}`;
+    }
+  } else {
+    return `${d.filename}.${d.ext}`;
+  }
+}
+
+export async function downloadAsset(src: string, name: string) {
+  try {
+    const res = await fetch(src);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const url = URL.createObjectURL(await res.blob());
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = name;
+    link.rel = "noopener";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1_000);
+  } catch {
+    window.open(src, "_blank", "noopener,noreferrer");
+  }
+}
+
+export function formatDuration(seconds: number | undefined) {
+  if (seconds === undefined || !Number.isFinite(seconds)) return "–:––";
+  const whole = Math.floor(seconds);
+  const m = Math.floor(whole / 60);
+  const s = whole % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
 }

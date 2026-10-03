@@ -15,6 +15,7 @@ import { SharpService } from "@/sharp/index.ts";
 import { UserStoreVectorService } from "@/store/vector-store.ts";
 import { UserStoreWorkupService } from "@/store/workup.ts";
 import { VoyageEmbeddingService } from "@/voyage/index.ts";
+import { AudioService } from "@d0paminedriven/audiodown";
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
 import { Client } from "pg";
@@ -29,8 +30,8 @@ const logger = LoggerService.getLoggerInstance({
   environment: "test",
   isProd: false
 });
-
-const extract = new ExtractService();
+const audioService = new AudioService();
+const extract = new ExtractService(audioService);
 
 const db = new PrismaDbService({
   connectionString: process.env.DATABASE_URL ?? "",

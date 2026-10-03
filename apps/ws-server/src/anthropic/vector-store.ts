@@ -568,7 +568,8 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       model === "claude-opus-4-8" ||
       model === "claude-opus-4-6" ||
       model === "claude-fable-5" ||
-      model === "claude-opus-4-7"
+      model === "claude-opus-4-7" ||
+      model === "claude-sonnet-5-5"
     ) {
       return { effort: "max" } as const;
     }

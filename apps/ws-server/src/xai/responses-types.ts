@@ -8,7 +8,6 @@ import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   CanonicalToolDefinition,
-  DiscriminatedUnionToRecord,
   GrokModelIdUnion,
   LocalToolName,
   MessageSingleton,
@@ -170,6 +169,34 @@ export type FileSearchTool = {
   max_num_results?: number;
 };
 
+export type RemoteMCPTool = {
+  type: "mcp";
+  /**
+   * The URL of the MCP server to connect to. Only Streaming HTTP and SSE transports are supported.
+   */
+  server_url: string;
+  /**
+   * A label to identify the server (used for tool call prefixing)
+   */
+  server_label: string;
+  /**
+   * A description of what the server provides
+   */
+  server_description?: string;
+  /**
+   * List of specific tool names to allow ***empty allows all***
+   */
+  allowed_tools?: Exclude<ToolUnionGrok4_6_Grok4_7["type"], "mcp">[];
+  /**
+   * A token that will be set in the Authorization header on requests to the MCP server
+   */
+  authorization?: string;
+  /**
+   * Additional headers to include in requests. The xAI native SDK uses the parameter name extra_headers.
+   */
+  headers?: { [record: string]: string | number | boolean };
+};
+
 export type CodeInterpreterTool = { type: "code_interpreter" };
 
 /**
@@ -187,6 +214,7 @@ export type LocalToolFunctionTool = {
 };
 
 export type ToolUnion =
+  | RemoteMCPTool
   | WebSearchTool
   | XSearchTool
   | FileSearchTool
@@ -199,6 +227,7 @@ export type ToolUnion =
 export type ToolUnionRecord = UTR<ToolUnion, "type">;
 
 export type ToolUnionGrok4_6_Grok4_7 =
+  | RemoteMCPTool
   | WebSearchTool
   | XSearchTool
   | FileSearchTool
@@ -428,18 +457,22 @@ export type SSEEvent<TUnion extends { type: string }> = TUnion extends {
     }
   : never;
 
-export type XAIResponsesSSEEvent = SSEEvent<XAIResponsesEvent>;
+export type XAIResponsesSSEEvent<
+  T extends "completed" | "failed" = "completed" | "failed"
+>  = SSEEvent<XAIResponsesEvent<T>>;
 
-export type xAIRecord = DiscriminatedUnionToRecord<XAIResponsesEvent, "type">;
+export type xAIRecord =XAIResponsesRecord;
 
 export type XAIResponsesEventType = keyof xAIRecord;
 
-export type XAIResponsesEvent =
+export type XAIResponsesEvent<
+  T extends "completed" | "failed" = "completed" | "failed"
+> =
   | xAIResponses.Created
   | xAIResponses.InProgress
   | xAIResponses.Completed
   | xAIResponses.OutputItem.Added
-  | xAIResponses.OutputItem.Done
+  | xAIResponses.OutputItem.Done<T>
   | xAIResponses.ContentPart.Added
   | xAIResponses.ContentPart.Done
   | xAIResponses.OutputText.Delta
@@ -452,6 +485,10 @@ export type XAIResponsesEvent =
   | xAIResponses.WebSearchCall.InProgress
   | xAIResponses.WebSearchCall.Searching
   | xAIResponses.WebSearchCall.Completed
+  | xAIResponses.MCP.Call.InProgress
+  | xAIResponses.MCP.Arguments.Delta
+  | xAIResponses.MCP.Arguments.Done
+  | xAIResponses.MCP.Call.Completed
   | xAIResponses.ImageGenerationCall.InProgress
   | xAIResponses.ImageGenerationCall.Generating
   | xAIResponses.ImageGenerationCall.Completed
@@ -463,7 +500,9 @@ export type XAIResponsesEvent =
   | xAIResponses.CustomToolCallInput.Delta
   | xAIResponses.CustomToolCallInput.Done;
 
-export type XAIResponsesRecord = UTR<XAIResponsesEvent, "type">;
+export type XAIResponsesRecord<
+  T extends "completed" | "failed" = "completed" | "failed"
+> = UTR<XAIResponsesEvent<T>, "type">;
 
 export type XAIResponsesEventTypes = XAIResponsesEvent["type"];
 

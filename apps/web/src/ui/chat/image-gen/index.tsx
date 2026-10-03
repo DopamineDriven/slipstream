@@ -1,10 +1,18 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import { Button, Download, Eye, shimmer } from "@slipstream/ui";
+import {
+  baseButtonVariants,
+  Button,
+  Download,
+  Eye,
+  shimmer
+} from "@slipstream/ui";
 
 interface ImageGenerationCanvasProps {
   isGenerating: boolean;
@@ -15,6 +23,21 @@ interface ImageGenerationCanvasProps {
   prompt?: string;
   attachmentId?: string;
   kind?: $Enums.ImageGenOutputKind;
+}
+
+/**
+ * The frame takes the image's ratio, so `object-cover` never crops: width is
+ * the intrinsic pixel width capped by the column (`max-w-3xl`), and height
+ * follows from `aspect-ratio`. Square only while no dimensions are known.
+ * Same rule as the inline canvas.
+ */
+function frameStyle(w: number | null, h: number | null) {
+  if (w === null || h === null)
+    return { aspectRatio: "1 / 1", width: "100%" } satisfies CSSProperties;
+  return {
+    aspectRatio: `${w} / ${h}`,
+    width: `min(100%, ${w}px)`
+  } satisfies CSSProperties;
 }
 
 export function ImageGenerationCanvasTest({
@@ -87,11 +110,18 @@ export function ImageGenerationCanvasTest({
     }
   }, [kind]);
 
+  // the latched `w`/`h` only land after the first effect pass; fall back to
+  // the raw props so a committed image reserves its real footprint on the
+  // very first paint
+  const frameW = w ?? (width || null);
+  const frameH = h ?? (height || null);
+
   return (
     <div
       id={displayAttachmentId ? `attachment-${displayAttachmentId}` : undefined}
       data-attachment-id={displayAttachmentId ?? undefined}
-      className="bg-muted group relative mx-auto aspect-square w-full max-w-3xl overflow-hidden rounded-2xl">
+      className="bg-muted group relative mx-auto max-w-3xl overflow-hidden rounded-2xl"
+      style={frameStyle(frameW, frameH)}>
       <div
         className={cn(
           "absolute inset-0 transition-opacity duration-500",
@@ -142,12 +172,27 @@ export function ImageGenerationCanvasTest({
               displayKind === "FINAL" &&
               "group-hover:opacity-100 focus:opacity-100"
           )}>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="bg-foreground/90 text-background hover:foreground backdrop-blur-sm">
-            <Eye className="size-4" />
-          </Button>
+          {/* the bubble can pass a synthetic id while streaming; a link only
+              once the frame is FINAL and the turn has stopped generating */}
+          {!isGenerating && displayKind === "FINAL" && displayAttachmentId ? (
+            <Link
+              href={`/attachment/${displayAttachmentId}`}
+              scroll={false}
+              aria-label="View full size"
+              className={cn(
+                baseButtonVariants({ variant: "ghost", size: "icon" }),
+                "bg-foreground/90 text-background hover:bg-foreground hover:text-background backdrop-blur-sm"
+              )}>
+              <Eye className="size-4" />
+            </Link>
+          ) : (
+            <Button
+              size="icon"
+              variant="ghost"
+              className="bg-foreground/90 text-background hover:foreground backdrop-blur-sm">
+              <Eye className="size-4" />
+            </Button>
+          )}
           <Button
             size="icon"
             variant="ghost"

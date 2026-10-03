@@ -60,6 +60,10 @@ import type { PrismaDbService } from "@slipstream/db/factory";
  *
  *  ⬆
  *
+ * `@/prisma/attachment-hydration.ts`
+ *
+ *  ⬆
+ *
  * `@/prisma/user-meta.ts`
  *
  *  ⬆

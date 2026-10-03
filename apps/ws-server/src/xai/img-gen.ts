@@ -325,7 +325,9 @@ export class GrokImgGenService extends GrokStreamWorkupService {
 
   private mapPersistenceImgGenArrr(
     userId: string,
-    props: ImageGenPartialArr[]
+    props: ImageGenPartialArr[],
+    facilitatingModel: string,
+    generatingModel: string
   ) {
     return props.map((t, o) => {
       const rt = t[25];
@@ -408,6 +410,9 @@ export class GrokImgGenService extends GrokStreamWorkupService {
           orientation: expImg.orientation
         },
         imageGenOutput: {
+          facilitatingModel,
+          generatingModel,
+          provider: "GROK",
           ext: expImg.format,
           height: expImg.height,
           width: expImg.width,
@@ -712,10 +717,12 @@ export class GrokImgGenService extends GrokStreamWorkupService {
           usage: undefined,
           imgGenFields: {
             partialImages: undefined,
-            images: this.mapPersistenceImgGenArrr(userId, partialImgArr),
+            images: this.mapPersistenceImgGenArrr(userId, partialImgArr, m, m),
             activeImage: this.mapPersistenceImgGenArrr(
               userId,
-              partialImgArr
+              partialImgArr,
+              m,
+              m
             ).find(t => t.index === partialImgArr.length - 1),
             actualCount: remapFinals.length,
             duration: dur,
@@ -761,10 +768,17 @@ export class GrokImgGenService extends GrokStreamWorkupService {
             imgGenEnabled: true,
             imgGenFields: {
               partialImages: undefined,
-              images: this.mapPersistenceImgGenArrr(userId, partialImgArr),
+              images: this.mapPersistenceImgGenArrr(
+                userId,
+                partialImgArr,
+                m,
+                m
+              ),
               activeImage: this.mapPersistenceImgGenArrr(
                 userId,
-                partialImgArr
+                partialImgArr,
+                m,
+                m
               ).find(t => t.index === partialImgArr.length - 1),
               actualCount: remapFinals.length,
               duration: dur,
@@ -809,10 +823,12 @@ export class GrokImgGenService extends GrokStreamWorkupService {
           imgGenEnabled: true,
           imgGenFields: {
             partialImages: undefined,
-            images: this.mapPersistenceImgGenArrr(userId, partialImgArr),
+            images: this.mapPersistenceImgGenArrr(userId, partialImgArr, m, m),
             activeImage: this.mapPersistenceImgGenArrr(
               userId,
-              partialImgArr
+              partialImgArr,
+              m,
+              m
             ).find(t => t.index === partialImgArr.length - 1),
             actualCount: remapFinals.length,
             duration: dur,

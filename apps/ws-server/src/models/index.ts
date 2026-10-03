@@ -94,6 +94,7 @@ export class ModelService extends ModelToolDefsService {
 
   public isOpenAIImgGenFacilitating(m: string) {
     return (
+      m === "gpt-6.1-sol" ||
       m === "gpt-6-sol" ||
       m === "gpt-6-luna" ||
       m === "gpt-6-astra" ||
@@ -280,9 +281,10 @@ export class ModelService extends ModelToolDefsService {
   }
   public isAnthropicAdaptiveModel(mod: string) {
     return (
+      mod === "claude-sonnet-5-5" ||
       mod === "claude-opus-5-5" ||
       mod === "claude-fable-5-1" ||
-      mod === "claude-sonnet-5"||
+      mod === "claude-sonnet-5" ||
       mod === "claude-opus-5" ||
       mod === "claude-fable-5" ||
       mod === "claude-opus-4-8" ||

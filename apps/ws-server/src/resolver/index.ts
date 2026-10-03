@@ -21,6 +21,26 @@ import type { S3Storage } from "@slipstream/storage-s3";
  *
  *  ⬆
  *
+ * `@/resolver/connection.ts`
+ *
+ *  ⬆
+ *
+ * `@/resolver/cli-recent-convos.ts`
+ *
+ *  ⬆
+ *
+ * `@/resolver/cli-config-hydrate.ts`
+ *
+ *  ⬆
+ *
+ * `@/resolver/cli-config-update.ts`
+ *
+ *  ⬆
+ *
+ * `@/resolver/local-tool-result.ts`
+ *
+ *  ⬆
+ *
  * `@/resolver/convo-list.ts`
  *
  *  ⬆
@@ -37,11 +57,11 @@ import type { S3Storage } from "@slipstream/storage-s3";
  *
  *  ⬆
  *
- * `@/resolver/chat-utils.ts`
+ * `@/resolver/stt.ts`
  *
  *  ⬆
  *
- * `@/resolver/connection.ts`
+ * `@/resolver/chat-utils.ts`
  *
  *  ⬆
  *
@@ -54,6 +74,10 @@ import type { S3Storage } from "@slipstream/storage-s3";
  *  ⬆
  *
  * `@/resolver/asset-attach-or-paste.ts`
+ *
+ *  ⬆
+ *
+ * `@/resolver/attachment-hydration.ts`
  *
  *  ⬆
  *

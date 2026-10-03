@@ -43,7 +43,9 @@ export {
   grokVoiceDisplayNamesTTS,
   grokVoiceIdToDisplayNameTTS,
   grokVoiceIdsTTS,
-  grokVoices
+  grokVoices,
+  WAVEFORM_PEAK_COUNT,
+  WAVEFORM_PEAK_SCALE
 } from "@/contract/audio.ts";
 
 export type {
@@ -151,6 +153,17 @@ export type {
   ConversationListAck,
   ConversationListEntry
 } from "@/contract/conversation-list-events.ts";
+
+export type {
+  HydrateAttachmentById,
+  HydrateAttachmentByIdAck,
+  HydrateAttachmentEventRecord,
+  HydrateAttachmentEventUnion,
+  HydrateAttachments,
+  HydrateAttachmentsAck,
+  HydrateAttachmentsByConversationId,
+  HydrateAttachmentsByConversationIdAck
+} from "@/contract/hydrate-attachments.ts";
 
 export type {
   HydrateConversation,

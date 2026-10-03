@@ -39,9 +39,10 @@ async function exe() {
       logLevel: typeof process.env.IS_PROD === "undefined" ? "info" : "debug",
       isProd
     };
+    const { AudioService } = await import("@d0paminedriven/audiodown");
     const { ExtractService } = await import("@/extract/index.ts");
 
-    const extract = new ExtractService();
+    const extract = new ExtractService(new AudioService());
 
     const logger = LoggerService.getLoggerInstance(loggerConfig),
       log = logger.getPinoInstance();

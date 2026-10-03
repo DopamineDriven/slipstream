@@ -1,5 +1,6 @@
 export const modelIdsByProvider = {
   openai: [
+    "gpt-6.1-sol",
     "gpt-6-sol",
     "gpt-6-luna",
     "gpt-6-astra",
@@ -85,6 +86,7 @@ export const modelIdsByProvider = {
     "grok-imagine-video"
   ],
   anthropic: [
+    "claude-sonnet-5-5",
     "claude-opus-5-5",
     "claude-fable-5-1",
     "claude-opus-5",

@@ -18,6 +18,7 @@ import type {
 import { PrismaAttachmentService } from "@/prisma/attachment.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type { $Enums } from "@slipstream/db/node/generated/client";
+import type { AttachmentWhereInput } from "@slipstream/db/node/generated/models";
 import type {
   AIChatRequest,
   ConversationSingletonOneOff,
@@ -46,6 +47,26 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
         messageBlock: true
       }
     } as const;
+  }
+
+  private get attWhere() {
+    return {
+      OR: [
+        { origin: { not: "GENERATED" } },
+        {
+          AND: [{ origin: "GENERATED" }, { audioGenOutput: { kind: "FINAL" } }]
+        },
+        {
+          AND: [{ origin: "GENERATED" }, { imageGenOutput: { kind: "FINAL" } }]
+        },
+        {
+          AND: [
+            { origin: "GENERATED" },
+            { inlineImageGenOutput: { kind: "FINAL" } }
+          ]
+        }
+      ]
+    } as const satisfies AttachmentWhereInput;
   }
 
   private isNewChat(id: string) {
@@ -456,23 +477,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
             audioGenJob: true,
             messageBlocks: { orderBy: { ordinal: "asc" } },
             attachments: {
-              where: {
-                OR: [
-                  { origin: { not: "GENERATED" } },
-                  {
-                    AND: [
-                      { origin: "GENERATED" },
-                      { imageGenOutput: { kind: "FINAL" } }
-                    ]
-                  },
-                  {
-                    AND: [
-                      { origin: "GENERATED" },
-                      { inlineImageGenOutput: { kind: "FINAL" } }
-                    ]
-                  }
-                ]
-              },
+              where: this.attWhere,
               orderBy: { createdAt: "asc" },
               include: this.includeGamma.include
             }
@@ -566,23 +571,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
             messageBlocks: { orderBy: { ordinal: "asc" } },
             audioGenJob: true,
             attachments: {
-              where: {
-                OR: [
-                  { origin: { not: "GENERATED" } },
-                  {
-                    AND: [
-                      { origin: "GENERATED" },
-                      { imageGenOutput: { kind: "FINAL" } }
-                    ]
-                  },
-                  {
-                    AND: [
-                      { origin: "GENERATED" },
-                      { inlineImageGenOutput: { kind: "FINAL" } }
-                    ]
-                  }
-                ]
-              },
+              where: this.attWhere,
               orderBy: { createdAt: "asc" },
               include: this.includeGamma.include
             }
@@ -679,23 +668,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
             audioGenJob: true,
             messageBlocks: { orderBy: { ordinal: "asc" } },
             attachments: {
-              where: {
-                OR: [
-                  { origin: { not: "GENERATED" } },
-                  {
-                    AND: [
-                      { origin: "GENERATED" },
-                      { imageGenOutput: { kind: "FINAL" } }
-                    ]
-                  },
-                  {
-                    AND: [
-                      { origin: "GENERATED" },
-                      { inlineImageGenOutput: { kind: "FINAL" } }
-                    ]
-                  }
-                ]
-              },
+              where: this.attWhere,
               orderBy: { createdAt: "asc" },
               include: this.includeGamma.include
             }
@@ -793,23 +766,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
             audioGenJob: true,
             messageBlocks: { orderBy: { ordinal: "asc" } },
             attachments: {
-              where: {
-                OR: [
-                  { origin: { not: "GENERATED" } },
-                  {
-                    AND: [
-                      { origin: "GENERATED" },
-                      { imageGenOutput: { kind: "FINAL" } }
-                    ]
-                  },
-                  {
-                    AND: [
-                      { origin: "GENERATED" },
-                      { inlineImageGenOutput: { kind: "FINAL" } }
-                    ]
-                  }
-                ]
-              },
+              where: this.attWhere,
               orderBy: { createdAt: "asc" },
               include: this.includeGamma.include
             }
@@ -1043,23 +1000,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
               orderBy: { ordinal: "asc" }
             },
             attachments: {
-              where: {
-                OR: [
-                  { origin: { not: "GENERATED" } },
-                  {
-                    AND: [
-                      { origin: "GENERATED" },
-                      { imageGenOutput: { kind: "FINAL" } }
-                    ]
-                  },
-                  {
-                    AND: [
-                      { origin: "GENERATED" },
-                      { inlineImageGenOutput: { kind: "FINAL" } }
-                    ]
-                  }
-                ]
-              },
+              where: this.attWhere,
               orderBy: { createdAt: "asc" },
               include: this.includeGamma.include
             }
@@ -1141,23 +1082,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
             messageBlocks: { orderBy: { ordinal: "asc" } },
             imageGenJob: true,
             attachments: {
-              where: {
-                OR: [
-                  { origin: { not: "GENERATED" } },
-                  {
-                    AND: [
-                      { origin: "GENERATED" },
-                      { imageGenOutput: { kind: "FINAL" } }
-                    ]
-                  },
-                  {
-                    AND: [
-                      { origin: "GENERATED" },
-                      { inlineImageGenOutput: { kind: "FINAL" } }
-                    ]
-                  }
-                ]
-              },
+              where: this.attWhere,
               orderBy: { createdAt: "asc" },
               include: this.includeGamma.include
             }
@@ -1278,23 +1203,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                   audioGenJob: true,
                   messageBlocks: { orderBy: { ordinal: "asc" } },
                   attachments: {
-                    where: {
-                      OR: [
-                        { origin: { not: "GENERATED" } },
-                        {
-                          AND: [
-                            { origin: "GENERATED" },
-                            { imageGenOutput: { kind: "FINAL" } }
-                          ]
-                        },
-                        {
-                          AND: [
-                            { origin: "GENERATED" },
-                            { inlineImageGenOutput: { kind: "FINAL" } }
-                          ]
-                        }
-                      ]
-                    },
+                    where: this.attWhere,
                     orderBy: { createdAt: "asc" },
                     include: this.includeGamma.include
                   } as const
@@ -1339,23 +1248,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                   audioGenJob: true,
                   messageBlocks: { orderBy: { ordinal: "asc" } },
                   attachments: {
-                    where: {
-                      OR: [
-                        { origin: { not: "GENERATED" } },
-                        {
-                          AND: [
-                            { origin: "GENERATED" },
-                            { imageGenOutput: { kind: "FINAL" } }
-                          ]
-                        },
-                        {
-                          AND: [
-                            { origin: "GENERATED" },
-                            { inlineImageGenOutput: { kind: "FINAL" } }
-                          ]
-                        }
-                      ]
-                    },
+                    where: this.attWhere,
                     orderBy: { createdAt: "asc" },
                     include: this.includeGamma.include
                   }
@@ -1510,23 +1403,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                     imageGenJob: true,
                     messageBlocks: { orderBy: { ordinal: "asc" } },
                     attachments: {
-                      where: {
-                        OR: [
-                          { origin: { not: "GENERATED" } },
-                          {
-                            AND: [
-                              { origin: "GENERATED" },
-                              { imageGenOutput: { kind: "FINAL" } }
-                            ]
-                          },
-                          {
-                            AND: [
-                              { origin: "GENERATED" },
-                              { inlineImageGenOutput: { kind: "FINAL" } }
-                            ]
-                          }
-                        ]
-                      },
+                      where: this.attWhere,
                       include: this.includeGamma.include,
                       orderBy: { createdAt: "asc" }
                     }
@@ -1573,23 +1450,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                     attachments: {
                       include: this.includeGamma.include,
                       orderBy: { createdAt: "asc" },
-                      where: {
-                        OR: [
-                          { origin: { not: "GENERATED" } },
-                          {
-                            AND: [
-                              { origin: "GENERATED" },
-                              { imageGenOutput: { kind: "FINAL" } }
-                            ]
-                          },
-                          {
-                            AND: [
-                              { origin: "GENERATED" },
-                              { inlineImageGenOutput: { kind: "FINAL" } }
-                            ]
-                          }
-                        ]
-                      }
+                      where: this.attWhere
                     }
                   }
                 }
@@ -1635,23 +1496,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                     imageGenJob: true,
                     messageBlocks: { orderBy: { ordinal: "asc" } },
                     attachments: {
-                      where: {
-                        OR: [
-                          { origin: { not: "GENERATED" } },
-                          {
-                            AND: [
-                              { origin: "GENERATED" },
-                              { imageGenOutput: { kind: "FINAL" } }
-                            ]
-                          },
-                          {
-                            AND: [
-                              { origin: "GENERATED" },
-                              { inlineImageGenOutput: { kind: "FINAL" } }
-                            ]
-                          }
-                        ]
-                      },
+                      where: this.attWhere,
                       include: this.includeGamma.include,
                       orderBy: { createdAt: "asc" }
                     }
@@ -1690,23 +1535,7 @@ export class PrismaChatRequestService extends PrismaAttachmentService {
                   imageGenJob: true,
                   messageBlocks: { orderBy: { ordinal: "asc" } },
                   attachments: {
-                    where: {
-                      OR: [
-                        { origin: { not: "GENERATED" } },
-                        {
-                          AND: [
-                            { origin: "GENERATED" },
-                            { imageGenOutput: { kind: "FINAL" } }
-                          ]
-                        },
-                        {
-                          AND: [
-                            { origin: "GENERATED" },
-                            { inlineImageGenOutput: { kind: "FINAL" } }
-                          ]
-                        }
-                      ]
-                    },
+                    where: this.attWhere,
                     include: this.includeGamma.include,
                     orderBy: { createdAt: "asc" }
                   }

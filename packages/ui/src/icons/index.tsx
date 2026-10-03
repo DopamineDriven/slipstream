@@ -5,6 +5,7 @@ import { AnthropicIcon } from "@/icons/anthropic";
 import { ArrowDownCircle } from "@/icons/arrow-down-circle";
 import { ArrowLeft } from "@/icons/arrow-left";
 import { ArrowRight } from "@/icons/arrow-right";
+import { AudioLines } from "@/icons/audio-lines";
 import { BookOpen } from "@/icons/book-open";
 import { Bot } from "@/icons/bot";
 import { Camera } from "@/icons/camera";
@@ -17,6 +18,7 @@ import { CircleAlert } from "@/icons/circle-alert";
 import { CircleCheck } from "@/icons/circle-check";
 import { CirclePlus } from "@/icons/circle-plus";
 import { ClaudeIcon } from "@/icons/claude";
+import { Clipboard } from "@/icons/clipboard";
 import { Code } from "@/icons/code";
 import { CohereIcon, CohereIconCurrentColor } from "@/icons/cohere";
 import { Compass } from "@/icons/compass";
@@ -28,6 +30,7 @@ import { EditIcon } from "@/icons/edit-icon";
 import { EllipsisHorizontal } from "@/icons/ellipsis-horizontal";
 import { EmptyChatHistory } from "@/icons/empty-chat-history";
 import { Expand } from "@/icons/expand";
+import { ExternalLink } from "@/icons/external-link";
 import { Eye } from "@/icons/eye";
 import { EyeClosed } from "@/icons/eye-closed";
 import { EyeOff } from "@/icons/eye-off";
@@ -85,6 +88,7 @@ import { SendMessage } from "@/icons/send-message";
 import { Settings } from "@/icons/settings";
 import { SettingsUser } from "@/icons/settings-user";
 import { ShareIcon } from "@/icons/share-icon";
+import { ShieldCheck } from "@/icons/shield-check";
 import { SlidersHorizontal } from "@/icons/sliders-horizontal";
 import { Sparkles } from "@/icons/sparkles";
 import { SquarePen } from "@/icons/square-pen";
@@ -96,6 +100,8 @@ import { ThumbsUp } from "@/icons/thumbs-up";
 import { Tools } from "@/icons/tools";
 import { Trash } from "@/icons/trash";
 import { TrashSimple } from "@/icons/trash-simple";
+import { TriangleAlert } from "@/icons/triangle-alert";
+import { Upload } from "@/icons/upload";
 import { User } from "@/icons/user";
 import { VercelIcon } from "@/icons/vercel";
 import { Voice } from "@/icons/voice";
@@ -113,6 +119,7 @@ const IconComponents = {
   ArrowDownCircle,
   ArrowLeft,
   ArrowRight,
+  AudioLines,
   BookOpen,
   Bot,
   Camera,
@@ -125,6 +132,7 @@ const IconComponents = {
   CirclePlus,
   Circle,
   ClaudeIcon,
+  Clipboard,
   Code,
   CohereIcon,
   CohereIconCurrentColor,
@@ -137,6 +145,7 @@ const IconComponents = {
   EllipsisHorizontal,
   EmptyChatHistory,
   Expand,
+  ExternalLink,
   Eye,
   EyeClosed,
   EyeOff,
@@ -194,6 +203,7 @@ const IconComponents = {
   Settings,
   SettingsUser,
   ShareIcon,
+  ShieldCheck,
   SlidersHorizontal,
   Sparkles,
   SquarePen,
@@ -205,6 +215,8 @@ const IconComponents = {
   Tools,
   Trash,
   TrashSimple,
+  TriangleAlert,
+  Upload,
   User,
   VercelIcon,
   Voice,
@@ -250,6 +262,7 @@ export {
   ArrowDownCircle,
   ArrowLeft,
   ArrowRight,
+  AudioLines,
   BookOpen,
   Bot,
   Camera,
@@ -262,6 +275,7 @@ export {
   CirclePlus,
   Circle,
   ClaudeIcon,
+  Clipboard,
   Code,
   CohereIcon,
   CohereIconCurrentColor,
@@ -274,6 +288,7 @@ export {
   EllipsisHorizontal,
   EmptyChatHistory,
   Expand,
+  ExternalLink,
   Eye,
   EyeClosed,
   EyeOff,
@@ -331,6 +346,7 @@ export {
   Settings,
   SettingsUser,
   ShareIcon,
+  ShieldCheck,
   SlidersHorizontal,
   Sparkles,
   SquarePen,
@@ -342,6 +358,8 @@ export {
   Tools,
   Trash,
   TrashSimple,
+  TriangleAlert,
+  Upload,
   User,
   VercelIcon,
   Voice,

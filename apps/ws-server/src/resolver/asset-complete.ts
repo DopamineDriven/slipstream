@@ -9,7 +9,7 @@ import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { WebSocket } from "ws";
 import { ResolverAssetFetchService } from "@/resolver/asset-fetch.ts";
 import type { S3Storage } from "@slipstream/storage-s3";
-import type { EventTypeMap } from "@slipstream/types";
+import type { AttachmentSingleton, EventTypeMap } from "@slipstream/types";
 
 export class ResolverAssetCompleteService extends ResolverAssetFetchService {
   constructor(
@@ -314,6 +314,27 @@ export class ResolverAssetCompleteService extends ResolverAssetFetchService {
                   }
                 }
       });
+
+      // registry write-through at finalize: a user upload has no generated
+      // lineage, so the two gen relations are null by construction; the key
+      // is the row's conversationId, or "new-chat" for an unbound upload
+      const registryRow = {
+        ...attachment,
+        size: attachment.size ? Number(attachment.size) : null,
+        imageGenOutput: null,
+        audioGenOutput: null
+      } satisfies AttachmentSingleton<true>;
+      const registryKey = this.wsServer.prisma.setRegistryAttachment(
+        userId,
+        registryRow
+      );
+      ws.send(
+        JSON.stringify({
+          type: "hydrate_attachment_by_id_ack",
+          conversationId: registryKey,
+          attachment: registryRow
+        } satisfies EventTypeMap["hydrate_attachment_by_id_ack"])
+      );
 
       const meta = (
         metadata?.type === "DOCUMENT"

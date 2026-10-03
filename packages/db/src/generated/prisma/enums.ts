@@ -146,6 +146,14 @@ export const ColorSpace = {
 export type ColorSpace = (typeof ColorSpace)[keyof typeof ColorSpace]
 
 
+export const AudioGenOutputKind = {
+  PARTIAL: 'PARTIAL',
+  FINAL: 'FINAL'
+} as const
+
+export type AudioGenOutputKind = (typeof AudioGenOutputKind)[keyof typeof AudioGenOutputKind]
+
+
 export const AudioGenStage = {
   QUEUED: 'QUEUED',
   PROCESSING: 'PROCESSING',

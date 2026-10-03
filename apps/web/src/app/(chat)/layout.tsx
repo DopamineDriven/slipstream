@@ -3,20 +3,25 @@ import { redirect } from "next/navigation";
 import { AIChatProvider } from "@/context/ai-chat-context";
 import { ApiKeysProvider } from "@/context/api-keys-context";
 import { AssetProvider } from "@/context/asset-context";
+import { AttachmentRegistryProvider } from "@/context/attachment-registry-context";
 import { AudioGenProvider } from "@/context/audio-gen-context";
 import { ChatWebSocketProvider } from "@/context/chat-ws-context";
 import { ConversationHydrationProvider } from "@/context/convo-hydration-context";
 import { ImageGenProvider } from "@/context/image-gen-context";
 import { ModelSelectionProvider } from "@/context/model-selection-context";
+import { PlaybackProvider } from "@/context/playback-context";
 import { SettingsDrawerProvider } from "@/context/settings-drawer-context";
 import { STTProvider } from "@/context/stt-context";
 import { TTSProvider } from "@/context/tts-context";
+import { NavigationSync } from "@/ui/navigation-sync";
 import { getSession } from "@/utils/auth";
 
 export default async function AuthedLayout({
-  children
+  children,
+  modal
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   const session = await getSession();
   if (!session?.user) redirect("/auth/login");
@@ -31,9 +36,15 @@ export default async function AuthedLayout({
                   <ImageGenProvider>
                     <TTSProvider>
                       <ConversationHydrationProvider userId={session.user.id}>
-                        <AIChatProvider userId={session.user.id}>
-                          {children}
-                        </AIChatProvider>
+                        <AttachmentRegistryProvider>
+                          <NavigationSync />
+                          <AIChatProvider userId={session.user.id}>
+                            <PlaybackProvider>
+                              {children}
+                              {modal}
+                            </PlaybackProvider>
+                          </AIChatProvider>
+                        </AttachmentRegistryProvider>
                       </ConversationHydrationProvider>
                     </TTSProvider>
                   </ImageGenProvider>

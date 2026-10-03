@@ -336,7 +336,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               }
               inlineImgAggArr = [
                 seriesOrdinal,
-                chunk.data.item.result,
+                chunk.data.item?.result ?? "",
                 chunk.data.item.id,
                 chunk.data.item.prompt,
                 seriesId,
@@ -387,7 +387,7 @@ export class GrokResponsesApiLinearService extends GrokImgGenService {
               ? new Date(s3RTHelper.lastModified)
               : new Date(Date.now());
 
-            const inlineImgObj = this.inlineImagePostUploadObj({
+            const inlineImgObj = this.prisma.inlineImagePostUploadObj({
               specs,
               s3RTHelper,
               userId,

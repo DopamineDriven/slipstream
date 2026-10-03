@@ -14,213 +14,106 @@
         "dist/index.d.ts"
       ],
       "alibaba": [
-        "dist/alibaba/index.d.ts",
-        "dist/alibaba/memory.d.ts",
-        "dist/alibaba/sse.d.ts",
-        "dist/alibaba/summarizer.d.ts",
-        "dist/alibaba/types.d.ts",
-        "dist/alibaba/workup.d.ts"
+        "dist/alibaba/*.d.ts"
       ],
       "anthropic": [
-        "dist/anthropic/base.d.ts",
-        "dist/anthropic/index.d.ts",
-        "dist/anthropic/summarizer.d.ts",
-        "dist/anthropic/types.d.ts",
-        "dist/anthropic/vector-store.d.ts",
-        "dist/anthropic/workup.d.ts"
+        "dist/anthropic/*.d.ts"
       ],
       "byte-codec": [
-        "dist/byte-codec/index.d.ts"
+        "dist/byte-codec/*.d.ts"
       ],
       "cohere": [
-        "dist/cohere/index.d.ts",
-        "dist/cohere/types.d.ts"
+        "dist/cohere/*.d.ts"
       ],
       "deepseek": [
-        "dist/deepseek/index.d.ts",
-        "dist/deepseek/memory.d.ts",
-        "dist/deepseek/sse.d.ts",
-        "dist/deepseek/summarizer.d.ts",
-        "dist/deepseek/types.d.ts",
-        "dist/deepseek/workup.d.ts"
+        "dist/deepseek/*.d.ts"
       ],
       "extract": [
-        "dist/extract/index.d.ts"
+        "dist/extract/*.d.ts"
       ],
       "gemini": [
-        "dist/gemini/chat.d.ts",
-        "dist/gemini/fss.d.ts",
-        "dist/gemini/index.d.ts",
-        "dist/gemini/types.d.ts",
-        "dist/gemini/workup.d.ts"
+        "dist/gemini/*.d.ts"
       ],
       "image": [
-        "dist/image/index.d.ts"
+        "dist/image/*.d.ts"
       ],
       "kimi": [
-        "dist/kimi/index.d.ts",
-        "dist/kimi/memory.d.ts",
-        "dist/kimi/sse.d.ts",
-        "dist/kimi/summarizer.d.ts",
-        "dist/kimi/types.d.ts",
-        "dist/kimi/workup.d.ts"
+        "dist/kimi/*.d.ts"
       ],
       "local-tools": [
-        "dist/local-tools/local-tool-broker.d.ts",
-        "dist/local-tools/types.d.ts"
+        "dist/local-tools/*.d.ts"
       ],
       "logger": [
-        "dist/logger/index.d.ts"
+        "dist/logger/*.d.ts"
       ],
       "memory": [
-        "dist/memory/semaphore.d.ts",
-        "dist/memory/summarizer-loop.d.ts",
-        "dist/memory/types.d.ts",
-        "dist/memory/vector-store.d.ts",
-        "dist/memory/workup.d.ts"
+        "dist/memory/*.d.ts"
       ],
       "meta": [
-        "dist/meta/base.d.ts",
-        "dist/meta/chat.d.ts",
-        "dist/meta/index.d.ts",
-        "dist/meta/store.d.ts",
-        "dist/meta/types.d.ts",
-        "dist/meta/workup.d.ts"
+        "dist/meta/*.d.ts"
       ],
       "minimax": [
-        "dist/minimax/index.d.ts",
-        "dist/minimax/memory.d.ts",
-        "dist/minimax/sse.d.ts",
-        "dist/minimax/summarizer.d.ts",
-        "dist/minimax/types.d.ts",
-        "dist/minimax/workup.d.ts"
+        "dist/minimax/*.d.ts"
       ],
       "mistral": [
-        "dist/mistral/index.d.ts",
-        "dist/mistral/memory.d.ts",
-        "dist/mistral/stream-content.d.ts",
-        "dist/mistral/types.d.ts",
-        "dist/mistral/workup.d.ts"
+        "dist/mistral/*.d.ts"
       ],
       "mixins": [
-        "dist/mixins/index.d.ts"
+        "dist/mixins/*.d.ts"
       ],
       "models": [
-        "dist/models/index.d.ts",
-        "dist/models/tool-defs.d.ts",
-        "dist/models/workup.d.ts"
+        "dist/models/*.d.ts"
       ],
       "openai": [
-        "dist/openai/base.d.ts",
-        "dist/openai/gpt-image.d.ts",
-        "dist/openai/index.d.ts",
-        "dist/openai/memory.d.ts",
-        "dist/openai/responses-chat.d.ts",
-        "dist/openai/responses-img-gen.d.ts",
-        "dist/openai/summarizer.d.ts",
-        "dist/openai/types.d.ts",
-        "dist/openai/workup.d.ts"
+        "dist/openai/*.d.ts"
       ],
       "pdf": [
-        "dist/pdf/index.d.ts"
+        "dist/pdf/*.d.ts"
       ],
       "prisma": [
-        "dist/prisma/attachment-provider.d.ts",
-        "dist/prisma/attachment.d.ts",
-        "dist/prisma/chat-request.d.ts",
-        "dist/prisma/chat-response.d.ts",
-        "dist/prisma/convo-hydration.d.ts",
-        "dist/prisma/convo-list.d.ts",
-        "dist/prisma/convo-memory-service.d.ts",
-        "dist/prisma/index.d.ts",
-        "dist/prisma/provider-store.d.ts",
-        "dist/prisma/tts.d.ts",
-        "dist/prisma/types.d.ts",
-        "dist/prisma/user-meta.d.ts",
-        "dist/prisma/user-store.d.ts",
-        "dist/prisma/utils.d.ts"
+        "dist/prisma/*.d.ts"
       ],
       "providers": [
-        "dist/providers/index.d.ts"
+        "dist/providers/*.d.ts"
       ],
       "resolver": [
-        "dist/resolver/asset-attach-or-paste.d.ts",
-        "dist/resolver/asset-compat.d.ts",
-        "dist/resolver/asset-complete.d.ts",
-        "dist/resolver/asset-fetch.d.ts",
-        "dist/resolver/chat-utils.d.ts",
-        "dist/resolver/chat.d.ts",
-        "dist/resolver/connection.d.ts",
-        "dist/resolver/convo-hydration.d.ts",
-        "dist/resolver/convo-list.d.ts",
-        "dist/resolver/dispatch.d.ts",
-        "dist/resolver/index.d.ts",
-        "dist/resolver/local-tool-result.d.ts",
-        "dist/resolver/tts.d.ts",
-        "dist/resolver/utils.d.ts"
+        "dist/resolver/*.d.ts"
       ],
       "sakana": [
-        "dist/sakana/base.d.ts",
-        "dist/sakana/chat.d.ts",
-        "dist/sakana/index.d.ts",
-        "dist/sakana/store.d.ts",
-        "dist/sakana/types.d.ts",
-        "dist/sakana/workup.d.ts"
+        "dist/sakana/*.d.ts"
       ],
       "sharp": [
-        "dist/sharp/index.ts"
+        "dist/sharp/*.ts"
       ],
       "store": [
-        "dist/store/vector-store.d.ts",
-        "dist/store/types.d.ts",
-        "dist/store/workup.d.ts"
+        "dist/store/*.d.ts"
+      ],
+      "stt": [
+        "dist/stt/*.d.ts"
       ],
       "tool-catalog": [
-        "dist/tool-catalog/index.d.ts",
-        "dist/tool-catalog/types.d.ts"
+        "dist/tool-catalog/*.d.ts"
       ],
       "tts": [
-        "dist/tts/types.d.ts",
-        "dist/tts/index.d.ts"
+        "dist/tts/*.d.ts"
       ],
       "types": [
-        "dist/types/index.d.ts"
+        "dist/types/*.d.ts"
       ],
       "vercel": [
-        "dist/vercel/index.d.ts",
-        "dist/vercel/sse.d.ts",
-        "dist/vercel/types.d.ts"
+        "dist/vercel/*.d.ts"
       ],
       "voyage": [
-        "dist/voyage/index.d.ts",
-        "dist/voyage/types.d.ts"
+        "dist/voyage/*.d.ts"
       ],
       "ws-server": [
-        "dist/ws-server/index.d.ts"
+        "dist/ws-server/*.d.ts"
       ],
       "xai": [
-        "dist/xai/api-base.d.ts",
-        "dist/xai/api-methods.d.ts",
-        "dist/xai/base.d.ts",
-        "dist/xai/collections.d.ts",
-        "dist/xai/event-types.ts",
-        "dist/xai/img-gen.ts",
-        "dist/xai/index.d.ts",
-        "dist/xai/response-sse.d.ts",
-        "dist/xai/responses-api.d.ts",
-        "dist/xai/responses-types.d.ts",
-        "dist/xai/stream-workup.d.ts",
-        "dist/xai/sync.d.ts",
-        "dist/xai/types.d.ts",
-        "dist/xai/user-store.d.ts"
+        "dist/xai/*.d.ts"
       ],
       "zai": [
-        "dist/zai/index.d.ts",
-        "dist/zai/memory.d.ts",
-        "dist/zai/sse.d.ts",
-        "dist/zai/summarizer.d.ts",
-        "dist/zai/types.d.ts",
-        "dist/zai/workup.d.ts"
+        "dist/zai/*.d.ts"
       ]
     }
   },
@@ -251,6 +144,7 @@
     "@aws-sdk/credential-providers": "catalog:aws",
     "@aws-sdk/s3-request-presigner": "catalog:aws",
     "@aws-sdk/types": "catalog:aws",
+    "@d0paminedriven/audiodown": "catalog:dd",
     "@d0paminedriven/fs": "catalog:dd",
     "@d0paminedriven/metadata": "catalog:dd",
     "@d0paminedriven/pdfdown": "catalog:dd",

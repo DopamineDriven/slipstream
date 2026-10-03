@@ -5,6 +5,8 @@ import { PrismaChatRequestService } from "@/prisma/chat-request.ts";
 import type { PrismaDbService } from "@slipstream/db/factory";
 import type {
   AttachmentUncheckedCreateWithoutMessageInput,
+  AudioGenOutputCreateNestedOneWithoutAttachmentInput,
+  AudioMetadataCreateNestedOneWithoutAttachmentInput,
   ImageGenOutputCreateNestedOneWithoutAttachmentInput
 } from "@slipstream/db/node/generated/models";
 import type {
@@ -124,6 +126,12 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
           versionId: t.versionId,
           s3ObjectId: t.s3ObjectId,
           cdnUrl: t.cdnUrl,
+          // every builder (meta, openai, gemini, grok) carries these off the
+          // upload result; the enumeration here was dropping them for the
+          // whole job lane
+          publicUrl: t.publicUrl,
+          sourceUrl: t.sourceUrl,
+          expiresAt: t.expiresAt,
           assetType: "IMAGE",
           storageClass: t.storageClass ?? undefined,
           origin: "GENERATED",
@@ -162,6 +170,9 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
                   kind: t.kind,
                   ext: t.ext,
                   height: t.image?.height,
+                  facilitatingModel: t.imageGenOutput?.facilitatingModel,
+                  generatingModel: t.imageGenOutput?.generatingModel,
+                  provider: t.imageGenOutput?.provider,
                   width: t.image?.width,
                   jobId: t.jobId,
                   isPartial: t.kind === "FINAL" ? false : true,
@@ -174,6 +185,9 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
               ? ({
                   create: {
                     mime: t.mime,
+                    facilitatingModel: t.imageGenOutput?.facilitatingModel,
+                    generatingModel: t.imageGenOutput?.generatingModel,
+                    provider: t.imageGenOutput?.provider,
                     revisedPrompt: data.imgGenFields?.revisedPrompt,
                     kind: t.kind,
                     ext: t.ext,
@@ -205,6 +219,9 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
           versionId: a.versionId,
           s3ObjectId: a.s3ObjectId,
           cdnUrl: a.cdnUrl,
+          publicUrl: a.publicUrl,
+          sourceUrl: a.sourceUrl,
+          expiresAt: a.expiresAt,
           assetType: "AUDIO",
           storageClass: a.storageClass ?? undefined,
           origin: "GENERATED",
@@ -234,24 +251,25 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
           compatReadyAt: new Date(Date.now()),
           checksumAlgo: a.checksumAlgo,
           checksumSha256: a.checksumSha256,
-          audio: a.audio ? { create: a.audio } : undefined,
+          audio: a.audio
+            ? ({
+                create: a.audio
+              } satisfies AudioMetadataCreateNestedOneWithoutAttachmentInput)
+            : undefined,
           audioGenOutput: a.audioGenOutput
-            ? {
+            ? ({
                 create: {
+                  provider: a.audioGenOutput.provider,
+                  kind: a.audioGenOutput.kind,
+                  content: a.audioGenOutput.content,
+                  facilitatingModel: a.audioGenOutput.facilitatingModel,
+                  generatingModel: a.audioGenOutput.generatingModel,
                   mime: a.audioGenOutput.mime,
                   ext: a.audioGenOutput.ext,
                   jobId: a.audioGenOutput.jobId
                 }
-              }
-            : jobId
-              ? {
-                  create: {
-                    mime: a.mime,
-                    ext: a.ext,
-                    jobId
-                  }
-                }
-              : undefined,
+              } satisfies AudioGenOutputCreateNestedOneWithoutAttachmentInput)
+            : undefined,
           user: { connect: { id: userId } }
         } as const)
       : undefined;
@@ -553,6 +571,13 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
         if (m.inlineImageGenOutput) inlineImgAttachmentIds.push(m.id);
       }
 
+      // registry write-through — the AI message's generated rows, born here
+      // with the real conversationId; every provider's persist funnels through
+      // this method, so this is the one write site
+      for (const att of updatedMsg?.attachments ?? []) {
+        this.setRegistryAttachment(userId, att);
+      }
+
       const {
         convo: _convo,
         inlineImgAttachmentIds: _i,
@@ -563,6 +588,12 @@ export class PrismaChatResponseService extends PrismaChatRequestService {
         inlineImgAttachmentIds,
         convo
       };
+    }
+    const aiMsg = transaction.convo.messages.find(
+      c => c.id === transaction.aiMsgId
+    );
+    for (const att of aiMsg?.attachments ?? []) {
+      this.setRegistryAttachment(userId, att);
     }
     return transaction;
   }

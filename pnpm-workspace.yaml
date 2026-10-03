@@ -11,6 +11,7 @@ trustPolicy: "off"
 trustLockfile: true
 blockExoticSubdeps: false
 dangerouslyAllowAllBuilds: true
+pmOnFail: ignore
 
 catalogs:
   anthropic:
@@ -18,11 +19,11 @@ catalogs:
   auth:
     better-auth: ^1.7.6
   aws:
-    "@aws-sdk/client-s3": ^3.1140.0
-    "@aws-sdk/client-secrets-manager": ^3.1140.0
-    "@aws-sdk/credential-providers": ^3.1140.0
-    "@aws-sdk/lib-storage": ^3.1140.0
-    "@aws-sdk/s3-request-presigner": ^3.1140.0
+    "@aws-sdk/client-s3": ^3.1141.0
+    "@aws-sdk/client-secrets-manager": ^3.1141.0
+    "@aws-sdk/credential-providers": ^3.1141.0
+    "@aws-sdk/lib-storage": ^3.1141.0
+    "@aws-sdk/s3-request-presigner": ^3.1141.0
     "@aws-sdk/types": ^3.974.6
   babel:
     babel-plugin-react-compiler: ^1.0.0
@@ -48,6 +49,7 @@ catalogs:
   cva:
     class-variance-authority: ^0.7.1
   dd:
+    "@d0paminedriven/audiodown": ^0.1.0
     "@d0paminedriven/fs": ^11.0.0
     "@d0paminedriven/iso-3166-1": ^1.4.0
     "@d0paminedriven/metadata": ^6.0.1
@@ -56,7 +58,7 @@ catalogs:
   decimal:
     "decimal.js": ^10.6.0
   dotenv:
-    dotenv: ^18.0.3
+    dotenv: ^18.0.4
     dotenv-cli: ^11.0.0
     dotenv-expand: ^1000.0.0
   eslint:
@@ -97,11 +99,16 @@ catalogs:
     "@types/mdast": ^4.0.4
   mistral:
     "@mistralai/mistralai": ^2.7.0
-  motion:
-    motion: ^12.43.0
-    motion-dom: ^12.43.0
+  motion12:
+    motion: ^12.4.3
+    motion-dom: ^12.4.3
     motion-plus-dom: ^2.12.0
-    motion-utils: ^12.39.0
+    motion-utils: ^12.3.9
+  motion:
+    motion: ^13.4.4
+    motion-dom: ^13.4.4
+    motion-plus-dom: ^2.12.0
+    motion-utils: ^13.3.0
   nanoid:
     nanoid: ^6.0.1
   napi:
@@ -112,7 +119,7 @@ catalogs:
     next: ^16.3.6
     next-themes: ^0.4.6
   node:
-    "@types/node": ^26.6.2
+    "@types/node": ^26.6.3
     node-html-parser: ^9.0.4
     nodemon: ^3.1.14
   nyc:
@@ -261,9 +268,9 @@ catalogs:
     "@vitejs/plugin-react": ^6.1.1
     vite: ^8.3.1
   vitest:
-    "@vitest/coverage-istanbul": ^5.0.1
-    "@vitest/ui": ^5.0.1
-    vitest: ^5.0.1
+    "@vitest/coverage-istanbul": ^5.0.2
+    "@vitest/ui": ^5.0.2
+    vitest: ^5.0.2
   ws:
     "@types/ws": ^8.18.1
     ws: ^8.21.3
