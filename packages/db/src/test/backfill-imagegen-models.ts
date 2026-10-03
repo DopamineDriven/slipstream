@@ -305,9 +305,9 @@ class BackfillImageGenModelsWorkup {
 }
 
 /**
- * pnpm tsx src/test/backfill-imagegen-models.ts --env dev --target gen-rows
- * pnpm tsx src/test/backfill-imagegen-models.ts --env dev --target exe
- * pnpm tsx src/test/backfill-imagegen-models.ts --env dev --target cross-check
+ * pnpm tsx src/test/backfill-imagegen-models.ts --env prod --target gen-rows
+ * pnpm tsx src/test/backfill-imagegen-models.ts --env prod --target exe
+ * pnpm tsx src/test/backfill-imagegen-models.ts --env prod --target cross-check
  */
 
 if (process.argv[3] === "dev" || process.argv[3] === "prod") {

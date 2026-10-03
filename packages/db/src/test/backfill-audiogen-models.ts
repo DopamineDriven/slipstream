@@ -204,9 +204,9 @@ class BackfillAudioGenModelsWorkup {
 }
 
 /**
- * pnpm tsx src/test/backfill-audiogen-models.ts --env dev --target gen-rows
- * pnpm tsx src/test/backfill-audiogen-models.ts --env dev --target exe
- * pnpm tsx src/test/backfill-audiogen-models.ts --env dev --target cross-check
+ * pnpm tsx src/test/backfill-audiogen-models.ts --env prod --target gen-rows
+ * pnpm tsx src/test/backfill-audiogen-models.ts --env prod --target exe
+ * pnpm tsx src/test/backfill-audiogen-models.ts --env prod --target cross-check
  */
 
 const env = process.argv[3];
