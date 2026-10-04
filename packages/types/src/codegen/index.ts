@@ -128,7 +128,11 @@ export class ModelServiceVideo extends ModelServiceImage {
   }
 
   public get videoImagineGrok() {
-    return ["grok-imagine-video-1.5", "grok-imagine-video"] as const;
+    return [
+      "grok-imagine-video-1.5",
+      "grok-imagine-video-1.5-lite",
+      "grok-imagine-video"
+    ] as const;
   }
 
   public get videoGrok() {
@@ -486,6 +490,7 @@ export class ModelServiceNameOverrides extends ModelServiceChat {
     "grok-imagine-image-quality": "Grok Imagine Image Quality",
     "grok-imagine-image": "Grok Imagine Image",
     "grok-imagine-video-1.5": "Grok Imagine Video 1.5",
+    "grok-imagine-video-1.5-lite": "Grok Imagine Video 1.5 Lite",
     "grok-imagine-video": "Grok Imagine Video"
   } as const;
 
@@ -641,6 +646,7 @@ export class ModelServiceFilter extends ModelServiceNameOverrides {
       id === "grok-imagine-image-quality" ||
       id === "grok-imagine-image" ||
       id === "grok-imagine-video-1.5" ||
+      id === "grok-imagine-video-1.5-lite" ||
       id === "grok-imagine-video"
     );
   }
@@ -836,47 +842,24 @@ export class ModelServiceDisplayName extends ModelServiceFilter {
 }
 
 export class ModelServiceFetch extends ModelServiceDisplayName {
-  private readonly anthropicKey = process.env.ANTHROPIC_API_KEY ?? "";
-  private readonly geminiKey = process.env.GOOGLE_API_KEY ?? "";
-  private async anthropicFetcher() {
-    return await fetch(`https://api.anthropic.com/v1/models?limit=100`, {
-      headers: {
-        "x-api-key": this.anthropicKey,
-        "anthropic-version": "2023-06-01"
-      }
-    });
+  protected readonly anthropicKey = process.env.ANTHROPIC_API_KEY ?? "";
+  protected readonly geminiKey = process.env.GOOGLE_API_KEY ?? "";
+
+  public async getGemini() {
+    const { default: gem } = await import("./__out__/gemini-results.json");
+    return gem.models;
   }
 
-  private async geminiFetcher() {
-    return await fetch(
-      `https://generativelanguage.googleapis.com/v1alpha/models?key=${this.geminiKey}&pageSize=1000`
-    );
+  public async getAnthropic() {
+    const { default: anthr } = await import("./__out__/anthropic-results.json");
+    return anthr.data;
   }
 
-  private formattedAnthropic(props: AnthropicResponse) {
-    if (!props.data) throw new Error(props.error.message);
-    return props.data;
-  }
-
-  private formattedGemini(props: GeminiResponse) {
-    if (!props.models) throw new Error(props.error.message);
-    return props.models;
-  }
-
-  public async fetchGemini() {
-    const rawGemini = await this.geminiFetcher().then(d => d.text());
-    return this.formattedGemini(JSON.parse(rawGemini));
-  }
-
-  public async fetchAnthropicAndGemini() {
-    const [rawAnthropic, rawGemini] = await Promise.all([
-      this.anthropicFetcher().then(d => d.text()),
-      this.geminiFetcher().then(d => d.text())
+  public async getAnthropicAndGemini() {
+    const [anthropicData, geminiData] = await Promise.all([
+      this.getAnthropic(),
+      this.getGemini()
     ]);
-
-    const anthropicData = this.formattedAnthropic(JSON.parse(rawAnthropic));
-    const geminiData = this.formattedGemini(JSON.parse(rawGemini));
-
     return {
       anthropicData,
       geminiData
@@ -886,7 +869,7 @@ export class ModelServiceFetch extends ModelServiceDisplayName {
 
 export class ModelServiceMapper extends ModelServiceFetch {
   private async modelAudioMapper(modelKeys = true) {
-    const geminiData = await this.fetchGemini();
+    const geminiData = await this.getGemini();
     return Array.from(Object.entries(this.providerModelAudioApi)).map(
       ([provider, models]) => {
         const p = provider as keyof typeof this.providerModelAudioApi;
@@ -912,7 +895,7 @@ export class ModelServiceMapper extends ModelServiceFetch {
   }
 
   private async modelChatMapper(modelKeys = true) {
-    const { anthropicData, geminiData } = await this.fetchAnthropicAndGemini();
+    const { anthropicData, geminiData } = await this.getAnthropicAndGemini();
 
     return Array.from(Object.entries(this.providerModelChatApi)).map(
       ([provider, models]) => {
@@ -1096,7 +1079,7 @@ export class ModelServiceMapper extends ModelServiceFetch {
   }
 
   private async modelImageMapper(modelKeys = true) {
-    const geminiData = await this.fetchGemini();
+    const geminiData = await this.getGemini();
     return Array.from(Object.entries(this.providerModelImageApi)).map(
       ([provider, models]) => {
         const p = provider as keyof typeof this.providerModelImageApi;
@@ -1158,7 +1141,7 @@ export class ModelServiceMapper extends ModelServiceFetch {
   }
 
   private async modelVideoMapper(modelKeys = true) {
-    const geminiData = await this.fetchGemini();
+    const geminiData = await this.getGemini();
     return Array.from(Object.entries(this.providerModelVideoApi)).map(
       ([provider, models]) => {
         const p = provider as keyof typeof this.providerModelVideoApi;
@@ -1565,6 +1548,7 @@ export class ModelServiceExe extends ModelServiceDisplayNameModelId {
   }
 
   private async displayNameToModelIdObj() {
+    const prefix = `src/codegen/__gen__/display-name-to-model-id`;
     return {
       template: {
         default: await this.displayNameToModelIdsScaffold("default"),
@@ -1573,15 +1557,16 @@ export class ModelServiceExe extends ModelServiceDisplayNameModelId {
         audio: await this.displayNameToModelIdsScaffold("audio")
       },
       path: {
-        default: "src/codegen/__gen__/display-name-to-model-id.ts",
-        img: "src/codegen/__gen__/display-name-to-model-id-img-gen.ts",
-        video: "src/codegen/__gen__/display-name-to-model-id-video-gen.ts",
-        audio: "src/codegen/__gen__/display-name-to-model-id-audio-gen.ts"
+        default: `${prefix}.ts`,
+        img: `${prefix}-img-gen.ts`,
+        video: `${prefix}-video-gen.ts`,
+        audio: `${prefix}-audio-gen.ts`
       }
     } as const;
   }
 
   private async displayNameOnlyObj() {
+    const prefix = `src/codegen/__gen__/display-names-by-provider`;
     return {
       template: {
         default: await this.displayNameOnlyScaffold("default"),
@@ -1590,15 +1575,16 @@ export class ModelServiceExe extends ModelServiceDisplayNameModelId {
         audio: await this.displayNameOnlyScaffold("audio")
       },
       path: {
-        default: "src/codegen/__gen__/display-names-by-provider.ts",
-        img: "src/codegen/__gen__/display-names-by-provider-img-gen.ts",
-        video: "src/codegen/__gen__/display-names-by-provider-video-gen.ts",
-        audio: "src/codegen/__gen__/display-names-by-provider-audio-gen.ts"
+        default: `${prefix}.ts`,
+        img: `${prefix}-img-gen.ts`,
+        video: `${prefix}-video-gen.ts`,
+        audio: `${prefix}-audio-gen.ts`
       }
     } as const;
   }
 
   private async modelIdToDisplayNameObj() {
+    const prefix = `src/codegen/__gen__/model-id-to-display-name`;
     return {
       template: {
         default: await this.modelIdToDisplayNameScaffold("default"),
@@ -1607,15 +1593,16 @@ export class ModelServiceExe extends ModelServiceDisplayNameModelId {
         audio: await this.modelIdToDisplayNameScaffold("audio")
       },
       path: {
-        default: "src/codegen/__gen__/model-id-to-display-name.ts",
-        img: "src/codegen/__gen__/model-id-to-display-name-img-gen.ts",
-        video: "src/codegen/__gen__/model-id-to-display-name-video-gen.ts",
-        audio: "src/codegen/__gen__/model-id-to-display-name-audio-gen.ts"
+        default: `${prefix}.ts`,
+        img: `${prefix}-img-gen.ts`,
+        video: `${prefix}-video-gen.ts`,
+        audio: `${prefix}-audio-gen.ts`
       }
     } as const;
   }
 
   private async modelIdsOnlyObj() {
+    const prefix = `src/codegen/__gen__/model-ids-by-provider`;
     return {
       template: {
         default: await this.modelIdsOnlyScaffold("default"),
@@ -1624,12 +1611,39 @@ export class ModelServiceExe extends ModelServiceDisplayNameModelId {
         audio: await this.modelIdsOnlyScaffold("audio")
       },
       path: {
-        default: "src/codegen/__gen__/model-ids-by-provider.ts",
-        img: "src/codegen/__gen__/model-ids-by-provider-img-gen.ts",
-        video: "src/codegen/__gen__/model-ids-by-provider-video-gen.ts",
-        audio: "src/codegen/__gen__/model-ids-by-provider-audio-gen.ts"
+        default: `${prefix}.ts`,
+        img: `${prefix}-img-gen.ts`,
+        video: `${prefix}-video-gen.ts`,
+        audio: `${prefix}-audio-gen.ts`
       }
     } as const;
+  }
+
+  public async preExe() {
+    const providers = {
+      anthropic: {
+        url: "https://api.anthropic.com/v1/models?limit=100",
+        headers: {
+          "x-api-key": this.anthropicKey,
+          "anthropic-version": "2023-06-01"
+        }
+      },
+      gemini: {
+        url: `https://generativelanguage.googleapis.com/v1alpha/models?key=${this.geminiKey}&pageSize=1000`,
+        headers: { "Content-Type": "application/json" }
+      }
+    } as const;
+
+    (async () => {
+      for (const [u, k] of Object.entries(providers)) {
+        const data = await fetch(k.url, { headers: k.headers }).then(
+          async v => await v.text()
+        );
+        const parsed = JSON.parse<GeminiResponse | AnthropicResponse>(data);
+        const path = `src/codegen/__out__/${u}-results.json`;
+        this.fs.withWs(path, JSON.stringify(parsed, null, 2));
+      }
+    })();
   }
 
   public async exe(target: ModeUnion) {
@@ -1662,6 +1676,12 @@ export class ModelServiceExe extends ModelServiceDisplayNameModelId {
       modelIdsOnlyObj.template[target]
     );
   }
+}
+
+if (process.argv[3] === "pregen") {
+  const fs = new Fs(process.cwd());
+  const codegen = new ModelServiceExe(fs);
+  codegen.preExe().catch(t => console.error(t));
 }
 
 if (

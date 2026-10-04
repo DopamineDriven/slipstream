@@ -83,6 +83,7 @@ export const modelIdsByProvider = {
     "grok-imagine-image",
     "grok-imagine-image-quality",
     "grok-imagine-video-1.5",
+    "grok-imagine-video-1.5-lite",
     "grok-imagine-video"
   ],
   anthropic: [

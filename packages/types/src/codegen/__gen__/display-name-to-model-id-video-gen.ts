@@ -8,6 +8,7 @@ export const displayNameToModelIdVideoGen = {
   },
   grok: {
     "Grok Imagine Video 1.5": "grok-imagine-video-1.5",
+    "Grok Imagine Video 1.5 Lite": "grok-imagine-video-1.5-lite",
     "Grok Imagine Video": "grok-imagine-video"
   }
 } as const;

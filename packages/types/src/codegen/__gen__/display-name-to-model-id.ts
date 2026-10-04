@@ -84,6 +84,7 @@ export const displayNameToModelId = {
     "Grok Imagine Image": "grok-imagine-image",
     "Grok Imagine Image Quality": "grok-imagine-image-quality",
     "Grok Imagine Video 1.5": "grok-imagine-video-1.5",
+    "Grok Imagine Video 1.5 Lite": "grok-imagine-video-1.5-lite",
     "Grok Imagine Video": "grok-imagine-video"
   },
   anthropic: {

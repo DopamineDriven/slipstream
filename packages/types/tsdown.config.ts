@@ -39,6 +39,8 @@ export default defineConfig(
         "src/codegen/__gen__/model-ids-by-provider-img-gen.ts",
         "src/codegen/__gen__/model-ids-by-provider-video-gen.ts",
         "src/codegen/__gen__/model-ids-by-provider.ts",
+        "src/codegen/__out__/anthropic-results.json",
+        "src/codegen/__out__/gemini-results.json",
         "src/contract/ai-chat-events.ts",
         "src/contract/asset-events.ts",
         "src/contract/audio.ts",

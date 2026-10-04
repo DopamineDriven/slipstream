@@ -240,7 +240,11 @@ export class ModelService extends ModelToolDefsService {
   }
 
   public isGrokVideoModel(m: string) {
-    return m === "grok-imagine-video" || m === "grok-imagine-video-1.5";
+    return (
+      m === "grok-imagine-video" ||
+      m === "grok-imagine-video-1.5" ||
+      m === "grok-imagine-video-1.5-lite"
+    );
   }
 
   public isGrokMultiAgentModel(m: string) {

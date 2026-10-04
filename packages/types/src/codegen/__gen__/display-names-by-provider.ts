@@ -83,6 +83,7 @@ export const displayNameModelsByProvider = {
     "Grok Imagine Image",
     "Grok Imagine Image Quality",
     "Grok Imagine Video 1.5",
+    "Grok Imagine Video 1.5 Lite",
     "Grok Imagine Video"
   ],
   anthropic: [
