@@ -19,6 +19,7 @@ export class ModelServiceImage {
 
   public get imagePureGemini() {
     return [
+      "gemini-nano-banana-2.1",
       "gemini-3.1-flash-lite-image",
       "gemini-3.1-flash-image-preview",
       "gemini-3-pro-image-preview",
@@ -189,6 +190,7 @@ export class ModelServiceChat extends ModelServiceAudio {
 
   public get chatClaude5Anthropic() {
     return [
+      "claude-haiku-5-5",
       "claude-sonnet-5-5",
       "claude-opus-5-5",
       "claude-fable-5-1",
@@ -249,6 +251,7 @@ export class ModelServiceChat extends ModelServiceAudio {
 
   public get chatGen3Gemini() {
     return [
+      "gemini-4-argon",
       "gemini-3.8-flash",
       "gemini-3.7-flash",
       "gemini-3.6-flash",
@@ -304,12 +307,20 @@ export class ModelServiceChat extends ModelServiceAudio {
     ] as const;
   }
 
+  public get chatWonderMeta() {
+    return ["muse-wonder-1.0"] as const;
+  }
+
   public get chatSparkMeta() {
     return ["muse-spark-1.3", "muse-spark-1.2", "muse-spark-1.1"] as const;
   }
 
   public get chatMeta() {
-    return [...this.chatSparkMeta, ...this.imageMeta] as const;
+    return [
+      ...this.chatWonderMeta,
+      ...this.chatSparkMeta,
+      ...this.imageMeta
+    ] as const;
   }
 
   public get chatM3MiniMax() {
@@ -333,14 +344,14 @@ export class ModelServiceChat extends ModelServiceAudio {
   }
 
   public get chatLargeMistral() {
-    return ["mistral-large-latest"] as const;
+    return ["mistral-large-4"] as const;
   }
 
   public get chatMistral() {
     return [
-      ...this.chatSmallMistral,
+      ...this.chatLargeMistral,
       ...this.chatMediumMistral,
-      ...this.chatLargeMistral
+      ...this.chatSmallMistral
     ] as const;
   }
 
@@ -495,6 +506,7 @@ export class ModelServiceNameOverrides extends ModelServiceChat {
   } as const;
 
   public META_NAME_OVERRIDES = {
+    "muse-wonder-1.0": "Muse Wonder 1.0",
     "muse-spark-1.3": "Muse Spark 1.3",
     "muse-spark-1.2": "Muse Spark 1.2",
     "muse-spark-1.1": "Muse Spark 1.1",
@@ -509,7 +521,7 @@ export class ModelServiceNameOverrides extends ModelServiceChat {
   } as const;
 
   public MISTRAL_NAME_OVERRIDES = {
-    "mistral-large-latest": "Mistral Large Latest",
+    "mistral-large-4": "Mistral Large 4",
     "mistral-medium-3": "Mistral Medium 3",
     "mistral-medium-3.5": "Mistral Medium 3.5",
     "mistral-small-latest": "Mistral Small 4"
@@ -653,6 +665,7 @@ export class ModelServiceFilter extends ModelServiceNameOverrides {
 
   public filterForMeta(id: string) {
     return (
+      id === "muse-wonder-1.0" ||
       id === "muse-spark-1.3" ||
       id === "muse-spark-1.2" ||
       id === "muse-spark-1.1" ||
@@ -671,7 +684,7 @@ export class ModelServiceFilter extends ModelServiceNameOverrides {
 
   public filterForMistral(id: string) {
     return (
-      id === "mistral-large-latest" ||
+      id === "mistral-large-4" ||
       id === "mistral-medium-3.5" ||
       id === "mistral-medium-3" ||
       id === "mistral-small-latest"

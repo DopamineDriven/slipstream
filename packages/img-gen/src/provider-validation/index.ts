@@ -59,10 +59,13 @@ export type ModelToAspectRatioOpts<T extends AllModelsUnion> =
         : T extends "grok-imagine-image-2.0" | GrokImgGenFacilitatingModels
           ? GrokImagine2ARUnion
           : T extends
-                "gemini-3.1-flash-image-preview" | "gemini-3.1-flash-lite-image"
+                | "gemini-3.1-flash-image-preview"
+                | "gemini-3.1-flash-lite-image"
+                | "gemini-nano-banana-2.1"
             ? NanoBanana2OutputAR
             : T extends Exclude<
                   GeminiImgGenModels,
+                  | "gemini-nano-banana-2.1"
                   | "gemini-3.1-flash-image-preview"
                   | "gemini-3.1-flash-lite-image"
                 >
@@ -98,6 +101,7 @@ export type ModelToQuality<T extends AllModelsUnion> =
                 : T extends "gemini-3.1-flash-lite-image"
                   ? GeminiImageQuality[T]
                   : T extends
+                        | "gemini-nano-banana-2.1"
                         | "gemini-3-pro-image-preview"
                         | "deep-research-max-preview-04-2026"
                         | "deep-research-preview-04-2026"
@@ -180,6 +184,7 @@ export class ProviderValidation {
       m === "gpt-image-1.5" ||
       m === "gpt-image-1" ||
       m === "gpt-image-1-mini" ||
+      m === "gemini-nano-banana-2.1" ||
       m === "gemini-2.5-flash-image" ||
       m === "gemini-3-pro-image-preview" ||
       m === "gemini-3.1-flash-image-preview" ||
@@ -213,6 +218,7 @@ export class ProviderValidation {
       "gpt-image-2": "GPT-Image-2",
       "dall-e-3": "DALL·E 3",
       "dall-e-2": "DALL·E 2",
+      "gemini-nano-banana-2.1": "Nano Banana 2.1",
       "gemini-3.1-flash-image-preview": "Nano Banana 2",
       "gemini-3.1-flash-lite-image": "Nano Banana 2 Lite",
       "gemini-3-pro-image-preview": "Nano Banana Pro",
@@ -261,6 +267,10 @@ export class ProviderValidation {
   public geminiNanoBananaTwo(m: string) {
     return m === "gemini-3.1-flash-image-preview";
   }
+
+  public geminiNanoBananaTwoPointOne(m: string) {
+    return m === "gemini-nano-banana-2.1";
+  }
   public geminiDeepResearchModel(m: string) {
     return (
       m === "deep-research-max-preview-04-2026" ||
@@ -273,6 +283,7 @@ export class ProviderValidation {
       this.geminiNanoBananaTwoLite(m) ||
       this.geminiDeepResearchModel(m) ||
       this.geminiNanoBananaTwo(m) ||
+      this.geminiNanoBananaTwoPointOne(m) ||
       m === "gemini-2.5-flash-image" ||
       m === "gemini-3-pro-image-preview"
     );
@@ -292,7 +303,7 @@ export class ProviderValidation {
   }
 
   public isImgGenCapableModel<const V extends string = string>(
-    model = "gpt-6-sol" as V
+    model = "gpt-6.1-sol" as V
   ) {
     if (this.imgGenCapableModel(model)) return true;
     else return false;
@@ -303,7 +314,7 @@ export class ProviderValidation {
     model: Exclude<AllModelsUnion, AllPureImgGenModelsUnion>
   ): false;
   public isPureImgGenModel<const V extends AllModelsUnion = AllModelsUnion>(
-    model = "gpt-6-sol" as V
+    model = "gpt-6.1-sol" as V
   ) {
     if (!this.imgGenCapableModel(model)) {
       return false;
@@ -556,7 +567,7 @@ export class ProviderValidation {
   }
 
   public geminiAspectRatio(
-    m: "gemini-3.1-flash-image-preview",
+    m: "gemini-3.1-flash-image-preview" | "gemini-nano-banana-2.1",
     data?: { output_size: NanoBanana2OutputAR }
   ): NanoBanana2OutputAR | undefined;
 
@@ -579,7 +590,8 @@ export class ProviderValidation {
     if (!data?.output_size) return;
     if (this.geminiNanoBananasModel(m)) {
       if (
-        (m === "gemini-3.1-flash-image-preview" ||
+        (m === "gemini-nano-banana-2.1" ||
+          m === "gemini-3.1-flash-image-preview" ||
           m === "gemini-3.1-flash-lite-image") &&
         this.isValidNanoBananaGenTwoAR(data.output_size)
       ) {
@@ -656,6 +668,7 @@ export class ProviderValidation {
       AllModelsUnion,
       Exclude<
         AllModelsUnion,
+        | "gemini-nano-banana-2.1"
         | "gemini-3-pro-image-preview"
         | "deep-research-preview-04-2026"
         | "deep-research-max-preview-04-2026"
@@ -750,7 +763,10 @@ export class ProviderValidation {
     const q = data?.output_quality;
     const m = model;
     if (this.geminiNanoBananasModel(m) && m !== "gemini-2.5-flash-image") {
-      if (
+      if (m==="gemini-nano-banana-2.1" && q) {
+        return this.isValidNanoBananaProAndTwoOutputQuality(q);
+      }
+      else if (
         m === "gemini-3.1-flash-lite-image" &&
         q &&
         this.isValidNanoBananaTwoLiteOutputQuality(q)
@@ -764,7 +780,8 @@ export class ProviderValidation {
         return q;
       }
 
-      if (q && this.isValidNanoBananaProAndTwoOutputQuality(q)) {
+      else if (q && this.isValidNanoBananaProAndTwoOutputQuality(q)) {
+
         return q;
       } else return "2K";
     } else if (this.geminiNanoBananaTwo(m)) {
@@ -803,7 +820,7 @@ export class ProviderValidation {
   public fallbackImgGenModelByProvider(provider: Provider) {
     switch (provider) {
       case "gemini": {
-        return "gemini-3.1-flash-image-preview" satisfies AllModelsUnion;
+        return "gemini-nano-banana-2.1" satisfies AllModelsUnion;
       }
       case "grok": {
         return "grok-imagine-image-2.0" satisfies AllModelsUnion;
@@ -989,6 +1006,7 @@ export class ProviderValidation {
       }
     } else if (this.geminiImgGenCapable(m)) {
       if (
+        m==="gemini-nano-banana-2.1" ||
         m === "gemini-3.1-flash-image-preview" ||
         m === "gemini-3.1-flash-lite-image"
       ) {
@@ -1031,7 +1049,7 @@ export class ProviderValidation {
     const model =
       data?.model ??
       this.fallbackImgGenModelByProvider(provider) ??
-      "gpt-6-astra";
+      "gpt-6.1-sol";
     const outputCompression = this.handleImgGenCompression(model, {
         output_compression: data.imgGenFields?.output_compression,
         output_format: data.imgGenFields?.output_format

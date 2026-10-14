@@ -101,7 +101,10 @@ export class GeminiWorkupService extends GeminiEnsureService {
                 if (attachment.assetType === "DOCUMENT") {
                   if (isFreshContext) {
                     if (isCurrentUserMsg) {
-                      if (this.isGemini3ChatModel(m)) {
+                      if (
+                        this.isGemini3ChatModel(m) ||
+                        this.isGemini4ChatModel(m)
+                      ) {
                         partArr.push({
                           fileData: { fileUri, mimeType },
                           mediaResolution: this.mediaResolutionLevel(mimeType)
@@ -126,7 +129,11 @@ export class GeminiWorkupService extends GeminiEnsureService {
                   );
                   if (isFreshContext) {
                     if (isCurrentUserMsg) {
-                      if (this.isGemini3ChatModel(m)) {
+                      if (
+                        this.isGemini3ChatModel(m) ||
+                        this.isGemini4ChatModel(m) ||
+                        this.isNanoBanana2dot1(m)
+                      ) {
                         partArr.push({
                           fileData: { fileUri, mimeType },
                           mediaResolution: this.mediaResolutionLevel(mimeType)
@@ -289,6 +296,7 @@ export class GeminiWorkupService extends GeminiEnsureService {
   ) {
     const [lat, lng] = this.prisma.handleLatLng(latlng);
     if (
+      this.isGemini4ChatModel(m) ||
       this.isGemini3ChatModel(m) ||
       this.isDeepResearch(m) ||
       this.isGemini2dot5Model(m)
@@ -376,6 +384,7 @@ export class GeminiWorkupService extends GeminiEnsureService {
     const localDeclarations =
       this.localToolFunctionDeclarations(localToolNames);
     if (
+      this.isGemini4ChatModel(m) ||
       this.isGemini3ChatModel(m) ||
       this.isDeepResearch(m) ||
       this.isGemini2dot5Model(m)
@@ -393,7 +402,11 @@ export class GeminiWorkupService extends GeminiEnsureService {
         }
       ] satisfies GenerateContentConfig["tools"];
     }
-    if (this.isNanoBanana2(m) || this.isNanoBananaPro(m)) {
+    if (
+      this.isNanoBanana2(m) ||
+      this.isNanoBananaPro(m) ||
+      this.isNanoBanana2dot1(m)
+    ) {
       return [{ googleSearch: {} }] satisfies GenerateContentConfig["tools"];
     }
     if (localDeclarations.length > 0) {
@@ -407,10 +420,12 @@ export class GeminiWorkupService extends GeminiEnsureService {
 
   private getThinkingConfig(m: GeminiModelIdUnion = "gemini-3.1-pro-preview") {
     if (
+      this.isGemini4ChatModel(m) ||
       this.isGemini3ChatModel(m) ||
       this.isDeepResearch(m) ||
       this.isNanoBanana2(m) ||
-      this.isNanoBanana2Lite(m)
+      this.isNanoBanana2Lite(m) ||
+      this.isNanoBanana2dot1(m)
     ) {
       return {
         includeThoughts: true,
@@ -483,17 +498,47 @@ export class GeminiWorkupService extends GeminiEnsureService {
       }
     } satisfies GenerateContentParameters;
   }
-  protected handleImgGenFields(
+
+  protected handleImgGenQuality(
     model: string,
-    {
-      output_size: ar,
-      output_quality: q
-    }: AIChatRequestImgGenFields | undefined = {}
+    { output_quality: q }: AIChatRequestImgGenFields | undefined = {}
+  ) {
+    let qual: "0.5K" | "1K" | "2K" | "4K" | undefined = undefined;
+    if (!this.isNanoBananaFam(model))
+      throw new Error("non-nano banana model passed into handleImgGenQuality");
+    if (this.isNanoBanana2dot1(model) || this.isNanoBananaPro(model)) {
+      if (q && this.prisma.isValidNanoBananaProAndTwoOutputQuality(q)) {
+        qual = q;
+      } else {
+        qual = "2K";
+      }
+    } else if (this.isNanoBanana2(model)) {
+      if (q && this.prisma.isValidNanoBananaTwoOutputQuality(q)) {
+        qual = q;
+      } else {
+        qual = "2K";
+      }
+    } else if (this.isNanoBanana2Lite(model)) {
+      if (q && this.prisma.isValidNanoBananaTwoLiteOutputQuality(q)) {
+        qual = q;
+      } else {
+        qual = "1K";
+      }
+    } else {
+      qual = "1K";
+    }
+    return this.handleImgSize(qual);
+  }
+
+  protected handleImgGenAR(
+    model: string,
+    { output_size: ar }: AIChatRequestImgGenFields | undefined = {}
   ) {
     let a: NanoBanana2OutputAR | undefined = undefined;
-    let qual: "0.5K" | "1K" | "2K" | "4K" | undefined = undefined;
-    if (!this.isNanoBananaFam(model)) return;
+    if (!this.isNanoBananaFam(model))
+      throw new Error("non-nano banana model passed into handleImgGenAR");
     if (
+      model === "gemini-nano-banana-2.1" ||
       model === "gemini-3.1-flash-image-preview" ||
       model === "gemini-3.1-flash-lite-image"
     ) {
@@ -502,41 +547,30 @@ export class GeminiWorkupService extends GeminiEnsureService {
       } else {
         a = "16:9";
       }
-      if (
-        model === "gemini-3.1-flash-image-preview" &&
-        q &&
-        this.prisma.isValidNanoBananaTwoOutputQuality(q)
-      ) {
-        qual = q;
-      }
-      if (
-        model === "gemini-3.1-flash-lite-image" &&
-        q &&
-        this.prisma.isValidNanoBananaTwoLiteOutputQuality(q)
-      ) {
-        qual = q;
-      } else {
-        qual = "1K";
-      }
-    }
-    if (
-      model === "gemini-3-pro-image-preview" ||
-      model === "gemini-2.5-flash-image"
-    ) {
+    } else {
       if (ar && this.prisma.isValidNanoBananaGenOneAR(ar)) {
         a = ar;
       } else {
         a = "16:9";
       }
-      if (q && this.prisma.isValidNanoBananaProAndTwoOutputQuality(q)) {
-        qual = q;
-      } else {
-        qual = "1K";
-      }
     }
+    return a;
+  }
+
+  protected handleImgGen(
+    m: string,
+    {
+      output_size: ar,
+      output_quality: q
+    }: AIChatRequestImgGenFields | undefined = {}
+  ) {
+    if (!this.isNanoBananaFam(m))
+      throw new Error("non-nano banana model passed into handleImgGen");
+    const aspectRatio = this.handleImgGenAR(m, { output_size: ar });
+    const imageSize = this.handleImgGenQuality(m, { output_quality: q });
     return {
-      aspectRatio: a,
-      imageSize: this.handleImgSize(qual)
+      aspectRatio,
+      imageSize
     } as const satisfies ImageConfig;
   }
 
@@ -605,7 +639,7 @@ export class GeminiWorkupService extends GeminiEnsureService {
     // could we more intelligently calculate ceiling instead of doing the 10 | 5 static cap above?
     // const getTokens = await client.models.countTokens({ model,contents: contents });
 
-    const imageConfig = this.handleImgGenFields(model, imgGenFields);
+    const imageConfig = this.handleImgGen(model, imgGenFields);
     const responseModalities = this.mediaModalities(model);
     const candidateCount = this.candidateCount(model, imgGenFields?.n);
     return {

@@ -48,6 +48,7 @@ export class AnthropicBaseService {
        * Avoid paying the prompt-cache cost twice when you retry a refused Claude Fable 5 request on another model.
        * https://platform.claude.com/docs/en/build-with-claude/fallback-credit
        */
+      case "claude-haiku-5-5":
       case "claude-sonnet-5-5":
       case "claude-opus-5-5":
       case "claude-fable-5-1":
@@ -125,6 +126,7 @@ export class AnthropicBaseService {
   }
 
   protected outputTokenCeilingByModel = {
+    "claude-haiku-5-5": 128000,
     "claude-sonnet-5-5": 128000,
     "claude-opus-5-5": 128000,
     "claude-fable-5-1": 128000,
@@ -141,6 +143,7 @@ export class AnthropicBaseService {
   } as const;
 
   protected inputTokenCeilingByModel = {
+    "claude-haiku-5-5": 1000000,
     "claude-sonnet-5-5": 1000000,
     "claude-opus-5-5": 1000000,
     "claude-fable-5-1": 1000000,

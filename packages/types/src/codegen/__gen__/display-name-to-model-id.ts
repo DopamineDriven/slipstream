@@ -43,6 +43,7 @@ export const displayNameToModelId = {
     "GPT-3.5 Turbo": "gpt-3.5-turbo"
   },
   gemini: {
+    "Gemini 4 Argon": "gemini-4-argon",
     "Gemini 3.8 Flash": "gemini-3.8-flash",
     "Gemini 3.7 Flash": "gemini-3.7-flash",
     "Gemini 3.6 Flash": "gemini-3.6-flash",
@@ -52,6 +53,7 @@ export const displayNameToModelId = {
     "Gemini 3.1 Pro Preview Custom Tools": "gemini-3.1-pro-preview-customtools",
     "Gemini 3.1 Flash Lite Preview": "gemini-3.1-flash-lite-preview",
     "Gemini 3 Flash Preview": "gemini-3-flash-preview",
+    "Nano Banana 2.1": "gemini-nano-banana-2.1",
     "Nano Banana 2 Lite": "gemini-3.1-flash-lite-image",
     "Nano Banana 2": "gemini-3.1-flash-image-preview",
     "Nano Banana Pro": "gemini-3-pro-image-preview",
@@ -88,6 +90,7 @@ export const displayNameToModelId = {
     "Grok Imagine Video": "grok-imagine-video"
   },
   anthropic: {
+    "Claude Haiku 5.5": "claude-haiku-5-5",
     "Claude Sonnet 5.5": "claude-sonnet-5-5",
     "Claude Opus 5.5": "claude-opus-5-5",
     "Claude Fable 5.1": "claude-fable-5-1",
@@ -103,6 +106,7 @@ export const displayNameToModelId = {
     "Claude Haiku 4.5": "claude-haiku-4-5-20251001"
   },
   meta: {
+    "Muse Wonder 1.0": "muse-wonder-1.0",
     "Muse Spark 1.3": "muse-spark-1.3",
     "Muse Spark 1.2": "muse-spark-1.2",
     "Muse Spark 1.1": "muse-spark-1.1",
@@ -113,10 +117,10 @@ export const displayNameToModelId = {
     "v0 medium (legacy)": "v0-1.0-md"
   },
   mistral: {
-    "Mistral Small 4": "mistral-small-latest",
+    "Mistral Large 4": "mistral-large-4",
     "Mistral Medium 3": "mistral-medium-3",
     "Mistral Medium 3.5": "mistral-medium-3.5",
-    "Mistral Large Latest": "mistral-large-latest"
+    "Mistral Small 4": "mistral-small-latest"
   },
   cohere: {
     "Command A Plus": "command-a-plus-05-2026",

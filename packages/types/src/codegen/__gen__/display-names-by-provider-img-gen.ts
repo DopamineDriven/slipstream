@@ -34,6 +34,7 @@ export const displayNameModelsByProviderImgGen = {
     "GPT-Image-1 mini"
   ],
   gemini: [
+    "Nano Banana 2.1",
     "Nano Banana 2 Lite",
     "Nano Banana 2",
     "Nano Banana Pro",

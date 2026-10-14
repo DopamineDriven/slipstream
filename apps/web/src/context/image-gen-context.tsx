@@ -409,7 +409,7 @@ export function ImageGenProvider({ children }: { children: ReactNode }) {
         if (imgCtx.isValidNanoBananaTwoOutputQuality(settings.quality)) {
           output_quality = settings.quality;
         } else output_quality = "2K";
-      } else if (mod === "gemini-3-pro-image-preview") {
+      } else if  (mod ==="gemini-nano-banana-2.1" || mod === "gemini-3-pro-image-preview") {
         if (imgCtx.isValidNanoBananaProAndTwoOutputQuality(settings.quality)) {
           output_quality = settings.quality;
         } else output_quality = "2K";
