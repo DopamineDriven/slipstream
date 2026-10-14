@@ -31,7 +31,18 @@ export type ImageGenModels =
   | "gemini-3-pro-image-preview"
   | "gemini-3.1-flash-image-preview"
   | "gemini-3.1-flash-lite-image"
+  | "gemini-nano-banana-2.1"
   | "muse-image-1.0";
+
+export type VideoGenModels =
+  | "gemini-omni-1.1-flash"
+  | "gemini-omni-flash-preview"
+  | "grok-imagine-video"
+  | "grok-imagine-video-1.5"
+  | "grok-imagine-video-1.5-lite"
+  | "veo-3.1-fast-generate-preview"
+  | "veo-3.1-generate-preview"
+  | "veo-3.1-lite-generate-preview";
 
 export type PureImageGenModelsByProvider<
   P extends "gpt" | "gemini" | "grok" | "meta",
@@ -49,8 +60,8 @@ export type PureImageGenModelsByProvider<
         ? `${P}-${U}`
         : never
       : P extends "meta"
-        ? T extends `${P}-${infer U}`
-          ? `${P}-${U}`
+        ? T extends `muse-${infer U}`
+          ? `muse-${U}`
           : never
         : never;
 
@@ -83,6 +94,7 @@ export const providerModelImageGenApi = {
     "gpt-image-1-mini"
   ],
   gemini: [
+    "gemini-nano-banana-2.1",
     "gemini-3.1-flash-image-preview",
     "gemini-3.1-flash-lite-image",
     "gemini-3-pro-image-preview",
@@ -96,6 +108,21 @@ export const providerModelImageGenApi = {
     "grok-imagine-image"
   ],
   meta: ["muse-image-1.0"]
+} as const;
+
+export const providerModelVideoGenApi = {
+  gemini: [
+    "gemini-omni-1.1-flash",
+    "gemini-omni-flash-preview",
+    "veo-3.1-generate-preview",
+    "veo-3.1-fast-generate-preview",
+    "veo-3.1-lite-generate-preview"
+  ],
+  grok: [
+    "grok-imagine-video-1.5",
+    "grok-imagine-video-1.5-lite",
+    "grok-imagine-video"
+  ]
 } as const;
 
 export const allImgSupportingProviderModels = {
@@ -162,6 +189,11 @@ export const providerModelImageGenFacilitatingApi = {
     "deep-research-preview-04-2026"
   ],
   grok: ["grok-4.7", "grok-4.6"]
+} as const;
+
+export const videoModelSets = {
+  gemini: new Set(providerModelVideoGenApi.gemini),
+  grok: new Set(providerModelVideoGenApi.grok)
 } as const;
 
 export const imageModelSets = {
@@ -270,8 +302,8 @@ export type GetAllImgGenModelUtilRt<T = ImageGenProviders> = T extends "grok"
 export type VideoGenProviders = keyof typeof modelIdsByProviderVideoGen;
 
 export type VideoGenModelMap = {
-  readonly [P in keyof typeof modelIdsByProviderVideoGen]: Unenumerate<
-    (typeof modelIdsByProviderVideoGen)[P]
+  readonly [P in keyof typeof providerModelVideoGenApi]: Unenumerate<
+    (typeof providerModelVideoGenApi)[P]
   >;
 };
 

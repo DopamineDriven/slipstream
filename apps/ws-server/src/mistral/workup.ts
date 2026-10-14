@@ -47,24 +47,25 @@ export class MistralWorkupService extends MistralStreamContentService {
     return this.defaultClient;
   }
 
-  protected isMistralModel(model = "mistral-medium-3.5") {
+  protected isMistralModel(model = "mistral-large-4") {
     return (
       model === "mistral-small-latest" ||
       model === "mistral-medium-3" ||
       model === "mistral-medium-3.5" ||
-      model === "mistral-large-latest"
+      model === "mistral-large-4"
     );
   }
 
-  protected resolveModel(model = "mistral-medium-3.5") {
+  protected resolveModel(model = "mistral-large-4") {
     if (this.isMistralModel(model)) {
       return model;
     }
 
-    return "mistral-medium-3.5" satisfies MistralModelIdUnion;
+    return "mistral-large-4" satisfies MistralModelIdUnion;
   }
 
   protected handleReasoning(m: MistralModelIdUnion) {
+    if (m==="mistral-large-4") return "high";
     if (m === "mistral-small-latest") return "high";
     if (m === "mistral-medium-3") return "high";
     if (m === "mistral-medium-3.5") return "high";

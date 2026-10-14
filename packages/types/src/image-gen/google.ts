@@ -3,6 +3,7 @@ import type { DX } from "@/utils.ts";
 
 export type GeminiModelAspectRatioWorkup = DX<
   {
+    "gemini-nano-banana-2.1": NanoBanana2OutputAR;
     "gemini-3-pro-image-preview": BaseNanoBananaOutputAR;
     "gemini-2.5-flash-image": BaseNanoBananaOutputAR;
     "deep-research-max-preview-04-2026": BaseNanoBananaOutputAR;
@@ -53,6 +54,7 @@ export type GeminiImageSize = GeminiModelAspectRatio;
 
 export type GeminiImageQuality = DX<
   {
+    "gemini-nano-banana-2.1": "1K" | "2K" | "4K";
     "gemini-3.1-flash-lite-image": "0.5K" | "1K";
     "gemini-3.1-flash-image-preview": "0.5K" | "1K" | "2K" | "4K";
     "gemini-3-pro-image-preview": "1K" | "2K" | "4K";
@@ -257,6 +259,7 @@ export interface GoogleImagenGenerateImagesConfig {
 export type NanoBananaImageGenOpts<
   T extends GeminiModelIdUnion = GeminiModelIdUnion
 > = T extends
+  | "gemini-nano-banana-2.1"
   | "gemini-3.1-flash-lite-image"
   | "gemini-3-pro-image-preview"
   | "gemini-2.5-flash-image"

@@ -178,6 +178,7 @@ export class ModelService extends ModelToolDefsService {
    */
   public isGeminiImgModel(m: string) {
     return (
+      m === "gemini-nano-banana-2.1" ||
       m === "gemini-3.1-flash-lite-image" ||
       m === "gemini-3-pro-image-preview" ||
       m === "gemini-3.1-flash-image-preview" ||
@@ -212,6 +213,7 @@ export class ModelService extends ModelToolDefsService {
 
   public isGeminiModel(m: string) {
     return (
+      m === "gemini-4-argon" ||
       m === "gemini-3.8-flash" ||
       m === "gemini-3.7-flash" ||
       m === "gemini-3.6-flash" ||
@@ -240,7 +242,11 @@ export class ModelService extends ModelToolDefsService {
   }
 
   public isGrokVideoModel(m: string) {
-    return m === "grok-imagine-video" || m === "grok-imagine-video-1.5";
+    return (
+      m === "grok-imagine-video" ||
+      m === "grok-imagine-video-1.5" ||
+      m === "grok-imagine-video-1.5-lite"
+    );
   }
 
   public isGrokMultiAgentModel(m: string) {
@@ -281,6 +287,7 @@ export class ModelService extends ModelToolDefsService {
   }
   public isAnthropicAdaptiveModel(mod: string) {
     return (
+      mod === "claude-haiku-5-5" ||
       mod === "claude-sonnet-5-5" ||
       mod === "claude-opus-5-5" ||
       mod === "claude-fable-5-1" ||
@@ -313,6 +320,7 @@ export class ModelService extends ModelToolDefsService {
 
   public isMetaModel(m: string) {
     return (
+      m=== "muse-wonder-1.0" ||
       this.isMetaImgModel(m) ||
       m === "muse-spark-1.1" ||
       m === "muse-spark-1.2" ||
@@ -325,13 +333,14 @@ export class ModelService extends ModelToolDefsService {
   }
   public isMistralReasoningModel(m: string) {
     return (
+      m === "mistral-large-4" ||
       m === "mistral-small-latest" ||
       m === "mistral-medium-3" ||
       m === "mistral-medium-3.5"
     );
   }
   public isMistralModel(m: string) {
-    return this.isMistralReasoningModel(m) || m === "mistral-large-latest";
+    return this.isMistralReasoningModel(m);
   }
 
   public isCohereReasoningModel(m: string) {

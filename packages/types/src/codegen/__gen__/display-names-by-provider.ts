@@ -43,6 +43,7 @@ export const displayNameModelsByProvider = {
     "GPT-3.5 Turbo"
   ],
   gemini: [
+    "Gemini 4 Argon",
     "Gemini 3.8 Flash",
     "Gemini 3.7 Flash",
     "Gemini 3.6 Flash",
@@ -52,6 +53,7 @@ export const displayNameModelsByProvider = {
     "Gemini 3.1 Pro Preview Custom Tools",
     "Gemini 3.1 Flash Lite Preview",
     "Gemini 3 Flash Preview",
+    "Nano Banana 2.1",
     "Nano Banana 2 Lite",
     "Nano Banana 2",
     "Nano Banana Pro",
@@ -83,9 +85,11 @@ export const displayNameModelsByProvider = {
     "Grok Imagine Image",
     "Grok Imagine Image Quality",
     "Grok Imagine Video 1.5",
+    "Grok Imagine Video 1.5 Lite",
     "Grok Imagine Video"
   ],
   anthropic: [
+    "Claude Haiku 5.5",
     "Claude Sonnet 5.5",
     "Claude Opus 5.5",
     "Claude Fable 5.1",
@@ -101,6 +105,7 @@ export const displayNameModelsByProvider = {
     "Claude Haiku 4.5"
   ],
   meta: [
+    "Muse Wonder 1.0",
     "Muse Spark 1.3",
     "Muse Spark 1.2",
     "Muse Spark 1.1",
@@ -108,10 +113,10 @@ export const displayNameModelsByProvider = {
   ],
   vercel: ["v0 medium", "v0 medium (legacy)"],
   mistral: [
-    "Mistral Small 4",
+    "Mistral Large 4",
     "Mistral Medium 3",
     "Mistral Medium 3.5",
-    "Mistral Large Latest"
+    "Mistral Small 4"
   ],
   cohere: ["Command A Plus", "Command A Reasoning", "Command A"],
   moonshotai: [

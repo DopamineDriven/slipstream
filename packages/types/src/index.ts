@@ -477,6 +477,7 @@ export type {
   VercelChatModels,
   VercelDisplayNameUnion,
   VercelModelIdUnion,
+  VideoGenModels,
   VideoGenModelMap,
   VideoGenProviders,
   ZaiChatModels,
@@ -533,8 +534,10 @@ export {
   providerModelChatApi,
   providerModelImageGenApi,
   providerModelImageGenFacilitatingApi,
+  providerModelVideoGenApi,
   toPrismaFormat,
-  videoMimeSupportByProvider
+  videoMimeSupportByProvider,
+  videoModelSets
 } from "@/models.ts";
 
 /**

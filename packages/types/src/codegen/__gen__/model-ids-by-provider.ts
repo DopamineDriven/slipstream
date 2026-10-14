@@ -43,6 +43,7 @@ export const modelIdsByProvider = {
     "gpt-3.5-turbo"
   ],
   gemini: [
+    "gemini-4-argon",
     "gemini-3.8-flash",
     "gemini-3.7-flash",
     "gemini-3.6-flash",
@@ -52,6 +53,7 @@ export const modelIdsByProvider = {
     "gemini-3.1-pro-preview-customtools",
     "gemini-3.1-flash-lite-preview",
     "gemini-3-flash-preview",
+    "gemini-nano-banana-2.1",
     "gemini-3.1-flash-lite-image",
     "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",
@@ -83,9 +85,11 @@ export const modelIdsByProvider = {
     "grok-imagine-image",
     "grok-imagine-image-quality",
     "grok-imagine-video-1.5",
+    "grok-imagine-video-1.5-lite",
     "grok-imagine-video"
   ],
   anthropic: [
+    "claude-haiku-5-5",
     "claude-sonnet-5-5",
     "claude-opus-5-5",
     "claude-fable-5-1",
@@ -101,6 +105,7 @@ export const modelIdsByProvider = {
     "claude-haiku-4-5-20251001"
   ],
   meta: [
+    "muse-wonder-1.0",
     "muse-spark-1.3",
     "muse-spark-1.2",
     "muse-spark-1.1",
@@ -108,10 +113,10 @@ export const modelIdsByProvider = {
   ],
   vercel: ["v0-1.5-md", "v0-1.0-md"],
   mistral: [
-    "mistral-small-latest",
+    "mistral-large-4",
     "mistral-medium-3",
     "mistral-medium-3.5",
-    "mistral-large-latest"
+    "mistral-small-latest"
   ],
   cohere: [
     "command-a-plus-05-2026",

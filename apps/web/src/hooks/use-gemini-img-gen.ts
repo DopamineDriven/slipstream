@@ -13,7 +13,7 @@ export type GeminiImgModelId = GeminiImgGenModels;
 export type NanoBananaAR = GeminiImageSize["gemini-3-pro-image-preview"];
 
 export type NanoBanana2AR = GeminiImageSize[
-  "gemini-3.1-flash-image-preview" | "gemini-3.1-flash-lite-image"];
+  "gemini-3.1-flash-image-preview" | "gemini-3.1-flash-lite-image" | "gemini-nano-banana-2.1"];
 
 export type GoogleAspectRatio = NanoBanana2AR;
 
@@ -63,6 +63,7 @@ const NANO_BANANA_2_ASPECT_RATIOS = [
 ] satisfies NanoBanana2AR[];
 
 const MODEL_ASPECT_RATIOS = new Map<GeminiImgModelId, GoogleAspectRatio[]>([
+  ["gemini-nano-banana-2.1", NANO_BANANA_2_ASPECT_RATIOS],
   ["gemini-3.1-flash-lite-image", NANO_BANANA_2_ASPECT_RATIOS],
   ["gemini-3.1-flash-image-preview", NANO_BANANA_2_ASPECT_RATIOS],
   ["gemini-3-pro-image-preview", NANO_BANANA_ASPECT_RATIOS],
@@ -84,6 +85,7 @@ const NANO_BANANA_2_QUALITIES = [
 ] satisfies NanoBanana2Quality[];
 
 const MODEL_QUALITIES = new Map<GeminiImgModelId, GoogleQuality[]>([
+  ["gemini-nano-banana-2.1", NANO_BANANA_QUALITIES],
   ["gemini-3.1-flash-lite-image", NANO_BANANA_2_LITE_QUALITIES],
   ["gemini-3.1-flash-image-preview", NANO_BANANA_2_QUALITIES],
   ["gemini-3-pro-image-preview", NANO_BANANA_QUALITIES],
@@ -108,6 +110,7 @@ const NANO_BANANA_DEFAULTS = {
 
 const MODEL_DEFAULTS = new Map<GeminiImgModelId, GoogleImageSettings>([
   ["gemini-3.1-flash-lite-image", NANO_BANANA_2_LITE_DEFAULTS],
+  ["gemini-nano-banana-2.1", NANO_BANANA_DEFAULTS],
   ["gemini-3.1-flash-image-preview", NANO_BANANA_DEFAULTS],
   ["gemini-3-pro-image-preview", NANO_BANANA_DEFAULTS],
   ["gemini-2.5-flash-image", NANO_BANANA_DEFAULTS],

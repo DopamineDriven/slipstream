@@ -569,7 +569,8 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       model === "claude-opus-4-6" ||
       model === "claude-fable-5" ||
       model === "claude-opus-4-7" ||
-      model === "claude-sonnet-5-5"
+      model === "claude-sonnet-5-5" ||
+      model === "claude-haiku-5-5"
     ) {
       return { effort: "max" } as const;
     }
@@ -581,7 +582,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
   }
 
   private handleModel(m: string | undefined) {
-    if (!m || !this.prisma.isAnthropicModel(m)) return "claude-opus-5" as const;
+    if (!m || !this.prisma.isAnthropicModel(m)) return "claude-opus-4-6" as const;
     else return m;
   }
 

@@ -218,7 +218,9 @@ export class GeminiBaseService {
     }
     return contents satisfies ContentListUnion;
   }
-
+  protected isGemini4ChatModel(m: string) {
+    return m==="gemini-4-argon";
+  }
   protected isGemini3ChatModel(m: string) {
     return (
       m === "gemini-3.8-flash" ||
@@ -306,8 +308,13 @@ export class GeminiBaseService {
     return m === "gemini-2.5-flash-image";
   }
 
+  protected isNanoBanana2dot1(m: string) {
+    return m==="gemini-nano-banana-2.1";
+  }
+
   protected isNanoBananaFam(m: string) {
     return (
+      this.isNanoBanana2dot1(m) ||
       this.isNanoBanana2(m) ||
       this.isNanoBananaPro(m) ||
       this.isNanoBanana1(m) ||

@@ -34,6 +34,7 @@ export const modelIdsByProviderImgGen = {
     "gpt-image-1-mini"
   ],
   gemini: [
+    "gemini-nano-banana-2.1",
     "gemini-3.1-flash-lite-image",
     "gemini-3.1-flash-image-preview",
     "gemini-3-pro-image-preview",

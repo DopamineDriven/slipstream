@@ -51,7 +51,7 @@ export class MetaBaseService {
   }
 
   /**
-   * only muse-spark-1.3 accepts max reasoning
+   * only muse-wonder-1.0 and muse-spark-1.3 accept max reasoning
    *
    * https://dev.meta.ai/docs/reasoning#summaries
    */
@@ -60,7 +60,12 @@ export class MetaBaseService {
     effort?: MetaReasoningEffort["effort"]
   ) {
     if (!this.prisma.isMetaModel(model)) return;
-    else if (!(model === "muse-spark-1.3")) {
+    else if (model === "muse-wonder-1.0") {
+      return {
+        effort: "max",
+        summary: "detailed"
+      } as const satisfies Reasoning;
+    } else if (!(model === "muse-spark-1.3")) {
       const normalizedEffort =
         effort && this.normalizeEffort(effort)
           ? "medium"

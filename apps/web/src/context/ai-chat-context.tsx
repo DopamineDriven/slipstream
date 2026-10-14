@@ -167,10 +167,13 @@ export function AIChatProvider({
   ]);
 
   // Reflect the live title into the document (set mid-stream from `evt.title`, then `convo.title` on commit).
+  // `pathname` is a dependency on purpose: when the router resyncs at recouple (`router.replace` → `/chat/<id>`),
+  // Next re-renders the layout's static `<title>` and clobbers the imperative write. The title itself has not
+  // changed since the first chunk, so without the path this effect would never reassert it.
   useEffect(() => {
     if (!status.title) return;
     if (typeof window !== "undefined") window.document.title = status.title;
-  }, [status.title]);
+  }, [status.title, pathname]);
 
   // ONE draft fold per token — drives BOTH the legacy scalar fields and the synthetic streaming bubble.
   const derived = useMemo(

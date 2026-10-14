@@ -34,6 +34,7 @@ export const modelIdToDisplayNameImgGen = {
     "gpt-image-1-mini": "GPT-Image-1 mini"
   },
   gemini: {
+    "gemini-nano-banana-2.1": "Nano Banana 2.1",
     "gemini-3.1-flash-lite-image": "Nano Banana 2 Lite",
     "gemini-3.1-flash-image-preview": "Nano Banana 2",
     "gemini-3-pro-image-preview": "Nano Banana Pro",

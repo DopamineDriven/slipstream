@@ -343,6 +343,7 @@ export class GeminiInteractionsService extends GeminiWorkupService {
           ]
         : [];
     if (
+      this.isGemini4ChatModel(m) ||
       this.isGemini3ChatModel(m) ||
       this.isDeepResearch(m) ||
       this.isGemini2dot5Model(m)
@@ -357,8 +358,10 @@ export class GeminiInteractionsService extends GeminiWorkupService {
         ...localTools
       ] satisfies Interactions.Tool[];
     }
-    if (this.isNanoBanana2(m)) {
-      return [{ type: "google_search" }] satisfies Interactions.Tool[];
+    if (this.isNanoBanana2(m) || this.isNanoBanana2dot1(m)) {
+      return [
+        { type: "google_search", search_types: ["image_search", "web_search"] }
+      ] satisfies Interactions.Tool[];
     } else {
       return [] satisfies Interactions.Tool[];
     }
@@ -366,8 +369,10 @@ export class GeminiInteractionsService extends GeminiWorkupService {
 
   private interactionsThinkingConfig(m: string) {
     if (
+      this.isGemini4ChatModel(m) ||
       this.isGemini3ChatModel(m) ||
       this.isDeepResearch(m) ||
+      this.isNanoBanana2dot1(m) ||
       this.isNanoBanana2(m) ||
       this.isNanoBanana2Lite(m) ||
       this.isGemini2dot5Model(m) ||
@@ -379,6 +384,7 @@ export class GeminiInteractionsService extends GeminiWorkupService {
 
   protected get nanoBananaFamTokenMax() {
     return {
+      "gemini-nano-banana-2.1": 131072,
       "gemini-3.1-flash-image-preview": 131072,
       "gemini-3.1-flash-image": 131072,
       "gemini-3.1-flash-lite-image": 65536,
@@ -504,7 +510,7 @@ export class GeminiInteractionsService extends GeminiWorkupService {
       }
     }
 
-    const imageConfig = this.handleImgGenFields(model, imgGenFields);
+    const imageConfig = this.handleImgGen(model, imgGenFields);
     const tools = this.getInteractionTools(model, via, latlng);
 
     return {
@@ -597,11 +603,12 @@ export class GeminiInteractionsService extends GeminiWorkupService {
   }
 
   protected async interactionCreate({
-    model = "gemini-3.1-pro-preview",
+    model = "gemini-4-argon",
     imgGenFields,
     ...rest
   }: InteractionConfigProps) {
-    const m = model ?? "gemini-3.1-pro-preview";
+    if (!this.prisma.isGeminiModel(model)) throw new Error("non-gemini model passed to interactions api");
+    const m = model;
     if (this.isNanoBananaFam(m) && typeof imgGenFields !== "undefined") {
       return await this.interactionNanoBananas({
         model: m,

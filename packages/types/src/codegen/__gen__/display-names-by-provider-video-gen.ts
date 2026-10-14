@@ -6,5 +6,9 @@ export const displayNameModelsByProviderVideoGen = {
     "Veo 3.1 fast",
     "Veo 3.1 lite"
   ],
-  grok: ["Grok Imagine Video 1.5", "Grok Imagine Video"]
+  grok: [
+    "Grok Imagine Video 1.5",
+    "Grok Imagine Video 1.5 Lite",
+    "Grok Imagine Video"
+  ]
 } as const;

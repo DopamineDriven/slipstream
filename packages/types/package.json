@@ -12,7 +12,7 @@
         "contract": [
           "dist/contract/*.d.ts"
         ],
-                "image-gen": [
+        "image-gen": [
           "dist/image-gen/*.d.ts"
         ],
         "models": [
@@ -49,9 +49,9 @@
       "contract": [
         "dist/contract/*.d.ts"
       ],
-                      "image-gen": [
-          "dist/image-gen/*.d.ts"
-        ],
+      "image-gen": [
+        "dist/image-gen/*.d.ts"
+      ],
       "models": [
         "dist/models.d.ts"
       ],
@@ -109,6 +109,7 @@
     "gen:default": "tsx src/codegen/index.ts --target default",
     "gen": "pnpm gen:audio && pnpm gen:image && pnpm gen:video && pnpm gen:default",
     "postgen": "pnpm format",
+    "pregen": "tsx src/codegen/index.ts --target pregen",
     "typecheck": "tsgo --noEmit"
   },
   "dependencies": {

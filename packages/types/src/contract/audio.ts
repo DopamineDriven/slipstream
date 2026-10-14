@@ -3,7 +3,7 @@ import type { AudioGenOutputSingleton, AudioSingleton } from "@/types.ts";
 import type { Rm } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 
-export const WAVEFORM_PEAK_COUNT=1024 as const;
+export const WAVEFORM_PEAK_COUNT = 1024 as const;
 
 export const WAVEFORM_PEAK_SCALE = 100 as const;
 
