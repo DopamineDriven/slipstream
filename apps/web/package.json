@@ -65,7 +65,7 @@
     "js-cookie": "catalog:cookies",
     "katex": "catalog:katex",
     "motion": "catalog:motion",
-    "motion-plus": "npm:@motionplus/core@^2.12.0",
+    "motion-plus": "npm:@motionplus/core@^3.0.0",
     "motion-plus-dom": "catalog:motion",
     "nanoid": "catalog:nanoid",
     "next": "catalog:next",
